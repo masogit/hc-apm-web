@@ -50,14 +50,14 @@
                             </p:selectBooleanCheckbox>
                         </f:facet>
                     </p:column>
-                    <p:column headerText="资产名称"  filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.AssetName}"  filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getAssetName(item.assetUID)}"/>
                     </p:column>
-                    <p:column headerText="二级规则" sortBy="" filterBy="" filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.Level2RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE">
                     		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID2)}"/>
                     		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',relRuleAssetManagerController.getRuleName(item.ruleUID2))}"/> -->
                     </p:column>
-                    <p:column headerText="三级规则" sortBy="" filterBy="" filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.Level3RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE">
                     		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID)}"/>
                     		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',relRuleAssetManagerController.getRuleName(item.ruleUID))}"/> -->
                     </p:column>
@@ -79,7 +79,7 @@
                     <p:column headerText="#{msg.manufacture}"  filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getManufacture(item.assetUID)}"/>
                     </p:column>
-                    <p:column headerText="配置日期"  filterMatchMode="GTE">
+                    <p:column headerText="#{msg.ConfigurationDate}"  filterMatchMode="GTE">
                             <h:outputText value="#{item.createdDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
@@ -88,8 +88,8 @@
                      	<h:outputText value="#{relRuleAssetManagerController.getQrCode(item.assetUID)}"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
-                    	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings" class="btn btn-sm btn-gray"  title="批量设置规则"/>
-                    	<p:commandButton id="generatePmOrders" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml?faces-redirect=true" icon="ui-icon-collections" class="btn btn-sm btn-gray"  title="批量生成保养工单"/>
+                    	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings" class="btn btn-sm btn-gray"  title="#{msg.SetRulesInBatch}"/>
+                    	<p:commandButton id="generatePmOrders" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml?faces-redirect=true" icon="ui-icon-collections" class="btn btn-sm btn-gray"  title="#{msg.GenerateMaintenanceWorkordersInBatch}"/>
                         <p:commandButton  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="RelRuleAsset_export"/>
                         </p:commandButton>
@@ -97,9 +97,9 @@
                         <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}"
                                          update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
                         <ui:fragment >
-                            <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量删除"
+                            <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}"
                                              actionListener="#{relRuleAssetManagerController.batchDelete}" update=":RelRuleAssetListForm" disabled="#{not relRuleAssetManagerController.isChecked()}">
-                                <p:confirm header="批量删除资产规则配置" message="您确定要删除选中的记录么?" icon="ui-icon-warning"/>
+                                <p:confirm header="#{msg.BatchDeleRuleConfig}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </ui:fragment>
                     </f:facet>

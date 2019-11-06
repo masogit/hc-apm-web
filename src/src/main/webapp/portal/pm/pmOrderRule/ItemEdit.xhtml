@@ -17,11 +17,11 @@
                             <p:inputText id="name" value="#{pmOrderRuleController.pmRuleCheckItem.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label>#{msg.period} (月) *：</label>
+                            <label>#{msg.period} (#{msg.Month}) *：</label>
                             <p:inputText id="period" value="#{pmOrderRuleController.pmRuleCheckItem.period}" required="true" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label>项目内容 ：</label>
+                            <label>#{msg.Items} ：</label>
                             <p:inputTextarea id="remark" value="#{pmOrderRuleController.pmRuleCheckItem.remark}" cols="80"/>
                         </h:panelGroup>
                         <!--<h:panelGroup>

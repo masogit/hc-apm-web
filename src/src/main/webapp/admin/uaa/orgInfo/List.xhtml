@@ -18,7 +18,7 @@
                         <div class="card" style="height:400px;">
                             <h:panelGroup>
                                 <p:inputText id="retrieval" value="#{orgInfoController.retrieval}"/>
-                                <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>
+                                <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="#{msg.Search2}"  update="orgTree editPanel :growl"/>
                             </h:panelGroup>
                             <p:commandButton id="btnSite" style="max-width:160px;" value="#{orgInfoController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
@@ -61,12 +61,12 @@
                                         <p:outputLabel value="N/A" rendered="#{orgInfoController.selected.parentOrg eq null}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">类型</label>
+                                        <label class="label">#{msg.type}</label>
                                         <p:outputLabel value="#{orgInfoController.selected.orgTypeName}"/>
                                     </h:panelGroup>
 
                                     <h:panelGroup rendered="#{orgInfoController.acShow and false}">
-                                        <label class="label">设备负责人A</label>
+                                        <label class="label">#{msg.EquipmentOwnerA}</label>
                                         <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>d
@@ -75,7 +75,7 @@
 
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{orgInfoController.acShow and false}">
-                                        <label class="label">设备负责人B</label>
+                                        <label class="label">#{msg.EquipmentOwnerB}</label>
                                         <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId2}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
