@@ -79,6 +79,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
@@ -142,6 +143,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private UnstructuredDataCollectionRepository reportDao;
     private List<PmOrderRuleCheckList> pmCheckItemList;// 每条检查项记录
     private CustomConfigObject currentCustomConfig;
+    List<String> ruleStrList;
     @Setter @Getter
     private Boolean nochange = false;
     private static final String SIGNATURE_HOLDER = "审核人签名：";
@@ -150,6 +152,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     Boolean switchTmp= false;
     @Getter @Setter
     private String fileterOrgName;
+    @Getter @Setter
+    private String filterRule;
     @Getter @Setter
     private Integer casePriority;
     private  String cancelInt;
@@ -299,10 +303,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 pmIdList.add(k);
 
         });
-
-      //  System.out.println(pmIdList);
     }
 
+
+    public PmOrderRule getRulePm(V2_PmOrder v2_pmOrder){
+        System.out.println();
+        List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNum(v2_pmOrder.getPmNum());
+        if(CollectionUtils.isEmpty(pmRuleByPmNum)){
+            return new PmOrderRule();
+        }
+        else{
+            PmOrderRule pmOrderRule = pmRuleByPmNum.get(0);
+            return pmOrderRule;
+        }
+    }
     public void preBatchCancel(){
         cancelReason=null;
          List<V2_PmOrder> pmList =getPmListByselectedId();
@@ -338,7 +352,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
         supplierName = itemDetail.getSupplier();
         nochange = true;
-
     }
     public void prepareCreateSupplier() {
         newSupplier = new Supplier();
@@ -1211,6 +1224,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(wfc !=null)
             isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
+
+    }
+
+    List<PmOrderRule> ruleList;
+    public void loadRuleList(){
+        String tenantUID = userContextService.getLoginUser().getTenantUID();
+        ruleList = pmOrderRuleRepository.findPmRuleByTenant(tenantUID);
     }
     public void saveNewSupplier() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -1418,6 +1438,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
         if (queryIndex == -1) {//待办
+            searchFilters = new ArrayList();
+            setSearchFilter();
             pmIdList = new ArrayList<>();
             filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
@@ -1833,7 +1855,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
     public List<String> autoCompleteDeptName(String query) {
-        if (clinicalDeptList == null) {
+         if (clinicalDeptList == null) {
             return Collections.emptyList();
         }
 
@@ -1863,6 +1885,29 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             clinicalDeptOrgUidSet = Collections.emptySet();
         }
     }
+    public void autoCompleteRuleName(){
+        System.out.println("00");
+    }
+/*
+*  获取租户下的所有保养规则
+*  ruleList
+* */
+
+    public void onRuleFilterChange(AjaxBehaviorEvent event){
+        if (event instanceof SelectEvent) {
+            filterRule = (String) ((SelectEvent) event).getObject();
+        }
+        if (!Strings.isNullOrEmpty(filterRule) && !ruleList.stream().anyMatch(item -> filterRule.equals(item.getName()))) {
+            filterRule = null;
+        }
+
+        if (filterRule != null) {
+            List<PmOrderRule> ruleMatchingByName = this.ruleList.stream().filter(item -> item.getName().equals(filterRule)).collect(Collectors.toList());
+            ruleStrList = ruleMatchingByName.stream().map(PmOrderRule::getUid).collect(Collectors.toList());
+        }
+    }
+
+
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
         AssetInfo asset = (AssetInfo) eventObject;

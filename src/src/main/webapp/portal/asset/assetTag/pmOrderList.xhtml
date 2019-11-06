@@ -70,9 +70,9 @@
                             <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
                         </p:column>
                         <!--所属科室-->
-                        <p:column headerText="#{msg.clinicalDeptName}"  width="100">
+                        <p:column headerText="#{msg.clinicalDeptName}---"  width="100">
                             <f:facet name="header">
-                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <h:outputText value="#{msg.clinicalDeptName}000"/><br/>
                                 <p:autoComplete dropdown="true" value="#{v2PmOrderController.fileterOrgName}" appendTo="@(Body)"
                                                 scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderController.autoCompleteDeptName}" size="5">
                                     <p:ajax event="itemSelect" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist"/>
@@ -82,13 +82,15 @@
                             <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
                         </p:column>
 
-                        <p:column headerText="创建人" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
+
+                        <!--<p:column headerText="创建人" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.creatorName}"/>
-                        </p:column>
+                        </p:column>-->
 
                         <p:column headerText="负责人" filterMatchMode="LIKE">
                             <h:outputText value="#{item.getCurrentPersonName()}"/>
                         </p:column>
+
 
 
                         <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
