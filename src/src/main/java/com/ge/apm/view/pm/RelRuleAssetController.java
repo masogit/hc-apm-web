@@ -329,7 +329,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             this.level = null;
             this.ruleUid = null;
             this.pmOrderRule = null;
-            WebUtil.addSuccessMessage("配置成功!");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("ConfigurationSuccess"));
         }
 
     }

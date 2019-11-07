@@ -6,8 +6,35 @@
 package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONPath;
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
+import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.PmOrderRuleCheckListRepository;
+import com.ge.apm.dao.PmOrderRuleRepository;
+import com.ge.apm.dao.TableDefinitionRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UnstructuredDataCollectionRepository;
+import com.ge.apm.dao.UnstructuredDataRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.V2_PmOrderRepository;
+import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
+import com.ge.apm.dao.V2_WorkOrderDetailRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.PmOrderRule;
+import com.ge.apm.domain.PmOrderRuleCheckList;
+import com.ge.apm.domain.ServiceRequestMsg;
+import com.ge.apm.domain.Supplier;
+import com.ge.apm.domain.TableDefinition;
+import com.ge.apm.domain.UnstructuredData;
+import com.ge.apm.domain.UnstructuredDataCollection;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.V2_PmOrder;
+import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.domain.V2_WorkOrderCoworker;
+import com.ge.apm.domain.V2_WorkOrder_Detail;
+import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoMgrService;
@@ -30,7 +57,25 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
-import lombok.Data;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
@@ -45,22 +90,11 @@ import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * v
@@ -229,7 +263,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
        PmFileExportTemplate template = new PmFileExportTemplate();
         List<V2_PmOrder> pmOrderList = getPmListByselectedId();
        if(pmOrderList ==null && queryIndex!=10){
-           WebUtil.addErrorMessage("请先选择要导出的文件");
+           WebUtil.addErrorMessage(WebUtil.getMessage("SelectExportFiles"));
            RequestContext.getCurrentInstance().addCallbackParam("", true);
            return;
        }
@@ -475,14 +509,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
          if(orderNumList.size()>0) {
              result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getApprovalStatus().equalsIgnoreCase("1"));
              if(result){
-                 WebUtil.addErrorMessage("审核中的工单,无法操作");
+                 WebUtil.addErrorMessage(WebUtil.getMessage("CantOperateWorkorderUnderApproval"));
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForApproval", true);
                  return result;
              }
 
              result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 3);
              if(result){
-                 WebUtil.addErrorMessage("3级保养工单不能批量完成");
+                 WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel3WorkOrdersInBatches"));
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
                  return result;
              }
@@ -501,7 +535,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(orderNumList.size()>0) {
             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getApprovalStatus().equalsIgnoreCase("1"));
             if(result){
-                WebUtil.addErrorMessage("审核中的工单,无法批量转单");
+                WebUtil.addErrorMessage(WebUtil.getMessage("CantRessignApprovalBatch"));
                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForTransfer", true);
 
             }
@@ -570,7 +604,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             WebUtil.addErrorMessage(e.getMessage());
         } catch (Exception e) {
             Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
-            WebUtil.addErrorMessage("保养报告生成失败");
+            WebUtil.addErrorMessage(WebUtil.getMessage("FailedToGenerateTheMaintenanceReport"));
         }
     }
 
@@ -675,7 +709,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (tb != null) {
             return tb.getName();
         } else {
-            return "未知报告: unstrurct data collection的 记录并未能在table defintion中找到 schema_Id is " + templateId;
+            return String.format(WebUtil.getMessage("SchemaIdUnknowReport"), templateId);
         }
     }
 
@@ -889,17 +923,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void savePM() {
         PmOrderActionForm formData = new PmOrderActionForm();
         if (selectedAsset.getStatus() == 5) {
-            WebUtil.addErrorMessage("所选设备停用,不能保养");
+            WebUtil.addErrorMessage(WebUtil.getMessage("DeactivatedCantRepair"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
         if (selectedAsset.getStatus() == 4) {
-            WebUtil.addErrorMessage("所选设备待报废,不能保养");
+            WebUtil.addErrorMessage(WebUtil.getMessage("CantRepairToBeTerminated"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
         if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
-            WebUtil.addErrorMessage("没有使用科室的资产不能创建保养工单");
+            WebUtil.addErrorMessage(WebUtil.getMessage("CantMaintenNoAssetDepartment"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else {
@@ -942,12 +976,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public boolean isFillRequired(HashMap<String,String> hashMap){
         if(!StringUtils.isEmpty(hashMap.get("pmReportNeedFill"))){
-            WebUtil.addErrorMessage(hashMap.get("pmReportNeedFill")+"  未填写");
+            WebUtil.addErrorMessage(
+                hashMap.get("pmReportNeedFill") + " " + WebUtil.getMessage("NoFilled"));
             RequestContext.getCurrentInstance().addCallbackParam("reports", true);
             return true;
         }
         if(!StringUtils.isEmpty(hashMap.get("saftyReportNeedFill"))){
-            WebUtil.addErrorMessage(hashMap.get("saftyReportNeedFill")+" 未填写");
+            WebUtil.addErrorMessage(
+                hashMap.get("saftyReportNeedFill") + " " + WebUtil.getMessage("NoFilled"));
             RequestContext.getCurrentInstance().addCallbackParam("reports", true);
             return true;
         }
@@ -957,22 +993,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
         if (selectedPmOrder.getManHours() == null && endTime == null) {
-            WebUtil.addErrorMessage("工时必填写");
+            WebUtil.addErrorMessage(WebUtil.getMessage("ManhoursRequired"));
             RequestContext.getCurrentInstance().addCallbackParam("needManhours", true);
-            WebUtil.addErrorMessage("结束时间必须填写");
+            WebUtil.addErrorMessage(WebUtil.getMessage("EndTimeRequired"));
             RequestContext.getCurrentInstance().addCallbackParam("needendtime", true);
             return false;
         } else if (endTime == null) {
-            WebUtil.addErrorMessage("结束时间必须填写");
+            WebUtil.addErrorMessage(WebUtil.getMessage("EndTimeRequired"));
             RequestContext.getCurrentInstance().addCallbackParam("needendtime", true);
             return false;
         } else if (selectedPmOrder.getManHours() == null) {
-            WebUtil.addErrorMessage("工时必填写");
+            WebUtil.addErrorMessage(WebUtil.getMessage("ManhoursRequired"));
             RequestContext.getCurrentInstance().addCallbackParam("needManhours", true);
             return false;
         }
         if (selectedPmOrder.getPlanTime() == null) {
-            WebUtil.addErrorMessage("计划完成时间必须填写");
+            WebUtil.addErrorMessage(WebUtil.getMessage("PlannedCompletionTimeRequired"));
             RequestContext.getCurrentInstance().addCallbackParam("needplanTime", true);
             return false;
         }
@@ -1032,19 +1068,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void saveServiceRequest() {
 
         if(currentStatus!=2 && currentStatus!=3){
-            WebUtil.addErrorMessage("必须选择当前状态");
+            WebUtil.addErrorMessage(WebUtil.getMessage("MustSelectCurrentStatus"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("status", true);
         }
         if(newServiceRequest.getRequestReason()==null){
-            newServiceRequest.setRequestReason("设备故障");
+            newServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
         }
         if (selectedAsset.getStatus() == 4) {
-            WebUtil.addErrorMessage("所选设备待报废,不能报修");
+            WebUtil.addErrorMessage(WebUtil.getMessage("CantRepairToBeTerminated"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
-            WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoDepartmentCantRepair"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else {
@@ -1203,7 +1239,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public void submitAppvalPmOrder() {
         if(StringUtils.isEmpty(comments)){
-            comments="报价审核";
+            comments = WebUtil.getMessage("QuotationApproval");
         }
         //先保存检查项
         saveCheckItemData();
@@ -1281,7 +1317,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             });
             List<V2_PmOrder> pmList = dao.checkSimplify(assetIdList);
             if (pmList.size() > 0) {
-                WebUtil.addErrorMessage("您的批量中不能包含待接单或待抢单的保养工单");
+                WebUtil.addErrorMessage(
+                    WebUtil.getMessage("CantContainWorkordersToBeAcceptedOrCompeted"));
                 return;
             }
             pmOrderService.acceptWorkOrderBatch(currentPagePmOrders, selectedMap, planTimeForBatch,type);
@@ -1341,7 +1378,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
         if(queryIndex == 20){
             filterOutPm(searchFilters);
-            searchFilters.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ, "已取消"));
+            searchFilters.add(new SearchFilter("currentStepName", SearchFilter.Operator.EQ,
+                WebUtil.getMessage("Canceled")));
         }
         if(queryIndex==100){
             //from asset detail page
@@ -1610,7 +1648,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
        if (selectedPmOrder != null) {
             if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
                     (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
-                WebUtil.addErrorMessage("审核不通过原因必须填写");
+                WebUtil.addErrorMessage(WebUtil.getMessage("MustProvideReason"));
                 RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
                 return;
             }
