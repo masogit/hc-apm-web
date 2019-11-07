@@ -101,7 +101,7 @@ public void removeAttachmentById(String blobId) {
         selected.setSupplierT(supplierT);
         selected.setMaintainerT(maintainerT);
         if(!mark){//表示供应商类型一个都没有选
-            WebUtil.addErrorMessage("必须选择一个类型");
+            WebUtil.addErrorMessage(WebUtil.getMessage("TypeErrTip"));
             RequestContext.getCurrentInstance().addCallbackParam("spType", true);
             return false;
         }
