@@ -527,7 +527,7 @@
         <h:form id="takeOrderDialogForm" >
             <h:panelGroup id="display1" rendered="#{not empty v2PmOrderController.selectedPmOrder or v2PmOrderController.isChecked()}">
                 <h:panelGroup rendered="#{not empty v2PmOrderController.selectedPmOrder and  v2PmOrderController.isChecked() eq false}" >
-                    <label class="label">#{msg.PlannedCompletionTime}*</label>
+                    <label class="label" title="#{msg.PlannedCompletionTime}*"></label>
                     <p:calendar timeZone="GMT+8" id="fillDate3" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="#{msg.PlannedCompletionTime} #{msg.ValidationRequire}"></p:calendar>
                 </h:panelGroup>
 

@@ -104,7 +104,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
                 //获取保养报告的名字
                 TableDefinition byBaseId = tableDao.findById(reporter.getSchemaId());
                 if(byBaseId == null){
-                    WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "检查项对应的保养报告不存在"));
+                    WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("MaintainReportNotExist")));
                 }
                 hm.put("pmReportNeedFill",byBaseId.getName());
             }
@@ -113,7 +113,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         if(null != reporter) {
             TableDefinition byBaseId = tableDao.findById(reporter.getSchemaId());
             if(byBaseId == null){
-                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "检查项对应的保养报告不存在"));
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("MaintainReportNotExist")));
             }
             if(CollectionUtils.isEmpty(reporter.getData())){
                 hm.put("saftyReportNeedFill",byBaseId.getName());
@@ -179,9 +179,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setQualityChecking(selectedPmOrder.getQualityChecking());
         String res = srApi.invokePmOrderAction(token,formData,"close",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Submit"));
         }else{
-            WebUtil.addSuccessMessage("关单成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("CloseSuccess"));
         }
     }
 
@@ -228,9 +228,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
 
         String res= srApi.invokePmOrderActionBatch(token,formDataList,"repair");
         if (res==null || !res.contains("OK")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量取消");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("BatchCancel"));
         }else{
-            WebUtil.addSuccessMessage("批量取消成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("BatchCancelSuccess"));
         }
     }
 
@@ -253,9 +253,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
 
         String res = srApi.invokePmOrderCancel(token,formData,"cancel",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Submit"));
         }else{
-            WebUtil.addSuccessMessage("取消提交成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("SubmissionSuccessfullyCanceled"));
         }
 
     }
@@ -300,9 +300,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
 
         String res = srApi.invokeBatchPmOrderCancel(token,formDataList,"cancel");
         if (res==null || !res.equalsIgnoreCase("ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Submit"));
         }else{
-            WebUtil.addSuccessMessage("取消提交成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("SubmissionSuccessfullyCanceled"));
         }
 
     }
@@ -323,9 +323,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setDetails(accessoryList);
         String res = srApi.invokePmOrderAction(token,formData,"approval",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Submit"));
         }else{
-            WebUtil.addSuccessMessage("审批提交成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("SubmissionForApprovalSuccess"));
         }
     }
 
@@ -361,7 +361,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         if (res==null || !res.equalsIgnoreCase("Ok")){
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("feedbackComment"));
         }else{
-            WebUtil.addSuccessMessage("操作成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("OperationSuccess"));
         }
     }
     public void rejectWorkOrder(V2_PmOrder selectedPmOrder,String reason, Integer status, Date confirmedDowntime) {
@@ -376,7 +376,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Acknowledge"));
         }else{
-            WebUtil.addSuccessMessage("操作成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("OperationSuccess"));
         }
 
     }
@@ -416,9 +416,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
 
         String res = srApi.invokePmOrderActionBatch(token,formDataList,"assign");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"派单");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Distribute"));
         }else{
-            WebUtil.addSuccessMessage("批量派单成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("BatchDistributeSuccess"));
         }
     }
     public void closePMBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,List<V2_BlobObject> picList ){
@@ -446,9 +446,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         });
         String res = srApi.invokePmOrderActionBatch(token,formDataList,"close");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Submit"));
         }else{
-            WebUtil.addSuccessMessage("批量关单成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("BatchCloseSuccess"));
         }
     }
     public void dispatchWorkOrder(V2_PmOrder selectedPmOrder,Date planTime) {
@@ -463,7 +463,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("dispatchWorkOrder"));
         }else{
-            WebUtil.addSuccessMessage("派工成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("DisptachSuccess"));
         }
         selectedPmOrder.setCurrentStepId("accept");
     }
@@ -503,9 +503,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
 
         String res = srApi.invokePmOrderActionBatch(token,formDataList,"reAssign");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Reassign"));
         }else{
-            WebUtil.addSuccessMessage("批量转单成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("BatchReassignSuccess"));
         }
     }
 
@@ -530,9 +530,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setDetails(accessList);
         String res = srApi.invokePmOrderAction(token,formData,"审批",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));
         }else{
-            WebUtil.addSuccessMessage("审批成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("ApprovalSuccess"));
         }
     }
     public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
@@ -563,9 +563,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setQualityChecking(selectedPmOrder.getQualityChecking());
         String res = srApi.invokePmOrderAction(token,formData,"保养",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));
         }else{
-            WebUtil.addSuccessMessage("操作成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("OperationSuccess"));
         }
     }
     public void repairWorkOrderBatch(Date endTime,Double totalManHours,Map<String, Boolean> hmPmOrder) {
@@ -601,9 +601,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
 
         String res= srApi.invokePmOrderActionBatch(token,formDataList,"repair");
         if (res==null || !res.contains("OK")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量完成");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("BatchComplete"));
         }else{
-            WebUtil.addSuccessMessage("批量完成成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("BatchCompleteSuccess"));
         }
     }
     public void reassignWorkOrder(V2_PmOrder selectedPmOrder, String assigneeId,String comments) {
@@ -615,9 +615,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setDesc(comments);
         String res = srApi.invokePmOrderAction(token,formData,"转单",selectedPmOrder.getId());
         if (res==null || !res.contains("OK")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Reassign"));
         }else{
-            WebUtil.addSuccessMessage("转单成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("ReassignSuccess"));
         }
     }
 
@@ -637,9 +637,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setCoworkers(coDetails);
         String res = srApi.invokePmOrderAction(token,formData,"tempRepair",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));
         }else{
-            WebUtil.addSuccessMessage("暂存成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("TemporaryStorageSuccess"));
         }
     }
     public List<V2_ServiceRequest> getServiceRequestByAssetId(Integer id) {
@@ -654,9 +654,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
         String res = srApi.invokePmOrderAction(token,formData,"accept",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"接单");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("TakeOrder"));
         }else{
-            WebUtil.addSuccessMessage("接单成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("TakeOrderSuccess"));
         }
         selectedPmOrder.setCurrentStepId("repair");
     }
@@ -682,15 +682,15 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         String res=srApi.invokePmOrderActionBatch(token,formDataList,"accept");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             if(type==1)
-                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"接单");
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("TakeOrder"));
             else
-                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"抢单");
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Compete"));
 
         }else{
             if(type==1)
-                WebUtil.addSuccessMessage("批量接单成功");
+                WebUtil.addSuccessMessage(WebUtil.getMessage("BatchTakeOrderSuccess"));
             else
-                WebUtil.addSuccessMessage("批量抢单成功");
+                WebUtil.addSuccessMessage(WebUtil.getMessage("BatchCompeteSuccess"));
 
             for(V2_PmOrder item:pmListTmp){
                 item.setCurrentStepId("repair");

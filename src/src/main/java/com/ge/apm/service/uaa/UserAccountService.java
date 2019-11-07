@@ -293,4 +293,8 @@ public class UserAccountService {
 
 		userOrgDao.save(userOrgList);
 	}
+
+	public String getUserLanguageByLoginName(String loginName) {
+		return userAccountMapper.getUserLanguageByLoginName(loginName);
+	}
 }
