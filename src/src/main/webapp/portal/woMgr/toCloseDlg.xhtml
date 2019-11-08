@@ -13,7 +13,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.caseType}</label>
                             <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
-                                <f:selectItems value="#{workOrderMgrController.getAssetFaultType()}" var="item" itemLabel="#{item.faultName}" itemValue="#{item.id}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>
