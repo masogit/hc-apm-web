@@ -68,7 +68,7 @@
                 </p:fieldset>
                 <h:panelGroup>
                     <label class="label">备注</label>
-                    <p:inputTextarea id="comment" class="beizhuClass" value="#{v2MeasureController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100" requiredMessage="审核不通过原因必须填写"/>
+                    <p:inputTextarea id="comment" class="beizhuClass" value="#{v2MeasureController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100" requiredMessage="#{msg.ApprovalFallureReasonRequired}"/>
                 </h:panelGroup>
                 <br/>
                 <h:panelGroup>

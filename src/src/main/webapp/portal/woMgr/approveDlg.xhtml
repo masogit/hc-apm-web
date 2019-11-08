@@ -24,7 +24,7 @@
                                     <!--<h:outputText value="勾选审批" />-->
                                 </f:facet>
                             </p:column>
-                            <p:column headerText="#{msg.accessory}名称">
+                            <p:column headerText="#{msg.accessory} #{msg.Name}">
                                 <h:outputText value="#{item.parts}"/>
                             </p:column>
 
@@ -73,7 +73,7 @@
 
                     </p:fieldset>
                         <h:panelGroup>
-                            <label class="label">维修总金额</label>
+                            <label class="label">#{msg.TotalMaintenanceAmount}</label>
 
                           <!--  <p:inputText class="c_repairManCost" disabled="true" value="#{workOrderMgrController.c_repairTotalCost}" rows="2"  cols="20"  queryDelay="750" minQueryLength="4" maxlength="8"/>-->
                             <p:inputNumber class="c_repairManCost" disabled="true" minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.c_repairTotalCost}" />
@@ -81,7 +81,7 @@
                     <br/>
                     <br/>
                         <h:panelGroup>
-                            <label class="label">维修人工费用</label>
+                            <label class="label">#{msg.MaintenanceLaborCost}</label>
                            <!-- <p:inputText class="c_repairManCost" disabled="true" value="#{workOrderMgrController.c_repairManCost}" rows="2"  cols="20"  queryDelay="750" minQueryLength="4" maxlength="8"/>-->
                             <p:inputNumber class="c_repairManCost" disabled="true" minValue="0" maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.c_repairManCost}" />
                         </h:panelGroup>
@@ -95,7 +95,7 @@
                     <br/>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder()}" value="审批" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder()}" value="#{msg.ApprovalP}" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
                         <!--<p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder('false')}" value="拒绝" update=":woMgrListForm :woMgrDetailForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'approveDialog');"/>-->
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('approveDialog').hide()"/>
                     </h:panelGroup>
