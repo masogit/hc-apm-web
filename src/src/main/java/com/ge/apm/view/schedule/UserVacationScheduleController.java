@@ -126,11 +126,11 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
         calender.add(Calendar.DAY_OF_MONTH, -1);
 
         if (startDate.before(calender.getTime())) {
-            WebUtil.addErrorMessage("开始日期不能早于当前日期");
+            WebUtil.addErrorMessage(WebUtil.getMessage("StartTimeCannotBeEarlierThanCurrentTime"));
             return false;
         }
         if (endDate.before(startDate)) {
-            WebUtil.addErrorMessage("结束日期不能早于开始日期");
+            WebUtil.addErrorMessage(WebUtil.getMessage("EndTimeCannotBeEarlierThanStartTime"));
             return false;
         }
 
@@ -143,9 +143,9 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
                 List assetInfoList = (List<AssetInfo>) msgMap.get("assetInfoList");
                 if(i == 0){
                     if(assetInfoList != null && !assetInfoList.isEmpty()){
-                        msg = ((Map)assetInfoList.get(0)).get("name") + "上只有你一个责任人或其他责任人都请假: ";
+                        msg = ((Map)assetInfoList.get(0)).get("name") + WebUtil.getMessage("VacationErrorMsgTip");
                     }else{
-                        msg = "该日期已存在请假记录: ";
+                        msg = WebUtil.getMessage("ThisDateHasALeaveRecord");
                     }
                 }
                 msg += msgMap.get("invalidDate") + ";";
@@ -229,11 +229,11 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
     public String getScheduleDateStageTitle(String scheduleDateStage){
         String title = "";
         if(UserSchedule.ScheduleDateStage.ALL.name().equals(scheduleDateStage)){
-            title = "全天";
+            title = WebUtil.getMessage("AllDay");
         }else if(UserSchedule.ScheduleDateStage.AM.name().equals(scheduleDateStage)){
-            title = "上午";
+            title = WebUtil.getMessage("Morning");
         }else if(UserSchedule.ScheduleDateStage.PM.name().equals(scheduleDateStage)){
-            title = "下午";
+            title = WebUtil.getMessage("Afternoon");
         }
         return title;
     }
@@ -241,11 +241,11 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
     public String getAuditStatusTitle(String auditStatus){
         String title = "";
         if(UserSchedule.AuditStatus.PendingApproval.name().equals(auditStatus)){
-            title = "待审批";
+            title = WebUtil.getMessage("tobeReview");
         }else if(UserSchedule.AuditStatus.Approved.name().equals(auditStatus)){
-            title = "审批通过";
+            title =  WebUtil.getMessage("Approved3");
         }else if(UserSchedule.AuditStatus.NotApproved.name().equals(auditStatus)){
-            title = "审批未通过";
+            title = WebUtil.getMessage("NotApproved");
         }
         return title;
     }

@@ -1648,7 +1648,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
        if (selectedPmOrder != null) {
             if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
                     (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("MustProvideReason"));
+                WebUtil.addErrorMessage(WebUtil.getMessage("ApprovalFallureReasonRequired"));
                 RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
                 return;
             }
