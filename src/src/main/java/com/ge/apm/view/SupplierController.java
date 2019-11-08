@@ -250,13 +250,13 @@ public void removeAttachmentById(String blobId) {
      }
         String name =new String();
         if(supplier.getMaintainerT() != null && supplier.getMaintainerT()){
-           name= name.concat("维修商 ");
+           name= name.concat(WebUtil.getMessage("maitanance")+" ");
         }
         if(supplier.getManufacturerT() != null && supplier.getManufacturerT()){
-            name= name.concat("制造商 ");
+            name= name.concat(WebUtil.getMessage("manufacture")+" ");
         }
         if(supplier.getSupplierT() != null && supplier.getSupplierT()){
-            name= name.concat("供应商");
+            name= name.concat(WebUtil.getMessage("vendor")+" ");
         }
 
        name= name.replace(" ","/");
