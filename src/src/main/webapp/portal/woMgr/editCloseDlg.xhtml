@@ -13,7 +13,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.caseType}</label>
                             <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.caseType}" disabled="false">
-                                <f:selectItems value="#{workOrderMgrController.getAssetFaultType()}" var="item" itemLabel="#{item.faultName}" itemValue="#{item.id}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -63,7 +63,7 @@
                                 <p:inputNumber maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" readonly="false"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">外部费用</label><!--外部费用-->
+                                <label class="label">#{msg.ExternalExpenses}</label><!--外部费用-->
                                 <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}" readonly="false"/>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -72,7 +72,7 @@
                             </h:panelGroup>
                         </p:panelGrid>
 
-                    </p:fieldset>
+                    </p:fieldset>、
 
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.saveEditedWorkOrder}" value="#{msg.save}" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleSubmit(args,'EditCloseDialog');"/>
