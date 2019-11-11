@@ -646,7 +646,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufactDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.manufactDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufactDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.manufactDate}" required="#{assetInfoEditController.customConfig.assetFields['manufactDate'].required}" 
+            <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.manufactDate}" required="#{assetInfoEditController.customConfig.assetFields['manufactDate'].required}"
                          requiredMessage="#{msg.manufactDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('manufactDate')}" 
                         maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  >
                 <p:ajax process="@(this)" update="@(.inputDate) @(.manufactDateChange)" />
@@ -663,7 +663,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'arriveDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.arriveDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['arriveDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="GMT+8"  id="arriveDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.arriveDate}" required="#{assetInfoEditController.customConfig.assetFields['arriveDate'].required}" 
+            <p:calendar timeZone="GMT+8"  id="arriveDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.arriveDate}" required="#{assetInfoEditController.customConfig.assetFields['arriveDate'].required}"
                          requiredMessage="#{msg.arriveDate} #{msg.ValidationRequire}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('arriveDate')}" 
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
         </h:panelGroup>
@@ -671,7 +671,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'acceptDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.acceptDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['acceptDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.acceptDate}" required="#{assetInfoEditController.customConfig.assetFields['acceptDate'].required}" 
+            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.acceptDate}" required="#{assetInfoEditController.customConfig.assetFields['acceptDate'].required}"
                          requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('acceptDate')}" 
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
         </h:panelGroup>
@@ -693,7 +693,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'factoryWarrantyDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.factoryWarrantyDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.factoryWarrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required}" 
+            <p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.factoryWarrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required}"
                          requiredMessage="#{msg.factoryWarrantyDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('factoryWarrantyDate')}"  
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
@@ -701,7 +701,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'warrantyDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.warrantyDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['warrantyDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.warrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['warrantyDate'].required}" 
+            <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.warrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['warrantyDate'].required}"
                          requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" showOn="button" readonly="#{!assetInfoEditController.needEdit('warrantyDate')}" 
                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
         </h:panelGroup>
@@ -709,7 +709,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'terminateDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.terminateDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['terminateDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.terminateDate}" showOn="button" required="#{assetInfoEditController.customConfig.assetFields['terminateDate'].required}" 
+            <p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.terminateDate}" showOn="button" required="#{assetInfoEditController.customConfig.assetFields['terminateDate'].required}"
                         requiredMessage="#{msg.terminateDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('terminateDate')}" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
         </h:panelGroup>
     </c:if>
