@@ -142,11 +142,30 @@ public class TenantInfo implements Serializable {
     @Transient
     private String plainPassword;
 
-    @Column(name = "nation")
-    private Integer nation;// 1、Chinese 2、India 3、
+    @Column(name = "currency")
+    private Integer currency = 1;//1、cny 2、dollar
+
+    @Column(name = "habit")
+    private Integer habit = 1;// 1、国内版 2、国际版
 
     @Transient
     private String cpmURL;
+
+    public Integer getHabit() {
+        return habit;
+    }
+
+    public void setHabit(Integer habit) {
+        this.habit = habit;
+    }
+
+    public Integer getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Integer currency) {
+        this.currency = currency;
+    }
 
     public Integer getType() {
 		return type;
@@ -156,13 +175,6 @@ public class TenantInfo implements Serializable {
 		this.type = type;
 	}
 
-    public Integer getNation() {
-        return nation;
-    }
-
-    public void setNation(Integer nation) {
-        this.nation = nation;
-    }
 
     public TenantInfo() {
         isInsulate = false;
