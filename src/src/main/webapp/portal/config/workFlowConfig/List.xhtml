@@ -24,7 +24,7 @@
                     <p:ajax event="rowSelect"  listener= "#{workflowConfigController.onSelect()}" update="createButton editButton deleteButton"/>
                     <p:ajax event="filter" listener="#{workflowConfigController.onFilter}" update="createButton editButton deleteButton"/>
 
-                    <p:column headerText="租户" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="EQ">
+                    <p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="EQ">
                         <h:outputText value="#{workflowConfigController.getTenantName(item.tenantUID)}"/>
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
@@ -34,7 +34,7 @@
                         </f:facet>
                     </p:column>
 
-                     <p:column headerText="集团" sortBy="#{item.institutionUID}" filterBy="#{item.institutionUID}" filterMatchMode="EQ">
+                     <p:column headerText="#{msg.Institution}" sortBy="#{item.institutionUID}" filterBy="#{item.institutionUID}" filterMatchMode="EQ">
                          <h:outputText value="#{workflowConfigController.getInsNameByUId(item.institutionUID)}"/>
                          <f:facet name="filter">
                              <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
@@ -43,7 +43,7 @@
                              </p:selectOneMenu>
                          </f:facet>
                     </p:column>
-                   <p:column headerText="医院" sortBy="#{item.hospitalUID}" filterBy="#{item.hospitalUID}" filterMatchMode="EQ">
+                   <p:column headerText="#{msg.Hospital}" sortBy="#{item.hospitalUID}" filterBy="#{item.hospitalUID}" filterMatchMode="EQ">
                        <h:outputText value="#{workflowConfigController.getHospitalNameByUId(item.hospitalUID)}"/>
                        <f:facet name="filter">
                            <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
@@ -52,7 +52,7 @@
                            </p:selectOneMenu>
                        </f:facet>
                    </p:column>
-                   <p:column headerText="院区" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
+                   <p:column headerText="#{msg.Site}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
                        <h:outputText value="#{workflowConfigController.getSiteNameByUId(item.siteUID)}" />
                        <f:facet name="filter">
                            <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" >
@@ -64,10 +64,10 @@
 <!--                      <p:column headerText="#{msg.dispatchMode}" sortBy="#{item.dispatchMode}" filterBy="#{item.dispatchMode}" filterMatchMode="EQ">
                     <h:outputText value="#{fieldMsg.fieldValue('dispatchMode',item.dispatchMode)}"/>
                </p:column> -->
-                    <p:column headerText="维修#{msg.dispatchUserName}" sortBy="#{item.dispatchUserName}" filterBy="#{item.dispatchUserName}" filterMatchMode="LIKE">
+                    <p:column headerText="#{msg.repair}#{msg.dispatchUserName}" sortBy="#{item.dispatchUserName}" filterBy="#{item.dispatchUserName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.dispatchUserName}"/>
                     </p:column>
-                     <p:column headerText="维修#{msg.dispatchUserName}2" sortBy="#{item.dispatchUserName2}" filterBy="#{item.dispatchUserName2}" filterMatchMode="LIKE">
+                     <p:column headerText="#{msg.repair}#{msg.dispatchUserName}2" sortBy="#{item.dispatchUserName2}" filterBy="#{item.dispatchUserName2}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.dispatchUserName2}"/>
                     </p:column>
                     <p:column headerText="#{msg.timeoutDispatch}" sortBy="#{item.timeoutDispatch}" filterBy="#{item.timeoutDispatch}" filterMatchMode="EQ">

@@ -8,17 +8,17 @@
 
     <ui:composition>
 
-        <p:dialog id="AttributeEditDlg" widgetVar="AttributeEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="#{attributeListController.CRUDActionName}#{attributeListController.selected.name}属性" >
+        <p:dialog id="AttributeEditDlg" widgetVar="AttributeEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="#{attributeListController.CRUDActionName}#{attributeListController.selected.name}#{msg.Attribute}" >
             <h:form id="AttributeEditForm">
                 <h:panelGroup id="display" rendered="#{attributeListController.selected ne null}">
 
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{attributeListController.selected != null}" style="min-width: 500px;">
                         <h:panelGroup>
-                            <label class="label">名称*: </label>
-                            <p:inputText id="loginName" value="#{attributeListController.selected.name}" required="true" requiredMessage="属性名称 #{msg.ValidationRequire}"/>
+                            <label class="label">#{msg.name}*: </label>
+                            <p:inputText id="loginName" value="#{attributeListController.selected.name}" required="true" requiredMessage="#{msg.AttributeName} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">描述: </label>
+                            <label class="label">#{msg.Description2}: </label>
                             <p:inputText id="name" value="#{attributeListController.selected.description}"/>
                         </h:panelGroup>
                     </p:panelGrid>

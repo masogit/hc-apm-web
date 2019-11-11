@@ -184,12 +184,12 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
     public void saveChange() {
 
         if(deptOrg == null){
-            WebUtil.addErrorMessage("请设置所属科室");
+            WebUtil.addErrorMessage(WebUtil.getMessage("PleaseSetTheDepartment"));
             return;
         }
 
         if(woOwner == null && woOwner2 == null && woOwner3 == null && pmOwner == null){
-            WebUtil.addErrorMessage("请设置维修负责人或保养负责人");
+            WebUtil.addErrorMessage(WebUtil.getMessage("PleaseSetTheRepairOwnerOrPMOwner"));
             return;
         }
 
@@ -223,7 +223,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
         this.resetOwnerConfig();
         this.clinicalDeptOrgUidSetFilter = Collections.emptySet();
         this.filterClinicalDeptOrgName = null;
-        WebUtil.addErrorMessage("保存成功");
+        WebUtil.addErrorMessage(WebUtil.getMessage("SaveSuccess"));
     }
 
     //选择院区树后的动作
@@ -333,7 +333,7 @@ public class DepartmentOwnerSettingController extends GenericCRUDUUIDController<
     public void deleteOwerConfig(){
         dao.delete(this.selected);
         this.selected = null;
-        WebUtil.addErrorMessage("删除成功");
+        WebUtil.addErrorMessage(WebUtil.getMessage("DeleteSuccess"));
     }
 
     public void onOwnerChange(SelectEvent event){
