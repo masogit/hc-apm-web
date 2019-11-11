@@ -450,3 +450,7 @@ ALTER TABLE i18n_message alter COLUMN value_tw type character varying(5000);
 
 --v19.11.2
 update asset_alert_config set lower_limit = 10 where config_type = 105;
+
+update tenant_info set currency = 1;
+update tenant_info set habit = 1;
+update tenant_info set time_zone = 8.0;
