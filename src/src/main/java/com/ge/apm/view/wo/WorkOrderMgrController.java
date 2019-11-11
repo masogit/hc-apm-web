@@ -205,6 +205,10 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
+        String queryAssetUID_href = WebUtil.getRequestParameter("queryAssetUID");
+        if(!Strings.isNullOrEmpty(queryAssetUID_href)){
+            queryAssetUid = queryAssetUID_href;
+        }
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
             requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
             queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
