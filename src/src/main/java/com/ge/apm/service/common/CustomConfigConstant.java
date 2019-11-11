@@ -166,6 +166,7 @@ public class CustomConfigConstant {
             allFields.put("manufacture", WebUtil.getMessage("manufacture"));
             allFields.put("makerShortName", WebUtil.getMessage("makerShortName"));
             allFields.put("vendor", WebUtil.getMessage("vendor"));
+            allFields.put("vendorTel", WebUtil.getMessage("vendorTel"));
             allFields.put("maitanance", WebUtil.getMessage("maitanance"));
             allFields.put("maitananceTel", WebUtil.getMessage("maitananceTel"));
             allFields.put("nationalStandardCode", WebUtil.getMessage("nationalStandardCode"));
@@ -237,7 +238,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsDetailpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
-                "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor",
+                "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
                 "maitanance", "maitananceTel", "nationalStandardCode");
     }
 
@@ -254,7 +255,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsEditpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID", "clinicalDeptName",
-                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "maitanance", "maitananceTel", "nationalStandardCode");
+                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode");
     }
 
     public static List<String> getAssetsEditpageCodesFields() {
