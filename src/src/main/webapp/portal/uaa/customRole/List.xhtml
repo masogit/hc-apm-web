@@ -33,16 +33,16 @@
 <!--                    <p:column headerText="主页" sortBy="#{item.homePage}" filterBy="#{item.homePage}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.homePage}"/>
                     </p:column>-->
-                    <p:column headerText="网页端菜单" sortBy="#{item.menusCH}" filterBy="#{item.menusCH}" filterMatchMode="LIKE" >
+                    <p:column headerText="#{msg.WebMenu}" sortBy="#{item.menusCH}" filterBy="#{item.menusCH}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.menusCH}"/>
                     </p:column>
-                    <p:column headerText="网页端权限" sortBy="#{item.webAuthoritiesCH}" filterBy="#{item.webAuthoritiesCH}" filterMatchMode="LIKE" >
+                    <p:column headerText="#{msg.WebAuthority}" sortBy="#{item.webAuthoritiesCH}" filterBy="#{item.webAuthoritiesCH}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.webAuthoritiesCH}"/>
                     </p:column>
-                    <p:column headerText="微信端卡片" sortBy="#{item.cardsCH}" filterBy="#{item.cardsCH}" filterMatchMode="LIKE" >
+                    <p:column headerText="#{msg.WeChatCard}" sortBy="#{item.cardsCH}" filterBy="#{item.cardsCH}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.cardsCH}"/>
                     </p:column>
-                    <p:column headerText="微信端权限" sortBy="#{item.authoritiesCH}" filterBy="#{item.authoritiesCH}" filterMatchMode="LIKE" >
+                    <p:column headerText="#{msg.WeChatAuthority}" sortBy="#{item.authoritiesCH}" filterBy="#{item.authoritiesCH}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.authoritiesCH}"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
@@ -53,7 +53,7 @@
                         <!--<p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{customRoleController.prepareView}" update=":CustomRoleViewDlg" oncomplete="PF('CustomRoleViewDialog').show()" disabled="#{empty customRoleController.selected}"/>-->
                         <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" actionListener="#{customRoleController.prepareEdit}" update=":CustomRoleEditDlg" oncomplete="PF('CustomRoleEditDialog').show()" disabled="#{empty customRoleController.selected}"/>
                         <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" actionListener="#{customRoleController.delete}" update=":CustomRoleEditDlg,datalist" disabled="#{empty customRoleController.selected}">
-                            <p:confirm header="#{msg.DeleteConformation}" message="确定要删除这条记录吗？" icon="ui-icon-warning"/>
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteTheRecord}？" icon="ui-icon-warning"/>
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>

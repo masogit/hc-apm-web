@@ -256,15 +256,15 @@ public class AssetCreateController {
         }
         Boolean res = acService.createAsset(assetInfo, isGeneratePmOrder);
         if (null != isGeneratePmOrder && isGeneratePmOrder && Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())) {
-            WebUtil.putGrowlMsg("使用科室未填，不能生成保养工单");
+            WebUtil.putGrowlMsg(WebUtil.getMessage("NoCompletionOfTheAssetDepartment"));
         }
         if (res) {
             acService.createAttachments(assetInfo, selectedPictures);
             acService.updateQrLib(assetInfo.getQrCode(), 3, createRequest.getSiteUID());
-            WebUtil.addSuccessMessage("创建成功");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("CreateSuccess"));
             return "RequestsList?faces-redirect=true";
         } else {
-            WebUtil.addErrorMessage("创建失败");
+            WebUtil.addErrorMessage(WebUtil.getMessage("CreateFailed"));
             return "";
         }
     }
@@ -273,7 +273,7 @@ public class AssetCreateController {
         acService.rejectReturn(createRequest, rejectText);
         this.rejectTextHistory.add(TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText));
         rejectText = "";
-        WebUtil.addSuccessMessage("消息已发送");
+        WebUtil.addSuccessMessage(WebUtil.getMessage("MessageSent"));
     }
 
     public List<UserAccount> getOwnerList() {

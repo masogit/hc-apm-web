@@ -3,8 +3,8 @@
     <div class="menu-content" tabindex="0">
         <pu:menu widgetVar="me">
 
-            <p:menuitem style=" font-size: 30" id="um000" value="切换成英文" rendered="#{localeService.language eq 'zh'}" icon="language" url="#{request.requestURI}?locale=en"/>
-            <p:menuitem style=" font-size: 30" id="um001" value="ChangeToChinese"  rendered="#{localeService.language eq 'en'}" icon="language" url="#{request.requestURI}?locale=zh"/>
+            <p:menuitem style=" font-size: 30" id="um000" value="ChangeToEnglish" rendered="#{localeService.language eq 'zh'}" icon="language" url="#{request.requestURI}?locale=en"/>
+            <p:menuitem style=" font-size: 30" id="um001" value="切换成中文"  rendered="#{localeService.language eq 'en'}" icon="language" url="#{request.requestURI}?locale=zh"/>
             <p:menuitem style=" font-size: 30" id="um01" value="#{msg.HomePage}" icon="&#xE871;" outcome="#{userContextService.userDefaultHomePage}" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('homePage')}"/>
             
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.accessContains('asset')}">
@@ -145,9 +145,9 @@
                 <p:menuitem id="um497" value="#{msg.AssetTag}" outcome="/portal/asset/tag/List.xhtml" rendered="#{userContextService.accessContains('config.assetMark')}"/>
                 <p:menuitem id="um498" value="#{msg.BiomedGroup}" outcome="/portal/uaa/biomedGroup/List.xhtml" rendered="#{userContextService.accessContains('config.engineerGroup')}"/>
                 <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/workFlowConfig/List.xhtml" rendered="#{userContextService.accessContains('config.workFlow')}"/>
-                <p:menuitem id="um504" value="自定义配置" outcome="/portal/asset/customConfig/CustomConfig.xhtml" rendered="#{userContextService.accessContains('config.custom')}"/>
-                <p:menuitem id="um505" value="属性配置" outcome="/portal/config/attribute/List.xhtml" rendered="#{userContextService.accessContains('config.attribute')}"/>
-                <p:menuitem id="um506" value="维修消息配置" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.accessContains('config.repairMessage')}"/>
+                <p:menuitem id="um504" value="#{msg.CustomConfiguration}" outcome="/portal/asset/customConfig/CustomConfig.xhtml" rendered="#{userContextService.accessContains('config.custom')}"/>
+                <p:menuitem id="um505" value="#{msg.AttributeConfiguration}" outcome="/portal/config/attribute/List.xhtml" rendered="#{userContextService.accessContains('config.attribute')}"/>
+                <p:menuitem id="um506" value="#{msg.RepairMessageConfiguration}" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.accessContains('config.repairMessage')}"/>
                 <!--<p:menuitem id="um500" value="#{msg.V2_WorkOrderWorkflowConfig}" outcome="/portal/config/workFlowConfig/Wo_Edit.xhtml"/>-->
                 <!--<p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>-->
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{userContextService.hasNotAnyRole('SuperAdmin') and userContextService.accessContains('config.qrCode')}"/>

@@ -63,6 +63,19 @@
                                 <!--<f:selectItem itemLabel="tw" itemValue="tw"/>-->
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">#{msg.habit}</label>
+                            <p:selectOneMenu value="#{tenantInfoController.selected.habit}"  >
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('habit')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">#{msg.currency}</label>
+                            <p:selectOneMenu value="#{tenantInfoController.selected.currency}"  >
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('currency')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
                         <!--<h:panelGroup rendered="true">
                             <label class="label">#{msg.manhourPrice}*</label>
                             <p:inputText id="manhourPrice" value="#{tenantInfoController.selected.manhourPrice}" />
