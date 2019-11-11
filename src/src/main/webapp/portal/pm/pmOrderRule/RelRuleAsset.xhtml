@@ -105,7 +105,7 @@
                        </h:panelGroup>
 
                       <h:panelGroup >
-                            <label class="label">保养规则(该过滤条件不会单独生效，需要配合以上条件)</label>
+                            <label class="label">#{msg.MaintenanceRuleCombine}</label>
                             <p:selectOneRadio id="deviceStatus" value="#{relRuleAssetController.queryAsset.ruleStatus}" >
                                     <p:ajax listener="#{relRuleAssetController.addFilter()}" update="queryCondition AssetsPickList" process="@this"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ruleStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -113,7 +113,7 @@
                       </h:panelGroup>
 
                        <h:panelGroup id="queryLevel" rendered="#{relRuleAssetController.queryAsset.ruleStatus != null}">
-                           <label class="label">规则等级</label>
+                           <label class="label">#{msg.RuleGrade}</label>
                            <p:selectOneMenu value="#{relRuleAssetController.queryAsset.queryLevel}">
                                <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -125,9 +125,9 @@
                     <p:pickList id="AssetsPickList" value="#{relRuleAssetController.availableAssets}" var="item"
                                 itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true"
                                 showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
-                                required="false" requiredMessage="已选设备 #{msg.ValidationRequire}">
-                        <f:facet name="sourceCaption">待选设备</f:facet>
-                        <f:facet name="targetCaption">已选设备</f:facet>
+                                required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
+                        <f:facet name="sourceCaption">#{msg.EquipmentToBeSelected}</f:facet>
+                        <f:facet name="targetCaption">#{msg.SelectedEquipment}</f:facet>
                         <p:ajax event="transfer" listener="#{relRuleAssetController.onAssetsTransfer}" />
                         <p:column style="float: left;width:25%;">
                             <h:outputText value="#{item.name}" />

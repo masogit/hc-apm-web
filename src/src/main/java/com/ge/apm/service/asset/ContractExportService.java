@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import webapp.framework.web.WebUtil;
 
 /**
  * Created by 212605082 on 2018/9/20.
@@ -96,19 +97,19 @@ public class ContractExportService {
             }
 
             Map<String, Object> contractInfoMap = new HashedMap();
-            contractInfoMap.put("合同UID", contractInfo.getId());
-            contractInfoMap.put("名称", contractInfo.getName());
-            contractInfoMap.put("合同编号", contractInfo.getContractNum());
-            contractInfoMap.put("报告号", contractInfo.getReportNum());
-            contractInfoMap.put("外贸合同号", contractInfo.getForeignTradeNum());
-            contractInfoMap.put("发票号", contractInfo.getInvoiceNum());
-            contractInfoMap.put("合同类型", contractInfo.getContractType() != null ? FieldValueMessageController.fieldValue("contractInfoType", contractInfo.getContractType()) : "");
-            contractInfoMap.put("所属院区", orgInfoDao.getByUid(contractInfo.getSiteUID()).getName());
-            contractInfoMap.put("供应商", supplierName);
-            contractInfoMap.put("合同总额", contractInfo.getAmount());
-            contractInfoMap.put("开始时间", formatDate(contractInfo.getStartDate()));
-            contractInfoMap.put("结束时间", formatDate(contractInfo.getEndDate()));
-            contractInfoMap.put("合同时间(月)", contractInfo.getEndMonths());
+            contractInfoMap.put("ContractUID", contractInfo.getId());
+            contractInfoMap.put("Name", contractInfo.getName());
+            contractInfoMap.put("ContractNumber", contractInfo.getContractNum());
+            contractInfoMap.put("ReportNumber", contractInfo.getReportNum());
+            contractInfoMap.put("ForeignTradeContractNumber", contractInfo.getForeignTradeNum());
+            contractInfoMap.put("InvoiceNumber", contractInfo.getInvoiceNum());
+            contractInfoMap.put("ContractType", contractInfo.getContractType() != null ? FieldValueMessageController.fieldValue("contractInfoType", contractInfo.getContractType()) : "");
+            contractInfoMap.put("Site", orgInfoDao.getByUid(contractInfo.getSiteUID()).getName());
+            contractInfoMap.put("Vendor", supplierName);
+            contractInfoMap.put("ContractAmount", contractInfo.getAmount());
+            contractInfoMap.put("StartTime", formatDate(contractInfo.getStartDate()));
+            contractInfoMap.put("EndTime", formatDate(contractInfo.getEndDate()));
+            contractInfoMap.put("ContractPeriodMonths", contractInfo.getEndMonths());
             contractInfoMap.put("endMonths", contractInfo.getEndMonths());
 
             contractResultList.add(contractInfoMap);
@@ -123,7 +124,7 @@ public class ContractExportService {
         List<Map<String, Object>> contractItemResultList = new ArrayList<>();
 
         for (Map contractInfoMap : contractResultList) {
-            List<ContractInfoItem> contractInfoItemList = contractInfoItemDao.findByContractId(contractInfoMap.get("合同UID").toString());
+            List<ContractInfoItem> contractInfoItemList = contractInfoItemDao.findByContractId(contractInfoMap.get("ContractUID").toString());
 
             for(ContractInfoItem contractInfoItem : contractInfoItemList){
                 Map<String, Object> contractInfoItemMap = new HashedMap();

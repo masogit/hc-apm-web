@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import webapp.framework.web.WebUtil;
 
 /**
  *
@@ -107,23 +108,23 @@ public class AssetFileExportService extends AssetFileImportBaseService {
 
         int rowNum = 2;
         while(true) {
-            String cellStringValue = doc.getCellStringValue("设备分类", rowNum, 2);
+            String cellStringValue = doc.getCellStringValue(WebUtil.getMessage("EquipmentClassification"), rowNum, 2);
 
             if (cellStringValue == null) {
                 break;
             }
-            doc.clearCell("设备分类", rowNum, 2);
+            doc.clearCell(WebUtil.getMessage("EquipmentClassification"), rowNum, 2);
 
             ++rowNum;
         }
         rowNum = 2;
         for(I18nMessage msg: assetGroupList) {
-            doc.writeCellData("设备分类", rowNum, 2, msg.getValueZh());
+            doc.writeCellData(WebUtil.getMessage("EquipmentClassification"), rowNum, 2, msg.getValueZh());
             ++rowNum;
         }
 
-        String formula = "设备分类!$B$2:$B$" + (rowNum - 1);
-        doc.updateName("设备分类", formula);
+        String formula = WebUtil.getMessage("EquipmentClassification")+"!$B$2:$B$" + (rowNum - 1);
+        doc.updateName(WebUtil.getMessage("EquipmentClassification"), formula);
     }
 
     public Boolean exportFailData(ExcelDocument doc, List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
