@@ -57,36 +57,32 @@ public class LocaleResolverRequestFilter extends OncePerRequestFilter {
     }
 
     private void forceLocaleFromParameter(HttpServletRequest request, HttpServletResponse response) {
-        /***
-         * 如果用户在浏览器端设置了locale,以用户设置为主，否则，以租户上的默认语言为主
-         *
-         */
+        //如果用户在浏览器端设置了locale,以用户设置为主，否则，以租户上的默认语言为主
         Cookie[] cookies = request.getCookies();
         boolean carryCookie = false;
-        for (Cookie cookie : cookies) {
-            //System.out.println(cookie.getName()+":"+cookie.getValue());
-            if(cookie.getName().equals(LOCALE_PARAMETER)){
-                carryCookie = true;
+        if(cookies != null && cookies.length > 0){
+            for (Cookie cookie : cookies) {
+                //System.out.println(cookie.getName()+":"+cookie.getValue());
+                if(cookie.getName().equals(LOCALE_PARAMETER)){
+                    carryCookie = true;
+                }
             }
         }
-
         String localeParameter = null;
         try {
             localeParameter = request.getParameter(LOCALE_PARAMETER);
-            System.out.println("localeParameter is "+localeParameter);
             if (isNotBlank(localeParameter)) {
                 Locale locale = LocaleUtils.toLocale(localeParameter);
-                log.info("forcing locale to {}", locale.getLanguage());
+                log.debug("forcing locale to {}", locale.getLanguage());
                 localeResolver.setLocale(request, response, locale);
             }else if(request.getUserPrincipal() != null && !carryCookie ){//第一次登陆，使用租户上的默认语言
                 WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
                 UserAccountService userAccountService = context.getBean(UserAccountService.class);
                 String loginName = request.getUserPrincipal().getName();
-                System.out.println("loginName : "+loginName);
                 String language = userAccountService.getUserLanguageByLoginName(loginName);
                 if(isNotBlank(language)){
                     Locale locale = LocaleUtils.toLocale(language);
-                    log.info("forcing locale to tenant {}", locale.getLanguage());
+                    log.debug("forcing locale to tenant {}", locale.getLanguage());
                     localeResolver.setLocale(request, response, locale);
                 }
             }

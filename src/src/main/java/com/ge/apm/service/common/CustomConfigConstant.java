@@ -52,7 +52,7 @@ public class CustomConfigConstant {
     }
 
     public synchronized static Map<String, String> getExportFields() {
-        if (null == exportFields) {
+//        if (null == exportFields) {
             exportFields = new LinkedHashMap();
             exportFields.put(WebUtil.getMessage("EquipmentID"), "departNum");
             exportFields.put(WebUtil.getMessage("EquipmentName"), "name");
@@ -139,12 +139,12 @@ public class CustomConfigConstant {
 //            exportFields.put(WebUtil.getMessage("assetOwnerTel3"), "assetOwnerTel3");
 //            exportFields.put(WebUtil.getMessage("clinicalOwnerTel"), "clinicalOwnerTel");
 //            exportFields.put(WebUtil.getMessage("pmOwnerTel"), "pmOwnerTel");
-        }
+//        }
         return exportFields;
     }
 
      public static synchronized LinkedHashMap<String, String> getAllFields() {
-        if (null == allFields) {
+//        if (null == allFields) {
             allFields = new LinkedHashMap();
             allFields.put("serialNum", WebUtil.getMessage("serialNum"));
             allFields.put("departNum", WebUtil.getMessage("departNum"));
@@ -166,6 +166,7 @@ public class CustomConfigConstant {
             allFields.put("manufacture", WebUtil.getMessage("manufacture"));
             allFields.put("makerShortName", WebUtil.getMessage("makerShortName"));
             allFields.put("vendor", WebUtil.getMessage("vendor"));
+            allFields.put("vendorTel", WebUtil.getMessage("vendorTel"));
             allFields.put("maitanance", WebUtil.getMessage("maitanance"));
             allFields.put("maitananceTel", WebUtil.getMessage("maitananceTel"));
             allFields.put("nationalStandardCode", WebUtil.getMessage("nationalStandardCode"));
@@ -225,7 +226,7 @@ public class CustomConfigConstant {
             allFields.put("orgPath", WebUtil.getMessage("orgPath"));
             allFields.put("assetLocation", WebUtil.getMessage("assetLocation"));
 
-        }
+//        }
         return allFields;
     }
 
@@ -237,7 +238,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsDetailpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID",
-                "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor",
+                "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel",
                 "maitanance", "maitananceTel", "nationalStandardCode");
     }
 
@@ -254,7 +255,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsEditpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID", "clinicalDeptName",
-                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "maitanance", "maitananceTel", "nationalStandardCode");
+                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode");
     }
 
     public static List<String> getAssetsEditpageCodesFields() {
