@@ -513,7 +513,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         WorkflowConfigRepository wfDao = WebUtil.getBean(WorkflowConfigRepository.class);
         List<WorkflowConfig> cfgList = wfDao.findBySearchFilter(checkFilters);
         if (cfgList != null && !cfgList.isEmpty()) {
-            WebUtil.addErrorMessage("该用户是派工人,不能删除.");
+            WebUtil.addErrorMessage(WebUtil.getMessage("TheUserIsAssignerAndCannotBeDeleted"));
             return false;
         }
         checkFilters.clear();
@@ -524,7 +524,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
         List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);
         if (assetList != null && !assetList.isEmpty()) {
-            WebUtil.addErrorMessage("该用户是设备责任人,不能删除.");
+            WebUtil.addErrorMessage(WebUtil.getMessage("TheUserIsEquipmentOwnerAndCannotBeDeleted"));
             return false;
         }
         checkFilters.clear();
@@ -532,7 +532,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         BiomedGroupUserRepository groupDao = WebUtil.getBean(BiomedGroupUserRepository.class);
         List<BiomedGroupUser> groupList = groupDao.findBySearchFilter(checkFilters);
         if (groupList != null && !groupList.isEmpty()) {
-            WebUtil.addErrorMessage("该用户在维修工程师群组中,不能删除.");
+            WebUtil.addErrorMessage(WebUtil.getMessage("ListedInTheGroupOfMintenanceEngineersCannotBeDeleted"));
             return false;
         }
 
@@ -542,7 +542,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         V2_WorkOrderRepository woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
         List<V2_WorkOrder> woList = woDao.findBySearchFilter(checkFilters);
         if (woList != null && !woList.isEmpty()) {
-            WebUtil.addErrorMessage("该用户有在修工单,不能删除.");
+            WebUtil.addErrorMessage(WebUtil.getMessage("TheUserHasAnOnGoingWorkOrderAndCannotBeDeleted"));
             return false;
         }
 
@@ -683,7 +683,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
 
         dao.save(selected);
-        WebUtil.addSuccessMessage("重置成功");
+        WebUtil.addSuccessMessage(WebUtil.getMessage("ResetSuccess"));
     }
 
     public void lockAccount() {
@@ -909,7 +909,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Transactional
     public void confirmActivation(){
         if(loginUser.getIsActive()){
-            WebUtil.addSuccessMessage("激活成功！");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("ActivateSuccess"));
             return;
         }
         loginUser.setIsActive(true);
@@ -928,7 +928,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 tenantInfoRepository.save(tenant);
                 dao.updateMembersStatus(loginUser.getTenantUID());
             }
-            WebUtil.addSuccessMessage("激活成功！");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("ActivateSuccess"));
         }else{
             logger.info("not active person !");
         }
@@ -944,7 +944,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         tenant.setActiveType(1);
         tenantInfoRepository.save(tenant);
         dao.updateMembersStatus(loginUser.getTenantUID());
-        WebUtil.addSuccessMessage("激活成功！");
+        WebUtil.addSuccessMessage(WebUtil.getMessage("ActivateSuccess"));
     }
 
     public boolean needActive(){
@@ -1036,7 +1036,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     	generateListSearchFilter();
     	List<UserAccount> listUserAccount=dao.findBySearchFilter(searchFilters);
 		if(listUserAccount==null || listUserAccount.size()==0){
-			WebUtil.addErrorMessage("无数据");
+			WebUtil.addErrorMessage(WebUtil.getMessage("NoData"));
 			return;
 		}
 		userAccountExportService.supplementUserAccount(listUserAccount);
