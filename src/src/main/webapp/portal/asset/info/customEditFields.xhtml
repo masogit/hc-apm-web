@@ -292,6 +292,8 @@
             </p:autoComplete>
             <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
         </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'vendorTel')}" >
         <h:panelGroup>
             <label class="label">#{msg.vendorTel}</label>
             <p:inputText id="vendorTel" value="#{assetInfoEditController.selected.vendorTel}" class="vendorChange" readonly="true" />

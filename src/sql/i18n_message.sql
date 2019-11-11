@@ -1824,3 +1824,13 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','otherClinicalDeptHeadWeight','备件审核-其他临床科室主任权重','Part Approval-Other Clinical Medical Head Weight',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','orgPath','所属单位','Organization',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','assetLocation','当前位置','Current Location',NULL,-1);
+
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('habit', '1', '国内版', 'InternalEdition', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('habit', '2', '国际版', 'InternationalEdition ', NULL, '-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('currency', '1', '元', 'CNY', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('currency', '2', '美元', 'Dollar', NULL, '-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'habit', '使用范围', 'TenantRange', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'currency', '货币', 'Currency', NULL, '-1');
