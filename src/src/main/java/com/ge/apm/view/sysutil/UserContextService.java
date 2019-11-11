@@ -859,4 +859,35 @@ public class UserContextService implements Serializable {
             return null;
         }
     }
+
+    public TenantInfo getCurrentUserTenantInfo(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.getTenantInfo();
+    }
+
+    //返回当前用户所在时区
+    public String getTimeZone(){
+        return "GMT+"+getCurrentUserTenantInfo().getTimeZone();
+    }
+
+    //是否是国际版
+    public boolean isInternationalVersion(){
+        return getCurrentUserTenantInfo().getHabit() == 2 ? true: false;
+    }
+
+    public String timeFormat(){
+        if(isInternationalVersion()){
+            return "MM/dd/yyyy";
+        }else{
+            return "yyyy/MM/dd";
+        }
+    }
+
+    public Locale getCalendarLocale(){
+        if(isInternationalVersion()){
+            return Locale.US;
+        }else{
+            return Locale.CHINA;
+        }
+    }
 }
