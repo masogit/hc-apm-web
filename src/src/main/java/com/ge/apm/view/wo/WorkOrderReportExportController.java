@@ -203,7 +203,7 @@ public class WorkOrderReportExportController implements Serializable {
     private void export2Docx(List<Map<String, Object>> data) {
         exportDocx = null;
         if (data.isEmpty()) {
-            WebUtil.addErrorMessage("未选中的需要导出的记录");
+            WebUtil.addErrorMessage(WebUtil.getMessage("NotSelectTheRecordsThatNeedToBeExported"));
             return;
         }
         try {
@@ -212,7 +212,7 @@ public class WorkOrderReportExportController implements Serializable {
             exportDocx = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
         } catch (IOException e) {
             logger.error("Fail to export work orders", e);
-            WebUtil.addErrorMessage("导出失败");
+            WebUtil.addErrorMessage(WebUtil.getMessage("ExportFailed"));
         }
     }
 
@@ -222,23 +222,23 @@ public class WorkOrderReportExportController implements Serializable {
         this.selectedItems = null;
 
         if (null == startTime && null == endTime && null == closedStartTime && null == closedEndTime) {
-            showMsgBox("报修时间范围和关单时间范围需任填一组（最早时间/最晚时间）");
+            showMsgBox(WebUtil.getMessage("ApplyTimeErrTip"));
             return;
         } else {
             if ((null != startTime && null == endTime)) {
-                showMsgBox("请选择最晚报修时间");
+                showMsgBox(WebUtil.getMessage("LastestApplyTimeErrTip"));
                 return;
             }
             if ((null == startTime && null != endTime)) {
-                showMsgBox("请选择最早报修时间");
+                showMsgBox(WebUtil.getMessage("EarliestApplyTimeErrTip"));
                 return;
             }
             if (null != closedStartTime && null == closedEndTime) {
-                showMsgBox("请选择最晚关单时间");
+                showMsgBox(WebUtil.getMessage("LastestCloseTimeErrTip"));
                 return;
             }
             if (null == closedStartTime && null != closedEndTime) {
-                showMsgBox("请选择最早关单时间");
+                showMsgBox(WebUtil.getMessage("EarliestCloseTimeErrTip"));
                 return;
             }
 
@@ -247,7 +247,7 @@ public class WorkOrderReportExportController implements Serializable {
                 LocalDate startDate = LocalDateTime.ofInstant(startTime.toInstant(), zone).toLocalDate();
                 Date tempEndDate = Date.from(startDate.plus(1, ChronoUnit.YEARS).atStartOfDay().atZone(zone).toInstant());
                 if(endTime.after(tempEndDate)){
-                    WebUtil.addErrorMessage("报修时间段最大不能超过一年！");
+                    WebUtil.addErrorMessage(WebUtil.getMessage("ApplyTimeTooLongErrTip"));
                     return;
                 }
             }
@@ -255,7 +255,7 @@ public class WorkOrderReportExportController implements Serializable {
                 LocalDate closedStartDate = LocalDateTime.ofInstant(closedStartTime.toInstant(), zone).toLocalDate();
                 Date tempClosedEndDate = Date.from(closedStartDate.plus(1, ChronoUnit.YEARS).atStartOfDay().atZone(zone).toInstant());
                 if(closedEndTime.after(tempClosedEndDate)){
-                    WebUtil.addErrorMessage("关单时间段最大不能超过一年！");
+                    WebUtil.addErrorMessage(WebUtil.getMessage("CloseTimeTooLongErrTip"));
                     return;
                 }
             }

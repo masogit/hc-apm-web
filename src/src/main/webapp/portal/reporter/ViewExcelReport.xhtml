@@ -16,7 +16,7 @@
             <div class="ui-g-12 card ">
                 <h:form id="ViewReportForm">
                     <tie:websheet id="sheet1" webSheetBean="#{editExcelReportController}"  maxRowsPerPage="30" readOnly="true"/>
-                <p:commandButton value="导出Excel"
+                <p:commandButton value="#{msg.ExportExcel}"
                                  ajax="false" actionListener="#{editExcelReportController.doExport()}">
                     <p:fileDownload value="#{editExcelReportController.exportFile}" />
                 </p:commandButton>

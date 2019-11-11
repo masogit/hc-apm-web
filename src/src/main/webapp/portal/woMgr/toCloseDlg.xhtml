@@ -13,7 +13,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.caseType}</label>
                             <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
-                                <f:selectItems value="#{workOrderMgrController.getAssetFaultType()}" var="item" itemLabel="#{item.faultName}" itemValue="#{item.id}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -70,7 +70,7 @@
                                 <p:inputNumber maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">外部费用</label><!--外部费用-->
+                                <label class="label">#{msg.ExternalExpenses}</label><!--外部费用-->
                                 <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}" readonly="true"/>
                             </h:panelGroup>
                             <p:spacer />

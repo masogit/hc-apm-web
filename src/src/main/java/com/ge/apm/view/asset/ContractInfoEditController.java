@@ -285,7 +285,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             List<ContractInfo> contractList = dao.findByContractNumAndTenantUID(selected.getContractNum(), selected.getTenantUID());
             if (null != contractList && !contractList.isEmpty()) {
                 if (contractList.stream().anyMatch(item -> !Objects.equals(item.getId(), selected.getId()))) {
-                    WebUtil.addErrorMessage("合同编号不能重复使用");
+                    WebUtil.addErrorMessage(WebUtil.getMessage("ContractNumberCannotBeReused"));
                     return;
                 }
             }
@@ -364,9 +364,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 return;
             }
             if (!asset.getSiteUID().equals(selected.getSiteUID())) {
-                WebUtil.addErrorMessage("只能添加合同所在院区的设备");
+                WebUtil.addErrorMessage(WebUtil.getMessage("CanOnlyAddEquipmentInTheSiteWhereTheContractIsLocated"));
             } else if (allItemList.stream().anyMatch(item -> Objects.equals(item.getAssetUid(), asset.getUid()))) {
-                WebUtil.addErrorMessage("该设备已经存在");
+                WebUtil.addErrorMessage(WebUtil.getMessage("ThisEquipmentExists"));
             } else {
                 ContractInfoItem newItem = new ContractInfoItem();
                 newItem.setAssetUid(asset.getUid());

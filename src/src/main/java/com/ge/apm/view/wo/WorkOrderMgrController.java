@@ -1043,7 +1043,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         assigneeId =ua1.getId().toString();
         if (hourRequired) {
             if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() < 0.01) {
-                WebUtil.addErrorMessage("所填工时不能小于0.01");
+                WebUtil.addErrorMessage(WebUtil.getMessage("TheCompletedManhoursTips"));
                 RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
                 return;
             }
@@ -1138,7 +1138,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         boolean valid = true;
         if (confirmedUpDate ==
                 null) {
-            WebUtil.addErrorMessage("恢复时间" + WebUtil.getMessage("ValidationRequire"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
             valid = false;
         }
@@ -1148,7 +1148,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             valid = false;
         }
         if (null == selectedWorkOrder.getRepairResult()) {
-            WebUtil.addErrorMessage("维修结果" + WebUtil.getMessage("ValidationRequire"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("RepairResult") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("repairResult", true);
             valid = false;
         }
@@ -1158,7 +1158,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         hourRequired=  woc.getHourRequired();*/
         if (hourRequired) { //如果工作流配置了工时必填，那么就要jian
             if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
-                WebUtil.addErrorMessage("工时不能小于0.01");
+                WebUtil.addErrorMessage(WebUtil.getMessage("TheCompletedManhoursTips"));
                 RequestContext.getCurrentInstance().addCallbackParam("manHours_input", true);
                 valid = false;
             }
@@ -1194,9 +1194,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     public void takeEquip() {
         if (Strings.isNullOrEmpty(equipmentTaker)) {
-            WebUtil.addErrorMessage("取物人" + WebUtil.getMessage("ValidationRequire"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("equipmentTaker") + WebUtil.getMessage("ValidationRequire"));
         } else if (equipmentTaker.trim().isEmpty()) {
-            WebUtil.addErrorMessage("取物人" + WebUtil.getMessage("ValidationRequire"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("equipmentTaker") + WebUtil.getMessage("ValidationRequire"));
         } else if (takeTime != null && takeTime.after(new Date())) {
             WebUtil.addErrorMessage("取物时间大于当前时间");
             takeTime = null;
@@ -1612,7 +1612,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     public void submitWorkOrder() {
         if(StringUtils.isEmpty(comments)){
-            comments="报价审核";
+            comments= WebUtil.getMessage("QuotationApproval");
         }
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         accessoryList.forEach(item -> {
@@ -1627,7 +1627,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     public void approveWorkOrder() {
         if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
-            WebUtil.addErrorMessage("审核不通过原因必须填写");
+            WebUtil.addErrorMessage(WebUtil.getMessage(WebUtil.getMessage("ApprovalFallureReasonRequired")));
             RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
             return;
         }
@@ -2055,9 +2055,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     public String getManHourShow() {
         if (hourRequired) {
-            return "工时(小时)*";
+            return WebUtil.getMessage("manhours")+"*";
         } else {
-            return "工时(小时)";
+            return WebUtil.getMessage("manhours");
         }
     }
 

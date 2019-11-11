@@ -88,8 +88,8 @@ public final class DbMessageSource extends ResourceBundleMessageSource {
     }
     
     protected void loadMessages() {
-        if(msgCache!=null) return;
-        
+        if(msgCache!=null)
+            return;
         reLoadMessages();
     }
     

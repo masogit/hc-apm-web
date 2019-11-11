@@ -8,25 +8,25 @@
 			</div> -->
 			<div class="ui-g-12 card">
 				<h:form enctype="multipart/form-data">
-					<p:fieldset legend="批量添加电气安全数据" id="uploaderContainer">
+					<p:fieldset legend="#{msg.UploadElectricSafetyDataInBulk}" id="uploaderContainer">
 						<p:panelGrid columns="1" layout="grid"
 							styleClass="ui-panelgrid-blank form-group">
 							<p:fileUpload
 								fileUploadListener="#{measureElectricSafetyController.handleFileUpload}"
 								mode="advanced" dragDropSupport="false" multiple="false"
-								auto="true" invalidFileMessage="只支持ps格式的文件"
-								invalidSizeMessage="文件大小不得超过5M" update=":measureElectricSafetyTab:dataListForm"
+								auto="true" invalidFileMessage="#{msg.OnlyPSFormat}"
+								invalidSizeMessage="#{msg.FileSizeMustNotExceedFiveM}" update=":measureElectricSafetyTab:dataListForm"
 								sizeLimit="5242880" allowTypes="/(\.|\/)(ps|PS)$/"
-								label="添加" cancelLabel="取消" uploadLabel="确认上传" />
+								label="#{msg.Add}" cancelLabel="#{msg.Cancel}" uploadLabel="#{msg.ConfirmUpload}" />
 							<p:growl id="messages" showDetail="true" />
 						</p:panelGrid>
 						<h:panelGroup>
-							<p>说明</p>
+							<p>#{msg.Description}</p>
 							<p>
 								1. <a href="APM_Electric_Safety_Template.ps" title="download">#{msg.downloadTemplateFile}</a>
 							</p>
-							<p>2. 文件中填入要导入的电气安全数据</p>
-							<p>3. 上传文件进行导入</p>
+							<p>2. #{msg.ImportElectricSafetyData}</p>
+							<p>3. #{msg.UpFileImport}</p>
 						</h:panelGroup>
 					</p:fieldset>
 				</h:form>
@@ -34,7 +34,7 @@
 
 			<div class="ui-g-12 card">
 				<h:form id="dataListForm">
-					<p:fieldset legend="电气安全数据导入预览">
+					<p:fieldset legend="#{msg.OverviewOfElectricSafetyDataImport}">
 						<p:dataTable id="datalistId"
 							rendered="#{not empty measureElectricSafetyController.dataList}"
 							value="#{measureElectricSafetyController.dataList}" var="item"
@@ -45,10 +45,10 @@
 							pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
 							rowsPerPageTemplate="20,50,100,500" selection="#{measureElectricSafetyController.selectedItems}" rowKey="#{item.lineIndex}" editable="true" editMode="cell" widgetVar="cellElectircImport">
 							<p:column selectionMode="multiple" style="width:32px;text-align:center" />
-							<p:column headerText="设备名称">
+							<p:column headerText="#{msg.EquipmentName}">
 								<h:outputText value="#{item.assetInfo.name}" />
 							</p:column>
-							<p:column headerText="制造商序列号">
+							<p:column headerText="#{msg.ManufacturerSerialNumber}">
 								<h:outputText value="#{item.assetInfo.serialNum}" />
 							</p:column>
 							<p:column headerText="#{msg.clinicalDeptName}">
@@ -57,56 +57,56 @@
 							<!-- <p:column headerText="工单编号">
 								<h:outputText value="#{item.v2PmOrder.pmNum}" />
 							</p:column> -->
-							<p:column headerText="工单信息" colspan="3">
+							<p:column headerText="#{msg.WorkorderInformation}" colspan="3">
 								<p:cellEditor rendered="#{item.listV2PmOrder!=null}">
 									<f:facet name="output">
 										<h:outputText value="#{item.v2PmOrder.pmNum}/" />
 										<h:outputText value="#{item.v2PmOrder.finished?item.v2PmOrder.strFinishTime:item.v2PmOrder.strPlanTime}">
 											<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd" />
 										</h:outputText>
-										<h:outputText value="/#{item.v2PmOrder.getCurrentPersonName()}/#{item.v2PmOrder.finished?'已完工':'未完工'}" />
+										<h:outputText value="/#{item.v2PmOrder.getCurrentPersonName()}/#{item.v2PmOrder.finished?msg.FinishedO:msg.UnfinishedO}" />
 									</f:facet>
 									<f:facet name="input">
 										<h:selectOneMenu value="#{item.v2PmOrder}" style="width:100%" converter="v2PmOrderConverter">
-											<f:selectItems value="#{item.listV2PmOrder}" var="t" itemLabel="#{t.pmNum}/#{t.finished?t.strFinishTime:t.strPlanTime}/#{t.getCurrentPersonName()}/#{t.finished?'已完工':'未完工'}" itemValue="#{t}" >
+											<f:selectItems value="#{item.listV2PmOrder}" var="t" itemLabel="#{t.pmNum}/#{t.finished?t.strFinishTime:t.strPlanTime}/#{t.getCurrentPersonName()}/#{t.finished?msg.FinishedO:msg.UnfinishedO}" itemValue="#{t}" >
 											</f:selectItems>
 										</h:selectOneMenu>
 									</f:facet>
 								</p:cellEditor>
-								<h:outputText rendered="#{item.listV2PmOrder==null and item.v2PmOrder!=null}" value="#{item.v2PmOrder.pmNum}/#{item.v2PmOrder.finished?item.v2PmOrder.strFinishTime:item.v2PmOrder.strPlanTime}/#{item.v2PmOrder.getCurrentPersonName()}/#{item.v2PmOrder.finished?'已完工':'未完工'}" />
+								<h:outputText rendered="#{item.listV2PmOrder==null and item.v2PmOrder!=null}" value="#{item.v2PmOrder.pmNum}/#{item.v2PmOrder.finished?item.v2PmOrder.strFinishTime:item.v2PmOrder.strPlanTime}/#{item.v2PmOrder.getCurrentPersonName()}/#{item.v2PmOrder.finished?msg.FinishedO:msg.UnfinishedO}" />
 							</p:column>
 							<!-- <p:column headerText="计划完成时间">
 								<h:outputText value="#{item.v2PmOrder.planTime}" >
 									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 								</h:outputText>
 							</p:column> -->
-							<p:column headerText="资产编号">
+							<p:column headerText="#{msg.AssetID}">
 								<h:outputText value="#{item.financingNum}" />
 							</p:column>
-							<p:column headerText="保护接地阻抗">
+							<p:column headerText="#{msg.ProtectiveGroundImpedance}">
 								<h:outputText value="#{item.protectGroundImpedance}" />
 							</p:column>
-							<p:column headerText="患者漏电流">
+							<p:column headerText="#{msg.PatientElectricLeakage}">
 								<h:outputText value="#{item.patientElectricLeakage_app}" />
 							</p:column>
-							<p:column headerText="对地漏电流">
+							<p:column headerText="#{msg.GroundElectricLeakage}">
 								<h:outputText value="#{item.groundElectricLeakage_normal}" />
 							</p:column>
-							<p:column headerText="外壳漏电流">
+							<p:column headerText="#{msg.ShellElectricLeakage}">
 								<h:outputText value="#{item.shellElectricLeakage_normal}" />
 							</p:column>
-							<p:column headerText="设备漏电流">
+							<p:column headerText="#{msg.EquipmentElectricLeakage}">
 								<h:outputText value="#{item.equipmentElectricLeakage}" />
 							</p:column>
 							<!-- <p:column headerText="设备类别">
 								<h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}" />
 							</p:column> -->
-							<p:column headerText="检测仪时间">
+							<p:column headerText="#{msg.DetectorTime}">
 								<h:outputText value="#{item.checkDate}" >
 									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
 								</h:outputText>
 							</p:column>
-							<p:column headerText="存储器时间">
+							<p:column headerText="#{msg.MemoryTime}">
 								<h:outputText value="#{item.storageDate}" >
 									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
 								</h:outputText>
@@ -118,7 +118,7 @@
 								<h:outputText value="#{item.groupType}" />
 							</p:column> -->
 							
-							<p:column headerText="警告信息">
+							<p:column headerText="#{msg.WarningMessage}">
 								<h:outputText value="#{item.warnMessage}" />
 							</p:column>
 							<f:facet name="{Toolbar}">

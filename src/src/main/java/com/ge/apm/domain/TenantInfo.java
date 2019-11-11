@@ -71,7 +71,7 @@ public class TenantInfo implements Serializable {
     @Column(name = "location_en")
     private String locationEn;
     @Column(name = "time_zone")
-    private Integer timeZone;
+    private Double timeZone;
     @Size(max = 16)
     @Column(name = "default_lang")
     private String defaultLang;
@@ -142,6 +142,9 @@ public class TenantInfo implements Serializable {
     @Transient
     private String plainPassword;
 
+    @Column(name = "nation")
+    private Integer nation;// 1、Chinese 2、India 3、
+
     @Transient
     private String cpmURL;
 
@@ -153,9 +156,15 @@ public class TenantInfo implements Serializable {
 		this.type = type;
 	}
 
+    public Integer getNation() {
+        return nation;
+    }
 
+    public void setNation(Integer nation) {
+        this.nation = nation;
+    }
 
-	public TenantInfo() {
+    public TenantInfo() {
         isInsulate = false;
         isEnabled = false;
         wfAutoStep2 = false;
@@ -260,11 +269,11 @@ public class TenantInfo implements Serializable {
         this.locationEn = locationEn;
     }
 
-    public Integer getTimeZone() {
+    public Double getTimeZone() {
         return timeZone;
     }
 
-    public void setTimeZone(Integer timeZone) {
+    public void setTimeZone(Double timeZone) {
         this.timeZone = timeZone;
     }
 

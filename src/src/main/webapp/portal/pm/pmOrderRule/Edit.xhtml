@@ -74,9 +74,9 @@
                             <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="false" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class ="label">#{msg.period}(月)</label>
+                            <label class ="label">#{msg.period}(#{msg.Month})</label>
                             <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="0" maxValue="120" decimalPlaces="0" 
-                            required="false" requiredMessage="超出范围（只能是1到120）！"  />
+                            required="false" requiredMessage="#{msg.OutOfRange}"  />
                            <!--  <p: id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/> -->
                         </h:panelGroup>
                         <h:panelGroup >
@@ -102,7 +102,7 @@
 	                       </p:selectOneMenu>
                                  <h:outputText id="safetyReport"  value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}"  style="display:none" />
 	                        &nbsp;&nbsp;
-	                   <p:commandButton  rendered="#{not empty pmOrderRuleController.selected.safetyReport}" immediate="true" value="预览" onclick="preparePreview(1,'PmOrderRuleEditForm');" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+	                   <p:commandButton  rendered="#{not empty pmOrderRuleController.selected.safetyReport}" immediate="true" value="#{msg.preview}" onclick="preparePreview(1,'PmOrderRuleEditForm');" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                        </h:panelGroup>
 	                   
 	                  <h:panelGroup>
@@ -114,21 +114,21 @@
                        	</p:selectOneMenu>
                                         <h:outputText id="performanceReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.performanceReport)}"  style="display:none"  />
                        	 &nbsp;&nbsp;
-                     	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="预览" onclick="preparePreview(2,'PmOrderRuleEditForm');"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                     	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="#{msg.preview}" onclick="preparePreview(2,'PmOrderRuleEditForm');"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                      </h:panelGroup>
 
                        <!--rendered="#{(not empty pmOrderRuleController.selected.id) and userContextService.hasRole('AssetHead')}"-->
                        <h:panelGroup rendered="#{userContextService.hasRole('AssetHead')}">
                            <!-- hide while creation -->
-                           <label class="label">保养模版</label>
-                           <p:commandLink value="下载模版示例" actionListener="#{pmOrderRuleController.generateReportTemplateFile()}" ajax="false" immediate="true">
+                           <label class="label">#{msg.MaintenanceTemplate}</label>
+                           <p:commandLink value="#{msg.DownloadSampleTemplate}" actionListener="#{pmOrderRuleController.generateReportTemplateFile()}" ajax="false" immediate="true">
                                <p:fileDownload value="#{pmOrderRuleController.reportTemplateFile}"/>
                            </p:commandLink><br/>
                            <!--<p:commandButton value="下载模版示例" actionListener="#{pmOrderRuleController.generateReportTemplateFile()}" process="@this">
                                <p:fileDownload value="#{pmOrderRuleController.reportTemplateFile}"/>
                            </p:commandButton><br/>-->
                            <h:panelGroup id="importReportTemplate">
-                               <p:commandButton value="导入模版" process="@this" update="importReportTemplate" oncomplete="PF('uploadEditDialog').show()" rendered="#{empty pmOrderRuleController.selected.reportStorageId}"/>
+                               <p:commandButton value="#{msg.ImportTemplate}" process="@this" update="importReportTemplate" oncomplete="PF('uploadEditDialog').show()" rendered="#{empty pmOrderRuleController.selected.reportStorageId}"/>
                                <p:link href="#{fileDownloadService.getFileUrl(pmOrderRuleController.selected.reportStorageId)}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}">#{pmOrderRuleController.selected.reportTemplateName}</p:link>
                                <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="${msg.Delete}" update=":PmOrderRuleEditForm:importReportTemplate :uploadEditDialogForm :growl" process="@this" actionListener="#{pmOrderRuleController.removeReportTemplate}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}"/>
                            </h:panelGroup>
@@ -139,7 +139,7 @@
 
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <label class="label">增加检查项</label>
+                            <label class="label">#{msg.AddCheckItem}</label>
                             <p:dataTable id="addCheckList" class="addCheckList" value="#{pmOrderRuleController.checkItemLists}" var="item" widgetVar="addCheckList" lazy="false" paginator="false"
                                          rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                 <p:column headerText="#{msg.name}">
@@ -151,7 +151,7 @@
                                 <!--<p:column headerText="注意事项">
                                     <h:outputText value="#{item.remark}"  style="word-wrap: break-word;"/>
                                 </p:column>-->
-                                <p:column headerText="项目内容">
+                                <p:column headerText="#{msg.Items}">
                                     <h:outputText value="#{item.remark}"  style="word-wrap: break-word;"/>
                                 </p:column>
                                 <p:column headerText="#{msg.Actions}">
@@ -179,7 +179,7 @@
         <ui:include src="ItemEdit.xhtml"/>
 
 
-<p:dialog id="uploadEditDialog" widgetVar="uploadEditDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="上传模版文件">
+<p:dialog id="uploadEditDialog" widgetVar="uploadEditDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.UploadTemplateFile}">
 <h:form id="uploadEditDialogForm" >
     <h:panelGroup id="display1" >
         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -190,8 +190,8 @@
                                multiple="false" sizeLimit="10000000" update=":uploadEditDialogForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(docx)$/" label="#{msg.Add}" rendered="#{empty pmOrderRuleController.uploadedFile}" />
             </h:panelGroup>
             <h:panelGroup>
-                <p>说明</p>
-                <p>上传文件进行导入</p>
+                <p>#{msg.Description}</p>
+                <p>#{msg.UpFileImport}</p>
             </h:panelGroup>
         </p:panelGrid>
         <h:panelGroup>
