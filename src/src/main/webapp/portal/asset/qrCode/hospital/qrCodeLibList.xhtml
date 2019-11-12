@@ -13,8 +13,8 @@
 
             <div class="ui-g-12 card">
                 <h:form >
-                    <p:commandButton id="qrCodeLibCreateButton" value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
-                    <p:commandButton value="导入二维码" title="导入二维码" action="/portal/asset/qrCode/importQrcode?faces-redirect=true"/>
+                    <p:commandButton id="qrCodeLibCreateButton" value="#{msg.CreateQRCode}" title="#{msg.CreateQRCode}" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
+                    <p:commandButton value="#{msg.ImportQRCode}" title="#{msg.ImportQRCode}" action="/portal/asset/qrCode/importQrcode?faces-redirect=true"/>
                 </h:form>
 
                 <h:form id="qrCodeLibListForm">
@@ -29,9 +29,9 @@
 
                         <p:ajax event="rowSelect" update="viewButton"/>
                         <p:ajax event="filter" listener="#{qrCodeLibController.onFilter}" />
-                        <p:column headerText="医院" style="word-wrap: break-word;" exportable="false">
+                        <p:column headerText="#{msg.Hospital}" style="word-wrap: break-word;" exportable="false">
                             <f:facet name="header">
-                                <h:outputText value="医院"/><br/>
+                                <h:outputText value="#{msg.Hospital}"/><br/>
                                 <p:overlayPanel widgetVar="varPanelSiteFilter" for="filterOrg" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userContextService.hasRole('ITAdmin')?orgTreeController.tenantOrgTree:orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
@@ -49,13 +49,13 @@
                             </f:facet>
                             <h:outputText value="#{qrCodeLibController.getHospitalName(item.siteUID)}"/>
                         </p:column>
-                        <p:column headerText="医院" style="word-wrap: break-word;" exportable="true" visible="false">
+                        <p:column headerText="#{msg.Hospital}" style="word-wrap: break-word;" exportable="true" visible="false">
                             <h:outputText value="#{qrCodeLibController.getHospitalName(item.siteUID)}"/>
                         </p:column>
-                        <p:column headerText="二维码" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.QRCode}" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
-                        <p:column headerText="当前状态" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.CurrentStatus}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />

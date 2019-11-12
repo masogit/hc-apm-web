@@ -60,7 +60,7 @@ public class ExportToBeTerminatedAppraisalService {
                 AssetInfo asset = new AssetInfo();
                 asset.setLineNum(dataRow++);
 
-                String funNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
+                String funNum = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("AssetID")));
                 if (org.springframework.util.StringUtils.isEmpty(funNum)) {
                     //end of file
                     break;
@@ -69,14 +69,14 @@ public class ExportToBeTerminatedAppraisalService {
                 List<AssetInfo> byFinancingNumAndTenantUID = assetInfoRepository.findByFinancingNumAndTenantUID(funNum, tenantUid);
                 byFinancingNumAndTenantUID.removeIf(i -> !siteIds.contains(i.getSiteUID()));
                 if (byFinancingNumAndTenantUID.isEmpty()) {
-                    WebUtil.addErrorMessage(String.format("资产编号[%s]对应的设备不存在，不能报废！", funNum));
+                    WebUtil.addErrorMessage(String.format(WebUtil.getMessage("DoesNotExist"), funNum));
                 } else {
                     result.addAll(byFinancingNumAndTenantUID);
                 }
             }
 
         } catch (Exception e) {
-            throw new Exception("第" + dataRow + "行数据错误:" + e.getMessage());
+            throw new Exception(WebUtil.getMessage("Page") + dataRow + WebUtil.getMessage("DataError") + e.getMessage());
         }
         return result;
     }
@@ -114,8 +114,8 @@ public class ExportToBeTerminatedAppraisalService {
         List<Map<ASSET_DETAIL, Object>> list = new ArrayList<>();
         for (String id : selectedIds) {
             AssetInfo assetInfo = assetInfoRepository.findByUid(id);
-            setValue(departmentName, assetInfo.getClinicalDeptName(), "所选设备的科室信息不一致");
-            setValue(terminalCause, assetInfo.getTerminationCause(), "所选设备的报废原因不一致");
+            setValue(departmentName, assetInfo.getClinicalDeptName(), WebUtil.getMessage("Inconsistent"));
+            setValue(terminalCause, assetInfo.getTerminationCause(), WebUtil.getMessage("ReasonInconsistent"));
             Map<ASSET_DETAIL, Object> map = new HashMap<>();
             map.put(financing_num, assetInfo.getFinancingNum());
             map.put(asset_name, assetInfo.getName());
