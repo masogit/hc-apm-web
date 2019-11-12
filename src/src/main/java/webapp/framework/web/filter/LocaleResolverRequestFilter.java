@@ -60,7 +60,7 @@ public class LocaleResolverRequestFilter extends OncePerRequestFilter {
         //如果用户在浏览器端设置了locale,以用户设置为主，否则，以租户上的默认语言为主
         Cookie[] cookies = request.getCookies();
         boolean carryCookie = false;
-        if(cookies.length > 0){
+        if(cookies != null && cookies.length > 0){
             for (Cookie cookie : cookies) {
                 //System.out.println(cookie.getName()+":"+cookie.getValue());
                 if(cookie.getName().equals(LOCALE_PARAMETER)){

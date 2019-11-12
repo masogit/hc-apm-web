@@ -47,7 +47,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 	//如果是新增，只有后台itadmin进来 可以修改。 如果是修改 全灰色
 	public Boolean subscribe(){
-		if(this.getCRUDActionName().equals("修改")){
+		if(this.getCRUDActionName().equals(WebUtil.getMessage("Edit"))){
 			return true; //不可修改
 		}else if(userContextService.hasRole("ITAdmin")){
 			return false;
@@ -106,7 +106,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		if (!requiredCheck()) {
 			return;
 		}
-		if(this.getCRUDActionName().equals("新增")) {
+		if(this.getCRUDActionName().equals(WebUtil.getMessage("Create"))) {
 			if (selectType == 1) {//维修
 				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
 				if(tagUserMode012.isEmpty()) {
