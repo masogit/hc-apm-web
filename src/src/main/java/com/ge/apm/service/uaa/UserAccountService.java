@@ -297,4 +297,10 @@ public class UserAccountService {
 	public String getUserLanguageByLoginName(String loginName) {
 		return userAccountMapper.getUserLanguageByLoginName(loginName);
 	}
+
+    @Transactional
+    public void deleteUserAccount(UserAccount userAccount){
+        userRoleRepository.deleteByUserAccount(userAccount.getId());
+        userAccountRepository.delete(userAccount);
+    }
 }

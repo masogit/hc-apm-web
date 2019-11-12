@@ -502,7 +502,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
         if (canDelete()) {
-            super.delete();
+            //super.delete();
+            userAccountService.deleteUserAccount(this.selected);
+            WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
         }
     }
 
