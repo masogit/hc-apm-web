@@ -21,7 +21,7 @@
                        </p:selectOneMenu>
                    </h:panelGroup>
 
-                <p:fieldset legend="#{msg.SelectedEquipment}" rendered="#{assetSubscriberController.CRUDActionName.equals('#{msg.Edit}')}" >
+                <p:fieldset legend="#{msg.SelectedEquipment}" rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Edit)}" >
                     <h:panelGroup>
                         <h:panelGrid columns="2">
                             <h:outputLabel class="label">#{msg.EquipmentName2}:</h:outputLabel>
@@ -31,7 +31,7 @@
                     </h:panelGroup>
                 </p:fieldset>
 
-                <p:fieldset rendered="#{assetSubscriberController.CRUDActionName.equals('#{msg.Create}')}" legend="#{msg.EquipmentSelection}">
+                <p:fieldset rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}" legend="#{msg.EquipmentSelection}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup  >
                         <!--设备分类-->
@@ -73,7 +73,7 @@
                     <!--<h:panelGroup gaolei>-->
                 <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals('#{msg.Create}')}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
                             itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
-                            required="false" requiredMessage="已选设备 #{msg.ValidationRequire}">
+                            required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
                     <f:facet name="sourceCaption">#{msg.EquipmentToBeSelected}</f:facet>
                     <f:facet name="targetCaption">#{msg.SelectedEquipment}</f:facet>
                     <p:ajax event="transfer" listener="#{assetSubscriberController.onAssetsTransfer}" />

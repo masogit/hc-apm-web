@@ -2183,6 +2183,15 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NumberOfListItems', '列表项个数', 'Number of List Items', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ListItem', '列表项', 'List Item', NULL, '-1');
 
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentMustBeSelectedErrMsg', '设备没有选取,请务必选择设备', 'The equipment is not selected, please be sure to select it', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MessageSettingsCannotBeEmpty', '消息设置不可为空', 'Message Settings cannot be empty', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BeSureToSelectPriority', '务必选择紧急程度', 'Be sure to select priority', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DuplicateCreateSubscriptionsErrMsg', '不能重复创建相同设备的消息订阅', 'Cannot repeatedly create the message subscriptions for the same equipment', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentSubscriptionSuccessTip', '成功创建设备消息订阅', 'Equipment message subscription successfully created', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TimeoutMessageErrTip', '务必选择工单超时消息推送', 'Be sure to select the message push for workorder timeout', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BeSureToSelectWorkorderPriority', '务必选择工单紧急程度', 'Be sure to select workorder priority', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DuplicateSubscriptionsErrMsg', '不能重复相同的设备消息订阅', 'Cannot repeat the message subscriptions for the same equipment', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Tag', '标签', 'Tag', NULL, '-1');
 
 
 
