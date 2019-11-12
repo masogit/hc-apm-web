@@ -23,6 +23,7 @@ import com.google.common.base.Strings;
 
 import javaslang.control.Option;
 import org.eclipse.jetty.util.B64Code;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
@@ -751,6 +752,19 @@ public class UserContextService implements Serializable {
 
     public boolean isIBorUltraSoundIBorDealerEndUser(){
         return isIBEndUser() || isUltraSoundIBEndUser() || isDealerEndUser();
+    }
+
+    /***
+     *  是否本地化 维修工作台在非中文状态下不显示外部工单和外部远程工单
+     *  TODO LocalHolder.getLocale = null的情况如何处理
+     * @return
+     */
+    public boolean isLocale(){
+        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+            return true;
+        } else {
+            return false;
+        }
     }
     
     public boolean isAccountEndUser(){
