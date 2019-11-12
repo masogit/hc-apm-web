@@ -2194,6 +2194,18 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Tag', '标签', 'Tag', NULL, '-1');
 
 
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FailedGenerateWordErrMsg', 'Word模版生成失败', 'Failed to generate Word template', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TakingTimeIsGreaterThanCurrentTimeTip', '取物时间大于当前时间', 'Taking time is greater than the current time', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NoEquipmentSelectedNoRepairTip', '没有选择设备,不能报修', 'No equipment selected, no repair', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ToBeTerminatedCannotBeRequestedFor repairTip', '所选设备待报废,不能报修', 'The selected equipment is to be terminated and cannot be requested for repair', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NoAssetDepartmentNoRepaired', '所选设备没有所属科室,不能报修', 'The selected equipment cannot be requested for repair for no asset department', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MVSEquipmentRepairRecord', 'MVS设备维修记录', 'MVS Equipment Repair Record', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DownloadTheReportTip', '请选择需要下载报告的工单！', 'Please select the workorder for which you want to download the report！', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WorkorderIsEmpty', '工单报告为空!', 'Workorder is empty!', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'StartDate', '开始日期', 'Start Date', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Vacation', '休假', 'Vacation', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EndDate', '结束日期！', 'End Date', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DateTypeCannotBeEmpty', '日期类型不能为空', 'Date Type cannot be empty', NULL, '-1');
 
 
 
