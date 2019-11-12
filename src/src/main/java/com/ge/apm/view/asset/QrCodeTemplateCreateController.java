@@ -127,7 +127,7 @@ public class QrCodeTemplateCreateController {
             item.setSiteUID(thisTemplate.getSiteUID());
         });
         elementDao.save(thisTemplateElementList);
-        WebUtil.addSuccessMessage("修改已经保存");
+        WebUtil.addSuccessMessage("");
     }
     
     public Map<String, String> getFieldsMap() {

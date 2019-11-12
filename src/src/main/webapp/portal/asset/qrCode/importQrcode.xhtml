@@ -11,13 +11,13 @@
 
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="#{msg.Import}二维码"/>
+                <p:outputLabel class="pageTitle" value="#{msg.Import}#{msg.QRCode}"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id="importForm">
 
                     <h:panelGroup >
-                        <p:commandButton value="上传文件"  process="@this" update=":importForm" oncomplete="PF('uploadDialog').show()" rendered="#{empty compareImportController.file}"/>
+                        <p:commandButton value="#{msg.uploadFile}"  process="@this" update=":importForm" oncomplete="PF('uploadDialog').show()" rendered="#{empty compareImportController.file}"/>
                         <h:outputText value="#{qrCodeImportController.file.fileName}" />
                         <!--<p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{qrCodeImportController.cancelUpload}" update=":importForm :uploadDialogForm" rendered="#{not empty qrCodeImportController.file}"/>-->
                     </h:panelGroup>
@@ -31,10 +31,10 @@
                         <p:column headerText="#{msg.qrcode}" >
                             <h:outputText value="#{item['QrcodeItem']}"/>
                         </p:column>
-                        <p:column headerText="使用院区" >
+                        <p:column headerText="#{msg.UsedSite}" >
                             <h:outputText value="#{item['org']}"/>
                         </p:column>
-                        <p:column headerText="状态" >
+                        <p:column headerText="#{msg.status}" >
                             <f:facet name="filter">
                                 <!--                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
                                                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -44,7 +44,7 @@
                             </f:facet>
                             <h:outputText value="#{item['status']}"/>
                         </p:column>
-                        <p:column headerText="警告信息" >
+                        <p:column headerText="#{msg.WarningMessage}" >
                             <h:outputText value="#{item['res']}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
@@ -78,10 +78,10 @@
                                            multiple="false" sizeLimit="10000000" update=":uploadDialogForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty qrCodeImportController.file}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p>说明</p>
+                            <p>#{msg.description}</p>
                             <p>1. <a href="QRCodeImportTemplate.xlsx" title="download">#{msg.downloadTemplateFile}</a> </p>
-                            <p>1. 文件中填入要导入的二维码</p>
-                            <p>2. 上传文件进行导入</p>
+                            <p>1. #{msg.NoQRCodeImported}</p>
+                            <p>2. #{msg.upFileImport}</p>
                         </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup>

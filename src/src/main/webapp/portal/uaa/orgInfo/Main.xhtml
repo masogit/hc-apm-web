@@ -24,12 +24,12 @@
             <div class="ui-g-12 card ">
                 <p:tabView id="tabview" >
                     <p:ajax event="tabChange"/>
-                    <p:tab title="组织机构编辑">
+                    <p:tab title="#{msg.OrganizationPathEdit}">
                         <div class="card" style="height:500px;">
                         <ui:include src="Mgr.xhtml"/>
                         </div>
                     </p:tab>
-                    <p:tab title="组织机构导入">
+                    <p:tab title="#{msg.OrganizationPathImport}">
                         <ui:include src="Import.xhtml"/>
                     </p:tab>
                 </p:tabView>
