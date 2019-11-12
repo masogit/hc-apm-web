@@ -71,7 +71,7 @@
                         </h:panelGroup>
                 </p:panelGrid>
                     <!--<h:panelGroup gaolei>-->
-                <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals('#{msg.Create}')}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
+                <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
                             itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
                             required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
                     <f:facet name="sourceCaption">#{msg.EquipmentToBeSelected}</f:facet>
