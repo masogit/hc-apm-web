@@ -363,7 +363,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             pmOrderRuleCheckListRepository.save(checkItemLists);
         }
         checkItemLists.clear();
-        WebUtil.addSuccessMessage(WebUtil.getMessage("保存成功！"));
+        WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess！"));
     }
 
     public void getName() {
@@ -644,7 +644,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             this.reportTemplateFile = new DefaultStreamedContent(doc, "application/msword", "maintenance-report-template.docx");
         } catch (Exception e)  {
             Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while generate word template", e);
-            WebUtil.addErrorMessage("Word模版生成失败");
+            WebUtil.addErrorMessage(WebUtil.getMessage("FailedGenerateWordErrMsg"));
         }finally {
             stream.close();
         }
