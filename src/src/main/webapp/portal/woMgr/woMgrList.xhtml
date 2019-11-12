@@ -90,7 +90,7 @@
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                     </h:outputText>
                 </p:column>
-                <p:column headerText="维修人" rendered="#{workOrderMgrController.queryIndex==8}">
+                <p:column headerText="#{msg.Assignee}" rendered="#{workOrderMgrController.queryIndex==8}">
                     <!--6 表示 step_name 是待关单-->
                     <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,6)}"/>
                 </p:column>
