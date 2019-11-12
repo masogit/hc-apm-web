@@ -8,19 +8,19 @@
     <div class="ui-g">
         <div class="ui-g-12 card">
             <h:form enctype="multipart/form-data">
-                <p:fieldset legend="批量导入 组织机构信息" id="uploaderContainer">
+                <p:fieldset legend="#{msg.ImportInBatch}" id="uploaderContainer">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <p:fileUpload fileUploadListener="#{orgImportController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
-                                      invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M" update="@(form) :tabview:orgEditForm:orgTree"
-                                      sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
+                                      invalidFileMessage="#{msg.OnlySupportsXlsOrXlsxFormat}" invalidSizeMessage="#{msg.FileSizeMustNotExceedFiveM}" update="@(form) :tabview:orgEditForm:orgTree"
+                                      sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.ImportFromExcel}" cancelLabel="#{msg.Cancel}" uploadLabel="#{msg.ConfirmUpload}" />
                     </p:panelGrid>
                     <h:panelGroup>
-                        <p>说明</p>
+                        <p>#{msg.description}</p>
                         <p>
                             1. <a href="APM_Org_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
                         </p>
-                        <p>2. 文件中填入要导入的用户数据</p>
-                        <p>3. 上传文件进行导入</p>
+                        <p>2. #{msg.FillInTheFileToBeImported}</p>
+                        <p>3. #{msg.upFileImport}</p>
                     </h:panelGroup>
                 </p:fieldset>
             </h:form>
@@ -30,13 +30,13 @@
             <h:form id="dataListForm">
                 <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false">
                 </p:messages>
-                <p:fieldset legend="导入的数据">
+                <p:fieldset legend="#{msg.ImportedData}">
                     <p:dataTable id="datalist2" rendered="#{not empty orgImportController.importFailedDataList}"
                                  value="#{orgImportController.importFailedDataList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
 
-                        <p:column headerText="EXCEL行数">
+                        <p:column headerText="#{msg.execlRowNum}">
                             <h:outputText value="#{item.excelIndex}" />
                         </p:column>
                         <p:column headerText="#{msg.Institution}">
@@ -54,7 +54,7 @@
                         <!--<p:column headerText="UUID">-->
                             <!--<h:outputText value="#{item.uuid}" />-->
                         <!--</p:column>-->
-                        <p:column headerText="备注">
+                        <p:column headerText="#{msg.Remark}">
                             <h:outputText value="#{item.status}" />
                         </p:column>
                         <f:facet name="{Toolbar}">
