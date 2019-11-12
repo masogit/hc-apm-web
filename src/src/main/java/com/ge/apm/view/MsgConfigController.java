@@ -99,7 +99,7 @@ public class MsgConfigController extends JpaCRUDController<MsgTenant> implements
                 msgCTDao.save(msgT);
             }
         }
-        WebUtil.addSuccessMessage("消息配置保存成功");
+        WebUtil.addSuccessMessage(WebUtil.getMessage("MessageConfigurationSaveSuccess"));
     }
 
 
