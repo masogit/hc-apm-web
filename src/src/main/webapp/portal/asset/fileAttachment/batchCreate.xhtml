@@ -111,7 +111,7 @@
                         <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0"
                                  rendered="#{'vlink' ne assetFileAttachmentController.boSubTypeBatch}">
                             <h:panelGroup rendered="#{assetFileAttachmentController.batchBlobObject.objectName==null}">
-                                <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatch}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatch}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                               multiple="false" sizeLimit="500000000" update=":FileAssetForm:upload" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
                                 <!--<p:growl id="messages" showDetail="true" />-->
                             </h:panelGroup>
