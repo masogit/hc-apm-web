@@ -121,12 +121,15 @@
                             <h:outputText value="#{item.qrCode}" title="#{item.qrCode}" />
                         </p:column>
                         <p:column headerText="#{msg.WorkorderQuantity}">
-                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(item.uid))}" target="_Blank">
+                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"  action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(item.uid))}" target="_Blank">
                                 <h:outputText value="#{item.workOrderCount}" title="#{item.workOrderCount}" />
-                            </h:commandLink>
+                            </h:commandLink>-->
                             <!--<a href="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;assetUID='.concat(item.uid))}" target="_Blank">
                                 <h:outputText value="#{item.workOrderCount}" title="#{item.workOrderCount}" />
                             </a>-->
+                            <a href="/geapm/portal/woMgr/workOrderList.xhtml?query=12&amp;queryAssetUID=#{item.uid}" target="_Blank">
+                                <h:outputText value="#{item.workOrderCount}" title="#{item.workOrderCount}" />
+                            </a>
                         </p:column>
 
                         <f:facet name="{Toolbar}">

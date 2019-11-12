@@ -46,7 +46,7 @@
                              rendered="#{'vlink' ne assetFileAttachmentController.selected.boSubType}">
                         <h:panelGroup
                                 rendered="#{assetFileAttachmentController.isCreatAction() and assetFileAttachmentController.selected.objectName==null}">
-                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/"
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/"
                                           fileUploadListener="#{assetFileAttachmentController.handleFileUpload}"
                                           mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                           multiple="false" sizeLimit="500000000"
