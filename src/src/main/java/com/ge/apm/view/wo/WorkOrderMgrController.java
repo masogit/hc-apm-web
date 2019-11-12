@@ -1202,7 +1202,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         } else if (equipmentTaker.trim().isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("equipmentTaker") + WebUtil.getMessage("ValidationRequire"));
         } else if (takeTime != null && takeTime.after(new Date())) {
-            WebUtil.addErrorMessage("取物时间大于当前时间");
+            WebUtil.addErrorMessage(WebUtil.getMessage("TakingTimeIsGreaterThanCurrentTimeTip"));
             takeTime = null;
         } else {
             takeTime = new Date();
@@ -1244,7 +1244,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
 
         if(requestReason==null){
-            newServiceRequest.setRequestReason("设备故障");
+            newServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
         }else{
             newServiceRequest.setRequestReason(requestReason.toString());
         }
@@ -1258,29 +1258,29 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
-        faultReason="设备故障";
+        faultReason=WebUtil.getMessage("EquipmentFault");
         selected = null;
     }
 
     public void saveServiceRequest() {
         if(StringUtils.isEmpty(faultReason)){
-            newServiceRequest.setRequestReason("设备故障");
+            newServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
         }else{
             newServiceRequest.setRequestReason(faultReason);
         }
 
         if (null == selectedAsset) {
-            WebUtil.addErrorMessage("没有选择设备,不能报修");
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoEquipmentSelectedNoRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
             return;
         }
         if (selectedAsset.getStatus() == 4) {
-            WebUtil.addErrorMessage("所选设备待报废,不能报修");
+            WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
-            WebUtil.addErrorMessage("所选设备没有所属科室,不能报修");
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoAssetDepartmentNoRepaired"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else {
@@ -1360,7 +1360,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     public void reassignWorkOrder() {
         if(StringUtils.isEmpty(comments)){
-            comments="工作需要";
+            comments=WebUtil.getMessage("WorkRequirements");
         }
         woService.reassignWorkOrder(selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
         cancel();
