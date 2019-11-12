@@ -22,7 +22,7 @@
                     </h:panelGroup>
                     <h:panelGroup >
                         <label class="label">#{msg.AssetTag}*</label>
-                        <p:selectOneMenu id="assetTag" disabled="#{tagSubscriberController.getCRUDActionName().equals('修改')}" value="#{tagSubscriberController.selected.tagId}" required="true" requiredMessage="#{msg.EquipmentLabelCannotBeEmpty}">
+                        <p:selectOneMenu id="assetTag" disabled="#{tagSubscriberController.getCRUDActionName().equals(msg.Edit)}" value="#{tagSubscriberController.selected.tagId}" required="true" requiredMessage="#{msg.EquipmentLabelCannotBeEmpty}">
                             <p:ajax process="@this"></p:ajax>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{tagSubscriberController.assetTags}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
@@ -31,7 +31,7 @@
 
                     <h:panelGroup>
                         <label class="label">#{msg.SelectType}</label>
-                        <p:selectOneMenu disabled="#{!tagSubscriberController.getCRUDActionName().equals('#{msg.Create}')}" required="true" value="#{tagSubscriberController.selectType}" requiredMessage="#{msg.EquipmentLabelCannotBeEmpty}">
+                        <p:selectOneMenu disabled="#{!tagSubscriberController.getCRUDActionName().equals(msg.Create)}" required="true" value="#{tagSubscriberController.selectType}" requiredMessage="#{msg.EquipmentLabelCannotBeEmpty}">
                             <p:ajax update="scriTab:AssetTagSubscribEditForm" event="change"></p:ajax>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="#{msg.repair}" itemValue="1"/>
