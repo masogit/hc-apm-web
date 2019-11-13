@@ -156,7 +156,7 @@
 
 
                    -->
-                    <h:panelGrid columns="2">
+                    <h:panelGrid columns="2" rendered = "#{userContextService.isLocale()}">
                         <h:panelGroup>
                             <h:panelGrid columns="2">
                                 <p:outputLabel value="#{msg.MeasurementEvent}:"/>
