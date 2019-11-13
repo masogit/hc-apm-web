@@ -13,11 +13,11 @@
 
                 <h:panelGroup>
                     <label class="label">#{msg.StartDate}*</label>
-                    <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{userVacationScheduleController.startDate}" required="true" requiredMessage="#{msg.StartDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{userVacationScheduleController.startDate}" required="true" requiredMessage="#{msg.StartDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.EndDate}*</label>
-                    <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{userVacationScheduleController.endDate}" required="true" requiredMessage="#{msg.EndDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{userVacationScheduleController.endDate}" required="true" requiredMessage="#{msg.EndDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.DateType}*</label>
