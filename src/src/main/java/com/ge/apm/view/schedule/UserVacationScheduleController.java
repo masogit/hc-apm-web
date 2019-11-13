@@ -219,7 +219,7 @@ public class UserVacationScheduleController extends GenericCRUDUUIDController<Us
 
         List<UserSchedule> tempUserScheduleList =  userScheduleService.getUserWorkList(this.selected.getUserAccount(), this.selected.getScheduleDate(), this.selected.getScheduleDateStage());
         for (UserSchedule us : tempUserScheduleList) {
-            auditInfo += us.getUserAccount().getName() + " " + sdf.format(us.getScheduleDate()) + "有排班记录！";
+            auditInfo += us.getUserAccount().getName() + " " + sdf.format(us.getScheduleDate()) + WebUtil.getMessage("HasAScheduleRecord");
             return false;
         }
 

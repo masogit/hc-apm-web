@@ -890,7 +890,7 @@ public class UserContextService implements Serializable {
     }
 
     public String timeFormat(){
-        if(isInternationalVersion()){
+        if(!isLocale()){
             return "MM/dd/yyyy";
         }else{
             return "yyyy/MM/dd";
@@ -898,7 +898,7 @@ public class UserContextService implements Serializable {
     }
 
     public String timeFormat8(){
-        if(isInternationalVersion()){
+        if(!isLocale()){
             return "MM-dd-yyyy";
         }else{
             return "yyyy-MM-dd";
@@ -906,7 +906,7 @@ public class UserContextService implements Serializable {
     }
 
     public String timeFormat12(){
-        if(isInternationalVersion()){
+        if(!isLocale()){
             return "MM/dd/yyyy HH:mm";
         }else{
             return "yyyy/MM/dd HH:mm";
@@ -914,7 +914,7 @@ public class UserContextService implements Serializable {
     }
 
     public String timeFormat14(){
-        if(isInternationalVersion()){
+        if(!isLocale()){
             return "MM/dd/yyyy HH:mm:ss";
         }else{
             return "yyyy/MM/dd HH:mm:ss";
@@ -922,7 +922,7 @@ public class UserContextService implements Serializable {
     }
 
     public Locale getCalendarLocale(){
-        if(isInternationalVersion()){
+        if(!isLocale()){
             return Locale.US;
         }else{
             return Locale.CHINA;

@@ -20,7 +20,7 @@
                 <h:form>
                     <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="#{msg.CreateWorkScheduleInBatch}" title="#{msg.CreateWorkScheduleInBatch}" update=":workScheduleBatchDlg" oncomplete="PF('workScheduleBatchDialog').show()"/>
                     <p:commandButton id="scheduleDateStageButton" icon="ui-icon-extlink" value="#{msg.SequenceTimeSettings}" title="#{msg.SequenceTimeSettings}" update=":scheduleDateStageDlg" oncomplete="PF('scheduleDateStageDialog').show()"/>
-                    <p:commandButton id="sharedAssetConfigButton" icon="ui-icon-extlink" value="#{msg.SwapCenterDutySettings}" title="#{msg.SwapCenterDutySettings}" update=":sharedAssetConfigDlg" actionListener="#{sharedAssetConfigController.loadSharedAssetConfig}" oncomplete="PF('sharedAssetConfigDialog').show()"/>
+                    <p:commandButton id="sharedAssetConfigButton" icon="ui-icon-extlink" value="#{msg.SwapCenterDutySettings}" title="#{msg.SwapCenterDutySettings}" update=":sharedAssetConfigDlg" actionListener="#{sharedAssetConfigController.loadSharedAssetConfig}" oncomplete="PF('sharedAssetConfigDialog').show()" rendered = "#{userContextService.isLocale()}"/>
                 </h:form>
                 <h:form id="workScheduleForm">
                     <p:growl widgetVar="messages" id="messages" showDetail="true" />
