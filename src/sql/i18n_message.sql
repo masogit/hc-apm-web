@@ -2194,7 +2194,46 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Tag', '标签', 'Tag', NULL, '-1');
 
 
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FailedGenerateWordErrMsg', 'Word模版生成失败', 'Failed to generate Word template', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TakingTimeIsGreaterThanCurrentTimeTip', '取物时间大于当前时间', 'Taking time is greater than the current time', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NoEquipmentSelectedNoRepairTip', '没有选择设备,不能报修', 'No equipment selected, no repair', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ToBeTerminatedCannotBeRequestedFor repairTip', '所选设备待报废,不能报修', 'The selected equipment is to be terminated and cannot be requested for repair', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NoAssetDepartmentNoRepaired', '所选设备没有所属科室,不能报修', 'The selected equipment cannot be requested for repair for no asset department', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MVSEquipmentRepairRecord', 'MVS设备维修记录', 'MVS Equipment Repair Record', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DownloadTheReportTip', '请选择需要下载报告的工单！', 'Please select the workorder for which you want to download the report！', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WorkorderIsEmpty', '工单报告为空!', 'Workorder is empty!', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'StartDate', '开始日期', 'Start Date', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Vacation', '休假', 'Vacation', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EndDate', '结束日期！', 'End Date', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DateTypeCannotBeEmpty', '日期类型不能为空', 'Date Type cannot be empty', NULL, '-1');
 
+
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CreateWorkScheduleInBatch', '批量创建排班', 'Create work schedule in batch', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SequenceTimeSettings', '班次时间设置', 'Sequence Time Settings', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SwapCenterDutySettings', '调剂中心值班设置', 'Swap Center Duty Settings', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WorkScheduleDetails', '排班明细', 'Work Schedule Details', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Date', '日期', 'Date', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Personnel', '人员', 'Personnel', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PersonnelCannotBeEmpty', '人员不能为空', 'Personnel cannot be empty', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SequenceCannotBeEmpty', '班次不能为空', 'Sequence cannot be empty', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Sequence', '班次', 'Sequence', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MorningShift', '早班', 'Morning Shift', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NightShift', '晚班', 'Night Shift', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UncreatedWorkScheduleRecord', '未创建的排班记录（和休假冲突）', 'Uncreated Work Schedule Record (conflicting with vcation)', NULL, '-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ConfictingWithTheExistingRecords', '和已存在记录冲突。', 'Conficting with the existing records.', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BatchWorkSchedule', '批量排班', 'Batch Work Schedule', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BatchWorkScheduleType', '批量排班类型', 'Batch Work Schedule Type', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BatchWorkScheduleTypecannotbeEmpty', '批量排班类型不能为空', 'Batch Work Schedule Type cannot be empty', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WeekDay', '工作日', 'WeekDay', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WeekEnd', '周末', 'WeekEnd', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SwapDutyOwner', '调剂值班负责人', 'Swap Duty Owner', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NormalDutyTime', '正常值班时间', 'Normal Duty Time', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NightDutyTelephoneNumber', '夜班值班电话', 'Night Duty Telephone Number', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NightDutyTelephoneNumberCannotBeEmpty', '夜班值班电话不能为空', 'Night Duty Telephone Number cannot be empty', NULL, '-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WorkScheduleCalendar', '排班日历', 'Work Schedule Calendar', NULL, '-1');
 
 
 
