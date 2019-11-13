@@ -7,7 +7,7 @@
 
 
     <ui:composition>
-        <p:dialog id="qrCodeLibShowDlg" widgetVar="qrCodeLibShowDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码展示">
+        <p:dialog id="qrCodeLibShowDlg" widgetVar="qrCodeLibShowDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.QRCodeDisplay}">
             <h:form id="qrCodeLibShowForm">
                 <p:panel header="#{qrCodeLibController.qrCode}" style="text-align:center">
                     <h:panelGrid columns="1" style="width:100%">

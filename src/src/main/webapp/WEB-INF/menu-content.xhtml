@@ -23,7 +23,7 @@
                 <p:menuitem value="资产审核" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.isAssetApprover()) and userContextService.accessContains('asset.audit')}"/>
                 <p:menuitem id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.accessContains('asset.batchImportData')}"/>
                 <p:menuitem id="um088" value="#{msg.inventoryWorkorder}" outcome="/portal/inventory/inventoryOrder.xhtml" rendered="#{userContextService.accessContains('asset.inventory')}"/>
-                <p:menuitem id="um089" value="报损模版管理" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContains('asset.scrapTempMgt')}"/>
+                <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContains('asset.scrapTempMgt')}"/>
             </p:submenu>
 
             <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.isHospitalUser() and userContextService.accessContains('assetAdjust')}">
@@ -131,7 +131,7 @@
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.accessContains('config')}">
                 <p:menuitem id="um46" value="#{msg.OrgAdmin}" outcome="/admin/uaa/orgInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/portal/loginAs/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
-                <p:menuitem id="um54" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.accessContains('config.assetMessage')}"/>
+                <p:menuitem id="um54" value="#{msg.MessageSubscriber}" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.accessContains('config.assetMessage')}"/>
                 <p:menuitem id="um48" value="#{msg.OrgAdmin}" outcome="/portal/uaa/orgInfo/Main.xhtml" rendered="#{userContextService.hasNotAnyRole('SuperAdmin') and userContextService.accessContains('config.org')}"/>
                 <p:menuitem id="um49" value="#{msg.UserAdmin}" outcome="/portal/uaa/userAccount/ListMain.xhtml" rendered="#{userContextService.hasNotAnyRole('SuperAdmin') and userContextService.accessContains('config.user')}"/>
                 <!--<p:menuitem id="um50" value="#{msg.AssetTagMsgSubscriber}" outcome="/portal/asset/assetTag/TagSubscribeList.xhtml"/>-->

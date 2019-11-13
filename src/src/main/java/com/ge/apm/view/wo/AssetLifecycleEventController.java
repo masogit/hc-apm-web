@@ -293,7 +293,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	public void downloadSelectedReport() {
 		this.exportFile = null;
 		if (setSelectedItems == null || setSelectedItems.size() == 0) {
-			WebUtil.addErrorMessage("请选择需要下载报告的工单！");
+			WebUtil.addErrorMessage(WebUtil.getMessage("DownloadTheReportTip"));
 			return;
 		}
 		Set<String> setReportIds = new HashSet<String>();
@@ -315,7 +315,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 			}
 		}
 		if (setReportIds.size() == 0) {
-			WebUtil.addErrorMessage("工单报告为空！");
+			WebUtil.addErrorMessage(WebUtil.getMessage("WorkorderIsEmpty"));
 			return;
 		}
 		try (ByteArrayOutputStream bout = new ByteArrayOutputStream(); ZipOutputStream zout = new ZipOutputStream(bout)) {

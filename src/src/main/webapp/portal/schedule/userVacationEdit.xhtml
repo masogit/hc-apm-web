@@ -7,25 +7,25 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:dialog id="userVacationScheduleEditDlg" widgetVar="userVacationScheduleEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{userVacationScheduleController.CRUDActionName} 休假">
+    <p:dialog id="userVacationScheduleEditDlg" widgetVar="userVacationScheduleEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{userVacationScheduleController.CRUDActionName} #{msg.Vacation}">
         <h:form id="userVacationScheduleEditForm">
             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userVacationScheduleController.selected != null}">
 
                 <h:panelGroup>
-                    <label class="label">开始日期*</label>
-                    <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{userVacationScheduleController.startDate}" required="true" requiredMessage="开始时间 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    <label class="label">#{msg.StartDate}*</label>
+                    <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{userVacationScheduleController.startDate}" required="true" requiredMessage="#{msg.StartDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">结束日期*</label>
-                    <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{userVacationScheduleController.endDate}" required="true" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    <label class="label">#{msg.EndDate}*</label>
+                    <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{userVacationScheduleController.endDate}" required="true" requiredMessage="#{msg.EndDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">日期类型*</label>
-                    <p:selectOneMenu value="#{userVacationScheduleController.scheduleDateStage}" style="width:125px" required="true" requiredMessage="日期类型不能为空">
+                    <label class="label">#{msg.DateType}*</label>
+                    <p:selectOneMenu value="#{userVacationScheduleController.scheduleDateStage}" style="width:125px" required="true" requiredMessage="#{msg.DateTypeCannotBeEmpty}">
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItem itemLabel="全天" itemValue="ALL" />
-                        <f:selectItem itemLabel="上午" itemValue="AM" />
-                        <f:selectItem itemLabel="下午" itemValue="PM" />
+                        <f:selectItem itemLabel="#{msg.AllDay}" itemValue="ALL" />
+                        <f:selectItem itemLabel="#{msg.Morning}" itemValue="AM" />
+                        <f:selectItem itemLabel="#{msg.Afternoon}" itemValue="PM" />
                     </p:selectOneMenu>
                 </h:panelGroup>
 

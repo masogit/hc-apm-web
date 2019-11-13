@@ -26,7 +26,7 @@
                         <p:ajax event="rowSelect" update="viewButton editButton createButton deleteButton saveAsButton"/>
                         <p:ajax event="filter" listener="#{qrCodeTemplateController.onFilter}" />
                         
-                        <p:column headerText="租户"  filterBy="#{item.tenantUID}" filterMatchMode="EQ" rendered="#{userContextService.hasRole('SuperAdmin')}">
+                        <p:column headerText="#{msg.TenantInfo}"  filterBy="#{item.tenantUID}" filterMatchMode="EQ" rendered="#{userContextService.hasRole('SuperAdmin')}">
                             <f:facet name="filter">
                                 <p:selectOneMenu value="#{qrCodeTemplateController.selectedTenantUid}" autoWidth="false" style="max-width: 150px;" >
                                     <p:ajax  update="datalist" />
@@ -37,7 +37,7 @@
                             <h:outputText value="#{qrCodeTemplateController.getTenantName(item.tenantUID)}"/>
                         </p:column>
 
-                        <p:column headerText="医院" sortBy="#{item.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.Hospital}" sortBy="#{item.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu id="hospitalIdSelect_list" onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
@@ -54,24 +54,24 @@
                             <h:outputText value="#{item.width} * #{item.height}">
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="启用时间"  >
+                        <p:column headerText="#{msg.EnableTime}"  >
                             <h:outputText value="#{item.usingDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.status}">
-                            <h:outputText value="未启用"  rendered="#{not item.isUsing}"/>
-                            <h:outputText value="使用中"  rendered="#{item.isUsing}"/>
+                            <h:outputText value="#{msg.NotEnabled}"  rendered="#{not item.isUsing}"/>
+                            <h:outputText value="#{msg.InService}"  rendered="#{item.isUsing}"/>
                             <p:spacer/>
                             <p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}" actionListener="#{qrCodeTemplateController.setToUsing(item.id,true)}" update=":qrCodeLibListForm:datalist"  rendered="#{not item.isUsing}" disabled="#{not qrCodeTemplateController.canEdit(item.siteUID)}"/>
-                            <p:commandButton icon="ui-icon-close" style="zoom:0.7" title="停止使用" actionListener="#{qrCodeTemplateController.setToUsing(item.id,false)}" update=":qrCodeLibListForm:datalist"  rendered="#{item.isUsing}" disabled="#{not qrCodeTemplateController.canEdit(item.siteUID)}"/>
+                            <p:commandButton icon="ui-icon-close" style="zoom:0.7" title="#{msg.Disabled}" actionListener="#{qrCodeTemplateController.setToUsing(item.id,false)}" update=":qrCodeLibListForm:datalist"  rendered="#{item.isUsing}" disabled="#{not qrCodeTemplateController.canEdit(item.siteUID)}"/>
                         </p:column>
 
 
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-add" title="#{msg.Create}" action="CreateTemplate.xhtml?faces-redirect=true&amp;action=Create" />
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" action="#{qrCodeTemplateController.getEditLink()}" disabled="#{not qrCodeTemplateController.canEdit(null)}"/>
-                            <p:commandButton id="saveAsButton" icon="ui-icon-save" class="btn btn-sm btn-gray" title="另存为" action="#{qrCodeTemplateController.saveAsAction}" update="datalist" disabled="#{empty qrCodeTemplateController.selected}"/>
+                            <p:commandButton id="saveAsButton" icon="ui-icon-save" class="btn btn-sm btn-gray" title="#{msg.SaveAs}" action="#{qrCodeTemplateController.saveAsAction}" update="datalist" disabled="#{empty qrCodeTemplateController.selected}"/>
                             <p:commandButton id="viewButton" icon="ui-icon-search" title="#{msg.View}" update="TemplateViewDlg" oncomplete="PF('TemplateViewDlg').show()" disabled="#{empty qrCodeTemplateController.selected}"/>
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{qrCodeTemplateController.deleteTemplate}" update=":qrCodeLibListForm:datalist, :growl"  disabled="#{not qrCodeTemplateController.canEdit(null) or qrCodeTemplateController.selected.isUsing}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>

@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -633,7 +634,14 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
     }
 
     public void generateReportTemplateFile() throws IOException {
-        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/measure-template.docx");
+        String fileName = null;
+        if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+            fileName = "measure-template_zh.docx";
+        } else {
+            fileName = "measure-template_en.docx";
+
+        }
+        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/" + fileName);
         try {
             InputStream doc = pmOrderReportTemplateService.generateMeasureReportTemplateByRule(stream, selected);
             this.reportTemplateFile = new DefaultStreamedContent(doc, "application/msword", "measure-report-template.docx");

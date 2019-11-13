@@ -828,8 +828,8 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("ImportEquipment?"), this.getImportEquipmentAsString());
         map.put(WebUtil.getMessage("CurrentStatus"), this.getStatusAsString());
         map.put(WebUtil.getMessage("accountingCategory"), this.getAccountingCategoryAsString());
-        map.put(WebUtil.getMessage("IsPM"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? "是" : "否");
-        map.put(WebUtil.getMessage("IsChecked?"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? "是" : "否");
+        map.put(WebUtil.getMessage("IsPM"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
+        map.put(WebUtil.getMessage("IsChecked?"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
         map.put(WebUtil.getMessage("assetGroupSecondary"), this.getAssetGroupSecondayName());
         map.put(WebUtil.getMessage("assetValueCategory"), this.getAssetValueCategoryName());
         map.put(WebUtil.getMessage("deviceStatus"), this.getDeviceStatusAsString());
