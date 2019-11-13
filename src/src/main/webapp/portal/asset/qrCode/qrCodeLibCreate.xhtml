@@ -7,20 +7,20 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:dialog id="qrCodeLibCreateDlg" widgetVar="qrCodeLibCreateDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码生成">
+    <p:dialog id="qrCodeLibCreateDlg" widgetVar="qrCodeLibCreateDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.QRCodeCreate}">
     <h:form id="qrCodeLibCreateForm">
         <h:panelGroup id="display">
         	<h:panelGroup id ="tenant" >
-            <h:outputLabel for="siteIdSelect" value="租户 ： "  />
-            <p:selectOneMenu id="siteIdSelect" value="#{qrCodeLibController.tenantUID}" required="true" requiredMessage="租户院区不能为空">
+            <h:outputLabel for="siteIdSelect" value="#{msg.TenantInfo} ： "  />
+            <p:selectOneMenu id="siteIdSelect" value="#{qrCodeLibController.tenantUID}" required="true" requiredMessage="#{msg.SiteCannotBeEmpty}">
                 <p:ajax  listener="#{qrCodeLibController.onSiteChange}" update="hospitalIdSelect" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{qrCodeLibController.tenantList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
             </p:selectOneMenu>
             <br/>
             <br/>
-            <h:outputLabel for="hospitalIdSelect" value="医院 ： " />
-            <p:selectOneMenu id="hospitalIdSelect" value="#{qrCodeLibController.siteUID}" required="true" requiredMessage="医院不能为空" >
+            <h:outputLabel for="hospitalIdSelect" value="#{msg.Hospital} ： " />
+            <p:selectOneMenu id="hospitalIdSelect" value="#{qrCodeLibController.siteUID}" required="true" requiredMessage="#{msg.HospitalCannotBeEmpty}" >
                 <p:ajax  listener="#{qrCodeLibController.onSiteUIDChange}" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
@@ -28,11 +28,11 @@
             <br/>
             <br/>
             </h:panelGroup>
-            <h:outputLabel for="hospitalIdSelect" value="二维码数量 ： " />
-            <p:inputNumber id="qrCodeNum" decimalPlaces="0" minValue="1" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="数量不能为空"/>
+            <h:outputLabel for="hospitalIdSelect" value="#{msg.QRCodeQuantity} ： " />
+            <p:inputNumber id="qrCodeNum" decimalPlaces="0" minValue="1" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="#{msg.QuantityCannotBeEmpty}"/>
             <br/>
             <br/>
-            <p:commandButton value="确定生成" icon="ui-icon-extlink" validateClient="true" actionListener="#{qrCodeLibController.createQrCode}" update=":qrCodeLibListForm:datalist :growl" oncomplete="handleSubmit(args, 'qrCodeLibCreateDialog');"/>
+            <p:commandButton value="#{msg.ConfirmCreate}" icon="ui-icon-extlink" validateClient="true" actionListener="#{qrCodeLibController.createQrCode}" update=":qrCodeLibListForm:datalist :growl" oncomplete="handleSubmit(args, 'qrCodeLibCreateDialog');"/>
             <br/>
         </h:panelGroup>
     </h:form>

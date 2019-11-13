@@ -44,7 +44,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.requestReason}</label>
-                            <p:inputTextarea placeholder="设备故障" value="#{serviceRequestController.newServiceRequest.requestReason}" maxlength="256" />
+                            <p:inputTextarea placeholder="#{msg.EquipmentFault}" value="#{serviceRequestController.newServiceRequest.requestReason}" maxlength="256" />
                             <p:outputLabel value="#{serviceRequestController.newServiceRequest.requestReason}" />
                         </h:panelGroup>
                         <h:panelGroup id="assetstatus">

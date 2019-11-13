@@ -53,12 +53,12 @@
                                         <p:outputLabel value="N/A" rendered="#{orgInfoController.selected.parentOrg eq null}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">类型</label>
+                                        <label class="label">#{msg.type}</label>
                                         <p:outputLabel value="#{orgInfoController.selected.orgTypeName}"/>
                                     </h:panelGroup>
 
                                     <h:panelGroup rendered="#{orgInfoController.acShow and false}">
-                                        <label class="label">设备负责人A</label>
+                                        <label class="label">#{msg.EquipmentOwnerA}</label>
                                         <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
@@ -66,7 +66,7 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup rendered="#{orgInfoController.acShow and false}">
-                                        <label class="label">设备负责人B</label>
+                                        <label class="label">#{msg.EquipmentOwnerB}</label>
                                         <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId2}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
@@ -89,15 +89,15 @@
 
                                     <c:if test="#{orgInfoController.selected.orgType eq 4}">
                                         <h:panelGroup>
-                                            <p:inputText id="buildingNum" value="#{orgInfoController.selected.buildingNum}"/><h:outputLabel>楼</h:outputLabel>
+                                            <p:inputText id="buildingNum" value="#{orgInfoController.selected.buildingNum}"/><h:outputLabel>#{msg.Building}</h:outputLabel>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <p:inputText id="floorNum" value="#{orgInfoController.selected.floorNum}"/><h:outputLabel>层</h:outputLabel>
+                                            <p:inputText id="floorNum" value="#{orgInfoController.selected.floorNum}"/><h:outputLabel>#{msg.Floor}</h:outputLabel>
                                         </h:panelGroup>
 
                                         <h:panelGroup>
-                                            <h:outputLabel>其他</h:outputLabel><p:inputText id="other" value="#{orgInfoController.selected.other}"/>
+                                            <h:outputLabel>#{msg.Other}</h:outputLabel><p:inputText id="other" value="#{orgInfoController.selected.other}"/>
                                         </h:panelGroup>
 
                                     </c:if>

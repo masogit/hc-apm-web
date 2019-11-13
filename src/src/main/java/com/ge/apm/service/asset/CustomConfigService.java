@@ -164,7 +164,7 @@ public class CustomConfigService {
     public void removeAssetField(CustomConfigObject customConfigObject, String key) {
 
         if (CustomConfigConstant.getSystemFields().contains(key)) {
-            WebUtil.addErrorMessage("系统必填字段,不能删除");
+            WebUtil.addErrorMessage(WebUtil.getMessage("SystemRequiredFieldsCannotBeDeleted"));
             return;
         }
         if (customConfigObject.getAssetFields().containsKey(key)) {

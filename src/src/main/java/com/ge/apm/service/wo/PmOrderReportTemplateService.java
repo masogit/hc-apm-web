@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.context.LocaleHolder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -58,7 +59,14 @@ public class PmOrderReportTemplateService {
             templateBytes = IOUtils.toByteArray(blobFileService.getBlobObjectByStorageId(template.getStorageId()).getStream());
         }
         if (templateBytes == null) {
-            templateBytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("report/maintenance-template.docx"));
+            String fileName = null;
+            if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+                fileName = "report/maintenance-template_zh.docx";
+            } else {
+                fileName = "report/maintenance-template_en.docx";
+
+            }
+            templateBytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("report/" + fileName ));
         }
         return templateBytes;
     }
