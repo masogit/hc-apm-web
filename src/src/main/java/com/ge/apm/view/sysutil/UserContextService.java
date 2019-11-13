@@ -897,6 +897,30 @@ public class UserContextService implements Serializable {
         }
     }
 
+    public String timeFormat8(){
+        if(isInternationalVersion()){
+            return "MM-dd-yyyy";
+        }else{
+            return "yyyy-MM-dd";
+        }
+    }
+
+    public String timeFormat12(){
+        if(isInternationalVersion()){
+            return "MM/dd/yyyy HH:mm";
+        }else{
+            return "yyyy/MM/dd HH:mm";
+        }
+    }
+
+    public String timeFormat14(){
+        if(isInternationalVersion()){
+            return "MM/dd/yyyy HH:mm:ss";
+        }else{
+            return "yyyy/MM/dd HH:mm:ss";
+        }
+    }
+
     public Locale getCalendarLocale(){
         if(isInternationalVersion()){
             return Locale.US;
