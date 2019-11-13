@@ -15,10 +15,10 @@
             <div class="ui-g-12 card ">
                 <p:tabView id="userAccountTab">
                     <p:ajax event="tabChange"/>
-                    <p:tab title="查询" id="showList">
+                    <p:tab title="#{msg.Search}" id="showList">
                         <ui:include src="List.xhtml"/>
                     </p:tab>
-                    <p:tab title="导入" id="userAccountImport">
+                    <p:tab title="#{msg.Import}" id="userAccountImport">
                         <ui:include src="ListImport.xhtml"/>
                     </p:tab>
                 </p:tabView>
