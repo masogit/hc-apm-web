@@ -41,7 +41,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.InvoicingTime}</label>
-                        <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" label="#{msg.EstimatedArrivalTime}" value="#{v2PmOrderController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
 
                     <h:panelGroup>
@@ -66,7 +66,7 @@
 
                     <h:panelGroup>
                         <label class="label">#{msg.WarrantyDate}</label>
-                        <p:calendar timeZone="GMT+8" label="#{msg.EquipmentTakingTime}" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.warrantyDate}" showOn="button"
+                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" label="#{msg.EquipmentTakingTime}"  value="#{v2PmOrderController.itemDetail.warrantyDate}" showOn="button"
                                     readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
@@ -79,7 +79,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ApplyTime}</label>
-                        <p:calendar disabled="#{v2PmOrderController.nochange}" timeZone="GMT+8" label="#{msg.ApplyTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <p:calendar disabled="#{v2PmOrderController.nochange}"   timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.ApplyTime}" value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.feedbackComment}</label>
@@ -179,11 +179,11 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.EstimatedArrivalTime}</label>
-                        <p:calendar disabled="true" timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <p:calendar disabled="true"   timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.EstimatedArrivalTime}"  value="#{v2PmOrderController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ApplyTime}</label>
-                        <p:calendar disabled="true" timeZone="GMT+8" label="#{msg.ApplyTime}" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <p:calendar disabled="true"   timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.ApplyTime}"  value="#{v2PmOrderController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <p:column headerText="#{msg.Arrival}">
                         <p:selectBooleanButton disabled="true"  value="#{v2PmOrderController.itemDetail.arrived}" onLabel="#{msg.Arrived}" offLabel="#{msg.NonArrived}">

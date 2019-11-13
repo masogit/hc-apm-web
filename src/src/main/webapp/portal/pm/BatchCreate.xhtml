@@ -24,11 +24,11 @@
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label" >计划开始时间*</label>
-                <p:calendar timeZone="GMT+8"  id="startTime" pattern="yyyy/MM/dd" value="#{pmOrderController.startPlanTime}" required="true" requiredMessage="计划开始时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="startTime"  value="#{pmOrderController.startPlanTime}" required="true" requiredMessage="计划开始时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">计划结束时间*</label>
-                <p:calendar timeZone="GMT+8"  id="endTime" pattern="yyyy/MM/dd" value="#{pmOrderController.endPlanTime}" required="true" requiredMessage="计划结束时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  id="endTime"  value="#{pmOrderController.endPlanTime}" required="true" requiredMessage="计划结束时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
             </h:panelGroup>
             <h:panelGroup>
                 <label class="label">保养次数*</label>
