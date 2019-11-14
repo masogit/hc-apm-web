@@ -11,6 +11,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetCreateService;
+import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.AssetOwnerService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.UserCommonService;
@@ -46,6 +47,7 @@ public class AssetOwnerSettingController {
     private List<AssetInfo> sourceAssets = Collections.emptyList();
     private List<AssetInfo> targetAssets;
     private AssetCreateService acServie;
+    private AssetInfoService assetInfoService;
 
     private AssetOwnerService aoService;
     private UserCommonService userCommonService;
@@ -70,6 +72,9 @@ public class AssetOwnerSettingController {
 
     private UserAccount currentUser;
 
+    private List<OrgInfo> clinicalDeptList;
+    private OrgInfo deptOrg;
+
     @PostConstruct
     protected void init() {
 
@@ -78,6 +83,8 @@ public class AssetOwnerSettingController {
         userCommonService = WebUtil.getBean(UserCommonService.class);
         customConfigService = WebUtil.getBean(CustomConfigService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
+
         queryAsset = new AssetInfo();
         queryAsset.setSiteId(currentUser.getSiteId());
         queryAsset.setHospitalId(currentUser.getHospitalId());
@@ -94,6 +101,7 @@ public class AssetOwnerSettingController {
         }
 
         userAccountList = userCommonService.getWorkerList(null,null);
+        clinicalDeptList = getClinicalDeptList();
         //not display data initially
 //        getQueryAssetsList();
 
@@ -134,7 +142,8 @@ public class AssetOwnerSettingController {
     }
 
     public List<OrgInfo> getClinicalDeptList() {
-        return acServie.getClinicalDeptList(queryAsset.getSiteUID());
+        //return acServie.getClinicalDeptList(queryAsset.getSiteUID());
+        return assetInfoService.getClinicalDeptList(currentUser.getSiteUID());
     }
 
     public List<UserAccount> getOwnerList() {
@@ -231,6 +240,25 @@ public class AssetOwnerSettingController {
     }
 
     public void onCheckChange(){
+    }
+
+    //新增修改所属科室控件自动填写列表
+    public List<OrgInfo> autoCompleteDept(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public void handleSelectDept(AjaxBehaviorEvent event){
+        this.queryAsset.setClinicalDeptUID(null);
+        if(this.deptOrg != null){
+            this.queryAsset.setClinicalDeptUID(this.deptOrg.getUid());
+            this.getQueryAssetsList();
+        }
     }
     
     //getter and setter
@@ -352,5 +380,13 @@ public class AssetOwnerSettingController {
 
     public void setOwnerSearch3(UserAccount ownerSearch3) {
         this.ownerSearch3 = ownerSearch3;
+    }
+
+    public OrgInfo getDeptOrg() {
+        return deptOrg;
+    }
+
+    public void setDeptOrg(OrgInfo deptOrg) {
+        this.deptOrg = deptOrg;
     }
 }
