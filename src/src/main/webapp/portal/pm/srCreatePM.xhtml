@@ -82,7 +82,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup >
-                        <h:outputText style="color:red; font-size:18px" value="#{msg.externalTeleNum}:4008128188" rendered="#{!v2PmOrderController.canCreateSr() or (!(v2PmOrderController.selectedAsset.ibStatus eq 0) and v2PmOrderController.selectedAsset.repairForm eq 3)}"/>
+                        <h:outputText style="color:red; font-size:18px" value="#{msg.externalTeleNum}:4008128188" rendered="#{!v2PmOrderController.canCreateSr() or (v2PmOrderController.selectedAsset.ibStatus eq 1 and v2PmOrderController.selectedAsset.repairForm eq 3)}"/>
                     </h:panelGroup>
                 </p:fieldset>
             </h:form>
