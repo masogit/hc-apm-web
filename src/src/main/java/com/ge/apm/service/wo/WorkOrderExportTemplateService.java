@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.context.LocaleHolder;
 
 import javax.faces.context.FacesContext;
 import java.io.IOException;
@@ -43,7 +44,13 @@ public class WorkOrderExportTemplateService {
             templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
         }
         if (templateBytes == null) {
-            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExportTemplate/template.docx"));
+            String fileName = "template.docx";
+            if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+                fileName = "template_zh.docx";
+            } else {
+                fileName = "template_en.docx";
+            }
+            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExportTemplate/"+fileName));
         }
         return templateBytes;
     }
