@@ -143,8 +143,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         createFunctionTypeSecondaryLevel();
 
-        createFormulaForExistingDropdown("所属科室", "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
-        createFormulaForExistingDropdown( "使用科室", "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+        createFormulaForExistingDropdown(WebUtil.getMessage("clinicalDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+        createFormulaForExistingDropdown( WebUtil.getMessage("assetDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
     }
 
     private void createDynamicList() {
@@ -289,7 +289,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     private void createDropdownWithNamedRange(int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
 
-        List<String> msgs = msgList.stream().map(I18nMessage::getValueZh).collect(Collectors.toList());
+        List<String> msgs = null;
+        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+            msgs = msgList.stream().map(I18nMessage::getValueZh).collect(Collectors.toList());
+        } else {
+            msgs = msgList.stream().map(I18nMessage::getValueEn).collect(Collectors.toList());
+        }
 
         createDropdownOnly(dynamicListSheet, rowNum, name, msgs, optional);
 
@@ -311,7 +316,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     private String getRangeName(String fieldName) {
-        String normalizedName = fieldName.replaceAll("[\\（\\）]", "_") + WebUtil.getMessage("List");
+        String normalizedName = fieldName.replaceAll("[\\（\\）]", "_").replaceAll(" ","_").replaceAll("\\?","_") + WebUtil.getMessage("List");
         return normalizedName;
     }
 

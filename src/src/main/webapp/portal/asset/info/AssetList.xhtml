@@ -249,7 +249,7 @@
                                         <p:inputText id="filterWarrantyDate" widgetVar="varFilterWarrantyDate" value="#{assetInfoListController.warrantyFormatTime}"/>
                                     </f:facet>
                                     <h:outputText value="#{item.warrantyDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
@@ -259,7 +259,7 @@
                                         <p:inputText id="filterCreatedDate" widgetVar="varFilterCreatedDate" value="#{assetInfoListController.selectedObject['createdDate']}"/>
                                     </f:facet>
                                     <h:outputText value="#{item.createdDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
@@ -495,21 +495,21 @@
                                         <p:inputText id="filterManufactDate" widgetVar="varFilterManufactDate" value="#{assetInfoListController.manufactDateFormatTime}"/>
                                     </f:facet>
                                     <h:outputText value="#{item.manufactDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'purchaseDate'}">
                                 <p:column headerText="#{msg.purchaseDate}" sortBy="#{item.purchaseDate}">
                                     <h:outputText value="#{item.purchaseDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'acceptDate'}">
                                 <p:column headerText="#{msg.acceptDate}" sortBy="#{item.acceptDate}">
                                     <h:outputText value="#{item.acceptDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
@@ -519,7 +519,7 @@
                                         <p:inputText id="filterArriveDate" widgetVar="varFilterArriveDate" value="#{assetInfoListController.arriveDateFormatTime}"/>
                                     </f:facet>
                                     <h:outputText value="#{item.arriveDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
@@ -529,14 +529,14 @@
                                         <p:inputText id="filterInstallDate" widgetVar="varFilterInstallDate" value="#{assetInfoListController.installDateFormatTime}"/>
                                     </f:facet>
                                     <h:outputText value="#{item.installDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'terminateDate'}">
                                 <p:column headerText="#{msg.terminateDate}" sortBy="#{item.terminateDate}">
                                     <h:outputText value="#{item.terminateDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
@@ -546,7 +546,7 @@
                                         <p:inputText id="filterFactoryWarrantyDate" widgetVar="varFilterFactoryWarrantyDate" value="#{assetInfoListController.factoryWarrantyDateFormatTime}"/>
                                     </f:facet>
                                     <h:outputText value="#{item.factoryWarrantyDate}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  />
                                     </h:outputText>
                                 </p:column>
                             </c:if>
@@ -657,9 +657,9 @@
         <p:overlayPanel id="idPanelFilterWarrantyDate" widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('warrantyDate')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varWarrantyDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varWarrantyDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
                 <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varWarrantyDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varWarrantyDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
             </h:panelGrid>
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterWarrantyDate', 'varWarrantyDateFrom', 'varWarrantyDateTo'); PF('panelFilterWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
@@ -668,9 +668,9 @@
         <p:overlayPanel widgetVar="panelFilterCreatedDate" for=":AssetInfoListForm:datalist:filterCreatedDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('createdDate')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varCreatedDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varCreatedDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
                 <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varCreatedDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varCreatedDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
             </h:panelGrid>
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterCreatedDate', 'varCreatedDateFrom', 'varCreatedDateTo'); PF('panelFilterCreatedDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterCreatedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
@@ -679,9 +679,9 @@
         <p:overlayPanel id="idPanelFilterManufactDate" widgetVar="panelFilterManufactDate" for=":AssetInfoListForm:datalist:filterManufactDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('manufactDate')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varManufactDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varManufactDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
                 <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varManufactDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varManufactDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
             </h:panelGrid>
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterManufactDate', 'varManufactDateFrom', 'varManufactDateTo'); PF('panelFilterManufactDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterManufactDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
@@ -690,9 +690,9 @@
         <p:overlayPanel id="idPanelFilterInstallDate" widgetVar="panelFilterInstallDate" for=":AssetInfoListForm:datalist:filterInstallDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('installDate')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varInstallDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varInstallDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
                 <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varInstallDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varInstallDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
             </h:panelGrid>
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterInstallDate', 'varInstallDateFrom', 'varInstallDateTo'); PF('panelFilterInstallDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterInstallDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
@@ -701,9 +701,9 @@
         <p:overlayPanel id="idPanelFilterArriveDate" widgetVar="panelFilterArriveDate" for=":AssetInfoListForm:datalist:filterArriveDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('arriveDate')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varArriveDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varArriveDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
                 <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varArriveDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varArriveDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
             </h:panelGrid>
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterArriveDate', 'varArriveDateFrom', 'varArriveDateTo'); PF('panelFilterArriveDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterArriveDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
@@ -712,9 +712,9 @@
         <p:overlayPanel id="idPanelFilterFactoryWarrantyDate" widgetVar="panelFilterFactoryWarrantyDate" for=":AssetInfoListForm:datalist:filterFactoryWarrantyDate" dismissable="false" rendered="#{assetInfoListController.isShowColumn('factoryWarrantyDate')}">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varFactoryWarrantyDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varFactoryWarrantyDateFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
                 <p:outputLabel value="#{msg.To}"/>
-                <p:calendar timeZone="GMT+8"  widgetVar="varFactoryWarrantyDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varFactoryWarrantyDateTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
             </h:panelGrid>
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterFactoryWarrantyDate', 'varFactoryWarrantyDateFrom', 'varFactoryWarrantyDateTo'); PF('panelFilterFactoryWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterFactoryWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
