@@ -19,7 +19,7 @@
                             <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
                             <p:overlayPanel id="panelOrg4User" my="right top" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                 <p:inputText id="treeNodeNameFilter2" class="treeNodeNameFilter" value="#{userAccountController.treeNodeNameFilter}"/>
-                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process="@(.treeNodeNameFilter) @this" update="@(.orgTree) @(.treeNodeNameFilter)" actionListener="#{userAccountController.filterTreeNode()}" value="检索"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process="@(.treeNodeNameFilter) @this" update="@(.orgTree) @(.treeNodeNameFilter)" actionListener="#{userAccountController.filterTreeNode()}" value="#{msg.Search2}"/>
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree4User" class="orgTree" style="width:98%;border:0;" value="#{userAccountController.orgTree}" selection="#{userAccountController.selectedNode}" var="node" selectionMode="single">
                                         <p:ajax process="@this" event="select" update="@(.selectedUserOrgName)" listener="#{userAccountController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
@@ -54,14 +54,14 @@
                             <p:inputText id="telephone" label="#{msg.telephone}" value="#{userAccountController.selected.telephone}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">地区</label>
+                            <label class="label">#{msg.Region}</label>
                             <p:selectOneMenu value="#{userAccountController.selected.region}" >
                                 <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('region')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">初始密码</label>
+                            <label class="label">#{msg.InitialPassword}</label>
                             <p:password id="password" value="#{userAccountController.selected.plainPassword}"  autocomplete="new-password"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="false">
