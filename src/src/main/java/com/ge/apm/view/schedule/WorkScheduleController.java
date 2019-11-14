@@ -175,7 +175,7 @@ public class WorkScheduleController{
                 }
                 dao.save(tempUserSchedule);
             }else {
-                WebUtil.addErrorMessage("和已存在记录冲突。");
+                WebUtil.addErrorMessage(WebUtil.getMessage("ConfictingWithTheExistingRecords"));
                 //this.loadScheduleData();
                 return;
             }
@@ -198,11 +198,11 @@ public class WorkScheduleController{
     private String getShowTitle(String scheduleDateStage){
         String tempTime = "";
         if(UserScheduleService.SCHEDULE_STAGE_ALL.equals(scheduleDateStage)){
-            tempTime = "全天";
+            tempTime = WebUtil.getMessage("AllDay");
         }else if(UserScheduleService.SCHEDULE_STAGE_AM.equals(scheduleDateStage)){
-            tempTime = "早班";
+            tempTime = WebUtil.getMessage("MorningShift");
         }else if(UserScheduleService.SCHEDULE_STAGE_PM.equals(scheduleDateStage)){
-            tempTime = "晚班";
+            tempTime = WebUtil.getMessage("NightShift");
         }
         return tempTime;
     }
@@ -362,11 +362,11 @@ public class WorkScheduleController{
         calender.add(Calendar.DAY_OF_MONTH, -1);
 
         if (startBatchDate.before(calender.getTime())) {
-            WebUtil.addErrorMessage("开始日期不能早于当前日期");
+            WebUtil.addErrorMessage(WebUtil.getMessage("StartTimeCannotBeEarlierThanCurrentTime"));
             return false;
         }
         if (endBatchDate.before(startBatchDate)) {
-            WebUtil.addErrorMessage("结束日期不能早于开始日期");
+            WebUtil.addErrorMessage(WebUtil.getMessage("EndTimeCannotBeEarlierThanStartTime"));
             return false;
         }
 

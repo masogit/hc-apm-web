@@ -68,7 +68,7 @@
                     </p:column>
                      <p:column headerText="#{msg.createdDate}" >
                        	<h:outputText value="#{item.createdDate}">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
                         </h:outputText>
                      </p:column>
                     <p:column headerText="#{msg.period}(#{msg.groupByMonth})" sortBy="#{item.period}" filterBy="#{item.period}" filterMatchMode="EQ">

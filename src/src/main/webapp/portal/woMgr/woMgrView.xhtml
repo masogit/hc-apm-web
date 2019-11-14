@@ -46,7 +46,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.requestTime}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.requestTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                             </p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -65,20 +65,20 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{workOrderMgrController.selected.serviceRequest.status ne 1}"/>
 
                             </p:selectOneRadio>
-                            <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.confirmedDownTime}" showOn="button" 
+                            <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime"  value="#{workOrderMgrController.confirmedDownTime}" showOn="button"
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                             <p:commandButton value="#{msg.UpdateShutdownTime}" rendered="#{workOrderMgrController.needConfirmTime}" actionListener="#{workOrderMgrController.updateDownTime}" process="@(.updateDownTime)" update="assetstatus showDownTime"/>
                         </h:panelGroup>
                         <h:panelGroup id="showDownTime">
                             <label class="label">#{msg.confirmedDownTime}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.confirmedDownTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                             </p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.UpTimeExcel}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.confirmedUpTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                             </p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -88,7 +88,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.PickUpTime}</label>
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.takeTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                             </p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{workOrderMgrController.selected.serviceRequest.status eq 3}">
@@ -207,7 +207,7 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.endTime}</label>
                                     <p:outputLabel value="#{woItem.closeTime}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                                     </p:outputLabel>
                                 </h:panelGroup>
 
@@ -234,12 +234,12 @@
                                 </p:column>
                                 <p:column headerText="#{msg.startTime}">
                                     <h:outputText value="#{stepItem.startTime}" >
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                                     </h:outputText>
                                 </p:column>
                                 <p:column headerText="#{msg.endTime}">
                                     <h:outputText value="#{stepItem.endTime}" >
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                        <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                                     </h:outputText>
                                 </p:column>
                                 <p:column headerText="#{msg.description}">
