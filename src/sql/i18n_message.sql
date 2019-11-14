@@ -2235,6 +2235,15 @@
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WorkScheduleCalendar', '排班日历', 'Work Schedule Calendar', NULL, '-1');
 
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UpTimeExcel', '开机时间', 'Up Time', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'HasAScheduleRecord', '有排班记录！', 'has a schedule record!', NULL, '-1');
+
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'VacationApproval', '请假审批', 'Vacation Approval', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ApprovalNotes', '审批注意信息', 'Approval Notes', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'VacationApplicant2', '请假人', 'Vacation Applicant', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Reject', '拒绝', 'Reject', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EndDate2', '结束日期', 'End Date', NULL, '-1');
 
 
 
