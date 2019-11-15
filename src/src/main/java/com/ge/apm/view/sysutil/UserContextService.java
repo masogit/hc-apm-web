@@ -754,19 +754,6 @@ public class UserContextService implements Serializable {
         return isIBEndUser() || isUltraSoundIBEndUser() || isDealerEndUser();
     }
 
-    /***
-     *  是否本地化 维修工作台在非中文状态下不显示外部工单和外部远程工单
-     *  TODO LocalHolder.getLocale = null的情况如何处理
-     * @return
-     */
-    public boolean isLocale(){
-        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
     public boolean isAccountEndUser(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount currentUser = getLoginUser();
@@ -881,12 +868,25 @@ public class UserContextService implements Serializable {
 
     //返回当前用户所在时区
     public String getTimeZone(){
-        return "GMT+"+getCurrentUserTenantInfo().getTimeZone();
+        Double timeZone = getCurrentUserTenantInfo().getTimeZone();
+        timeZone = timeZone == null ? 8 : timeZone;
+        if(timeZone >= 0){
+            return "GMT+"+timeZone;
+        }else{
+            return "GMT"+timeZone;
+        }
     }
 
-    //是否是国际版
-    public boolean isInternationalVersion(){
-        return getCurrentUserTenantInfo().getHabit() == 2 ? true: false;
+
+    /***
+     *  是否是中国 维修工作台在非中文状态下不显示外部工单和外部远程工单
+     */
+    public boolean isLocale(){
+        if(LocaleHolder.getLocale().getLanguage().equalsIgnoreCase("zh")){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public String timeFormat(){
