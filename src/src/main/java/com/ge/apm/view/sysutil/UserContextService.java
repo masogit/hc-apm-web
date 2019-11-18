@@ -882,7 +882,9 @@ public class UserContextService implements Serializable {
      *  是否是中国 维修工作台在非中文状态下不显示外部工单和外部远程工单
      */
     public boolean isLocale(){
-        if(LocaleHolder.getLocale().getLanguage().equalsIgnoreCase("zh")){
+        Locale locale = LocaleHolder.getLocale();
+        //System.out.println("locale  is "+locale);
+        if(locale.getLanguage().equalsIgnoreCase("zh")){
             return true;
         } else {
             return false;
@@ -921,11 +923,11 @@ public class UserContextService implements Serializable {
         }
     }
 
-    public Locale getCalendarLocale(){
+    public String getCalendarLocale(){
         if(!isLocale()){
-            return Locale.US;
+            return Locale.US.toString();
         }else{
-            return Locale.CHINA;
+            return Locale.SIMPLIFIED_CHINESE.getLanguage();
         }
     }
 }
