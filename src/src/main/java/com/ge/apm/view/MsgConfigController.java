@@ -58,15 +58,60 @@ public class MsgConfigController extends JpaCRUDController<MsgTenant> implements
     @Setter
     private LinkedHashMap<String, String> allFields = new LinkedHashMap<String,String>();
 
+    @Getter
+    @Setter
+    public List<String> msgNameListEn;
+    @Getter
+    @Setter
+    private LinkedHashMap<String, String> allFieldsEn = new LinkedHashMap<String,String>();
+
     @Override
     protected void init(){
         userContextService = WebUtil.getBean(UserContextService.class);
         msgRepository  = WebUtil.getBean(MsgRepository.class);
+        boolean locale=userContextService.isLocale();
         msgNameList = msgRepository.find().stream().map(item->item.getMsgName()).collect(Collectors.toList());
+        msgNameListEn = msgRepository.find().stream().map(item->item.getMsgNameEn()).collect(Collectors.toList());
+
         msgNameList.stream().forEach(item->allFields.put(item,item));
+        msgNameListEn.stream().forEach(item->allFieldsEn.put(item,item));
+
+
+        if(locale) {
+            List<String> selectedMsg = msgRepository.findByTenantUid(userContextService.getLoginUser().getTenantUID());
+            msgNameList.stream().forEach(item -> selectedMsgFields.put(item, false));
+            selectedMsg.stream().filter(item -> selectedMsgFields.containsKey(item)).filter(item -> selectedMsgFields.put(item, true)).collect(Collectors.toList());
+            //  msgVOList = getMsgConfigVO(userContextService.getLoginUser().getTenantUID());
+        }else{
+            List<String> selectedMsgEn = msgRepository.findByTenantUidEn(userContextService.getLoginUser().getTenantUID());
+            msgNameListEn.stream().forEach(item -> selectedMsgFields.put(item, false));
+            selectedMsgEn.stream().filter(item -> selectedMsgFields.containsKey(item)).filter(item -> selectedMsgFields.put(item, true)).collect(Collectors.toList());
+
+        }
+
+
+        /*List<MsgConfig> selectedMsgConf = msgRepository.findByTenantUid2(userContextService.getLoginUser().getTenantUID());
+
         List<String> selectedMsg = msgRepository.findByTenantUid(userContextService.getLoginUser().getTenantUID());
-        msgNameList.stream().forEach(item->selectedMsgFields.put(item,false));
-        selectedMsg.stream().filter(item->selectedMsgFields.containsKey(item)).filter(item->selectedMsgFields.put(item,true)).collect(Collectors.toList());
+
+        //List<String> selectedMsg6;
+
+        //selectedMsgConf.stream().forEach(item->item.getMsgName().contains(selectedMsg3));
+        //selectedMsgConf.stream().map(item->item.getMsgName()).forEach(item-> (selectedMsg3.contains(item) ? selectedMsg6.add(selectedMsgConf.get)));
+
+        //personList.stream().map(p-> p.getName()).forEach(s -> System.out.println(s));
+
+       if(locale){
+            //List<String> selectedMsg2 = selectedMsg3.stream().map(item->item.equals(selectedMsg.iterator().next().getMsgName()) ).collect(Collectors.toList());
+            msgNameList.stream().forEach(item->selectedMsgFields.put(item,false));
+        }else{
+            //msgRepository.find().stream().map(item->item.getMsgName().equals(selectedMsg.iterator().next().getMsgNameEn()) ).collect(Collectors.toList());
+            msgNameList.stream().forEach(item->selectedMsgFields.put(item,false));
+            //selectedMsg.stream().filter(item->selectedMsgFields.containsKey(item)).filter(item->selectedMsgFields.put(item,true)).collect(Collectors.toList());
+        }*/
+
+
+
       //  msgVOList = getMsgConfigVO(userContextService.getLoginUser().getTenantUID());
 
     }

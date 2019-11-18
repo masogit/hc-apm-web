@@ -52,6 +52,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.event.SelectEvent;
 
 import org.springframework.util.StringUtils;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -159,6 +160,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             this.isShowButton = Boolean.TRUE;
         }
 
+    }
+
+    public boolean isLocale(){
+        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void updateRoleList() {

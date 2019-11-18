@@ -83,7 +83,7 @@
                             <f:facet name="filter">
                                 <p:selectOneMenu value="#{userAccountController.userRoleType}" onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
-                                    <f:selectItems value="#{userAccountController.roles}" var="item" itemLabel="#{item.roleDesc}" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{userAccountController.roles}" var="item" itemLabel="#{userContextService.isLocale() ? item.roleDesc : item.roleDescEn}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                             <h:outputText value="#{userAccountController.getCurrentUserRoleNames(item.id)}" />
