@@ -37,6 +37,7 @@ import com.ge.apm.domain.UserRole;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -68,7 +69,6 @@ public class UaaService {
 
     @Autowired
     private CustomRoleRepository customRoleRepository;
-    
 
     private void loadSysRoles(){
         if(sysRoles!=null) return;
@@ -153,6 +153,15 @@ public class UaaService {
         return roleList;
     }
 
+
+    public boolean isLocale(){
+        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public List<SysRoleVO> getSysRoleVO(String tenantUID){
         loadSysRoles();
         TenantInfo ti = tenantInfoDao.findByuid(tenantUID);
@@ -161,7 +170,15 @@ public class UaaService {
             SysRoleVO srVO = new SysRoleVO();
             srVO.setId(tempSysRole.getId());
             srVO.setName(tempSysRole.getName());
+
             srVO.setRoleDesc(tempSysRole.getRoleDesc());
+            srVO.setRoleDescEn(tempSysRole.getRoleDescEn());
+
+            /*if(isLocale()){
+                srVO.setRoleDesc(tempSysRole.getRoleDesc());
+            }else{
+                srVO.setRoleDesc(tempSysRole.getRoleDescEn());
+            }*/
             srVO.setRoleType(0);
             //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
             if(UserContextService.isOnlyLocalITAdmin()){

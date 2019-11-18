@@ -16,9 +16,9 @@
 
 
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <c:forEach items="#{msgConfigController.msgNameList}" var="item">
+                            <c:forEach items="#{userContextService.isLocale() ? msgConfigController.msgNameList : msgConfigController.msgNameListEn}" var="item">
                                 <h:panelGroup >
-                                    <p:selectBooleanCheckbox itemLabel="#{msgConfigController.allFields[item]}" value="#{msgConfigController.selectedMsgFields[item]}"   />
+                                    <p:selectBooleanCheckbox itemLabel="#{userContextService.isLocale() ? msgConfigController.allFields[item] : msgConfigController.allFieldsEn[item]}" value="#{msgConfigController.selectedMsgFields[item]}"   />
                                 </h:panelGroup>
 
                             </c:forEach>

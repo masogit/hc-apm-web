@@ -29,12 +29,12 @@
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
 							<p:selectManyCheckbox value="#{customRoleController.menus}" layout="responsive" columns="4">
-								<f:selectItems value="#{customRoleController.listI18nMenus}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-							</p:selectManyCheckbox>
+								<f:selectItems value="#{customRoleController.listI18nMenus}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"  />
+						</p:selectManyCheckbox>
 						</h:panelGroup>
 					</p:panelGrid>
 				</p:fieldset>
-				<p:fieldset id="authConfig" legend="#{msg.WebAuthorityConfiguration}">
+				<p:fieldset id="authConfig" legend="#{msg.WebAuthorityConfiguration}"  rendered="#{userContextService.isLocale()}">
 					<p:repeat var="domainAuth" value="#{customRoleController.authJSONArr}">
 						<label class="label">#{domainAuth['v']}</label>
 						<p:selectBooleanCheckbox value="#{domainAuth['s']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 's')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 's')}">
