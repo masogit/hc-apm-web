@@ -45,10 +45,10 @@
 					<f:selectItem itemLabel="#{msg.Stopped}" itemValue="2" />
 					<f:selectItem itemLabel="#{msg.PartialFunction}" itemValue="3" />
 					<f:selectItem itemLabel="#{msg.ToBeTerminated}" itemValue="4" />
-					<f:selectItem itemLabel="停用" itemValue="5" />
+					<f:selectItem itemLabel="#{msg.terminated}" itemValue="5" />
 				</p:selectOneMenu>
 			</f:facet>
-			<h:outputText value="#{item.assetInfo.status==1?msg.Normal:item.assetInfo.status==2?msg.Stopped:item.assetInfo.status==3?msg.PartialFunction:item.assetInfo.status==4?msg.ToBeTerminated:item.assetInfo.status==5?'停用':item.assetInfo.status}" />
+			<h:outputText value="#{item.assetInfo.status==1?msg.Normal:item.assetInfo.status==2?msg.Stopped:item.assetInfo.status==3?msg.PartialFunction:item.assetInfo.status==4?msg.ToBeTerminated:item.assetInfo.status==5?msg.terminated:item.assetInfo.status}" />
 		</p:column>
 		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
 			<h:outputText value="#{item.assetInfo.locationName}" />

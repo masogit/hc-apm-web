@@ -87,7 +87,7 @@
                 </p:column>
                 <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}">
                     <h:outputText value="#{item.serviceRequest.requestTime}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                        <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{msg.Assignee}" rendered="#{workOrderMgrController.queryIndex==8}">
@@ -307,7 +307,7 @@
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(2).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(2).msgKey}" />
                             <f:selectItem itemLabel="#{fieldMsg.getFieldValueList('assetStatus').get(3).value}" itemValue="#{fieldMsg.getFieldValueList('assetStatus').get(3).msgKey}" />
                         </p:selectOneRadio>
-                        <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.confirmedDownTime}" showOn="button"
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime"  value="#{workOrderMgrController.confirmedDownTime}" showOn="button"
                                     readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                 </p:panelGrid>

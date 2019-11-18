@@ -96,26 +96,26 @@
             <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup>
                     <label class="label">#{msg.EarliestApplyTime}</label>
-                    <p:calendar timeZone="GMT+8" id="startTime" value="#{workOrderReportExportController.startTime}"
-                                pattern="yyyy/MM/dd" required="false" requiredMessage="#{msg.startTime} #{msg.ValidationRequire}"
+                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="startTime" value="#{workOrderReportExportController.startTime}"
+                                 required="false" requiredMessage="#{msg.startTime} #{msg.ValidationRequire}"
                                 showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.LatestApplyTime}</label>
-                    <p:calendar timeZone="GMT+8" id="endTime" value="#{workOrderReportExportController.endTime}"
-                                pattern="yyyy/MM/dd" required="false" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"
+                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="endTime" value="#{workOrderReportExportController.endTime}"
+                                 required="false" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"
                                 showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.EarliestCloseTime}</label>
-                    <p:calendar timeZone="GMT+8" id="closedStartTime"
-                                value="#{workOrderReportExportController.closedStartTime}" pattern="yyyy/MM/dd"
+                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="closedStartTime"
+                                value="#{workOrderReportExportController.closedStartTime}"
                                 showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.LatestCloseTime}</label>
-                    <p:calendar timeZone="GMT+8" id="closedEndTime" value="#{workOrderReportExportController.closedEndTime}"
-                                pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                    <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="closedEndTime" value="#{workOrderReportExportController.closedEndTime}"
+                                 showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
             </p:panelGrid>
         </p:fieldset>
