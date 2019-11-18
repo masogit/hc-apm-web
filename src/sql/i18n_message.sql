@@ -2066,7 +2066,7 @@
 
 
 
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ReportTemplateManagement', '报表模版管理', 'Report Template Management', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ReportFormTemplateManagement', '报表模版管理', 'Report Template Management', NULL, '-1');
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'VacationManagement', '休假管理', 'Vacation Management', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Approved3', '审批通过', 'Approved', NULL, '-1');
@@ -2594,7 +2594,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CantMaintenNoAssetDepartment', '没有使用科室的资产不能创建保养工单', 'Cannot create a maintenance workorder for any asset with no asset department', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ManhoursRequired', '工时必填写', 'Manhours Required', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'EndTimeRequired', '结束时间必须填写', 'End Time Required', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'NoFilled', '未填写', '', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'NoFilled', '未填写', 'Not filled', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'PlannedCompletionTimeRequired', '计划完成时间必须填写', 'Planned Completion Time Required', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CloseSuccess', '关单成功', 'Close Success', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'SubmissionSuccessfullyCanceled', '取消提交成功', 'Submission successfully canceled', NULL, '-1');
@@ -2617,8 +2617,8 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'Compete', '抢单', 'Compete', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'BatchTakeOrderSuccess', '批量接单成功', 'Batch Take Order Success', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'BatchCompeteSuccess', '批量抢单成功', 'Batch Compete Success', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MaintainReportNotExist', '检查项对应的保养报告不存在', 'null', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'BatchCancelSuccess', '批量取消成功', '', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MaintainReportNotExist', '检查项对应的保养报告不存在', 'The maintenance report corresponding to the inspection item does not exist', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'BatchCancelSuccess', '批量取消成功', 'Batch cancelled successfully', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'Level2RulePM', '二级规则', 'Level 2 Rule', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'Level3RulePM', '三级规则', 'Level 3 Rule', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ConfigurationDate', '配置日期', 'Configuration Date', NULL, '-1');
@@ -2724,8 +2724,8 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ReportTemplateConfiguration', '报表模版配置', 'Report Template Configuration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'DownloadTheCurrentActiveTemplate', '下载当前生效模版', 'Download the current active template', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'TemplateFile', '模版文件', 'Template File', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ConfigurationSuccess', '配置成功!', 'ConfigurationSuccess', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'SelectExportFiles', '请先选择要导出的文件!', '', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ConfigurationSuccess', '配置成功!', 'Configuration Success!', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'SelectExportFiles', '请先选择要导出的文件!', 'Please select the file to export first', NULL, '-1');
 
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentID', '设备编号 ', 'Equipment ID ', NULL, '-1');
