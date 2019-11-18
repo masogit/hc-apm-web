@@ -61,9 +61,9 @@ public class PmOrderReportTemplateService {
         if (templateBytes == null) {
             String fileName = null;
             if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
-                fileName = "report/maintenance-template_zh.docx";
+                fileName = "maintenance-template_zh.docx";
             } else {
-                fileName = "report/maintenance-template_en.docx";
+                fileName = "maintenance-template_en.docx";
 
             }
             templateBytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("report/" + fileName ));

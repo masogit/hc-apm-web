@@ -632,9 +632,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     public void generateReportTemplateFile() throws IOException{
         String fileName = null;
         if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
-            fileName = "report/maintenance-template_zh.docx";
+            fileName = "maintenance-template_zh.docx";
         } else {
-            fileName = "report/maintenance-template_en.docx";
+            fileName = "maintenance-template_en.docx";
 
         }
         InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/" + fileName );
