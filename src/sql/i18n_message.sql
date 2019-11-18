@@ -935,8 +935,6 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reportType','2','计量','Measurement',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('checklistType','3','质控','Quality Control',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','staff_tile_quality','质控','Quality Control',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','outerPm','外部保养','outer pm orders',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','outerRemotePm','外部远程保养','outer remote pm orders',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','staff_tile_preventive','保养','Maintenance',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('reportType','1','保养','Maintenance',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','maintenanceAnalysis_title','设备维修事件统计分析','Equipment Repair Event Analysis',NULL,-1);
@@ -2001,7 +1999,6 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CheckInTime', '签到时间', 'Check-in Time', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ExternalExpenses', '外部费用', 'External Expenses', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UsedPart', '使用的备件', 'Used Part', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ApprovalStatus', '审核状态', 'Approval Status', NULL, '-1');
 
 
 
@@ -2132,7 +2129,6 @@
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TypeErrTip', '必须选择一个类型', 'Must select a type', NULL, '-1');
 
-    ##-------------------
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MaintenanceSubStatus', '维修子状态', 'Maintenance sub status', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TotalMaintenanceAmount', '维修总金额', 'Total maintenance amount', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MaintenanceLaborCost', '维修人工费用', 'Maintenance labor cost', NULL, '-1');
@@ -2148,7 +2144,6 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'LabelDeviceMessageSubscription', '标签设备消息订阅', 'Label device message subscription', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TagMessageSubscription', '标签消息订阅', 'Tag message subscription', NULL, '-1');
 
-    ##-------------------------------
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'RepairWorkbench', '维修工作台', 'Repair Workbench', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MyRepairWorkorder', '我的维修工单', 'My Repair Workorder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'RepairWorkorderReport', '维修工单报表', 'Repair Workorder Report', NULL, '-1');
