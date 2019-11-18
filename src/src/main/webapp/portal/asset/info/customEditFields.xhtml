@@ -648,9 +648,9 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufactDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.manufactDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufactDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="#{userContextService.getTimeZone()}"  id="manufactDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.manufactDate}" required="#{assetInfoEditController.customConfig.assetFields['manufactDate'].required}"
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="manufactDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.manufactDate}" required="#{assetInfoEditController.customConfig.assetFields['manufactDate'].required}"
                         requiredMessage="#{msg.manufactDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('manufactDate')}"
-                        maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  locate="#{userContextService.getCalendarLocale()}">
+                        maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  >
                 <p:ajax process="@(this)" update="@(.inputDate) @(.manufactDateChange)" />
             </p:calendar>
         </h:panelGroup>
@@ -658,24 +658,24 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'purchaseDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.purchaseDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['purchaseDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="#{userContextService.getTimeZone()}"  id="purchaseDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.purchaseDate}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('purchaseDate')}" class="manufactDateChange"
-                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  locate="#{userContextService.getCalendarLocale()}" required="#{assetInfoEditController.customConfig.assetFields['purchaseDate'].required}" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="purchaseDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.purchaseDate}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('purchaseDate')}" class="manufactDateChange"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="#{assetInfoEditController.customConfig.assetFields['purchaseDate'].required}" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'arriveDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.arriveDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['arriveDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="#{userContextService.getTimeZone()}"  id="arriveDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.arriveDate}" required="#{assetInfoEditController.customConfig.assetFields['arriveDate'].required}"
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="arriveDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.arriveDate}" required="#{assetInfoEditController.customConfig.assetFields['arriveDate'].required}"
                         requiredMessage="#{msg.arriveDate} #{msg.ValidationRequire}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('arriveDate')}"
-                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" locate="#{userContextService.getCalendarLocale()}"/>
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'acceptDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.acceptDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['acceptDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="#{userContextService.getTimeZone()}"  pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.acceptDate}" required="#{assetInfoEditController.customConfig.assetFields['acceptDate'].required}"
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.acceptDate}" required="#{assetInfoEditController.customConfig.assetFields['acceptDate'].required}"
                         requiredMessage="#{msg.acceptDate} #{msg.ValidationRequire}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('acceptDate')}"
-                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" locate="#{userContextService.getCalendarLocale()}"/>
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'warrantyMonth')}" >
@@ -688,31 +688,31 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'installDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.installDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['installDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="#{userContextService.getTimeZone()}"  id="installDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.installDate}" readonly="#{!assetInfoEditController.needEdit('installDate')}"
-                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" locate="#{userContextService.getCalendarLocale()}" required="#{assetInfoEditController.customConfig.assetFields['installDate'].required}" requiredMessage="#{msg.installDate} #{msg.ValidationRequire}"/>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="installDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.installDate}" readonly="#{!assetInfoEditController.needEdit('installDate')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="#{assetInfoEditController.customConfig.assetFields['installDate'].required}" requiredMessage="#{msg.installDate} #{msg.ValidationRequire}"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'factoryWarrantyDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.factoryWarrantyDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="#{userContextService.getTimeZone()}"  id="factoryWarrantyDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.factoryWarrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required}"
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="factoryWarrantyDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.factoryWarrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required}"
                         requiredMessage="#{msg.factoryWarrantyDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('factoryWarrantyDate')}"
-                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" locate="#{userContextService.getCalendarLocale()}"/>
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'warrantyDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.warrantyDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['warrantyDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="#{userContextService.getTimeZone()}"  id="warrantyDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.warrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['warrantyDate'].required}"
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="warrantyDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.warrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['warrantyDate'].required}"
                         requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" showOn="button" readonly="#{!assetInfoEditController.needEdit('warrantyDate')}"
-                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" locate="#{userContextService.getCalendarLocale()}"/>
+                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'terminateDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.terminateDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['terminateDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="#{userContextService.getTimeZone()}"  id="terminateDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.terminateDate}" showOn="button" required="#{assetInfoEditController.customConfig.assetFields['terminateDate'].required}"
-                        requiredMessage="#{msg.terminateDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('terminateDate')}" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" locate="#{userContextService.getCalendarLocale()}"/>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="terminateDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoEditController.selected.terminateDate}" showOn="button" required="#{assetInfoEditController.customConfig.assetFields['terminateDate'].required}"
+                        requiredMessage="#{msg.terminateDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('terminateDate')}" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'warranty')}" >

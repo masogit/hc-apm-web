@@ -754,7 +754,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','DeleteFileConformationMsg','确认删除文件吗？','Confirm to delete the file?',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','SelectUploadFile','请选择上传文件','Please select file to upload',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','SuccessUploaded','上传成功','Successfully Uploaded',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','InvalidPictureFileType','文件类型应该属于(gif,jpe,jpeg,png,bmp)','File type should be the form of (gif, jpe, jpeg, png and bmp)',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','InvalidPictureFileType','文件类型应该属于(xls,xlsx,doc,docx,pdf,jpeg,jpg,png,txt,ps)','File type should be the form of (xls,xlsx,doc,docx,pdf,jpeg,jpg,png,txt and ps)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','WhenIsFinished','任务完成时，%s不能为空.','%s cannot be empty when the task is finished',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','ResetConformation','重置确认','Reset Conformation',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','ResetConformationMsg','您确定要重置选定用户的密码么?','Are you sure you want to reset the password of the selected user?',NULL,-1);
@@ -2235,6 +2235,15 @@
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WorkScheduleCalendar', '排班日历', 'Work Schedule Calendar', NULL, '-1');
 
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'UpTimeExcel', '开机时间', 'Up Time', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'HasAScheduleRecord', '有排班记录！', 'has a schedule record!', NULL, '-1');
+
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'VacationApproval', '请假审批', 'Vacation Approval', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ApprovalNotes', '审批注意信息', 'Approval Notes', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'VacationApplicant2', '请假人', 'Vacation Applicant', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Reject', '拒绝', 'Reject', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EndDate2', '结束日期', 'End Date', NULL, '-1');
 
 
 

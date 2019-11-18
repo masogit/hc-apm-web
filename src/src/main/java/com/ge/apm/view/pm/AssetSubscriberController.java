@@ -19,6 +19,7 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -372,8 +373,12 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			/* 如果加上合同等消息推送 替换成这个if
 			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
 					selected.getContractDueHit()==false && selected.getMeterHit()==false && selected.getIsReceiveTimeoutMsg()==false){*/
-				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getIsReceiveTimeoutMsg()==false && selected.getMeterHit()==false){
-				WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
+				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getIsReceiveTimeoutMsg()==false ){
+					if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh") && selected.getMeterHit()==false){
+						WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
+					}else{
+						WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
+					}
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				msgsubList = new ArrayList<MessageSubscriber>();
 				return;

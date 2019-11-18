@@ -71,7 +71,7 @@ public class TenantInfo implements Serializable {
     @Column(name = "location_en")
     private String locationEn;
     @Column(name = "time_zone")
-    private Double timeZone;
+    private Double timeZone = 8.0d;
     @Size(max = 16)
     @Column(name = "default_lang")
     private String defaultLang;
@@ -145,19 +145,8 @@ public class TenantInfo implements Serializable {
     @Column(name = "currency")
     private Integer currency = 1;//1、cny 2、dollar
 
-    @Column(name = "habit")
-    private Integer habit = 1;// 1、国内版 2、国际版
-
     @Transient
     private String cpmURL;
-
-    public Integer getHabit() {
-        return habit;
-    }
-
-    public void setHabit(Integer habit) {
-        this.habit = habit;
-    }
 
     public Integer getCurrency() {
         return currency;

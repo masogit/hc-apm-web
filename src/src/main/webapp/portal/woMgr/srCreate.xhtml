@@ -80,7 +80,7 @@
 
                     </p:dataGrid>
                     <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{workOrderMgrController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                  multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                  multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
                         <p:commandButton validateClient="true" value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" disabled="#{!workOrderMgrController.canCreateSr()}"  update="woTab:woMgrListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
@@ -89,7 +89,7 @@
                     </h:panelGroup>
                     
                      <h:panelGroup >
-                       <h:outputText style="color:red; font-size:18px" value="#{msg.RepairTelephoneNumberTips}:4008128188" rendered="#{!workOrderMgrController.canCreateSr() or (!(workOrderMgrController.selectedAsset.ibStatus eq 0) and workOrderMgrController.selectedAsset.repairForm eq 3)}"/>
+                       <h:outputText style="color:red; font-size:18px" value="#{msg.RepairTelephoneNumberTips}:4008128188" rendered="#{!workOrderMgrController.canCreateSr() or (workOrderMgrController.selectedAsset.ibStatus eq 1 and workOrderMgrController.selectedAsset.repairForm eq 3)}"/>
                     </h:panelGroup>
                 </p:fieldset>
             </h:form>

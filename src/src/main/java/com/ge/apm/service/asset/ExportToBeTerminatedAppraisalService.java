@@ -17,6 +17,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
@@ -190,7 +191,13 @@ public class ExportToBeTerminatedAppraisalService {
             templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
         }
         if (templateBytes == null) {
-            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/tobeterminated_template.docx"));
+            String fileName = "tobeterminated_template.docx";
+            if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+                fileName = "tobeterminated_template_zh.docx";
+            } else {
+                fileName = "tobeterminated_template_en.docx";
+            }
+            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/template/"+fileName));
         }
         return templateBytes;
     }
