@@ -64,7 +64,10 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
+
     private SupplierController supplierController;
+    @Setter @Getter
+    UserAccount approver;
     @Setter @Getter
     Double c_woManhourPrice =0d;
     @Setter @Getter
@@ -579,7 +582,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private void filterStepSet(Integer fillterStepId){
         searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
     }
-
+public void test1(){
+    System.out.println("test1------");
+}
 
     /*stepName:StepId 报修:1 待派工: 2 , 待接单:3, 维修中:4 , 待验收:5 待关单:6 ， 待评价:7  , 待审核:8 ， 已计划: 0*/
     @Override
@@ -1683,7 +1688,11 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     }
 
     public List<UserAccount> getApproverList(String name) {
-        return woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
+        List<UserAccount> uaList = woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
+      /* List<String> ua1List = uaList.stream().map(UserAccount::getUid).collect(Collectors.toList());
+        List<UserAccount> tmp=  userDao.findByUidIn(ua1List);*/
+        return uaList;
+
     }
 
     public void setNothing(){}

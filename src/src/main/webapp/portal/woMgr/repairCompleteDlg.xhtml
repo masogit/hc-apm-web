@@ -257,20 +257,28 @@
                             <p:inputTextarea placeholder="#{msg.QuotationApproval}" value="#{workOrderMgrController.comments}" maxlength="256" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.approveUserId}*</label>
+                            <label class="label">审核人*</label>
                             <p:autoComplete id="approver" value="#{workOrderMgrController.selectedApproverUid}" dropdown="true" scrollHeight="300"
-                                            forceSelection="true" required="true" requiredMessage="#{msg.approveUserId}#{msg.ValidationRequire}"
+                                            forceSelection="true" required="true" requiredMessage="审核人#{msg.ValidationRequire}"
                                             completeMethod="#{workOrderMgrController.getApproverList}"
                                             var="t" itemLabel="#{t.name}" itemValue="#{t.uid}">
                                 <p:ajax process="@this" event="itemSelect" listener="#{workOrderMgrController.setNothing()}"/>
                                 <p:ajax process="@this" listener="#{workOrderMgrController.setNothing()}"/>
                             </p:autoComplete>
-<!--                            <p:selectOneMenu  value="#{workOrderMgrController.selectedApproverUid}" required="true" requiredMessage="审核人#{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{workOrderMgrController.getApproverList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                            </p:selectOneMenu>-->
+                            <p:column>
+                                <h:outputText value="#{shr.name}"/>
+                            </p:column>
                         </h:panelGroup>
+                       <!-- <h:panelGroup>
+                            <label class="label">审核人*</label>
+                            <p:autoComplete id="approverffff" converter="userAccountConverter" required="true" value="#{workOrderMgrController.approver}" dropdown="true"  forceSelection="true"  requiredMessage="审核人#{msg.ValidationRequire}" var="shr" itemLabel="#{shr.name}" itemValue="#{shr}" completeMethod="#{workOrderMgrController.getApproverList}">
+                            </p:autoComplete>
+                            <p:column>
+                                <h:outputText value="#{shr.name}"/>
+                            </p:column>
+                        </h:panelGroup>-->
                     </p:panelGrid>
+
                     <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.submitWorkOrder()}" value="#{msg.SubmitForApproval}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');PF('submitCommentsDlg').hide()" />
                 </h:panelGroup>
             </h:form>
@@ -282,6 +290,7 @@
         <script type="text/javascript">
             function handleValidFields(xhr, status, args) {
                 var valid = true;
+                var valid1 = true;
                 if (args.confirmedUpDate) {
                     $('#woTab\\:repairCompleteDialogForm\\:confirmedUpDate_input').addClass("ui-state-error");
                     valid = false;
@@ -298,8 +307,14 @@
                     $('#woTab\\:repairCompleteDialogForm\\:manHours_input').addClass("ui-state-error");
                     valid = false;
                 }
+                if(args.approvalMust){
+                    valid1 =false;
+                }
                 if (valid) {
                     handleSubmit(args, 'repairCompleteDialog');
+                }
+                if(valid1){
+                    handleSubmit1(args, 'submitCommentsDlg')
                 }
             }
         </script>
