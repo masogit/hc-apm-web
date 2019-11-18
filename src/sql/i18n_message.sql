@@ -1942,7 +1942,7 @@
 
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EstimatedArrivalTime', '预计到达时间', 'Estimated Arrival Time', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PartType', '维修总金额', 'Part Type', NULL, '-1');
+    --INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PartType', '维修总金额', 'Part Type', NULL, '-1');
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NewSuuplierInformation', '新增供应商信息', 'New Suuplier Information', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PartName', '备件名称', 'Part Name', NULL, '-1');
@@ -2912,6 +2912,72 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'HospitalDirector', '院长', 'Hospital Director', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DirectorOfTheMedicalEngineeringDepartment', '医学工程处主任', 'Director of the Medical Engineering Department', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Engineer', '工程师', 'Engineer', NULL, '-1');
+
+
+
+
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','FileUploadFailed','文件上传失败!','File upload failed!',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','Close2','结单','Close',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','EquipmentCannotBeTerminated','设备[%s]未处于待报废状态，不能报废！','The equipment [%s] is not to be termianted and cannot be terminated!',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','UnfinishedWorkorderCandBeTerminated','设备名称[%s]存在未完成工单，不能报废！','The equipment name [%s] has an unfinished workorder and cannot be terminated!',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','SwappedInRentPleaseReturnItFirst','操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！','Operation Failed. The equipment name [%s] and ID [%s] are swapped in rent, please return it first!',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','PleaseSetTheEquipmentClassification','请设置设备分类','Please set the equipment classification',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','PleaseSetTheRepairOwnerOrPMOwner','请设置维修负责人或保养负责人','Please set the repair owner or PM owner',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','SaveSuccess','保存成功','Save Success',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','DeleteSuccess','删除成功','Delete Success',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','PleaseSetTheDepartment','请设置所属科室','Please set the department',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','TheUserIsAssignerAndCannotBeDeleted','该用户是派工人,不能删除.','The user is assigner and cannot be deleted.',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','TheUserIsEquipmentOwnerAndCannotBeDeleted','该用户是设备责任人,不能删除.','The user is equipment owner and cannot be deleted.',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ListedInTheGroupOfMintenanceEngineersCannotBeDeleted','该用户在维修工程师群组中,不能删除.','The user is listed in the group of mintenance engineers and cannot be deleted.',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','TheUserHasAnOnGoingWorkOrderAndCannotBeDeleted','该用户有在修工单,不能删除. ','The user has an on-going workorder and cannot be deleted.',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ResetSuccess','重置成功 ','Reset Success!',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ActivateSuccess','激活成功！ ','Activate Success!',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ForTheSystemActivation','系统激活专用','For the System Activation',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','NoData','无数据','No Data!',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','NoCompletionOfTheAssetDepartment','使用科室未填，不能生成保养工单','Cannot generate the maintenance workorder for no completion of the asset department',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','CreateSuccess','创建成功','Create Success',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','CreateFailed','创建失败','Create Failed',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','MessageSent','消息已发送','Message Sent',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','CreatedAfterSaving','当前院区无配置,保存后创建','No configuration in the current site, created after saving',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ModifiedBy','修改人','Modified by',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','AssetFieldSettings','资产字段设置','Asset Field Settings',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','DisplayedField','显示的字段','Displayed Field',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ReadableRole','可读取角色','Readable Role',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ExportableRole','可导出角色','Exportable Role',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ModifiableRole','可修改角色','Modifiable Role',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','AssetListPage','资产列表页面','Asset List Page',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','AssetDetailPage','资产详细页面','Asset Detail Page',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','BasicInformationFieldset','基本信息字段组','Basic Information Fieldset',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','DetailFields','详细信息字段组','Detail Fields',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','AssetEditPage','资产编辑页面','Asset Edit Page',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','BasicFields','基本信息字段组','Basic Fields',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','CodeFields','编码信息字段组','Code Fields',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','StatusFields','状态信息字段组','Status Fields',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','CategoryFields','分类信息字段组','Category Fields',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','DateFields','日期信息字段组','Date Fields',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','FinancialFields','财务信息字段组','Financial Fields',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','WeChatAssetPage','微信端资产页面','WeChat Asset Page',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','HeaderFields','头部信息字段组','Header Fields',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','RepairFields','维修信息字段组','Repair Fields',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','WeChatRequestPage','微信端报修页面','WeChat Request Page',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','AssetInformationDisplayFields','资产信息显示字段组','Asset Information Display Fields',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ProvideTheRequestInformation','报修信息填写','Provide the request information',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','DisplayPriority','显示紧急程度','Display Priority',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','Default','默认值','Default',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','DisplayAssetStatus','显示资产状态','Display Asset Status',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','RequestPageDisplay','报修页面显示','Request Page Display',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ProvideTheFaultDescription','故障描述填写','Provide the fault description',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','DisplayImageUploaded','显示上传图片','Display Image Uploaded',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','Required','必填','Required',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','DisplayVoiceUploaded','显示上传语音','Display Voice Uploaded',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','DisplayTextDescription','显示文字描述','Display Text Description',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','VoiceOrTextRequired','语音文字必填一项','Voice or Text Required',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','PartTypeDefault','备件类型默认值','Part Type Default',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','Onekey','一键','Onekey',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','BasicEquipmentInformationRequired','设备基本信息是否必填','Basic Equipment Information Required?',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','InstallationOfTheArrivalsRequired','到货安装是否必填','Installation of the arrivals required?',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ColumnWidth','列宽','Column Width',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','NoAddableField','无可添加字段','No Addable Field',NULL,-1);
 
 
 
