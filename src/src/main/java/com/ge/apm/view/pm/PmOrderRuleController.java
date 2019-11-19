@@ -363,7 +363,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             pmOrderRuleCheckListRepository.save(checkItemLists);
         }
         checkItemLists.clear();
-        WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess！"));
+        WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess"));
     }
 
     public void getName() {
