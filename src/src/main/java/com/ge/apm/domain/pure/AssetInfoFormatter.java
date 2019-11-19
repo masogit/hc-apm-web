@@ -829,7 +829,7 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("CurrentStatus"), this.getStatusAsString());
         map.put(WebUtil.getMessage("accountingCategory"), this.getAccountingCategoryAsString());
         map.put(WebUtil.getMessage("IsPM"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
-        map.put(WebUtil.getMessage("IsChecked?"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
+        map.put(WebUtil.getMessage("IsChecked2"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
         map.put(WebUtil.getMessage("assetGroupSecondary"), this.getAssetGroupSecondayName());
         map.put(WebUtil.getMessage("assetValueCategory"), this.getAssetValueCategoryName());
         map.put(WebUtil.getMessage("deviceStatus"), this.getDeviceStatusAsString());
