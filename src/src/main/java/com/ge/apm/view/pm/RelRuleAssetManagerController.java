@@ -1,9 +1,6 @@
 package com.ge.apm.view.pm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
@@ -205,6 +202,22 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}
 		return null;
 	}
+	public Date getInstallDate(String assetUid){
+		AssetInfo ai = getAssetInfo(assetUid);
+		if (ai != null) {
+			return ai.getInstallDate();
+		}
+		return null;
+	}
+
+	public Date getPurchaseDate(String assetUid){
+		AssetInfo ai = getAssetInfo(assetUid);
+		if (ai != null) {
+			return ai.getPurchaseDate();
+		}
+		return null;
+	}
+
 
 	public String getDepartNum(String assetUid) {
 		AssetInfo ai = getAssetInfo(assetUid);
