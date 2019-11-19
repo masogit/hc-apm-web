@@ -124,7 +124,7 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("CurrentStatus"), "status");
 
             exportFields.put(WebUtil.getMessage("IsPM"),"isPm");
-            exportFields.put(WebUtil.getMessage("IsChecked?"), "isChecked");
+            exportFields.put(WebUtil.getMessage("IsChecked2"), "isChecked");
             exportFields.put(WebUtil.getMessage("assetValueCategory"), "assetValueCategory");
             exportFields.put(WebUtil.getMessage("deviceStatus"), "deviceStatus");
             exportFields.put(WebUtil.getMessage("isWarrantyNotice"), "warranty");
