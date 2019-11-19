@@ -233,12 +233,12 @@ public class QrCodeService {
         //Demo asset for preview
         AssetInfo asset = new AssetInfo();
         asset.setAssetGroup(1);
-        asset.setName("(TBD");
-        asset.setSerialNum("(TBD");
-        asset.setFinancingNum("(TBD)");
-        asset.setDepartNum("(TBD)");
-        asset.setModalityId("(TBD)");
-        asset.setFunctionType("(TBD)");
+        asset.setName(WebUtil.getMessage("TBD"));
+        asset.setSerialNum(WebUtil.getMessage("TBD"));
+        asset.setFinancingNum(WebUtil.getMessage("TBD"));
+        asset.setDepartNum(WebUtil.getMessage("TBD"));
+        asset.setModalityId(WebUtil.getMessage("TBD"));
+        asset.setFunctionType(WebUtil.getMessage("TBD"));
         return asset;
     }
 
@@ -286,7 +286,7 @@ public class QrCodeService {
                             OrgInfo clinicalDept = orgInfoDao.getByUid(asset.getClinicalDeptUID());
                             itemObject.put("TextShowValue", textValue.concat(clinicalDept.getName() == null ? "" : clinicalDept.getName()));
                         } else {
-                            itemObject.put("TextShowValue", textValue.concat("(TBD)"));
+                            itemObject.put("TextShowValue", textValue.concat(WebUtil.getMessage("TBD")));
                         }
                         break;
                     case "serialNum":

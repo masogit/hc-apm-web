@@ -2907,7 +2907,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'HospitalDirector', '院长', 'Hospital Director', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DirectorOfTheMedicalEngineeringDepartment', '医学工程处主任', 'Director of the Medical Engineering Department', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Engineer', '工程师', 'Engineer', NULL, '-1');
-
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TBD', '待定', 'TBD', NULL, '-1');
 
 
 
