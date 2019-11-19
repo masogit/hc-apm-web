@@ -2972,6 +2972,7 @@
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','InstallationOfTheArrivalsRequired','到货安装是否必填','Installation of the arrivals required?',NULL,-1);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','ColumnWidth','列宽','Column Width',NULL,-1);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','NoAddableField','无可添加字段','No Addable Field',NULL,-1);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','Asset','资产','Asset',NULL,-1);
 
 
 
