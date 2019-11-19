@@ -2345,7 +2345,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'InstallationLocation', '安装位置', 'Installation Location', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'UseOwner', '使用责任人', 'Use Owner', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'IsPM', '是否PM', 'Is PM?', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'IsChecked', '是否盘点', 'Is Checked?', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'IsChecked2', '是否盘点', 'Is Checked?', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'AssetValueCategory', '资产价值分类', 'Asset Value Category', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CapitalSourceTwo', '资金来源2', 'Capital Source 2', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'WarrantyExpirationReminder', '是否对维保到期提醒', 'Warranty Expiration Reminder?', NULL, '-1');
