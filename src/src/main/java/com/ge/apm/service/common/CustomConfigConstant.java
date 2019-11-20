@@ -62,8 +62,8 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("RepairOwner3"), "assetOwnerName3");
             exportFields.put(WebUtil.getMessage("pmOwnerName"), "pmOwnerName");
             exportFields.put(WebUtil.getMessage("Site"), "siteUID");
-            exportFields.put(WebUtil.getMessage("AssetDepartment"), "clinicalDeptName");
-            exportFields.put(WebUtil.getMessage("Manufacturer"), "assetDeptName");
+            exportFields.put(WebUtil.getMessage("clinicalDeptId"), "clinicalDeptName");
+            exportFields.put(WebUtil.getMessage("AssetDepartment"), "assetDeptName");
             exportFields.put(WebUtil.getMessage("manufacture"), "manufacture");
             exportFields.put(WebUtil.getMessage("BrandManufacturerShortName"), "makerShortName");
 
