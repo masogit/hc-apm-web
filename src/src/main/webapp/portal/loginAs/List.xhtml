@@ -49,7 +49,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,30,90">
 
-                        <p:ajax event="rowSelect" update="loginAsButton createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton"/>
+                        <p:ajax event="rowSelect" update="loginAsButton createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton deactivateButton"/>
                         <p:ajax event="filter" listener="#{userAccountController.onFilter}" update="loginAsButton createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton"/>
 
                         <!-- <p:column headerText="#{msg.orgId}" sortBy="#{item.orgInfoId}">
@@ -100,6 +100,11 @@
                             <p:commandButton id="resetPassButton" icon="ui-icon-repeat" process="@this" title="#{msg.resetPassword}" actionListener="#{userAccountController.resetPassword}" update="datalist" rendered="#{userAccountController.showButton}" disabled="#{empty userAccountController.selected}">
                                 <p:confirm header="#{msg.ResetConformation}" message="#{msg.ResetConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
+
+                            <p:commandButton rendered="#{userContextService.partnerAccount}" id="deactivateButton" icon="ui-icon-lock-outline" process="@this" title="#{msg.deactivateAccount}" actionListener="#{userAccountController.deactivateAccount}" update="datalist" disabled="#{empty userAccountController.selected}">
+                                <p:confirm header="#{msg.deactivateAccount}" message="#{msg.deactivateAccountConfirm}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+
                             <p:commandButton rendered="false" id="lockButton" icon="ui-icon-lock-outline" process="@this" title="#{msg.lockAccount}" actionListener="#{userAccountController.lockAccount}" update="datalist" disabled="#{empty userAccountController.selected}">
                                 <p:confirm header="#{msg.lockAccount}" message="#{msg.lockAccountConfirm}" icon="ui-icon-alert"/>
                             </p:commandButton>

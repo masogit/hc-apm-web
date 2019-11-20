@@ -23,7 +23,7 @@
                     rows="20" emptyMessage="#{msg.noRecordFound}"
                     rowsPerPageTemplate="20,50,100,500"> 
 
-                    <p:ajax event="rowSelect" update="createButton editButton editVersionButton viewButton deleteButton"/>
+                    <p:ajax event="rowSelect" update="createButton editButton editVersionButton viewButton deleteButton disableButton"/>
                     <p:ajax event="filter" listener="#{tenantInfoController.onFilter}" oncomplete="rc();"/>
                     
                     <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -108,6 +108,11 @@
                         <p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{tenantInfoController.prepareView}" update=":SiteInfoViewDlg" oncomplete="PF('SiteInfoViewDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="editButton" rendered="#{tenantInfoController.showTestTenant}" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{tenantInfoController.prepareEdit('edit')}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="editVersionButton" rendered="#{tenantInfoController.showTestTenant}"  icon="fa fa-fw fa-reorder" class="btn btn-sm btn-gray" title="版本功能" actionListener="#{tenantInfoController.prepareEdit}" update=":SiteInfoEditVersionDlg" oncomplete="PF('SiteInfoEditVersionDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
+
+                        <p:commandButton id="disableButton" rendered="#{userContextService.partnerAccount}" icon="ui-icon-lock-outline" process="@this" title="#{msg.disableTenant}" actionListener="#{tenantInfoController.disableTenant}" update="datalist" disabled="#{empty tenantInfoController.selected}">
+                            <p:confirm header="#{msg.disableTenant}" message="#{msg.disableTenantConfirm}" icon="ui-icon-alert"/>
+                        </p:commandButton>
+
                         <p:commandButton id="deleteButton" rendered="#{tenantInfoController.showTestTenant}" process="@this" icon="ui-icon-close" title="#{msg.delete}" actionListener="#{tenantInfoController.delete}" update="datalist" disabled="#{empty tenantInfoController.selected}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                         </p:commandButton>
@@ -116,7 +121,7 @@
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
-                <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton datalist:editButton datalist:editVersionButton datalist:viewButton" immediate="true"/>
+                <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton datalist:editButton datalist:editVersionButton datalist:viewButton datalist:disableButton" immediate="true"/>
             </h:form>
 
             <ui:include src="Edit.xhtml"/>
