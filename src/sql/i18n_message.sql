@@ -2285,7 +2285,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MaximumFiveThDataLinesInTheExcel', '导入Excel中数据行数最多5000条，请分批导入！', 'Import into a maximum of 5000 data lines in the Excel, please import in batches', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ImportCompletedNoteFailureRecord', '导入完成，注意有导入失败的记录！', 'Import completed, Please note a record of import failure!', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ThereAreATotalOf', '总共有', 'There are a total of', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'RecordsOfFailure!', '条记录处理失败', 'records of processing failure!', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'RecordsOfFailure', '条记录处理失败', 'records of processing failure!', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ImportComplete', '导入完成', 'Import Complete', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'Deleted', '已删除', 'Deleted', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CannotBeDeleted', '不能删除', 'Cannot be deleted', NULL, '-1');
