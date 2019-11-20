@@ -117,8 +117,8 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("capitalSource2"), "capitalSource2");
             exportFields.put(WebUtil.getMessage("MeasurementGrade"), "measureGrade");
             exportFields.put(WebUtil.getMessage("RiskGrade"), "riskGrade");
-            exportFields.put(WebUtil.getMessage("EmergencyEquipment?"), "emergencyEquipment");
-            exportFields.put(WebUtil.getMessage("ImportEquipment?"), "importEquipment");
+            exportFields.put(WebUtil.getMessage("IsEmergencyEquipment"), "emergencyEquipment");
+            exportFields.put(WebUtil.getMessage("IsImportEquipment"), "importEquipment");
             exportFields.put(WebUtil.getMessage("MeasurementItemCategory"), "measuringItemCategory");
             exportFields.put(WebUtil.getMessage("accountingCategory"), "accountingCategory");
             exportFields.put(WebUtil.getMessage("CurrentStatus"), "status");
