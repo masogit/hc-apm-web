@@ -723,8 +723,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         dao.save(selected);
     }
 
-    public void deactivateAccount() {
-        selected.setIsActive(false);
+    public void markDeleted() {
+        selected.setIsDeleted(true);
         dao.save(selected);
     }
 

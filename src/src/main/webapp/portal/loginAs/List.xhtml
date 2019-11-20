@@ -79,6 +79,17 @@
                         <p:column headerText="#{msg.Locked}?" sortBy="#{item.isLocked}">
                             <h:outputText value="#{item.isLocked? msg.True2Yes : msg.False2No }"/>
                         </p:column>
+                        <p:column headerText="禁用" sortBy="#{item.isDeleted}" filterBy="#{item.isDeleted}" filterMatchMode="EQ" rendered="#{userContextService.partnerAccount}">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:converter converterId="javax.faces.Boolean" />
+                                    <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.isDeleted ? msg.True2Yes : msg.False2No }"/>
+                        </p:column>
                         <p:column headerText="#{msg.roleId}" filterBy="#{item.userRoleList.roleId}" filterMatchMode="EQ" rendered="#{userAccountController.isShowButton()}">
                             <f:facet name="filter">
                                 <p:selectOneMenu value="#{userAccountController.userRoleType}" onchange="PF('varDataList').filter()" >
@@ -101,7 +112,7 @@
                                 <p:confirm header="#{msg.ResetConformation}" message="#{msg.ResetConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
 
-                            <p:commandButton rendered="#{userContextService.partnerAccount}" id="deactivateButton" icon="ui-icon-lock-outline" process="@this" title="#{msg.deactivateAccount}" actionListener="#{userAccountController.deactivateAccount}" update="datalist" disabled="#{empty userAccountController.selected}">
+                            <p:commandButton rendered="#{userContextService.partnerAccount}" id="deactivateButton" icon="ui-icon-lock-outline" process="@this" title="#{msg.deactivateAccount}" actionListener="#{userAccountController.markDeleted}" update="datalist" disabled="#{empty userAccountController.selected}">
                                 <p:confirm header="#{msg.deactivateAccount}" message="#{msg.deactivateAccountConfirm}" icon="ui-icon-alert"/>
                             </p:commandButton>
 

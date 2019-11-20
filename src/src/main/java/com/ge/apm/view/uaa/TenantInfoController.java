@@ -293,8 +293,8 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		super.delete();
 	}
 
-	public void disableTenant() {
-		selected.setIsEnabled(false);
+	public void markDeleted() {
+		selected.setIsDeleted(true);
 		dao.save(selected);
 	}
 
