@@ -293,6 +293,11 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		super.delete();
 	}
 
+	public void disableTenant() {
+		selected.setIsEnabled(false);
+		dao.save(selected);
+	}
+
 	@Override
 	public String getErrorMessageForDuplicateKey(TenantInfo site) {
 		return String.format(WebUtil.getMessage("DuplicateSiteName"), site.getName());
