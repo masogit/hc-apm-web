@@ -57,11 +57,11 @@
                          </p:selectBooleanCheckbox>
                      </f:facet>-->
                 </p:column>
-                <p:column headerText="#{msg.hospitalId}" filterBy="#{item.hospitalId}" filterMatchMode="EQ">
+                <p:column headerText="#{msg.hospitalId}">
                     <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
-                    <f:facet name="filter">
+                    <!--<f:facet name="filter">
                         <p:inputText id="btnOrg2" class="btnOrg2clss" readonly="true" value="#{empty v2PmOrderController.selectSite? msg.AllHospitals:v2PmOrderController.selectSite.name}"/>
-                    </f:facet>
+                    </f:facet>-->
                 </p:column>
 
                 <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
@@ -131,7 +131,7 @@
                 </p:column>
 
 
-                <p:column headerText="#{msg.MaintenanceNumber}" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
+                <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.pmNum}"/>
                 </p:column>
                 <p:column headerText="#{msg.CurrentProcessingStep}"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
@@ -231,7 +231,7 @@
 
                     <ui:fragment rendered="true">
 
-                        <p:commandButton  icon="ui-icon-assignment-ind" class="btn btn-sm btn-gray batch-terminated" title="#{BatchDispatch}"  update="@(.disClass)" rendered="#{v2PmOrderController.queryIndex==2}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('dispatchDialog').show()">
+                        <p:commandButton  icon="ui-icon-assignment-ind" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDispatch}"  update="@(.disClass)" rendered="#{v2PmOrderController.queryIndex==2}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('dispatchDialog').show()">
                         </p:commandButton>
 
                         <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="#{msg.BatchTake}"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3}" disabled="#{v2PmOrderController.isBatchTakePm()}" oncomplete="PF('takeOrderDialog').show()">

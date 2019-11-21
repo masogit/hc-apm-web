@@ -1389,6 +1389,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
+
         this.setSearchFilter();
         removeFilterOnField("currentStepId");
         removeFilterOnField("currentPersonId");
@@ -1415,22 +1416,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(queryIndex==10){
             pmIdList = new ArrayList<>();
             filterOutPm(searchFilters);
-            List<Sort.Order> orders = new ArrayList<Sort.Order>();
-            orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
-            orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
-            Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
-            //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
-            if(orderFor!=null) {
-                if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
-                    orders = new ArrayList<Sort.Order>();
-                    orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
-                    orders.add(new Sort.Order(Sort.Direction.ASC, "pmNum"));
-                }
-            }else{
-                //如果选择除计划完成时间的其它列 进行排序
-                orders =  acqListSortOrder(pageRequest);
-            }
-            Sort sort = new Sort(orders);
+            Sort sort= returnSort(pageRequest);
+
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
             Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
@@ -1442,7 +1429,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
         if (queryIndex == -1) {//待办
-            searchFilters = new ArrayList();
+//            searchFilters = new ArrayList();
             setSearchFilter();
             pmIdList = new ArrayList<>();
             filterOutPm(searchFilters);
@@ -1562,22 +1549,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         this.selected = null;
 
-        List<Sort.Order> orders = new ArrayList<Sort.Order>();
-        orders.add(new Sort.Order(Sort.Direction.ASC,"planTime"));
-        orders.add(new Sort.Order(Sort.Direction.ASC,"pmNum"));
-        Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
-        //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
-       if(orderFor!=null) {
-           if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
-               orders = new ArrayList<Sort.Order>();
-               orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
-               orders.add(new Sort.Order(Sort.Direction.ASC, "pmNum"));
-           }
-       }else{
-      //如果选择除计划完成时间的其它列 进行排序
-        orders =  acqListSortOrder(pageRequest);
-       }
-        Sort sort = new Sort(orders);
+
+        Sort sort = returnSort(pageRequest);
         pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
 
         result = dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -1592,6 +1565,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
         }
         return result;
+    }
+
+    private Sort returnSort(PageRequest pageRequest){
+        List<Sort.Order> orders = new ArrayList<Sort.Order>();
+        orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
+        orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
+        Sort.Order orderFor = pageRequest.getSort().getOrderFor("planTime");
+        //默认是计划完成时间按降序排,如果选择升续操作 就会加入下面的column
+        if(orderFor!=null) {
+            if (orderFor.getDirection().equals(Sort.Direction.ASC)) {
+                orders = new ArrayList<Sort.Order>();
+                orders.add(new Sort.Order(Sort.Direction.ASC, "planTime"));
+                orders.add(new Sort.Order(Sort.Direction.ASC, "pmNum"));
+            }
+        }else{
+            //如果选择除计划完成时间的其它列 进行排序
+            orders =  acqListSortOrder(pageRequest);
+        }
+        Sort sort = new Sort(orders);
+        return sort;
+
     }
 
     private  List<Sort.Order> acqListSortOrder(PageRequest pageRequest){
