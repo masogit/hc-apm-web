@@ -9,7 +9,7 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="导出合同信息"/>
+                <p:outputLabel class="pageTitle" value="#{msg.ExportContractInformation}"/>
             </div>
         </div>
         <div class="ui-g-12 card">
@@ -20,7 +20,7 @@
                             <label class="label">*#{msg.hospitalId}</label>
                             <p:inputText id="selectedOrgName"
                                          value="#{contractInfoExportController.selectedOrg==null ? '': contractInfoExportController.selectedOrg.name}"
-                                         readonly="true" required="true" requiredMessage="所属院区不能为空"/>
+                                         readonly="true" required="true" requiredMessage="#{msg.SiteCannotBeEmpty}"/>
                             <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down"
                                              class="btn btn-sm popupIconButton"/>
                             <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"
@@ -62,17 +62,17 @@
                 <p:fieldset legend="#{msg.FilterCondition}">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
-                            <label class="label">合同开始时间</label>
+                            <label class="label">#{msg.contractStartTime}</label>
                             <p:calendar timeZone="GMT+8"  id="startDateFilter" value="#{contractInfoExportController.startDateFilter}" pattern="yyyy/MM/dd" requiredMessage="开始时间 #{msg.ValidationRequire}" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">合同结束时间</label>
+                            <label class="label">#{msg.contractEndTime}</label>
                             <p:calendar timeZone="GMT+8"  id="endDateFilter" value="#{contractInfoExportController.endDateFilter}" pattern="yyyy/MM/dd" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 
-                <p:commandButton value="预览结果" actionListener="#{contractInfoExportController.previewData}" icon="ui-icon-arrowthick-1-s" validateClient="true" class="btn btn-sm btn-gray" update=":dataListForm :growl"/>
+                <p:commandButton value="#{msg.PreviewResult}" actionListener="#{contractInfoExportController.previewData}" icon="ui-icon-arrowthick-1-s" validateClient="true" class="btn btn-sm btn-gray" update=":dataListForm :growl"/>
             </h:form>
 
             <h:form id="dataListForm">
@@ -86,36 +86,36 @@
                              rowsPerPageTemplate="20,50,100,500">
 
                     <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
-                    <p:column headerText="合同编号">
+                    <p:column headerText="#{msg.ContractNumber}">
                         <h:outputText value="#{item.合同编号}"/>
                     </p:column>
-                    <p:column headerText="合同名称">
+                    <p:column headerText="#{msg.ContractName}">
                         <h:outputText value="#{item.名称}"/>
                     </p:column>
-                    <p:column headerText="合同类型">
+                    <p:column headerText="#{msg.contractType}">
                         <h:outputText value="#{item.合同类型}"/>
                     </p:column>
-                    <p:column headerText="开始时间">
+                    <p:column headerText="#{msg.ContractStartTime}">
                         <h:outputText value="#{item.开始时间}"/>
                     </p:column>
-                    <p:column headerText="结束时间">
+                    <p:column headerText="#{msg.ContractEndTime}">
                         <h:outputText value="#{item.结束时间}"/>
                     </p:column>
-                    <p:column headerText="合同时间(月)">
+                    <p:column headerText="#{msg.ContractPeriodMonths}">
                         <h:outputText value="#{item.endMonths}"/>
                     </p:column>
-                    <p:column headerText="合同总额">
+                    <p:column headerText="#{msg.ContractValue}">
                         <!--<h:outputText value="#{item.合同总额}"/>-->
                         <p:inputNumber value="#{item.合同总额}" readonly="true"> </p:inputNumber>
                     </p:column>
 
                     <f:facet name="{Toolbar}">
-                        <p:commandButton ajax="false" value="合同列表全部导出" rendered="#{not empty contractInfoExportController.contractResultList}"
+                        <p:commandButton ajax="false" value="#{msg.ExportAllContractLists}" rendered="#{not empty contractInfoExportController.contractResultList}"
                                          actionListener="#{contractInfoExportController.exportAll()}"
                                          icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
                             <p:fileDownload value="#{contractInfoExportController.exportFile}"/>
                         </p:commandButton>
-                        <p:commandButton ajax="false" value="合同列表选择导出" rendered="#{not empty contractInfoExportController.contractResultList}"
+                        <p:commandButton ajax="false" value="#{msg.SelectAndExportContractList}" rendered="#{not empty contractInfoExportController.contractResultList}"
                                          actionListener="#{contractInfoExportController.exportSelected()}"
                                          icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
                             <p:fileDownload value="#{contractInfoExportController.exportFile}"/>

@@ -41,7 +41,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
             Map<String, ExcelDocument.ValueWrapper> rowMap = iterator.next();
 
 
-            String orgName = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("DepartmentName")));
+            String orgName = ExcelDocument.getCellStringValue(rowMap.get("部门名称"));
 
             if (orgName == null || orgName.isEmpty() || orgName.equals(AssetRow.DELETE_MARK)) {
                 continue;
