@@ -127,9 +127,12 @@
                             <!--<a href="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;assetUID='.concat(item.uid))}" target="_Blank">
                                 <h:outputText value="#{item.workOrderCount}" title="#{item.workOrderCount}" />
                             </a>-->
-                            <a href="/geapm/portal/woMgr/workOrderList.xhtml?query=12&amp;queryAssetUID=#{item.uid}" target="_Blank">
+                            <!--<a href="/geapm/portal/woMgr/workOrderList.xhtml?query=12&amp;queryAssetUID=#{item.uid}" target="_Blank">
                                 <h:outputText value="#{item.workOrderCount}" title="#{item.workOrderCount}" />
-                            </a>
+                            </a>-->
+                            <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/woMgr/workOrderList?faces-redirect=true&amp;query=12&amp;queryAssetUID='.concat(item.uid))}" target="_Blank">
+                                <h:outputText value="#{item.workOrderCount}" title="#{item.workOrderCount}" />
+                            </p:commandLink>
                         </p:column>
 
                         <f:facet name="{Toolbar}">
