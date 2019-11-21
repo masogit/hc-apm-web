@@ -11,6 +11,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Name;
@@ -90,13 +91,15 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         webAppContext.getAutowireCapableBeanFactory().autowireBean(this);
 
-        String fileName = null;
-        if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+
+        String fileName = "APM_Asset_Dynamic_Template.xlsx";
+        /*if (userContextService.isLocale()){
             fileName = "APM_Asset_Dynamic_Template_zh.xlsx";
         } else {
             fileName = "APM_Asset_Dynamic_Template_en.xlsx";
 
-        }
+        }*/
         InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/" + fileName);
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
