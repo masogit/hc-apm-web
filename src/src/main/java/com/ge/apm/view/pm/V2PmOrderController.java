@@ -6,35 +6,8 @@
 package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONPath;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.PmOrderRuleCheckListRepository;
-import com.ge.apm.dao.PmOrderRuleRepository;
-import com.ge.apm.dao.TableDefinitionRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UnstructuredDataCollectionRepository;
-import com.ge.apm.dao.UnstructuredDataRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.V2_PmOrderRepository;
-import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
-import com.ge.apm.dao.V2_WorkOrderDetailRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.PmOrderRule;
-import com.ge.apm.domain.PmOrderRuleCheckList;
-import com.ge.apm.domain.ServiceRequestMsg;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.TableDefinition;
-import com.ge.apm.domain.UnstructuredData;
-import com.ge.apm.domain.UnstructuredDataCollection;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.V2_PmOrder;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_WorkOrderCoworker;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
-import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoMgrService;
@@ -57,25 +30,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
@@ -84,6 +39,7 @@ import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -91,11 +47,25 @@ import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.BySearchFilterSpecification;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.persistence.criteria.*;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * v
@@ -106,6 +76,12 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements ServerEventInterface {
     V2_WorkOrderDetailRepository v2_workOrderDetailRepository;
+    @Setter @Getter
+    private List<PmOrderRule> ruleList;
+    @Getter @Setter
+    private PmOrderRule pmOrderRule;
+
+
     @Setter @Getter
     private Boolean isBatchOp=true;
     private SupplierController supplierController;
@@ -260,6 +236,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return true;
         }
     }
+    public String getSiteOrgName(String siteUID) {
+        OrgInfo org = orgDao.getByUid(siteUID);
+        if (org != null) {
+            return org.getName();
+        }
+        return null;
+    }
+   /* public void onSelectPmRule(){
+
+        System.out.println("99999999");
+    }*/
    public void clearPmList(){
        pmIdList = new ArrayList<String>();
    }
@@ -380,7 +367,24 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         serviceRequestApiService.addAccess(token,selectedPmOrder.getAssetInfo().getUid(),itemDetail);
         accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
     }
+    public void onSelectSiteTreeNode2(NodeSelectEvent event) {
+        // Compared with the above method "onSelectSiteTreeNode",
+        // this method does not clear existing filters
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
+        }
 
+        //如果是mvs role,选择了所有租户选项，则清空所选机构
+        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+
+        if(selectSite==null) this.removeFilterOnField("siteUID");
+
+        loadClinicalDeptListForFilter();
+    }
     public void saveAndadd(int oper){
         //照旧原来的添加一个备件
         if(oper ==1){ //来自保存新增，从新建一个item
@@ -1221,14 +1225,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
         WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
-        if(wfc !=null) {
-            isBatchOp = wfc.getPmIsSupportBatchFinish();
-        }
+        if(wfc !=null)
+            isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
+        loadRuleList();
 
     }
 
-    List<PmOrderRule> ruleList;
     public void loadRuleList(){
         String tenantUID = userContextService.getLoginUser().getTenantUID();
         ruleList = pmOrderRuleRepository.findPmRuleByTenant(tenantUID);
@@ -1856,6 +1859,38 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
         }
     }
+    public void setSearchFilterForOrg(){
+        if (null != selectSite) {
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
+        }
+    }
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        this.searchFilters.clear();
+        if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            selectSite = (OrgInfo) event.getTreeNode().getData();
+        } else {
+            selectSite = null;
+        }
+        if (userContextService.getIsMVSRole() && selectSite != null && selectSite.getId() == -1) {
+            selectSite = null;
+        }
+    }
+
+    private void loadClinicalDeptListForFilter() {
+        clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        if (null != selectSite) {
+            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
+                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+        }
+    }
     public List<String> autoCompleteDeptName(String query) {
          if (clinicalDeptList == null) {
             return Collections.emptyList();
@@ -1887,6 +1922,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             clinicalDeptOrgUidSet = Collections.emptySet();
         }
     }
+
+
     public void autoCompleteRuleName(){
         System.out.println("00");
     }
