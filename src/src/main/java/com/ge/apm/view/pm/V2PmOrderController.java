@@ -154,7 +154,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Date applyTime;
     private Date planTimeForBatch;
     private String currentPersonIdBatch;
-    private String qualityCheckingBatch;
     private Boolean terminate;
     private UaaService uaaService;
     private UserContextService userContextService;
@@ -1482,7 +1481,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             //抢单tab中 ,已经派的单但是未被接单人接的单子也要显示出来 (已经派的单状态是Accept，所以也要加进来)
             filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4));
-            List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign", "1*3+"));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept", "1*3+7*"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+7*"));
@@ -1534,7 +1532,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
-            //   searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
@@ -1548,20 +1545,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, true));
         }
         this.selected = null;
-
-
         Sort sort = returnSort(pageRequest);
         pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-
         result = dao.findBySearchFilter(this.searchFilters, pageRequest);
-
         currentPagePmOrders = result.getContent();
-
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
-       // isSelectedCurrentPage=false;
         if(queryIndex==20 || queryIndex== 8){
             pmIdList= new ArrayList<>();
-            result.getContent().forEach(item->pmIdList.add(item.getId()));
 
         }
         return result;
@@ -1889,14 +1879,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
          if (clinicalDeptList == null) {
             return Collections.emptyList();
         }
-
         List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
     }
-
-
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
@@ -1948,7 +1935,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return;
         }
         assetName = asset.getName();
-        //String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
         dptName = asset.getClinicalDeptName();//orgDao.getByUid(orgInfoUID).getName();
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
@@ -1991,11 +1977,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         //调用微服务删除备件
         serviceRequestApiService.delAccess(token,itemId);
     }
-
     public void prepareBatchComplete() {
         this.endTime = null;
         this.totalManHours = null;
-     //   this.selectedMap = new HashMap();
     }
 
     public void prepareEditCoWorkerDetail(String itemId) {
@@ -2009,10 +1993,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void addAcessItem() {
-      /*  if(switchTmp){ //如果为true 则新增备件 否则为修改备件
-            itemDetail.setId(null);
-        }*/
-        //itemDetail.setId(null);
         saveItem();
     }
     List<TableDefinition> tDefinitions;
@@ -2389,14 +2369,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setPmType(Integer pmType) {
         this.pmType = pmType;
-    }
-
-    public String getQualityCheckingBatch() {
-        return qualityCheckingBatch;
-    }
-
-    public void setQualityCheckingBatch(String qualityCheckingBatch) {
-        this.qualityCheckingBatch = qualityCheckingBatch;
     }
 
     public String getQaStatus() {
