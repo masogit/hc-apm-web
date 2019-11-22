@@ -120,9 +120,9 @@ public class QrCodeTemplateService {
         elementList.add(qrcodeElement);
 
         elementList.add(createTextElement("", "hospital", 320, 40, 40, 1, "Microsoft YaHei", "000000"));
-        elementList.add(createTextElement(WebUtil.getMessage("EquipmentName")+"   ", "name", 320, 240, 32, 1, "Microsoft YaHei", "000000"));
-        elementList.add(createTextElement(WebUtil.getMessage("clinicalDeptId")+"   ", "clinicalDept", 320, 120, 32, 1, "Microsoft YaHei", "000000"));
-        elementList.add(createTextElement(WebUtil.getMessage("AssetID")+"   ", "financingNum", 320, 180, 32, 1, "Microsoft YaHei", "000000"));
+        elementList.add(createTextElement("设备名称   ", "name", 320, 240, 32, 1, "Microsoft YaHei", "000000"));
+        elementList.add(createTextElement("所属科室   ", "clinicalDept", 320, 120, 32, 1, "Microsoft YaHei", "000000"));
+        elementList.add(createTextElement("资产编号   ", "financingNum", 320, 180, 32, 1, "Microsoft YaHei", "000000"));
         return elementList;
     }
 

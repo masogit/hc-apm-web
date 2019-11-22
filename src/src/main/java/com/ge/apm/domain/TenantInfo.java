@@ -145,6 +145,9 @@ public class TenantInfo implements Serializable {
     @Column(name = "currency")
     private Integer currency = 1;//1、cny 2、dollar
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;//是否删除
+
     @Transient
     private String cpmURL;
 
@@ -507,5 +510,13 @@ public class TenantInfo implements Serializable {
 
     public void setContractNo(String contractNo) {
         this.contractNo = contractNo;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }

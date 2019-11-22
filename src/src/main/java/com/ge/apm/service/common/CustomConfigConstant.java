@@ -62,8 +62,8 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("RepairOwner3"), "assetOwnerName3");
             exportFields.put(WebUtil.getMessage("pmOwnerName"), "pmOwnerName");
             exportFields.put(WebUtil.getMessage("Site"), "siteUID");
-            exportFields.put(WebUtil.getMessage("AssetDepartment"), "clinicalDeptName");
-            exportFields.put(WebUtil.getMessage("Manufacturer"), "assetDeptName");
+            exportFields.put(WebUtil.getMessage("clinicalDeptId"), "clinicalDeptName");
+            exportFields.put(WebUtil.getMessage("AssetDepartment"), "assetDeptName");
             exportFields.put(WebUtil.getMessage("manufacture"), "manufacture");
             exportFields.put(WebUtil.getMessage("BrandManufacturerShortName"), "makerShortName");
 
@@ -117,14 +117,14 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("capitalSource2"), "capitalSource2");
             exportFields.put(WebUtil.getMessage("MeasurementGrade"), "measureGrade");
             exportFields.put(WebUtil.getMessage("RiskGrade"), "riskGrade");
-            exportFields.put(WebUtil.getMessage("EmergencyEquipment?"), "emergencyEquipment");
-            exportFields.put(WebUtil.getMessage("ImportEquipment?"), "importEquipment");
+            exportFields.put(WebUtil.getMessage("IsEmergencyEquipment"), "emergencyEquipment");
+            exportFields.put(WebUtil.getMessage("IsImportEquipment"), "importEquipment");
             exportFields.put(WebUtil.getMessage("MeasurementItemCategory"), "measuringItemCategory");
             exportFields.put(WebUtil.getMessage("accountingCategory"), "accountingCategory");
             exportFields.put(WebUtil.getMessage("CurrentStatus"), "status");
 
             exportFields.put(WebUtil.getMessage("IsPM"),"isPm");
-            exportFields.put(WebUtil.getMessage("IsChecked?"), "isChecked");
+            exportFields.put(WebUtil.getMessage("IsChecked2"), "isChecked");
             exportFields.put(WebUtil.getMessage("assetValueCategory"), "assetValueCategory");
             exportFields.put(WebUtil.getMessage("deviceStatus"), "deviceStatus");
             exportFields.put(WebUtil.getMessage("isWarrantyNotice"), "warranty");

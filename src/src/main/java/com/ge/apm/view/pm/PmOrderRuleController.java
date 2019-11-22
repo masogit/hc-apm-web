@@ -80,6 +80,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private RelRuleAssetRepository relRuleAssetRepository;
     private SupplierService supplierService;
     private List<String> deletedCheckListIds = new ArrayList<>();
+    private UserContextService userContextService;
 
     @Override
     protected void init() {
@@ -87,6 +88,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         dao = WebUtil.getBean(PmOrderRuleRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         supplierDao = WebUtil.getBean(SupplierRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         user = UserContextService.getCurrentUserAccount();
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
@@ -363,7 +365,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             pmOrderRuleCheckListRepository.save(checkItemLists);
         }
         checkItemLists.clear();
-        WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess！"));
+        WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess"));
     }
 
     public void getName() {
@@ -630,13 +632,13 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     }
 
     public void generateReportTemplateFile() throws IOException{
-        String fileName = null;
-        if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+        String fileName = "maintenance-template.docx";
+        /*if (userContextService.isLocale()){
             fileName = "maintenance-template_zh.docx";
         } else {
             fileName = "maintenance-template_en.docx";
 
-        }
+        }*/
         InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/" + fileName );
 
         try {

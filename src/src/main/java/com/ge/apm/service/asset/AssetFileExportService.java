@@ -108,23 +108,23 @@ public class AssetFileExportService extends AssetFileImportBaseService {
 
         int rowNum = 2;
         while(true) {
-            String cellStringValue = doc.getCellStringValue(WebUtil.getMessage("EquipmentClassification"), rowNum, 2);
+            String cellStringValue = doc.getCellStringValue("设备分类", rowNum, 2);
 
             if (cellStringValue == null) {
                 break;
             }
-            doc.clearCell(WebUtil.getMessage("EquipmentClassification"), rowNum, 2);
+            doc.clearCell("设备分类", rowNum, 2);
 
             ++rowNum;
         }
         rowNum = 2;
         for(I18nMessage msg: assetGroupList) {
-            doc.writeCellData(WebUtil.getMessage("EquipmentClassification"), rowNum, 2, msg.getValueZh());
+            doc.writeCellData("设备分类", rowNum, 2, msg.getValueZh());
             ++rowNum;
         }
 
-        String formula = WebUtil.getMessage("EquipmentClassification")+"!$B$2:$B$" + (rowNum - 1);
-        doc.updateName(WebUtil.getMessage("EquipmentClassification"), formula);
+        String formula = "设备分类!$B$2:$B$" + (rowNum - 1);
+        doc.updateName("设备分类", formula);
     }
 
     public Boolean exportFailData(ExcelDocument doc, List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {

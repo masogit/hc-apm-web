@@ -23,7 +23,7 @@
                     rows="20" emptyMessage="#{msg.noRecordFound}"
                     rowsPerPageTemplate="20,50,100,500"> 
 
-                    <p:ajax event="rowSelect" update="createButton editButton editVersionButton viewButton deleteButton"/>
+                    <p:ajax event="rowSelect" update="createButton editButton editVersionButton viewButton deleteButton disableButton"/>
                     <p:ajax event="filter" listener="#{tenantInfoController.onFilter}" oncomplete="rc();"/>
                     
                     <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -103,11 +103,27 @@
                         </f:facet>
                         <h:outputText value="#{item.insulate? msg.True2Yes : msg.False2No }"/>
                     </p:column>
+                    <p:column headerText="禁用" sortBy="#{item.isDeleted}" filterBy="#{item.isDeleted}" filterMatchMode="EQ" rendered="#{userContextService.partnerAccount}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                <f:converter converterId="javax.faces.Boolean" />
+                                <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.isDeleted ? msg.True2Yes : msg.False2No }"/>
+                    </p:column>
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tenantInfoController.prepareCreate('create')}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()"/>
                         <p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{tenantInfoController.prepareView}" update=":SiteInfoViewDlg" oncomplete="PF('SiteInfoViewDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="editButton" rendered="#{tenantInfoController.showTestTenant}" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{tenantInfoController.prepareEdit('edit')}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
                         <p:commandButton id="editVersionButton" rendered="#{tenantInfoController.showTestTenant}"  icon="fa fa-fw fa-reorder" class="btn btn-sm btn-gray" title="版本功能" actionListener="#{tenantInfoController.prepareEdit}" update=":SiteInfoEditVersionDlg" oncomplete="PF('SiteInfoEditVersionDialog').show()" disabled="#{empty tenantInfoController.selected}"/>
+
+                        <p:commandButton id="disableButton" rendered="#{userContextService.partnerAccount}" icon="ui-icon-lock-outline" process="@this" title="#{msg.disableTenant}" actionListener="#{tenantInfoController.markDeleted}" update="datalist" disabled="#{empty tenantInfoController.selected}">
+                            <p:confirm header="#{msg.disableTenant}" message="#{msg.disableTenantConfirm}" icon="ui-icon-alert"/>
+                        </p:commandButton>
+
                         <p:commandButton id="deleteButton" rendered="#{tenantInfoController.showTestTenant}" process="@this" icon="ui-icon-close" title="#{msg.delete}" actionListener="#{tenantInfoController.delete}" update="datalist" disabled="#{empty tenantInfoController.selected}">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                         </p:commandButton>
@@ -116,7 +132,7 @@
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
-                <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton datalist:editButton datalist:editVersionButton datalist:viewButton" immediate="true"/>
+                <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton datalist:editButton datalist:editVersionButton datalist:viewButton datalist:disableButton" immediate="true"/>
             </h:form>
 
             <ui:include src="Edit.xhtml"/>

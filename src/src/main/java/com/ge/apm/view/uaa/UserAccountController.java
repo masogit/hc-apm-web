@@ -723,6 +723,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         dao.save(selected);
     }
 
+    public void markDeleted() {
+        selected.setIsDeleted(true);
+        dao.save(selected);
+    }
+
     @Override
     public void prepareEdit() {
         super.prepareEdit();
