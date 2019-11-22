@@ -1697,7 +1697,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         planTime = selectedPmOrder.getPlanTime();
         accessoryList = getWorkOrderDetail(woid);
         coWorkerList = getWorkOrderCoworker(woid);
-        picList = new ArrayList<V2_BlobObject>();
         loadHmCheck(selectedPmOrder);
         if (pmCheckItemList != null){
         pmCheckItemList.stream().filter(item-> !hmCheck.containsKey(item.getUid()))
@@ -1709,9 +1708,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 });
 
         }
-
-
-        picList = new ArrayList<V2_BlobObject>();
+        picList = blobDao.findByBoUuid(selectedPmOrder.getId());
+       if( CollectionUtils.isEmpty(picList)){
+           picList = new ArrayList<V2_BlobObject>();
+       }
         picListForRP = new ArrayList<V2_BlobObject>();
     }
 
