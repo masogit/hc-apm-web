@@ -242,13 +242,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         return null;
     }
-   /* public void onSelectPmRule(){
 
-        System.out.println("99999999");
-    }*/
-   public void clearPmList(){
-       pmIdList = new ArrayList<String>();
-   }
+    public boolean exportButtonShow(){
+        if (queryIndex==10 || queryIndex  == 20){
+            return false;
+        }else{
+            return !isChecked();
+
+        }
+    }
    public void exportExcel() throws IOException{
        PmFileExportTemplate template = new PmFileExportTemplate();
         List<V2_PmOrder> pmOrderList = getPmListByselectedId();
