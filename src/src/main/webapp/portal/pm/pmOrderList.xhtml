@@ -224,7 +224,7 @@
                 </p:column>
 
                 <f:facet name="{Toolbar}" >
-                    <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderController.exportExcel}" disabled="#{not v2PmOrderController.isChecked()}" onclick="PrimeFaces.monitorDownload(start, stop);">
+                    <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderController.exportExcel}" disabled="#{v2PmOrderController.exportButtonShow()}" onclick="PrimeFaces.monitorDownload(start, stop);">
 
                         <p:fileDownload value="#{v2PmOrderController.excelFile}"/>
                     </p:commandButton>
