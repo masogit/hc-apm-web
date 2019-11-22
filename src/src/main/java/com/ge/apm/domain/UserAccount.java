@@ -257,6 +257,9 @@ public class UserAccount implements ChineseName, Serializable {
         
 	@Column(name = "ge_sso")
 	private String geSso;
+
+	@Column(name = "is_deleted")
+	private Boolean isDeleted;//是否删除
         
 	@Transient
 	private Integer excelIdex;
@@ -1086,5 +1089,13 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	public Boolean getIsDeleted() {
+		return isDeleted;
+	}
+
+	public void setIsDeleted(Boolean deleted) {
+		isDeleted = deleted;
 	}
 }

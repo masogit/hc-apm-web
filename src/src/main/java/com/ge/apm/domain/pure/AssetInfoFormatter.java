@@ -770,8 +770,8 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("RepairOwner3"), this.getAssetOwnerName3());
         map.put(WebUtil.getMessage("pmOwnerName"), this.getPmOwnerName());
         map.put(WebUtil.getMessage("Site"), this.getSiteName());
-        map.put(WebUtil.getMessage("AssetDepartment"), this.getClinicalDeptName());
-        map.put(WebUtil.getMessage("clinicaldepart"), this.getAssetDeptName());
+        map.put(WebUtil.getMessage("clinicalDeptId"), this.getClinicalDeptName());
+        map.put(WebUtil.getMessage("AssetDepartment"), this.getAssetDeptName());
         map.put(WebUtil.getMessage("Manufacturer"), this.getManufacture());
         map.put(WebUtil.getMessage("BrandManufacturerShortName"), this.getMakerShortName());
         map.put(WebUtil.getMessage("EquipmentStandardName"), this.getDeviceName());
@@ -824,12 +824,12 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("RiskGrade"), this.getRiskGradeAsString());
         map.put(WebUtil.getMessage("MeasurementGrade"), this.getMeasureGradeAsString());
         map.put(WebUtil.getMessage("measuringItemCategory"), this.getMeasuringItemCategoryAsString());
-        map.put(WebUtil.getMessage("EmergencyEquipment?"),  this.getEmergencyEquipmentAsString());
-        map.put(WebUtil.getMessage("ImportEquipment?"), this.getImportEquipmentAsString());
+        map.put(WebUtil.getMessage("IsEmergencyEquipment"),  this.getEmergencyEquipmentAsString());
+        map.put(WebUtil.getMessage("IsImportEquipment"), this.getImportEquipmentAsString());
         map.put(WebUtil.getMessage("CurrentStatus"), this.getStatusAsString());
         map.put(WebUtil.getMessage("accountingCategory"), this.getAccountingCategoryAsString());
         map.put(WebUtil.getMessage("IsPM"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
-        map.put(WebUtil.getMessage("IsChecked?"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
+        map.put(WebUtil.getMessage("IsChecked2"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
         map.put(WebUtil.getMessage("assetGroupSecondary"), this.getAssetGroupSecondayName());
         map.put(WebUtil.getMessage("assetValueCategory"), this.getAssetValueCategoryName());
         map.put(WebUtil.getMessage("deviceStatus"), this.getDeviceStatusAsString());
