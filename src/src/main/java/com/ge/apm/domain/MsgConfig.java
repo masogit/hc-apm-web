@@ -25,6 +25,18 @@ public class MsgConfig {
     @Column(name = "msg_name")
     private String msgName;
 
+    public String getMsgNameEn() {
+        return msgNameEn;
+    }
+
+    public void setMsgNameEn(String msgNameEn) {
+        this.msgNameEn = msgNameEn;
+    }
+
+    @Size(max = 256)
+    @Column(name = "msg_name_en")
+    private String msgNameEn;
+
 
     public Integer getId() {
         return id;

@@ -11,11 +11,13 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.context.LocaleHolder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -42,6 +44,7 @@ public class PmOrderReportTemplateService {
     @Autowired
     private BlobFileService blobFileService;
 
+
     public byte[] getActiveTemplateBytes(boolean isInsulate, UserAccount user) throws IOException {
         byte[] templateBytes = null;
         List<String> uids = new ArrayList<>();
@@ -58,7 +61,14 @@ public class PmOrderReportTemplateService {
             templateBytes = IOUtils.toByteArray(blobFileService.getBlobObjectByStorageId(template.getStorageId()).getStream());
         }
         if (templateBytes == null) {
-            templateBytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("report/maintenance-template.docx"));
+            String fileName = "maintenance-template.docx";
+            /*if (userContextService.isLocale()){
+                fileName = "maintenance-template_zh.docx";
+            } else {
+                fileName = "maintenance-template_en.docx";
+
+            }*/
+            templateBytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("report/" + fileName ));
         }
         return templateBytes;
     }

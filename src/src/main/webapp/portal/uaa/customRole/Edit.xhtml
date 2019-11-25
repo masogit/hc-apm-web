@@ -9,32 +9,32 @@
 		header="#{customRoleController.CRUDActionName} #{msg.CustomRole}">
 		<h:form id="CustomRoleEditForm">
 			<h:panelGroup id="display">
-				<p:fieldset id="title" legend="角色描述">
+				<p:fieldset id="title" legend="#{msg.roleDesc}">
 					<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
 							<label class="label">#{msg.name}*</label>
 							<p:inputText id="name" value="#{customRoleController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}" />
 						</h:panelGroup>
 						<h:panelGroup>
-							<label class="label">角色描述</label>
+							<label class="label">#{msg.roleDesc}</label>
 							<p:inputText id="roleDesc" value="#{customRoleController.selected.roleDesc}" />
 						</h:panelGroup>
 						<h:panelGroup rendered="false">
-							<label class="label">主页</label>
+							<label class="label">#{msg.Homepage}</label>
 							<p:inputText id="homePage" value="#{customRoleController.selected.homePage}" disabled="true" />
 						</h:panelGroup>
 					</p:panelGrid>
 				</p:fieldset>
-				<p:fieldset id="menuConfig" legend="网页端菜单配置">
+				<p:fieldset id="menuConfig" legend="#{msg.WebMenuConfiguration}">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
 							<p:selectManyCheckbox value="#{customRoleController.menus}" layout="responsive" columns="4">
-								<f:selectItems value="#{customRoleController.listI18nMenus}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-							</p:selectManyCheckbox>
+								<f:selectItems value="#{customRoleController.listI18nMenus}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"  />
+						</p:selectManyCheckbox>
 						</h:panelGroup>
 					</p:panelGrid>
 				</p:fieldset>
-				<p:fieldset id="authConfig" legend="网页端权限配置">
+				<p:fieldset id="authConfig" legend="#{msg.WebAuthorityConfiguration}"  rendered="#{userContextService.isLocale()}">
 					<p:repeat var="domainAuth" value="#{customRoleController.authJSONArr}">
 						<label class="label">#{domainAuth['v']}</label>
 						<p:selectBooleanCheckbox value="#{domainAuth['s']}" label="#{fieldMsg.fieldValue(domainAuth['k'], 's')}" style="display:inline;" rendered="#{not empty fieldMsg.fieldValue(domainAuth['k'], 's')}">
@@ -51,7 +51,7 @@
 						</p:selectBooleanCheckbox>
 					</p:repeat>
 				</p:fieldset>
-				<p:fieldset id="cardConfig" legend="微信端卡片配置">
+				<p:fieldset id="cardConfig" legend="#{msg.WeChatCardConfiguration}">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
 							<p:selectManyCheckbox value="#{customRoleController.cards}" layout="responsive" columns="4">
@@ -60,16 +60,16 @@
 						</h:panelGroup>
 					</p:panelGrid>
 				</p:fieldset>
-				<p:fieldset id="assetInventory" legend="微信端权限配置">
+				<p:fieldset id="assetInventory" legend="#{msg.WeChatAuthorityConfiguration}">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
-							<label class="label">盘点工单</label>
+							<label class="label">#{msg.InventoryWorkorder}</label>
 							<p:selectManyCheckbox value="#{customRoleController.mapAuthCard['assetInventory']}" layout="responsive" columns="4">
 								<f:selectItems value="#{fieldMsg.getFieldValueList('assetInventoryAuthority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 							</p:selectManyCheckbox>
 						</h:panelGroup>
 						<h:panelGroup>
-							<label class="label">临床助手</label>
+							<label class="label">#{msg.ClinicalAssistant}</label>
 							<p:selectManyCheckbox value="#{customRoleController.mapAuthCard['nurse']}" layout="responsive" columns="4">
 								<f:selectItems value="#{fieldMsg.getFieldValueList('wechatCardNurse')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 							</p:selectManyCheckbox>

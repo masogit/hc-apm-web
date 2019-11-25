@@ -10,19 +10,19 @@
     	<h:outputScript name="js/commonUtils.js"/>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="维修工单"/>
+                <p:outputLabel class="pageTitle" value="#{msg.WorkOrder}"/>
             </div>
 
             <div class="ui-g-12 ">
                 <p:tabView class="ui-g-12" id="woTab" dynamic="true" cache="false" activeIndex="#{workOrderTabController.queryTab}">
                    <!-- <p:ajax event="tabChange"/>-->
-                    <p:tab class="ui-g-12" title="内部工单" id="inWorkOrder" rendered="#{workOrderTabController.showInOrder}">
+                    <p:tab class="ui-g-12" title="#{msg.InternalWorkorder}" id="inWorkOrder" rendered="#{workOrderTabController.showInOrder}">
                         <ui:include src="woMgrList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="外部工单" id="outWorkOrder" rendered="#{not userContextService.isAccountEndUser()}">
+                    <p:tab class="ui-g-12" title="#{msg.ExternalWorkorder}" id="outWorkOrder" rendered="#{not userContextService.isAccountEndUser() and userContextService.isLocale()}">
                         <ui:include src="woMgrOutList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="外部远程工单"  id="outRemoteWorkOrder" rendered="#{not userContextService.isAccountEndUser()}">
+                    <p:tab class="ui-g-12" title="#{msg.ExternalRemoteWorkorder}"  id="outRemoteWorkOrder" rendered="#{not userContextService.isAccountEndUser() and userContextService.isLocale()}">
                         <ui:include src="woMgrOutRemoteList.xhtml"/>
                     </p:tab>
                 </p:tabView>

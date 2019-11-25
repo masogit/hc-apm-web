@@ -7,35 +7,35 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:dialog id="auditVacationDlg" widgetVar="auditVacationDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="请假审批">
+    <p:dialog id="auditVacationDlg" widgetVar="auditVacationDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.VacationApproval}">
         <h:form id="auditVacationForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userVacationScheduleController.selected != null}">
 
                 <h:panelGroup rendered="#{userVacationScheduleController.auditInfo != ''}">
-                    <label class="label">审批注意信息</label>
+                    <label class="label">#{msg.ApprovalNotes}</label>
                     <h:outputText value="#{userVacationScheduleController.auditInfo}" style="color: red"/>
                 </h:panelGroup>
 
                 <h:panelGroup>
-                    <label class="label">日期</label>
-                    <p:calendar id="date_edit" value="#{userVacationScheduleController.selected.scheduleDate}" disabled="true" timeZone="GMT+8" pattern="yyyy-MM-dd"/>
+                    <label class="label">#{msg.Date}</label>
+                    <p:calendar id="date_edit" value="#{userVacationScheduleController.selected.scheduleDate}" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"/>
                 </h:panelGroup>
 
                 <h:panelGroup>
-                    <label class="label">日期类型</label>
+                    <label class="label">#{msg.DateType}</label>
                     <h:outputText value="#{userVacationScheduleController.getScheduleDateStageTitle(userVacationScheduleController.selected.scheduleDateStage)}"/>
                 </h:panelGroup>
 
                 <h:panelGroup>
-                    <label class="label">请假人</label>
+                    <label class="label">#{msg.VacationApplicant2}</label>
                     <h:outputText value="#{userVacationScheduleController.selected.userAccount.name}"/>
                 </h:panelGroup>
 
             </p:panelGrid>
             <br/>
 
-            <p:commandButton validateClient="true" value="通过" action="#{userVacationScheduleController.approveVacation(true)}" update=":userVacationScheduleListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'auditVacationDialog');"/>
-            <p:commandButton validateClient="true" value="拒绝" action="#{userVacationScheduleController.approveVacation(false)}" update=":userVacationScheduleListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'auditVacationDialog');"/>
+            <p:commandButton validateClient="true" value="#{msg.Pass}" action="#{userVacationScheduleController.approveVacation(true)}" update=":userVacationScheduleListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'auditVacationDialog');"/>
+            <p:commandButton validateClient="true" value="#{msg.Reject}" action="#{userVacationScheduleController.approveVacation(false)}" update=":userVacationScheduleListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'auditVacationDialog');"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('auditVacationDialog').hide()"/>
         </h:form>
     </p:dialog>

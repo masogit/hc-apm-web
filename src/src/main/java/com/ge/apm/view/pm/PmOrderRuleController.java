@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
@@ -79,6 +80,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private RelRuleAssetRepository relRuleAssetRepository;
     private SupplierService supplierService;
     private List<String> deletedCheckListIds = new ArrayList<>();
+    private UserContextService userContextService;
 
     @Override
     protected void init() {
@@ -86,6 +88,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         dao = WebUtil.getBean(PmOrderRuleRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         supplierDao = WebUtil.getBean(SupplierRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         user = UserContextService.getCurrentUserAccount();
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
@@ -362,7 +365,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             pmOrderRuleCheckListRepository.save(checkItemLists);
         }
         checkItemLists.clear();
-        WebUtil.addSuccessMessage(WebUtil.getMessage("保存成功！"));
+        WebUtil.addSuccessMessage(WebUtil.getMessage("SaveSuccess"));
     }
 
     public void getName() {
@@ -629,14 +632,21 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     }
 
     public void generateReportTemplateFile() throws IOException{
-        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/maintenance-template.docx");
+        String fileName = "maintenance-template.docx";
+        /*if (userContextService.isLocale()){
+            fileName = "maintenance-template_zh.docx";
+        } else {
+            fileName = "maintenance-template_en.docx";
+
+        }*/
+        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/" + fileName );
 
         try {
             InputStream doc = pmOrderReportTemplateService.generateReportTemplateByRule(stream, selected);
             this.reportTemplateFile = new DefaultStreamedContent(doc, "application/msword", "maintenance-report-template.docx");
         } catch (Exception e)  {
             Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while generate word template", e);
-            WebUtil.addErrorMessage("Word模版生成失败");
+            WebUtil.addErrorMessage(WebUtil.getMessage("FailedGenerateWordErrMsg"));
         }finally {
             stream.close();
         }

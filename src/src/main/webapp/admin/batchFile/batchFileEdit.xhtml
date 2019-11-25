@@ -57,7 +57,7 @@
                     <h:panelGroup>
                         <label class="label">#{msg.BatchfileUploadedTime}*</label>
                         <h:outputText value="#{batchFileController.selected.uploadedTime}">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            <f:convertDateTime   timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                         </h:outputText>
                     </h:panelGroup>
                     <h:panelGroup>
@@ -73,13 +73,13 @@
                     <h:panelGroup>
                         <label class="label">#{msg.BatchfileProcessStartTime}*</label>
                         <h:outputText value="#{batchFileController.selected.processStartTime}" >
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            <f:convertDateTime   timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                         </h:outputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.BatchfileProcessEndTime}*</label>
                         <h:outputText value="#{batchFileController.selected.processEndTime}">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            <f:convertDateTime   timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" />
                         </h:outputText>
                     </h:panelGroup>
                     <h:panelGroup>

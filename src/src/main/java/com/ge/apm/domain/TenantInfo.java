@@ -71,7 +71,7 @@ public class TenantInfo implements Serializable {
     @Column(name = "location_en")
     private String locationEn;
     @Column(name = "time_zone")
-    private Integer timeZone;
+    private Double timeZone = 8.0d;
     @Size(max = 16)
     @Column(name = "default_lang")
     private String defaultLang;
@@ -142,8 +142,22 @@ public class TenantInfo implements Serializable {
     @Transient
     private String plainPassword;
 
+    @Column(name = "currency")
+    private Integer currency = 1;//1、cny 2、dollar
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;//是否删除
+
     @Transient
     private String cpmURL;
+
+    public Integer getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Integer currency) {
+        this.currency = currency;
+    }
 
     public Integer getType() {
 		return type;
@@ -154,8 +168,7 @@ public class TenantInfo implements Serializable {
 	}
 
 
-
-	public TenantInfo() {
+    public TenantInfo() {
         isInsulate = false;
         isEnabled = false;
         wfAutoStep2 = false;
@@ -260,11 +273,11 @@ public class TenantInfo implements Serializable {
         this.locationEn = locationEn;
     }
 
-    public Integer getTimeZone() {
+    public Double getTimeZone() {
         return timeZone;
     }
 
-    public void setTimeZone(Integer timeZone) {
+    public void setTimeZone(Double timeZone) {
         this.timeZone = timeZone;
     }
 
@@ -497,5 +510,13 @@ public class TenantInfo implements Serializable {
 
     public void setContractNo(String contractNo) {
         this.contractNo = contractNo;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }

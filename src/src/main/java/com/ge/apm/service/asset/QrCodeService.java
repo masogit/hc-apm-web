@@ -233,12 +233,12 @@ public class QrCodeService {
         //Demo asset for preview
         AssetInfo asset = new AssetInfo();
         asset.setAssetGroup(1);
-        asset.setName("(待定)");
-        asset.setSerialNum("(待定)");
-        asset.setFinancingNum("(待定)");
-        asset.setDepartNum("(待定)");
-        asset.setModalityId("(待定)");
-        asset.setFunctionType("(待定)");
+        asset.setName(WebUtil.getMessage("TBD"));
+        asset.setSerialNum(WebUtil.getMessage("TBD"));
+        asset.setFinancingNum(WebUtil.getMessage("TBD"));
+        asset.setDepartNum(WebUtil.getMessage("TBD"));
+        asset.setModalityId(WebUtil.getMessage("TBD"));
+        asset.setFunctionType(WebUtil.getMessage("TBD"));
         return asset;
     }
 
@@ -286,7 +286,7 @@ public class QrCodeService {
                             OrgInfo clinicalDept = orgInfoDao.getByUid(asset.getClinicalDeptUID());
                             itemObject.put("TextShowValue", textValue.concat(clinicalDept.getName() == null ? "" : clinicalDept.getName()));
                         } else {
-                            itemObject.put("TextShowValue", textValue.concat("(待定)"));
+                            itemObject.put("TextShowValue", textValue.concat(WebUtil.getMessage("TBD")));
                         }
                         break;
                     case "serialNum":
@@ -414,7 +414,7 @@ public class QrCodeService {
             return "";
         }
         if (qrcode.length() > 64) {
-            WebUtil.addErrorMessage("二维码不能超过最大长度64位");
+            WebUtil.addErrorMessage(WebUtil.getMessage("Over64Digits"));
             return "";
         }
 
@@ -431,7 +431,7 @@ public class QrCodeService {
 
         } else {
             if (qrCodeLib == null) {
-                WebUtil.addErrorMessage("无此二维码");
+                WebUtil.addErrorMessage(WebUtil.getMessage("NoSuchQRCode"));
                 return "";
             }
             if (qrCodeLib.getStatus() == 1) {
@@ -439,7 +439,7 @@ public class QrCodeService {
             }
         }
 
-        WebUtil.addErrorMessage("二维码已被使用");
+        WebUtil.addErrorMessage(WebUtil.getMessage("QRCodeHasBeenInUse"));
         return "";
     }
 
@@ -655,7 +655,7 @@ public class QrCodeService {
 
         for (Map< String, String> rowMap = doc.getStringDataRowMap(sheetName, keyRow, dataRow); rowMap != null; rowMap = doc.getStringDataRowMap(sheetName, keyRow, ++dataRow)) {
 
-            String qrcodeItem = Optional.ofNullable(rowMap.get("二维码")).orElse("").toString();
+            String qrcodeItem = Optional.ofNullable(rowMap.get(WebUtil.getMessage("QRCode"))).orElse("").toString();
             if (StringUtils.isEmpty(qrcodeItem)) {
                 break; //return if go beyond the valid cell range
             }
@@ -670,7 +670,7 @@ public class QrCodeService {
 
     public Map<String, Map<String, Object>> importQrCode(Map<String, Map<String, Object>> importQrCodeMap, OrgInfo site) {
         if (null == site) {
-            WebUtil.addErrorMessage("所选院区无效");
+            WebUtil.addErrorMessage(WebUtil.getMessage("TheSelectedSiteIsInvalid"));
             return importQrCodeMap;
         }
 
@@ -678,22 +678,22 @@ public class QrCodeService {
         importQrCodeMap.entrySet().stream().forEach(item -> {
             String newQrcode = ((String) (item.getValue().get("QrcodeItem"))).trim();
             if (Strings.isNullOrEmpty(newQrcode)) {
-                item.getValue().put("res", "二维码不能为空");
-                item.getValue().put("status", "失败");
+                item.getValue().put("res", WebUtil.getMessage("QRCodeCannotBeEmpty"));
+                item.getValue().put("status", WebUtil.getMessage("Failed"));
             } else if (newQrcode.length() > 64) {
-                item.getValue().put("res", "二维码超长");
-                item.getValue().put("status", "失败");
+                item.getValue().put("res", WebUtil.getMessage("QRCodeIsTooLong"));
+                item.getValue().put("status",  WebUtil.getMessage("Failed"));
             } else if (newQrcode.length() < 4) {
-                item.getValue().put("res", "二维码不能少于4位");
-                item.getValue().put("status", "失败");
+                item.getValue().put("res", WebUtil.getMessage("Over4Digits"));
+                item.getValue().put("status",  WebUtil.getMessage("Failed"));
             } else if (newQrcodeList.stream().anyMatch(saveditem -> Objects.equals(saveditem.getQrCode(), newQrcode))) {
-                item.getValue().put("res", "文件中重复的二维码");
-                item.getValue().put("status", "失败");
+                item.getValue().put("res", WebUtil.getMessage("QRCodeDuplicatedInTheFile"));
+                item.getValue().put("status",  WebUtil.getMessage("Failed"));
             } else {
                 QrCodeLib qrcodeItem = this.findByQrCode(newQrcode, site.getUid());
                 if (null != qrcodeItem) {
-                    item.getValue().put("res", "已经存在二维码，状态：" + WebUtil.getFieldValueMessage("qrCodeLibStatus", String.valueOf(qrcodeItem.getStatus())));
-                    item.getValue().put("status", "失败");
+                    item.getValue().put("res", WebUtil.getMessage("ExistingQRCode") + WebUtil.getFieldValueMessage("qrCodeLibStatus", String.valueOf(qrcodeItem.getStatus())));
+                    item.getValue().put("status",  WebUtil.getMessage("Failed"));
                 } else {
                     qrcodeItem = new QrCodeLib();
                     qrcodeItem.setQrCode(newQrcode);
@@ -704,8 +704,8 @@ public class QrCodeService {
                     qrcodeItem.setStatus(1);
                     qrcodeItem.setIssueDate(new Date());
                     newQrcodeList.add(qrcodeItem);
-                    item.getValue().put("res", "导入");
-                    item.getValue().put("status", "导入成功");
+                    item.getValue().put("res", WebUtil.getMessage("Import"));
+                    item.getValue().put("status", WebUtil.getMessage("ImportSuccess"));
                 }
             }
 

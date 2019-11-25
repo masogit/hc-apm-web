@@ -10,13 +10,13 @@
     <p:dialog id="TemplateEditDlg" widgetVar="TemplateEditDialog"
               onHide="#{toBeTerminatedTemplateController.onSelect()}" width="1000" height="450" modal="true"
               resizable="true" draggable="true" appendTo="@(body)"
-              header="#{toBeTerminatedTemplateController.CRUDActionName} #{msg.AssetTerminationReportTemplate}配置">
+              header="#{toBeTerminatedTemplateController.CRUDActionName} #{msg.AssetTerminationReportTemplate} #{msg.Configuration}">
         <h:form id="WoExportTemplateEditForm">
             <h:panelGroup id="display">
-                <p:fieldset id="basic" legend="#{msg.AssetTerminationReportTemplate}配置">
+                <p:fieldset id="basic" legend="#{msg.AssetTerminationReportTemplate} #{msg.Configuration}">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <p:commandButton update=":growl" icon="ui-icon-file-download" value="下载当前生效模版"
+                            <p:commandButton update=":growl" icon="ui-icon-file-download" value="#{msg.DownloadTheCurrentActiveTemplate}"
                                              onclick="PrimeFaces.monitorDownload(start, stop);">
                                 <p:fileDownload
                                         value="#{toBeTerminatedTemplateController.getActiveTemplate()}"/>

@@ -66,7 +66,7 @@
                                 </p:spinner>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">二维码编码模式</label>
+                                <label class="label">#{msg.QRCodeEncodingMode}</label>
                                 <p:selectOneMenu id="qrCodeEncodingMethods" value="#{qrCodeTemplateCreateController.templateJsonObject.QrCodeElements.EncodingMethod}" style="max-width: 200px;">
                                     <p:ajax update="qrCodeEditForm:preView"/>
                                     <f:selectItems value="#{qrCodeTemplateCreateController.qrCodeEncodingMethods.entrySet()}" var="item" itemLabel="#{item.value}" itemValue="#{item.key}"/>
@@ -142,12 +142,12 @@
                             </p:column>
                             <p:column headerText="#{msg.font}#{msg.type}">
                                 <p:cellEditor>
-                                    <f:facet name="output"><h:outputText value="#{element.FontType==0?'正常':element.FontType==1?'加粗':'斜体'}" /></f:facet>
+                                    <f:facet name="output"><h:outputText value="#{element.fontType==0?'正常':element.fontType==1?'加粗':'斜体'}" /></f:facet>
                                     <f:facet name="input">
                                         <h:selectOneMenu value="#{element.FontType}" style="width:100%">
-                                            <f:selectItem itemLabel="正常" itemValue="0" />
-                                            <f:selectItem itemLabel="加粗" itemValue="1" />
-                                            <f:selectItem itemLabel="斜体" itemValue="2" />
+                                            <f:selectItem itemLabel="#{msg.Normal}" itemValue="0" />
+                                            <f:selectItem itemLabel="#{msg.Bold}" itemValue="1" />
+                                            <f:selectItem itemLabel="#{msg.Italic}" itemValue="2" />
                                         </h:selectOneMenu>
                                     </f:facet>
 
@@ -177,7 +177,7 @@
                     <h:panelGroup >
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{qrCodeTemplateCreateController.saveChange()}" validateClient="true" update="preView :growl" style="float:left"/>
                         <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="qrCodeTemplate.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
-                        <p:commandButton value="导入/导出"  icon="ui-icon-arrowstop-1-s" actionListener="#{qrCodeTemplateCreateController.onExportAction()}" oncomplete="PF('importDlg').show()"  immediate="true"  update=":templateImportForm :growl" style="float:left"/>
+                        <p:commandButton value="#{msg.Import}/#{msg.Export}"  icon="ui-icon-arrowstop-1-s" actionListener="#{qrCodeTemplateCreateController.onExportAction()}" oncomplete="PF('importDlg').show()"  immediate="true"  update=":templateImportForm :growl" style="float:left"/>
                     </h:panelGroup>
 
                 </h:form>
@@ -191,7 +191,7 @@
                     <h:panelGroup id="jsonString">
                         <label class="label">#{msg.jsonString}</label>
                         <p:inputTextarea id="jsonStringText"  value="#{qrCodeTemplateCreateController.importJsonString}" cols="100" />
-                        <p:commandButton  value="确定" actionListener="#{qrCodeTemplateCreateController.onImportSave}" process="jsonString" update=":qrCodeEditForm :growl" oncomplete="handleComplete(xhr, status, args);"/>
+                        <p:commandButton  value="#{msg.OK}" actionListener="#{qrCodeTemplateCreateController.onImportSave}" process="jsonString" update=":qrCodeEditForm :growl" oncomplete="handleComplete(xhr, status, args);"/>
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>

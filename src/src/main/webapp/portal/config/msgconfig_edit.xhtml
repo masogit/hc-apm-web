@@ -8,17 +8,17 @@
     <ui:define name="content">
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="消息配置项"/>
+                <p:outputLabel class="pageTitle" value="#{msg.MessageConfigurationItem}"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id ="MsgConfigForm" style="margin-top: 20px;">
-                    <p:tab title="消息配置选项" class="ui-g-12" >
+                    <p:tab title="#{msg.MessageConfigurationOptions}" class="ui-g-12" >
 
 
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <c:forEach items="#{msgConfigController.msgNameList}" var="item">
+                            <c:forEach items="#{userContextService.isLocale() ? msgConfigController.msgNameList : msgConfigController.msgNameListEn}" var="item">
                                 <h:panelGroup >
-                                    <p:selectBooleanCheckbox itemLabel="#{msgConfigController.allFields[item]}" value="#{msgConfigController.selectedMsgFields[item]}"   />
+                                    <p:selectBooleanCheckbox itemLabel="#{userContextService.isLocale() ? msgConfigController.allFields[item] : msgConfigController.allFieldsEn[item]}" value="#{msgConfigController.selectedMsgFields[item]}"   />
                                 </h:panelGroup>
 
                             </c:forEach>

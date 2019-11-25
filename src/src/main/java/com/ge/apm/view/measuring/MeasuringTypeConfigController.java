@@ -106,6 +106,7 @@ public class MeasuringTypeConfigController extends GenericCRUDUUIDController<Mea
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
+        this.i18nMessage = null;
 
         this.initMeasuringItemCategoryList();
     }

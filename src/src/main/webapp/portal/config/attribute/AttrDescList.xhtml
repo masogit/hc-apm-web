@@ -9,12 +9,12 @@
     <ui:define name="content">
         <div class="ui-g-12 card">
             <h:form id="attrDescListForm">
-                <p:fieldset legend="#{attrDescListController.selectedAttribute.name}属性列表">
+                <p:fieldset legend="#{attrDescListController.selectedAttribute.name}#{msg.AttributeList}">
                     <p:dataTable id="attrDescList" value="#{attrDescListController.lazyModel}" var="attrDesc" widgetVar="attrDescListVar"
                                  selectionMode="single" selection="#{attrDescListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{attrDesc.id}" sortMode="single" sortOrder="descending" sortBy="#{attrDesc.name}"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500" >
@@ -22,15 +22,15 @@
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
                         <p:ajax event="filter" listener="#{attributeListController.onFilter}" update="attrDescList"/>
 
-                        <p:column headerText="子属性">
+                        <p:column headerText="#{msg.AttrDesc}">
                             <h:outputText value="#{attrDesc.name}" />
                         </p:column>
-                        <p:column headerText="子属性描述">
+                        <p:column headerText="#{msg.SubattributeDescription}">
                             <h:outputText value="#{attrDesc.description}"/>
                         </p:column>
-                        <p:column headerText="是否必须">
-                            <h:outputText value="是" rendered="#{attrDesc.required}"/>
-                            <h:outputText value="否" rendered="#{!attrDesc.required}"/>
+                        <p:column headerText="#{msg.RequiredOrNot}">
+                            <h:outputText value="#{msg.True2Yes}" rendered="#{attrDesc.required}"/>
+                            <h:outputText value="#{msg.False2No}" rendered="#{!attrDesc.required}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{attrDescListController.prepareCreate}" process="@this" update=":AttrDescEditDlg" oncomplete="PF('AttrDescEditDialog').show()" />
@@ -53,16 +53,16 @@
 
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="min-width: 500px;">
                             <h:panelGroup>
-                                <label class="label">子属性*</label>
-                                <p:inputText id="loginName" value="#{attrDescListController.selected.name}" required="true" requiredMessage="属性名称 #{msg.ValidationRequire}"/>
+                                <label class="label">#{msg.AttrDesc}*</label>
+                                <p:inputText id="loginName" value="#{attrDescListController.selected.name}" required="true" requiredMessage="#{msg.AttributeName} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">描述</label>
+                                <label class="label">#{msg.Description2}</label>
                                 <p:inputText id="name" value="#{attrDescListController.selected.description}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">必须</label>
-                                <p:selectBooleanButton id="isRequired" value="#{attrDescListController.selected.required}" onLabel="是" offLabel="否"/>
+                                <label class="label">#{msg.Required2}</label>
+                                <p:selectBooleanButton id="isRequired" value="#{attrDescListController.selected.required}" onLabel="#{msg.True2Yes}" offLabel="#{msg.False2No}"/>
                             </h:panelGroup>
                         </p:panelGrid>
                         <br/>

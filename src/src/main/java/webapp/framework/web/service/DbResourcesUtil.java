@@ -64,7 +64,6 @@ public class DbResourcesUtil {
         if (date == null) {
             return "";
         }
-
         String format = getProperty(DATE_FORMAT_KEY);
         SimpleDateFormat dateFormat = new SimpleDateFormat(format, LocaleContextHolder.getLocale());
         return dateFormat.format(date);
@@ -74,7 +73,6 @@ public class DbResourcesUtil {
         if (localDate == null) {
             return "";
         }
-
         String format = getProperty(DATE_FORMAT_KEY);
         return localDate.toString(format, LocaleContextHolder.getLocale());
     }
@@ -83,7 +81,6 @@ public class DbResourcesUtil {
         if (localDateTime == null) {
             return "";
         }
-
         String format = getProperty(DATE_FORMAT_KEY);
         return localDateTime.toString(format, LocaleContextHolder.getLocale());
     }

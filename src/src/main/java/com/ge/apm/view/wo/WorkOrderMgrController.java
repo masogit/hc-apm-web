@@ -64,7 +64,10 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOrder> implements Serializable, ServerEventInterface {
+
     private SupplierController supplierController;
+    @Setter @Getter
+    UserAccount approver;
     @Setter @Getter
     Double c_woManhourPrice =0d;
     @Setter @Getter
@@ -205,6 +208,10 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
+        String queryAssetUID_href = WebUtil.getRequestParameter("queryAssetUID");
+        if(!Strings.isNullOrEmpty(queryAssetUID_href)){
+            queryAssetUid = queryAssetUID_href;
+        }
         if (!Strings.isNullOrEmpty(enCodeParameters)) {
             requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
             queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
@@ -575,7 +582,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private void filterStepSet(Integer fillterStepId){
         searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
     }
-
+public void test1(){
+    System.out.println("test1------");
+}
 
     /*stepName:StepId 报修:1 待派工: 2 , 待接单:3, 维修中:4 , 待验收:5 待关单:6 ， 待评价:7  , 待审核:8 ， 已计划: 0*/
     @Override
@@ -1043,7 +1052,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         assigneeId =ua1.getId().toString();
         if (hourRequired) {
             if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() < 0.01) {
-                WebUtil.addErrorMessage("所填工时不能小于0.01");
+                WebUtil.addErrorMessage(WebUtil.getMessage("TheCompletedManhoursTips"));
                 RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
                 return;
             }
@@ -1138,7 +1147,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         boolean valid = true;
         if (confirmedUpDate ==
                 null) {
-            WebUtil.addErrorMessage("恢复时间" + WebUtil.getMessage("ValidationRequire"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("recoveryTime") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
             valid = false;
         }
@@ -1148,7 +1157,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             valid = false;
         }
         if (null == selectedWorkOrder.getRepairResult()) {
-            WebUtil.addErrorMessage("维修结果" + WebUtil.getMessage("ValidationRequire"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("RepairResult") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("repairResult", true);
             valid = false;
         }
@@ -1158,7 +1167,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         hourRequired=  woc.getHourRequired();*/
         if (hourRequired) { //如果工作流配置了工时必填，那么就要jian
             if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
-                WebUtil.addErrorMessage("工时不能小于0.01");
+                WebUtil.addErrorMessage(WebUtil.getMessage("TheCompletedManhoursTips"));
                 RequestContext.getCurrentInstance().addCallbackParam("manHours_input", true);
                 valid = false;
             }
@@ -1194,11 +1203,11 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     public void takeEquip() {
         if (Strings.isNullOrEmpty(equipmentTaker)) {
-            WebUtil.addErrorMessage("取物人" + WebUtil.getMessage("ValidationRequire"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("equipmentTaker") + WebUtil.getMessage("ValidationRequire"));
         } else if (equipmentTaker.trim().isEmpty()) {
-            WebUtil.addErrorMessage("取物人" + WebUtil.getMessage("ValidationRequire"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("equipmentTaker") + WebUtil.getMessage("ValidationRequire"));
         } else if (takeTime != null && takeTime.after(new Date())) {
-            WebUtil.addErrorMessage("取物时间大于当前时间");
+            WebUtil.addErrorMessage(WebUtil.getMessage("TakingTimeIsGreaterThanCurrentTimeTip"));
             takeTime = null;
         } else {
             takeTime = new Date();
@@ -1240,7 +1249,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
 
         if(requestReason==null){
-            newServiceRequest.setRequestReason("设备故障");
+            newServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
         }else{
             newServiceRequest.setRequestReason(requestReason.toString());
         }
@@ -1254,29 +1263,29 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
-        faultReason="设备故障";
+        faultReason=WebUtil.getMessage("EquipmentFault");
         selected = null;
     }
 
     public void saveServiceRequest() {
         if(StringUtils.isEmpty(faultReason)){
-            newServiceRequest.setRequestReason("设备故障");
+            newServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
         }else{
             newServiceRequest.setRequestReason(faultReason);
         }
 
         if (null == selectedAsset) {
-            WebUtil.addErrorMessage("没有选择设备,不能报修");
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoEquipmentSelectedNoRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
             return;
         }
         if (selectedAsset.getStatus() == 4) {
-            WebUtil.addErrorMessage("所选设备待报废,不能报修");
+            WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
-            WebUtil.addErrorMessage("所选设备没有所属科室,不能报修");
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoAssetDepartmentNoRepaired"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else {
@@ -1356,7 +1365,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     public void reassignWorkOrder() {
         if(StringUtils.isEmpty(comments)){
-            comments="工作需要";
+            comments=WebUtil.getMessage("WorkRequirements");
         }
         woService.reassignWorkOrder(selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
         cancel();
@@ -1612,7 +1621,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     public void submitWorkOrder() {
         if(StringUtils.isEmpty(comments)){
-            comments="报价审核";
+            comments= WebUtil.getMessage("QuotationApproval");
         }
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         accessoryList.forEach(item -> {
@@ -1627,7 +1636,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     public void approveWorkOrder() {
         if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
-            WebUtil.addErrorMessage("审核不通过原因必须填写");
+            WebUtil.addErrorMessage(WebUtil.getMessage(WebUtil.getMessage("ApprovalFallureReasonRequired")));
             RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
             return;
         }
@@ -1679,7 +1688,11 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     }
 
     public List<UserAccount> getApproverList(String name) {
-        return woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
+        List<UserAccount> uaList = woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid(),name);
+      /* List<String> ua1List = uaList.stream().map(UserAccount::getUid).collect(Collectors.toList());
+        List<UserAccount> tmp=  userDao.findByUidIn(ua1List);*/
+        return uaList;
+
     }
 
     public void setNothing(){}
@@ -2055,9 +2068,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     public String getManHourShow() {
         if (hourRequired) {
-            return "工时(小时)*";
+            return WebUtil.getMessage("manhours")+"*";
         } else {
-            return "工时(小时)";
+            return WebUtil.getMessage("manhours");
         }
     }
 

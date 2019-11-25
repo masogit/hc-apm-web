@@ -11,6 +11,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Name;
@@ -26,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.jsf.FacesContextUtils;
+import webapp.framework.context.LocaleHolder;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.*;
@@ -42,10 +45,10 @@ import java.util.stream.Collectors;
 public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileDynamicTemplate.class);
 
-    private static final String SHEET_DYNAMIC_LIST_NAME = "动态列表";
-    private static final String SHEET_STATIC_LIST_NAME = "静态列表";
-    private static final String SHEET_ASSET_GROUP_SECONDAY_LEVEL_NAME = "设备分类2级";
-    private static final String SHEET_FUNCTION_TYPE_SECONDAY_LEVEL_NAME = "医疗器械子分类";
+    private static final String SHEET_DYNAMIC_LIST_NAME = WebUtil.getMessage("DynamicList");
+    private static final String SHEET_STATIC_LIST_NAME = WebUtil.getMessage("StaticList");
+    private static final String SHEET_ASSET_GROUP_SECONDAY_LEVEL_NAME = WebUtil.getMessage("EquipmentClassificationClassII");
+    private static final String SHEET_FUNCTION_TYPE_SECONDAY_LEVEL_NAME = WebUtil.getMessage("MedicalDeviceSubclassification");
     public static final int ASSET_FORMULA_DEFAULT_MAX_ROWS = 20000;
 
 //    public static String[] columnTitles = {
@@ -88,7 +91,16 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         webAppContext.getAutowireCapableBeanFactory().autowireBean(this);
 
-        InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/APM_Asset_Dynamic_Template.xlsx");
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+
+        String fileName = "APM_Asset_Dynamic_Template.xlsx";
+        /*if (userContextService.isLocale()){
+            fileName = "APM_Asset_Dynamic_Template_zh.xlsx";
+        } else {
+            fileName = "APM_Asset_Dynamic_Template_en.xlsx";
+
+        }*/
+        InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/" + fileName);
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
         assetSheet = workBook.getSheet(SHEET_ASSET);
@@ -134,48 +146,48 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         createFunctionTypeSecondaryLevel();
 
-        createFormulaForExistingDropdown("所属科室", "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
-        createFormulaForExistingDropdown( "使用科室", "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+        createFormulaForExistingDropdown(WebUtil.getMessage("clinicalDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+        createFormulaForExistingDropdown( WebUtil.getMessage("assetDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
     }
 
     private void createDynamicList() {
 
         Row row = dynamicListSheet.createRow(0);
-        row.createCell(0).setCellValue("列表名称");
-        row.createCell(1).setCellValue("列表");
+        row.createCell(0).setCellValue(WebUtil.getMessage("StaticList"));
+        row.createCell(1).setCellValue(WebUtil.getMessage("List"));
 
         int rowNum = 1;
-        createDropdownWithNamedRange(rowNum++, "设备分类", assetGroup, false);
-        createDropdownWithNamedRange(rowNum++, "医疗器械分类", assetFunctionTypes, true);
-        createDropdownWithNamedRange(rowNum++, "折旧算法", depreciationMethod, true);
-        createDropdownWithNamedRange(rowNum++, "用途分类", assetUsageList, true);
-        createDropdownWithNamedRange(rowNum++, "资金来源", capitalSourceList, true);
-        createDropdownWithNamedRange(rowNum++, "计量等级", measureGradeList, true);
-        createDropdownWithNamedRange(rowNum++, "风险等级", riskGradeList, true);
-        createDropdownWithNamedRange(rowNum++, "是否急救设备", emergencyEquipmentList, true);
-        createDropdownWithNamedRange(rowNum++, "是否进口设备", importEquipmentList, true);
-        createDropdownWithNamedRange(rowNum++, "核算类别", accountingCategoryList, true);
-        createDropdownWithNamedRange(rowNum++, "计量项目类别", measuringItemCategoryList, true);
-        createDropdownWithNamedRange(rowNum++, "维修类型", repairFormList, true);
-        createDropdownWithNamedRange(rowNum++, "当前状态", assetStatusList, false);
-        createDropdownWithNamedRange(rowNum++, "资产价值分类", assetValueCategoryList, true);
-        createDropdownWithNamedRange(rowNum++, "资金来源2", capitalSource2List, true);
-        createDropdownWithNamedRange(rowNum++, "资产状态", deviceStatusList, true);
-        createDropdownWithNamedRange(rowNum++, "专有分类", proprietaryClassList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("EquipmentClassification"), assetGroup, false);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("MedicalDeviceClassification"), assetFunctionTypes, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("DepreciationMethod"), depreciationMethod, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("UsageClassification"), assetUsageList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("capitalSource"), capitalSourceList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("MeasurementGrade"), measureGradeList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("riskGrade"), riskGradeList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("emergencyEquipment"), emergencyEquipmentList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("ImportEquipment?"), importEquipmentList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("accountingCategory"), accountingCategoryList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("measuringItemCategory"), measuringItemCategoryList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("repairForm"), repairFormList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("CurrentStatus"), assetStatusList, false);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("AssetValueCategory"), assetValueCategoryList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("CapitalSourceTwo"), capitalSource2List, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("deviceStatus"), deviceStatusList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("ProprietaryClass"), proprietaryClassList, true);
 
         dynamicListSheet.setSelected(false);
     }
 
     private void createStaticList() {
         Row row = staticListSheet.createRow(0);
-        row.createCell(0).setCellValue("列表名称");
-        row.createCell(1).setCellValue("列表");
+        row.createCell(0).setCellValue(WebUtil.getMessage("ListName"));
+        row.createCell(1).setCellValue(WebUtil.getMessage("List"));
 
         int rowNum = 1;
-        createDropdownWithStaticList(rowNum++, "功能等级", true, "1", "2", "3");
-        createDropdownWithStaticList(rowNum++, "是否PM", true, "是", "否");
-        createDropdownWithStaticList(rowNum++, "是否盘点", true, "是", "否");
-        createDropdownWithStaticList(rowNum++, "是否对维保到期提醒", true, "是", "否");
+        createDropdownWithStaticList(rowNum++, WebUtil.getMessage("FunctionGrade"), true, "1", "2", "3");
+        createDropdownWithStaticList(rowNum++, WebUtil.getMessage("IsPM"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
+        createDropdownWithStaticList(rowNum++, WebUtil.getMessage("IsChecked"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
+        createDropdownWithStaticList(rowNum++, WebUtil.getMessage("WarrantyExpirationReminder"), true, WebUtil.getMessage("true"), WebUtil.getMessage("false"));
 
         staticListSheet.setSelected(false);
     }
@@ -189,9 +201,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         }
 
         Row row = sheet.createRow(0);
-        row.createCell(0).setCellValue("列表名称");
-        row.createCell(1).setCellValue("列表项个数");
-        row.createCell(2).setCellValue("列表项");
+        row.createCell(0).setCellValue(WebUtil.getMessage("ListName"));
+        row.createCell(1).setCellValue(WebUtil.getMessage("NumberOfListItems"));
+        row.createCell(2).setCellValue(WebUtil.getMessage("ListItem"));
 
         int rowNum = 1;
         for (I18nMessage msg: assetGroup) {
@@ -218,9 +230,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         }
 
         Row row = sheet.createRow(0);
-        row.createCell(0).setCellValue("列表名称");
-        row.createCell(1).setCellValue("列表项个数");
-        row.createCell(2).setCellValue("列表项");
+        row.createCell(0).setCellValue(WebUtil.getMessage("ListName"));
+        row.createCell(1).setCellValue(WebUtil.getMessage("NumberOfListItems"));
+        row.createCell(2).setCellValue(WebUtil.getMessage("ListItem"));
 
         int rowNum = 1;
         for (I18nMessage msg: assetFunctionTypes) {
@@ -280,7 +292,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     private void createDropdownWithNamedRange(int rowNum, String name, List<I18nMessage> msgList, boolean optional) {
 
-        List<String> msgs = msgList.stream().map(I18nMessage::getValueZh).collect(Collectors.toList());
+        List<String> msgs = null;
+        if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+            msgs = msgList.stream().map(I18nMessage::getValueZh).collect(Collectors.toList());
+        } else {
+            msgs = msgList.stream().map(I18nMessage::getValueEn).collect(Collectors.toList());
+        }
 
         createDropdownOnly(dynamicListSheet, rowNum, name, msgs, optional);
 
@@ -302,7 +319,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     private String getRangeName(String fieldName) {
-        String normalizedName = fieldName.replaceAll("[\\（\\）]", "_") + "列表";
+        String normalizedName = fieldName.replaceAll("[\\（\\）]", "_").replaceAll(" ","_").replaceAll("\\?","_") + WebUtil.getMessage("List");
         return normalizedName;
     }
 
@@ -474,8 +491,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     private void writeSummaryFormula(ExcelDocumentStreamingWriter writer, List<String> exportFields, int maxRows) {
 
-        int nameIndex = exportFields.indexOf("设备名称");
-        int purchasePriceIndex = exportFields.indexOf("采购价格");
+        int nameIndex = exportFields.indexOf(WebUtil.getMessage("EquipmentName"));
+        int purchasePriceIndex = exportFields.indexOf(WebUtil.getMessage("PurchasePrice"));
 
         if (nameIndex == -1 || purchasePriceIndex == -1) return;
 
@@ -533,37 +550,37 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         Map<String, Object> map = new HashMap<>();
 
-        map.put("设备名称", "XXXXXX");
-        map.put("设备编号", "SBBH0001");
-        map.put("设备别名", "XXXX");
-        map.put("维修负责人", "张三");
-        map.put("维修负责人2", "李四");
-        map.put("所属科室", clinicalDeptList.size() == 0 ? "" : clinicalDeptList.get(0).getName());
-        map.put("制造商", "XXX医疗器械有限公司");
-        map.put("供应商", "XX医疗设备有限公司");
+        map.put(WebUtil.getMessage("EquipmentName"), "XXXXXX");
+        map.put(WebUtil.getMessage("EquipmentID"), "SBBH0001");
+        map.put(WebUtil.getMessage("EquipmentAlias"), "XXXX");
+        map.put(WebUtil.getMessage("assetOwnerId"), "张三");
+        map.put(WebUtil.getMessage("RepairOwner2"), "李四");
+        map.put(WebUtil.getMessage("clinicalDeptId"), clinicalDeptList.size() == 0 ? "" : clinicalDeptList.get(0).getName());
+        map.put(WebUtil.getMessage("Manufacturer"), "XXX医疗器械有限公司");
+        map.put(WebUtil.getMessage("Vendor"), "XX医疗设备有限公司");
 
-        map.put("医疗器械分类", "6801基础外科手术器械");
-        map.put("医疗器械子分类", "医用缝合针(不带线)");
+        map.put(WebUtil.getMessage("MedicalDeviceClassification"), "6801基础外科手术器械");
+        map.put(WebUtil.getMessage("MedicalDeviceSubclassification"), "医用缝合针(不带线)");
 
         String data = assetGroup.isEmpty() ? "其他类" : assetGroup.get(0).getValueZh();
-        map.put("设备分类", data);
+        map.put(WebUtil.getMessage("EquipmentClassification"), data);
 
-        map.put("设备型号", "XXX");
-        map.put("制造商序列号", "123456");
+        map.put(WebUtil.getMessage("EquipmentModel"), "XXX");
+        map.put(WebUtil.getMessage("ManufacturerSerialNumber"), "123456");
 
-        map.put("采购价格", 100.0);
-        map.put("最终残值", 0.0);
-        map.put("使用年限", null);
-        map.put("折旧算法", "平均年限");
+        map.put(WebUtil.getMessage("PurchasePrice"), 100.0);
+        map.put(WebUtil.getMessage("FinalSalvageValue"), 0.0);
+        map.put(WebUtil.getMessage("LifeCycle"), null);
+        map.put(WebUtil.getMessage("depreciationMethod"), "平均年限");
 
-        map.put("用途分类", "治疗类");
-        map.put("资金来源", "医疗");
-        map.put("风险等级", "二级");
-        map.put("计量等级", "B类计量设备");
-        map.put("计量项目类别", "磁共振类");
-        map.put("是否急救设备", "急救设备");
-        map.put("是否进口设备", "进口");
-        map.put("当前状态", "正常");
+        map.put(WebUtil.getMessage("UsageClassification"), "治疗类");
+        map.put(WebUtil.getMessage("capitalSource"), "医疗");
+        map.put(WebUtil.getMessage("riskGrade"), "二级");
+        map.put(WebUtil.getMessage("MeasurementGrade"), "B类计量设备");
+        map.put(WebUtil.getMessage("measuringItemCategory"), "磁共振类");
+        map.put(WebUtil.getMessage("emergencyEquipment"), "急救设备");
+        map.put(WebUtil.getMessage("ImportEquipment?"), "进口");
+        map.put(WebUtil.getMessage("CurrentStatus"), "正常");
 
         return map;
 

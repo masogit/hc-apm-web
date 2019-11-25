@@ -66,7 +66,7 @@
 
                     <h:panelGroup>
                         <label class="label">质保期</label>
-                        <p:calendar timeZone="GMT+8" label="取物时间" pattern="yyyy/MM/dd" value="#{v2MeasureController.itemDetail.warrantyDate}" showOn="button"
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" label="取物时间"  value="#{v2MeasureController.itemDetail.warrantyDate}" showOn="button"
                                     readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
@@ -75,11 +75,11 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">预计到达时间</label>
-                        <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd HH:mm" value="#{v2MeasureController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="预计到达时间"  value="#{v2MeasureController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">申请时间</label>
-                        <p:calendar disabled="#{v2MeasureController.nochange}" timeZone="GMT+8" label="申请时间" pattern="yyyy/MM/dd HH:mm" value="#{v2MeasureController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <p:calendar disabled="#{v2MeasureController.nochange}" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="申请时间"  value="#{v2MeasureController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">备注</label>
@@ -183,7 +183,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">申请时间</label>
-                        <p:calendar disabled="true" timeZone="GMT+8" label="申请时间" pattern="yyyy/MM/dd HH:mm" value="#{v2MeasureController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="申请时间"  value="#{v2MeasureController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <p:column headerText="到货">
                         <p:selectBooleanButton disabled="true"  value="#{v2MeasureController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货">

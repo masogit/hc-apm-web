@@ -10,10 +10,10 @@
 		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
 		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController2.onFilter}" />
-		<p:column headerText="设备名" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false" sortBy="#{item.assetInfo.namePyCode}">
+		<p:column headerText="#{msg.EquipmentName}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false" sortBy="#{item.assetInfo.namePyCode}">
 			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetInfo.id}" target="_Blank"><h:outputText value="#{item.assetInfo.name}" /></a>
 		</p:column>
-		<p:column headerText="设备名" exportable="true" visible="false">
+		<p:column headerText="#{msg.EquipmentName}" exportable="true" visible="false">
 			<h:outputText value="#{item.assetInfo.name}" />
 		</p:column>
 		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}">
@@ -25,38 +25,38 @@
 			</f:facet>
 			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 		</p:column>
-		<p:column headerText="设备二维码" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.qrCode}">
+		<p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.qrCode}">
 			<h:outputText value="#{item.assetInfo.qrCode}" />
 		</p:column>
-		<p:column headerText="设备编号" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.departNum}">
+		<p:column headerText="#{msg.EquipmentID}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.departNum}">
 			<h:outputText value="#{item.assetInfo.departNum}" />
 		</p:column>
-		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.functionType}">
+		<p:column headerText="#{msg.EquipmentModel}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.functionType}">
 			<h:outputText value="#{item.assetInfo.functionType}" />
 		</p:column>
-		<p:column headerText="设备财产号" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.financingNum}">
+		<p:column headerText="#{msg.EquipmentPropertyNumber}" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.financingNum}">
 			<h:outputText value="#{item.assetInfo.financingNum}" />
 		</p:column>
-		<p:column headerText="资产状态" filterBy="#{item.assetInfo.status}" filterMatchMode="EQ">
+		<p:column headerText="#{msg.AssetStatus}" filterBy="#{item.assetInfo.status}" filterMatchMode="EQ">
 			<f:facet name="filter">
 				<p:selectOneMenu onchange="PF('varDataList2').filter()" autoWidth="false" style="max-width: 150px;">
 					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-					<f:selectItem itemLabel="正常" itemValue="1" />
-					<f:selectItem itemLabel="停机" itemValue="2" />
-					<f:selectItem itemLabel="限制功能使用" itemValue="3" />
-					<f:selectItem itemLabel="待报废" itemValue="4" />
-					<f:selectItem itemLabel="停用" itemValue="5" />
+					<f:selectItem itemLabel="#{msg.Normal}" itemValue="1" />
+					<f:selectItem itemLabel="#{msg.Stopped}" itemValue="2" />
+					<f:selectItem itemLabel="#{msg.PartialFunction}" itemValue="3" />
+					<f:selectItem itemLabel="#{msg.ToBeTerminated}" itemValue="4" />
+					<f:selectItem itemLabel="#{msg.terminated}" itemValue="5" />
 				</p:selectOneMenu>
 			</f:facet>
-			<h:outputText value="#{item.assetInfo.status==1?'正常':item.assetInfo.status==2?'停机':item.assetInfo.status==3?'限制功能使用':item.assetInfo.status==4?'待报废':item.assetInfo.status==5?'停用':item.assetInfo.status}" />
+			<h:outputText value="#{item.assetInfo.status==1?msg.Normal:item.assetInfo.status==2?msg.Stopped:item.assetInfo.status==3?msg.PartialFunction:item.assetInfo.status==4?msg.ToBeTerminated:item.assetInfo.status==5?msg.terminated:item.assetInfo.status}" />
 		</p:column>
-		<p:column headerText="安装位置" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
+		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
 			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
-		<p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE" sortBy="#{item.lastModifiedBy}">
+		<p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE" sortBy="#{item.lastModifiedBy}">
 			<h:outputText value="#{item.lastModifiedBy}" />
 		</p:column>
-		<p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE" sortBy="#{item.lastModifiedDate}">
+		<p:column headerText="#{msg.InvnetoryTime}" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE" sortBy="#{item.lastModifiedDate}">
 			<f:facet name="filter">
 				<p:inputText id="filterLastModifiedDate2" widgetVar="varFilterLastModifiedDate2" />
 			</f:facet>

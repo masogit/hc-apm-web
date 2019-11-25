@@ -37,6 +37,9 @@ public class SysRole implements Serializable {
     @Size(max = 64)
     @Column(name = "role_desc")
     private String roleDesc;
+    @Size(max = 255)
+    @Column(name = "role_desc_en")
+    private String roleDescEn;
     @Size(max = 64)
     @Column(name = "home_page")
     private String homePage;
@@ -46,6 +49,14 @@ public class SysRole implements Serializable {
 
     @Column(name = "authorities")
     private String authorities;
+
+    public String getRoleDescEn() {
+        return roleDescEn;
+    }
+
+    public void setRoleDescEn(String roleDescEn) {
+        this.roleDescEn = roleDescEn;
+    }
 
     @Column(name = "authorities_ch")
     private String authoritiesCH;

@@ -11,12 +11,12 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="创建模版"/>
+                <p:outputLabel class="pageTitle" value="#{msg.CreateTemplate}"/>
             </div>
             <div class="ui-g-12 card ">
                 <h:form id="CreateTemplateForm">
                     <p:tabView  id="tabView">
-                        <p:tab title="模版编辑">
+                        <p:tab title="#{msg.TemplateEdit}">
 
                             <div class="ui-g-12 card cardTitle">
                                 <p:inputText id="pageTitle1" class="pageTitle" value="#{tableCreateController.table.title}" >
@@ -43,7 +43,7 @@
                                                     </p:selectOneMenu>
                                                 </c:if>
                                                 <c:if test="#{fieldItem.component eq 'Switch'}" >
-                                                    <p:selectBooleanButton onLabel="是" offLabel="否"  value="#{tableCreateController.tableValue[fieldItem.key]}"/>
+                                                    <p:selectBooleanButton onLabel="#{msg.True2Yes}" offLabel="#{msg.False2No}"  value="#{tableCreateController.tableValue[fieldItem.key]}"/>
                                                 </c:if>
                                                 <c:if test="#{fieldItem.component eq 'TextArea'}" >
                                                     <p:inputTextarea value="#{tableCreateController.tableValue[fieldItem.key]}"  placeholder="#{fieldItem.ref}"/>
@@ -55,24 +55,24 @@
                                                     <h:outputText value="#{tableCreateController.tableValue[fieldItem.resKey]}"  />
                                                 </c:if>
                                                 <br/>
-                                                <p:commandLink actionListener="#{tableCreateController.prepareEditItem(groupItem,fieldItem)}" value="修改" update=":editItemDialogForm" oncomplete="PF('editItemDialog').show()"/>
-                                                <p:commandLink actionListener="#{tableCreateController.moveItem(groupItem,fieldItem,'up')}" value="上移"  update=":CreateTemplateForm"   disabled="#{tableCreateController.isReadOnly}"/>
-                                                <p:commandLink actionListener="#{tableCreateController.moveItem(groupItem,fieldItem,'down')}" value="下移"  update=":CreateTemplateForm"  disabled="#{tableCreateController.isReadOnly}"/>
-                                                <p:commandLink actionListener="#{tableCreateController.removeItem(groupItem,fieldItem)}" value="删除"  update=":CreateTemplateForm"  disabled="#{tableCreateController.isReadOnly}"/>
+                                                <p:commandLink actionListener="#{tableCreateController.prepareEditItem(groupItem,fieldItem)}" value="#{msg.Update}" update=":editItemDialogForm" oncomplete="PF('editItemDialog').show()"/>
+                                                <p:commandLink actionListener="#{tableCreateController.moveItem(groupItem,fieldItem,'up')}" value="#{msg.ShiftUp}"  update=":CreateTemplateForm"   disabled="#{tableCreateController.isReadOnly}"/>
+                                                <p:commandLink actionListener="#{tableCreateController.moveItem(groupItem,fieldItem,'down')}" value="#{msg.ShiftDown}"  update=":CreateTemplateForm"  disabled="#{tableCreateController.isReadOnly}"/>
+                                                <p:commandLink actionListener="#{tableCreateController.removeItem(groupItem,fieldItem)}" value="#{msg.Delete}"  update=":CreateTemplateForm"  disabled="#{tableCreateController.isReadOnly}"/>
                                             </h:panelGroup>
                                         </c:forEach>
                                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                             <h:panelGroup>
-                                                <p:commandLink actionListener="#{tableCreateController.prepareAddItem(groupItem)}" value="添加"  update=":editItemDialogForm" oncomplete="PF('editItemDialog').show()" process="@this" disabled="#{tableCreateController.isReadOnly}"/>
+                                                <p:commandLink actionListener="#{tableCreateController.prepareAddItem(groupItem)}" value="#{msg.Add}"  update=":editItemDialogForm" oncomplete="PF('editItemDialog').show()" process="@this" disabled="#{tableCreateController.isReadOnly}"/>
                                             </h:panelGroup>
                                         </p:panelGrid>
                                     </p:panelGrid>
 
                                     <h:panelGroup style="float:right">
-                                        <p:commandLink  actionListener="#{tableCreateController.prepareEditGroup(groupItem)}" value="修改"  update=":editGroupDialogForm" oncomplete="PF('editGroupDialog').show()" disabled="#{tableCreateController.isReadOnly}"/>
-                                        <p:commandLink  actionListener="#{tableCreateController.moveGroup(groupItem,'up')}" value="上移"  update=":CreateTemplateForm" disabled="#{tableCreateController.isReadOnly}"/>
-                                        <p:commandLink  actionListener="#{tableCreateController.moveGroup(groupItem,'down')}" value="下移"  update=":CreateTemplateForm" disabled="#{tableCreateController.isReadOnly}"/>
-                                        <p:commandLink  actionListener="#{tableCreateController.removeGroup(groupItem)}" value="删除"  update=":CreateTemplateForm" disabled="#{tableCreateController.isReadOnly}"/>
+                                        <p:commandLink  actionListener="#{tableCreateController.prepareEditGroup(groupItem)}" value="#{msg.Update}"  update=":editGroupDialogForm" oncomplete="PF('editGroupDialog').show()" disabled="#{tableCreateController.isReadOnly}"/>
+                                        <p:commandLink  actionListener="#{tableCreateController.moveGroup(groupItem,'up')}" value="#{msg.ShiftUp}"  update=":CreateTemplateForm" disabled="#{tableCreateController.isReadOnly}"/>
+                                        <p:commandLink  actionListener="#{tableCreateController.moveGroup(groupItem,'down')}" value="#{msg.ShiftDown}"  update=":CreateTemplateForm" disabled="#{tableCreateController.isReadOnly}"/>
+                                        <p:commandLink  actionListener="#{tableCreateController.removeGroup(groupItem)}" value="#{msg.Delete}"  update=":CreateTemplateForm" disabled="#{tableCreateController.isReadOnly}"/>
                                     </h:panelGroup>
                                 </p:fieldset>
 
@@ -82,11 +82,11 @@
 
                                 <h:panelGroup>
 
-                                    <p:commandLink process="@this" actionListener="#{tableCreateController.prepareAddGroup}" value="添加Group"  update=":editGroupDialogForm" oncomplete="PF('editGroupDialog').show()" disabled="#{tableCreateController.isReadOnly}"/>
+                                    <p:commandLink process="@this" actionListener="#{tableCreateController.prepareAddGroup}" value="#{msg.AddGroup}"  update=":editGroupDialogForm" oncomplete="PF('editGroupDialog').show()" disabled="#{tableCreateController.isReadOnly}"/>
                                     <br/>
-                                    <p:commandLink immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                                    <p:commandLink immediate="true" value="#{msg.MobilePreview}" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                                     <br />
-                                    <p:commandLink value="下载模版" actionListener="#{tableCreateController.generateExcelTemplateFile()}" ajax="false" rendered="#{not empty tableCreateController.table.title}">
+                                    <p:commandLink value="#{msg.DownloadTemplate}" actionListener="#{tableCreateController.generateExcelTemplateFile()}" ajax="false" rendered="#{not empty tableCreateController.table.title}">
                                         <p:fileDownload value="#{tableCreateController.exportedFile}"/>
                                     </p:commandLink>
                                 </h:panelGroup>
@@ -95,7 +95,7 @@
 
 
                         </p:tab>
-                        <p:tab title="文本查看">
+                        <p:tab title="#{msg.TextView}">
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup >
                                     <label class="label">#{msg.name}</label>
@@ -104,52 +104,52 @@
                                 <h:panelGroup id="jsonString">
                                     <label class="label">#{msg.jsonString}</label>
                                     <p:inputTextarea id="jsonStringText"  value="#{tableCreateController.tableString}" cols="100"  readonly="#{!tableCreateController.isStringEditable}" />
-                                    <p:commandButton  value="编辑" actionListener="#{tableCreateController.onStringEdit()}" process="jsonString" update="jsonString :growl" rendered="#{!tableCreateController.isStringEditable}" disabled="#{tableCreateController.isReadOnly}"/>
-                                    <p:commandButton  value="保存" actionListener="#{tableCreateController.onStringSave()}" process="jsonString" update=":CreateTemplateForm jsonString :growl" rendered="#{tableCreateController.isStringEditable}" disabled="#{tableCreateController.isReadOnly}"/>
+                                    <p:commandButton  value="#{msg.modify}" actionListener="#{tableCreateController.onStringEdit()}" process="jsonString" update="jsonString :growl" rendered="#{!tableCreateController.isStringEditable}" disabled="#{tableCreateController.isReadOnly}"/>
+                                    <p:commandButton  value="#{msg.Save}" actionListener="#{tableCreateController.onStringSave()}" process="jsonString" update=":CreateTemplateForm jsonString :growl" rendered="#{tableCreateController.isStringEditable}" disabled="#{tableCreateController.isReadOnly}"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
-                        <p:tab title="Excel查看">
+                        <p:tab title="#{msg.ViewExcel}">
                             <div class="ui-g-12 card cardTitle">
                                 <p:inputText id="pageTitle3" class="pageTitle" value="#{tableCreateController.table.title}" >
                                     <p:ajax update=":CreateTemplateForm:tabView:pageTitle2 :CreateTemplateForm:tabView:pageTitle1"  listener="#{tableCreateController.onTitleChange}"/>
                                 </p:inputText>
                             </div>
                             <h:panelGroup id="importExcel">
-                                <p:commandButton value="导入模版"  process="@this" update="importExcel" oncomplete="PF('uploadDialog').show()" rendered="#{empty tableCreateController.selectedTableDefinition.excelStorageId}" disabled="#{tableCreateController.isReadOnly}"/>
+                                <p:commandButton value="#{msg.ImportTemplate}"  process="@this" update="importExcel" oncomplete="PF('uploadDialog').show()" rendered="#{empty tableCreateController.selectedTableDefinition.excelStorageId}" disabled="#{tableCreateController.isReadOnly}"/>
                                 <h:outputText value="#{tableCreateController.uploadedFile.fileName}" />
                                 <p:link href="#{fileDownloadService.getFileUrl(tableCreateController.selectedTableDefinition.excelStorageId)}" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId and empty tableCreateController.uploadedFile}">#{tableCreateController.selectedTableDefinition.name}</p:link>
                                 <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" process="@this" actionListener="#{tableCreateController.removeExcelTemplate}" update="importExcel :uploadDialogForm preview" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId}" disabled="#{tableCreateController.isReadOnly}"/>
                             </h:panelGroup>
-                            <p:fieldset legend="预览" id="preview">
+                            <p:fieldset legend="#{msg.preview}" id="preview">
                                 <tie:websheet id="sheet1" webSheetBean="#{tableCreateController}"  maxRowsPerPage="30" rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId}" showLineNumber="false" />
                                 <p:panel rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId }">
-                                    <p:commandButton value="测试"  update="preview" actionListener="#{tableCreateController.testSubmit()}" />
+                                    <p:commandButton value="#{msg.Test}"  update="preview" actionListener="#{tableCreateController.testSubmit()}" />
                                     <h:outputText value="#{tableCreateController.tableFields}" />
                                 </p:panel>
                             </p:fieldset>
                         </p:tab>
-                        <p:tab title="仪器数据导入配置">
+                        <p:tab title="#{msg.InstrumentDataImportConfiguration}">
                             <div class="ui-g-12 card">
                             </div>
                             <h:panelGrid columns="6" id="instrumentDataImportConfig">
-                                <label class="label">模板标签</label>
+                                <label class="label">#{msg.TemplateLabel}</label>
                                 <p:selectOneMenu value="#{tableCreateController.templateLabel}" id="idTemplateLabel">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" />
                                     <f:selectItems value="#{tableCreateController.templateLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
                                 </p:selectOneMenu>
-                                <label class="label">仪器数据字段</label>
+                                <label class="label">#{msg.InstrumentDataField}</label>
                                 <p:selectOneMenu value="#{tableCreateController.instrumentDataLabel}" id="idInstrumentLabel">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" />
                                     <f:selectItems value="#{tableCreateController.instrumentDataLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
                                 </p:selectOneMenu>
-                                <p:commandButton value="绑定键值对" update="idInstrumentDataBind" actionListener="#{tableCreateController.bindInstrumentData()}" />
+                                <p:commandButton value="#{msg.BindKeyValuePairs}" update="idInstrumentDataBind" actionListener="#{tableCreateController.bindInstrumentData()}" />
                             </h:panelGrid>
                             <p:panelGrid id="idInstrumentDataBind" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             	<h:panelGroup>
                             		<p:pickList value="#{tableCreateController.listInstrumentMppingLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" style="width:auto;" escape="false">
-	                                    <f:facet name="sourceCaption">待绑定键值对</f:facet>
-	                                    <f:facet name="targetCaption">已绑定键值对</f:facet>
+	                                    <f:facet name="sourceCaption">#{msg.KeyValuePairsToBeBound}</f:facet>
+	                                    <f:facet name="targetCaption">#{msg.KeyValuePairsBound}</f:facet>
 										                  <p:column style="float: left;width:100%;text-align:left;">
 											                  <h:outputText value="#{item}" />
 										                  </p:column>
@@ -168,7 +168,7 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class="label">备注</label>
+                            <label class="label">#{msg.Remark}</label>
                             <p:inputTextarea value="#{tableCreateController.selectedTableDefinition.description}" cols="50"  readonly="#{tableCreateController.isReadOnly}"/>
                         </h:panelGroup>
 
@@ -191,7 +191,7 @@
                     </p:panelGrid>
                     <h:panelGroup>
                         <!--<p:commandButton icon="ui-icon-remove-red-eye" immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>-->
-                        <p:commandButton icon="ui-icon-check" actionListener="#{tableCreateController.saveTemplate}" value="保存" style="float:left" validateClient="true" update=":CreateTemplateForm :growl" disabled="#{tableCreateController.isReadOnly}"/>
+                        <p:commandButton icon="ui-icon-check" actionListener="#{tableCreateController.saveTemplate}" value="#{msg.Save}" style="float:left" validateClient="true" update=":CreateTemplateForm :growl" disabled="#{tableCreateController.isReadOnly}"/>
                         <!--<p:remoteCommand name="saveExcel" actionListener="#{excelTableCreateController.saveTemplate}" update=":CreateTemplateForm :growl" />-->
                         <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="schemaList.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
                     </h:panelGroup>
@@ -200,7 +200,7 @@
             </div>
 
         </div>
-        <p:dialog id="editGroupDialog" widgetVar="editGroupDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="编辑组">
+        <p:dialog id="editGroupDialog" widgetVar="editGroupDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.EditGroup}">
             <h:form id="editGroupDialogForm" >
                 <h:panelGroup id="display" rendered="#{not empty tableCreateController.editGroup}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -219,7 +219,7 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog id="editItemDialog" widgetVar="editItemDialog" modal="true" width="800" height="450"  resizable="true" draggable="true" appendTo="@(body)" header="字段编辑">
+        <p:dialog id="editItemDialog" widgetVar="editItemDialog" modal="true" width="800" height="450"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.FieldEdit}">
             <h:form id="editItemDialogForm" >
                 <h:panelGroup id="display" rendered="#{not empty tableCreateController.editTableItem}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -237,7 +237,7 @@
                                 <f:selectItem itemLabel="#{msg.ComponentTypeSelect}" itemValue="#{'Select'}"/>
                                 <f:selectItem itemLabel="#{msg.ComponentTypeTextArea}" itemValue="#{'TextArea'}"/>
                                 <f:selectItem itemLabel="#{msg.ComponentTypeDate}" itemValue="#{'Date'}"/>
-                                <f:selectItem itemLabel="结果输出" itemValue="#{'Label'}"/>
+                                <f:selectItem itemLabel="#{msg.ResultOutput}" itemValue="#{'Label'}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
@@ -248,24 +248,24 @@
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class="label">字段说明</label>
+                            <label class="label">#{msg.FieldDescription}</label>
                             <p:inputText value="#{tableCreateController.editTableItem.ref}" />
                         </h:panelGroup>
                         <h:panelGroup id="ruleSelect">
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup >
-                            <label class="label">计算规则</label>
+                            <label class="label">#{msg.CalculationRule}</label>
                             <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['rule']}" >
                                 <p:ajax listener="#{tableCreateController.onRuleChange}" update="advanceSetting"  />
-                                <f:selectItem itemLabel="无"  />
-                                <f:selectItem itemLabel="上下限" itemValue="#{'RangeRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Number'}"/>
-                                <f:selectItem itemLabel="范围上下限" itemValue="#{'ScopeRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Number'}"/>
-                                <f:selectItem itemLabel="设定值校验" itemValue="#{'VerifyRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Label'}"/>
-                                <f:selectItem itemLabel="偏差校验" itemValue="#{'DeltaRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Label'}"/>
+                                <f:selectItem itemLabel="#{msg.None}"  />
+                                <f:selectItem itemLabel="#{msg.UpperAndLowerLimits}" itemValue="#{'RangeRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Number'}"/>
+                                <f:selectItem itemLabel="#{msg.UpperAndLowerRangeLimits}" itemValue="#{'ScopeRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Number'}"/>
+                                <f:selectItem itemLabel="#{msg.SetValueVerification}" itemValue="#{'VerifyRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Label'}"/>
+                                <f:selectItem itemLabel="#{msg.DeviationVerification}" itemValue="#{'DeltaRule'}" itemDisabled="#{tableCreateController.editTableItem.component ne 'Label'}"/>
                             </p:selectOneMenu>
                             </h:panelGroup >
                             <h:panelGroup  rendered="#{tableCreateController.editTableItem.component eq 'Number'}">
-                                <label class="label">小数位数</label>
+                                <label class="label">#{msg.DecimalPlaces}</label>
                                 <p:spinner value="#{tableCreateController.editTableItem.decimalLength}" max="4"  min="0"/>
                             </h:panelGroup>
                             </p:panelGrid>
@@ -273,155 +273,155 @@
 
                     </p:panelGrid>
                     <h:panelGroup id="advanceSetting">
-                        <p:fieldset legend="上下限设置"  rendered="#{'RangeRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <h:outputText id="RangeRuleComments" value="正常: 下限#{tableCreateController.editTableItem.exp['minCompare'] eq 'GT'? '&lt;':'≤'}测量值#{tableCreateController.editTableItem.exp['maxCompare'] eq 'LT'? '&lt;':'≤'}上限" />
+                        <p:fieldset legend="#{msg.UpperAndLowerLimitSettings}"  rendered="#{'RangeRule' eq tableCreateController.editTableItem.exp['rule']}" >
+                            <h:outputText id="RangeRuleComments" value="#{msg.NormalLowerLimit}#{tableCreateController.editTableItem.exp['minCompare'] eq 'GT'? '&lt;':'≤'}#{msg.Measurement}#{tableCreateController.editTableItem.exp['maxCompare'] eq 'LT'? '&lt;':'≤'}#{msg.UpperLimit}" />
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
-                                    <label class="label ">计算结果Key*</label>
-                                    <p:inputText   value="#{tableCreateController.editTableItem.resKey}" required="true" requiredMessage="计算结果Key#{msg.ValidationRequire}" />
+                                    <label class="label ">#{msg.CalculationKey}*</label>
+                                    <p:inputText   value="#{tableCreateController.editTableItem.resKey}" required="true" requiredMessage="#{msg.CalculationKey}#{msg.ValidationRequire}" />
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">上限</label>
+                                    <label class="label">#{msg.UpperLimit}</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['maxCompare']}" >
                                         <p:ajax update="RangeRuleComments" process="@this"/>
-                                        <f:selectItem itemLabel="小于等于" itemValue="#{'LE'}"/>
-                                        <f:selectItem itemLabel="小于" itemValue="#{'LT'}"/>
+                                        <f:selectItem itemLabel="#{msg.LessThanOrEqualTo}" itemValue="#{'LE'}"/>
+                                        <f:selectItem itemLabel="#{msg.LessThan}" itemValue="#{'LT'}"/>
                                     </p:selectOneMenu>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['max']}" />
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">下限</label>
+                                    <label class="label">#{msg.LowerLimit}</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['minCompare']}" >
                                         <p:ajax update="RangeRuleComments" process="@this"/>
-                                        <f:selectItem itemLabel="大于等于" itemValue="#{'GE'}"/>
-                                        <f:selectItem itemLabel="大于" itemValue="#{'GT'}"/>
+                                        <f:selectItem itemLabel="#{msg.GreaterThanOrEqualTo}" itemValue="#{'GE'}"/>
+                                        <f:selectItem itemLabel="#{msg.GreaterThan}" itemValue="#{'GT'}"/>
                                     </p:selectOneMenu>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['min']}" />
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">结果标识</label>
+                                    <label class="label">#{msg.ResultIdentifier}</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['resIdentify']}" >
-                                        <f:selectItem itemLabel="正常/不正常" itemValue="#{'resIdentify_1'}"/>
-                                        <f:selectItem itemLabel="正常/过高/过低" itemValue="#{'resIdentify_2'}"/>
+                                        <f:selectItem itemLabel="#{msg.NormalOrAbnormal}" itemValue="#{'resIdentify_1'}"/>
+                                        <f:selectItem itemLabel="#{msg.NormalOrTooHighOrTooLow}" itemValue="#{'resIdentify_2'}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup> 
 
                             </p:panelGrid>
                         </p:fieldset>
-                        <p:fieldset legend="范围上下限"  rendered="#{'ScopeRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <h:outputText id="ScopeRuleComments" value="正常: (1-下限范围)*标准值#{tableCreateController.editTableItem.exp['minCompare'] eq 'GT'? '&lt;':'≤'}测量值#{tableCreateController.editTableItem.exp['maxCompare'] eq 'LT'? '&lt;':'≤'}(1+上限范围)*标准值" />
+                        <p:fieldset legend="#{msg.UpperAndLowerRangeLimits}"  rendered="#{'ScopeRule' eq tableCreateController.editTableItem.exp['rule']}" >
+                            <h:outputText id="ScopeRuleComments" value="#{msg.NormalLowerLimitRange}*#{msg.StandardValue}#{tableCreateController.editTableItem.exp['minCompare'] eq 'GT'? '&lt;':'≤'}#{msg.Measurement}#{tableCreateController.editTableItem.exp['maxCompare'] eq 'LT'? '&lt;':'≤'}#{msg.UpperLimitRangeStandardValue}" />
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
-                                    <label class="label">计算结果Key*</label>
-                                    <p:inputText   value="#{tableCreateController.editTableItem.resKey}" required="true" requiredMessage="计算结果Key#{msg.ValidationRequire}" />
+                                    <label class="label">#{msg.CalculationKey}*</label>
+                                    <p:inputText   value="#{tableCreateController.editTableItem.resKey}" required="true" requiredMessage="#{msg.CalculationKey}#{msg.ValidationRequire}" />
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">标准值</label>
+                                    <label class="label">#{msg.StandardValue}</label>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['norm']}" />
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">上限范围</label>
+                                    <label class="label">#{msg.UpperLimitRange}</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['maxCompare']}" >
                                         <p:ajax update="ScopeRuleComments" process="@this"/>
-                                        <f:selectItem itemLabel="小于等于" itemValue="#{'LE'}"/>
-                                        <f:selectItem itemLabel="小于" itemValue="#{'LT'}"/>
+                                        <f:selectItem itemLabel="#{msg.LessThanOrEqualTo}" itemValue="#{'LE'}"/>
+                                        <f:selectItem itemLabel="#{msg.LessThan}" itemValue="#{'LT'}"/>
                                     </p:selectOneMenu>
-                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['max']}" minValue="0" />或
+                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['max']}" minValue="0" />#{msg.Or}
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['maxPercent']}" symbol="%" symbolPosition="s" minValue="0"/>
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">下限范围</label>
+                                    <label class="label">#{msg.LowerLimitRange}</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['minCompare']}" >
                                         <p:ajax update="ScopeRuleComments" process="@this"/>
-                                        <f:selectItem itemLabel="大于等于" itemValue="#{'GE'}"/>
-                                        <f:selectItem itemLabel="大于" itemValue="#{'GT'}"/>
+                                        <f:selectItem itemLabel="#{msg.GreaterThanOrEqualTo}" itemValue="#{'GE'}"/>
+                                        <f:selectItem itemLabel="#{msg.GreaterThanOrEqualTo}" itemValue="#{'GT'}"/>
                                     </p:selectOneMenu>
-                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['min']}" maxValue="0" />或
+                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['min']}" maxValue="0" />#{msg.Or}
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['minPercent']}" symbol="%" symbolPosition="s" maxValue="0"/>
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">结果标识</label>
+                                    <label class="label">#{msg.ResultIdentifier}</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['resIdentify']}" >
-                                        <f:selectItem itemLabel="正常/不正常" itemValue="#{'resIdentify_1'}"/>
-                                        <f:selectItem itemLabel="正常/过高/过低" itemValue="#{'resIdentify_2'}"/>
+                                        <f:selectItem itemLabel="#{msg.NormalOrAbnormal}" itemValue="#{'resIdentify_1'}"/>
+                                        <f:selectItem itemLabel="#{msg.NormalOrTooHighOrTooLow}" itemValue="#{'resIdentify_2'}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup> 
 
                             </p:panelGrid>
                         </p:fieldset>
-                        <p:fieldset legend="设定值校验"  rendered="#{'VerifyRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <p class="label"> 正常: 偏差下限范围≤|Y-X|/X≤偏差上限范围 ; 误差下限范围≤|Y-Z|/Z≤误差上限范围</p>
+                        <p:fieldset legend="#{msg.SetValueVerification}"  rendered="#{'VerifyRule' eq tableCreateController.editTableItem.exp['rule']}" >
+                            <p class="label"> #{msg.ConfirmRangeNor}</p>
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
-                                    <label class="label">计算结果Key*</label>
-                                    <p:inputText   value="#{tableCreateController.editTableItem.resKey}" required="true" requiredMessage="计算结果Key#{msg.ValidationRequire}" />
+                                    <label class="label">#{msg.CalculationKey}*</label>
+                                    <p:inputText   value="#{tableCreateController.editTableItem.resKey}" required="true" requiredMessage="#{msg.CalculationKey}#{msg.ValidationRequire}" />
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">设定值(X)*</label>
-                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['norm']}" required="true" requiredMessage="设定值(X)#{msg.ValidationRequire}" />
+                                    <label class="label">#{msg.SetValueX}*</label>
+                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['norm']}" required="true" requiredMessage="#{msg.SetValueX}#{msg.ValidationRequire}" />
                                 </h:panelGroup>
                                 <!--                                <h:panelGroup >
                                                                     <label class="label">量程(FS)*</label>
                                                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['FS']}" required="true" requiredMessage="量程(FS)#{msg.ValidationRequire}" />
                                                                 </h:panelGroup>-->
                                 <h:panelGroup  >
-                                    <label class="label">设备显示值Key(Y)*</label>
-                                    <p:inputText   value="#{tableCreateController.editTableItem.exp['Y_Key']}" required="true" requiredMessage="设备显示值Key(Y)#{msg.ValidationRequire}" />
+                                    <label class="label">#{msg.EquipmentDisplayValueKey}(Y)*</label>
+                                    <p:inputText   value="#{tableCreateController.editTableItem.exp['Y_Key']}" required="true" requiredMessage="#{msg.EquipmentDisplayValueKey}(Y)#{msg.ValidationRequire}" />
                                 </h:panelGroup>
                                 <h:panelGroup  >
-                                    <label class="label">仪表显示值Key(Z)*</label>
-                                    <p:inputText   value="#{tableCreateController.editTableItem.exp['Z_Key']}" required="true" requiredMessage="仪表显示值Key(Z)#{msg.ValidationRequire}" />
+                                    <label class="label">#{msg.InstrumentDisplayValueKey}(Z)*</label>
+                                    <p:inputText   value="#{tableCreateController.editTableItem.exp['Z_Key']}" required="true" requiredMessage="#{msg.InstrumentDisplayValueKey}(Z)#{msg.ValidationRequire}" />
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <label class="label">偏差上限范围</label>
+                                    <label class="label">#{msg.UpperLimitOfDeviation}</label>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['deltaMaxPercent']}" symbol="%" symbolPosition="s" minValue="0"/>
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">偏差下限范围</label>
+                                    <label class="label">#{msg.LowerLimitOfDeviation}</label>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['deltaMinPercent']}" symbol="%" symbolPosition="s" maxValue="0"/>
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <label class="label">误差上限范围</label>
+                                    <label class="label">#{msg.UpperLimitOfError}</label>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['MuMaxPercent']}" symbol="%" symbolPosition="s" minValue="0"/>
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">误差下限范围</label>
+                                    <label class="label">#{msg.LowerLimitOfError}</label>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['MuMinPercent']}" symbol="%" symbolPosition="s" maxValue="0"/>
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">结果标识</label>
+                                    <label class="label">#{msg.ResultIdentifier}</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['resIdentify']}" >
-                                        <f:selectItem itemLabel="正常/不正常" itemValue="#{'resIdentify_1'}"/>
-                                        <f:selectItem itemLabel="正常/误差超限/偏差超限" itemValue="#{'resIdentify_3'}"/>
+                                        <f:selectItem itemLabel="#{msg.NormalOrAbnormal}" itemValue="#{'resIdentify_1'}"/>
+                                        <f:selectItem itemLabel="#{msg.NormalErrorBeyondLimitDeviationBeyondLimit}" itemValue="#{'resIdentify_3'}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup> 
 
                             </p:panelGrid>
                         </p:fieldset>
-                        <p:fieldset legend="偏差校验"  rendered="#{'DeltaRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <p class="label">正常: |Y-Z|≤最大偏差 </p>
+                        <p:fieldset legend="#{msg.DeviationVerification}"  rendered="#{'DeltaRule' eq tableCreateController.editTableItem.exp['rule']}" >
+                            <p class="label">#{msg.NormalMaximumDeviation} </p>
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
-                                    <label class="label">计算结果Key*</label>
-                                    <p:inputText   value="#{tableCreateController.editTableItem.resKey}" required="true" requiredMessage="计算结果Key#{msg.ValidationRequire}" />
+                                    <label class="label">#{msg.CalculationKey}*</label>
+                                    <p:inputText   value="#{tableCreateController.editTableItem.resKey}" required="true" requiredMessage="#{msg.CalculationKey}#{msg.ValidationRequire}" />
                                 </h:panelGroup> 
                                 <h:panelGroup  >
-                                    <label class="label">设备显示值Key(Y)*</label>
-                                    <p:inputText   value="#{tableCreateController.editTableItem.exp['Y_Key']}" required="true" requiredMessage="设备显示值Key(Y)#{msg.ValidationRequire}" />
+                                    <label class="label">#{msg.EquipmentDisplayValueKey}(Y)*</label>
+                                    <p:inputText   value="#{tableCreateController.editTableItem.exp['Y_Key']}" required="true" requiredMessage="#{msg.EquipmentDisplayValueKey}(Y)#{msg.ValidationRequire}" />
                                 </h:panelGroup>
                                 <h:panelGroup  >
-                                    <label class="label">仪表显示值Key(Z)*</label>
-                                    <p:inputText   value="#{tableCreateController.editTableItem.exp['Z_Key']}" required="true" requiredMessage="仪表显示值Key(Z)#{msg.ValidationRequire}" />
+                                    <label class="label">#{msg.InstrumentDisplayValueKey}(Z)*</label>
+                                    <p:inputText   value="#{tableCreateController.editTableItem.exp['Z_Key']}" required="true" requiredMessage="#{msg.InstrumentDisplayValueKey}(Z)#{msg.ValidationRequire}" />
                                 </h:panelGroup>
                                 <h:panelGroup >
-                                    <label class="label">最大偏差</label>
+                                    <label class="label">#{msg.MaximumDeviation}</label>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['deltaMax']}"  minValue="0"/>
                                 </h:panelGroup> 
                                 <h:panelGroup >
-                                    <label class="label">结果标识</label>
+                                    <label class="label">#{msg.ResultIdentifier}</label>
                                     <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['resIdentify']}" >
-                                        <f:selectItem itemLabel="正常/不正常" itemValue="#{'resIdentify_1'}"/>
-                                        <f:selectItem itemLabel="正常/误差超限/偏差超限" itemValue="#{'resIdentify_3'}"/>
+                                        <f:selectItem itemLabel="#{msg.NormalOrAbnormal}" itemValue="#{'resIdentify_1'}"/>
+                                        <f:selectItem itemLabel="#{msg.NormalErrorBeyondLimitDeviationBeyondLimit}" itemValue="#{'resIdentify_3'}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup> 
 
@@ -435,13 +435,13 @@
                             <f:facet name="header">
                                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"  actionListener="#{tableCreateController.prepareAddOption()}" process="@this" update=":editOptionDialogForm" oncomplete="PF('editOptionDialog').show()" />
                             </f:facet>
-                            <p:column headerText="选项标识" >
+                            <p:column headerText="#{msg.OptionIdentifier}" >
                                 <h:outputText value="#{optionItem.key}"/>
                             </p:column>
-                            <p:column headerText="选项显示值" >
+                            <p:column headerText="#{msg.OptionDisplayValue}" >
                                 <h:outputText value="#{optionItem.value}"/>
                             </p:column>
-                            <p:column headerText="操作" width="64" >
+                            <p:column headerText="#{msg.Operation}" width="64" >
                                 <p:commandLink actionListener="#{tableCreateController.prepareEditOption(optionItem)}" process="@this" update=":editOptionDialogForm" oncomplete="PF('editOptionDialog').show()" rendered="#{not empty optionItem.key}"><span class="ui-icon ui-icon-pencil" /></p:commandLink>
                                 <p:commandLink actionListener="#{tableCreateController.removeOption(optionItem)}" process="@this" update=":editItemDialogForm:optionsTable" rendered="#{not empty optionItem.key}"><span class="ui-icon ui-icon-trash" /></p:commandLink>
                             </p:column>
@@ -457,7 +457,7 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog id="editOptionDialog" widgetVar="editOptionDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="编辑选项">
+        <p:dialog id="editOptionDialog" widgetVar="editOptionDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.EditOption}">
             <h:form id="editOptionDialogForm" >
                 <h:panelGroup id="display" rendered="#{not empty tableCreateController.selectedOption}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -480,13 +480,13 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog id="PmOrderPreviewDlg" widgetVar="PmOrderPreviewDlg" height="500" width="400" modal="true" resizable="false" draggable="true" appendTo="@(body)" header="预览">
+        <p:dialog id="PmOrderPreviewDlg" widgetVar="PmOrderPreviewDlg" height="500" width="400" modal="true" resizable="false" draggable="true" appendTo="@(body)" header="#{msg.preview}">
             <h:form id="PmOrderPreviewForm" >
                 <iframe src="/wx/form/preview/"  width="100%"  height="490"/>
             </h:form>
 
         </p:dialog>
-        <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="上传模版文件">
+        <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.UploadTemplateFile}">
             <h:form id="uploadDialogForm" >
                 <h:panelGroup id="display" >
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -497,8 +497,8 @@
                                            multiple="false" sizeLimit="10000000" update=":uploadDialogForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty tableCreateController.uploadedFile}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p>说明</p>
-                            <p>上传文件进行导入</p>
+                            <p>#{msg.Description}</p>
+                            <p>#{msg.UpFileImport}</p>
                         </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup>

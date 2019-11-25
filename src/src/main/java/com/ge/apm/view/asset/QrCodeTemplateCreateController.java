@@ -127,7 +127,7 @@ public class QrCodeTemplateCreateController {
             item.setSiteUID(thisTemplate.getSiteUID());
         });
         elementDao.save(thisTemplateElementList);
-        WebUtil.addSuccessMessage("修改已经保存");
+        WebUtil.addSuccessMessage(WebUtil.getMessage("ModificationSaved"));
     }
     
     public Map<String, String> getFieldsMap() {
@@ -157,13 +157,13 @@ public class QrCodeTemplateCreateController {
         try {
             templateJsonObject = JSONObject.parseObject(importJsonString);
             if(!templateService.isValidJson(templateJsonObject)){
-                WebUtil.addErrorMessage("JSON不正确");
+                WebUtil.addErrorMessage(WebUtil.getMessage("JSONIncorrect"));
                 RequestContext.getCurrentInstance().addCallbackParam("JsonValid", false);
                 return;
             };
             RequestContext.getCurrentInstance().addCallbackParam("JsonValid", true);
         } catch (JSONException e) {
-            WebUtil.addErrorMessage("不能解析JSON");
+            WebUtil.addErrorMessage(WebUtil.getMessage("CannotParseJSON"));
             RequestContext.getCurrentInstance().addCallbackParam("JsonValid", false);
         }
     }

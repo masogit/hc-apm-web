@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="设备标签"/>
+                <p:outputLabel class="pageTitle" value="#{msg.EquipmentLabel}"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -28,10 +28,10 @@
                         <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
-                        <p:column headerText="租户">
+                        <p:column headerText="#{msg.TenantInfo}">
                             <h:outputText value="#{assetTagController.getTenantName(item.tenantUID)}"/>
                         </p:column>
-                        <p:column headerText="医院">
+                        <p:column headerText="#{msg.Hospital}">
                             <h:outputText value="#{assetTagController.getSiteName(item.siteUID)}"/>
                         </p:column>
 

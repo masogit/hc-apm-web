@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="qrCodeLibCreateDlg" widgetVar="qrCodeLibCreateDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码生成">
+        <p:dialog id="qrCodeLibCreateDlg" widgetVar="qrCodeLibCreateDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.QRCodeCreate}">
             <h:form id="qrCodeLibCreateForm">
                 <h:panelGroup id="display">
 <!--                    <h:panelGroup id ="tenant">
@@ -28,7 +28,7 @@
                     </h:panelGroup>-->
 
                     <h:panelGroup >
-                        <p:inputText id="hospitalIdSelect" value="#{qrCodeLibController.selectedOrg.name}" readonly="true" required="true" requiredMessage="医院不能为空"/>
+                        <p:inputText id="hospitalIdSelect" value="#{qrCodeLibController.selectedOrg.name}" readonly="true" required="true" requiredMessage="#{msg.HospitalCannotBeEmpty}"/>
                         <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
                         <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false" class="ui-selectonemenu-panel">
                             <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -44,11 +44,11 @@
                         </p:overlayPanel>
                     </h:panelGroup>
 
-                    <h:outputLabel for="hospitalIdSelect" value="二维码数量 ： " />
-                    <p:inputNumber id="qrCodeNum" decimalPlaces="0" minValue="1" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="数量不能为空"/>
+                    <h:outputLabel for="hospitalIdSelect" value="#{msg.QRCodeQuantity} ： " />
+                    <p:inputNumber id="qrCodeNum" decimalPlaces="0" minValue="1" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="#{msg.QuantityCannotBeEmpty}"/>
                     <br/>
                     <br/>
-                    <p:commandButton value="确定生成" icon="ui-icon-extlink" validateClient="true" actionListener="#{qrCodeLibController.createQrCode}" update=":qrCodeLibListForm:datalist :growl" oncomplete="handleSubmit(args, 'qrCodeLibCreateDialog');"/>
+                    <p:commandButton value="#{msg.ConfirmCreate}" icon="ui-icon-extlink" validateClient="true" actionListener="#{qrCodeLibController.createQrCode}" update=":qrCodeLibListForm:datalist :growl" oncomplete="handleSubmit(args, 'qrCodeLibCreateDialog');"/>
                     <br/>
                 </h:panelGroup>
             </h:form>

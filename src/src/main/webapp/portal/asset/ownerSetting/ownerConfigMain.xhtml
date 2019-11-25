@@ -9,7 +9,7 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="维修责任人设置"/>
+                <p:outputLabel class="pageTitle" value="#{msg.AssetOwnerSetting}"/>
             </div>
 
             <div class="ui-g-12">
@@ -17,13 +17,13 @@
                     <!--
                     <p:ajax event="tabChange" listener="#{measureAssetListController.onTabChange}" oncomplete="openAssetViewWindow(xhr, status, args)"/>
                     -->
-                    <p:tab title="设备责任人设置" id="assetOwnerSetting">
+                    <p:tab title="#{msg.EquipmentOwnerSettings}" id="assetOwnerSetting">
                         <ui:include src="setAssetOwners.xhtml"/>
                     </p:tab>
-                    <p:tab title="设备类型责任人设置" id="assetGroupOwnerSetting">
+                    <p:tab title="#{msg.EquipmentTypeOwnerSettings}" id="assetGroupOwnerSetting">
                         <ui:include src="assetGroupOwnersList.xhtml"/>
                     </p:tab>
-                    <p:tab title="科室责任人设置" id="departmentOwnerSetting">
+                    <p:tab title="#{msg.DepartmentOwnerSettings}" id="departmentOwnerSetting">
                         <ui:include src="departmentOwnersList.xhtml"/>
                     </p:tab>
                 </p:tabView>

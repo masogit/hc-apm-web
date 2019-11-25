@@ -32,11 +32,17 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.clinicalDeptName}</label>
-                        <p:selectOneMenu id="clinicalDeptName" value="#{assetOwnerSettingController.queryAsset.clinicalDeptUID}">
+                        <p:autoComplete id="deptOrg" dropdown="true" value="#{assetOwnerSettingController.deptOrg}"
+                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetOwnerSettingController.autoCompleteDept}"
+                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
+                            <p:ajax event="itemSelect" listener="#{assetOwnerSettingController.handleSelectDept}" update="AssetsPickList" />
+                            <p:ajax listener="#{assetOwnerSettingController.handleSelectDept}" update="AssetsPickList" />
+                        </p:autoComplete>
+                        <!--<p:selectOneMenu id="clinicalDeptName" value="#{assetOwnerSettingController.queryAsset.clinicalDeptUID}">
                             <p:ajax  listener="#{assetOwnerSettingController.getQueryAssetsList()}" update="AssetsPickList" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}"/>
-                        </p:selectOneMenu>
+                        </p:selectOneMenu>-->
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">

@@ -65,7 +65,7 @@ public class ContractItemImportController {
 
             int maxRowNum = contractItemImportService.EXCEL_CONTRACTITEM_HEADER_ROW + 5000;
             if(doc.exceedMaxRowNum(contractItemImportService.SHEET_CONTRACTITEM, maxRowNum)){
-                WebUtil.addErrorMessage("导入Excel中数据行数最多5000条，请分批导入！");
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
                 return;
             }
 
@@ -76,10 +76,10 @@ public class ContractItemImportController {
             errorContractItemList = contractItemImportService.filterErrorRecords(importContractItemMapList);
 
             if(!errorContractItemList.isEmpty()){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "导入完成,注意有导入失败的记录！", "总共有"+errorContractItemList.size()+"条记录处理失败！");
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+errorContractItemList.size()+WebUtil.getMessage("RecordsOfFailure"));
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }else {
-                WebUtil.addSuccessMessage("导入完成");
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ImportComplete"));
             }
 
         } catch (IOException ex) {

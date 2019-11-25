@@ -11,7 +11,7 @@
         <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{workflowConfigController.onSelect()}" width="1000" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{workflowConfigController.CRUDActionName} #{msg.SystemConfig}">
             <h:form id="V2_WorkflowConfigEditForm">
                 <h:panelGroup id="display">
-                    <p:fieldset id="basic" legend="公共配置">
+                    <p:fieldset id="basic" legend="#{msg.CommonConfiguration}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                             <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}*</label>
@@ -32,7 +32,7 @@
                                 </p:overlayPanel>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
-                                <label class = "label">备件审核是否需要签名?</label>
+                                <label class = "label">#{msg.SignatureRequiredForPartApproval}</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.partsNeedSign}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
@@ -77,10 +77,10 @@
                         </p:panelGrid>
                     </p:fieldset>
 
-                    <p:fieldset id="wo" legend="维修配置">
+                    <p:fieldset id="wo" legend="#{msg.RepairConfiguration}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                             <h:panelGroup >
-                                <label class="label">维修#{msg.dispatchUserName}</label>
+                                <label class="label">#{msg.Repair}#{msg.dispatchUserName}</label>
                                 <p:selectOneMenu id="dispatchUserId" value="#{workflowConfigController.selected.dispatchUserId}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
                                     <p:ajax process="@this" />
@@ -89,7 +89,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">维修#{msg.dispatchUserName}2</label>
+                                <label class="label">#{msg.Repair}#{msg.dispatchUserName}2</label>
                                 <p:selectOneMenu id="dispatchUserId2" value="#{workflowConfigController.selected.dispatchUserId2}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
                                     <p:ajax process="@this" />
@@ -122,120 +122,120 @@
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
-                                <label class = "label">系统自动验收(天)</label>
+                                <label class = "label">#{msg.SystemAutomaticAcceptance}</label>
                                 <p:inputNumber id="autoAckDays" value="#{workflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
-                                <label class = "label">是否自动派工?</label>
+                                <label class = "label">#{msg.AutomaticallySendWorkers}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isAutoEnabled}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
-                                <label class = "label">是否允许抢单?</label>
+                                <label class = "label">#{msg.WorkorderCompetitionAllowed}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isTakeOrderEnabled}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
-                                <label class = "label">是否人工派工?</label>
+                                <label class = "label">#{msg.ManuallySendWorkers}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isManualEnabled}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup >
-                                <label class = "label">工单完工不需要验收?</label>
+                                <label class = "label">#{msg.NoAcceptanceRequired}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.autoAck}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup >
-                                <label class = "label">工单完工自动关单?</label>
+                                <label class = "label">#{msg.AutomaticallyClosed}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.autoClose}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup >
-                                <label class = "label">是否必须评价?</label>
+                                <label class = "label">#{msg.RatingRequired}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.ratingRequired}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
-                                <label class = "label">无备件自动关单?</label>
+                                <label class = "label">#{msg.AutomaticallyClosedForNoPart}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.closeWithoutParts}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup >
-                                <label class = "label">是否工时必填?</label>
+                                <label class = "label">#{msg.ManhoursRequired}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.hourRequired}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
 
                             <h:panelGroup rendered="true">
-                                <label class = "label">不允许临时账号?</label>
+                                <label class = "label">#{msg.NoTemporaryAccountAllowed}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isTempUserReport}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
-                                <label class = "label">是否电话报修?</label>
+                                <label class = "label">#{msg.TelephoneBasedRequestForRepairRequired}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isTelReport}">
                                     <p:ajax process="@this" update="V2_WorkflowConfigEditForm:wo" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup id="telStart" rendered="#{!!workflowConfigController.selected.isTelReport}">
-                                <label class = "label">电话报修开始时间</label>
+                                <label class = "label">#{msg.TelephoneBasedRequestStartTime}</label>
                                 <p:calendar value="#{workflowConfigController.telRepStart}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
                             </h:panelGroup >
                             <h:panelGroup id="telEnd" rendered="#{!!workflowConfigController.selected.isTelReport}">
-                                <label class = "label">电话报修结束时间</label>
+                                <label class = "label">#{msg.TelephoneBasedRequestEndTime}</label>
                                 <p:calendar value="#{workflowConfigController.telRepEnd}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
                             </h:panelGroup >
 
                             <h:panelGroup>
-                                <label class="label">工单人工费用(元/小时)</label>
+                                <label class="label">#{msg.WorkorderRelatedLaborCost}(#{msg.rmb_hour})</label>
                                 <p:inputNumber id="woManHourPrice" value="#{workflowConfigController.selected.woManhourPrice}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>
                             <!-- 紧急工单配置-->
                             <h:panelGroup>
-                                <label class="label">紧急工单#{msg.timeoutDispatch}</label>
+                                <label class="label">#{msg.EmergencyWorkorder}#{msg.timeoutDispatch}</label>
                                 <p:inputNumber id="emergencyTimeoutDispatch" value="#{workflowConfigController.selected.emergencyTimeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">紧急工单#{msg.timeoutAccept}</label>
+                                <label class="label">#{msg.EmergencyWorkorder}#{msg.timeoutAccept}</label>
                                 <p:inputNumber id="emergencyTimeoutAccept" value="#{workflowConfigController.selected.emergencyTimeoutAccept}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">紧急工单#{msg.timeoutClose}</label>
+                                <label class="label">#{msg.EmergencyWorkorder}#{msg.timeoutClose}</label>
                                 <p:inputNumber id="emergencyTimeoutClose" value="#{workflowConfigController.selected.emergencyTimeoutClose}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">紧急工单#{msg.maxMessageCount}</label>
+                                <label class="label">#{msg.EmergencyWorkorder}#{msg.maxMessageCount}</label>
                                 <p:inputNumber id="emergencyMaxMessageCount" value="#{workflowConfigController.selected.emergencyMaxMessageCount}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class = "label">验收是否需要签名?</label>
+                                <label class = "label">#{msg.SignatureRequiredForAcceptance}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.ackNeedSign}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup>
-                                <label class = "label">抢单模式不发送消息?</label>
+                                <label class = "label">#{msg.NoInformation}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.notSendMsgInTakeOrderMode}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
@@ -243,10 +243,10 @@
                         </p:panelGrid>
                     </p:fieldset>
 
-                    <p:fieldset id="pm" legend="保养配置">
+                    <p:fieldset id="pm" legend="#{msg.MaintenanceConfiguration}">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                         <h:panelGroup >
-                            <label class="label">保养#{msg.dispatchUserName}</label>
+                            <label class="label">#{msg.staff_tile_preventive}#{msg.dispatchUserName}</label>
                             <p:selectOneMenu id="pmDispatchUserId" value="#{workflowConfigController.selected.pmDispatchUserId}"
                                              required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -254,7 +254,7 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class="label">保养#{msg.dispatchUserName}2</label>
+                            <label class="label">#{msg.staff_tile_preventive}#{msg.dispatchUserName}2</label>
                             <p:selectOneMenu id="pmDispatchUserId2" value="#{workflowConfigController.selected.pmDispatchUserId2}"
                                              required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -262,31 +262,31 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="true">
-                            <label class = "label">二级简化保养?</label>
+                            <label class = "label">#{msg.Level2SimplifiedMaintenance}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmSimplify}"/>
                         </h:panelGroup >
                         <h:panelGroup rendered="true">
-                            <label class = "label">是否自动派工?</label>
+                            <label class = "label">#{msg.AutomaticallySendWorkers}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmAutoEnabled}"/>
                         </h:panelGroup >
                         <h:panelGroup rendered="true">
-                            <label class = "label">是否允许抢单?</label>
+                            <label class = "label">#{msg.WorkorderCompetitionAllowed}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmTakeOrderEnabled}"/>
                         </h:panelGroup >
                         <h:panelGroup rendered="true">
-                            <label class = "label">是否人工派工?</label>
+                            <label class = "label">#{msg.ManuallySendWorkers}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmManualEnabled}"/>
                         </h:panelGroup >
                         <h:panelGroup>
-                            <label class="label">保养提醒提前天数</label>
+                            <label class="label">#{msg.PriorDaysOfMaintenanceReminder}</label>
                             <p:inputNumber id="pmReminderTime" value="#{workflowConfigController.selected.pmReminderTime}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">保养提醒次数</label>
+                            <label class="label">#{msg.FrequencyOfMaintenanceReminder}</label>
                             <p:inputNumber id="pmReminderTimes" value="#{workflowConfigController.selected.pmReminderTimes}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">保养工单人工费用(元/小时)</label>
+                            <label class="label">#{msg.MaintenanceRelatedLaborCost}(#{msg.rmb_hour})</label>
                             <p:inputNumber id="pmManHourPrice" value="#{workflowConfigController.selected.pmManhourPrice}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
                         <h:panelGroup >
@@ -296,10 +296,10 @@
                     </p:panelGrid>
                 </p:fieldset>
 
-                    <p:fieldset id="measure" legend="计量配置">
+                    <p:fieldset id="measure" legend="#{msg.MeasurementConfiguration}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                             <h:panelGroup >
-                                <label class="label">计量#{msg.dispatchUserName}</label>
+                                <label class="label">#{msg.staff_tile_meter}#{msg.dispatchUserName}</label>
                                 <p:selectOneMenu id="measureDispatchUserId" value="#{workflowConfigController.selected.measureDispatchUserId}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -307,7 +307,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">计量#{msg.dispatchUserName}2</label>
+                                <label class="label">#{msg.staff_tile_meter}#{msg.dispatchUserName}2</label>
                                 <p:selectOneMenu id="measureDispatchUserId2" value="#{workflowConfigController.selected.measureDispatchUserId2}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -316,28 +316,28 @@
                             </h:panelGroup>
 
                             <h:panelGroup rendered="true">
-                                <label class = "label">是否自动派工?</label>
+                                <label class = "label">#{msg.AutomaticallySendWorkers}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isMeasureAutoEnabled}"/>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
-                                <label class = "label">是否允许抢单?</label>
+                                <label class = "label">#{msg.WorkorderCompetitionAllowed}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isMeasureTakeOrderEnabled}"/>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
-                                <label class = "label">是否人工派工?</label>
+                                <label class = "label">#{msg.ManuallySendWorkers}?</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isMeasureManualEnabled}"/>
                             </h:panelGroup >
                             <h:panelGroup>
-                                <label class="label">计量工单人工费用(元/小时)</label>
+                                <label class="label">#{msg.MeasurementRelatedLaborCost}(#{msg.rmb_hour})</label>
                                 <p:inputNumber id="measureManHourPrice" value="#{workflowConfigController.selected.measureManhourPrice}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
-                    <p:fieldset id="ac" legend="设备调剂配置">
+                    <p:fieldset id="ac" legend="#{msg.EquipmentSwapConfiguration}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                             <h:panelGroup rendered="true">
-                                <label class="label">调剂中心</label>
+                                <label class="label">#{msg.SwapCenter}</label>
                                 <p:selectOneMenu id="deptForSharedAsset" value="#{workflowConfigController.selected.deptForSharedAsset}">
                                     <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -345,23 +345,23 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
-                                <label class = "label">是否计算借用工时</label>
+                                <label class = "label">#{msg.WhetherOrNotToCalculateTheManhours}</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableLeaseManHour}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup>
-                                <label class="label">借用工时默认值</label>
+                                <label class="label">#{msg.RentManhourDefault}</label>
                                 <p:inputNumber id="defaultLeaseManHour" value="#{workflowConfigController.selected.defaultLeaseManHour}" minValue="0.0" decimalPlaces="1"/>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
-                                <label class = "label">是否计算归还工时</label>
+                                <label class = "label">#{msg.CalculateReturnTheManhours}</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.enableReturnManHour}">
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup>
-                                <label class="label">归还工时默认值</label>
+                                <label class="label">#{msg.ReturnManhourDefault}</label>
                                 <p:inputNumber id="defaultReturnManHour" value="#{workflowConfigController.selected.defaultReturnManHour}" minValue="0.0" decimalPlaces="1"/>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -372,7 +372,7 @@
                             </h:panelGroup >
 
                             <h:panelGroup>
-                                <label class = "label">自动确认时间（分钟）</label>
+                                <label class = "label">#{msg.AutomaticConfirmationTime}</label>
                                 <p:inputNumber id="shareAutoConfirm" value="#{workflowConfigController.selected.shareAutoConfirm}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
@@ -387,12 +387,12 @@
                             </h:panelGroup>-->
 
                             <h:panelGroup>
-                                <label class="label">开始时间</label>
+                                <label class="label">#{msg.StartTime}</label>
                                 <p:calendar id="periodStart" value="#{workflowConfigController.selected.periodStart}" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" defaultHour="00" defaultMinute="00" defaultSecond="00"/>
                             </h:panelGroup>
 
                             <h:panelGroup>
-                                <label class="label">结束时间</label>
+                                <label class="label">#{msg.EndTime}</label>
                                 <p:calendar id="periodEnd" value="#{workflowConfigController.selected.periodEnd}" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" defaultHour="23" defaultMinute="59" defaultSecond="59"/>
                             </h:panelGroup>
 
@@ -413,10 +413,10 @@
                         </p:panelGrid>
                     </p:fieldset>
 
-                    <p:fieldset id="other" legend="其他配置">
+                    <p:fieldset id="other" legend="#{msg.OtherConfiguration}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                             <h:panelGroup >
-                                <label class="label">资产创建审核人</label>
+                                <label class="label">#{msg.AssetCreationApprover}</label>
                                 <p:selectOneMenu id="approveUserList" value="#{workflowConfigController.selected.assetApprover}">
                                     <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -424,38 +424,38 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
-                                <label class = "label">维保/质保提醒提前天数</label>
+                                <label class = "label">#{msg.PriorDaysOfMaintenance}</label>
                                 <p:inputNumber id="warrantyRemindDays" value="#{workflowConfigController.selected.warrantyRemindDays}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
-                                <label class = "label">维保/质保提醒次数</label>
+                                <label class = "label">#{msg.FrequencyOfMaintenance}</label>
                                 <p:inputNumber id="warrantyRemindTimes" value="#{workflowConfigController.selected.warrantyRemindTimes}" minValue="0" decimalPlaces="0">
-                                    <p:ajax process="@this" />  
+                                    <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup>
-                                <label class = "label">计量提醒提前天数</label>
+                                <label class = "label">#{msg.PriorDaysOfMeasurementReminder}</label>
                                 <p:inputNumber id="measuringRemindDays" value="#{workflowConfigController.selected.measuringRemindDays}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup>
-                                <label class = "label">计量提醒次数</label>
+                                <label class = "label">#{msg.FrequencyOfMeasurementReminder}</label>
                                 <p:inputNumber id="measuringReminderTimes" value="#{workflowConfigController.selected.measuringReminderTimes}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
-                                <label class = "label">到货安装是否需要核对入库</label>
+                                <label class = "label">#{msg.WhetherOrNotToCheck}</label>
                                 <p:selectBooleanCheckbox value="#{workflowConfigController.selected.needInstorageCheck}">
                                 	<p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
 
                             <h:panelGroup>
-                                <label class="label">三码配置</label>
+                                <label class="label">#{msg.ThreeCodeConfiguration}</label>
                                 <p:selectOneMenu value="#{workflowConfigController.selected.assetCodeConfig}">
                                     <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -472,7 +472,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup>
-                                <label class ="label">初始流水号</label>
+                                <label class ="label">#{msg.InitialSerialNumber}</label>
                                 <p:selectOneMenu value="#{workflowConfigController.selected.format}" disabled="false">
                                     <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -481,7 +481,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup style="display: #{(workflowConfigController.selected.generateMethod == 1) or (workflowConfigController.selected.generateMethod == 3) ? 'auto' : 'none'}">
-                                <label class ="label" >资产编号前缀(最多三位)</label>
+                                <label class ="label" >#{msg.AssetIDPrefix}</label>
                                 <p:inputText id="prefix" value="#{workflowConfigController.selected.prefix}" maxlength="3" ><p:ajax process="@this"></p:ajax></p:inputText>
                             </h:panelGroup>
 
