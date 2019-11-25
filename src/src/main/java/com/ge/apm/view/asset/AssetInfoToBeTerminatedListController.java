@@ -233,7 +233,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
             batchUpdateAssets.removeIf(i -> validateTermination(i));
 
         } catch (Exception e) {
-            WebUtil.addErrorMessage("文件上传失败!");
+            WebUtil.addErrorMessage(WebUtil.getMessage("FileUploadFailed"));
         }
     }
 
@@ -520,18 +520,18 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public boolean validateTermination(AssetInfo assetInfo) {
         if (assetInfo.getStatus() != 4) {
-            WebUtil.addErrorMessage(String.format("设备[%s]未处于待报废状态，不能报废！", assetInfo.getName()));
+            WebUtil.addErrorMessage(String.format(WebUtil.getMessage("EquipmentCannotBeTerminated"), assetInfo.getName()));
             return true;
         }
 
         int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
         if (workOrdersNum > 0) {
-            WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
+            WebUtil.addErrorMessage(String.format(WebUtil.getMessage("UnfinishedWorkorderCandBeTerminated"), assetInfo.getName()));
             return true;
         }
 
         if (aiMgrService.isInDispenceCenter(assetInfo)) {
-            WebUtil.addErrorMessageWithParams("操作失败，设备名称[%s]，设备编号[%s]为在借中的调剂设备，请先归还！", assetInfo.getName(), assetInfo.getDepartNum());
+            WebUtil.addErrorMessageWithParams(String.format(WebUtil.getMessage("SwappedInRentPleaseReturnItFirst"), assetInfo.getName(), assetInfo.getDepartNum()));
             return true;
         }
         return false;

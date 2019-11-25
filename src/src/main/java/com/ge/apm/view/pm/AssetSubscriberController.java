@@ -19,6 +19,7 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -327,7 +328,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	}
 	//如果是新增，只有后台itadmin进来 可以修改。 如果是修改 全灰色
 	public Boolean subscribe(){
-		if(this.getCRUDActionName().equals("修改")){
+		if(this.getCRUDActionName().equals(WebUtil.getMessage("Edit"))){
 			return true; //不可修改
 		}else if(userContextService.hasRole("ITAdmin")){
 			return false;
@@ -362,9 +363,9 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	public void saveAssetSub(){
         MessageSubscriber msgsub= null;
         List<MessageSubscriber> msgsubList = new ArrayList<MessageSubscriber>();
-		if(this.getCRUDActionName().equals("新增")) {
+		if(this.getCRUDActionName().equals(WebUtil.getMessage("Create"))) {
 			if(targetAssets.isEmpty()){
-				WebUtil.addErrorMessage("设备没有选取,请务必选择设备");
+				WebUtil.addErrorMessage(WebUtil.getMessage("EquipmentMustBeSelectedErrMsg"));
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				msgsubList = new ArrayList<MessageSubscriber>();
 				return;
@@ -372,8 +373,12 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			/* 如果加上合同等消息推送 替换成这个if
 			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
 					selected.getContractDueHit()==false && selected.getMeterHit()==false && selected.getIsReceiveTimeoutMsg()==false){*/
-				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getIsReceiveTimeoutMsg()==false && selected.getMeterHit()==false){
-				WebUtil.addErrorMessage("消息设置不可为空");
+				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getIsReceiveTimeoutMsg()==false ){
+					if(LocaleHolder.getLocale().toString().equalsIgnoreCase("zh") && selected.getMeterHit()==false){
+						WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
+					}else{
+						WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
+					}
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				msgsubList = new ArrayList<MessageSubscriber>();
 				return;
@@ -381,7 +386,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 
 			if(selected.getIsReceiveTimeoutMsg()){
 				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
-					WebUtil.addErrorMessage("务必选择紧急程度");
+					WebUtil.addErrorMessage(WebUtil.getMessage("BeSureToSelectPriority"));
 					RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 					msgsubList = new ArrayList<MessageSubscriber>();
 					return;
@@ -419,18 +424,18 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			List<Integer> idList=msgsubList.stream().map(item->item.getAssetId()).collect(toList());
 			List<MessageSubscriber> msglist = dao.getMsgListByAssetIdAndUserId(idList,selected.getSubscribeUserId());
 			if(msglist.size()>0){
-				WebUtil.addErrorMessage("不能重复创建相同设备的消息订阅");
+				WebUtil.addErrorMessage(WebUtil.getMessage("DuplicateCreateSubscriptionsErrMsg"));
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				return;
 			}
 			dao.save(msgsubList);
-			WebUtil.addSuccessMessage("成功创建设备消息订阅");
+			WebUtil.addSuccessMessage(WebUtil.getMessage("EquipmentSubscriptionSuccessTip"));
 
 			assetName=null;
 		}else{
 			if(selected.getIsReceiveTimeoutMsg()){
 				if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false){
-					WebUtil.addErrorMessage("务必选择紧急程度");
+					WebUtil.addErrorMessage(WebUtil.getMessage("BeSureToSelectPriority"));
 					RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 					return;
 				}
@@ -439,7 +444,7 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 			* if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&
 					selected.getContractDueHit()==false && selected.getMeterHit()==false)*/
 			if(selected.getLevel0()==false &&selected.getLevel1()==false && selected.getLevel2()==false &&selected.getMeterHit()==false){
-				WebUtil.addErrorMessage("消息设置不可为空");
+				WebUtil.addErrorMessage(WebUtil.getMessage("MessageSettingsCannotBeEmpty"));
 				RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 				return;
 			}
@@ -493,11 +498,11 @@ public class AssetSubscriberController  extends JpaCRUDController<MessageSubscri
 	public boolean requiredCheck(){
 		/*必须要选择紧急程度*/
 		if(!level0 && !level1 && !level2){
-			WebUtil.addErrorMessage("务必选择紧急程度");
+			WebUtil.addErrorMessage(WebUtil.getMessage("BeSureToSelectPriority"));
 			RequestContext.getCurrentInstance().addCallbackParam("priority", true);
 			return false;
 		}
-		if (targetAssets.isEmpty() && this.getCRUDActionName().equals("新增")) {
+		if (targetAssets.isEmpty() && this.getCRUDActionName().equals(WebUtil.getMessage("Create"))) {
 			WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
 			RequestContext.getCurrentInstance().addCallbackParam("addAsset", true);
 			return false;

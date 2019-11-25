@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import webapp.framework.web.WebUtil;
 
 /**
  *
@@ -85,7 +86,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
                 if (!StringUtils.isEmpty(uuid)) {
                     asset = assetDao.findByUid(uuid);
-                    if (asset == null || !asset.getTenantUID().equals(selectedOrgToImport.getTenantUID())) throw new Exception("无效UUID");
+                    if (asset == null || !asset.getTenantUID().equals(selectedOrgToImport.getTenantUID())) throw new Exception(WebUtil.getMessage("InvalidUUID"));
 
                     //save old data to compare later
                     map.put(AssetFileImportSupportingService.OLD_QRCODE_KEY, asset.getQrCode());
@@ -203,7 +204,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
             }catch(Exception e){
                 logger.error(e.getMessage(), e);
-                throw new Exception("第"+dataRow+"行数据错误:" + e.getMessage());
+                throw new Exception(WebUtil.getMessage("RowStart")+dataRow+WebUtil.getMessage("DataError") + e.getMessage());
             }
 
 

@@ -8,30 +8,30 @@
 
 <ui:composition>
     <!--新增 标签关注/修改 标签关注-->
-    <p:dialog class="acl1" id="AssetSubscribEditDlg" height="550" width="1300" widgetVar="AssetSubscribEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSubscriberController.CRUDActionName}设备关注">
+    <p:dialog class="acl1" id="AssetSubscribEditDlg" height="550" width="1300" widgetVar="AssetSubscribEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSubscriberController.CRUDActionName} #{msg.EquipmentFocus}">
         <h:form id="AssetSubscribEditForm">
             <h:panelGroup id="display" rendered="#{assetSubscriberController.selected != null}">
 
                    <h:panelGroup >
-                       <label class="label">关注人</label>
-                       <p:selectOneMenu disabled="#{assetSubscriberController.subscribe()}" value="#{assetSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">
+                       <label class="label">#{msg.subscriber}</label>
+                       <p:selectOneMenu disabled="#{assetSubscriberController.subscribe()}" value="#{assetSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="#{msg.SubscriberCannotBeEmpty}">
                            <p:ajax  event="change" update="@(.tree) @(.pickListCls) scriTab:AssetSubscribEditForm" listener="#{assetSubscriberController.changeSubId()}"></p:ajax>
                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                            <f:selectItems value="#{assetSubscriberController.tenantUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                        </p:selectOneMenu>
                    </h:panelGroup>
 
-                <p:fieldset legend="已选设备" rendered="#{assetSubscriberController.CRUDActionName.equals('修改')}" >
+                <p:fieldset legend="#{msg.SelectedEquipment}" rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Edit)}" >
                     <h:panelGroup>
                         <h:panelGrid columns="2">
-                            <h:outputLabel class="label">设备名:</h:outputLabel>
+                            <h:outputLabel class="label">#{msg.EquipmentName2}:</h:outputLabel>
                             <h:outputLabel
                                            value="#{assetSubscriberController.getSelectedAssetName()}"></h:outputLabel>
                         </h:panelGrid>
                     </h:panelGroup>
                 </p:fieldset>
 
-                <p:fieldset rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}" legend="设备选择">
+                <p:fieldset rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}" legend="#{msg.EquipmentSelection}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup  >
                         <!--设备分类-->
@@ -62,7 +62,7 @@
                             </p:overlayPanel>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">所属科室</label>
+                            <label class="label">#{msg.clinicalDeptId}</label>
                             <p:selectOneMenu id="clinicalDeptName" value="#{assetSubscriberController.queryAsset1.clinicalDeptId}">
                                 <p:ajax  listener="#{assetSubscriberController.getQueryAssetsList()}" update="AssetsPickList" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -71,11 +71,11 @@
                         </h:panelGroup>
                 </p:panelGrid>
                     <!--<h:panelGroup gaolei>-->
-                <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals('新增')}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
+                <p:pickList rendered="#{assetSubscriberController.CRUDActionName.equals(msg.Create)}" class="pickListCls" id="AssetsPickList" value="#{assetSubscriberController.availableAssets}" var="item"
                             itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true" showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
-                            required="false" requiredMessage="已选设备 #{msg.ValidationRequire}">
-                    <f:facet name="sourceCaption">待选设备</f:facet>
-                    <f:facet name="targetCaption">已选设备</f:facet>
+                            required="false" requiredMessage="#{msg.SelectedEquipment} #{msg.ValidationRequire}">
+                    <f:facet name="sourceCaption">#{msg.EquipmentToBeSelected}</f:facet>
+                    <f:facet name="targetCaption">#{msg.SelectedEquipment}</f:facet>
                     <p:ajax event="transfer" listener="#{assetSubscriberController.onAssetsTransfer}" />
                     <p:column style="float: left;width:30%;">
                         <h:outputText value="#{item.name}" />
@@ -92,11 +92,11 @@
                 </p:pickList>
                     <!--</h:panelGroup>-->
                 </p:fieldset>
-                <p:fieldset legend="消息设置">
+                <p:fieldset legend="#{msg.MessageSettings}">
                     <h:panelGrid columns="5" id="grid">
                         <h:panelGroup>
                             <h:panelGrid columns="2">
-                                <p:outputLabel value="维修事件: "/>
+                                <p:outputLabel value="#{msg.RepairEvent}: "/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>
@@ -122,7 +122,7 @@
                                 <p:selectBooleanCheckbox class="ck5" value="#{assetSubscriberController.selected.isReceiveTimeoutMsg}">
                                     <p:ajax update="@(.ck5)"></p:ajax>
                                 </p:selectBooleanCheckbox>
-                                <p:outputLabel value="超时消息"/>
+                                <p:outputLabel value="#{fieldMsg.fieldValue('casePriority','4')}"/>
                             </h:panelGrid>
                         </h:panelGroup>
                     </h:panelGrid>
@@ -156,10 +156,10 @@
 
 
                    -->
-                    <h:panelGrid columns="2">
+                    <h:panelGrid columns="2" rendered = "#{userContextService.isLocale()}">
                         <h:panelGroup>
                             <h:panelGrid columns="2">
-                                <p:outputLabel value="计量事件:"/>
+                                <p:outputLabel value="#{msg.MeasurementEvent}:"/>
                             </h:panelGrid>
                         </h:panelGroup>
                         <h:panelGroup>

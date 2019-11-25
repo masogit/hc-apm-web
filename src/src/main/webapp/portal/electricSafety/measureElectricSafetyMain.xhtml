@@ -9,16 +9,16 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="电气安全数据导入"/>
+                <p:outputLabel class="pageTitle" value="#{msg.ElectricSafetyDataImport}"/>
             </div>
 
             <div class="ui-g-12 card ">
                 <p:tabView id="measureElectricSafetyTab">
                     <p:ajax event="tabChange"/>
-                    <p:tab title="查询" id="showList">
+                    <p:tab title="#{msg.Search}" id="showList">
                         <ui:include src="measureElectricSafetyList.xhtml"/>
                     </p:tab>
-                    <p:tab title="导入" id="resultImport">
+                    <p:tab title="#{msg.Import}" id="resultImport">
                         <ui:include src="measureElectricSafetyImport.xhtml"/>
                     </p:tab>
                 </p:tabView>

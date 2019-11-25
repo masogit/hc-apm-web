@@ -15,4 +15,10 @@ public interface MsgRepository extends GenericRepository<MsgConfig> {
     @Query(value="select mc.msg_name from msg_tenant mt ,msg_config mc where  mc.id = msgconfig_id and tenant_uid = ?1",nativeQuery = true)
     public List<String> findByTenantUid(String tenantUid);
 
+    @Query(value="select mc.msg_name_En from msg_tenant mt ,msg_config mc where  mc.id = msgconfig_id and tenant_uid = ?1",nativeQuery = true)
+    public List<String> findByTenantUidEn(String tenantUid);
+
+    @Query(value="select * from msg_tenant mt ,msg_config mc where  mc.id = msgconfig_id and tenant_uid = ?1",nativeQuery = true)
+    public List<MsgConfig> findByTenantUid2(String tenantUid);
+
 }

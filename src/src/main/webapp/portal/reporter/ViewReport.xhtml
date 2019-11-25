@@ -42,7 +42,7 @@
                                     <c:if test="#{fieldItem.component eq 'Switch'}" >
                                         <h:panelGroup>
                                             <label class="label">#{fieldItem.label}</label>
-                                            <p:selectBooleanButton onLabel="是" offLabel="否"  value="#{editReportController.tableValue[fieldItem.key]}"  />
+                                            <p:selectBooleanButton onLabel="#{msg.True2Yes}" offLabel="#{msg.False2No}"  value="#{editReportController.tableValue[fieldItem.key]}"  />
                                         </h:panelGroup>
                                     </c:if>
                                     <c:if test="#{fieldItem.component eq 'TextArea'}" >

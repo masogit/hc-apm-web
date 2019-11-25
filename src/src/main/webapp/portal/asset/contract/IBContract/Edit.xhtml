@@ -53,8 +53,8 @@
 
                         <h:panelGroup id="pmCount">
                         <h:panelGroup rendered="#{iBAssetConstractController.selected.contractType == 5}">
-                            <label class="label">保养次数*</label>
-                            <p:inputNumber decimalPlaces="0" value="#{iBAssetConstractController.pmCount}" required="true" requiredMessage="保养次数 #{msg.ValidationRequire}"/>
+                            <label class="label">#{msg.FrequencyOfMaintenance}*</label>
+                            <p:inputNumber decimalPlaces="0" value="#{iBAssetConstractController.pmCount}" required="true" requiredMessage="#{msg.FrequencyOfMaintenance} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.AssetContractAmount}*</label>
@@ -64,7 +64,7 @@
                     </p:panelGrid>
                     <p:panel  id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">
                         <h:panelGroup  style="max-width:50px;" rendered="#{iBAssetConstractController.isCreatAction() and iBAssetConstractController.selected.objectId==null}">
-                            <label class="label">合同附件*</label>
+                            <label class="label">#{msg.AssetContractAttachment}*</label>
                             <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" required="true" fileUploadListener="#{iBAssetConstractController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:40%" process="@this" multiple="false" sizeLimit="10000000" update=":AssetContractEditForm:upload" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}" />
                             <p:growl id="messages" showDetail="true" />
                         </h:panelGroup>

@@ -179,12 +179,12 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
     public void saveChange() {
 
         if(assetGroupID == null){
-            WebUtil.addErrorMessage("请设置设备分类");
+            WebUtil.addErrorMessage(WebUtil.getMessage("PleaseSetTheEquipmentClassification"));
             return;
         }
 
         if(woOwner == null && woOwner2 == null && woOwner3 == null && pmOwner == null){
-            WebUtil.addErrorMessage("请设置维修负责人或保养负责人");
+            WebUtil.addErrorMessage(WebUtil.getMessage("PleaseSetTheRepairOwnerOrPMOwner"));
             return;
         }
 
@@ -219,7 +219,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
         this.resetOwnerConfig();
         this.assetGroupID = null;
         this.assetGroupSecondaryID = null;
-        WebUtil.addErrorMessage("保存成功");
+        WebUtil.addErrorMessage(WebUtil.getMessage("SaveSuccess"));
     }
 
     //选择院区树后的动作
@@ -268,7 +268,7 @@ public class AssetGroupOwnerSettingController extends GenericCRUDUUIDController<
     public void deleteOwerConfig(){
         dao.delete(this.selected);
         this.selected = null;
-        WebUtil.addErrorMessage("删除成功");
+        WebUtil.addErrorMessage(WebUtil.getMessage("DeleteSuccess"));
     }
 
     //新增修改时选择设备分类时的动作（得到责任人信息和设备分类2的数据）

@@ -9,19 +9,19 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="维修工单报表导出"/>
+                <p:outputLabel class="pageTitle" value="#{msg.ExportRepairWorkorderReports}"/>
             </div>
 
             <div class="ui-g-12 card ">
                 <p:tabView id="woTab">
                     <p:ajax event="tabChange"/>
-                    <p:tab title="工单报表导出" id="export">
+                    <p:tab title="#{msg.ExportWorkorderReports}" id="export">
                         <ui:include src="export.xhtml"/>
                     </p:tab>
-                    <p:tab title="工单备件报表导出" id="woDetailExport">
+                    <p:tab title="#{msg.ExportWorkorderPartReports}" id="woDetailExport">
                         <ui:include src="woDetailExport.xhtml"/>
                     </p:tab>
-                    <p:tab title="工单报表统计" id="statistics">
+                    <p:tab title="#{msg.WorkorderReportStatistics}" id="statistics">
                         <ui:include src="statistics.xhtml"/>
                     </p:tab>
                 </p:tabView>

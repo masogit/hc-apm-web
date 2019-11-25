@@ -5,22 +5,22 @@
 
 		<div class="ui-g">
 			<div class="ui-g-12 card cardTitle">
-				<p:outputLabel class="pageTitle" value="盘点详情" />
+				<p:outputLabel class="pageTitle" value="#{msg.InventoryDetails}" />
 			</div>
 
 			<div class="ui-g-12 card ">
 				<p:tabView id="inventoryOrderDetailAssetInfoTab" activeIndex="0">
 					<p:ajax event="tabChange"/>
-					<p:tab title="未盘点" id="tab0">
+					<p:tab title="#{msg.NonInventory}" id="tab0">
 						<ui:include src="inventoryOrderDetailAssetInfo.xhtml" />
 					</p:tab>
-					<p:tab title="已盘点" id="tab1">
+					<p:tab title="#{msg.Inventorized}" id="tab1">
 						<ui:include src="inventoryOrderDetailAssetInfo2.xhtml" />
 					</p:tab>
-					<p:tab title="无台账" id="tab2">
+					<p:tab title="#{msg.NonLedger}" id="tab2">
 						<ui:include src="inventoryOrderDetailAssetInfo3.xhtml" />
 					</p:tab>
-					<p:tab title="有问题" id="tab3">
+					<p:tab title="#{msg.HasIssue}" id="tab3">
 						<ui:include src="inventoryOrderDetailAssetInfoIssue.xhtml" />
 					</p:tab>
 				</p:tabView>

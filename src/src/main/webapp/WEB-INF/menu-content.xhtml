@@ -2,8 +2,10 @@
 
     <div class="menu-content" tabindex="0">
         <pu:menu widgetVar="me">
-            <p:menuitem style=" font-size: 30" id="um01" value="#{msg.HomePage}" icon="&#xE871;" outcome="#{userContextService.userDefaultHomePage}" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('homePage')}"/>
 
+            <!--<p:menuitem style=" font-size: 30" id="um000" value="ChangeToEnglish" rendered="#{localeService.language eq 'zh'}" icon="language" url="#{request.requestURI}?locale=en"/>
+            <p:menuitem style=" font-size: 30" id="um001" value="切换成中文"  rendered="#{localeService.language eq 'en'}" icon="language" url="#{request.requestURI}?locale=zh"/>-->
+            <p:menuitem style=" font-size: 30" id="um01" value="#{msg.HomePage}" icon="&#xE871;" outcome="#{userContextService.userDefaultHomePage}" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('homePage')}"/>
             
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.accessContains('asset')}">
                 <!--<p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/List"/>-->
@@ -20,8 +22,8 @@
                 <p:menuitem id="um083" value="#{msg.Create}#{msg.BuildAsset}" outcome="/portal/asset/createAsset/RequestsList.xhtml" rendered="#{userContextService.accessContains('asset.create')}"/>
                 <p:menuitem value="资产审核" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.isAssetApprover()) and userContextService.accessContains('asset.audit')}"/>
                 <p:menuitem id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.accessContains('asset.batchImportData')}"/>
-                <p:menuitem id="um088" value="盘点工单" outcome="/portal/inventory/inventoryOrder.xhtml" rendered="#{userContextService.accessContains('asset.inventory')}"/>
-                <p:menuitem id="um089" value="报损模版管理" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContains('asset.scrapTempMgt')}"/>
+                <p:menuitem id="um088" value="#{msg.inventoryWorkorder}" outcome="/portal/inventory/inventoryOrder.xhtml" rendered="#{userContextService.accessContains('asset.inventory')}"/>
+                <p:menuitem id="um089" value="#{msg.ScrapTemplateManagement}" outcome="/portal/asset/template/List.xhtml" rendered="#{userContextService.accessContains('asset.scrapTempMgt')}"/>
             </p:submenu>
 
             <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.isHospitalUser() and userContextService.accessContains('assetAdjust')}">
@@ -42,23 +44,23 @@
                 <p:menuitem value="核对入库" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.needInstorageCheck() and userContextService.accessContains('install.check')}"/>
             </p:submenu>
             <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.accessContains('repair')}">
-                <p:menuitem id="um89" value="维修工单" outcome="/portal/workorder/repaireWorkOrder.xhtml" rendered="false"/>
+                <p:menuitem id="um89" value="#{msg.WorkOrder}" outcome="/portal/workorder/repaireWorkOrder.xhtml" rendered="false"/>
                 <p:menuitem id="um10" value="#{msg.ServiceRequestMgmt}" outcome="/portal/sr/srList.xhtml" rendered="false"/>
                 <p:menuitem id="um2001" value="#{msg.dispatchMgmt}" outcome="/portal/sr/dispatchList.xhtml" rendered="false"/> 
 
                <!-- <p:menuitem  value="维修工作台" outcome="/portal/woMgr/woMgrList.xhtml"/>-->
-                <p:menuitem value="维修工作台" outcome="/portal/woMgr/workOrderList.xhtml" rendered="#{userContextService.accessContains('repair.workbench')}"/>
-                <p:menuitem id="um12" value="我的维修工单" outcome="/portal/sr/processList.xhtml" rendered="false"/>
+                <p:menuitem value="#{msg.RepairWorkbench}" outcome="/portal/woMgr/workOrderList.xhtml" rendered="#{userContextService.accessContains('repair.workbench')}"/>
+                <p:menuitem id="um12" value="#{msg.MyRepairWorkorder}" outcome="/portal/sr/processList.xhtml" rendered="false"/>
                 <p:menuitem id="um11" value="#{msg.MyWorkOrder}" rendered="false" outcome="/portal/wo/myWoList.xhtml"/>
-                <p:menuitem id="um13" value="设备维修统计" outcome="/portal/wo/assetWorkOrder.xhtml" rendered="#{userContextService.accessContains('repair.count')}"/>
-                <p:menuitem id="um085" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{(not userContextService.isIBEndUser()) and userContextService.accessContains('repair.message')}"/>
-                <p:menuitem id="um200" value="维修工单报表" outcome="/portal/wo/woExport/woReportMain.xhtml" rendered="#{userContextService.accessContains('repair.report')}"/>
-                <p:menuitem id="um201" value="排班管理" outcome="/portal/schedule/workSchedule.xhtml" rendered="#{userContextService.accessContains('repair.workSchedule')}"/>
-                <p:menuitem id="um202" value="休假管理" outcome="/portal/schedule/userVacationList.xhtml" rendered="#{userContextService.accessContains('repair.vacationMgt')}"/>
-                <p:menuitem id="um220" value="报表模版管理" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.accessContains('repair.reportMgt')}"/>
+                <p:menuitem id="um13" value="#{msg.EquipmentRepairStatistics}" outcome="/portal/wo/assetWorkOrder.xhtml" rendered="#{userContextService.accessContains('repair.count')}"/>
+                <p:menuitem id="um085" value="#{msg.MessageSubscriber}" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{(not userContextService.isIBEndUser()) and userContextService.accessContains('repair.message')}"/>
+                <p:menuitem id="um200" value="#{msg.RepairWorkorderReport}" outcome="/portal/wo/woExport/woReportMain.xhtml" rendered="#{userContextService.accessContains('repair.report')}"/>
+                <p:menuitem id="um201" value="#{msg.WorkScheduleManagement}" outcome="/portal/schedule/workSchedule.xhtml" rendered="#{userContextService.accessContains('repair.workSchedule')}"/>
+                <p:menuitem id="um202" value="#{msg.VacationManagement}" outcome="/portal/schedule/userVacationList.xhtml" rendered="#{userContextService.accessContains('repair.vacationMgt')}"/>
+                <p:menuitem id="um220" value="#{msg.ReportTemplateManagement}" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.accessContains('repair.reportMgt')}"/>
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('maintain')}">
-                <p:menuitem value="保养工作台" outcome="/portal/pm/pmOrderListAll.xhtml" rendered="#{userContextService.accessContains('maintain.workbench')}"/>
+                <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/pmOrderListAll.xhtml" rendered="#{userContextService.accessContains('maintain.workbench')}"/>
                 <p:menuitem id="um29" vale="#{msg.DeviceAdverseEventMgmt}" rendered="false" outcome="/empty"/>
                 <p:menuitem id="um30" value="#{msg.DeviceMedicalAccidentMgmt}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um301" value="#{msg.ChecklistAdmin}" outcome="/portal/insp/checkListList.xhtml" rendered="false"/>
@@ -66,9 +68,9 @@
                 <p:menuitem id="um303" value="#{msg.PmOrderRule}" outcome="/portal/pm/pmOrderRule/List.xhtml" rendered="#{userContextService.accessContains('maintain.rule')}"/>
                 <!-- <p:menuitem id="um304" value="#{msg.RelRuleAsset}" outcome="/portal/pm/pmOrderRule/RelRuleAsset.xhtml"/> -->
                 <p:menuitem id="um306" value="#{msg.assetRuleManager}" outcome="/portal/pm/relRuleAsset/List.xhtml" rendered="#{userContextService.accessContains('maintain.assetMgt')}"/>
-                <p:menuitem id="um307" value="电气安全数据导入" outcome="/portal/electricSafety/measureElectricSafetyMain.xhtml" rendered="#{userContextService.accessContains('maintain.electricDataImport')}"/>
-                <p:menuitem value="报告模版管理" outcome="/portal/reporter/schemaList.xhtml" rendered="#{userContextService.accessContains('maintain.reportMgt')}"/>
-                <p:menuitem value="报表模版管理" outcome="/portal/pm/pmOrderReportTemplate/List.xhtml" rendered="#{userContextService.accessContains('maintain.reportFormMgt')}"/>
+                <p:menuitem id="um307" value="#{msg.ElectricSafetyDataImport}" outcome="/portal/electricSafety/measureElectricSafetyMain.xhtml" rendered="#{userContextService.accessContains('maintain.electricDataImport')}"/>
+                <p:menuitem value="#{msg.ReportTemplateManagement}" outcome="/portal/reporter/schemaList.xhtml" rendered="#{userContextService.accessContains('maintain.reportMgt')}"/>
+                <p:menuitem value="#{msg.ReportFormTemplateManagement}" outcome="/portal/pm/pmOrderReportTemplate/List.xhtml" rendered="#{userContextService.accessContains('maintain.reportFormMgt')}"/>
         <!-- <p:menuitem id="um402" value="SAPConfig" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceConfigMain.xhtml"/>
         <p:menuitem id="um403" value="SAP" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml"/>
         <p:menuitem id="um404" value="SAPReport" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/> -->
@@ -129,7 +131,7 @@
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.accessContains('config')}">
                 <p:menuitem id="um46" value="#{msg.OrgAdmin}" outcome="/admin/uaa/orgInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/portal/loginAs/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
-                <p:menuitem id="um54" value="设备消息订阅" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.accessContains('config.assetMessage')}"/>
+                <p:menuitem id="um54" value="#{msg.MessageSubscriber}" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.accessContains('config.assetMessage')}"/>
                 <p:menuitem id="um48" value="#{msg.OrgAdmin}" outcome="/portal/uaa/orgInfo/Main.xhtml" rendered="#{userContextService.hasNotAnyRole('SuperAdmin') and userContextService.accessContains('config.org')}"/>
                 <p:menuitem id="um49" value="#{msg.UserAdmin}" outcome="/portal/uaa/userAccount/ListMain.xhtml" rendered="#{userContextService.hasNotAnyRole('SuperAdmin') and userContextService.accessContains('config.user')}"/>
                 <!--<p:menuitem id="um50" value="#{msg.AssetTagMsgSubscriber}" outcome="/portal/asset/assetTag/TagSubscribeList.xhtml"/>-->
@@ -143,9 +145,9 @@
                 <p:menuitem id="um497" value="#{msg.AssetTag}" outcome="/portal/asset/tag/List.xhtml" rendered="#{userContextService.accessContains('config.assetMark')}"/>
                 <p:menuitem id="um498" value="#{msg.BiomedGroup}" outcome="/portal/uaa/biomedGroup/List.xhtml" rendered="#{userContextService.accessContains('config.engineerGroup')}"/>
                 <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/workFlowConfig/List.xhtml" rendered="#{userContextService.accessContains('config.workFlow')}"/>
-                <p:menuitem id="um504" value="自定义配置" outcome="/portal/asset/customConfig/CustomConfig.xhtml" rendered="#{userContextService.accessContains('config.custom')}"/>
-                <p:menuitem id="um505" value="属性配置" outcome="/portal/config/attribute/List.xhtml" rendered="#{userContextService.accessContains('config.attribute')}"/>
-                <p:menuitem id="um506" value="维修消息配置" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.accessContains('config.repairMessage')}"/>
+                <p:menuitem id="um504" value="#{msg.CustomConfiguration}" outcome="/portal/asset/customConfig/CustomConfig.xhtml" rendered="#{userContextService.accessContains('config.custom')}"/>
+                <p:menuitem id="um505" value="#{msg.AttributeConfiguration}" outcome="/portal/config/attribute/List.xhtml" rendered="#{userContextService.accessContains('config.attribute')}"/>
+                <p:menuitem id="um506" value="#{msg.RepairMessageConfiguration}" outcome="/portal/config/msgconfig_edit.xhtml" rendered="#{userContextService.accessContains('config.repairMessage')}"/>
                 <!--<p:menuitem id="um500" value="#{msg.V2_WorkOrderWorkflowConfig}" outcome="/portal/config/workFlowConfig/Wo_Edit.xhtml"/>-->
                 <!--<p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>-->
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{userContextService.hasNotAnyRole('SuperAdmin') and userContextService.accessContains('config.qrCode')}"/>

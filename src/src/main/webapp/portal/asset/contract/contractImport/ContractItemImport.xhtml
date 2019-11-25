@@ -9,12 +9,12 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="合同相关设备导入"/>
+                <p:outputLabel class="pageTitle" value="#{msg.ContractRelatedEquipmentImport}"/>
             </div>
         </div>
         <div class="ui-g-12 card">
             <h:form id="importForm">
-                <p:fieldset  legend="合同相关设备导入" id="uploaderContainerItem">
+                <p:fieldset  legend="#{msg.ContractRelatedEquipmentImport}" id="uploaderContainerItem">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
                         <h:panelGroup>
@@ -36,7 +36,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <div style="white-space:pre">说明   1. <a href="APM_ContractItem_Service_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>        2. 文件中填入要导入的合同数据        3. 上传文件进行导入</div>
+                            <div style="white-space:pre">#{msg.Description}   1. <a href="APM_ContractItem_Service_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>        2. #{msg.fileNeedData}        3. #{msg.upFileImport}</div>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
@@ -48,22 +48,22 @@
         <div class="ui-g-12 card">
             <h:form id="errorDataListForm">
                 <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
-                <p:fieldset  legend="导入失败数据">
+                <p:fieldset  legend="#{msg.ImportFailureData}">
                     <p:dataTable id="errorDatalist" rendered="#{not empty contractItemImportController.errorContractItemList}" value="#{contractItemImportController.errorContractItemList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:column headerText="EXCEL行数">
+                        <p:column headerText="#{msg.EXCELRowNumber}">
                             <h:outputText value="#{item.get('contractInfoItem').lineNum}" />
                         </p:column>
-                        <p:column headerText="合同UID">
+                        <p:column headerText="#{msg.ContractUID}">
                             <h:outputText value="#{item.get('contractInfoItem').contractId}" />
                         </p:column>
-                        <p:column headerText="相关设备UID">
+                        <p:column headerText="#{msg.RelatedEquipmentUID}">
                             <h:outputText value="#{item.get('contractInfoItem').assetUid}" />
                         </p:column>
-                        <p:column headerText="失败信息" >
+                        <p:column headerText="#{msg.FailureInformation}" >
                             <h:outputText value="#{fieldMsg.fieldValue('importStatus',item.get('status'))}"/><br/>
                             <h:outputText value="#{item.get('errmsg')}"/>
                         </p:column>

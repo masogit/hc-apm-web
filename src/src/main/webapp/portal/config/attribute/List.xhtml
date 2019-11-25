@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="属性配置"/>
+                <p:outputLabel class="pageTitle" value="#{msg.AttributeConfiguration}"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -17,7 +17,7 @@
                                  selectionMode="single" selection="#{attributeListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.name}"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500" >
@@ -25,25 +25,25 @@
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton" />
                         <p:ajax event="filter" listener="#{attributeListController.onFilter}" update=":attributeListForm:datalist"/>
 
-                        <p:column headerText="属性名称" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.AttributeName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
 
-                        <p:column headerText="属性描述" sortBy="#{item.description}">
+                        <p:column headerText="#{msg.AttributeDescription}" sortBy="#{item.description}">
                             <h:outputText value="#{item.description}"/>
                         </p:column>
-                        <p:column headerText="修改人" sortBy="#{item.lastModifiedBy}">
+                        <p:column headerText="#{msg.ModifiedBy}" sortBy="#{item.lastModifiedBy}">
                             <h:outputText value="#{attributeListController.findUserNameByAccountUid(item.lastModifiedBy)}"/>
                         </p:column>
 
-                        <p:column headerText="修改时间">
+                        <p:column headerText="#{msg.ModifiedOn}">
                             <h:outputText value="#{item.lastModifiedDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="操作">
-                            <p:commandButton value="编辑子属性" actionListener="#{attributeListController.editAttrDesc(item)}" oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
+                        <p:column headerText="#{msg.ModifiedOn}">
+                            <p:commandButton value="#{msg.EditSubattribute}" actionListener="#{attributeListController.editAttrDesc(item)}" oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
                         </p:column>
 
                         <f:facet name="{Toolbar}">

@@ -9,7 +9,7 @@
 <ui:composition>
     <div class="ui-g-12 card">
         <h:form id="assetGroupOwnerSettingForm">
-            <p:fieldset legend="设备类型设置" rendered="#{not empty assetGroupOwnerSettingController.selected}">
+            <p:fieldset legend="#{msg.EquipmentTypeSettings}" rendered="#{not empty assetGroupOwnerSettingController.selected}">
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">#{msg.hospitalId}</label>
@@ -60,7 +60,7 @@
                 </p:panelGrid>
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup id="pmOwnerSelecter_assetGroup">
-                        <label class="label">设置保养负责人</label>
+                        <label class="label">#{msg.SetPMOwner}</label>
                         <p:autoComplete dropdown="true" value="#{assetGroupOwnerSettingController.pmOwner}"
                                         scrollHeight="300"  forceSelection="true" completeMethod="#{assetGroupOwnerSettingController.autoCompleteOwner}"
                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="userAccountConverter" class="SiteUIDChange">

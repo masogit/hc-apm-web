@@ -25,6 +25,8 @@ import webapp.framework.dao.SearchFilter;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONArray;
 import com.ge.apm.service.common.QrcodeConfigConstant;
+import webapp.framework.web.WebUtil;
+
 import java.util.Objects;
 
 /**

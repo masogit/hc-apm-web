@@ -1319,7 +1319,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
        if (selectedMeasureOrder != null) {
             if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
                     (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
-                WebUtil.addErrorMessage("审核不通过原因必须填写");
+                WebUtil.addErrorMessage(WebUtil.getMessage("MustProvideReason"));
                 RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
                 return;
             }

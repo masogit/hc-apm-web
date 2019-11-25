@@ -73,4 +73,7 @@ public interface UserAccountMapper {
 	
 	@Delete("delete from user_org where user_uid =#{userUid}")
 	public void deleteUserOrgInfo(UserOrgInfo userOrgInfo);
-} 
+
+	@Select("select default_lang from tenant_info where uid = (select tenant_uid from user_account where login_name = #{loginName})")
+	public String getUserLanguageByLoginName(String loginName);
+}

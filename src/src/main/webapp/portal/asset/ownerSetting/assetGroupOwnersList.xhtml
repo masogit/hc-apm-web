@@ -40,7 +40,7 @@
                 <p:ajax event="rowSelect" listener="#{assetGroupOwnerSettingController.onSelectOwnerConfig}" update="ownerConfigTab:assetGroupOwnerSettingForm deleteButton"/>
                 <p:ajax event="filter" listener="#{assetGroupOwnerSettingController.onFilter}"/>
 
-                <p:column headerText="院区">
+                <p:column headerText="#{msg.Site}">
                     <h:outputText value="#{item.siteOrgInfo.name}"/>
                 </p:column>
                 <p:column headerText="#{msg.assetGroup}" filterBy="#{item.assetGroupID}" filterMatchMode="EQ">
@@ -64,16 +64,16 @@
                     </f:facet>
                 </p:column>-->
 
-                <p:column headerText="维修责任人" filterBy="#{item.woOwner.name}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.RepairOwner}" filterBy="#{item.woOwner.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.woOwner.name}"/>
                 </p:column>
-                <p:column headerText="维修责任人2" filterBy="#{item.woOwner2.name}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.RepairOwner2}" filterBy="#{item.woOwner2.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.woOwner2.name}"/>
                 </p:column>
-                <p:column headerText="维修责任人3" filterBy="#{item.woOwner3.name}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.RepairOwner3}" filterBy="#{item.woOwner3.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.woOwner3.name}"/>
                 </p:column>
-                <p:column headerText="保养责任人" filterBy="#{item.pmOwner.name}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.pmOwnerName}" filterBy="#{item.pmOwner.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.pmOwner.name}"/>
                 </p:column>
 

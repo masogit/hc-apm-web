@@ -8,6 +8,7 @@ import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import webapp.framework.web.WebUtil;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -760,88 +761,88 @@ public class AssetInfoFormatter {
 
         Map<String, Object> map = new HashMap<>();
 
-        map.put("设备名称", this.getName());
-        map.put("设备编号", this.getDepartNum());
-        map.put("资产编号", this.getFinancingNum());
-        map.put("设备别名", this.getAliasName());
-        map.put("维修负责人", this.getAssetOwnerName());
-        map.put("维修负责人2", this.getAssetOwnerName2());
-        map.put("维修负责人3", this.getAssetOwnerName3());
-        map.put("保养负责人", this.getPmOwnerName());
-        map.put("所属院区", this.getSiteName());
-        map.put("所属科室", this.getClinicalDeptName());
-        map.put("使用科室", this.getAssetDeptName());
-        map.put("制造商", this.getManufacture());
-        map.put("品牌/制造商简称", this.getMakerShortName());
-        map.put("设备标准名称", this.getDeviceName());
-        map.put("注册证号", this.getRegistrationNo());
-        map.put("供应商", this.getVendor());
-        map.put("主设备", this.getParentAssetName());
+        map.put(WebUtil.getMessage("EquipmentName"), this.getName());
+        map.put(WebUtil.getMessage("EquipmentID"), this.getDepartNum());
+        map.put(WebUtil.getMessage("financingNum"), this.getFinancingNum());
+        map.put(WebUtil.getMessage("EquipmentAlias"), this.getAliasName());
+        map.put(WebUtil.getMessage("RepairOwner"), this.getAssetOwnerName());
+        map.put(WebUtil.getMessage("RepairOwner2"), this.getAssetOwnerName2());
+        map.put(WebUtil.getMessage("RepairOwner3"), this.getAssetOwnerName3());
+        map.put(WebUtil.getMessage("pmOwnerName"), this.getPmOwnerName());
+        map.put(WebUtil.getMessage("Site"), this.getSiteName());
+        map.put(WebUtil.getMessage("clinicalDeptId"), this.getClinicalDeptName());
+        map.put(WebUtil.getMessage("AssetDepartment"), this.getAssetDeptName());
+        map.put(WebUtil.getMessage("Manufacturer"), this.getManufacture());
+        map.put(WebUtil.getMessage("BrandManufacturerShortName"), this.getMakerShortName());
+        map.put(WebUtil.getMessage("EquipmentStandardName"), this.getDeviceName());
+        map.put(WebUtil.getMessage("RegistrationNumber"), this.getRegistrationNo());
+        map.put(WebUtil.getMessage("Vendor"), this.getVendor());
+        map.put(WebUtil.getMessage("parentAsset"), this.getParentAssetName());
 
-        map.put("医疗器械分类", this.getFunctionGroupAsString());
-        map.put("医疗器械子分类", this.getAssetCode68AsString());
+        map.put(WebUtil.getMessage("MedicalDeviceClassification"), this.getFunctionGroupAsString());
+        map.put(WebUtil.getMessage("MedicalDeviceSubclassification"), this.getAssetCode68AsString());
 
-        map.put("设备分类", this.getAssetGroupAsString());
+        map.put(WebUtil.getMessage("EquipmentClassification"),this.getAssetGroupAsString());
 
-        map.put("功能等级", this.getFunctionGrade());
-        map.put("维修类型", this.getRepairFormAsString());
-        map.put("设备型号", this.getFunctionType());
-        map.put("制造商序列号", this.getSerialNum());
-        map.put("SystemID/厂商报修ID", this.getSystemId());
-        map.put("条码", this.getBarcode());
-        map.put("2010国家编码", this.getNationalStandardCode());
-        map.put("IT系统编号", this.getModalityId());
+        map.put(WebUtil.getMessage("FunctionGrade"),  this.getFunctionGrade());
+        map.put(WebUtil.getMessage("RepairType"), this.getRepairFormAsString());
+        map.put(WebUtil.getMessage("EquipmentModel"), this.getFunctionType());
+        map.put(WebUtil.getMessage("ManufacturerSerialNumber"), this.getSerialNum());
+        map.put(WebUtil.getMessage("SystemIDManufacturerRequestID"), this.getSystemId());
+        map.put(WebUtil.getMessage("BarCode"), this.getBarcode());
+        map.put(WebUtil.getMessage("2010NationalCode"), this.getNationalStandardCode());
+        map.put(WebUtil.getMessage("ITSystemID"), this.getModalityId());
 
-        map.put("采购价格", this.getPurchasePrice());
-        map.put("最终残值", this.getSalvageValue());
-        map.put("使用年限", this.getLifecycleInYear());
-        map.put("折旧算法", this.getDepreciationMethodAsString());
-
-
-        map.put("出厂日期", this.getManufactDate());
-        map.put("采购日期", this.getPurchaseDate());
-        map.put("到货日期", this.getArriveDate());
-        map.put("启用日期", this.getInstallDate());
-        map.put("质保日期", this.getFactoryWarrantyDate());
-        map.put("维保截止日期", this.getWarrantyDate());
-        map.put("报废日期", this.getTerminateDate());
-        map.put("上次保养日期", this.getLastPmDate());
-        map.put("上次计量日期", this.getLastMeteringDate());
-        map.put("上次巡检日期", this.getLastQaDate());
-
-        map.put("维修商", this.getMaitanance());
-        map.put("维修商电话", this.getMaitananceTel());
-        map.put("二维码", this.getQrCode());
-        map.put("安装位置编码", this.getLocationCode());
-        map.put("安装位置", this.getLocationName());
-        map.put("使用责任人", this.getClinicalOwnerName());
-        map.put("备注", this.getComments());
+        map.put(WebUtil.getMessage("PurchasePrice"), this.getPurchasePrice());
+        map.put(WebUtil.getMessage("FinalSalvageValue"), this.getSalvageValue());
+        map.put(WebUtil.getMessage("LifeCycle"), this.getLifecycleInYear());
+        map.put(WebUtil.getMessage("DepreciationMethod"), this.getDepreciationMethodAsString());
 
 
-        map.put("用途分类", this.getAssetUsageAsString());
-        map.put("资金来源", this.getCapitalSourceAsString());
-        map.put("风险等级", this.getRiskGradeAsString());
-        map.put("计量等级", this.getMeasureGradeAsString());
-        map.put("计量项目类别", this.getMeasuringItemCategoryAsString());
-        map.put("是否急救设备", this.getEmergencyEquipmentAsString());
-        map.put("是否进口设备", this.getImportEquipmentAsString());
-        map.put("当前状态", this.getStatusAsString());
-        map.put("核算类别", this.getAccountingCategoryAsString());
-        map.put("是否PM", assetInfo.getIsPm() == null || assetInfo.getIsPm() ? "是" : "否");
-        map.put("是否盘点", assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? "是" : "否");
-        map.put("设备分类2级", this.getAssetGroupSecondayName());
-        map.put("资产价值分类", this.getAssetValueCategoryName());
-        map.put("资产状态", this.getDeviceStatusAsString());
-        map.put("资金来源2", this.getCapitalSource2AsString());
-        map.put("是否对维保到期提醒", this.getWarrantyAsString());
-        map.put("所属课题项目", assetInfo.getSubjectProject());
-        map.put("质保时间（月）", assetInfo.getWarrantyMonth());
-        map.put("验收日期", assetInfo.getAcceptDate());
-        map.put("创建日期", assetInfo.getCreatedDate());
+        map.put(WebUtil.getMessage("ManufactureDate"),this.getManufactDate());
+        map.put(WebUtil.getMessage("PurchaseDate"),  this.getPurchaseDate());
+        map.put(WebUtil.getMessage("ArrivalDate"), this.getArriveDate());
+        map.put(WebUtil.getMessage("StartUsingDate"), this.getInstallDate());
+        map.put(WebUtil.getMessage("WarrantyDate"),this.getFactoryWarrantyDate());
+        map.put(WebUtil.getMessage("WarrantyExpirationDate"), this.getWarrantyDate());
+        map.put(WebUtil.getMessage("TerminateDate"), this.getTerminateDate());
+        map.put(WebUtil.getMessage("lastPmDate"), this.getLastPmDate());
+        map.put(WebUtil.getMessage("LastMeasurementDate"), this.getLastMeteringDate());
+        map.put(WebUtil.getMessage("LastInspectionDate"), this.getLastQaDate());
 
-        map.put("专有分类", this.getProprietaryClassAsString());
+        map.put(WebUtil.getMessage("Maintainer"), this.getMaitanance());
+        map.put(WebUtil.getMessage("MaintainerTelephone"), this.getMaitananceTel());
+        map.put(WebUtil.getMessage("QRCode"), this.getQrCode());
+        map.put(WebUtil.getMessage("InstallationLocationCode"), this.getLocationCode());
+        map.put(WebUtil.getMessage("InstallationLocation"), this.getLocationName());
+        map.put(WebUtil.getMessage("UseOwner"),  this.getClinicalOwnerName());
+        map.put(WebUtil.getMessage("Remark"), this.getComments());
 
-        map.put("UUID", this.getUid());
+
+        map.put(WebUtil.getMessage("UsageClassification"),this.getAssetUsageAsString());
+        map.put(WebUtil.getMessage("CapitalSource"), this.getCapitalSourceAsString());
+        map.put(WebUtil.getMessage("RiskGrade"), this.getRiskGradeAsString());
+        map.put(WebUtil.getMessage("MeasurementGrade"), this.getMeasureGradeAsString());
+        map.put(WebUtil.getMessage("measuringItemCategory"), this.getMeasuringItemCategoryAsString());
+        map.put(WebUtil.getMessage("IsEmergencyEquipment"),  this.getEmergencyEquipmentAsString());
+        map.put(WebUtil.getMessage("IsImportEquipment"), this.getImportEquipmentAsString());
+        map.put(WebUtil.getMessage("CurrentStatus"), this.getStatusAsString());
+        map.put(WebUtil.getMessage("accountingCategory"), this.getAccountingCategoryAsString());
+        map.put(WebUtil.getMessage("IsPM"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
+        map.put(WebUtil.getMessage("IsChecked2"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
+        map.put(WebUtil.getMessage("assetGroupSecondary"), this.getAssetGroupSecondayName());
+        map.put(WebUtil.getMessage("assetValueCategory"), this.getAssetValueCategoryName());
+        map.put(WebUtil.getMessage("deviceStatus"), this.getDeviceStatusAsString());
+        map.put(WebUtil.getMessage("capitalSource2"), this.getCapitalSource2AsString());
+        map.put(WebUtil.getMessage("isWarrantyNotice"), this.getWarrantyAsString());
+        map.put(WebUtil.getMessage("subjectProject"), assetInfo.getSubjectProject());
+        map.put(WebUtil.getMessage("warrantyMonth"), assetInfo.getWarrantyMonth());
+        map.put(WebUtil.getMessage("acceptDate"), assetInfo.getAcceptDate());
+        map.put(WebUtil.getMessage("createdDate"), assetInfo.getCreatedDate());
+
+        map.put(WebUtil.getMessage("proprietaryClass"), this.getProprietaryClassAsString());
+
+        map.put(WebUtil.getMessage("UUID"), this.getUid());
 
         return map;
 

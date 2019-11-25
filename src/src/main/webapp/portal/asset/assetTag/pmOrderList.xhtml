@@ -70,9 +70,9 @@
                             <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
                         </p:column>
                         <!--所属科室-->
-                        <p:column headerText="#{msg.clinicalDeptName}"  width="100">
+                        <p:column headerText="#{msg.clinicalDeptName}---"  width="100">
                             <f:facet name="header">
-                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <h:outputText value="#{msg.clinicalDeptName}000"/><br/>
                                 <p:autoComplete dropdown="true" value="#{v2PmOrderController.fileterOrgName}" appendTo="@(Body)"
                                                 scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderController.autoCompleteDeptName}" size="5">
                                     <p:ajax event="itemSelect" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist"/>
@@ -82,13 +82,15 @@
                             <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
                         </p:column>
 
-                        <p:column headerText="创建人" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
+
+                        <!--<p:column headerText="创建人" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.creatorName}"/>
-                        </p:column>
+                        </p:column>-->
 
                         <p:column headerText="负责人" filterMatchMode="LIKE">
                             <h:outputText value="#{item.getCurrentPersonName()}"/>
                         </p:column>
+
 
 
                         <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
@@ -109,13 +111,13 @@
                         </p:column>
                         <p:column headerText="计划完成时间"  sortBy="#{item.planTime}">
                             <h:outputText value="#{item.planTime}">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="实际完成时间" rendered="#{v2PmOrderController.queryIndex==7}" sortBy="#{item.endTime}">
                             <h:outputText value="#{item.endTime}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                <f:convertDateTime  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" />
                             </h:outputText>
                         </p:column>
 
@@ -215,7 +217,7 @@
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">结束保养时间*</label>
-                        <p:calendar timeZone="GMT+8" id="fillDate1" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.endTime}" required="true" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="fillDate1"   value="#{v2PmOrderController.endTime}" required="true" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">总工时*</label>
@@ -236,7 +238,7 @@
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">结束保养时间*</label>
-                        <p:calendar timeZone="GMT+8" id="fillDate6" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.endTime}" required="true" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="fillDate6"   value="#{v2PmOrderController.endTime}" required="true" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">总工时*</label>
@@ -269,7 +271,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计划完成时间*</label>
-                            <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                            <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="fillDate"  value="#{v2PmOrderController.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
 
                         <h:panelGroup>
@@ -382,7 +384,7 @@
                                 <p:ajax  listener="#{v2PmOrderController.onStatusChange()}"  update="assetstatus" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneRadio>
-                            <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{v2PmOrderController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.confirmedDownTime}" showOn="button"
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}" label="#{msg.confirmedDownTime}" rendered="#{v2PmOrderController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.confirmedDownTime}" showOn="button"
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -408,7 +410,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">批量计划完成时间*</label>
-                            <p:calendar timeZone="GMT+8" id="fillDate4" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                            <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="fillDate4"   value="#{v2PmOrderController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false"  required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
                     </p:panelGrid>
                 </h:panelGroup>
@@ -424,7 +426,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计划完成时间*</label>
-                            <p:calendar timeZone="GMT+8" id="fillDate2" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 必须输入}"></p:calendar>
+                            <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false"  required="true" requiredMessage="计划完成时间 必须输入}"></p:calendar>
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
@@ -443,12 +445,12 @@
                 <h:panelGroup id="display1" rendered="#{not empty v2PmOrderController.selectedPmOrder or v2PmOrderController.isChecked()}">
                     <h:panelGroup rendered="#{not empty v2PmOrderController.selectedPmOrder and  v2PmOrderController.isChecked() eq false}" >
                         <label class="label">计划完成时间*</label>
-                        <p:calendar timeZone="GMT+8" id="fillDate3" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false"  required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{v2PmOrderController.isChecked() eq true}">
                         <label class="label">批量计划完成时间*</label>
-                        <p:calendar timeZone="GMT+8" id="fillDate5" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  value="#{v2PmOrderController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false"  required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                     </h:panelGroup>
                     <br/>
                     <h:panelGroup>
@@ -466,12 +468,12 @@
             <h:panelGroup id="display22">
                <!-- <h:panelGroup rendered="#{not empty v2PmOrderController.selectedPmOrder and  v2PmOrderController.isChecked() eq false}" >
                     <label class="label">计划完成时间*</label>
-                    <p:calendar timeZone="GMT+8" id="fillDate31" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                    <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="fillDate31"   value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                 </h:panelGroup>-->
 
                 <h:panelGroup>
                     <label class="label">批量计划完成时间*</label>
-                    <p:calendar timeZone="GMT+8" id="fillDate51" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                    <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  value="#{v2PmOrderController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false"  required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                 </h:panelGroup>
                 <br/>
                 <h:panelGroup>

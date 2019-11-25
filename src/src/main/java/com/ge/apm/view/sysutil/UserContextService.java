@@ -23,6 +23,7 @@ import com.google.common.base.Strings;
 
 import javaslang.control.Option;
 import org.eclipse.jetty.util.B64Code;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
@@ -752,7 +753,7 @@ public class UserContextService implements Serializable {
     public boolean isIBorUltraSoundIBorDealerEndUser(){
         return isIBEndUser() || isUltraSoundIBEndUser() || isDealerEndUser();
     }
-    
+
     public boolean isAccountEndUser(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount currentUser = getLoginUser();
@@ -857,6 +858,76 @@ public class UserContextService implements Serializable {
             return decryptionData;
         }catch (Exception ex){
             return null;
+        }
+    }
+
+    public TenantInfo getCurrentUserTenantInfo(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.getTenantInfo();
+    }
+
+    //返回当前用户所在时区
+    public String getTimeZone(){
+        Double timeZone = getCurrentUserTenantInfo().getTimeZone();
+        timeZone = timeZone == null ? 8 : timeZone;
+        if(timeZone >= 0){
+            return "GMT+"+timeZone;
+        }else{
+            return "GMT"+timeZone;
+        }
+    }
+
+
+    /***
+     *  是否是中国 维修工作台在非中文状态下不显示外部工单和外部远程工单
+     */
+    public boolean isLocale(){
+        Locale locale = LocaleHolder.getLocale();
+        //System.out.println("locale  is "+locale);
+        if(locale.getLanguage().equalsIgnoreCase("zh")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public String timeFormat(){
+        if(!isLocale()){
+            return "MM/dd/yyyy";
+        }else{
+            return "yyyy/MM/dd";
+        }
+    }
+
+    public String timeFormat8(){
+        if(!isLocale()){
+            return "MM-dd-yyyy";
+        }else{
+            return "yyyy-MM-dd";
+        }
+    }
+
+    public String timeFormat12(){
+        if(!isLocale()){
+            return "MM/dd/yyyy HH:mm";
+        }else{
+            return "yyyy/MM/dd HH:mm";
+        }
+    }
+
+    public String timeFormat14(){
+        if(!isLocale()){
+            return "MM/dd/yyyy HH:mm:ss";
+        }else{
+            return "yyyy/MM/dd HH:mm:ss";
+        }
+    }
+
+    public String getCalendarLocale(){
+        if(!isLocale()){
+            return Locale.US.toString();
+        }else{
+            return Locale.SIMPLIFIED_CHINESE.getLanguage();
         }
     }
 }

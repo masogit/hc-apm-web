@@ -8,11 +8,11 @@
     <ui:define name="content">
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="#{contractInfoEditController.CRUDActionName}#{msg.ContractInfo}"/>
+                <p:outputLabel class="pageTitle" value="#{contractInfoEditController.CRUDActionName} #{msg.ContractInfo}"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id="AssetContractEditForm">
-                    <p:fieldset legend="基本信息">
+                    <p:fieldset legend="#{msg.BasicInformation}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}</label>
@@ -93,7 +93,7 @@
                                 </p:calendar>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">合同时间(月)</label>
+                                <label class="label">#{msg.ContractPeriodMonths}</label>
                                 <p:inputNumber decimalPlaces="0" maxValue="99" id="endMonths" value="#{contractInfoEditController.selected.endMonths}">
                                     <p:ajax listener="#{contractInfoEditController.onChangeEndDate}" update=":AssetContractEditForm:endTime"></p:ajax>
                                 </p:inputNumber>
@@ -107,7 +107,7 @@
                                 </h:panelGroup>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">报告号</label>
+                                <label class="label">#{msg.ReportNumber}</label>
                                 <p:inputText value="#{contractInfoEditController.selected.reportNum}" >
                                     <p:ajax process="@this" />
                                 </p:inputText>
@@ -117,10 +117,10 @@
                             <p:dataList id="AttachList" value="#{contractInfoEditController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" style="text-align:left">
                                 <f:facet name="header">
                                     <div class="ui-g" style="text-align:left">
-                                        <h:outputText value="附件类型" class="ui-g-2"/>
-                                        <h:outputText value="文件名称" class="ui-g-3"/>
-                                        <h:outputText value="上传时间" class="ui-g-3" />
-                                        <h:outputText value="上传人" class="ui-g-2" />
+                                        <h:outputText value="#{msg.AttachmentType}" class="ui-g-2"/>
+                                        <h:outputText value="#{msg.FileName}" class="ui-g-3"/>
+                                        <h:outputText value="#{msg.UploadTime}" class="ui-g-3" />
+                                        <h:outputText value="#{msg.Uploader}" class="ui-g-2" />
                                         <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  oncomplete="PF('uploadDialog').show()" class="ui-g-2" rendered="#{contractInfoEditController.canBeEdit}"/>
                                     </div>
                                 </f:facet>
@@ -139,7 +139,7 @@
                             </p:dataList>
 
                         </h:panelGroup>
-                        <p:fieldset legend="付款信息">
+                        <p:fieldset legend="#{msg.PaymentInformation}">
 
                             <h:panelGroup >
                                 <p:dataTable id="paymentList"  value="#{contractInfoEditController.getPaymentList()}" var="item" 
@@ -147,10 +147,10 @@
                                              paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                              rowsPerPageTemplate="20,50,100,500"  rows="20" emptyMessage="#{msg.noRecordFound}">
                                     <p:ajax event="rowSelect" />
-                                    <p:column headerText="付款金额">
+                                    <p:column headerText="#{msg.PaymentAmount}">
                                         <h:outputText value="#{item.paymentPrice}"/>
                                     </p:column>
-                                    <p:column headerText="付款时间">
+                                    <p:column headerText="#{msg.PaymentTime}">
                                         <h:outputText value="#{item.paymentDate}">
                                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                                         </h:outputText>
@@ -160,14 +160,14 @@
                                     </p:column>
                                     <p:column width="140" rendered="#{contractInfoEditController.canBeEdit}">
                                         <f:facet name="header" >
-                                            <h:outputText value="操作" />
+                                            <h:outputText value="#{msg.Operation}" />
                                         </f:facet>
                                         <p:commandLink process="@this" actionListener="#{contractInfoEditController.prepareEditPaymentInfo(item)}" update=":addPaymentForm" oncomplete="PF('addPaymentDlg').show()" value="#{msg.Edit}" style="padding:10px" />
                                         <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="paymentList" />
                                     </p:column>
 
                                     <f:facet name="{Toolbar}">
-                                        <p:commandLink value="添加付款信息" style="color:#3e87e8;padding: 10px" actionListener="#{contractInfoEditController.prepareAddPaymentInfo()}" process="@this" rendered="#{contractInfoEditController.canBeEdit}"
+                                        <p:commandLink value="#{msg.AddPaymentInformation}" style="color:#3e87e8;padding: 10px" actionListener="#{contractInfoEditController.prepareAddPaymentInfo()}" process="@this" rendered="#{contractInfoEditController.canBeEdit}"
                                                        update=":addPaymentForm" oncomplete="PF('addPaymentDlg').show()" />
                                     </f:facet>
 
@@ -177,7 +177,7 @@
 
                         </p:fieldset>
                     </p:fieldset>
-                    <p:fieldset legend="详细信息一" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType eq 'Equipment'}">
+                    <p:fieldset legend="#{msg.DetailOne}" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType eq 'Equipment'}">
                         <!-- <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>
                                 <label class="label">#{msg.reportNum}*</label>
@@ -284,20 +284,20 @@
                             </p:column>
                             <p:column width="140" >
                                 <f:facet name="header" >
-                                    <h:outputText value="操作" />
+                                    <h:outputText value="#{msg.operation}" />
                                 </f:facet>
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()" value="#{msg.Edit}" style="padding:10px" />
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}" disabled="#{!contractInfoEditController.canRemovePucheseItem(item)}"  update="purchaseList" />
                             </p:column>
 
                             <f:facet name="{Toolbar}">
-                                <p:commandLink value="添加订购设备" style="color:#3e87e8;padding: 10px" actionListener="#{contractInfoEditController.prepareAddPurchaseAsset()}" process="@this" 
+                                <p:commandLink value="#{msg.AddOrderedEquipment}" style="color:#3e87e8;padding: 10px" actionListener="#{contractInfoEditController.prepareAddPurchaseAsset()}" process="@this"
                                                update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>
                             </f:facet>
 
                         </p:dataTable>
                     </p:fieldset>
-                    <p:fieldset legend="合同相关设备" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType ne 'Parts'}">
+                    <p:fieldset legend="#{msg.ContractRelatedEquipment}" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType ne 'Parts'}">
                         <p:dataTable id="itemList"  value="#{contractInfoEditController.contractItemsList}" var="item"
                                      rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -331,27 +331,27 @@
                             <p:column headerText="#{msg.arrivalListInvoiceNum}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
                                 <h:outputText value="#{item.arrivalListItem.arrivalList.invoiceNum}" />
                             </p:column>
-                            <p:column headerText="安装状态" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
+                            <p:column headerText="#{msg.InstallationStatus}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
                                 <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.arrivalListItem.installStatus)}" />
                             </p:column>
 
                             <p:column width="140" >
                                 <f:facet name="header" >
-                                    <h:outputText value="操作" />
+                                    <h:outputText value="#{msg.operation}" />
                                 </f:facet>
                                 <p:link target="_blank" outcome="#{contractInfoEditController.getDetailPageLink(item.assetInfo)}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item.assetInfo)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}" />
                             </p:column>
 
                             <f:facet name="{Toolbar}" rendered="#{contractInfoEditController.canBeEdit}">
-                                <p:commandLink  value="添加已有设备" style="color:#3e87e8;padding: 10px" actionListener="#{searchController.prepareDialogCallback(contractInfoEditController,1,contractInfoEditController.selected.siteUID, ':AssetContractEditForm:itemList')}" 
+                                <p:commandLink  value="#{msg.AddExistingEquipment}" style="color:#3e87e8;padding: 10px" actionListener="#{searchController.prepareDialogCallback(contractInfoEditController,1,contractInfoEditController.selected.siteUID, ':AssetContractEditForm:itemList')}"
                                                 process="@this" update=":searchDlg" oncomplete="PF('varCommonSearchDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}"/>
                             </f:facet>
 
                         </p:dataTable>
                     </p:fieldset>
 
-                    <p:fieldset legend="合同相关设备" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType eq 'Parts'}">
+                    <p:fieldset legend="#{msg.ContractRelatedEquipment}" rendered="#{not empty contractInfoEditController.selected.id and contractInfoEditController.selected.contractType eq 'Parts'}">
                         <p:dataTable value="#{contractInfoEditController.partsList}" var="item"
                                      rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -372,12 +372,12 @@
                             <p:column headerText="#{msg.arrivalListInvoiceNum}" >
                                 <h:outputText value="#{item[1].invoiceNum}" />
                             </p:column>
-                            <p:column headerText="数量" >
+                            <p:column headerText="#{msg.Quantity}" >
                                 <h:outputText value="#{item[1].apartsQuantity}" />
                             </p:column>
                             <p:column width="140" rendered="#{contractInfoEditController.canBeEdit}">
                                 <f:facet name="header" >
-                                    <h:outputText value="操作" />
+                                    <h:outputText value="#{msg.operation}" />
                                 </f:facet>
                                 <p:link  outcome="#{contractInfoEditController.getDetailPageLink(item[0])}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
                             </p:column>
@@ -393,7 +393,7 @@
 
         </div>
         <ui:include src="/portal/asset/searchDialog.xhtml"/>
-        <p:dialog id="addPurchaseDlg" widgetVar="addPurchaseDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="添加/修改采购设备">
+        <p:dialog id="addPurchaseDlg" widgetVar="addPurchaseDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="#{msg.AddUpdatePurchasedEquipmment}">
             <h:form id="addPurchaseForm" >
                 <h:panelGroup id="display" rendered="#{not empty contractInfoEditController.selectedContractItem}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -474,7 +474,7 @@
                              <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.tailPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                          </h:panelGroup> -->
                         <h:panelGroup>
-                            <label class="label">#{msg.comments}</label>
+                            <label class="label" title="#{msg.comments}"></label>
                             <p:inputText  value="#{contractInfoEditController.selectedContractItem.comments}"/>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -487,17 +487,17 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog id="addPaymentDlg" widgetVar="addPaymentDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="添加付款信息">
+        <p:dialog id="addPaymentDlg" widgetVar="addPaymentDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.AddPaymentInformation}">
             <h:form id="addPaymentForm" >
                 <h:panelGroup id="display" >
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
-                            <label class="label">付款金额*</label>
-                            <p:inputNumber decimalPlaces="4"  value="#{contractInfoEditController.paymentInfo.paymentPrice}" required="true" requiredMessage="付款金额#{msg.ValidationRequire}" >
+                            <label class="label" title="#{msg.PaymentAmount}">*</label>
+                            <p:inputNumber decimalPlaces="4"  value="#{contractInfoEditController.paymentInfo.paymentPrice}" required="true" requiredMessage="#{msg.PaymentAmount}#{msg.ValidationRequire}" >
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">付款时间</label>
+                            <label class="label" title="#{msg.PaymentTime}"></label>
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.paymentInfo.paymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
                             </p:calendar>
                         </h:panelGroup>
@@ -516,7 +516,7 @@
             </h:form>
 
         </p:dialog>
-        <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="上传文件">
+        <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.UploadFile}">
             <h:form id="uploadDialogForm" >
                 <h:panelGroup id="display" >
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
