@@ -20,6 +20,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.Order;
@@ -35,16 +37,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeTemplate;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -140,6 +132,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private Map<String, Object> selectedObject;
     private AssetLifecyleService assetLifecyleService;
 
+    private SupplierRepository supplierDao;
+
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -158,6 +152,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
+        supplierDao = WebUtil.getBean(SupplierRepository.class);
 
 //        importService = WebUtil.getBean(AssetFileImportService.class);
         exportService = WebUtil.getBean(AssetFileExportService.class);
@@ -228,6 +223,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         addMisingClinicalDeptOrg(currentPageAssets);
 
         setWarrantyAlerts(currentPageAssets);
+
+        setSupplier(currentPageAssets);
 
         return res;
     }
@@ -745,6 +742,19 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             //searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
             //filterWarrantyDate = null;
         }
+    }
+
+    private void setSupplier(List<AssetInfo> assets){
+        assets.stream().forEach(item -> {
+            item.setSupplier(item.getSupplierId() != null ? supplierDao.findById(item.getSupplierId()) : new Supplier());
+        });
+
+        /*for (AssetInfo ai : assets) {
+            if(ai.getSupplierId() != null){
+                ai.setSupplier(supplierDao.findById(ai.getSupplierId()));
+            }
+        }*/
+
     }
 
     public OrgInfo getSelectSite() {
