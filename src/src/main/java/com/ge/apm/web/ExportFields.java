@@ -3,6 +3,7 @@ package com.ge.apm.web;
 public enum ExportFields {
     ASSETNAME("资产名称"),
     SERIALNUM("制造商序列号"),
+    ACTUALTIME("实际完成时间"),
     ASSETNUM("设备编号(院方)"),
     RUNLEVEL("保养等级"),
     PMTYPE("保养类型"),
