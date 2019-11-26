@@ -454,3 +454,7 @@ update asset_alert_config set lower_limit = 10 where config_type = 105;
 update tenant_info set currency = 1;
 update tenant_info set habit = 1;
 update tenant_info set time_zone = 8.0;
+
+
+--v19.12.1
+update asset_alert_config set upper_limit = 40 where config_type = 156;
