@@ -66,7 +66,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <div style="white-space:pre">#{msg.Description}   1. <a href="APM_Contract_Service_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>        2. #{msg.FileNeedData}        3. #{msg.UpFileImport}</div>
+                            <div style="white-space:pre">#{msg.Description}   1. <a href="#{contractImportController.getTemplateName()}" title="download">#{msg.downloadTemplateFile}</a>        2. #{msg.FileNeedData}        3. #{msg.UpFileImport}</div>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
