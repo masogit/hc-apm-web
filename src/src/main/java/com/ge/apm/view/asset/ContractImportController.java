@@ -148,6 +148,11 @@ public class ContractImportController {
         return file;
     }
 
+    public String getTemplateName(){
+        UserContextService ucs = WebUtil.getBean(UserContextService.class);
+        return ucs.isLocale() == true ? "APM_Contract_Service_Template.xlsx":"APM_Contract_Service_Template_en.xlsx";
+    }
+
     public void setFile(UploadedFile file) {
         this.file = file;
     }
