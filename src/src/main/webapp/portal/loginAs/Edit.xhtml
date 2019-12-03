@@ -70,7 +70,7 @@
                             <p:selectBooleanCheckbox itemLabel="#{msg.isActive}*" value="#{userAccountController.selected.isActive}" required="true" requiredMessage="#{msg.isActive} #{msg.ValidationRequire}"/>
                         </h:panelGroup>-->
                         <h:panelGroup>
-                            <label class="label">用户分类</label>
+                            <label class="label">#{msg.userTags}</label>
                             <p:selectManyCheckbox id="userTags" value="#{userAccountController.selected.userTags}">
                                 <f:selectItem itemLabel="IB" itemValue="IB" />
                                 <f:selectItem itemLabel="Account" itemValue="Account" />
