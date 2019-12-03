@@ -25,10 +25,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  *
@@ -260,6 +257,9 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@Column(name = "is_deleted")
 	private Boolean isDeleted;//是否删除
+
+	@Column(name = "tags")
+	private String tags;
         
 	@Transient
 	private Integer excelIdex;
@@ -1097,5 +1097,21 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setIsDeleted(Boolean deleted) {
 		isDeleted = deleted;
+	}
+
+	public List<String> getUserTags() {
+		if (tags == null) {
+			return Collections.emptyList();
+		}
+		return Arrays.asList(tags.split(","));
+	}
+
+	public void setUserTags(List<String> userTags) {
+		if (null == userTags || userTags.size() == 0) {
+			this.tags = null;
+		} else {
+			this.tags = String.join(",", userTags);
+		}
+
 	}
 }

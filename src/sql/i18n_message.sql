@@ -2981,3 +2981,4 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','deactivateAccountConfirm','您确定要禁用此账户么?','Are you sure you want to deactivate this account?',NULL,-1);
 
 
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'userTags', '用户分类', 'User Classification', NULL, '-1');
