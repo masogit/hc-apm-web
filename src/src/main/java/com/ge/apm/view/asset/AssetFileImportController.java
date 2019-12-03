@@ -159,8 +159,12 @@ public class AssetFileImportController {
 
         AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
         template.exportSampleAsset(orgList, exportFields);
-
-        assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        if(userContextService.isLocale()){
+            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
+        }else{
+            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
+        }
     }
 
     public void downloadImportFailureData() {
