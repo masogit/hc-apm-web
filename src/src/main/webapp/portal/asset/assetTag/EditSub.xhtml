@@ -38,14 +38,14 @@
                             <f:selectItem itemLabel="#{msg.EEAlert}" itemValue="2"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('#{msg.Edit}') and tagSubscriberController.receiveMsgMode!=3)}">
+                    <h:panelGroup rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals(msg.Edit) and tagSubscriberController.receiveMsgMode!=3)}">
                         <label  class="label">#{msg.messagepushoption}*</label>
                         <p:selectOneMenu id="select1" value="#{tagSubscriberController.receiveMsgMode}" required="true" requiredMessage="#{msg.WorkorderMessagePushOptionCannotBeEmpty}">
                             <!-- <p:ajax  process="@this" listener="#{tagSubscriberController.gondantuisongxuanxiang}"></p:ajax>-->
                             <f:selectItems value="#{tagSubscriberController.msgModeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneMenu>
                     </h:panelGroup><!--selectType=1 选择类型:维修-->
-                    <h:panelGroup id="id3" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('#{msg.Edit}') and tagSubscriberController.receiveMsgMode!=3)}">
+                    <h:panelGroup id="id3" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals(msg.Edit) and tagSubscriberController.receiveMsgMode!=3)}">
                         <p:panelGrid  columns="3">
                             <h:panelGroup >
                                 <p:selectBooleanCheckbox class="ck1"  value="#{tagSubscriberController.level0}" itemLabel="#{fieldMsg.fieldValue('casePriority','1')}">
@@ -65,7 +65,7 @@
                         </p:panelGrid>
                     </h:panelGroup>
 
-                    <h:panelGroup id ="id1" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('#{msg.Edit}') and tagSubscriberController.receiveMsgMode!=3)}">
+                    <h:panelGroup id ="id1" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals(msg.Edit) and tagSubscriberController.receiveMsgMode!=3)}">
                         <p:selectBooleanCheckbox  value="#{tagSubscriberController.isReceiveTimeoutMsg}"  itemLabel="#{msg.WorkorderTimeoutMessagePush}">
                         </p:selectBooleanCheckbox>
                     </h:panelGroup>
