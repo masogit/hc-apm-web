@@ -551,6 +551,9 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private OrgInfo clinicalDeptOrg;
+
+    @Transient
+    private Supplier supplier;
     
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
 		return sharedAssetReqDetailList;
@@ -1736,6 +1739,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setMeasuringType(String measuringType) {
         this.measuringType = measuringType;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
     @Override

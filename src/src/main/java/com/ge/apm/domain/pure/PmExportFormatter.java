@@ -23,6 +23,7 @@ public class PmExportFormatter<T> {
     private String currentStep;
     private String orderType;
     private Date planTime;
+    private Date actualCompletionTime;
     private OrgInfoRepository orgDao;
     private List<I18nMessage> i18PmtypeList=null;
     private List<I18nMessage> i18OrderTypeList=null;
@@ -59,6 +60,9 @@ public class PmExportFormatter<T> {
         Map<String, Object> map = new HashMap<>();
         map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
         map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
+        map.put(ExportFields.ACTUALTIME.getChinese(), this.getActualCompletionTime());
+        map.put(ExportFields.ASSETNUM.getChinese(), this.getAssetNumber());
+
         map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
         map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
         map.put(ExportFields.CLINICALNAME.getChinese(), this.getClincialName());
@@ -138,6 +142,13 @@ public class PmExportFormatter<T> {
 
     public Date getPlanTime() {
         return v2_pmOrder.getPlanTime();
+    }
+    public Date getActualCompletionTime() {
+        return v2_pmOrder.getEndTime();
+    }
+
+    public void setActualCompletionTime(Date actualCompletionTime) {
+        this.actualCompletionTime = actualCompletionTime;
     }
 
     public void setPlanTime(Date planTime) {
