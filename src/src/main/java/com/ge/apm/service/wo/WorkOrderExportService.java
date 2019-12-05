@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -144,72 +145,72 @@ public class WorkOrderExportService {
             Map<String, Object> workOrderMap = new HashedMap();
 
             workOrderMap.put("woId", workOrderExportPojo.getId());
-            workOrderMap.put("报修单号", workOrderExportPojo.getSrNum() != null ? workOrderExportPojo.getSrNum() : "");
-            workOrderMap.put("设备编号", workOrderExportPojo.getAssetDepartNum());
+            workOrderMap.put(WebUtil.getMessage("srNum_xlsx"), workOrderExportPojo.getSrNum() != null ? workOrderExportPojo.getSrNum() : "");
+            workOrderMap.put(WebUtil.getMessage("EquipmentID_xlsx"), workOrderExportPojo.getAssetDepartNum());
             //workOrderMap.put("工单状态", workOrderExportPojo.getStatusName());
-            workOrderMap.put("工单状态", workOrderExportPojo.getStatus() != null ? FieldValueMessageController.fieldValue("status", workOrderExportPojo.getStatus().toString()) : "");
-            workOrderMap.put("资产编号", workOrderExportPojo.getAssetFinancingNum());
-            workOrderMap.put("设备序列号", workOrderExportPojo.getAssetSerialNum());
-            workOrderMap.put("设备名称", workOrderExportPojo.getAssetName());
-            workOrderMap.put("院区", workOrderExportPojo.getHospitalName());
-            workOrderMap.put("科室", workOrderExportPojo.getAssetClinicalDeptName());
-            workOrderMap.put("制造商", workOrderExportPojo.getAssetManufacture());
-            workOrderMap.put("品牌", workOrderExportPojo.getAssetMakerShortName());
-            workOrderMap.put("当前责任人", workOrderExportPojo.getCurrentPersonName());
+            workOrderMap.put(WebUtil.getMessage("WorkorderStatus_xlsx"), workOrderExportPojo.getStatus() != null ? FieldValueMessageController.fieldValue("status", workOrderExportPojo.getStatus().toString()) : "");
+            workOrderMap.put(WebUtil.getMessage("AssetID_xlsx"), workOrderExportPojo.getAssetFinancingNum());
+            workOrderMap.put(WebUtil.getMessage("EquipmentSerialNumber_xlsx"), workOrderExportPojo.getAssetSerialNum());
+            workOrderMap.put(WebUtil.getMessage("EquipmentName_xlsx"), workOrderExportPojo.getAssetName());
+            workOrderMap.put(WebUtil.getMessage("Site"), workOrderExportPojo.getHospitalName());
+            workOrderMap.put(WebUtil.getMessage("Department"), workOrderExportPojo.getAssetClinicalDeptName());
+            workOrderMap.put(WebUtil.getMessage("manufacture"), workOrderExportPojo.getAssetManufacture());
+            workOrderMap.put(WebUtil.getMessage("brand"), workOrderExportPojo.getAssetMakerShortName());
+            workOrderMap.put(WebUtil.getMessage("CurrentOwner_xlsx"), workOrderExportPojo.getCurrentPersonName());
             //workOrderMap.put("当前步骤", workOrderExportPojo.getCurrentStepName());
-            workOrderMap.put("当前步骤", workOrderExportPojo.getCurrentStepId() != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, workOrderExportPojo.getCurrentStepId().toString()) : "");
-            workOrderMap.put("报修人", workOrderExportPojo.getRequestorName());
-            workOrderMap.put("报修时间", formatDate(workOrderExportPojo.getRequestTime()));
-            workOrderMap.put("故障描述", workOrderExportPojo.getRequestReason());
-            workOrderMap.put("派工人", workOrderExportPojo.getSendStepOwnerName());
-            workOrderMap.put("派工时间", formatDate(workOrderExportPojo.getSendStepStartTime()));
+            workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), workOrderExportPojo.getCurrentStepId() != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, workOrderExportPojo.getCurrentStepId().toString()) : "");
+            workOrderMap.put(WebUtil.getMessage("requestorId"), workOrderExportPojo.getRequestorName());
+            workOrderMap.put(WebUtil.getMessage("RequestTime_xlsx"), formatDate(workOrderExportPojo.getRequestTime()));
+            workOrderMap.put(WebUtil.getMessage("FaultDescription_xlsx"), workOrderExportPojo.getRequestReason());
+            workOrderMap.put(WebUtil.getMessage("dispatchUserName"), workOrderExportPojo.getSendStepOwnerName());
+            workOrderMap.put(WebUtil.getMessage("AssignTime_xlsx"), formatDate(workOrderExportPojo.getSendStepStartTime()));
             //workOrderMap.put("工单类型", workOrderExportPojo.getIntExtTypeName());
-            workOrderMap.put("工单类型", workOrderExportPojo.getIntExtType() != null ? FieldValueMessageController.fieldValue(I18N_INT_EXT_TYPE, workOrderExportPojo.getIntExtType().toString()) : "");
+            workOrderMap.put(WebUtil.getMessage("WorkorderType_xlsx"), workOrderExportPojo.getIntExtType() != null ? FieldValueMessageController.fieldValue(I18N_INT_EXT_TYPE, workOrderExportPojo.getIntExtType().toString()) : "");
             //workOrderMap.put("维修类型", workOrderExportPojo.getRepairTypeName());
-            workOrderMap.put("维修类型", workOrderExportPojo.getRepairType() != null ? FieldValueMessageController.fieldValue(I18N_REPAIR_TYPE, workOrderExportPojo.getRepairType().toString()) : "");
-            workOrderMap.put("接单人", workOrderExportPojo.getAcceptStepOwnerName());
-            workOrderMap.put("接单时间", formatDate(workOrderExportPojo.getAcceptStepStartTime()));
-            workOrderMap.put("维修完成时间", formatDate(workOrderExportPojo.getWorkStepEndTime()));
-            workOrderMap.put("签到时间", formatDate(workOrderExportPojo.getCheckinTime()));
-            workOrderMap.put("维修工程师工时", workOrderExportPojo.getManHours());
-            workOrderMap.put("维修总工时", workOrderExportPojo.getTotalManHour());
-            workOrderMap.put("维修备件", workOrderExportPojo.getParts());
-            workOrderMap.put("备件总费用", workOrderExportPojo.getPartsTotalPrice());
-            workOrderMap.put("其他费用", workOrderExportPojo.getOtherExpense());
-            workOrderMap.put("外修费用", workOrderExportPojo.getExternalExpense());
-            workOrderMap.put("维修总费用", workOrderExportPojo.getTotalPrice());
-            workOrderMap.put("验收人", workOrderExportPojo.getEvaluateStepOwnerName());
-            workOrderMap.put("验收时间", formatDate(workOrderExportPojo.getEvaluateStepEndTime()));
-            workOrderMap.put("关单人", workOrderExportPojo.getCloseStepOwnerName());
-            workOrderMap.put("关单时间", formatDate(workOrderExportPojo.getCloseStepEndTime()));
-            workOrderMap.put("协助者", workOrderExportPojo.getCoworker());
-            workOrderMap.put("协助者工时", workOrderExportPojo.getCoworkManHour());
-            workOrderMap.put("最终评价", workOrderExportPojo.getFeedbackRating());
-            workOrderMap.put("故障类型", workOrderExportPojo.getCaseTypeName());
-            workOrderMap.put("原因描述", workOrderExportPojo.getPatProblems());
-            workOrderMap.put("解决方案", workOrderExportPojo.getPatActions());
-            workOrderMap.put("交付前检测", workOrderExportPojo.getPatTests());
-            workOrderMap.put("备注", workOrderExportPojo.getComment());
-            workOrderMap.put("二维码", workOrderExportPojo.getAssetInfoQrCode());
+            workOrderMap.put(WebUtil.getMessage("RepairType_xlsx"), workOrderExportPojo.getRepairType() != null ? FieldValueMessageController.fieldValue(I18N_REPAIR_TYPE, workOrderExportPojo.getRepairType().toString()) : "");
+            workOrderMap.put(WebUtil.getMessage("Acceptedby_xlsx"), workOrderExportPojo.getAcceptStepOwnerName());
+            workOrderMap.put(WebUtil.getMessage("AcceptTime_xlsx"), formatDate(workOrderExportPojo.getAcceptStepStartTime()));
+            workOrderMap.put(WebUtil.getMessage("RepairCompleteTime_xlsx"), formatDate(workOrderExportPojo.getWorkStepEndTime()));
+            workOrderMap.put(WebUtil.getMessage("CheckInTime_xlsx"), formatDate(workOrderExportPojo.getCheckinTime()));
+            workOrderMap.put(WebUtil.getMessage("MaintenanceEngineerManhours_xlsx"), workOrderExportPojo.getManHours());
+            workOrderMap.put(WebUtil.getMessage("TotalManhours_xlsx"), workOrderExportPojo.getTotalManHour());
+            workOrderMap.put(WebUtil.getMessage("RepairPart_xlsx"), workOrderExportPojo.getParts());
+            workOrderMap.put(WebUtil.getMessage("TotalPartPrice_xlsx"), workOrderExportPojo.getPartsTotalPrice());
+            workOrderMap.put(WebUtil.getMessage("OtherExpenses_xlsx"), workOrderExportPojo.getOtherExpense());
+            workOrderMap.put(WebUtil.getMessage("ExternalExpenses_xlsx"), workOrderExportPojo.getExternalExpense());
+            workOrderMap.put(WebUtil.getMessage("TotalRepairPrice_xlsx"), workOrderExportPojo.getTotalPrice());
+            workOrderMap.put(WebUtil.getMessage("AcknowledgedBy_xlsx"), workOrderExportPojo.getEvaluateStepOwnerName());
+            workOrderMap.put(WebUtil.getMessage("AcceptTime_xlsx"), formatDate(workOrderExportPojo.getEvaluateStepEndTime()));
+            workOrderMap.put(WebUtil.getMessage("Closedby_xlsx"), workOrderExportPojo.getCloseStepOwnerName());
+            workOrderMap.put(WebUtil.getMessage("CloseTime_xlsx"), formatDate(workOrderExportPojo.getCloseStepEndTime()));
+            workOrderMap.put(WebUtil.getMessage("Coworker"), workOrderExportPojo.getCoworker());
+            workOrderMap.put(WebUtil.getMessage("CoworkerManhours_xlsx"), workOrderExportPojo.getCoworkManHour());
+            workOrderMap.put(WebUtil.getMessage("FinalRating_xlsx"), workOrderExportPojo.getFeedbackRating());
+            workOrderMap.put(WebUtil.getMessage("FaultType_xlsx"), workOrderExportPojo.getCaseTypeName());
+            workOrderMap.put(WebUtil.getMessage("ReasonDescription_xlsx"), workOrderExportPojo.getPatProblems());
+            workOrderMap.put(WebUtil.getMessage("patActions"), workOrderExportPojo.getPatActions());
+            workOrderMap.put(WebUtil.getMessage("patTests"), workOrderExportPojo.getPatTests());
+            workOrderMap.put(WebUtil.getMessage("Remark"), workOrderExportPojo.getComment());
+            workOrderMap.put(WebUtil.getMessage("QRCode_xlsx"), workOrderExportPojo.getAssetInfoQrCode());
             //workOrderMap.put("设备分类", workOrderExportPojo.getAssetGroupName());
-            workOrderMap.put("设备分类", workOrderExportPojo.getAssetGroup() != null ? FieldValueMessageController.fieldValue("assetGroup", workOrderExportPojo.getAssetGroup().toString()) : "");
+            workOrderMap.put(WebUtil.getMessage("EquipmentClassification_xlsx"), workOrderExportPojo.getAssetGroup() != null ? FieldValueMessageController.fieldValue("assetGroup", workOrderExportPojo.getAssetGroup().toString()) : "");
             /*workOrderMap.put("医疗器械分类", workOrderExportPojo.getAssetFunctionGroupName());
             workOrderMap.put("医疗器械子分类", workOrderExportPojo.getAssetCode68Name());*/
-            workOrderMap.put("设备型号", workOrderExportPojo.getAssetFunctionType());
-            workOrderMap.put("修复后无故障天数", (workOrderExportPojo.getNearestWorkDay() == null || workOrderExportPojo.getNearestWorkDay() < 0) ? "" : workOrderExportPojo.getNearestWorkDay());
-            workOrderMap.put("停机时间", formatDate(workOrderExportPojo.getConfirmedDownTime()));
-            workOrderMap.put("恢复时间", formatDate(workOrderExportPojo.getConfirmedUpTime()));
-            workOrderMap.put("报修人电话", workOrderExportPojo.getTelephone());
-            workOrderMap.put("当前位置", workOrderExportPojo.getLocationName());
+            workOrderMap.put(WebUtil.getMessage("EquipmentModel_xlsx"), workOrderExportPojo.getAssetFunctionType());
+            workOrderMap.put(WebUtil.getMessage("NearestWorkDays_xlsx"), (workOrderExportPojo.getNearestWorkDay() == null || workOrderExportPojo.getNearestWorkDay() < 0) ? "" : workOrderExportPojo.getNearestWorkDay());
+            workOrderMap.put(WebUtil.getMessage("DownTime_xlsx"), formatDate(workOrderExportPojo.getConfirmedDownTime()));
+            workOrderMap.put(WebUtil.getMessage("RecoveryTime_xlsx"), formatDate(workOrderExportPojo.getConfirmedUpTime()));
+            workOrderMap.put(WebUtil.getMessage("RequestorTelephone_xlsx"), workOrderExportPojo.getTelephone());
+            workOrderMap.put(WebUtil.getMessage("CurrentLocation_xlsx"), workOrderExportPojo.getLocationName());
             //workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
-            workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getAssetStatus().toString()) : "");
+            workOrderMap.put(WebUtil.getMessage("RequestStatus_xlsx"), workOrderExportPojo.getAssetStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getAssetStatus().toString()) : "");
 
             if (workOrderExportPojo.getAssetFunctionGroup() != null) {
-                workOrderMap.put("医疗器械分类", workOrderExportPojo.getAssetFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType", workOrderExportPojo.getAssetFunctionGroup().toString()) : "");
-                workOrderMap.put("医疗器械子分类", workOrderExportPojo.getAssetCode68() != null ? FieldValueMessageController.fieldValue(workOrderExportPojo.getAssetFunctionGroup().toString(), workOrderExportPojo.getAssetCode68().toString()) : "");
+                workOrderMap.put(WebUtil.getMessage("MedicalDeviceClassification_xlsx"), workOrderExportPojo.getAssetFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType", workOrderExportPojo.getAssetFunctionGroup().toString()) : "");
+                workOrderMap.put(WebUtil.getMessage("MedicalDeviceSubclassification_xlsx"), workOrderExportPojo.getAssetCode68() != null ? FieldValueMessageController.fieldValue(workOrderExportPojo.getAssetFunctionGroup().toString(), workOrderExportPojo.getAssetCode68().toString()) : "");
             } else {
-                workOrderMap.put("医疗器械分类", "");
-                workOrderMap.put("医疗器械子分类", "");
+                workOrderMap.put(WebUtil.getMessage("MedicalDeviceClassification_xlsx"), "");
+                workOrderMap.put(WebUtil.getMessage("MedicalDeviceSubclassification_xlsx"), "");
             }
 
             /*String sendStepInfo = workOrderExportPojo.getSendStepInfo();
@@ -256,7 +257,7 @@ public class WorkOrderExportService {
                     attributesStr += label + ":" + value + ";";
                 }
             }
-            workOrderMap.put("属性", attributesStr);
+            workOrderMap.put(WebUtil.getMessage("Attribute"), attributesStr);
 
             if(workOrderExportPojo.getSignature() != null){
                 workOrderMap.put("signature", workOrderExportPojo.getSignature());
@@ -279,8 +280,8 @@ public class WorkOrderExportService {
 
         List<Map<String, Object>> partList = new ArrayList<>();
         for (Map<String, Object> workOrderMap : workOrderList) {
-            if(workOrderMap.containsKey("备件信息")){
-                partList.addAll((List<Map<String, Object>>)workOrderMap.get("备件信息"));
+            if(workOrderMap.containsKey("PartInformation")){
+                partList.addAll((List<Map<String, Object>>)workOrderMap.get("PartInformation"));
             }
         }
         return partList;
@@ -292,31 +293,31 @@ public class WorkOrderExportService {
         List<Map<String, Object>> parts = new ArrayList<>();
         for (V2_WorkOrder_Detail workOrderDetail : workOrderDetailList) {
             Map<String, Object> part = new HashedMap();
-            part.put("报修单号", workOrderPojo.getSrNum());
-            part.put("资产名称", workOrderPojo.getAssetName());
-            part.put("设备编号", workOrderPojo.getAssetDepartNum());
-            part.put("备件名", workOrderDetail.getParts());
-            part.put("合同价格", workOrderDetail.getClosedPrice());
-            part.put("数量", workOrderDetail.getApartsQuantity());
-            part.put("类型", workOrderDetail.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetail.getPartsType()) : "");
-            part.put("序列号", workOrderDetail.getSerialNum());
-            part.put("质保期", workOrderDetail.getWarrantyDate());
-            part.put("合同号", workOrderDetail.getContractNum());
-            part.put("发票号", workOrderDetail.getInvoiceNum());
-            part.put("开票日期", formatDate(workOrderDetail.getInvoiceTime()));
-            part.put("预计价格", workOrderDetail.getPartsPrice());
-            part.put("供应商", workOrderDetail.getSupplier());
-            part.put("备注", workOrderDetail.getComment());
+            part.put(WebUtil.getMessage("srNum_xlsx"), workOrderPojo.getSrNum());
+            part.put(WebUtil.getMessage("AssetName_xlsx"), workOrderPojo.getAssetName());
+            part.put(WebUtil.getMessage("EquipmentID_xlsx"), workOrderPojo.getAssetDepartNum());
+            part.put(WebUtil.getMessage("PartName_xlsx"), workOrderDetail.getParts());
+            part.put(WebUtil.getMessage("ContractPrice_xlsx"), workOrderDetail.getClosedPrice());
+            part.put(WebUtil.getMessage("Quantity"), workOrderDetail.getApartsQuantity());
+            part.put(WebUtil.getMessage("type"), workOrderDetail.getPartsType() != null ? FieldValueMessageController.fieldValue("partsType", workOrderDetail.getPartsType()) : "");
+            part.put(WebUtil.getMessage("SerialNumber_xlsx"), workOrderDetail.getSerialNum());
+            part.put(WebUtil.getMessage("WarrantyDate_xlsx"), workOrderDetail.getWarrantyDate());
+            part.put(WebUtil.getMessage("ContractNumber_xlsx"), workOrderDetail.getContractNum());
+            part.put(WebUtil.getMessage("InvoiceNumber_xlsx"), workOrderDetail.getInvoiceNum());
+            part.put(WebUtil.getMessage("InvoiceTime_xlsx"), formatDate(workOrderDetail.getInvoiceTime()));
+            part.put(WebUtil.getMessage("EstimatedPrice_xlsx"), workOrderDetail.getPartsPrice());
+            part.put(WebUtil.getMessage("Vendor"), workOrderDetail.getSupplier());
+            part.put(WebUtil.getMessage("Remark"), workOrderDetail.getComment());
             if (workOrderDetail.getArrived() == null) {
-                part.put("到货", null);
+                part.put(WebUtil.getMessage("Arrival"), null);
             } else {
-                String arrived = workOrderDetail.getArrived().equals(Boolean.TRUE) ? "到货" : "未到货";
-                part.put("到货", arrived);
+                String arrived = workOrderDetail.getArrived().equals(Boolean.TRUE) ? WebUtil.getMessage("Arrival") : WebUtil.getMessage("NonArrived");
+                part.put(WebUtil.getMessage("Arrival"), arrived);
             }
             parts.add(part);
         }
 
-        workOrderMap.put("备件信息", parts);
+        workOrderMap.put("PartInformation", parts);
     }
 
     private void putWorkOrderStep(WorkOrderExportPojo workOrderPojo, Map<String, Object> workOrderMap){

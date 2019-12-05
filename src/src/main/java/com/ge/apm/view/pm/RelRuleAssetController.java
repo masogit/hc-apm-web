@@ -1,6 +1,7 @@
 package com.ge.apm.view.pm;
 
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,13 +21,18 @@ import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
 import com.google.common.collect.Lists;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
+import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.domain.pure.AssetRuleModel;
@@ -35,6 +41,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -42,7 +49,12 @@ import webapp.framework.web.mvc.JpaCRUDController;
 @ManagedBean
 @ViewScoped
 public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAsset> {
-
+    private String installDateFormatTime = null;
+    private Date varInstallDateTo = null;
+    private Date installDateFrom;
+    private Date installDateTo;
+private Date startInstallDate;
+private Date endInstallDate;
     private static final long serialVersionUID = -1L;
     private DualListModel<AssetInfo> availableAssets;
     private List<AssetInfo> sourceAssets;
@@ -182,10 +194,35 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         }*/
         return name;
     }
+    @Override
+    public void onFilter(FilterEvent event) {
+        super.onFilter(event);
+    }
+    @Override
+    protected Page<RelRuleAsset> loadData(PageRequest pageRequest) {
+
+        return null;
+    }
 
     public List<AssetInfo> getAssetList() {
         List<SearchFilter> assetFilters = new ArrayList<SearchFilter>();
         List<String> uids = null;
+        if (queryAsset.getPurchaseDateStart() != null) {
+            assetFilters.add(new SearchFilter("purchaseDate", SearchFilter.Operator.GTE, queryAsset.getPurchaseDateStart()));
+        }
+        if (queryAsset.getPurchaseDateEnd()!=null) {
+            assetFilters.add(new SearchFilter("purchaseDate", SearchFilter.Operator.LTE
+                    , queryAsset.getPurchaseDateEnd()));
+        }
+
+        if (queryAsset.getStartInstallDate() != null) {
+
+            assetFilters.add(new SearchFilter("installDate", SearchFilter.Operator.GTE, queryAsset.getStartInstallDate()));
+        }
+        if (queryAsset.getEndInstallDate()!=null) {
+            assetFilters.add(new SearchFilter("installDate", SearchFilter.Operator.LTE
+                    , queryAsset.getEndInstallDate()));
+        }
         if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
             assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
         }
@@ -208,13 +245,20 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                 assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,results));
             }
         }
-/*        if (StringUtils.isNotEmpty(queryAsset.getClinicalDeptUid())){
-            Set<String> clinicalUids = orgInfoTreeService.collectChildClinicalDept(queryAsset.getClinicalDeptUid());
-            List<String> results = new ArrayList<>(clinicalUids);
-            if(CollectionUtils.isNotEmpty(results)){
-                assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,results));
-            }
-        }*/
+
+
+
+/* if (values.length > 1) {
+                    filterValue = TimeUtil.fromString(values[1]);
+                    if (filterValue != null) {
+                        //结束时间是一天的最后一秒  YHAAO-4035
+                        Date toDate = TimeUtils.getDateFromStr(TimeUtils.getStrDate(((DateTime) filterValue).toDate(), "yyyyMMdd").concat("235959"), "yyyyMMddHHmmss");
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, toDate));
+                    }
+                }*/
+
+
+
         if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
             assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
         }
@@ -244,6 +288,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         return new ArrayList<>();
     }
 
+
     public List<String> getAssetUids(String tenantUid,String pmOrderRuleLevel){
         List<String> uids = null;
         if("2".equals(pmOrderRuleLevel)){//二级保养规则
@@ -271,8 +316,15 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         return filter;
     }
 
+    public void x1(){
+        System.out.println();
+    }
+    public void x2(){
+        System.out.println();
+    }
     public void addFilter() {
-        sourceAssets = getAssetList();
+
+            sourceAssets = getAssetList();
         targetAssets.forEach((item) -> {
             if (sourceAssets.contains(item)) {
                 sourceAssets.remove(item);
@@ -558,4 +610,53 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         this.siteUid = siteUid;
     }
 
+
+    public String getInstallDateFormatTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        if (varInstallDateTo == null) {
+            return installDateFormatTime;
+        } else {
+            return "~" + sdf.format(varInstallDateTo);
+        }
+    }
+
+    public void setInstallDateFormatTime(String installDateFormatTime) {
+        this.installDateFormatTime = installDateFormatTime;
+    }
+
+    public Date getVarInstallDateTo() {
+        return varInstallDateTo;
+    }
+
+    public Date getInstallDateFrom() {
+        return installDateFrom;
+    }
+
+    public void setInstallDateFrom(Date installDateFrom) {
+        this.installDateFrom = installDateFrom;
+    }
+
+    public Date getInstallDateTo() {
+        return installDateTo;
+    }
+
+    public void setInstallDateTo(Date installDateTo) {
+        this.installDateTo = installDateTo;
+    }
+
+    public Date getStartInstallDate() {
+        return startInstallDate;
+    }
+
+    public void setStartInstallDate(Date startInstallDate) {
+        this.startInstallDate = startInstallDate;
+    }
+
+    public Date getEndInstallDate() {
+        return endInstallDate;
+    }
+
+    public void setEndInstallDate(Date endInstallDate) {
+        this.endInstallDate = endInstallDate;
+    }
 }

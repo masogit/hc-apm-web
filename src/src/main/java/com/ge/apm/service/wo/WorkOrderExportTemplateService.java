@@ -3,11 +3,13 @@ package com.ge.apm.service.wo;
 import com.ge.apm.dao.WorkOrderExportTemplateRepository;
 import com.ge.apm.domain.WorkOrderExportTemplate;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.context.LocaleHolder;
+import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.IOException;
@@ -44,8 +46,9 @@ public class WorkOrderExportTemplateService {
             templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
         }
         if (templateBytes == null) {
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
             String fileName = "template.docx";
-            if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+            if (userContextService.isLocale()){
                 fileName = "template_zh.docx";
             } else {
                 fileName = "template_en.docx";

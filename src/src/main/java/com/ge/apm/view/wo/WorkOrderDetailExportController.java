@@ -196,8 +196,13 @@ public class WorkOrderDetailExportController implements Serializable {
     }
 
     private void exportWorkOrderDetailData(List<Map<String, Object>> workOrderDetailData) {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        String fileName = "APM_WorkOrderDetail_Template.xlsx";
+        if(!userContextService.isLocale()){
+            fileName = "APM_WorkOrderDetail_Template_en.xlsx";
+        }
         try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExport/APM_WorkOrderDetail_Template.xlsx");
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExport/" + fileName);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = workOrderDetailExportService.exportOrderDetailData(doc, workOrderDetailData);
             if (exportFlag) {

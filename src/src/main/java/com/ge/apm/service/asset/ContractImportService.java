@@ -66,6 +66,19 @@ public class ContractImportService {
             contractInfoVO.setLineNum(i);
 
             ContractRow contractRow = new ContractRow(contractInfoVO, rowMap);
+            contractRow.setFieldStringValue(WebUtil.getMessage("ContractUID"), "setId");
+            contractRow.setFieldStringValue(WebUtil.getMessage("name"), "setName");
+            contractRow.setFieldStringValue(WebUtil.getMessage("contractNum"), "setContractNum");
+            contractRow.setFieldStringValue(WebUtil.getMessage("reportNum"), "setReportNum");
+            contractRow.setFieldStringValue(WebUtil.getMessage("foreignTradeNum"), "setForeignTradeNum");
+            contractRow.setFieldStringValue(WebUtil.getMessage("invoiceNum"), "setInvoiceNum");
+            contractRow.setFieldStringValue(WebUtil.getMessage("Vendor"), "setSupplierName");
+            contractRow.setFieldDoubleValue(WebUtil.getMessage("ContractValue"), "setAmount");
+            contractRow.setFieldDateValue(WebUtil.getMessage("startTime"), "setStartDate");
+            contractRow.setFieldDateValue(WebUtil.getMessage("endTime"), "setEndDate");
+            contractRow.setFieldIntegerValue(WebUtil.getMessage("ContractPeriodMonths"), "setEndMonths");
+
+            /*ContractRow contractRow = new ContractRow(contractInfoVO, rowMap);
             contractRow.setFieldStringValue("合同UID", "setId");
             contractRow.setFieldStringValue("名称", "setName");
             contractRow.setFieldStringValue("合同编号", "setContractNum");
@@ -76,7 +89,7 @@ public class ContractImportService {
             contractRow.setFieldDoubleValue("合同总额", "setAmount");
             contractRow.setFieldDateValue("开始时间", "setStartDate");
             contractRow.setFieldDateValue("结束时间", "setEndDate");
-            contractRow.setFieldIntegerValue("合同时间(月)", "setEndMonths");
+            contractRow.setFieldIntegerValue("合同时间(月)", "setEndMonths");*/
 
             /*contractRow.setFieldStringValue("清单序号", "setListNum");
             contractRow.setFieldStringValue("项目申请名称", "setApplyProjectName");

@@ -528,10 +528,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             return false;
         }
         checkFilters.clear();
-        checkFilters.add(new SearchFilter("assetOwnerId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
-        checkFilters.add(new SearchFilter("assetOwnerId2", SearchFilter.Operator.EQ, selected.getId(), "1+"));
-        checkFilters.add(new SearchFilter("assetOwnerId3", SearchFilter.Operator.EQ, selected.getId(), "1+"));
-        checkFilters.add(new SearchFilter("clinicalOwnerId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
+        checkFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
+        checkFilters.add(new SearchFilter("assetOwnerId", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
+        checkFilters.add(new SearchFilter("assetOwnerId2", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
+        checkFilters.add(new SearchFilter("assetOwnerId3", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
+        checkFilters.add(new SearchFilter("clinicalOwnerId", SearchFilter.Operator.EQ, selected.getId(), "1*2+"));
         AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
         List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);
         if (assetList != null && !assetList.isEmpty()) {

@@ -1,6 +1,15 @@
 package com.ge.apm.domain;
 
+import java.util.Date;
+
 public class QueryAsset {
+	private Date installDateStart;
+	private Date installDateEnd;
+	private Date startInstallDate;
+	private Date endInstallDate;
+
+	private Date purchaseDateStart;
+	private Date purchaseDateEnd;
 	private String tenantUID;
 	private String name;
 	private String functionType;//设备型号
@@ -25,7 +34,39 @@ public class QueryAsset {
         return clinicalDeptUid;
     }
 
-    public void setClinicalDeptUid(String clinicalDeptUid) {
+	public Date getInstallDateStart() {
+		return installDateStart;
+	}
+
+	public void setInstallDateStart(Date installDateStart) {
+		this.installDateStart = installDateStart;
+	}
+
+	public Date getInstallDateEnd() {
+		return installDateEnd;
+	}
+
+	public void setInstallDateEnd(Date installDateEnd) {
+		this.installDateEnd = installDateEnd;
+	}
+
+	public Date getPurchaseDateStart() {
+		return purchaseDateStart;
+	}
+
+	public void setPurchaseDateStart(Date purchaseDateStart) {
+		this.purchaseDateStart = purchaseDateStart;
+	}
+
+	public Date getPurchaseDateEnd() {
+		return purchaseDateEnd;
+	}
+
+	public void setPurchaseDateEnd(Date purchaseDateEnd) {
+		this.purchaseDateEnd = purchaseDateEnd;
+	}
+
+	public void setClinicalDeptUid(String clinicalDeptUid) {
         this.clinicalDeptUid = clinicalDeptUid;
     }
 
@@ -79,6 +120,20 @@ public class QueryAsset {
 	public void setManufacture(String manufacture) {
 		this.manufacture = manufacture;
 	}
-	
-	
+
+	public Date getStartInstallDate() {
+		return startInstallDate;
+	}
+
+	public void setStartInstallDate(Date startInstallDate) {
+		this.startInstallDate = startInstallDate;
+	}
+
+	public Date getEndInstallDate() {
+		return endInstallDate;
+	}
+
+	public void setEndInstallDate(Date endInstallDate) {
+		this.endInstallDate = endInstallDate;
+	}
 }
