@@ -99,21 +99,9 @@
                         </p:column>
                         <p:column>
                             <f:facet name="header">
-<<<<<<< HEAD
                                 <h:outputText value="#{msg.PmOrderRule}"/><br/>
                                 <p:autoComplete dropdown="true" value="#{v2PmOrderController.filterRule}" appendTo="@(Body)"
-=======
-                                <h:outputText value="保养规则"/><br/>
-                                <!--<p:selectOneMenu id ="pmOrder" value ="#{v2PmOrderController.pmOrderRule}" converter="pmRuleConverter">
-                                    <f:selectItems value="#{v2PmOrderController.ruleList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
-                                        <p:ajax listener="#{v2PmOrderController.onSelectPmRule()}"
-                                                update="datalist"/>
 
-                                </p:selectOneMenu>-->
-
-
-                                <!--<p:autoComplete dropdown="true" value="#{v2PmOrderController.pmOrderRule}" appendTo="@(Body)"
->>>>>>> ab4f83c38c069fae32f7c9f326492b62fc36144e
                                                 scrollHeight="300" forceSelection="ture" completeMethod="#{v2PmOrderController.autoCompleteRuleName()}" size="5">
                                     <p:ajax event="itemSelect" listener="#{v2PmOrderController.onRuleFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist" ></p:ajax>
                                     <p:ajax process="@this" listener="#{v2PmOrderController.onRuleFilterChange}"   update="pmTab:pmOrderListForm:datalist"/>
