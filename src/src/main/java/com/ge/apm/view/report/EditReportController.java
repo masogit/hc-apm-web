@@ -73,7 +73,7 @@ public class EditReportController {
     public void save() {
         tableValue.putAll(tableService.getRuleResultData(tableValue,table));
         tableService.saveTableDate(report,tableValue);
-        WebUtil.addSuccessMessage("已保存");
+        WebUtil.addSuccessMessage(WebUtil.getMessage("Saved"));
     }
 
 
@@ -81,7 +81,7 @@ public class EditReportController {
         tableValue.putAll(tableService.getRuleResultData(tableValue,table));
         tableService.saveTableDate(report,tableValue);
         tableService.submitReport(report);
-         WebUtil.addSuccessMessage("已提交");
+         WebUtil.addSuccessMessage(WebUtil.getMessage("Submitted"));
     }
     
     public String getOptionValue(TableItem fieldItem){
