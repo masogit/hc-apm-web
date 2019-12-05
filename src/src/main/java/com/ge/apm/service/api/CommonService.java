@@ -49,9 +49,9 @@ public class CommonService {
   @Cacheable(cacheNames = "springCache", key = "'commonService.findAllMessages'")
   public Iterable<Tuple7<Integer, String, String, String, String, String, Integer>> findAllMessages() {
     return Try.of(() -> db.select(new SQL().SELECT("id", "msg_type", "msg_key", "value_zh", "value_en", "value_tw", "site_id").FROM("i18n_message").toString())
-      .getAs(Integer.class, String.class, String.class, String.class, String.class, String.class, Integer.class)
-      .map(t -> Tuple.of(t._1(), t._2(), t._3(), t._4(), t._5(), t._6(), t._7())).sorted((l, r) -> l._1 - r._1)
-      .cache().toBlocking().toIterable()).getOrElse(ImmutableList.of());
+            .getAs(Integer.class, String.class, String.class, String.class, String.class, String.class, Integer.class)
+            .map(t -> Tuple.of(t._1(), t._2(), t._3(), t._4(), t._5(), t._6(), t._7())).sorted((l, r) -> l._1 - r._1)
+            .cache().toBlocking().toIterable()).getOrElse(ImmutableList.of());
   }
 
   @Cacheable(cacheNames = "springCache", key = "'commonService.findFields.'+#siteId+'.'+#type")

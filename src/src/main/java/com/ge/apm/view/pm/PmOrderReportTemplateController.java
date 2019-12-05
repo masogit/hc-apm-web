@@ -21,6 +21,7 @@ import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -32,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @ManagedBean
 @ViewScoped
@@ -170,12 +172,22 @@ public class PmOrderReportTemplateController extends GenericCRUDUUIDController<P
 
     }
 
+
     /**
      * called when download template.
      *
      * @return {@link StreamedContent} object
      */
     public StreamedContent getActiveTemplate() {
+
+        /*String fileName = null;
+        if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+            fileName = "measure-template_zh.docx";
+        } else {
+            fileName = "measure-template_en.docx";
+
+        }*/
+
         try {
             byte[] activeTemplateBytes = pmOrderReportTemplateService.getActiveTemplateBytes(isInsulate, user);
             return new DefaultStreamedContent((new ByteArrayInputStream(activeTemplateBytes)), "application/msword", "template.docx");

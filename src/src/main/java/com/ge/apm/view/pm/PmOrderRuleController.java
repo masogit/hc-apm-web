@@ -631,14 +631,24 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         this.checkItemLists = checkItemLists;
     }
 
+    public boolean isLocale(){
+        Locale locale = LocaleHolder.getLocale();
+        //System.out.println("locale  is "+locale);
+        if(locale.getLanguage().equalsIgnoreCase("zh")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void generateReportTemplateFile() throws IOException{
         String fileName = "maintenance-template.docx";
-        /*if (userContextService.isLocale()){
+        if (isLocale()){
             fileName = "maintenance-template_zh.docx";
         } else {
             fileName = "maintenance-template_en.docx";
 
-        }*/
+        }
         InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/" + fileName );
 
         try {
