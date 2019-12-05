@@ -151,6 +151,17 @@ public class TenantInfo implements Serializable {
     @Transient
     private String cpmURL;
 
+    @Column(name = "international_version")
+    private Integer internationalVersion;//是否是国际化租户 0或null:不是 1：是
+
+    public Integer getInternationalVersion() {
+        return internationalVersion;
+    }
+
+    public void setInternationalVersion(Integer internationalVersion) {
+        this.internationalVersion = internationalVersion;
+    }
+
     public Integer getCurrency() {
         return currency;
     }
