@@ -30,19 +30,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
-<<<<<<< HEAD
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
-=======
-import lombok.Data;
->>>>>>> ab4f83c38c069fae32f7c9f326492b62fc36144e
+
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
@@ -59,13 +47,7 @@ import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-<<<<<<< HEAD
-import webapp.framework.context.LocaleHolder;
-=======
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.dao.BySearchFilterSpecification;
->>>>>>> ab4f83c38c069fae32f7c9f326492b62fc36144e
+
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -1158,16 +1140,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
 
 
-    public boolean isLocale(){
-        Locale locale = LocaleHolder.getLocale();
-        //System.out.println("locale  is "+locale);
-        if(locale.getLanguage().equalsIgnoreCase("zh")){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     protected void init() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
@@ -1200,6 +1172,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         configService = WebUtil.getBean(ConfigService.class);
         v2_workOrderDetailRepository = WebUtil.getBean(V2_WorkOrderDetailRepository.class);
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         this.selectedMap = new HashMap();
         pmReportService = WebUtil.getBean(PmReportService.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
@@ -1228,7 +1201,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         for (ExportFields exs: ExportFields.values()
         ) {
-            if(isLocale()){
+            if(userContextService.isLocale()){
                 pmFieldsExport.add(exs.getChinese());
             }else{
                 pmFieldsExport.add(exs.getEnglish());
