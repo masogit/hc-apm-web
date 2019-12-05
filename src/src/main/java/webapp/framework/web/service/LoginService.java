@@ -368,16 +368,22 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
              * handler.performNavigation("/home.xhtml?faces-redirect=true");
              */
         } catch (UsernameNotFoundException | BadCredentialsException e) {
+            e.printStackTrace();
             addErrorMessage(response, 401, "login_error");
         } catch (DisabledException e) {
+            e.printStackTrace();
             addErrorMessage(response, 401, "security_account_disabled");
         } catch (LockedException e) {
+            e.printStackTrace();
             addErrorMessage(response, 403, "AccountLocked");
         } catch (AccountExpiredException | CredentialsExpiredException e) {
+            e.printStackTrace();
             addErrorMessage(response, 401, "security_account_expired");
         } catch (AccountStatusException e) {
+            e.printStackTrace();
             addErrorMessage(response, 401, "AccountLocked");
         } catch (AuthenticationException e) {
+            e.printStackTrace();
             addErrorMessage(response, 401, "login_error");
             updateLoginStatus(user.getLoginName(), false);
         } finally {
