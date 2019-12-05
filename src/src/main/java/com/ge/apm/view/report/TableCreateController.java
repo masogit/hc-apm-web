@@ -121,7 +121,7 @@ public class TableCreateController extends TieWebSheetBean {
                     StreamedContent savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getExcelStorageId());
                     loadWebSheetByStream(savedFile.getStream());
                 } catch (Exception e) {
-                    WebUtil.addErrorMessage("Excel模版加载失败");
+                    WebUtil.addErrorMessage(WebUtil.getMessage("FailedToLoadExcelTemplate"));
                 }
             }
 
@@ -166,7 +166,7 @@ public class TableCreateController extends TieWebSheetBean {
             context.put("X", tableFields);
             loadWebSheet(inputStream, context);
         } catch (Exception e) {
-            WebUtil.addErrorMessage(e, "读取模版失败");
+            WebUtil.addErrorMessage(e, WebUtil.getMessage("FailedToReadTemplate"));
         }
     }
 
@@ -175,11 +175,11 @@ public class TableCreateController extends TieWebSheetBean {
     public void saveTemplate() {
         tableString = JSONObject.toJSONString(table);
         if (StringUtils.isEmpty(table.getTitle())) {
-            WebUtil.addErrorMessage("名称不能为空");
+            WebUtil.addErrorMessage(WebUtil.getMessage("NameCannotBeEmpty"));
             return;
         }
         if (!Strings.isNullOrEmpty(table.getTitle()) && table.getTitle().length() > 64) {
-            WebUtil.addErrorMessage("名称最大长度64");
+            WebUtil.addErrorMessage(WebUtil.getMessage("NameCannotExceed64DigitsInLength"));
             return;
         }
         Date operationTime = new Date();
@@ -198,7 +198,7 @@ public class TableCreateController extends TieWebSheetBean {
             selectedTableDefinition.setCreatedDate(operationTime);
             templateDao.save(selectedTableDefinition);
 
-            WebUtil.addSuccessMessage("JSON已保存");
+            WebUtil.addSuccessMessage(WebUtil.getMessage("JSONSaved"));
         } else {
             Integer count = templateService.getCountByTemplate(selectedTableDefinition.getId());
             if (count == 0 || !templateService.hasKeyChange(selectedTableDefinition.getSchema(), tableString)) {
@@ -209,12 +209,12 @@ public class TableCreateController extends TieWebSheetBean {
                 selectedTableDefinition.setLastModifiedBy(operator);
                 selectedTableDefinition.setLastModifiedDate(operationTime);
                 templateDao.save(selectedTableDefinition);
-                WebUtil.addSuccessMessage("JSON已保存");
+                WebUtil.addSuccessMessage(WebUtil.getMessage("JSONSaved"));
             } else {
                 //save instrument data
                 selectedTableDefinition.setInstrumentKeyValues(saveSelectedInstrumentData());
                 selectedTableDefinition = templateService.updateJSONTemplate(selectedTableDefinition, tableString);
-                WebUtil.addErrorMessage("字段变动, JSON已保存为新版本");
+                WebUtil.addErrorMessage(WebUtil.getMessage("TheFieldChanged"));
             }
 
         }
@@ -299,12 +299,12 @@ public class TableCreateController extends TieWebSheetBean {
 
         if (templateService.hasDuplicatedKey(table)) {
             if (!editGroup.getItems().contains(editTableItem) && templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
-                WebUtil.addErrorMessage("Key已经被使用");
+                WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
                 editTableItem.setKey(null);
                 return;
             }
             if (null != editTableItem.getResKey()) {
-                WebUtil.addErrorMessage("结果Key已经被使用");
+                WebUtil.addErrorMessage(WebUtil.getMessage("ResultKeyHasBeenUsed"));
                 editTableItem.setResKey(null);
             }
             RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -344,7 +344,7 @@ public class TableCreateController extends TieWebSheetBean {
     public void onStringSave() {
         try {
             if (templateService.hasDuplicatedKey(JSONObject.parseObject(tableString, TableSchema.class))) {
-                WebUtil.addErrorMessage("Key已经被使用");
+                WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
                 RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("validationFailed", true);
                 tableString = JSONObject.toJSONString(table);
@@ -352,7 +352,7 @@ public class TableCreateController extends TieWebSheetBean {
             }
             table = JSONObject.parseObject(tableString, TableSchema.class);
         } catch (Exception e) {
-            WebUtil.addErrorMessage("不能解析成模版");
+            WebUtil.addErrorMessage(WebUtil.getMessage("CannotParseIntoATemplate"));
             return;
         }
         this.isStringEditable = false;
@@ -410,7 +410,7 @@ public class TableCreateController extends TieWebSheetBean {
                 StreamedContent savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getExcelStorageId());
                 loadWebSheetByStream(savedFile.getStream());
             } catch (Exception e) {
-                WebUtil.addErrorMessage("Excel模版加载失败");
+                WebUtil.addErrorMessage(WebUtil.getMessage("FailedToLoadExcelTemplate"));
             }
         }
     }
@@ -467,7 +467,7 @@ public class TableCreateController extends TieWebSheetBean {
                 }
                 blobService.saveBlobObject(uploadedFileObject);
                 templateDao.save(selectedTableDefinition);
-                WebUtil.addSuccessMessage("Excel已保存");
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ExcelSaved"));
             }
         } else {
             //修改
@@ -475,7 +475,7 @@ public class TableCreateController extends TieWebSheetBean {
             if (uploadedFile != null) {
                 //Eexcel 模版有变动
                 selectedTableDefinition = templateService.updateExcelTemplate(selectedTableDefinition, uploadedFileObject);
-                WebUtil.addSuccessMessage("Excel已保存");
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ExcelSaved"));
             } else {
                 //删除Excel
                 selectedTableDefinition = templateService.updateExcelTemplate(selectedTableDefinition, null);
@@ -511,7 +511,7 @@ public class TableCreateController extends TieWebSheetBean {
             exportedFile = new DefaultStreamedContent(doc, "application/vnd.ms-excel", fname);
         } catch (Exception ex) {
             Logger.getLogger(TableCreateController.class.getName()).log(Level.WARNING, "Error happens while generate Excel template", ex);
-            WebUtil.addErrorMessage("Excel模版生成失败");
+            WebUtil.addErrorMessage(WebUtil.getMessage("FailedToGenerateExcelTemplate"));
         }
     }
 
@@ -552,7 +552,7 @@ public class TableCreateController extends TieWebSheetBean {
         String newKey = editTableItem.getKey();
         if (!newKey.matches("^[A-Za-z0-9_]+$")) {
             editTableItem.setKey("");
-            WebUtil.addErrorMessage("只能包含,英文,数字,下划线");
+            WebUtil.addErrorMessage(WebUtil.getMessage("OnlyContainEnglishNumbersAndUnderscores"));
         }
     }
 
@@ -740,7 +740,7 @@ public class TableCreateController extends TieWebSheetBean {
                 }
             } catch (Exception e) {
                 // TODO: handle exception
-                WebUtil.addErrorMessage(e, "解析模版失败");
+                WebUtil.addErrorMessage(e, WebUtil.getMessage("FailedToParseTemplate"));
             }
         }
         return templateLabels;
