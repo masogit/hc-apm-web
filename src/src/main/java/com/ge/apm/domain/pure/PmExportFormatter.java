@@ -4,7 +4,10 @@ import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.V2_PmOrder;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
+import org.springframework.beans.factory.annotation.Autowired;
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.web.WebUtil;
 
 import java.util.*;
@@ -32,6 +35,9 @@ public class PmExportFormatter<T> {
         return v2_pmOrder.getCreatorName();
     }
 
+    @Autowired
+    UserContextService userContextService;
+
     public void setCreator(String creator) {
         this.creator = v2_pmOrder.getCreatorName();
     }
@@ -54,20 +60,44 @@ public class PmExportFormatter<T> {
         return type;
     }
 
+    public boolean isLocale(){
+        Locale locale = LocaleHolder.getLocale();
+        //System.out.println("locale  is "+locale);
+        if(locale.getLanguage().equalsIgnoreCase("zh")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public Map<String, Object> buildExcelColumnKeyValueMap() {
 
         Map<String, Object> map = new HashMap<>();
-        map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
-        map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
-        map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
-        map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
-        map.put(ExportFields.CLINICALNAME.getChinese(), this.getClincialName());
-        map.put(ExportFields.CREATOR.getChinese(), this.getCreator());
-        map.put(ExportFields.OWNER.getChinese(), this.getOwner());
-        map.put(ExportFields.PMNUM.getChinese(), this.getPmNum());
-        map.put(ExportFields.CURRENTSTEP.getChinese(), this.getCurrentStep());
-        map.put(ExportFields.ORDERTYPE.getChinese(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
-        map.put(ExportFields.PLANTIME.getChinese(), this.getPlanTime());
+        if(isLocale()){
+            map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
+            map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
+            map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
+            map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
+            map.put(ExportFields.CLINICALNAME.getChinese(), this.getClincialName());
+            map.put(ExportFields.CREATOR.getChinese(), this.getCreator());
+            map.put(ExportFields.OWNER.getChinese(), this.getOwner());
+            map.put(ExportFields.PMNUM.getChinese(), this.getPmNum());
+            map.put(ExportFields.CURRENTSTEP.getChinese(), this.getCurrentStep());
+            map.put(ExportFields.ORDERTYPE.getChinese(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
+            map.put(ExportFields.PLANTIME.getChinese(), this.getPlanTime());
+        }else {
+            map.put(ExportFields.ASSETNAME.getEnglish(), this.getAssetName());
+            map.put(ExportFields.SERIALNUM.getEnglish(), this.getSerialNUm());
+            map.put(ExportFields.RUNLEVEL.getEnglish(), this.getRuleLevel());
+            map.put(ExportFields.PMTYPE.getEnglish(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
+            map.put(ExportFields.CLINICALNAME.getEnglish(), this.getClincialName());
+            map.put(ExportFields.CREATOR.getEnglish(), this.getCreator());
+            map.put(ExportFields.OWNER.getEnglish(), this.getOwner());
+            map.put(ExportFields.PMNUM.getEnglish(), this.getPmNum());
+            map.put(ExportFields.CURRENTSTEP.getEnglish(), this.getCurrentStep());
+            map.put(ExportFields.ORDERTYPE.getEnglish(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
+            map.put(ExportFields.PLANTIME.getEnglish(), this.getPlanTime());
+        }
         return map;
     }
 
