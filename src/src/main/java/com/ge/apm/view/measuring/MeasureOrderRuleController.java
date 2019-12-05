@@ -634,13 +634,13 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
     }
 
     public void generateReportTemplateFile() throws IOException {
-        String fileName = null;
-        if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
+        String fileName = "measure-template.docx";
+/*        if (LocaleHolder.getLocale().toString().equalsIgnoreCase("zh")){
             fileName = "measure-template_zh.docx";
         } else {
             fileName = "measure-template_en.docx";
 
-        }
+        }*/
         InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/" + fileName);
         try {
             InputStream doc = pmOrderReportTemplateService.generateMeasureReportTemplateByRule(stream, selected);

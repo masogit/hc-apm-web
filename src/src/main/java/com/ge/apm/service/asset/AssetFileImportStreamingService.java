@@ -96,103 +96,103 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 asset.setLineNum(dataRow);
 
-                String assetName = ExcelDocument.getCellStringValue(rowMap.get("设备名称"));
+                String assetName = ExcelDocument.getCellStringValue(rowMap.get(trimMsgKey(WebUtil.getMessage("EquipmentName"))));
                 if (StringUtils.isEmpty(assetName)) {
                     break; //return if go beyond the valid cell range
                 }
 
                 AssetRow assetRow = new AssetRow(asset, rowMap);
-                assetRow.setFieldStringValue("设备名称", "setName", false);
-                assetRow.setFieldStringValue("设备编号", "setDepartNum", true);
-                assetRow.setFieldStringValue("资产编号", "setFinancingNum", true);
-                assetRow.setFieldStringValue("设备别名", "setAliasName", true);
-                assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName", true);
-                assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2", true);
-                assetRow.setFieldStringValue("维修负责人3", "setAssetOwnerName3", true);
-                assetRow.setFieldStringValue("保养负责人", "setPmOwnerName", true);
-                assetRow.setFieldStringValue("所属科室", "setClinicalDeptName", true);
-                assetRow.setFieldStringValue("制造商", "setManufacture", true);
-                assetRow.setFieldStringValue("品牌/制造商简称", "setMakerShortName", true);
-                assetRow.setFieldStringValue("设备标准名称", "setDeviceName", true);
-                assetRow.setFieldStringValue("注册证号", "setRegistrationNo", true);
-                assetRow.setFieldStringValue("供应商", "setVendor", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentName")), "setName", false);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentID")), "setDepartNum", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("AssetID")), "setFinancingNum", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentAlias")), "setAliasName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("RepairOwner")), "setAssetOwnerName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("RepairOwner2")), "setAssetOwnerName2", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("RepairOwner3")), "setAssetOwnerName3", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("PMOwner")), "setPmOwnerName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("Department")), "setClinicalDeptName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("manufacture")), "setManufacture", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("BrandManufacturerShortName")), "setMakerShortName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentStandardName")), "setDeviceName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("RegistrationNumber")), "setRegistrationNo", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("Vendor")), "setVendor", true);
 
-                assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", assetFunctionTypes, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("medicalInstrumentClassification")), "setFunctionGroup", assetFunctionTypes, map, null);
                 if (asset.getFunctionGroup() != null) {
                     List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(String.valueOf(asset.getFunctionGroup()), siteId);
-                    assetRow.setFieldDropdownValue("医疗器械子分类", "setAssetCode68", msgList, map, null);
+                    assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetCode68")), "setAssetCode68", msgList, map, null);
                 } else {
                     //only update need to clear old data
                     asset.setAssetCode68(null);
                 }
 
-                assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetGroup")), "setAssetGroup", assetGroup, map, null);
                 if (asset.getAssetGroup() != null) {
                     String msgType = "assetGroupSecondary_" + asset.getAssetGroup();
                     List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(msgType, siteId);
-                    assetRow.setFieldDropdownValue("设备分类2级", "setAssetGroupSecondary", msgList, map, null);
+                    assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetGroupSecondary")), "setAssetGroupSecondary", msgList, map, null);
                 } else {
                     asset.setAssetGroupSecondary(null);
                 }
 
-                assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
-                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, StringUtils.isEmpty(asset.getUid()) ? 1 : null); //新增资产默认内修
-                assetRow.setFieldStringValue("设备型号", "setFunctionType", true);
-                assetRow.setFieldStringValue("制造商序列号", "setSerialNum", true);
-                assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId", true);
-                assetRow.setFieldStringValue("条码", "setBarcode", true);
-                assetRow.setFieldStringValue("2010国家编码", "setNationalStandardCode", true);
-                assetRow.setFieldStringValue("IT系统编号", "setModalityId", true);
-                assetRow.setFieldDoubleValue("采购价格", "setPurchasePrice");
-                assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
-                assetRow.setFieldDoubleValue("使用年限", "setLifecycleInYear");
+                assetRow.setFieldIntegerValue(trimMsgKey(WebUtil.getMessage("functionGrade")), "setFunctionGrade");
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("repairForm")), "setRepairForm", repairFormList, map, StringUtils.isEmpty(asset.getUid()) ? 1 : null); //新增资产默认内修
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("functionType")), "setFunctionType", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("serialNum")), "setSerialNum", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("systemId")), "setSystemId", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("BarCode")), "setBarcode", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("NationalCode")), "setNationalStandardCode", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("ITSystemID")), "setModalityId", true);
+                assetRow.setFieldDoubleValue(trimMsgKey(WebUtil.getMessage("PurchasePrice")), "setPurchasePrice");
+                assetRow.setFieldDoubleValue(trimMsgKey(WebUtil.getMessage("FinalSalvageValue")), "setSalvageValue");
+                assetRow.setFieldDoubleValue(trimMsgKey(WebUtil.getMessage("LifeCycle")), "setLifecycleInYear");
 
-                assetRow.setFieldDropdownValue("折旧算法", "setDepreciationMethod", depreciationMethod, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("DepreciationMethod")), "setDepreciationMethod", depreciationMethod, map, null);
 
-                assetRow.setFieldDateValue("出厂日期", "setManufactDate");
-                assetRow.setFieldDateValue("采购日期", "setPurchaseDate");
-                assetRow.setFieldDateValue("到货日期", "setArriveDate");
-                assetRow.setFieldDateValue("启用日期", "setInstallDate");
-                assetRow.setFieldDateValue("质保日期", "setFactoryWarrantyDate");
-                assetRow.setFieldDateValue("维保截止日期", "setWarrantyDate");
-                assetRow.setFieldDateValue("报废日期", "setTerminateDate");
-                assetRow.setFieldDateValue("上次保养日期", "setLastPmDate");
-                assetRow.setFieldDateValue("上次计量日期", "setLastMeteringDate");
-                assetRow.setFieldDateValue("上次巡检日期", "setLastQaDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("manufactDate")), "setManufactDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("purchaseDate")), "setPurchaseDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("arriveDate")), "setArriveDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("StartUsingDate")), "setInstallDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("WarrantyDate")), "setFactoryWarrantyDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("WarrantyExpirationDate")), "setWarrantyDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("terminateDate")), "setTerminateDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("lastPmDate")), "setLastPmDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("lastMeteringDate")), "setLastMeteringDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("LastInspectionDate")), "setLastQaDate");
 
-                assetRow.setFieldStringValue("维修商", "setMaitanance", true);
-                assetRow.setFieldStringValue("维修商电话", "setMaitananceTel", true);
-                assetRow.setFieldStringValue("安装位置编码", "setLocationCode", true);
-                assetRow.setFieldStringValue("安装位置", "setLocationName", true);
-                assetRow.setFieldStringValue("使用责任人", "setClinicalOwnerName", true);
-                assetRow.setFieldStringValue("备注", "setComments", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("Maintainer")), "setMaitanance", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("MaintainerTelephone")), "setMaitananceTel", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("InstallationLocationCode")), "setLocationCode", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("InstallationLocation")), "setLocationName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("UseOwner")), "setClinicalOwnerName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("Remark")), "setComments", true);
 
-                assetRow.setFieldDropdownValue("用途分类", "setAssetUsage", assetUsageList, map, null);
-                assetRow.setFieldDropdownValue("资金来源", "setCapitalSource", capitalSourceList, map, null);
-                assetRow.setFieldDropdownValue("风险等级", "setRiskGrade", riskGradeList, map, null);
-                assetRow.setFieldDropdownValue("计量等级", "setMeasureGrade", measureGradeList, map, null);
-                assetRow.setFieldDropdownValue("计量项目类别", "setMeasuringItemCategory", measuringItemCategoryList, map, null);
-                assetRow.setFieldDropdownValue("是否急救设备", "setEmergencyEquipment", emergencyEquipmentList, map, null);
-                assetRow.setFieldDropdownValue("是否进口设备", "setImportEquipment", importEquipmentList, map, null);
-                assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map, 1);
-                assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map, null);
-                assetRow.setFieldBooleanValue("是否PM", "setIsPm", true);
-                assetRow.setFieldBooleanValue("是否盘点", "setIsChecked", true);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("UsageClassification")), "setAssetUsage", assetUsageList, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("CapitalSource")), "setCapitalSource", capitalSourceList, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("riskGrade")), "setRiskGrade", riskGradeList, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("measureGrade")), "setMeasureGrade", measureGradeList, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("measuringItemCategory")), "setMeasuringItemCategory", measuringItemCategoryList, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("IsEmergencyEquipment")), "setEmergencyEquipment", emergencyEquipmentList, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("IsImportEquipment")), "setImportEquipment", importEquipmentList, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("CurrentStatus")), "setStatus", assetStatusList, map, 1);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("AccountingCategory")), "setAccountingCategory", accountingCategoryList, map, null);
+                assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("IsPM")), "setIsPm", true);
+                assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("IsChecked")), "setIsChecked", true);
 
-                assetRow.setFieldDropdownValueAsString("资产价值分类", "setAssetValueCategory", assetValueCategoryList, map, null);
+                assetRow.setFieldDropdownValueAsString(trimMsgKey(WebUtil.getMessage("assetValueCategory")), "setAssetValueCategory", assetValueCategoryList, map, null);
 
-                assetRow.setFieldDropdownValue("资产状态", "setDeviceStatus", deviceStatusList, map, null);
-                assetRow.setFieldDropdownValue("资金来源2", "setCapitalSource2", capitalSource2List, map, null);
-                assetRow.setFieldBooleanValue("是否对维保到期提醒", "setWarranty", true);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("deviceStatus")), "setDeviceStatus", deviceStatusList, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("capitalSource2")), "setCapitalSource2", capitalSource2List, map, null);
+                assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("isWarrantyNotice")), "setWarranty", true);
 
-                assetRow.setFieldStringValue("所属课题项目", "setSubjectProject", true);
-                assetRow.setFieldDateValue("验收日期", "setAcceptDate");
-                assetRow.setFieldIntegerValue("质保时间（月）", "setWarrantyMonth");
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("subjectProject")), "setSubjectProject", true);
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("acceptDate")), "setAcceptDate");
+                assetRow.setFieldIntegerValue(trimMsgKey(WebUtil.getMessage("WarrantyPeriodMonths")), "setWarrantyMonth");
 
-                assetRow.setFieldStringValue("二维码", "setQrCode", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("QRCode")), "setQrCode", true);
 //                supportingService.tryFormatQrCodeIfPossible(rowMap, asset);
 
-                assetRow.setFieldDropdownValueAsString("专有分类", "setProprietaryClass", proprietaryClassList, map, null);
+                assetRow.setFieldDropdownValueAsString(trimMsgKey(WebUtil.getMessage("ProprietaryClass")), "setProprietaryClass", proprietaryClassList, map, null);
 
                 supportingService.markDefautValue(selectedOrgToImport, asset, now, isNeedAudit);
 
@@ -216,6 +216,10 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
         logger.info("Duration for getAssetMapFromTemplate: {} seconds", duration.getSeconds());
 
         return result;
+    }
+    
+    public String trimMsgKey(String msgKey){
+        return msgKey == null ? "" : msgKey.trim();
     }
 
 

@@ -1,5 +1,6 @@
 package webapp.framework.web.service;
 
+import org.apache.commons.lang.LocaleUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -13,6 +14,7 @@ public class LocaleConfiguration {
     public LocaleResolver localeResolver() {
         CookieLocaleResolver resolver = new CookieLocaleResolver();
         resolver.setCookieName("locale");
+        //Locale locale = LocaleUtils.toLocale("en");
         Locale locale = new Locale("zh", "CN");
         resolver.setDefaultLocale(locale);
         LocaleHolder.setLocale(locale);

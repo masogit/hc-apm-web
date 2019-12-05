@@ -868,8 +868,8 @@ public class UserContextService implements Serializable {
 
     //返回当前用户所在时区
     public String getTimeZone(){
-        Double timeZone = getCurrentUserTenantInfo().getTimeZone();
-        timeZone = timeZone == null ? 8 : timeZone;
+        Double currentTimeZone = getCurrentUserTenantInfo().getTimeZone();
+        Integer timeZone = currentTimeZone == null ? 8 : currentTimeZone.intValue();
         if(timeZone >= 0){
             return "GMT+"+timeZone;
         }else{

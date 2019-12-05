@@ -71,7 +71,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
 
-                    <p:commandButton validateClient="true" value="#{msg.ConfirmConfirm}" action="#{userVacationScheduleController.saveVacation}" icon="ui-icon-check" update=":userVacationScheduleListForm:datalist" oncomplete="PF('vacationResultDialog').hide()"/>
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{userVacationScheduleController.saveVacation}" icon="ui-icon-check" update=":userVacationScheduleListForm:datalist" oncomplete="PF('vacationResultDialog').hide()"/>
                     <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('vacationResultDialog').hide()"/>
                 </p:dialog>
 

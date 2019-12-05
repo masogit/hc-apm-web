@@ -26,6 +26,7 @@ public class PmExportFormatter<T> {
     private String currentStep;
     private String orderType;
     private Date planTime;
+    private Date actualCompletionTime;
     private OrgInfoRepository orgDao;
     private List<I18nMessage> i18PmtypeList=null;
     private List<I18nMessage> i18OrderTypeList=null;
@@ -73,6 +74,7 @@ public class PmExportFormatter<T> {
     public Map<String, Object> buildExcelColumnKeyValueMap() {
 
         Map<String, Object> map = new HashMap<>();
+<<<<<<< HEAD
         if(isLocale()){
             map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
@@ -98,6 +100,22 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ORDERTYPE.getEnglish(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
             map.put(ExportFields.PLANTIME.getEnglish(), this.getPlanTime());
         }
+=======
+        map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
+        map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
+        map.put(ExportFields.ACTUALTIME.getChinese(), this.getActualCompletionTime());
+        map.put(ExportFields.ASSETNUM.getChinese(), this.getAssetNumber());
+
+        map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
+        map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
+        map.put(ExportFields.CLINICALNAME.getChinese(), this.getClincialName());
+        map.put(ExportFields.CREATOR.getChinese(), this.getCreator());
+        map.put(ExportFields.OWNER.getChinese(), this.getOwner());
+        map.put(ExportFields.PMNUM.getChinese(), this.getPmNum());
+        map.put(ExportFields.CURRENTSTEP.getChinese(), this.getCurrentStep());
+        map.put(ExportFields.ORDERTYPE.getChinese(), this.getFromI18(i18OrderTypeList,v2_pmOrder.getIntExtType()));
+        map.put(ExportFields.PLANTIME.getChinese(), this.getPlanTime());
+>>>>>>> ab4f83c38c069fae32f7c9f326492b62fc36144e
         return map;
     }
 
@@ -168,6 +186,13 @@ public class PmExportFormatter<T> {
 
     public Date getPlanTime() {
         return v2_pmOrder.getPlanTime();
+    }
+    public Date getActualCompletionTime() {
+        return v2_pmOrder.getEndTime();
+    }
+
+    public void setActualCompletionTime(Date actualCompletionTime) {
+        this.actualCompletionTime = actualCompletionTime;
     }
 
     public void setPlanTime(Date planTime) {

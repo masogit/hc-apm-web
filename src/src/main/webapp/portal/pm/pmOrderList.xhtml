@@ -41,11 +41,11 @@
                 <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                 <p:column width="36" visible="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6 or v2PmOrderController.queryIndex == 31 or v2PmOrderController.queryIndex == 7 or v2PmOrderController.queryIndex == -1}" exportable="false">
                     <p:selectBooleanCheckbox  value="#{v2PmOrderController.selectedMap[item.id]}"  class="selectCheckBox">
-                        <p:ajax process="@this" listener="#{v2PmOrderController.pick(item.id)}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();" />
+                        <p:ajax process="@this" listener="#{v2PmOrderController.pick(item.id)}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.exportExcelBtn) @(.finishButton) @(.completeButton) @(.competeButton) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();" />
                     </p:selectBooleanCheckbox>
                     <f:facet name="header">
                         <p:selectBooleanCheckbox id="selectCheckBoxHeader"  class="selectCheckBoxHeader">
-                            <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();"/>
+                            <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.exportExcelBtn) @(.batch-piliangjiedan) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton) @(.btn-export-maintenance-report) @(.downloadBtn)" oncomplete="updateSelectAllCheckBox();"/>
 
                             <!-- <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.finishButton) @(.competeButton) @(.completeButton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.planedCompleteButton)"/>-->
 
@@ -57,7 +57,12 @@
                          </p:selectBooleanCheckbox>
                      </f:facet>-->
                 </p:column>
-
+                <p:column headerText="#{msg.hospitalId}">
+                    <h:outputText value="#{v2PmOrderController.getSiteOrgName(item.siteUID)}"/>
+                    <!--<f:facet name="filter">
+                        <p:inputText id="btnOrg2" class="btnOrg2clss" readonly="true" value="#{empty v2PmOrderController.selectSite? msg.AllHospitals:v2PmOrderController.selectSite.name}"/>
+                    </f:facet>-->
+                </p:column>
 
                 <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.name}"/>
                 </p:column>
@@ -94,43 +99,33 @@
                         </p:column>
                         <p:column>
                             <f:facet name="header">
+<<<<<<< HEAD
                                 <h:outputText value="#{msg.PmOrderRule}"/><br/>
                                 <p:autoComplete dropdown="true" value="#{v2PmOrderController.filterRule}" appendTo="@(Body)"
+=======
+                                <h:outputText value="保养规则"/><br/>
+                                <!--<p:selectOneMenu id ="pmOrder" value ="#{v2PmOrderController.pmOrderRule}" converter="pmRuleConverter">
+                                    <f:selectItems value="#{v2PmOrderController.ruleList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+                                        <p:ajax listener="#{v2PmOrderController.onSelectPmRule()}"
+                                                update="datalist"/>
+
+                                </p:selectOneMenu>-->
+
+
+                                <!--<p:autoComplete dropdown="true" value="#{v2PmOrderController.pmOrderRule}" appendTo="@(Body)"
+>>>>>>> ab4f83c38c069fae32f7c9f326492b62fc36144e
                                                 scrollHeight="300" forceSelection="ture" completeMethod="#{v2PmOrderController.autoCompleteRuleName()}" size="5">
                                     <p:ajax event="itemSelect" listener="#{v2PmOrderController.onRuleFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist" ></p:ajax>
                                     <p:ajax process="@this" listener="#{v2PmOrderController.onRuleFilterChange}"   update="pmTab:pmOrderListForm:datalist"/>
-                                </p:autoComplete>
+                                </p:autoComplete>-->
                             </f:facet>
                             <h:outputText value="#{v2PmOrderController.getRulePm(item).name}"/>
 
                         </p:column>
-                <p:column headerText="#{msg.EquipmentIDHospital}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.assetInfo.departNum}"/>
-                </p:column>
-                <p:column headerText="#{msg.MeasurementGrade}" sortBy="#{item.ruleLevel}" filterBy="#{item.ruleLevel}" filterMatchMode="EQ">
-                    <h:outputText value="#{item.ruleLevel}"/>
-                </p:column>
-                <p:column headerText="#{msg.MaintenanceType}" sortBy="#{item.pmType}" filterBy="#{item.pmType}" filterMatchMode="EQ">
-                    <f:facet name="filter" >
-                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.repairTypeInt}">
-                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                        </p:selectOneMenu>
-                    </f:facet>
-                    <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
-                </p:column>
-                <!--所属科室-->
-                <p:column headerText="#{msg.clinicalDeptName}"  width="100">
-                    <f:facet name="header">
-                        <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                        <p:autoComplete dropdown="true" value="#{v2PmOrderController.fileterOrgName}" appendTo="@(Body)"
-                                        scrollHeight="300"  forceSelection="true" completeMethod="#{v2PmOrderController.autoCompleteDeptName}" size="5">
-                            <p:ajax event="itemSelect" listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist"/>
-                            <p:ajax listener="#{v2PmOrderController.onClinicalDeptNameFilterChange}" process="@this"  update="pmTab:pmOrderListForm:datalist"/>
-                        </p:autoComplete>
-                    </f:facet>
-                    <h:outputText value="#{v2PmOrderController.getOrgInfoByUid(item.clinicalDeptId).name}"/>
-                </p:column>
+
+                        <p:column headerText="保养周期">
+                            <h:outputText value="#{v2PmOrderController.getRulePm(item).period}"/>
+                        </p:column>
 
                 <p:column headerText="#{msg.Creator}" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.creatorName}"/>
@@ -141,7 +136,7 @@
                 </p:column>
 
 
-                <p:column headerText="#{msg.MaintenanceNumber}" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
+                <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.pmNum}"/>
                 </p:column>
                 <p:column headerText="#{msg.CurrentProcessingStep}"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
@@ -234,14 +229,14 @@
                 </p:column>
 
                 <f:facet name="{Toolbar}" >
-                    <p:commandButton title="#{msg.exportToXLS}"  icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderController.exportExcel}"  onclick="PrimeFaces.monitorDownload(start, stop);">
+                    <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderController.exportExcel}" disabled="#{v2PmOrderController.exportButtonShow()}" onclick="PrimeFaces.monitorDownload(start, stop);">
 
                         <p:fileDownload value="#{v2PmOrderController.excelFile}"/>
                     </p:commandButton>
 
                     <ui:fragment rendered="true">
 
-                        <p:commandButton  icon="ui-icon-assignment-ind" class="btn btn-sm btn-gray batch-terminated" title="#{BatchDispatch}"  update="@(.disClass)" rendered="#{v2PmOrderController.queryIndex==2}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('dispatchDialog').show()">
+                        <p:commandButton  icon="ui-icon-assignment-ind" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDispatch}"  update="@(.disClass)" rendered="#{v2PmOrderController.queryIndex==2}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('dispatchDialog').show()">
                         </p:commandButton>
 
                         <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="#{msg.BatchTake}"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3}" disabled="#{v2PmOrderController.isBatchTakePm()}" oncomplete="PF('takeOrderDialog').show()">

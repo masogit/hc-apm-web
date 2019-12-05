@@ -227,6 +227,11 @@
                                     <h:outputText value="#{item.vendor}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'vendorTel'}">
+                                <p:column headerText="#{msg.vendorTel}">
+                                    <h:outputText value="#{item.supplier.tel}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'subjectProject'}">
                                 <p:column headerText="#{msg.subjectProject}" sortBy="#{item.subjectProject}" filterBy="#{item.subjectProject}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.subjectProject}"/>

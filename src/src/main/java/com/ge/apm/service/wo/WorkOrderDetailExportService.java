@@ -12,6 +12,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -111,22 +112,22 @@ public class WorkOrderDetailExportService {
             Map<String, Object> workOrderDetailMap = new HashedMap();
 
             workOrderDetailMap.put("wodID", workOrderDetailPojo.getId());
-            workOrderDetailMap.put("科室", workOrderDetailPojo.getAssetClinicalDeptName());
-            workOrderDetailMap.put("设备编号", workOrderDetailPojo.getAssetDepartNum());
-            workOrderDetailMap.put("资产名称", workOrderDetailPojo.getAssetName());
-            workOrderDetailMap.put("供应商", workOrderDetailPojo.getSupplierName());
-            workOrderDetailMap.put("备件名称", workOrderDetailPojo.getPartsName());
-            workOrderDetailMap.put("数量", workOrderDetailPojo.getPartsQuantity());
-            workOrderDetailMap.put("发生费用", workOrderDetailPojo.getClosedPrice() * workOrderDetailPojo.getPartsQuantity());
-            workOrderDetailMap.put("发票号", workOrderDetailPojo.getInvoiceNum());
-            workOrderDetailMap.put("开票日期", formatDate(workOrderDetailPojo.getInvoiceTime()));
-            workOrderDetailMap.put("审核人", workOrderDetailPojo.getApproverName());
-            workOrderDetailMap.put("合同号", workOrderDetailPojo.getContractNum());
-            workOrderDetailMap.put("备注", workOrderDetailPojo.getComment());
+            workOrderDetailMap.put(WebUtil.getMessage("Department"), workOrderDetailPojo.getAssetClinicalDeptName());
+            workOrderDetailMap.put(WebUtil.getMessage("EquipmentID_xlsx"), workOrderDetailPojo.getAssetDepartNum());
+            workOrderDetailMap.put(WebUtil.getMessage("AssetName_xlsx"), workOrderDetailPojo.getAssetName());
+            workOrderDetailMap.put(WebUtil.getMessage("Vendor"), workOrderDetailPojo.getSupplierName());
+            workOrderDetailMap.put(WebUtil.getMessage("PartName_xlsx2"), workOrderDetailPojo.getPartsName());
+            workOrderDetailMap.put(WebUtil.getMessage("Quantity"), workOrderDetailPojo.getPartsQuantity());
+            workOrderDetailMap.put(WebUtil.getMessage("ClosedPrice_xlsx"), workOrderDetailPojo.getClosedPrice() * workOrderDetailPojo.getPartsQuantity());
+            workOrderDetailMap.put(WebUtil.getMessage("InvoiceNumber_xlsx"), workOrderDetailPojo.getInvoiceNum());
+            workOrderDetailMap.put(WebUtil.getMessage("InvoiceTime_xlsx"), formatDate(workOrderDetailPojo.getInvoiceTime()));
+            workOrderDetailMap.put(WebUtil.getMessage("approveUserId"), workOrderDetailPojo.getApproverName());
+            workOrderDetailMap.put(WebUtil.getMessage("ContractNumber_xlsx"), workOrderDetailPojo.getContractNum());
+            workOrderDetailMap.put(WebUtil.getMessage("Remark"), workOrderDetailPojo.getComment());
             if(workOrderDetailPojo.getStatementStatus() != null){
-                workOrderDetailMap.put("结单状态", workOrderDetailPojo.getStatementStatus() == Boolean.TRUE ? "已结单" : "未结单");
+                workOrderDetailMap.put(WebUtil.getMessage("CloseStatus_xlsx"), workOrderDetailPojo.getStatementStatus() == Boolean.TRUE ? WebUtil.getMessage("ClosedFinish") : WebUtil.getMessage("Opened"));
             }else{
-                workOrderDetailMap.put("结单状态", "未结单");
+                workOrderDetailMap.put(WebUtil.getMessage("CloseStatus_xlsx"), WebUtil.getMessage("Opened"));
             }
 
 
