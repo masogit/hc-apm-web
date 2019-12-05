@@ -824,6 +824,7 @@
 
     <build>
         <defaultGoal>jetty:run</defaultGoal>
+        <finalName>geapm</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -845,6 +846,10 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
