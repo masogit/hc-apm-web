@@ -3094,3 +3094,39 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ClosedPrice_xlsx', '发生费用', 'ClosedPrice', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CloseStatus_xlsx', '结单状态', 'CloseStatus', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'userTags', '用户分类', 'User Classification', NULL, '-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'GroundElectricLeakageSingleError', '对地漏电流(单一故障状态)', 'Ground Electric Leakage (Single Error)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ShellElectricLeakageNormal', '外壳漏电流(正常状态)', 'Shell Electric Leakage (Normal)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ShellElectricLeakageSingleError', '外壳漏电流(单一故障状态)', 'Shell Electric Leakage (Single Error)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PatientElectricLeakageACNormal', '患者漏电流AC(正常状态)', 'Patient Electric Leakage AC (Normal)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PatientElectricLeakageACSingleError', '患者漏电流AC(单一故障状态)', 'Patient Electric Leakage AC (Single Error)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PatientElectricLeakageDCNormal', '患者漏电流DC(正常状态)', 'Patient Electric Leakage DC (Normal)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PatientElectricLeakageDCSingleError', '患者漏电流DC(单一故障状态)', 'Patient Electric Leakage DC (Single Error)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PatientAssistElectricLeakageACNormal', '患者辅助电流AC(正常状态)', 'Patient Assist Electric Leakage AC (Normal)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PatientAssistElectricLeakageACSingleError', '患者辅助电流AC(单一故障状态)', 'Patient Assist Electric Leakage AC (Single Error)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PatientAssistElectricLeakageDCNormal', '患者辅助电流DC(正常状态)', 'Patient Assist Electric Leakage DC (Normal)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PatientAssistElectricLeakageDCSingleError', '患者辅助电流DC(单一故障状态)', 'Patient Assist Electric Leakage DC (Single Error)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CityVoltageActualValue', '市电电压实际值', 'City Voltage Actual Value', NULL, '-1');
+
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FailedToLoadExcelTemplate', 'Excel模版加载失败', 'Failed to load Excel template', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FailedToReadTemplate', '读取模版失败', 'Failed to read template', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NameCannotBeEmpty', '名称不能为空', 'Name cannot be empty', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NameCannotExceed64DigitsInLength', '名称最大长度64', 'Name cannot exceed 64 digits in length', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'JSONSaved', 'JSON已保存', 'JSON Saved', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TheFieldChanged', '字段变动, JSON已保存为新版本', 'The field changed, and JSON is saved as a new version', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'KeyHasBeenUsed', 'Key已经被使用', 'Key has been used', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ResultKeyHasBeenUsed', '结果Key已经被使用', 'Result Key has been used', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CannotParseIntoATemplate', '不能解析成模版', 'Cannot parse into a template', NULL, '-1');
+    --INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FailedToLoadExcelTemplate', 'Excel模版加载失败', 'Failed to load Excel template', NULL, '-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ExcelSaved', 'Excel已保存', 'Excel Saved', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FailedToGenerateExcelTemplate', 'Excel模版生成失败', 'Failed to generate Excel template', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'OnlyContainEnglishNumbersAndUnderscores', '只能包含,英文,数字,下划线', 'Can only contain English, numbers and underscores', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FailedToParseTemplate', '解析模版失败', 'Failed to parse template', NULL, '-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Saved', '已保存', 'Saved', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Submitted', '已提交', 'Submitted', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NoCorrespondingDataFound', '未找到对应数据', 'No corresponding data found', NULL, '-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PMPlanTime', '保养计划时间', 'PM Plan Time', NULL, '-1');
