@@ -21,6 +21,19 @@ public class ParentAssetComparator implements Comparator<AssetInfo> {
             return 0;
         }
 
+        //both contains, then equals
+        if ((asset1.getName().contains(query)
+                || asset1.getNamePyCode() != null   && asset1.getNamePyCode().contains(query.toLowerCase())
+                || asset1.getQrCode() != null       && asset1.getQrCode().contains(query)
+                || asset1.getSerialNum() != null    && asset1.getSerialNum().contains(query))
+        && (asset2.getName().contains(query)
+                || asset2.getNamePyCode() != null   && asset2.getNamePyCode().contains(query.toLowerCase())
+                || asset2.getQrCode() != null       && asset2.getQrCode().contains(query)
+                || asset2.getSerialNum() != null    && asset2.getSerialNum().contains(query))) {
+
+            return 0;
+        }
+
         if (asset1.getName().contains(query)
                 || asset1.getNamePyCode() != null   && asset1.getNamePyCode().contains(query.toLowerCase())
                 || asset1.getQrCode() != null       && asset1.getQrCode().contains(query)
@@ -35,6 +48,15 @@ public class ParentAssetComparator implements Comparator<AssetInfo> {
                 || asset2.getSerialNum() != null    && asset2.getSerialNum().contains(query)) {
 
             return -1;
+        }
+
+        //both contains, then equals
+        if ((asset1.getFinancingNum() != null && asset1.getFinancingNum().contains(query)
+                || (asset1.getDepartNum() != null   && asset1.getDepartNum().contains(query)))
+        && (asset2.getFinancingNum() != null && asset2.getFinancingNum().contains(query)
+                || (asset2.getDepartNum() != null   && asset2.getDepartNum().contains(query)))) {
+
+            return 0;
         }
 
         if (asset1.getFinancingNum() != null && asset1.getFinancingNum().contains(query)
