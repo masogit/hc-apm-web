@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ge.apm.service.utils.ParentAssetComparator;
 import org.springframework.stereotype.Component;
 
 import com.ge.apm.domain.AssetInfo;
@@ -75,13 +76,17 @@ public class AutoCompleteService {
     	if(assetInfoList==null){
     		return Collections.emptyList();
     	}
-    	List<AssetInfo> res=assetInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query) 
-                || (item.getNamePyCode()==null?false:item.getNamePyCode().contains(query.toLowerCase())) 
-                || item.getQrCode() != null && item.getQrCode().contains(query)
-                || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
-                || item.getSerialNum() != null && item.getSerialNum().contains(query)
-                || (item.getDepartNum()!=null?item.getDepartNum().contains(query):true)).collect(Collectors.toList());
-    	res.sort(new PinYinComparatorByName());
+    	List<AssetInfo> res=assetInfoList.stream().filter(
+    	                item->Strings.isNullOrEmpty(query)
+                        || item.getName().contains(query)
+                        || item.getNamePyCode() != null && item.getNamePyCode().contains(query.toLowerCase())
+                        || item.getQrCode() != null && item.getQrCode().contains(query)
+                        || item.getFinancingNum() != null && item.getFinancingNum().contains(query)
+                        || item.getSerialNum() != null && item.getSerialNum().contains(query)
+                        || (item.getDepartNum() != null ? item.getDepartNum().contains(query) : true)
+        ).collect(Collectors.toList());
+    	Collections.sort(res, new ParentAssetComparator(query));
+    	Collections.reverse(res);
     	return res;
     }
 
