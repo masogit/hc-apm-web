@@ -226,17 +226,6 @@ public class UserContextService implements Serializable {
     }
     
     public boolean accessContains(String menuName){
-        TenantInfo tenantInfo=getTenantInfo();
-        if(tenantInfo != null && tenantInfo.getInternationalVersion() != null){
-            Integer internalVersion = tenantInfo.getInternationalVersion();
-            if(internalVersion == INTERNATIONAL_VERSION){
-                if(internationalList.stream().anyMatch( s -> menuName.contains(s))){
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-        }
     	return authContains(menuName)&&versionContains(menuName);
     }
     

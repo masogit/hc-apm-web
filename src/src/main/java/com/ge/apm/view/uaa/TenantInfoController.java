@@ -437,7 +437,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public boolean isGeneralVersion;
 
 	public void onVersionChange() {
-		List<String> showTemplateList = Lists.newArrayList(TenantInfoConfigService.VERSION_COMMON,
+		List<String> showTemplateList = Lists.newArrayList(TenantInfoConfigService.VERSION_COMMON,TenantInfoConfigService.ZKB_VERSION,
                 TenantInfoConfigService.EXCELLENT_ENJOYMENT_A,TenantInfoConfigService.EXCELLENT_ENJOYMENT_B);
 		if (showTemplateList.contains(tenantConfigService.getEdition())) {
 			disableCreateTemplateBt = Boolean.FALSE;
