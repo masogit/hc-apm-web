@@ -3,8 +3,8 @@
     <div class="menu-content" tabindex="0">
         <pu:menu widgetVar="me">
 
-            <p:menuitem style=" font-size: 30" id="um000" value="ChangeToEnglish" rendered="#{localeService.language eq 'zh'}" icon="language" url="#{request.requestURI}?locale=en"/>
-            <p:menuitem style=" font-size: 30" id="um001" value="切换成中文"  rendered="#{localeService.language eq 'en'}" icon="language" url="#{request.requestURI}?locale=zh"/>
+           <!-- <p:menuitem style=" font-size: 30" id="um000" value="ChangeToEnglish" rendered="#{localeService.language eq 'zh'}" icon="language" url="#{request.requestURI}?locale=en"/>
+            <p:menuitem style=" font-size: 30" id="um001" value="切换成中文"  rendered="#{localeService.language eq 'en'}" icon="language" url="#{request.requestURI}?locale=zh"/>-->
             <p:menuitem style=" font-size: 30" id="um01" value="#{msg.HomePage}" icon="&#xE871;" outcome="#{userContextService.userDefaultHomePage}" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('homePage')}"/>
             
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.accessContains('asset')}">
@@ -94,6 +94,7 @@
             </p:submenu>
             <p:submenu id="um31" label="#{msg.AssetKnowledgeBaseMgmt}" icon="fa fa-book" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('knowledge')}">
                 <p:menuitem id="um32" value="#{msg.AssetDocMgmt}" outcome="/portal/asset/fileAttachment/List.xhtml" rendered="#{userContextService.accessContains('knowledge.mgt')}"/>
+<!--                <p:menuitem id="um322" value="#{msg.AssetDocMgmt}" outcome="/portal/asset/fileAttachment/List.xhtml" rendered="#{userContextService.accessContains('knowledge.zkb')}"/>-->
                 <p:menuitem id="um33" value="#{msg.AssetKMMgmt}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um34" value="#{msg.DeviceMgmtForum}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um35" value="#{msg.DeviceApplication}" rendered="false" style="color: orange;" outcome="/empty"/>
@@ -154,7 +155,7 @@
                 <p:menuitem id="um503" value="#{msg.SmallScreenMessageConfiguration}" outcome="/portal/asset/captureData/captureDataMessageList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SiteAdmin')}"/>
                 <p:menuitem id="um507" value="#{msg.CustomRole}" outcome="/portal/uaa/customRole/List.xhtml" rendered= "#{userContextService.accessContains('config.customRole')}"/>
             </p:submenu>
-            <p:submenu id="um3000" label="#{msg.MVSEquipmentManagement}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin,MVSFE') and userContextService.accessContains('international')}">
+            <p:submenu id="um3000" label="#{msg.MVSEquipmentManagement}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,MVSAdmin,MVSFE')}">
                 <p:menuitem id="um3001" value="#{msg.BasicInfo}" outcome="/portal/asset/info/AssetList"/>
                 <p:menuitem id="um3002" value="#{msg.PurchaseManagement}" outcome="/portal/woMgr/mvs/List.xhtml" rendered="#{userContextService.hasNotAnyRole('MVSFE')}"/>
             </p:submenu>
@@ -164,7 +165,7 @@
                     <p:menuitem id="um5003" value="#{msg.SSOUserImport}" outcome="/portal/ssouser/import/import.xhtml" rendered="#{userContextService.accessContains('examineMgt.ssoImp')}"/>
             </p:submenu>
             <!--Super admin and GE OP only-->
-            <p:submenu id="um4000" label="#{msg.APMPlatformManagement}" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')} and userContextService.accessContains('international')">
+            <p:submenu id="um4000" label="#{msg.APMPlatformManagement}" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}">
                 <p:menuitem id="um45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp') }"/>
                 <p:menuitem id="um471" value="#{msg.BatchFileImport}" outcome="/admin/batchFile/batchFileList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
                 <p:menuitem id="um4100" value="#{msg.SRReportList}" outcome="/portal/sr/opsreport/reportList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
