@@ -256,7 +256,10 @@ public class TenantInfoConfigService {
 			if(key.equals("link.CPM")){
 				tempItem.setValue(false);
 			}
-			if(key.equals("knowledge.zkb")){
+			if(key.equals("knowledge.zkbMgt")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("knowledge.zkbView")){
 				tempItem.setValue(false);
 			}
 			if (edition.equals(VERSION_ASSETMGT)) {
@@ -268,7 +271,10 @@ public class TenantInfoConfigService {
 				}
 			}
 			if(edition.equals(ZKB_VERSION)){
-				if(key.equals("knowledge.zkb")){
+				if(key.equals("knowledge.zkbMgt")){
+					tempItem.setValue(true);
+				}
+				if(key.equals("knowledge.zkbView")){
 					tempItem.setValue(true);
 				}
 			}
