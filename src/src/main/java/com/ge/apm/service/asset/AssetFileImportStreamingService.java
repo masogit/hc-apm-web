@@ -110,7 +110,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("RepairOwner2")), "setAssetOwnerName2", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("RepairOwner3")), "setAssetOwnerName3", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("PMOwner")), "setPmOwnerName", true);
-                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("Department")), "setClinicalDeptName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("clinicalDeptId")), "setClinicalDeptName", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("manufacture")), "setManufacture", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("BrandManufacturerShortName")), "setMakerShortName", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentStandardName")), "setDeviceName", true);
@@ -172,7 +172,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("riskGrade")), "setRiskGrade", riskGradeList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("measureGrade")), "setMeasureGrade", measureGradeList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("measuringItemCategory")), "setMeasuringItemCategory", measuringItemCategoryList, map, null);
-                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("IsEmergencyEquipment")), "setEmergencyEquipment", emergencyEquipmentList, map, null);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("emergencyEquipment")), "setEmergencyEquipment", emergencyEquipmentList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("IsImportEquipment")), "setImportEquipment", importEquipmentList, map, null);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("CurrentStatus")), "setStatus", assetStatusList, map, 1);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("AccountingCategory")), "setAccountingCategory", accountingCategoryList, map, null);
