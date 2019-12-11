@@ -63,7 +63,7 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("pmOwnerName"), "pmOwnerName");
             exportFields.put(WebUtil.getMessage("Site"), "siteUID");
             exportFields.put(WebUtil.getMessage("clinicalDeptId"), "clinicalDeptName");
-            exportFields.put(WebUtil.getMessage("AssetDepartment"), "assetDeptName");
+            exportFields.put(WebUtil.getMessage("assetDeptName"), "assetDeptName");
             exportFields.put(WebUtil.getMessage("manufacture"), "manufacture");
             exportFields.put(WebUtil.getMessage("BrandManufacturerShortName"), "makerShortName");
 
