@@ -1907,7 +1907,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CapitalSource', '资金来源 ', 'Capital Source ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'RiskGrade', '风险等级 ', 'Risk Grade ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MeasurementGrade', '计量等级', 'Measurement Grade ', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MeasurementItemCategory', '计量项目类别 ', 'Measurement Item Category ', NULL, '-1');
+    --INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MeasurementItemCategory', '计量项目类别 ', 'Measurement Item Category ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'IsEmergencyEquipment', '是否急救设备 ', 'Emergency Equipment? ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'IsImportEquipment', '是否进口设备', 'Import Equipment? ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CurrentStatus', '当前状态', 'Current Status', NULL, '-1');
