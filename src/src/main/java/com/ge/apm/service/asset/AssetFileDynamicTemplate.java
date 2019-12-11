@@ -579,7 +579,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("MeasurementGrade"), "B类计量设备");
         map.put(WebUtil.getMessage("measuringItemCategory"), "磁共振类");
         map.put(WebUtil.getMessage("emergencyEquipment"), "急救设备");
-        map.put(WebUtil.getMessage("ImportEquipment?"), "进口");
+        map.put(WebUtil.getMessage("IsImportEquipment"), "进口");
         map.put(WebUtil.getMessage("CurrentStatus"), "正常");
 
         return map;
