@@ -258,9 +258,6 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "is_deleted")
 	private Boolean isDeleted;//是否删除
 
-	@Column(name = "tags")
-	private String tags;
-        
 	@Transient
 	private Integer excelIdex;
 
@@ -1099,19 +1096,4 @@ public class UserAccount implements ChineseName, Serializable {
 		isDeleted = deleted;
 	}
 
-	public List<String> getUserTags() {
-		if (tags == null) {
-			return Collections.emptyList();
-		}
-		return Arrays.asList(tags.split(","));
-	}
-
-	public void setUserTags(List<String> userTags) {
-		if (null == userTags || userTags.size() == 0) {
-			this.tags = null;
-		} else {
-			this.tags = String.join(",", userTags);
-		}
-
-	}
 }
