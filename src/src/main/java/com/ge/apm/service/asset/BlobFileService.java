@@ -83,6 +83,42 @@ public class BlobFileService {
         }
 
     }
+
+    public V2_BlobObject uploadFile(V2_BlobObject tempBlobObject, UploadedFile file) {
+
+        String path = "";
+        try {
+            path = fsService.saveUploadedFile(file);
+        } catch (Exception ex) {
+            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
+            Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+
+        String token = UserContextService.getAccessToken();
+        if (token == null || token.isEmpty()) {
+            WebUtil.addErrorMessage("do not have premission");
+            return null;
+        }
+
+        Map<String, Object> fileObject = microService.uploadSingleFile(token, new File(path));
+        fsService.deleteUploadedFile(path);
+
+        if (null != fileObject && tempBlobObject != null) {
+            V2_BlobObject blobObject = tempBlobObject;
+            blobObject.setObjectName((String) fileObject.get("objectName"));
+            blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
+            blobObject.setObjectStorageId((String) fileObject.get("objectId"));
+            blobObject.setObjectType((String) fileObject.get("objectType"));
+            blobObject.setCreatedDate(new Date());
+            blobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            return blobDao.save(blobObject);
+        } else {
+            return null;
+        }
+
+    }
+
     public V2_BlobObject uploadFile(InputStream input,String fileName) {
         
         String path = "";

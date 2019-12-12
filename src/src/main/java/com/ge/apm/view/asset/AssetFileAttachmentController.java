@@ -19,6 +19,7 @@ import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
+import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.ObjectUtils;
@@ -29,10 +30,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -84,6 +82,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     private VlinkParserService vlinkParserService;
 
     private String assetName;
+    private UploadedFile uploadFile;
+    private UploadedFile uploadFile_batch;
 
     @Override
     protected void init() {
@@ -173,6 +173,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             selected.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
             selected.setBoUuid(selectedAsset.getUid());
             selected.setObjectName(vlinkTitle);
+            selected.setCreatedDate(new Date());
+            selected.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
             dao.save(selected);
             cancel();
             return;
@@ -184,7 +186,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             selected.setBoId(selectedAsset.getId());
             selected.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
             selected.setBoUuid(selectedAsset.getUid());
-            dao.save(selected);
+            blobService.uploadFile(selected, uploadFile);
+            //dao.save(selected);
             cancel();
         }
     }
@@ -210,17 +213,20 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void handleFileUpload(FileUploadEvent event) {
 
-        V2_BlobObject blobObject = blobService.uploadFile(event);
+        uploadFile = event.getFile();
+        selected.setObjectName(uploadFile.getFileName());
+
+        /*V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             selected = blobObject;
         } else {
             WebUtil.addErrorMessage("fail to upload file");
-        }
+        }*/
 
     }
 
     public void removeAttachment(Integer fileId) {
-        blobService.deleteBlobFile(selected);
+        //blobService.deleteBlobFile(selected);
         selected.setId(null);
         selected.setObjectName(null);
         selected.setObjectStorageId(null);
@@ -353,18 +359,21 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void handleFileUploadBatch(FileUploadEvent event) {
 
-        V2_BlobObject blobObject = blobService.uploadFile(event);
+        uploadFile_batch = event.getFile();
+        batchBlobObject.setObjectName(uploadFile_batch.getFileName());
+
+        /*V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             batchBlobObject = blobObject;
         } else {
             WebUtil.addErrorMessage("fail to upload file");
-        }
+        }*/
 
     }
 
     public void removeAttachmentBatch(Integer fileId) {
 
-        blobService.deleteBlobFile(batchBlobObject);
+        //blobService.deleteBlobFile(batchBlobObject);
         batchBlobObject.setId(null);
         batchBlobObject.setObjectName(null);
         batchBlobObject.setObjectStorageId(null);
@@ -391,6 +400,12 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     }
 
     public void batchSave() {
+
+        if(targetAssets == null || targetAssets.isEmpty()){
+            WebUtil.addErrorMessage(WebUtil.getMessage("assetName") + WebUtil.getMessage("ValidationRequire"));
+            return;
+        }
+
         if (batchBlobObject != null || "vlink".equals(boSubTypeBatch)) {
             String parsedLink = vlinkParserService.parseVlink(vlink);
             if ("vlink".equals(boSubTypeBatch) && StringUtils.isEmpty(parsedLink)) {
@@ -413,10 +428,11 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                     tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
                     tempBlobObject.setObjectType(batchBlobObject.getObjectType());
                 }
-                dao.save(tempBlobObject);
+                //dao.save(tempBlobObject);
+                blobService.uploadFile(tempBlobObject, uploadFile_batch);
             }
         } else {
-            WebUtil.addErrorMessage("附件不能为空");
+            WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
             return;
         }
 
@@ -425,7 +441,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     private void initBatchData() {
         selectedOrg = null;
-        batchBlobObject = null;
+        batchBlobObject = new V2_BlobObject();
         boSubTypeBatch = null;
 
         targetAssets = new ArrayList();
