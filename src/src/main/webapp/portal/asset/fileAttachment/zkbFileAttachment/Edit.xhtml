@@ -69,8 +69,8 @@
                     <h:panelGroup rendered="#{zkbFileAttachmentController.actionName eq 'Create'}">
                         <p:dataList id="zkbUploadList" value="#{zkbFileAttachmentController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.attachmentList}</f:facet>
-                            <h:outputText value="#{fileitem.fileName}"/>
-                            <p:commandButton actionListener="#{zkbFileAttachmentController.removeAttachmentById(fileitem)}" update="zkbUploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                            <h:outputText value="#{fileitem.objectName}"/>
+                            <p:commandButton actionListener="#{zkbFileAttachmentController.removeAttachmentById(fileitem.id)}" update="zkbUploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </p:dataList>
