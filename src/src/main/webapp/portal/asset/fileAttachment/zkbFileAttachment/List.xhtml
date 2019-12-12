@@ -81,7 +81,7 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbFileAttachmentController.prepareCreate}" update=":zkbFileAttachmentEditForm" disabled="#{not zkbFileAttachmentController.zkbAdmin}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray batch-terminated" title="#{msg.Edit}" actionListener="#{zkbFileAttachmentController.prepareEdit}"  update=":zkbFileAttachmentEditForm" disabled="#{not zkbFileAttachmentController.checkedOne or not zkbFileAttachmentController.zkbAdmin}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" actionListener="#{zkbFileAttachmentController.deleteZkbFileAttachment}" update=":zkbFileAttachmentListForm :growl" disabled="#{not zkbFileAttachmentController.checked or not zkbFileAttachmentController.zkbAdmin}">
+                            <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" actionListener="#{zkbFileAttachmentController.deleteZkbFileAttachment}" update=":zkbFileAttachmentListForm :zkbFileAttachmentEditForm :growl" disabled="#{not zkbFileAttachmentController.checked or not zkbFileAttachmentController.zkbAdmin}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </f:facet>

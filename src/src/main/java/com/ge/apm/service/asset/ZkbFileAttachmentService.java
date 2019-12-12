@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.util.*;
 
@@ -57,19 +58,28 @@ public class ZkbFileAttachmentService {
     }
 
     @Transactional
-    public void saveZkbFileAttachment(V2_BlobObject blobObject, List<UploadedFile> uploadedFileList, List<TenantInfo> tenantInfoList){
+    public void saveZkbFileAttachment(V2_BlobObject blobObject, List<V2_BlobObject> uploadedFileList, List<TenantInfo> tenantInfoList){
 
         blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB);
         blobObject.setCreatedDate(new Date());
         blobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
 
-        for (UploadedFile uploadedFile: uploadedFileList) {
-            V2_BlobObject tempBlobObject = new V2_BlobObject();
-            BeanUtils.copyProperties(blobObject, tempBlobObject);
-            V2_BlobObject finishedBlobObject = blobFileService.uploadFile(tempBlobObject, uploadedFile);
+        for (V2_BlobObject tempBlobObject: uploadedFileList) {
+
+            tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB);
+            tempBlobObject.setCreatedDate(new Date());
+            tempBlobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+
+            tempBlobObject.setBoSubType(blobObject.getBoSubType());
+            tempBlobObject.setOperationType(blobObject.getOperationType());
+            tempBlobObject.setMainDirectory(blobObject.getMainDirectory());
+            tempBlobObject.setSecondDirectory(blobObject.getSecondDirectory());
+
+            blobObjectDao.save(tempBlobObject);
+
             for (TenantInfo tenantInfo: tenantInfoList) {
                 FileAttachmentOrgInfo tempFileAttachmentOrgInfo = new FileAttachmentOrgInfo();
-                tempFileAttachmentOrgInfo.setBlobObjectUid(finishedBlobObject.getId());
+                tempFileAttachmentOrgInfo.setBlobObjectUid(tempBlobObject.getId());
                 tempFileAttachmentOrgInfo.setTenantUID(tenantInfo.getUid());
                 fileAttachmentOrgInfoDao.save(tempFileAttachmentOrgInfo);
             }
@@ -101,6 +111,18 @@ public class ZkbFileAttachmentService {
         fileAttachmentOrgInfoDao.deleteByBlobObjectUid(blobObjectUid);
 
         blobFileService.deleteBlobFileById(blobObjectUid);
+    }
+
+    public V2_BlobObject fileUpload(UploadedFile file){
+
+        V2_BlobObject blobObject = blobFileService.uploadFile(file);
+
+        return blobObject;
+
+    }
+
+    public void removeUploadFile(String blobId){
+        blobFileService.deleteBlobFileById(blobId);
     }
 
     public Map<String, List<String>> initZkbSecondDirectory(){

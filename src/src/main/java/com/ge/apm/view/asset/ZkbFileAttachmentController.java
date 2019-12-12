@@ -34,7 +34,7 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
     private TenantInfoRepository tenantInfoDao;
     private ZkbFileAttachmentService zkbFileAttachmentService;
 
-    private List<UploadedFile> attachements;
+    private List<V2_BlobObject> attachements;
     private String actionName;
     private UserAccount currentUser;
 
@@ -115,12 +115,20 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
     }
 
     public void handleFileUpload(FileUploadEvent event) {
-        UploadedFile tempUploadedFile = event.getFile();
-        attachements.add(tempUploadedFile);
+        UploadedFile file = event.getFile();
+        V2_BlobObject blobObject = zkbFileAttachmentService.fileUpload(file);
+
+        if (null != blobObject) {
+            attachements.add(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file" + file.getFileName());
+        }
     }
 
-    public void removeAttachmentById(UploadedFile tempUploadedFile) {
-        attachements = attachements.stream().filter(item -> !item.equals(tempUploadedFile)).collect(Collectors.toList());
+    public void removeAttachmentById(String blobId) {
+        zkbFileAttachmentService.removeUploadFile(blobId);
+        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
 
     public void onSelectAllOfPage() {
@@ -153,6 +161,9 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
             }
         });
 
+        this.selectedMap = new HashMap();
+        this.cancel();
+
     }
 
     public List<String> getZkbSecondDirectoryList(){
@@ -184,11 +195,11 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
         return zkbFileAttachmentService.isZkbAdmin(currentUser);
     }
 
-    public List<UploadedFile> getAttachements() {
+    public List<V2_BlobObject> getAttachements() {
         return attachements;
     }
 
-    public void setAttachements(List<UploadedFile> attachements) {
+    public void setAttachements(List<V2_BlobObject> attachements) {
         this.attachements = attachements;
     }
 
