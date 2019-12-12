@@ -31,10 +31,10 @@
 				<p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetName}" />
 				</p:column>
-				<p:column headerText="外部工单号" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
+				<p:column headerText="#{msg.ExternalWorkorderID}" sortBy="#{item.eventUid}" filterBy="#{item.eventUid}" filterMatchMode="LIKE">
 					<h:outputText value="#{item.eventUid}" />
 				</p:column>
-				<p:column headerText="更新时间" sortBy="#{item.createTime}" >
+				<p:column headerText="#{msg.UpdateTime}" sortBy="#{item.createTime}" >
 					<h:outputText value="#{item.createTime}">
 						<f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
 					</h:outputText>
@@ -46,7 +46,7 @@
 					filterMatchMode="LIKE">
 					<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 				</p:column>
-				<p:column headerText="状态" filterBy="#{item.description}" filterMatchMode="LIKE">
+				<p:column headerText="#{msg.Status}" filterBy="#{item.description}" filterMatchMode="LIKE">
 					<f:facet name="filter">
 						<p:selectOneMenu onchange="PF('varDataList3').filter()" value="#{assetLifecycleEvent5Controller.descriptionStatusFilter}">
 							<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -57,13 +57,13 @@
 					</f:facet>
 					<h:outputText value="#{assetLifecycleEvent5Controller.getMsStatus(item)}" />
 				</p:column>
-				<p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}">
+				<p:column headerText="#{msg.PMPlanTime}" sortBy="#{item.scheduleDate}">
 					<h:outputText value="#{item.scheduleDate}">
 						<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 					</h:outputText>
 				</p:column>
 
-				<p:column headerText="报告下载" exportable="false">
+				<p:column headerText="#{msg.ReportDownload}" exportable="false">
 					<p:repeat value="#{item.reports}" var="report">
 						<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
 							<h:outputText value="#{report.displayName}" />
@@ -75,7 +75,7 @@
 					<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetLifecycleEvent5Controller.exportSelected}" update=":growl" ajax="false">
 						<p:fileDownload value="#{assetLifecycleEvent5Controller.exportFile}" />
 					</p:commandButton>
-					<p:commandButton id="downloadAllId" title="报告下载" icon="ui-icon-file-download" ajax="false"
+					<p:commandButton id="downloadAllId" title="#{msg.ReportDownload}" icon="ui-icon-file-download" ajax="false"
 						actionListener="#{assetLifecycleEvent5Controller.downloadSelectedReport()}" process="datalist3" update=":growl">
 						<p:fileDownload value="#{assetLifecycleEvent5Controller.exportFile}" />
 					</p:commandButton>

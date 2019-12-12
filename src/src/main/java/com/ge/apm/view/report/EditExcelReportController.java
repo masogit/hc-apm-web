@@ -85,25 +85,25 @@ public class EditExcelReportController extends TieWebSheetBean {
             context.put("X", tableValue);
             loadWebSheet(excelFile.getStream(), context);
         } catch (Exception e) {
-            WebUtil.addErrorMessage(e, "读取模版失败");
+            WebUtil.addErrorMessage(e, WebUtil.getMessage("FailedToReadTemplate"));
         }
     }
     
     public void saveData() {
         tableService.saveTableDate(report, tableValue);
-        WebUtil.addSuccessMessage("已保存");
+        WebUtil.addSuccessMessage(WebUtil.getMessage("Saved"));
     }
 
     public void submit() {
         tableService.saveTableDate(report, tableValue);
         tableService.submitReport(report);
-        WebUtil.addSuccessMessage("已提交");
+        WebUtil.addSuccessMessage(WebUtil.getMessage("Submitted"));
     }
     
     public void importElectricSafetyData(){
     	electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
     	if(tableValue.size()==0){
-    		WebUtil.addSuccessMessage("未找到对应数据");
+    		WebUtil.addSuccessMessage(WebUtil.getMessage("NoCorrespondingDataFound"));
     	}
     	reloadData();
     }

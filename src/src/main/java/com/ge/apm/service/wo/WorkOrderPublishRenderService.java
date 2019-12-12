@@ -14,6 +14,7 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.web.WebUtil;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -74,10 +75,10 @@ public class WorkOrderPublishRenderService {
     }
 
     private String getFileName(Map<String, Object> map, int index) {
-        String deviceName = (String) map.get("设备名称");
+        String deviceName = (String) map.get(WebUtil.getMessage("EquipmentName_xlsx"));
         deviceName = StringUtils.replace(deviceName, "\\", "-");
         deviceName = StringUtils.replace(deviceName, "/", "-");
-        return "WO" + index + "-" + deviceName + "-" + map.get("报修单号") + ".docx";
+        return "WO" + index + "-" + deviceName + "-" + map.get(WebUtil.getMessage("srNum_xlsx")) + ".docx";
     }
 
     private String encoding(String fileName) {

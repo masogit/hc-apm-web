@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ApmConstant;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,6 +35,12 @@ public class UserContextService implements Serializable {
 
     private static final long serialVersionUID = 1L;
     public static final String ADMIN = "SuperAdmin,ITAdmin";
+    public static final Integer INTERNATIONAL_VERSION = 1;
+    public static List<String> internationalList;
+    {
+        internationalList = Lists.newArrayList("asset","repair","maintain","config");
+    }
+
 //    public static final String MVS_ADMIN="MVSAdmin";
 //    private static final String MVS_FE="MVSFE";
 

@@ -94,12 +94,12 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 
         String fileName = "APM_Asset_Dynamic_Template.xlsx";
-        /*if (userContextService.isLocale()){
-            fileName = "APM_Asset_Dynamic_Template_zh.xlsx";
+        if (userContextService.isLocale()){
+            fileName = "APM_Asset_Dynamic_Template.xlsx";
         } else {
             fileName = "APM_Asset_Dynamic_Template_en.xlsx";
 
-        }*/
+        }
         InputStream inputStream = AssetFileDynamicTemplate.class.getClassLoader().getResourceAsStream("template/" + fileName);
         workBook = new SXSSFWorkbook(new XSSFWorkbook(inputStream));
 
@@ -165,7 +165,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("MeasurementGrade"), measureGradeList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("riskGrade"), riskGradeList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("emergencyEquipment"), emergencyEquipmentList, true);
-        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("ImportEquipment?"), importEquipmentList, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("IsImportEquipment"), importEquipmentList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("accountingCategory"), accountingCategoryList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("measuringItemCategory"), measuringItemCategoryList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("repairForm"), repairFormList, true);
@@ -579,7 +579,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("MeasurementGrade"), "B类计量设备");
         map.put(WebUtil.getMessage("measuringItemCategory"), "磁共振类");
         map.put(WebUtil.getMessage("emergencyEquipment"), "急救设备");
-        map.put(WebUtil.getMessage("ImportEquipment?"), "进口");
+        map.put(WebUtil.getMessage("IsImportEquipment"), "进口");
         map.put(WebUtil.getMessage("CurrentStatus"), "正常");
 
         return map;
