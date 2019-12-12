@@ -61,7 +61,7 @@ public class WorkOrderDocxRenderServiceTest {
 
     private Map<String, Object> mockFullMap() {
         Map<String, Object> map = new HashMap<>();
-        for (Map.Entry<String, String> entry : WorkOrderDocxRenderService.COPY_KEY_MAPPING.entrySet()) {
+/*        for (Map.Entry<String, String> entry : WorkOrderDocxRenderService.COPY_KEY_MAPPING.entrySet()) {
             map.put(entry.getValue(), entry.getValue() + "X");
         }
 
@@ -74,7 +74,7 @@ public class WorkOrderDocxRenderServiceTest {
             map.put("ack_signature", FileUtils.readFileToByteArray(new File("src\\test\\resources\\sign\\acceptance.png")));
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
         return map;
     }
 

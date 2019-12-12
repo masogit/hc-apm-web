@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.web.WebUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +30,7 @@ public class WorkOrderDocxRenderService {
 
     private static final PictureRenderData EMPTY_PICTURE = new PictureRenderData(0, 0, ".jpg", new byte[0]);
 
-    static final Map<String, String> COPY_KEY_MAPPING = new HashMap<>();
+
 
     @Autowired
     private BlobFileService blobService;
@@ -45,46 +46,46 @@ public class WorkOrderDocxRenderService {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    static {
-        COPY_KEY_MAPPING.put("device_name", "设备名称");
-        COPY_KEY_MAPPING.put("device_type", "设备型号");
-        COPY_KEY_MAPPING.put("device_serial", "设备序列号");
-        COPY_KEY_MAPPING.put("device_qr", "二维码");
-        COPY_KEY_MAPPING.put("device_department", "科室");
-        COPY_KEY_MAPPING.put("device_oem", "制造商");
-        COPY_KEY_MAPPING.put("device_number", "设备编号");
-        COPY_KEY_MAPPING.put("device_location", "当前位置");
+    private void copyKeyMapping(Map<String,String> COPY_KEY_MAPPING) {
+        COPY_KEY_MAPPING.put("device_name", WebUtil.getMessage("EquipmentName_xlsx"));
+        COPY_KEY_MAPPING.put("device_type", WebUtil.getMessage("EquipmentModel_xlsx"));
+        COPY_KEY_MAPPING.put("device_serial", WebUtil.getMessage("EquipmentSerialNumber_xlsx"));
+        COPY_KEY_MAPPING.put("device_qr", WebUtil.getMessage("QRCode_xlsx"));
+        COPY_KEY_MAPPING.put("device_department", WebUtil.getMessage("Department"));
+        COPY_KEY_MAPPING.put("device_oem", WebUtil.getMessage("manufacture"));
+        COPY_KEY_MAPPING.put("device_number", WebUtil.getMessage("EquipmentID_xlsx"));
+        COPY_KEY_MAPPING.put("device_location", WebUtil.getMessage("CurrentLocation_xlsx"));
 
-        COPY_KEY_MAPPING.put("issue_number", "报修单号");
-        COPY_KEY_MAPPING.put("issue_reporter", "报修人");
-        COPY_KEY_MAPPING.put("issue_reporter_phone", "报修人电话");
-        COPY_KEY_MAPPING.put("issue_report_time", "报修时间");
-        COPY_KEY_MAPPING.put("issue_report_status", "报修状态");
-        COPY_KEY_MAPPING.put("issue_device_stop_time", "停机时间");
-        COPY_KEY_MAPPING.put("issue_desc", "故障描述");
+        COPY_KEY_MAPPING.put("issue_number", WebUtil.getMessage("srNum_xlsx"));
+        COPY_KEY_MAPPING.put("issue_reporter", WebUtil.getMessage("requestorId"));
+        COPY_KEY_MAPPING.put("issue_reporter_phone", WebUtil.getMessage("RequestorTelephone_xlsx"));
+        COPY_KEY_MAPPING.put("issue_report_time", WebUtil.getMessage("RequestTime_xlsx"));
+        COPY_KEY_MAPPING.put("issue_report_status", WebUtil.getMessage("RequestStatus_xlsx"));
+        COPY_KEY_MAPPING.put("issue_device_stop_time", WebUtil.getMessage("DownTime_xlsx"));
+        COPY_KEY_MAPPING.put("issue_desc", WebUtil.getMessage("FaultDescription_xlsx"));
 
-        COPY_KEY_MAPPING.put("fix_status", "工单状态");
-        COPY_KEY_MAPPING.put("fix_hours", "维修总工时");
-        COPY_KEY_MAPPING.put("fix_fee", "维修总费用");
-        COPY_KEY_MAPPING.put("fix_other_fee", "其他费用");
-        COPY_KEY_MAPPING.put("fix_ext_fee", "外修费用");
-        COPY_KEY_MAPPING.put("fix_sign_time", "签到时间");
-        COPY_KEY_MAPPING.put("fix_type", "工单类型");
-        COPY_KEY_MAPPING.put("fix_error_type", "故障类型");
+        COPY_KEY_MAPPING.put("fix_status", WebUtil.getMessage("WorkorderStatus_xlsx"));
+        COPY_KEY_MAPPING.put("fix_hours", WebUtil.getMessage("TotalManhours_xlsx"));
+        COPY_KEY_MAPPING.put("fix_fee", WebUtil.getMessage("TotalRepairPrice_xlsx"));
+        COPY_KEY_MAPPING.put("fix_other_fee", WebUtil.getMessage("OtherExpenses_xlsx"));
+        COPY_KEY_MAPPING.put("fix_ext_fee", WebUtil.getMessage("ExternalExpenses_xlsx"));
+        COPY_KEY_MAPPING.put("fix_sign_time", WebUtil.getMessage("CheckInTime_xlsx"));
+        COPY_KEY_MAPPING.put("fix_type", WebUtil.getMessage("WorkorderType_xlsx"));
+        COPY_KEY_MAPPING.put("fix_error_type", WebUtil.getMessage("FaultType_xlsx"));
 
-        COPY_KEY_MAPPING.put("fix_owner", "当前责任人");
-        COPY_KEY_MAPPING.put("fix_reason", "原因描述");
-        COPY_KEY_MAPPING.put("fix_solution", "解决方案");
-        COPY_KEY_MAPPING.put("fix_validation", "交付前检测");
+        COPY_KEY_MAPPING.put("fix_owner", WebUtil.getMessage("CurrentOwner_xlsx"));
+        COPY_KEY_MAPPING.put("fix_reason", WebUtil.getMessage("ReasonDescription_xlsx"));
+        COPY_KEY_MAPPING.put("fix_solution", WebUtil.getMessage("patActions"));
+        COPY_KEY_MAPPING.put("fix_validation", WebUtil.getMessage("TestbeforeDelivery_xlsx"));
 
         /*COPY_KEY_MAPPING.put("fix_co1", "协作者1");
         COPY_KEY_MAPPING.put("fix_co2", "协作者2");
         COPY_KEY_MAPPING.put("fix_cohour1", "工时1");
         COPY_KEY_MAPPING.put("fix_cohour2", "工时2");*/
 
-        COPY_KEY_MAPPING.put("fix_man_hour", "维修工程师工时");
+        COPY_KEY_MAPPING.put("fix_man_hour", WebUtil.getMessage("MaintenanceEngineerManhours_xlsx"));
 
-        COPY_KEY_MAPPING.put("part_table", "备件信息");
+        COPY_KEY_MAPPING.put("part_table", "PartInformation");
         //COPY_KEY_MAPPING.put("proceed_table", "维修流程");
     }
 
@@ -122,7 +123,8 @@ public class WorkOrderDocxRenderService {
         putWorkOrderStep(target, (String) source.get("woId"));
         putServiceRequestMessage(target, (String) source.get("woId"));
         putWorkOrderCoworker(target, (String) source.get("woId"));
-
+        Map<String, String> COPY_KEY_MAPPING = new HashMap<>();
+        copyKeyMapping(COPY_KEY_MAPPING);
         for (Map.Entry<String, String> entry : COPY_KEY_MAPPING.entrySet()) {
             target.put(entry.getKey(), source.get(entry.getValue()));
         }

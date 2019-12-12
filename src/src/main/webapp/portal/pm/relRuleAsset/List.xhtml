@@ -50,13 +50,13 @@
                             </p:selectBooleanCheckbox>
                         </f:facet>
                     </p:column>
-                    <p:column headerText="启用日期">
+                    <p:column headerText="#{msg.StartUsingDate}">
                         <h:outputText value="#{relRuleAssetManagerController.getInstallDate(item.assetUID)}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
 
-                    <p:column headerText="采购日期">
+                    <p:column headerText="#{msg.PurchaseDate}">
                         <h:outputText value="#{relRuleAssetManagerController.getPurchaseDate(item.assetUID)}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>

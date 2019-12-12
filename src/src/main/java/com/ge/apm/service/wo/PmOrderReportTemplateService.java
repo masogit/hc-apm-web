@@ -23,12 +23,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 @Component
 public class PmOrderReportTemplateService {
@@ -44,6 +42,16 @@ public class PmOrderReportTemplateService {
     @Autowired
     private BlobFileService blobFileService;
 
+
+    public boolean isLocale(){
+        Locale locale = LocaleHolder.getLocale();
+        //System.out.println("locale  is "+locale);
+        if(locale.getLanguage().equalsIgnoreCase("zh")){
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public byte[] getActiveTemplateBytes(boolean isInsulate, UserAccount user) throws IOException {
         byte[] templateBytes = null;
@@ -61,13 +69,13 @@ public class PmOrderReportTemplateService {
             templateBytes = IOUtils.toByteArray(blobFileService.getBlobObjectByStorageId(template.getStorageId()).getStream());
         }
         if (templateBytes == null) {
-            String fileName = "maintenance-template.docx";
-            /*if (userContextService.isLocale()){
+            String fileName = null;
+            if (isLocale()){
                 fileName = "maintenance-template_zh.docx";
             } else {
                 fileName = "maintenance-template_en.docx";
 
-            }*/
+            }
             templateBytes = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("report/" + fileName ));
         }
         return templateBytes;

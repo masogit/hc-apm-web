@@ -3,6 +3,7 @@ package com.ge.apm.view.wo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.faces.bean.ManagedBean;
@@ -17,6 +18,7 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.wo.AssetLifecycleEventService;
 import com.ge.apm.view.sysutil.FileDownloadService;
 
+import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -32,10 +34,30 @@ public class AssetLifecycleEvent5Controller extends AssetLifecycleEventControlle
 		super.init();
         tabStatus=5;
     }
+
+    /***
+     *  是否是中国 维修工作台在非中文状态下不显示外部工单和外部远程工单
+     */
+    public boolean isLocale(){
+        Locale locale = LocaleHolder.getLocale();
+        //System.out.println("locale  is "+locale);
+        if(locale.getLanguage().equalsIgnoreCase("zh")){
+            return true;
+        } else {
+            return false;
+        }
+    }
     
     protected void downloadFile(List<Map<String,Object>> data){
+        String fileName = null;
+        if (isLocale()){
+            fileName = "/portal/pm/pmOrderListRemote_export_zh.xlsx";
+        } else {
+            fileName = "/portal/pm/pmOrderListRemote_export_en.xlsx";
+
+        }
 		try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/pm/pmOrderListRemote_export.xlsx");
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(fileName);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             Boolean exportFlag = service.exportData(doc, data);
             if (exportFlag) {

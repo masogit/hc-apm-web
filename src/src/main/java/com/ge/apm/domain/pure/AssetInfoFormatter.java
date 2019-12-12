@@ -824,7 +824,7 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("RiskGrade"), this.getRiskGradeAsString());
         map.put(WebUtil.getMessage("MeasurementGrade"), this.getMeasureGradeAsString());
         map.put(WebUtil.getMessage("measuringItemCategory"), this.getMeasuringItemCategoryAsString());
-        map.put(WebUtil.getMessage("IsEmergencyEquipment"),  this.getEmergencyEquipmentAsString());
+        map.put(WebUtil.getMessage("emergencyEquipment"),  this.getEmergencyEquipmentAsString());
         map.put(WebUtil.getMessage("IsImportEquipment"), this.getImportEquipmentAsString());
         map.put(WebUtil.getMessage("CurrentStatus"), this.getStatusAsString());
         map.put(WebUtil.getMessage("accountingCategory"), this.getAccountingCategoryAsString());

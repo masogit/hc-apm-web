@@ -452,5 +452,19 @@ ALTER TABLE i18n_message alter COLUMN value_tw type character varying(5000);
 update asset_alert_config set lower_limit = 10 where config_type = 105;
 
 update tenant_info set currency = 1;
-update tenant_info set habit = 1;
+--update tenant_info set habit = 1;
 update tenant_info set time_zone = 8.0;
+
+
+--v19.12.1
+update asset_alert_config set upper_limit = 40 where config_type = 156;
+
+insert into asset_alert_config(id, config_type, create_date, lower_limit, upper_limit, check_type, device_type, is_default, is_notify_customer,
+is_notify_fe, is_notify_ole, is_notify_sales, label, mute_period, pad_message, unit_of_measure, valid_values, wechat_message, is_enabled, ole_config)
+values ('0ba6a478745d5151897d711188bc4955', 9951, now(), 16, 28, 4, 99, true, false, false, false, false, '环境温度 for OLE', 0, '请检查设备间空调工作状态，否则影响图像质量，造成设备损坏。',
+'℃', '报警', '环境温度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），请检查设备间空调工作状态，否则影响图像质量，造成设备损坏。', true, true);
+
+insert into asset_alert_config(id, config_type, create_date, lower_limit, upper_limit, check_type, device_type, is_default, is_notify_customer,
+is_notify_fe, is_notify_ole, is_notify_sales, label, mute_period, pad_message, unit_of_measure, valid_values, wechat_message, is_enabled, ole_config)
+values ('21d87039ea3e45cab62f843e9b008629', 9952, now(), 20, 65, 4, 99, true, false, false, false, false, '环境湿度 for OLE', 0, '请检查设备间空调工作状态，否则影响图像质量，造成设备损坏',
+'%', '报警', '环境湿度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），请检查设备间空调工作状态，否则影响图像质量，造成设备损坏。', true, true);

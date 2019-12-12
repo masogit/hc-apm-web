@@ -5,6 +5,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:p="http://primefaces.org/ui">
 
     <h:form id="exportDataForm">
@@ -142,17 +143,37 @@
             <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
             <p:column headerText="#{msg.srNum}">
                 <a href="/geapm/portal/wo/woList.xhtml?woId=#{item.woId}" target="_Blank">
+                    <c:if test="#{userContextService.isLocale()}">
                     <h:outputText value="#{item.报修单号}"/>
+                    </c:if>
+                    <c:if test="#{!userContextService.isLocale()}">
+                        <h:outputText value="#{item.RequestWorkorderNumber}"/>
+                    </c:if>
                 </a>
             </p:column>
             <p:column headerText="#{msg.EquipmentID}">
+                <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备编号}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.EquipmentID}"/>
+                </c:if>
             </p:column>
             <p:column headerText="#{msg.arrivalListAssetName}">
+                <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备名称}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.EquipmentName}"/>
+                </c:if>
             </p:column>
             <p:column headerText="#{msg.functionType}">
+                <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备型号}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.EquipmentModel}"/>
+                </c:if>
             </p:column>
             <!--<p:column headerText="资产编号">
                 <h:outputText value="#{item.资产编号}"/>
@@ -163,25 +184,60 @@
                 <h:outputText value="#{item.院区}"/>
             </p:column>-->
             <p:column headerText="#{msg.Department}">
+                <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.科室}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.Department}"/>
+                </c:if>
             </p:column>
             <p:column headerText="#{msg.requestorId}">
+                <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.报修人}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.Requestor}"/>
+                </c:if>
             </p:column>
             <p:column headerText="#{msg.requestTime}">
+                <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.报修时间}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.RequestTime}"/>
+                </c:if>
             </p:column>
             <p:column headerText="#{msg.CurrentOwner}">
+                <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.当前责任人}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.CurrentOwner}"/>
+                </c:if>
             </p:column>
             <p:column headerText="#{msg.FaultDescription}">
+                <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.故障描述}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.FaultDescription}"/>
+                </c:if>
             </p:column>
             <p:column headerText="#{msg.CurrentStep}">
+                <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.当前步骤}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.CurrentStep}"/>
+                </c:if>
             </p:column>
             <p:column headerText="#{msg.WorkorderStatus}">
+                <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.工单状态}"/>
+                </c:if>
+                <c:if test="#{!userContextService.isLocale()}">
+                    <h:outputText value="#{item.WorkorderStatus}"/>
+                </c:if>
             </p:column>
 
             <f:facet name="{Toolbar}">

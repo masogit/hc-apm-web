@@ -30,7 +30,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
-import lombok.Data;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
@@ -47,9 +47,7 @@ import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.dao.BySearchFilterSpecification;
+
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -1140,6 +1138,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setSupplier(supplier.getName());
     }
     private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
+
+
     protected void init() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
@@ -1172,6 +1172,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         configService = WebUtil.getBean(ConfigService.class);
         v2_workOrderDetailRepository = WebUtil.getBean(V2_WorkOrderDetailRepository.class);
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         this.selectedMap = new HashMap();
         pmReportService = WebUtil.getBean(PmReportService.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
@@ -1200,8 +1201,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         for (ExportFields exs: ExportFields.values()
         ) {
-            pmFieldsExport.add(exs.getChinese());
+            if(userContextService.isLocale()){
+                pmFieldsExport.add(exs.getChinese());
+            }else{
+                pmFieldsExport.add(exs.getEnglish());
+            }
         }
+
+
+
 
         /*if ((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) || userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") && (userContextService.hasAnyRole("HospitalHead") || userContextService.hasAnyRole("ClinicalStaff") || userContextService.hasAnyRole("DeptHead"))) {
             String query = WebUtil.getRequestParameter("query");
