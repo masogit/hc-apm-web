@@ -2,16 +2,26 @@ package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "v2_blob_object")
 public class V2_BlobObject implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    public enum ZkbBoSubType {
+        ServiceManual, OperationManual, MaintenanceList, Others
+    }
+    public enum ZkbOperationType {
+        A, C
+    }
 
     public static final String BO_TYPE_ServiceRequest = "ServiceRequest";
     public static final String BO_TYPE_PCCReport="PccReport";
@@ -30,6 +40,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_ArrivalListItem = "ArrivalListItem";
     public static final String BO_TYPE_ArrivalList = "ArrivalList";
     public static final String BO_TYPE_TableDefinition = "TableDefinition";
+    public static final String BO_TYPE_ZKB = "ZKB";
     public static final String BO_SUB_TYPE_DOCS = "Docs";
     public static final String BO_SUB_TYPE_IMG = "Image";
     public static final String BO_SUB_TYPE_EXCEL = "Excel";
@@ -84,6 +95,15 @@ public class V2_BlobObject implements Serializable {
 
     @Column(name = "ext_link")
     private String extLink;
+
+    @Column(name = "operation_type")
+    private String operationType;
+
+    @Column(name = "main_directory")
+    private String mainDirectory;
+
+    @Column(name = "second_directory")
+    private String secondDirectory;
 
     @JoinColumn(insertable=false,updatable=false, name = "bo_uuid", referencedColumnName = "uid",nullable = true)
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
@@ -216,6 +236,30 @@ public class V2_BlobObject implements Serializable {
 
     public void setExtLink(String extLink) {
         this.extLink = extLink;
+    }
+
+    public String getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
+    }
+
+    public String getMainDirectory() {
+        return mainDirectory;
+    }
+
+    public void setMainDirectory(String mainDirectory) {
+        this.mainDirectory = mainDirectory;
+    }
+
+    public String getSecondDirectory() {
+        return secondDirectory;
+    }
+
+    public void setSecondDirectory(String secondDirectory) {
+        this.secondDirectory = secondDirectory;
     }
 
     @Override

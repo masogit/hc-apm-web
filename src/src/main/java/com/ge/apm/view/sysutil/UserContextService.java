@@ -937,4 +937,32 @@ public class UserContextService implements Serializable {
             return Locale.SIMPLIFIED_CHINESE.getLanguage();
         }
     }
+
+    public boolean isZkbUser(){
+        TenantInfo currentTenantInfo = this.getCurrentUserTenantInfo();
+
+        if(currentTenantInfo.getType() == null || currentTenantInfo.getTestStatus() == null){
+            return Boolean.FALSE;
+        }
+
+        if(currentTenantInfo.getType().equals(3) && !currentTenantInfo.getTestStatus().equals(-1)){
+            return Boolean.TRUE;
+        }
+
+        return Boolean.FALSE;
+    }
+
+    public boolean isZkbAdmin(){
+        TenantInfo currentTenantInfo = this.getCurrentUserTenantInfo();
+
+        if(currentTenantInfo.getType() == null || currentTenantInfo.getTestStatus() == null){
+            return Boolean.FALSE;
+        }
+
+        if(currentTenantInfo.getType().equals(3) && currentTenantInfo.getTestStatus().equals(-1)){
+            return Boolean.TRUE;
+        }
+
+        return Boolean.FALSE;
+    }
 }
