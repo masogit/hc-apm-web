@@ -771,7 +771,7 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("pmOwnerName"), this.getPmOwnerName());
         map.put(WebUtil.getMessage("Site"), this.getSiteName());
         map.put(WebUtil.getMessage("clinicalDeptId"), this.getClinicalDeptName());
-        map.put(WebUtil.getMessage("AssetDepartment"), this.getAssetDeptName());
+        map.put(WebUtil.getMessage("assetDeptId"), this.getAssetDeptName());
         map.put(WebUtil.getMessage("Manufacturer"), this.getManufacture());
         map.put(WebUtil.getMessage("BrandManufacturerShortName"), this.getMakerShortName());
         map.put(WebUtil.getMessage("EquipmentStandardName"), this.getDeviceName());
