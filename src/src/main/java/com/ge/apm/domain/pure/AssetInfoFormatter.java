@@ -782,7 +782,7 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("MedicalDeviceClassification"), this.getFunctionGroupAsString());
         map.put(WebUtil.getMessage("MedicalDeviceSubclassification"), this.getAssetCode68AsString());
 
-        map.put(WebUtil.getMessage("EquipmentClassification"),this.getAssetGroupAsString());
+        map.put(WebUtil.getMessage("assetGroup"),this.getAssetGroupAsString());
 
         map.put(WebUtil.getMessage("FunctionGrade"),  this.getFunctionGrade());
         map.put(WebUtil.getMessage("RepairType"), this.getRepairFormAsString());
@@ -803,8 +803,8 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("PurchaseDate"),  this.getPurchaseDate());
         map.put(WebUtil.getMessage("ArrivalDate"), this.getArriveDate());
         map.put(WebUtil.getMessage("StartUsingDate"), this.getInstallDate());
-        map.put(WebUtil.getMessage("WarrantyDate"),this.getFactoryWarrantyDate());
-        map.put(WebUtil.getMessage("WarrantyExpirationDate"), this.getWarrantyDate());
+        map.put(WebUtil.getMessage("factoryWarrantyDate"),this.getFactoryWarrantyDate());
+        map.put(WebUtil.getMessage("WarrantyDate"), this.getWarrantyDate());
         map.put(WebUtil.getMessage("TerminateDate"), this.getTerminateDate());
         map.put(WebUtil.getMessage("lastPmDate"), this.getLastPmDate());
         map.put(WebUtil.getMessage("LastMeasurementDate"), this.getLastMeteringDate());

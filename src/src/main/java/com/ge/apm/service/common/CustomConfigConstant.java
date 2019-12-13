@@ -72,7 +72,7 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("Vendor"), "vendor");
             exportFields.put(WebUtil.getMessage("MedicalDeviceClassification"), "functionGroup");
             exportFields.put(WebUtil.getMessage("MedicalDeviceSubclassification"), "assetCode68");
-            exportFields.put(WebUtil.getMessage("EquipmentClassification"),"assetGroup");
+            exportFields.put(WebUtil.getMessage("assetGroup"),"assetGroup");
             exportFields.put(WebUtil.getMessage("assetGroupSecondary"), "assetGroupSecondary");
             exportFields.put(WebUtil.getMessage("parentAsset"), "parentAssetId");
             exportFields.put(WebUtil.getMessage("FunctionGrade"), "functionGrade");
@@ -94,8 +94,8 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("PurchaseDate"), "purchaseDate");
             exportFields.put(WebUtil.getMessage("ArrivalDate"), "arriveDate");
             exportFields.put(WebUtil.getMessage("StartUsingDate"),"installDate");
-            exportFields.put(WebUtil.getMessage("WarrantyDate"), "factoryWarrantyDate");
-            exportFields.put(WebUtil.getMessage("WarrantyExpirationDate"), "warrantyDate");
+            exportFields.put(WebUtil.getMessage("factoryWarrantyDate"), "factoryWarrantyDate");
+            exportFields.put(WebUtil.getMessage("warrantyDate"), "warrantyDate");
             exportFields.put(WebUtil.getMessage("TerminateDate"), "terminateDate");
             exportFields.put(WebUtil.getMessage("LastMaintenanceDate"), "lastPmDate");
             exportFields.put(WebUtil.getMessage("LastMeasurementDate"), "lastQaDate");
