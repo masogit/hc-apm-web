@@ -153,8 +153,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("purchaseDate")), "setPurchaseDate");
                 assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("arriveDate")), "setArriveDate");
                 assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("StartUsingDate")), "setInstallDate");
-                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("WarrantyDate")), "setFactoryWarrantyDate");
-                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("WarrantyExpirationDate")), "setWarrantyDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("factoryWarrantyDate")), "setFactoryWarrantyDate");
+                assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("warrantyDate")), "setWarrantyDate");
                 assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("terminateDate")), "setTerminateDate");
                 assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("lastPmDate")), "setLastPmDate");
                 assetRow.setFieldDateValue(trimMsgKey(WebUtil.getMessage("lastMeteringDate")), "setLastMeteringDate");
