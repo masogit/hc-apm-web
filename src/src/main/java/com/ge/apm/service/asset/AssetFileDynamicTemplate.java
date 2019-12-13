@@ -157,7 +157,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         row.createCell(1).setCellValue(WebUtil.getMessage("List"));
 
         int rowNum = 1;
-        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("EquipmentClassification"), assetGroup, false);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("assetGroup"), assetGroup, false);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("MedicalDeviceClassification"), assetFunctionTypes, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("DepreciationMethod"), depreciationMethod, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("UsageClassification"), assetUsageList, true);
@@ -563,7 +563,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("MedicalDeviceSubclassification"), "医用缝合针(不带线)");
 
         String data = assetGroup.isEmpty() ? "其他类" : assetGroup.get(0).getValueZh();
-        map.put(WebUtil.getMessage("EquipmentClassification"), data);
+        map.put(WebUtil.getMessage("assetGroup"), data);
 
         map.put(WebUtil.getMessage("EquipmentModel"), "XXX");
         map.put(WebUtil.getMessage("ManufacturerSerialNumber"), "123456");
