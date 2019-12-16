@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 public class TenantInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -98,7 +99,7 @@ public class TenantInfo implements Serializable {
     private Integer passwordLifeTime; //密码有效天数
     
     @Column(name = "type")
-    private Integer type = 0;//0、普通租户，1、代理商租户 2、临时租户
+    private Integer type = 0;//0、普通租户，1、代理商租户 2、临时租户 3,zkb租户
 
     @Column(name = "is_insulate")
     private Boolean isInsulate;
@@ -530,4 +531,5 @@ public class TenantInfo implements Serializable {
     public void setIsDeleted(Boolean deleted) {
         isDeleted = deleted;
     }
+
 }

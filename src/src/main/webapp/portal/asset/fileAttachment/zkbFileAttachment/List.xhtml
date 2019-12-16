@@ -1,0 +1,113 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.zkbKnowledgeMgmt}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="zkbFileAttachmentListForm">
+                    <p:dataTable id="datalist" value="#{zkbFileAttachmentController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbFileAttachmentController.selected}" disabledSelection="true"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" update="editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{zkbFileAttachmentController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
+                        <p:ajax event="page" oncomplete="updateSelectAllCheckBox();"/>
+
+                        <p:column width="36" id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{zkbFileAttachmentController.selectedMap[item.id]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{zkbFileAttachmentController.onSelectAllOfPage}" update="@(.selectCheckBox) editButton deleteButton" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="#{msg.mainDirectory}" filterBy="#{item.mainDirectory}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.mainDirectory}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.secondDirectory}" filterBy="#{item.secondDirectory}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.secondDirectory}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.name}" filterBy="#{item.objectName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.objectName}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.fileType}" filterBy="#{item.boSubType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbAttachmentType', item.boSubType)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <c:forEach items="#{fieldMsg.getFieldValueList('zkbAttachmentType')}" var="v">
+                                        <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}" />
+                                    </c:forEach>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="#{msg.operationType}" filterBy="#{item.operationType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbOperationType', item.operationType)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <c:forEach items="#{fieldMsg.getFieldValueList('zkbOperationType')}" var="v">
+                                        <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}" />
+                                    </c:forEach>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="#{msg.download}" exportable="false">
+                            <p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}">#{msg.download}</p:link>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbFileAttachmentController.prepareCreate}" update=":zkbFileAttachmentEditForm" disabled="#{not zkbFileAttachmentController.zkbAdmin}"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray batch-terminated" title="#{msg.Edit}" actionListener="#{zkbFileAttachmentController.prepareEdit}"  update=":zkbFileAttachmentEditForm" disabled="#{not zkbFileAttachmentController.checkedOne or not zkbFileAttachmentController.zkbAdmin}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" actionListener="#{zkbFileAttachmentController.deleteZkbFileAttachment}" update=":zkbFileAttachmentListForm :zkbFileAttachmentEditForm :growl" disabled="#{not zkbFileAttachmentController.checked or not zkbFileAttachmentController.zkbAdmin}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </f:facet>
+
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+
+        <script>
+            //<![CDATA[
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetFileAttachmentListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>
