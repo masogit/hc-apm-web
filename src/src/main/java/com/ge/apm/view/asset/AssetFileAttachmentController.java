@@ -391,6 +391,11 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     }
 
     public void batchSave() {
+        if(targetAssets == null || targetAssets.isEmpty()){
+            WebUtil.addErrorMessage(WebUtil.getMessage("assetName") + WebUtil.getMessage("ValidationRequire"));
+            return;
+        }
+
         if (batchBlobObject != null || "vlink".equals(boSubTypeBatch)) {
             String parsedLink = vlinkParserService.parseVlink(vlink);
             if ("vlink".equals(boSubTypeBatch) && StringUtils.isEmpty(parsedLink)) {
@@ -416,7 +421,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                 dao.save(tempBlobObject);
             }
         } else {
-            WebUtil.addErrorMessage("附件不能为空");
+            WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
             return;
         }
 
