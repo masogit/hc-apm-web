@@ -519,15 +519,15 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         }
 
         //检查该组织下是否有二维码
-        checkFilters.clear();
-        checkFilters.add(new SearchFilter("orgId", SearchFilter.Operator.IN, clinicalsDeptIds, "1+"));
-
-        QrCodeLibRepository qrcodeLibDao = WebUtil.getBean(QrCodeLibRepository.class);
-        List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
-        if (qrcodeList != null && !qrcodeList.isEmpty()) {
-            WebUtil.addErrorMessage("该组织下有二维码存在,不能删除.");
-            return false;
-        }
+//        checkFilters.clear();
+//        checkFilters.add(new SearchFilter("orgId", SearchFilter.Operator.IN, clinicalsDeptIds, "1+"));
+//
+//        QrCodeLibRepository qrcodeLibDao = WebUtil.getBean(QrCodeLibRepository.class);
+//        List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
+//        if (qrcodeList != null && !qrcodeList.isEmpty()) {
+//            WebUtil.addErrorMessage("该组织下有二维码存在,不能删除.");
+//            return false;
+//        }
 
         return true;
     }
