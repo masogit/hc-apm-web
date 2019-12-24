@@ -605,6 +605,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','45','监护仪','Medical Monitor',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','46','呼吸机','Respirator',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','47','除颤仪','Defibrillator',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','48','生物安全柜','Biosafety Cabinet',NULL,-1);
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroup','1','放射类','Radioactive',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetCategory','1','放射类','Radioactive',NULL,-1);
