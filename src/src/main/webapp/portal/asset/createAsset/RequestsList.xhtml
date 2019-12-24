@@ -78,7 +78,7 @@
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.Create2}" >
-                            <p:link   outcome="CreateAsset" >#{msg.Create}
+                            <p:link target="_new" outcome="CreateAsset" >#{msg.Create}
                                 <f:param name="qrCode" value="#{item.qrCode}" />
                                 <f:param name="siteUid" value="#{item.siteUID}" />
                             </p:link >
