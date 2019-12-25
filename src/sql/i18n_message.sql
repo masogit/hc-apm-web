@@ -2844,7 +2844,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PriorDaysOfMaintenance', '维保/质保提醒提前天数', 'Prior Days of Maintenance/Warranty Reminder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FrequencyOfMaintenance', '维保/质保提醒次数', 'Frequency of Maintenance/Warranty Reminder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PriorDaysOfMeasurementReminder', '计量提醒提前天数', 'Prior Days of Measurement Reminder', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FrequencyOfMeasurementReminder', '计量提醒提前天数', 'Frequency of Measurement Reminder', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FrequencyOfMeasurementReminder', '计量提醒提前次数', 'Frequency of Measurement Reminder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WhetherOrNotToCheck', '到货安装是否需要核对入库', 'Whether or not to check and store upon installation of the arrivals', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ThreeCodeConfiguration', '三码配置', 'Three-code Configuration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'InitialSerialNumber', '初始流水号', 'Initial Serial Number', NULL, '-1');
