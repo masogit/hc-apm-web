@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.zkbContactManagement}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="zkbContactPersonListForm">
+
+                    <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                        <p:outputLabel value="#{msg.TenantInfo}*:"/>
+                        <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbContactPersonController.selectionTenantInfo}">
+                            <p:ajax listener="#{zkbContactPersonController.tenantInfoSelect}" update="datalist :zkbContactPersonEditForm"/>
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <c:forEach items="#{zkbContactPersonController.tenantInfoList}" var="v">
+                                <f:selectItem itemLabel="#{v.name}" itemValue="#{v.uid}"/>
+                            </c:forEach>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+
+                    <p:dataTable id="datalist" value="#{zkbContactPersonController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbContactPersonController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" listener="#{zkbContactPersonController.prepareEdit}" update="deleteButton :zkbContactPersonEditForm"/>
+                        <p:ajax event="filter" listener="#{zkbContactPersonController.onFilter}" />
+
+                        <p:column headerText="#{msg.zkbContact_tenant}">
+                            <h:outputText value="#{zkbContactPersonController.getTenantInfo(item.tenantUID).name}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContact_name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContact_phone}" filterBy="#{item.phone}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.phone}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContact_email}" filterBy="#{item.email}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.email}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContact_position}" filterBy="#{item.position}" filterMatchMode="LIKE">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbContactPosition', item.position)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <c:forEach items="#{fieldMsg.getFieldValueList('zkbContactPosition')}" var="v">
+                                        <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}" />
+                                    </c:forEach>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContact_zipcode}" filterBy="#{item.zipcode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.zipcode}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContact_address}" filterBy="#{item.address}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.address}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContact_remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.remark}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbContactPersonController.prepareCreate}" update=":zkbContactPersonEditForm" disabled="#{empty zkbContactPersonController.selectionTenantInfo}"/>
+                            <!--<p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContactPersonController.prepareEdit}" update=":zkbContactPersonEditForm" disabled="#{empty zkbContactPersonController.selected.id}"/>-->
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContactPersonController.delete}" update=":zkbContactPersonListForm :zkbContactPersonEditForm" disabled="#{empty zkbContactPersonController.selected.id}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="ZKB_ContactPerson_Export"/>
+                            </p:commandButton>
+                        </f:facet>
+
+                    </p:dataTable>
+
+                </h:form>
+
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+
+
+</ui:composition>
