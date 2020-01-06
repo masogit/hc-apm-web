@@ -122,7 +122,7 @@
                 <p:menuitem id="um39" value="#{msg.DeviceROIAnalysis}" rendered="false" outcome="/empty"/>
                 <p:menuitem id="um40" value="#{msg.FinancialPerformanceAndForecast}" url="/portal/analysis/reports.xhtml#/AssetPerf" rendered="false"/>
                 <p:menuitem id="um41" value="#{msg.UsageAndClinicalPerformance}" outcome="/portal/analysis/assetOperationalPerf" rendered="false"/>
-                <p:menuitem id="um42" value="#{msg.BIPerformanceAnalysisPlatform}" rendered="#{true and !userContextService.isOnlyAssetStaff() and userContextService.accessContains('performance.BI')}" url="/geapm/web/bi"/>
+                <p:menuitem id="um42" value="#{msg.BIPerformanceAnalysisPlatform}" rendered="#{true and !userContextService.isOnlyAssetStaff() and userContextService.accessContains('performance.BI')}" url="/geapm/web/bi" target="_new"/>
                 <p:menuitem id="um43" value="#{msg.DeviceCostAnalysis}" rendered="false" outcome="/empty"/>
                 <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
             </p:submenu>
@@ -173,7 +173,10 @@
                 <p:menuitem id="um4100" value="#{msg.SRReportList}" outcome="/portal/sr/opsreport/reportList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
                 <p:menuitem id="um4200" value="#{msg.AlertSettingsList}" outcome="/portal/fealert/report/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
             </p:submenu>
-
+            <p:submenu label="#{msg.ZKBBasicInfo}" icon="settings" rendered="#{userContextService.accessContains('zkbBasicInfo')}">
+                <p:menuitem value="#{msg.ZKBAgentContactPersonMgt}" outcome="/portal/zkb/contactPerson/List.xhtml" rendered="#{userContextService.accessContains('zkbBasicInfo.agentContactPersonMgt')}"/>
+                <p:menuitem value="#{msg.ZKBEngineerMgt}" outcome="/portal/zkb/engineer/List.xhtml " rendered="#{userContextService.accessContains('zkbBasicInfo.engineerMgt')}"/>
+            </p:submenu>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
             <p:menuitem id="logout" value="#{msg.Logout}" icon="&#xe8ac;" url="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"/>

@@ -277,6 +277,15 @@ public class TenantInfoConfigService {
 				if(key.equals("knowledge.zkbView")){
 					tempItem.setValue(true);
 				}
+                if(key.equals("zkbBasicInfo")){
+                    tempItem.setValue(true);
+                }
+                if(key.equals("zkbBasicInfo.agentContactPersonMgt")){
+                    tempItem.setValue(true);
+                }
+                if(key.equals("knowledge.zkbBasicInfo.engineerMgt")){
+                    tempItem.setValue(true);
+                }
 			}
 		}
 		if (root != null) {

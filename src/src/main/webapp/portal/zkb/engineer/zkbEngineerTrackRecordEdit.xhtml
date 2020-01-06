@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <p:dialog id="zkbEngineerTrackRecordEditDlg" widgetVar="zkbEngineerTrackRecordEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="工程师工作经历" height="370">
+        <h:form id="zkbEngineerTrackRecordEditForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbEngineerController.zkbEngineerTrackRecordSelected != null}">
+
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbEngineer_companyName}*</label>
+                    <p:inputText id="companyName" value="#{zkbEngineerController.zkbEngineerTrackRecordSelected.companyName}" required="true" requiredMessage="#{msg.zkbEngineer_companyName} #{msg.ValidationRequire}" />
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbEngineer_position}*</label>
+                    <p:inputText id="position" value="#{zkbEngineerController.zkbEngineerTrackRecordSelected.position}" required="true" requiredMessage="#{msg.zkbEngineer_position} #{msg.ValidationRequire}" />
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbEngineer_hireDate}*</label>
+                    <p:calendar timeZone="GMT+8"  id="hireDate" pattern="yyyy/MM/dd" value="#{zkbEngineerController.zkbEngineerTrackRecordSelected.hireDate}" required="true" requiredMessage="#{msg.zkbEngineer_hireDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbEngineer_workSeniority}*</label>
+                    <p:inputNumber id="workSeniority"  decimalPlaces="0" minValue="0" maxValue="999" value="#{zkbEngineerController.zkbEngineerTrackRecordSelected.workSeniority}" required="true" requiredMessage="#{msg.zkbEngineer_workSeniority} #{msg.ValidationRequire}">
+                        <f:convertNumber pattern="0" type="number"/>
+                    </p:inputNumber>
+                </h:panelGroup>
+
+            </p:panelGrid>
+            <br/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbEngineerController.saveZkbEngineerTrackRecord}" update=":growl :zkbEngineerEditForm:zkbEngineerTrackRecordDatalist" icon="ui-icon-check" onclick="PF('zkbEngineerTrackRecordEditDialog').hide()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbEngineerTrackRecordEditDialog').hide()"/>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+
+</html>

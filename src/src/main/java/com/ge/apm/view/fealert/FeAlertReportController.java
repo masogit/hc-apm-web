@@ -37,7 +37,7 @@ public class FeAlertReportController extends GenericCRUDUUIDController<AssetAler
         this.setSearchFilter();
         this.selected = null;
         searchFilters.add(new SearchFilter("checkType", SearchFilter.Operator.EQ, 1));
-        searchFilters.add(new SearchFilter("oleConfig", SearchFilter.Operator.EQ, null));
+        searchFilters.add(new SearchFilter("oleConfig", SearchFilter.Operator.IsNull, ""));
         return repository.findBySearchFilter(searchFilters, pageRequest);
     }
 

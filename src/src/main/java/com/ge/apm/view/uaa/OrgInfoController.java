@@ -478,7 +478,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         List<OrgInfo> clinicalsDeptOrg = clinicalDeptService.collectChildClinicalDept(selected);
 
         List<String> clinicalsDeptUids = clinicalsDeptOrg.stream().map(org -> org.getUid()).collect(Collectors.toList());
-        List<Integer> clinicalsDeptIds = clinicalsDeptOrg.stream().map(org -> org.getId()).collect(Collectors.toList());
 
         List<SearchFilter> checkFilters = new ArrayList<>();
 
@@ -492,18 +491,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             return false;
         }
 
-        //检查是否有用户选择了该组织作为可见组织。
-        //JIRA#4216
-//        checkFilters.clear();
-//        checkFilters.add(new SearchFilter("orgUid", SearchFilter.Operator.IN, clinicalsDeptUids, "1+"));
-//
-//        UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-//        List<UserOrgInfo> userOrgInfoList = userOrgDao.findBySearchFilter(checkFilters);
-//        if (!userOrgInfoList.isEmpty()) {
-//            WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
-//            return false;
-//        }
-
         //检查该组织是否已经有资产属于该组织。
         checkFilters.clear();
         checkFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false, "1*"));
@@ -515,17 +502,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);
         if (assetList != null && !assetList.isEmpty()) {
             WebUtil.addErrorMessage("该组织下有资产存在,不能删除.");
-            return false;
-        }
-
-        //检查该组织下是否有二维码
-        checkFilters.clear();
-        checkFilters.add(new SearchFilter("orgId", SearchFilter.Operator.IN, clinicalsDeptIds, "1+"));
-
-        QrCodeLibRepository qrcodeLibDao = WebUtil.getBean(QrCodeLibRepository.class);
-        List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
-        if (qrcodeList != null && !qrcodeList.isEmpty()) {
-            WebUtil.addErrorMessage("该组织下有二维码存在,不能删除.");
             return false;
         }
 

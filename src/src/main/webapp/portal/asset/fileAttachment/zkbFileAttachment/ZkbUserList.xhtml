@@ -37,7 +37,7 @@
                             <h:outputText value="#{item.blobObject.objectName}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.fileType}" filterBy="#{item.blobObject.blobObject.boSubType}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.fileType}" filterBy="#{item.blobObject.boSubType}" filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbAttachmentType', item.blobObject.boSubType)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
