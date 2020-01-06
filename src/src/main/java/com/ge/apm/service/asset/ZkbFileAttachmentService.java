@@ -42,6 +42,7 @@ public class ZkbFileAttachmentService {
         List<SearchFilter> searchFilters = new ArrayList<>();
 
         searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, 3));
+        searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.NE, -1));
 
         return tenantInfoDao.findBySearchFilter(searchFilters);
     }

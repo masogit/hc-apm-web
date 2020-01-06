@@ -571,36 +571,48 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','11','超声多普勒胎心仪','Ultrasonic Doppler Fetal Heart Rate Meter',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','12','血压计（表）','Sphygmomanometer',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','13','电子血压计','Electronic Sphygmomanometer',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','14','心电图机','ECG Machine',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','15','脑电图仪','EEG Machine',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','16','听力计','Audiometer',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','17','验光仪','Refractometer',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','18','验光镜片组','Optometry Lens Group',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','19','氧气吸入器','Oxygen Inhaler',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','20','酸度计','PH Meter',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','21','分光光度计','Spectrophotometer',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','22','天平','Balance',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','23','电子体重秤','Electronic Scale',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','24','指针式机械体重秤','Pointer Type Mechanical Weight Scale',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','25','温湿度计','Hygrothermograph',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','26','体温计','Thermometer',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','27','电导率仪','Conductivity Meter',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','28','剂量仪','Dosimeter',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','29','活度计','Activity Meter',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','30','标准器','Standard',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','31','测试仪','Tester',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','32','移液器','Pipette',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','33','婴儿培养箱','Infant Incubator',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','34','普通压力表','General Pressure Gauge',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','35','精密压力表','Precision Pressure Gauge',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','36','安全阀','Safety Valve',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','37','压力容器','Pressure Vessel',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','38','高压氧舱','Hyperbaric Oxygen Chamber',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','39','血压计（电子）','Sphygmomanometer (Electronic)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','40','血压计（水银）','Sphygmomanometer (Mercury)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','41','流量计','Flow Meter',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','42','超声诊断设备','Ultrasound Diagnostic Equipment',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','43','数字心电图','Digital ECG',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','44','放射类','Radioactive',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','45','监护仪','Medical Monitor',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','46','呼吸机','Respirator',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','47','除颤仪','Defibrillator',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','48','生物安全柜','Biosafety Cabinet',NULL,-1);
+
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroup','1','放射类','Radioactive',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetCategory','1','放射类','Radioactive',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','44','放射类','Radioactive',NULL,-1);
+
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringStatus','3','无结果','No Result',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('accountingCategory','1','医用电子仪器','Medical Electronic Equipment',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','38','高压氧舱','Hyperbaric Oxygen Chamber',NULL,-1);
+
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('accountingCategory','2','光学仪器及内窥镜','Optical Instruments and Endoscopes',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('accountingCategory','3','医用机械设备','Medical Machinery',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('accountingCategory','4','电子产品及通讯设备','Electronic Products and Communication Equipment',NULL,-1);
@@ -1101,7 +1113,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('6816','3','烧伤（整形）用钳','Forceps for Burn (Plastic) Surgery',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('6816','4','烧伤（整形）用镊、夹','Tweezers and Clips for Burn (Plastic) Surgery',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('6816','6','烧伤（整形）用其他器械','Other Devices for Burn (Plastic) Surgery',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','26','体温计','Thermometer',NULL,-1);
+
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('6820','1','体温计','Thermometer',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('6820','3','肺量计','Spirometer',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('6820','4','听诊器（无电能）','Stethoscope (without Electric Energy)',NULL,-1);
@@ -1179,10 +1191,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','8','投放','Launch',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('arrivalListOrderType','3','投放','Launch',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('6820','2','血压计','Sphygmomanometer',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','22','天平','Balance',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','32','移液器','Pipette',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','20','酸度计','PH Meter',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('measuringItemCategory','14','心电图机','ECG Machine',NULL,-1);
+
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('6831','3','X线机配套用患者或部件支撑装置（电动）','X-ray Machine Supporting Patient or Component Support Device (Electric)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('6831','4','X射线透视、摄影附加装置','X-ray Fluoroscopy and Photography Attachments',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('6831','5','X射线机用限速器','Speed Limiter for X-ray Machine',NULL,-1);
@@ -1712,7 +1721,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','config','系统配置','System Administrator',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','OrgAdmin','组织机构管理','Organization Administrator',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','CustomRole','自定义角色','Custom Role',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','Accountdash','资产管理一览','Asset Overview',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','Accountdash','资产管理一览','Medical Asset Executive View',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','config.org','组织机构管理','Organization Administrator',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','UserAdmin','用户管理','User Administrator',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','config.user','用户管理','User Administrator',NULL,-1);
@@ -2835,7 +2844,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PriorDaysOfMaintenance', '维保/质保提醒提前天数', 'Prior Days of Maintenance/Warranty Reminder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FrequencyOfMaintenance', '维保/质保提醒次数', 'Frequency of Maintenance/Warranty Reminder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PriorDaysOfMeasurementReminder', '计量提醒提前天数', 'Prior Days of Measurement Reminder', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FrequencyOfMeasurementReminder', '计量提醒提前天数', 'Frequency of Measurement Reminder', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FrequencyOfMeasurementReminder', '计量提醒提前次数', 'Frequency of Measurement Reminder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WhetherOrNotToCheck', '到货安装是否需要核对入库', 'Whether or not to check and store upon installation of the arrivals', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ThreeCodeConfiguration', '三码配置', 'Three-code Configuration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'InitialSerialNumber', '初始流水号', 'Initial Serial Number', NULL, '-1');
@@ -3158,6 +3167,54 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersion','ZKBVersion','ZKB版','ZKB Version',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','knowledge.zkbMgt','智康保文档管理','ZKB Document Management',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','knowledge.zkbView','智康保文档查看','ZKB Document view',NULL,-1);
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContactPerson','智康保联系人','ZKB Contact Person',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContactManagement','智康保联系人管理','ZKB Contact Management',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContactInfo','联系人信息','ZKB Contact Info',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContact_tenant','租户','tenant',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContact_name','负责人','name',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContact_phone','电话','phone',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContact_email','邮箱','email',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContact_position','职务','position',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContact_zipcode','邮编','zipcode',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContact_address','地址','address',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContact_remark','备注','remark',NULL,-1);
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContactPosition','Engineer','工程师','engineer',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContactPosition','EngineerManager','工程师经理','engineer manager',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContactPosition','AfterSales','售后销售','after sales',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContactPosition','AfterSalesManager','售后销售经理','afterSales manager',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContactPosition','MaintenanceManager','维修部经理','maintenance manager',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContactPosition','AssetSales','设备销售','asset sales',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContactPosition','AssetSalesManager','设备销售经理','asset sales manager',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContactPosition','GeneralManager','总经理','general manager',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContactPosition','ZKBAdmin','智康保管理员','zkb admin',NULL,-1);
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer','智康保工程师','ZKB Engineer',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineerInfo','工程师信息','ZKB Engineer Info',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineerManagement','智康保工程师管理','ZKB Engineer Management',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineerTrackRecord','工程师工作经历','Engineer Track Record',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_tenant','租户','tenant',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_name','姓名','name',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_phone','电话','phone',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_email','邮箱','email',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_status','认证状态','status',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_age','年龄','age',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_educationalBackground','学历','educationalBackground',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_graduateSchool','毕业院校','graduateSchool',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_specialty','专业','specialty',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_companyName','公司名称','companyName',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_position','职务','position',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_hireDate','入职时间','hireDate',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbEngineer_workSeniority','工作年限','workSeniority',NULL,-1);
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','zkbBasicInfo','智康保基本信息','ZKB Basic Info',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','zkbBasicInfo.agentContactPersonMgt','智康保联系人管理','ZKB Agent Contact Person Mgt',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','zkbBasicInfo.engineerMgt','智康保工程师管理','ZKB Engineer Mgt',NULL,-1);
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ZKBBasicInfo','基本信息','Basic Info',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ZKBAgentContactPersonMgt','公司信息','Company Info',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ZKBEngineerMgt','工程师信息','Engineer Info',NULL,-1);
 
    --Other显示中文修改
    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Other002', '其他', 'Other', NULL, '-1');
