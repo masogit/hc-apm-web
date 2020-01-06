@@ -6,6 +6,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContactPerson;
 import com.ge.apm.service.zkb.ZkbContactPersonService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -28,6 +29,7 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
 
     private ZkbContactPersonRepository dao;
     private ZkbContactPersonService zkbContactPersonService;
+    private UserContextService userContextService;
 
     private UserAccount currentUser;
     private List<TenantInfo> tenantInfoList;
@@ -40,11 +42,15 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
 
         dao = WebUtil.getBean(ZkbContactPersonRepository.class);
         zkbContactPersonService = WebUtil.getBean(ZkbContactPersonService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
 
-        //this.selectionTenantInfo = currentUser.getTenantUID();
         tenantInfoList = zkbContactPersonService.getSourceTenantInfoList();
+
+        if(userContextService.isZkbUser()) {
+            this.selectionTenantInfo = currentUser.getTenantUID();
+        }
     }
 
     @Override
@@ -102,6 +108,28 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
 
     public TenantInfo getTenantInfo(String tenantInfoUID){
         return zkbContactPersonService.getTenantInfo(tenantInfoUID);
+    }
+
+    public boolean isHaveMaintenanceManager(){
+        if(StringUtils.isNotEmpty(this.selectionTenantInfo)){
+           if(zkbContactPersonService.isHaveContactPosition(ZkbContactPerson.Position.MaintenanceManager.name(), this.selectionTenantInfo)){
+               return Boolean.TRUE;
+           }
+        }else {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
+    public boolean isHaveZKBAdmin(){
+        if(StringUtils.isNotEmpty(this.selectionTenantInfo)){
+            if(zkbContactPersonService.isHaveContactPosition(ZkbContactPerson.Position.ZKBAdmin.name(), this.selectionTenantInfo)){
+                return Boolean.TRUE;
+            }
+        }else {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 
     public String getSelectionTenantInfo() {

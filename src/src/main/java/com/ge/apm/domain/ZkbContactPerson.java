@@ -15,6 +15,10 @@ public class ZkbContactPerson {
 
     private static final long serialVersionUID = 1L;
 
+    public enum Position {
+        Engineer, EngineerManager, AfterSales, AfterSalesManager, MaintenanceManager, AssetSales, AssetSalesManager, GeneralManager, ZKBAdmin
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
