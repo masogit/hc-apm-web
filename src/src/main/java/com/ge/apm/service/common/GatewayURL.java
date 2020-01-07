@@ -80,10 +80,9 @@ public enum GatewayURL {
     REMOTE_ACCEPT_RENT("/hcapmworkflowservice/api/apm/allocation/remote/acceptRent/{requestId}"),
     LEASE_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/rent/shortcut"),
     RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut"),
-    GET_VOUCHER_NUM("/hcapmworkflowservice/api/apm/allocation/voucherNum");
+    GET_VOUCHER_NUM("/hcapmworkflowservice/api/apm/allocation/voucherNum"),
 
-
-
+    BATCH_FILE_UPLOAD("/hcapmreportservice/api/apm/batchFile/upload");
 
     private final String url;
 
