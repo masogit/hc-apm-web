@@ -17,7 +17,7 @@
 
                     <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
                         <p:outputLabel value="#{msg.TenantInfo}*:"/>
-                        <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbEngineerController.selectionTenantInfo}">
+                        <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbEngineerController.selectionTenantInfo}" disabled="#{userContextService.zkbUser}">
                             <p:ajax listener="#{zkbEngineerController.tenantInfoSelect}" update="datalist :zkbEngineerEditForm"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <c:forEach items="#{zkbEngineerController.tenantInfoList}" var="v">

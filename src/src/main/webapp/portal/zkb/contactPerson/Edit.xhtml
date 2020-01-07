@@ -34,7 +34,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbContact_position}*</label>
+                        <label class="label">#{msg.zkbContact_position}*(“智康保管理员”为派工、备件订购联系人)</label>
                         <p:selectOneMenu id="position" value="#{zkbContactPersonController.selected.position}" required="true" requiredMessage="#{msg.zkbContact_position} #{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <c:forEach items="#{fieldMsg.getFieldValueList('zkbContactPosition')}" var="v">
