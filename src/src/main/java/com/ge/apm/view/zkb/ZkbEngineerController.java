@@ -29,6 +29,7 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
 
     private ZkbEngineerRepository dao;
     private ZkbEngineerService zkbEngineerService;
+    private UserContextService userContextService;
 
     private UserAccount currentUser;
     private List<TenantInfo> tenantInfoList;
@@ -43,9 +44,14 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
         super.init();
         dao = WebUtil.getBean(ZkbEngineerRepository.class);
         zkbEngineerService = WebUtil.getBean(ZkbEngineerService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
         tenantInfoList = zkbEngineerService.getSourceTenantInfoList();
+
+        if(userContextService.isZkbUser()) {
+            this.selectionTenantInfo = currentUser.getTenantUID();
+        }
     }
 
     @Override
