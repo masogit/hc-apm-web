@@ -64,6 +64,7 @@ public class PmExportFormatter<T> {
         if(userContextService.isLocale()){
             map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
+            map.put(ExportFields.ASSETNUM.getChinese(), this.getAssetNumber());
             map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
             map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getChinese(), this.getClincialName());
@@ -76,6 +77,7 @@ public class PmExportFormatter<T> {
         }else {
             map.put(ExportFields.ASSETNAME.getEnglish(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getEnglish(), this.getSerialNUm());
+            map.put(ExportFields.ASSETNUM.getEnglish(), this.getAssetNumber());
             map.put(ExportFields.RUNLEVEL.getEnglish(), this.getRuleLevel());
             map.put(ExportFields.PMTYPE.getEnglish(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getEnglish(), this.getClincialName());
