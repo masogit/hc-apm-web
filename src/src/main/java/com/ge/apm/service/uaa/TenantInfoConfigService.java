@@ -36,7 +36,7 @@ public class TenantInfoConfigService {
 	public static final String EXCELLENT_ENJOYMENT_A="excellentEnjoymentA";//优享A
 	public static final String EXCELLENT_ENJOYMENT_B="excellentEnjoymentB";//优享B
 	public static final String OPS_VERSION ="opsVersion";//OPS版
-	public static final String ZKB_VERSION ="ZKB";//智康宝版
+	public static final String ZKB_VERSION ="ZKBVersion";//智康宝版
 	public static final String TREE_TYPE = "tenantConfigTree";
 	private static final String MSG_TYPE = "tenantVersionMenu";
 	private String edition;
@@ -260,6 +260,15 @@ public class TenantInfoConfigService {
 				tempItem.setValue(false);
 			}
 			if(key.equals("knowledge.zkbView")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("zkbBasicInfo")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("zkbBasicInfo.agentContactPersonMgt")){
+				tempItem.setValue(false);
+			}
+			if(key.equals("knowledge.zkbBasicInfo.engineerMgt")){
 				tempItem.setValue(false);
 			}
 			if (edition.equals(VERSION_ASSETMGT)) {
