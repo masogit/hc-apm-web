@@ -158,9 +158,7 @@ public class TenantInfoConfigService {
 			if (edition.equals(VERSION_COMMON)) {
 				//do nothing
 			}else if(edition.equals(EXCELLENT_ENJOYMENT_A)){
-				if(key.equals("measure.templateMgt")){
-					tempItem.setValue(false);
-				}
+				//do nothing
 			} else if (edition.equals(VERSION_ULTRASOUND)) {
 				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
@@ -197,8 +195,6 @@ public class TenantInfoConfigService {
 				}else if(key.equals("repair.vacationMgt")){
 					tempItem.setValue(false);
 				}else if(key.contains("nurseSite")){
-					tempItem.setValue(false);
-				}else if(key.equals("measure.templateMgt")){
 					tempItem.setValue(false);
 				}
 
@@ -241,15 +237,6 @@ public class TenantInfoConfigService {
 			if(key.equals("performance.bigScreen")){
 				tempItem.setValue(false);
 			}
-			if(key.equals("measure.console")){
-				tempItem.setValue(false);
-			}
-			if(key.equals("measure.rule")){
-				tempItem.setValue(false);
-			}
-			if(key.equals("measure.ruleMgt")){
-				tempItem.setValue(false);
-			}
 			if(key.equals("link")){
 				tempItem.setValue(false);
 			}
@@ -262,13 +249,7 @@ public class TenantInfoConfigService {
 			if(key.equals("knowledge.zkbView")){
 				tempItem.setValue(false);
 			}
-			if(key.equals("zkbBasicInfo")){
-				tempItem.setValue(false);
-			}
-			if(key.equals("zkbBasicInfo.agentContactPersonMgt")){
-				tempItem.setValue(false);
-			}
-			if(key.equals("knowledge.zkbBasicInfo.engineerMgt")){
+			if(key.contains("zkbBasicInfo")){
 				tempItem.setValue(false);
 			}
 			if (edition.equals(VERSION_ASSETMGT)) {
@@ -286,13 +267,7 @@ public class TenantInfoConfigService {
 				if(key.equals("knowledge.zkbView")){
 					tempItem.setValue(true);
 				}
-                if(key.equals("zkbBasicInfo")){
-                    tempItem.setValue(true);
-                }
-                if(key.equals("zkbBasicInfo.agentContactPersonMgt")){
-                    tempItem.setValue(true);
-                }
-                if(key.equals("knowledge.zkbBasicInfo.engineerMgt")){
+                if(key.contains("zkbBasicInfo")){
                     tempItem.setValue(true);
                 }
 			}
