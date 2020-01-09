@@ -267,8 +267,9 @@ public class UaaService {
         //first remove all existing user roles
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-        userRoleDao.deleteByUserAccount(userAccount.getId());
-        
+        if(userAccount.getId()!=null){
+            userRoleDao.deleteByUserAccount(userAccount.getId());
+        }
         //then set user roles
         SysRoleRepository sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
         if((!newRoleNames.contains(TEMP_STAFF)) && (userAccount.getUserRoleNames().contains(TEMP_STAFF))){
