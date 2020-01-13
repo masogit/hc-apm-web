@@ -1,10 +1,7 @@
 package com.ge.apm.view;
 
-import java.util.List;
-import java.util.Map;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
+import com.ge.apm.dao.AdminSqlHistoryRepository;
+import com.ge.apm.domain.AdminSqlHistory;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
@@ -13,6 +10,12 @@ import webapp.framework.dao.NativeSqlUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.SqlDataController;
 
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 @ManagedBean
 @ViewScoped
 public class SqlDynaColumnController extends SqlDataController {
@@ -20,6 +23,8 @@ public class SqlDynaColumnController extends SqlDataController {
     private String sqlColumns = "";
     private boolean isShow = true;
     private static final Integer LX_USER_TYPE = -1; // lixinag usertype
+
+    private AdminSqlHistoryRepository adminSqlHistoryDao;
 
     public String getSql() {
         return sql;
@@ -39,6 +44,9 @@ public class SqlDynaColumnController extends SqlDataController {
 
     @Override
     public void init() {
+
+        adminSqlHistoryDao = WebUtil.getBean(AdminSqlHistoryRepository.class);
+
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
         //判断是否是理想用户
@@ -80,7 +88,10 @@ public class SqlDynaColumnController extends SqlDataController {
         
         // remove the last ; if exists
         if(sql.endsWith(";")) sql = sql.substring(0, sql.length()-1);
-        
+
+        //save sql for admin to review later
+        saveSql(sql);
+
         try{
             if(!sql.toLowerCase().startsWith("select ")){
                 executeSql();
@@ -137,5 +148,14 @@ public class SqlDynaColumnController extends SqlDataController {
             
             NativeSqlUtil.execute(sqlLine, null);
         }
+    }
+
+    private void saveSql(String sql) {
+        AdminSqlHistory sqlHistory = new AdminSqlHistory();
+        sqlHistory.setSql(sql);
+        sqlHistory.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
+        sqlHistory.setCreatedDate(new Date());
+
+        adminSqlHistoryDao.save(sqlHistory);
     }
 }
