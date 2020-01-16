@@ -130,7 +130,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         if (StringUtils.equals(fileType, ImportFiles.ImportFileType.SrExcel.toString())
                 || StringUtils.equals(fileType, ImportFiles.ImportFileType.SrResetReport.toString())
                 || StringUtils.equals(fileType, ImportFiles.ImportFileType.PMScheduleExcel.toString())) {
-            microServiceUtil.synchBatchTask(new File(savedfilePath), fileType);
+            microServiceUtil.synchBatchTask(new File(fileService.getUploadFileFullPath(savedfilePath)), fileType);
         }
     }
 
