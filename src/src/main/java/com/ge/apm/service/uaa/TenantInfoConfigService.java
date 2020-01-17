@@ -261,6 +261,36 @@ public class TenantInfoConfigService {
 				}
 			}
 			if(edition.equals(ZKB_VERSION)){
+                if(key.equals("asset.analysis")){
+                    tempItem.setValue(false);
+                }else if(key.equals("asset.mgt")){
+                    tempItem.setValue(false);
+                }else if(key.equals("asset.supplierMgt")){
+                    tempItem.setValue(false);
+                }else if(key.equals("asset.scrapTempMgt")){
+                    tempItem.setValue(false);
+                }else if(key.equals("asset.audit")){
+                    tempItem.setValue(false);
+                }else if(key.equals("assetAdjust")) {
+                    tempItem.setValue(false);
+                } else if(key.contains("assetAdjust.")) {
+                    tempItem.setValue(false);
+                }else if(key.equals("repair.count")) {
+                    tempItem.setValue(false);
+                }else if(key.equals("repair.message")) {
+                    tempItem.setValue(false);
+                }else if (key.equals("repair.workSchedule")) {
+                    tempItem.setValue(false);
+                }else if(key.equals("repair.vacationMgt")){
+                    tempItem.setValue(false);
+                }else if(key.contains("measure")){
+                    tempItem.setValue(false);
+                }else if(key.contains("nurseSite")){
+                    tempItem.setValue(false);
+                }else if(key.contains("install")){
+                    tempItem.setValue(false);
+                }
+
 				if(key.equals("knowledge.zkbMgt")){
 					tempItem.setValue(true);
 				}
