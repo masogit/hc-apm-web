@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:dialog id="zkbEngineerTrackRecordEditDlg" widgetVar="zkbEngineerTrackRecordEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="工程师工作经历" height="370">
+    <p:dialog id="zkbEngineerTrackRecordEditDlg" widgetVar="zkbEngineerTrackRecordEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.zkbEngineerTrackRecord}" height="370">
         <h:form id="zkbEngineerTrackRecordEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbEngineerController.zkbEngineerTrackRecordSelected != null}">
 
