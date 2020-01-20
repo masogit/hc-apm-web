@@ -214,6 +214,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
     }
 
     public void save(){
+        super.save();
         assetTagService.saveAssetTag(this.getSelected(), targetBiomedGroup, targetAssets);
     }
 
