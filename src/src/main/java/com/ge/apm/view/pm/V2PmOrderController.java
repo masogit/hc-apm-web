@@ -1487,7 +1487,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             //someone could only access siteA,but assigned with asset on SiteB, therefore "OR" is added saying that one also could see the asset that is assigned to him.
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         } else if (queryIndex == 31) {//待抢单 dispatch 2表示人工派工或抢单模式 3表示抢单模式 4表示人工派工
-            isBatchOp=false;
+            isBatchOp=true;
             //抢单tab中 ,已经派的单但是未被接单人接的单子也要显示出来 (已经派的单状态是Accept，所以也要加进来)
             filterOutPm(searchFilters);
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4));
