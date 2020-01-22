@@ -598,8 +598,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });
-
+        log.info(formDataList.toString());
         String res= srApi.invokePmOrderActionBatch(token,formDataList,"repair");
+        log.info(res);
         if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("BatchComplete"));
         }else{
