@@ -18,10 +18,7 @@ import org.springframework.util.MultiValueMap;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author 212579464
@@ -149,20 +146,20 @@ public class MicroServiceUtil extends MicroServiceInvoker {
 
     }
 
-    public String getAuthenticateByUserPassword(String userName, String password,String userAgent) {
-        return doGetAuthenticateByUserPassword(userName, password, false,userAgent); //password is in plain text
+    public String getAuthenticateByUserPassword(String userName, String password, String userAgent) {
+        return doGetAuthenticateByUserPassword(userName, password, false, userAgent); //password is in plain text
     }
 
-    public String getAuthenticateByUserPasswordEncrypted(String userName, String password,String userAgent) {
-        return doGetAuthenticateByUserPassword(userName, password, true,userAgent); //password is already encrypted
+    public String getAuthenticateByUserPasswordEncrypted(String userName, String password, String userAgent) {
+        return doGetAuthenticateByUserPassword(userName, password, true, userAgent); //password is already encrypted
     }
 
-    public String doGetAuthenticateByUserPassword(String userName, String password, boolean isPasswordEncrypted,String userAgent) {
+    public String doGetAuthenticateByUserPassword(String userName, String password, boolean isPasswordEncrypted, String userAgent) {
         HttpHeaders headers = new HttpHeaders();
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
-        headers.add("User-Agent",userAgent);
-        headers.add("request-source","legacy");
+        headers.add("User-Agent", userAgent);
+        headers.add("request-source", "legacy");
         Map<String, String> postParameters = new HashMap<String, String>();
         postParameters.put("loginName", userName);
         postParameters.put("password", password);
@@ -205,7 +202,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         headers.setContentType(type);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        ByteArrayResource arrayResource = new ByteArrayResource(content){
+        ByteArrayResource arrayResource = new ByteArrayResource(content) {
             @Override
             public String getFilename() throws IllegalStateException {
                 return ".\\dummy.docx";
@@ -221,6 +218,30 @@ public class MicroServiceUtil extends MicroServiceInvoker {
             return response.getBody();
         }
         return null;
+    }
+
+    public void synchBatchTask(File file, String batchFileType) {
+        logger.info("File uploaded {}, {}", batchFileType, file.getName());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        List<MediaType> acceptList = new ArrayList<>();
+        acceptList.add(MediaType.APPLICATION_JSON);
+        headers.setAccept(acceptList);
+
+        MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+        bodyMap.add("file", new FileSystemResource(file));
+        bodyMap.add("fileName", file.getName());
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+
+        String uploadFileUrl = getGatewayURL(GatewayURL.BATCH_FILE_UPLOAD) + "/" + batchFileType;
+        logger.info("upload file url: {}", uploadFileUrl);
+
+        ResponseEntity<byte[]> response = template.postForEntity(uploadFileUrl, requestEntity, byte[].class);
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new IllegalStateException("Upload file failure");
+        }
+        logger.info("File uploaded");
     }
 
 }

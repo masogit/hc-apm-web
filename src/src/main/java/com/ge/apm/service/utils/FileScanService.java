@@ -134,4 +134,9 @@ public class FileScanService {
         return fileName;
     }
 
+    public String getUploadFileFullPath(String path) {
+        return BATCH_FILE_Folder.concat(path);
+    }
+
+
 }

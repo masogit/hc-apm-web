@@ -5,7 +5,6 @@
  */
 package com.ge.apm.view.sysutil;
 
-import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.ImportFilesRepository;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.ImportFiles;
@@ -14,18 +13,21 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.FileScanExportService;
 import com.ge.apm.service.utils.FileScanService;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.google.common.base.Strings;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import webapp.framework.web.WebUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -63,12 +65,15 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     private StreamedContent exportFile;
 
+    MicroServiceUtil microServiceUtil;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ImportFilesRepository.class);
         fileService = WebUtil.getBean(FileScanService.class);
         userService = WebUtil.getBean(UserCommonService.class);
         fileScanExportService = WebUtil.getBean(FileScanExportService.class);
+        microServiceUtil = WebUtil.getBean(MicroServiceUtil.class);
 
         this.filterBySite = false;
         this.filterByHospital = false;
@@ -121,6 +126,12 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         }
 
         fileList.add(new Tuple2<>(itemFile, event.getFile()));
+
+        if (StringUtils.equals(fileType, ImportFiles.ImportFileType.SrExcel.toString())
+                || StringUtils.equals(fileType, ImportFiles.ImportFileType.SrResetReport.toString())
+                || StringUtils.equals(fileType, ImportFiles.ImportFileType.PMScheduleExcel.toString())) {
+            microServiceUtil.synchBatchTask(new File(fileService.getUploadFileFullPath(savedfilePath)), fileType);
+        }
     }
 
     public void removeFailedFile(String id) {

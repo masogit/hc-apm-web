@@ -9,7 +9,7 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="#{msg.zkbEngineerManagement}"/>
+                <p:outputLabel class="pageTitle" value="#{msg.ZKBEngineerMgt}"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -80,9 +80,9 @@
                             <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbEngineerController.delete}" update=":zkbEngineerListForm :zkbEngineerEditForm" disabled="#{empty zkbEngineerController.selected.id}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
-                            <!--<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="ZKB_ContactPerson_Export"/>
-                            </p:commandButton>-->
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbEngineerController.exportAll}" icon="ui-icon-arrowthick-1-s">
+                                <p:fileDownload value="#{zkbEngineerController.exportFile}"/>
+                            </p:commandButton>
                         </f:facet>
 
                     </p:dataTable>

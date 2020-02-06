@@ -15,6 +15,7 @@ import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultTreeNode;
@@ -80,6 +81,8 @@ public class AssetInfoMgrService {
         asset.setFinancingNum(null);
         asset.setDepartNum(null);
         asset.setQrCode(null);
+        asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+        asset.setLastModifiedDate(new Date());
         assetDao.save(asset);
         updateNurseSiteMaintain(asset.getUid());
     }
