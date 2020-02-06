@@ -25,7 +25,7 @@ public class ZkbEngineerService {
     @Autowired
     private TenantInfoRepository tenantInfoDao;
     @Autowired
-    private ZkbEngineerRepository ZkbEngineerDao;
+    private ZkbEngineerRepository zkbEngineerDao;
     @Autowired
     private ZkbEngineerTrackRecordRepository zkbEngineerTrackRecordDao;
 
@@ -54,7 +54,7 @@ public class ZkbEngineerService {
 
     @Transactional
     public void delete(ZkbEngineer zkbEngineer, List<ZkbEngineerTrackRecord> zkbEngineerTrackRecordList){
-        ZkbEngineerDao.delete(zkbEngineer);
+        zkbEngineerDao.delete(zkbEngineer);
         zkbEngineerTrackRecordDao.delete(zkbEngineerTrackRecordList);
     }
 

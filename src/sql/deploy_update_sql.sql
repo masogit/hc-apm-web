@@ -36,7 +36,6 @@ insert into org_info (site_id,uid,org_level,org_type,tenant_uid,institution_uid,
 update org_info set hospital_id=id where hospital_id is null and org_type=0;
 update org_info set parent_uid=tenant_uid where org_type=1 and parent_uid is null;
 
-
 -- update v2_blob_object set bo_uuid and bo_sub_type for QrCodeLib
 update v2_blob_object o set bo_uuid=(select uid from qr_code_lib q where q.id=o.bo_id) where bo_id is not null and bo_uuid is null and bo_type='QrCodeLib'
 update v2_blob_object set bo_sub_type='1' where bo_type='QrCodeLib' and object_type='image/jpeg'
