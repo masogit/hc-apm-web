@@ -61,13 +61,20 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">#{msg.userPosition}</label>
+                            <p:selectOneMenu value="#{userAccountController.selected.position}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('userPosition')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">#{msg.InitialPassword}</label>
                             <p:password id="password" value="#{userAccountController.selected.plainPassword}"  autocomplete="new-password"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="false">
-                            <p:selectBooleanCheckbox itemLabel="#{msg.isSiteAdmin}*" value="#{userAccountController.selected.isSiteAdmin}" required="true" requiredMessage="#{msg.isSiteAdmin} #{msg.ValidationRequire}"/>
-                        </h:panelGroup>
-                        <p:spacer/>
+                        <!--<h:panelGroup rendered="false">-->
+                            <!--<p:selectBooleanCheckbox itemLabel="#{msg.isSiteAdmin}*" value="#{userAccountController.selected.isSiteAdmin}" required="true" requiredMessage="#{msg.isSiteAdmin} #{msg.ValidationRequire}"/>-->
+                        <!--</h:panelGroup>-->
+                        <!--<p:spacer/>-->
                         <!--<h:panelGroup>
                             <p:selectBooleanCheckbox itemLabel="#{msg.isActive}*" value="#{userAccountController.selected.isActive}" required="true" requiredMessage="#{msg.isActive} #{msg.ValidationRequire}"/>
                         </h:panelGroup>-->
