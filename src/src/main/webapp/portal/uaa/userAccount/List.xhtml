@@ -81,8 +81,14 @@
 				</f:facet>
 				<h:outputText value="#{userAccountController.getCurrentUserRoleNames(item.id)}" />
 			</p:column>
-			<p:column headerText="#{msg.userPosition}">
+			<p:column headerText="#{msg.userPosition}" filterBy="#{item.position}" filterMatchMode="EQ">
 				<h:outputText value="#{fieldMsg.fieldValue('userPosition',item.position)}"/>
+				<f:facet name="filter">
+					<p:selectOneMenu onchange="PF('varDataList').filter()" >
+						<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+						<f:selectItems value="#{fieldMsg.getFieldValueList('userPosition')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+					</p:selectOneMenu>
+				</f:facet>
 			</p:column>
 			<p:column headerText="UUID" visible="false" exportable="true">
 				<h:outputText value="#{item.uid}" />
