@@ -81,6 +81,9 @@
 				</f:facet>
 				<h:outputText value="#{userAccountController.getCurrentUserRoleNames(item.id)}" />
 			</p:column>
+			<p:column headerText="#{msg.userPosition}">
+				<h:outputText value="#{fieldMsg.fieldValue('userPosition',item.position)}"/>
+			</p:column>
 			<p:column headerText="UUID" visible="false" exportable="true">
 				<h:outputText value="#{item.uid}" />
 			</p:column>

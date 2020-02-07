@@ -19,6 +19,8 @@ import java.util.UUID;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.domain.*;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -42,15 +44,6 @@ import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.dao.UserRoleRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysRole;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UploadFileErrorTypeEnum;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserModel;
-import com.ge.apm.domain.UserOrgInfo;
-import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.apm.service.utils.PasswordUtil;
@@ -58,7 +51,12 @@ import com.ge.apm.view.sysutil.UserContextService;
 
 @Service
 public class UserAccountImportService {
+
 	private Logger logger = LoggerFactory.getLogger(getClass());
+
+	protected Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+	public List<I18nMessage> userPositionList = FieldValueMessageController.getFieldValueList("userPosition", siteId);
+
 	private static final String HEADER_INSTITUTION="所属集团";
 	private static final String HEADER_HOSPITAL="所属医院";
 	private static final String HEADER_SITE="所属院区";
@@ -73,6 +71,7 @@ public class UserAccountImportService {
 	private static final String HEADER_ISLOCKED="锁定?*";
 	private static final String HEADER_ROLENAME="角色*";
 	private static final String HEADER_ACCESSSCOPE="可见范围（科室）";
+	private static final String HEADER_POSITION="职务";
 	private static final String HEADER_PASSWORD="初始密码";
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
@@ -145,6 +144,19 @@ public class UserAccountImportService {
 			}
 		}
 		return false;
+	}
+
+	private String getPositionKey(String positionLabel) {
+		if (null == positionLabel) {
+			return null;
+		}
+		for (I18nMessage message: userPositionList) {
+			if (message.getValue().equals(positionLabel)) {
+				return message.getMsgKey();
+			}
+		}
+
+		return null;
 	}
 	
 	private UserAccount checkLoginName(UserAccount newUser){
@@ -737,6 +749,7 @@ public class UserAccountImportService {
 		boolean isLocked;
 		String roleName;
 		String accessScope;
+		String position;
 		String password;
 		String UUID;
 
@@ -754,6 +767,7 @@ public class UserAccountImportService {
 		int islockedIndex=header.get(HEADER_ISLOCKED);
 		int rolenameIndex=header.get(HEADER_ROLENAME);
 		int accessScopeIndex=header.get(HEADER_ACCESSSCOPE);
+		int positionIndex=header.get(HEADER_POSITION);
 		Integer passwordIndex=header.get(HEADER_PASSWORD);
 		int uuidIndex=header.get(HEADER_UUID);
 
@@ -808,6 +822,9 @@ public class UserAccountImportService {
 				}
 				roleName=ExcelParser.getCellStringValue(row, rolenameIndex);
 				accessScope=ExcelParser.getCellStringValue(row, accessScopeIndex);
+
+				position=ExcelParser.getCellStringValue(row, positionIndex);
+
 				if (passwordIndex != null) {
 					password = ExcelParser.getCellStringValue(row, passwordIndex);
 				} else {
@@ -846,7 +863,7 @@ public class UserAccountImportService {
 				newUser.setDepartName3(department3);
 				newUser.setAccessScope(accessScope);
 				newUser.setImportRoleNames(roleName);
-
+				newUser.setPosition(getPositionKey(position));
 
 				//handle password
 				if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(password.trim())) {
