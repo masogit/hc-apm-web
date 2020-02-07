@@ -3215,4 +3215,15 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ZKBEngineerMgt','工程师信息','Engineer Info',NULL,-1);
 
    --Other显示中文修改
-   INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Other002', '其他', 'Other', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Other002', '其他', 'Other', NULL, '-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','userPosition','职务','Position',NULL,-1);
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('userPosition','radiologyTechnician','放射科技师','Radiology Technician',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('userPosition','radiologyDirector','放射主任','Radiology Director',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('userPosition','deviceRepairer','设备维修人','Device Repairer',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('userPosition','deviceDirector','设备主任','Device Director',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('userPosition','ultrasoundDirector','超声主任','Ultrasound Director',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('userPosition','ultrasoundTechnician','超声技师','Ultrasound Technician',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('userPosition','dean','院长','Dean',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('userPosition','other','其他','Other',NULL,-1);

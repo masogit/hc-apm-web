@@ -142,6 +142,9 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "region")
 	private Integer region = 1;//地区
 
+	@Column(name = "position")
+	private String position;//职务
+
 	@CreatedBy
 	@Column(name = "created_by", nullable = true, length = 50, updatable = false)
 	@JsonIgnore
@@ -1096,4 +1099,11 @@ public class UserAccount implements ChineseName, Serializable {
 		isDeleted = deleted;
 	}
 
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
 }
