@@ -113,6 +113,11 @@ public class ArrivalList implements Serializable {
     //供应商Id
     @Column(name = "supplier_id")
     private Integer supplierId;
+
+    //供应商负责人
+    @Column(name = "supplier_user_id")
+    private Integer supplierUserId;
+
     //经办人
     @Size(max = 64)
     @Column(name = "agent")
@@ -391,7 +396,14 @@ public class ArrivalList implements Serializable {
     public void setManufactureId(String manufactureId) {
         this.manufactureId = manufactureId;
     }
-    
+
+    public Integer getSupplierUserId() {
+        return supplierUserId;
+    }
+
+    public void setSupplierUserId(Integer supplierUserId) {
+        this.supplierUserId = supplierUserId;
+    }
 
     @Override
     public int hashCode() {

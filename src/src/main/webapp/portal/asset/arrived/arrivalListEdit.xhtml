@@ -92,16 +92,23 @@
                                         <p:inputNumber  maxValue="99999999"  decimalPlaces="2" value="#{assetArrivedListEditController.selected.contractPrice}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.arrivalListContractPrice}#{msg.ValidationRequire}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
+                                        <label class="label">#{msg.arrivalListAgent}</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.agent}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
                                         <label class="label">#{msg.vendor}</label>
                                         <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true" 
                                                         disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" />
-                                            <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" />
+                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
+                                            <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                         </p:autoComplete>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.arrivalListAgent}</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.agent}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                        <label class="label">供应商责任人</label>
+                                        <p:selectOneMenu id="supplierUser" value="#{assetArrivedListEditController.selected.supplierUserId}" style="width:125px" required="false" requiredMessage="#{msg.PersonnelCannotBeEmpty}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}">
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItems value="#{assetArrivedListEditController.supplierUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                        </p:selectOneMenu>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.ArrivalProcessType}*</label>
