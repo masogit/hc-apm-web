@@ -17,4 +17,6 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
     
     
     List<ArrivalList> findByContractItemIdIn(Collection<String> itemId);
+
+    List<ArrivalList> findBySupplierId(Integer supplierId);
 }

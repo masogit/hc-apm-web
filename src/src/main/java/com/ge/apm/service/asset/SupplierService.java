@@ -1,13 +1,17 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.SupplierRepository;
+import com.ge.apm.dao.SupplierUserRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.Supplier;
+import com.ge.apm.domain.SupplierUser;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.ArrayList;
@@ -18,6 +22,10 @@ public class SupplierService {
 
     @Autowired
     private SupplierRepository supplierDao;
+    @Autowired
+    private SupplierUserRepository supplierUserDao;
+    @Autowired
+    private UserAccountRepository userAccountDao;
 
     public List<String> getSupplier(String name) {
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -35,5 +43,55 @@ public class SupplierService {
         suppliers.stream().forEach( s -> names.add(s.getName()));
         names.sort(new PinYinComparator());
         return names;
+    }
+
+    public List<UserAccount> getTempStaffList(String tenantUID){
+        return userAccountDao.findByTenantUIDAndTempStaffRole(tenantUID);
+    }
+
+    public List<SupplierUser> getSupplierUserList(Integer supplierId, String status){
+        return supplierUserDao.findBySupplierIDAndStatus(supplierId, status);
+    }
+
+    public List<UserAccount> getApprovedUserList(Integer supplierId){
+        List<SupplierUser> supplierUserList = supplierUserDao.findBySupplierIDAndStatus(supplierId, SupplierUser.Status.Approved.name());
+
+        List<UserAccount> approvedUserList = new ArrayList<>();
+        for (SupplierUser supplierUser : supplierUserList) {
+            approvedUserList.add(supplierUser.getUserAccount());
+        }
+
+        return approvedUserList;
+    }
+
+    public void approve(SupplierUser supplierUser){
+        supplierUser.setStatus(SupplierUser.Status.Approved.name());
+        supplierUserDao.save(supplierUser);
+    }
+
+    public void refuse(SupplierUser supplierUser){
+        supplierUserDao.delete(supplierUser.getId());
+    }
+
+    @Transactional
+    public void updateSupplierUserList(Supplier supplier, List<UserAccount> approvedUserList){
+
+        supplierUserDao.deleteBySupplierIDAndStatus(supplier.getId(), SupplierUser.Status.Approved.name());
+
+        List<Integer> userIDList = new ArrayList<>();
+        for (UserAccount userAccount : approvedUserList) {
+            SupplierUser supplierUser = new SupplierUser();
+            supplierUser.setSupplierID(supplier.getId());
+            supplierUser.setSupplierUID(supplier.getUid());
+            supplierUser.setUserID(userAccount.getId());
+            supplierUser.setUserUID(userAccount.getUid());
+            supplierUser.setStatus(SupplierUser.Status.Approved.name());
+            supplierUserDao.save(supplierUser);
+
+            userIDList.add(userAccount.getId());
+        }
+
+        supplierUserDao.deleteBySupplierIDAndStatusAndUserIDIn(supplier.getId(), SupplierUser.Status.PendingApproval.name(), userIDList);
+
     }
 }

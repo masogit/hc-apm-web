@@ -234,8 +234,6 @@ public class ContractInfo implements Serializable {
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
 
-    @Getter
-    @Setter
     @Column(name = "contract_status")
     private String contractStatus;
 
@@ -573,6 +571,14 @@ public class ContractInfo implements Serializable {
 
     public void setInvoiceNum(String invoiceNum) {
         this.invoiceNum = invoiceNum;
+    }
+
+    public String getContractStatus() {
+        return contractStatus;
+    }
+
+    public void setContractStatus(String contractStatus) {
+        this.contractStatus = contractStatus;
     }
 
     @Override
