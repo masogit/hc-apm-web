@@ -574,6 +574,15 @@ public class UserContextService implements Serializable {
         return -1;
     }
 
+    public static int getHospitalId() {
+        UserAccount userAccount = getCurrentUserAccount();
+        if (userAccount != null) {
+            return userAccount.getHospitalId();
+        }
+
+        return 0;
+    }
+
     public static void setSiteFilter(List<SearchFilter> filters) {
         filters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, UserContextService.getSiteId()));
     }

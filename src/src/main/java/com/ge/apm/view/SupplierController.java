@@ -111,6 +111,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     @Override
     public void onBeforeNewObject(Supplier supplier) {
         supplier.setSiteId(UserContextService.getSiteId());
+        supplier.setHospitalId(UserContextService.getHospitalId());
         supplier.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
     }
 
