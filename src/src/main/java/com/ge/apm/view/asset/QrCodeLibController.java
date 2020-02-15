@@ -105,7 +105,7 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
         this.removeFilterOnField("tenantUID");
         this.removeFilterOnField("institutionUID");
         this.removeFilterOnField("hospitalUID");
-        Boolean d = userContextService.hasRole("ITAdmin");
+//        Boolean d = userContextService.hasRole("ITAdmin");
         if (!userContextService.hasRole("SuperAdmin") && !userContextService.hasRole("ITAdmin")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -114,7 +114,7 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
         
-        if(userContextService.hasRole("ITAdmin")){
+        if(Strings.isNullOrEmpty(tenantUIDFilter) && userContextService.hasRole("ITAdmin")){
             tenantUIDFilter = userContextService.getLoginUser().getTenantUID();
         }
         
