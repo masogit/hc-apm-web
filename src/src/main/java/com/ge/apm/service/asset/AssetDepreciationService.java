@@ -146,6 +146,7 @@ public class AssetDepreciationService {
 				depreciationAmount = calAssetDepreciation(assetInfo, betweenYear(first, dateTime));
 				ad.setAssetId(assetInfo.getId());
 				ad.setSiteId(assetInfo.getSiteId());
+				ad.setHospitalId(assetInfo.getHospitalId());
 				ad.setContractId(-1);
 				ad.setDeprecateDate(TimeUtils.getDateFromStr(yyyyMM, "yyyy-MM-dd"));
 				ad.setDeprecateAmount(depreciationAmount);
@@ -155,37 +156,37 @@ public class AssetDepreciationService {
 	}
 	
 	@SuppressWarnings("unused")
-	private void assetDepreciation(Double purchasePriceFromAsset, Integer lifecycleFromAsset, Integer depreciationMethodFromAsset, 
-			Double salvageValueFromAsset,Date purchaseDateFromAsset,Integer assetId ,Integer siteId) {
-		if(purchasePriceFromAsset == null || lifecycleFromAsset == null || depreciationMethodFromAsset == null || salvageValueFromAsset == null 
-				|| purchaseDateFromAsset == null || assetId == null || siteId == null){
-			return;
-		}
-		assetDepreciationRepository.deleteByAssetIdAndContractType(assetId, -1);
-
-		int lifecycle = lifecycleFromAsset - 1;// 以月为单位，不足1年的默认为1年
-		Date purchaseDate = purchaseDateFromAsset;
-		DateTime first = new DateTime(purchaseDate);
-		if (first.isAfterNow()) {// 未来时间暂不录入
-			return;
-		}
-		DateTime last = first.plusMonths(lifecycle);
-		String yyyyMM = null;
-		Double depreciationAmount = null;
-		AssetDepreciation ad = null;
-		for (DateTime dateTime = first; dateTime.isBefore(last); dateTime = dateTime.plusMonths(1)) {
-			ad = new AssetDepreciation();
-			yyyyMM = dateTime.toString(FORMAT) + "-01";
-			depreciationAmount = calAssetDepreciationAmount(purchasePriceFromAsset, lifecycleFromAsset, depreciationMethodFromAsset, 
-					salvageValueFromAsset,betweenYear(first, dateTime));
-			ad.setAssetId(assetId);
-			ad.setSiteId(siteId);
-			ad.setContractId(-1);
-			ad.setDeprecateDate(TimeUtils.getDateFromStr(yyyyMM, "yyyy-MM-dd"));
-			ad.setDeprecateAmount(depreciationAmount);
-			assetDepreciationRepository.save(ad);
-		}
-	}
+//	private void assetDepreciation(Double purchasePriceFromAsset, Integer lifecycleFromAsset, Integer depreciationMethodFromAsset,
+//			Double salvageValueFromAsset,Date purchaseDateFromAsset,Integer assetId ,Integer siteId) {
+//		if(purchasePriceFromAsset == null || lifecycleFromAsset == null || depreciationMethodFromAsset == null || salvageValueFromAsset == null
+//				|| purchaseDateFromAsset == null || assetId == null || siteId == null){
+//			return;
+//		}
+//		assetDepreciationRepository.deleteByAssetIdAndContractType(assetId, -1);
+//
+//		int lifecycle = lifecycleFromAsset - 1;// 以月为单位，不足1年的默认为1年
+//		Date purchaseDate = purchaseDateFromAsset;
+//		DateTime first = new DateTime(purchaseDate);
+//		if (first.isAfterNow()) {// 未来时间暂不录入
+//			return;
+//		}
+//		DateTime last = first.plusMonths(lifecycle);
+//		String yyyyMM = null;
+//		Double depreciationAmount = null;
+//		AssetDepreciation ad = null;
+//		for (DateTime dateTime = first; dateTime.isBefore(last); dateTime = dateTime.plusMonths(1)) {
+//			ad = new AssetDepreciation();
+//			yyyyMM = dateTime.toString(FORMAT) + "-01";
+//			depreciationAmount = calAssetDepreciationAmount(purchasePriceFromAsset, lifecycleFromAsset, depreciationMethodFromAsset,
+//					salvageValueFromAsset,betweenYear(first, dateTime));
+//			ad.setAssetId(assetId);
+//			ad.setSiteId(siteId);
+//			ad.setContractId(-1);
+//			ad.setDeprecateDate(TimeUtils.getDateFromStr(yyyyMM, "yyyy-MM-dd"));
+//			ad.setDeprecateAmount(depreciationAmount);
+//			assetDepreciationRepository.save(ad);
+//		}
+//	}
 	
 	
 
