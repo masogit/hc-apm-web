@@ -343,6 +343,15 @@
             </p:overlayPanel>
         </h:panelGroup>
     </c:if>
+    <!--UCMID-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'UCMID')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.UCMID}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['UCMID'].required? '*':''}</span></label>
+            <p:inputText id="UCMID" value="#{assetInfoEditController.selected.UCMID}" required="#{assetInfoEditController.customConfig.assetFields['UCMID'].required}"
+                         requiredMessage="#{msg.UCMID} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('UCMID')}"/>
+        </h:panelGroup>
+    </c:if>
+
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'parentAssetId')}" >
         <h:panelGroup>
             <label class="label">#{msg.parentAsset}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required? '*':''}</span></label>

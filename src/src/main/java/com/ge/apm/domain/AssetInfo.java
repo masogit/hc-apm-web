@@ -528,6 +528,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "measuring_type")
     private String measuringType;
 
+    @Column(name = "UCMID")
+    private String UCMID;
+
     @Transient
     private int lineNum;
 
@@ -1903,5 +1906,13 @@ public class AssetInfo implements ChineseName,Serializable {
         } else {
             return input;
         }
+    }
+
+    public String getUCMID() {
+      return UCMID;
+    }
+
+    public void setUCMID(String UCMID) {
+      this.UCMID = UCMID;
     }
 }
