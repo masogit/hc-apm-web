@@ -225,7 +225,7 @@ public class CustomConfigConstant {
             allFields.put("measuringOwner", WebUtil.getMessage("measuringOwner"));
             allFields.put("orgPath", WebUtil.getMessage("orgPath"));
             allFields.put("assetLocation", WebUtil.getMessage("assetLocation"));
-
+            allFields.put("UCMID", WebUtil.getMessage("UCMID"));
 //        }
         return allFields;
     }
@@ -255,7 +255,7 @@ public class CustomConfigConstant {
     public static List<String> getAssetsEditpageBasicFields() {
         return Arrays.asList("serialNum", "name", "aliasName", "assetGroup", "assetOwnerName",
                 "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3", "pmOwnerName", "pmOwnerTel", "siteUID", "clinicalDeptName",
-                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode");
+                "clinicalOwnerName", "clinicalOwnerTel", "manufacture", "makerShortName", "vendor", "vendorTel","maitanance", "maitananceTel", "nationalStandardCode","UCMID");
     }
 
     public static List<String> getAssetsEditpageCodesFields() {
