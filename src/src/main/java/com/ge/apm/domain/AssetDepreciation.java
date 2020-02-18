@@ -58,6 +58,7 @@ public class AssetDepreciation implements Serializable {
     @Basic(optional = true)
     @Column(name = "hospital_id")
     private Integer hospitalId;
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "asset_id")
@@ -135,6 +136,14 @@ public class AssetDepreciation implements Serializable {
 
     public void setContractId(Integer contractId) {
         this.contractId = contractId;
+    }
+
+    public Integer getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(Integer hospitalId) {
+        this.hospitalId = hospitalId;
     }
 
     @Override
