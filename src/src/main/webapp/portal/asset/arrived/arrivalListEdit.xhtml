@@ -84,6 +84,11 @@
                                         <p:inputText value="#{assetArrivedListEditController.selected.invoiceNum}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
                                     <h:panelGroup>
+                                        <label class="label">发票日期</label>
+                                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.invoiceDate}" maxdate="#{appContextService.curentDate}"
+                                                     converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
                                         <label class="label">#{msg.arrivalListContractNum}</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.contractNum}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
@@ -117,7 +122,42 @@
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListProcessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
-
+                                    <h:panelGroup >
+                                        <label class="label">外贸协议</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.foreignTradeAgreements}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">开箱安装日期</label>
+                                        <p:calendar value="#{assetArrivedListEditController.selected.boxInstallationDate}" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">使用日期</label>
+                                        <p:calendar value="#{assetArrivedListEditController.selected.usingDate}" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">使用人</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.usingPerson}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">使用人电话</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.usingPersonTel}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">联系人</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.contactPerson}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">联系人电话</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.contactPersonTel}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">维修联系人</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.repairer}" />
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">维修联系人电话</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.repairerTel}" />
+                                    </h:panelGroup>
 
                                 </p:panelGrid>
                                 <h:panelGroup rendered="#{assetArrivedListEditController.selected.status eq 2 and assetArrivedListEditController.getInstalledCount() eq 0}">
@@ -336,6 +376,7 @@
                                             </p:selectOneRadio>
                                         </h:panelGroup>
                                     </c:if>
+
                                 </p:panelGrid>
                                 <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px">
                                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
