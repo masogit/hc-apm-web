@@ -3,6 +3,7 @@ package com.ge.apm.service.asset;
 import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.service.wo.doctemplate.PartTableRenderPolicy;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -31,14 +32,17 @@ public class AssetInstallationReportService {
     public static final String REPORT_TECHNOLOGY_TEMPLATE = "/portal/asset/arrived/reportTemplate/TechnologyReportTemplate.docx";
     public static final String REPORT_BUSINESS_TEMPLATE = "/portal/asset/arrived/reportTemplate/BusinessReportTemplate.docx";
     public static final String REPORT_CLINICAL_TEMPLATE = "/portal/asset/arrived/reportTemplate/ClinicalReportTemplate.docx";
+    public static final String REPORT_ASSET_TEMPLATE = "/portal/asset/arrived/reportTemplate/AssetReportTemplate.docx";
 
     public static final String REPORT_TECHNOLOGY_TITLE = "技术验收报告";
     public static final String REPORT_BUSINESS_TITLE = "商务验收报告";
     public static final String REPORT_CLINICAL_TITLE = "临床验收报告";
+    public static final String REPORT_ASSET_TITLE = "固定资产验收单";
 
     public static final String REPORT_TYPE_TECHNOLOGY = "technology";
     public static final String REPORT_TYPE_BUSINESS = "business";
     public static final String REPORT_TYPE_CLINICAL = "clinical";
+    public static final String REPORT_TYPE_ASSET = "fixasset";
 
     @Autowired
     private OrgInfoRepository orgInfoDao;
@@ -66,6 +70,21 @@ public class AssetInstallationReportService {
         reportData.put("technical_third_party_name", "");//第三方检查单位
         reportData.put("technical_check_date", "");//检测日期
         reportData.put("technical_ack_name", "");//验收人/经办人
+
+        //固定资产验收单
+        reportData.put("supplier_name", arrivalListItem.getArrivalList().getVendor());//外贸协议
+        reportData.put("invoice_date", arrivalListItem.getArrivalList().getInvoiceDate());//发票号
+        reportData.put("foreign_trade_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
+        reportData.put("box_installation_date", arrivalListItem.getArrivalList().getBoxInstallationDate());//开箱安装日期
+        reportData.put("using_date", arrivalListItem.getArrivalList().getUsingDate());//使用日期
+        reportData.put("using_person", arrivalListItem.getArrivalList().getUsingPerson());//使用人
+        reportData.put("using_person_tel", arrivalListItem.getArrivalList().getUsingPersonTel());//使用人电话
+        reportData.put("contact_person", arrivalListItem.getArrivalList().getContactPerson());//联系人
+        reportData.put("contact_person_tel", arrivalListItem.getArrivalList().getContactPersonTel());//联系人电话
+        reportData.put("repairer", arrivalListItem.getArrivalList().getRepairer());//维修联系人
+        reportData.put("repairer_tel", arrivalListItem.getArrivalList().getRepairerTel());//维修联系人电话
+        reportData.put("location_name", arrivalListItem.getLocationName());//安置地点
+        reportData.put("fixasset_ack_date", ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getFixassetAckStatus()) ? arrivalListItem.getFixassetAckDate() : "");//验收日期
 
         return reportData;
     }
@@ -122,6 +141,8 @@ public class AssetInstallationReportService {
             templatePath = REPORT_BUSINESS_TEMPLATE;
         }else if(REPORT_TYPE_CLINICAL.equals(reportType)){
             templatePath = REPORT_CLINICAL_TEMPLATE;
+        }else if(REPORT_TYPE_ASSET.equals(reportType)){
+            templatePath = REPORT_ASSET_TEMPLATE;
         }
 
         if(templatePath != null){
@@ -156,7 +177,6 @@ public class AssetInstallationReportService {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             InputStream inputStream = new ByteArrayInputStream(templateBytes);
             template = XWPFTemplate.compile(inputStream);
-
             template.render(data);
             template.write(out);
             bytes = out.toByteArray();
@@ -191,6 +211,8 @@ public class AssetInstallationReportService {
             reportTypeTitle = REPORT_BUSINESS_TITLE;
         }else if(REPORT_TYPE_CLINICAL.equals(reportType)){
             reportTypeTitle = REPORT_CLINICAL_TITLE;
+        }else if(REPORT_TYPE_ASSET.equals(reportType)){
+            reportTypeTitle = REPORT_ASSET_TITLE;
         }
 
         if(isEncoding){

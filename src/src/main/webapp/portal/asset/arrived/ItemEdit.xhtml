@@ -483,11 +483,11 @@
                                               multiple="true"  sizeLimit="10000000"  update="pictureList2" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                             </h:panelGroup>
 
-                            <h:panelGroup id="TechnicalAck">
+                            <h:panelGroup id="technicalAck">
                                 <h:panelGroup>
                                     <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
                                     <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.technicalAckStatus}">
-                                        <p:ajax process="@this" update="TechnicalAck" listener="#{assetInstallationController.onAckChange('technical')}"/>
+                                        <p:ajax process="@this" update="technicalAck" listener="#{assetInstallationController.onAckChange('technical')}"/>
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                                     </p:selectOneRadio>
                                 </h:panelGroup>
@@ -505,6 +505,30 @@
                                 </p:dataList>
                                 <p:fileUpload id="typetechnical" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                               multiple="true"  sizeLimit="10000000"  update="pictureList3" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup id="fixassetAck">
+                                <h:panelGroup>
+                                    <label class="label">固定资产验收</label>
+                                    <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.fixassetAckStatus}">
+                                        <p:ajax process="@this" update="fixassetAck" listener="#{assetInstallationController.onAckChange('fixasset')}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{assetInstallationController.arrivalListItem.fixassetAckStatus eq 'pass'}">
+                                    <label class="label">固定资产验收日期</label>
+                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.fixassetAckDate}"
+                                                mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
+                                </h:panelGroup>
+                                <p:dataList id="pictureList4" value="#{assetInstallationController.getAttachList('fixasset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{msg.attachmentUrl}</f:facet>
+                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                    <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList4" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="typefixasset" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                              multiple="true"  sizeLimit="10000000"  update="pictureList4" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                             </h:panelGroup>
                         </p:panelGrid>
 
@@ -550,6 +574,9 @@
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
                             <p:menuitem immediate="true" value="临床验收报告" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('clinical')}">
+                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>
+                            </p:menuitem>
+                            <p:menuitem immediate="true" value="固定资产验收单" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('fixasset')}">
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
                         </p:menuButton>
