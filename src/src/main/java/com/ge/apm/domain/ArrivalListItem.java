@@ -117,10 +117,20 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "clinical_ack_status")
     private String clinicalAckStatus = ACK_STATUS_NONE;
     
-    //技术验收日期
+    //临床验收日期
     @Column(name = "clinical_ack_date")
     @Temporal(TemporalType.DATE)
     private Date clinicalAckDate;
+
+    //固定资产验收状态 [none:待验收,pass:验收通过,reject:验收不通过]
+    @Size(max = 64)
+    @Column(name = "fixasset_ack_status")
+    private String fixassetAckStatus = ACK_STATUS_NONE;
+
+    //固定资产验收日期
+    @Column(name = "fixasset_ack_date")
+    @Temporal(TemporalType.DATE)
+    private Date fixassetAckDate;
     
     //安装流程状态 [new:安装中,instorage:已入库,rejected:已退货]
     @Size(max = 64)
@@ -461,6 +471,22 @@ public class ArrivalListItem implements Serializable {
 
     public void setClinicalAckStatus(String clinicalAckStatus) {
         this.clinicalAckStatus = clinicalAckStatus;
+    }
+
+    public String getFixassetAckStatus() {
+        return fixassetAckStatus;
+    }
+
+    public void setFixassetAckStatus(String fixassetAckStatus) {
+        this.fixassetAckStatus = fixassetAckStatus;
+    }
+
+    public Date getFixassetAckDate() {
+        return fixassetAckDate;
+    }
+
+    public void setFixassetAckDate(Date fixassetAckDate) {
+        this.fixassetAckDate = fixassetAckDate;
     }
 
     public String getInstallStatus() {
