@@ -151,7 +151,7 @@ public class UserCommonService {
                 u.setName(item.get("name").toString());
                 u.setTelephone(Optional.ofNullable(item.get("telephone")).orElse("").toString());
                 return u;
-            }).collect(Collectors.toList());
+            }).distinct().collect(Collectors.toList());
 
             return userList;
         }
