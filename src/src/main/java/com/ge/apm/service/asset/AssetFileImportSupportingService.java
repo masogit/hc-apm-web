@@ -168,6 +168,7 @@ public class AssetFileImportSupportingService {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
 
         supplier.setSiteId(selectedOrgToImport.getSiteId());
+        supplier.setHospitalId(selectedOrgToImport.getId());
         supplier.setName(name);
         supplier.setTel(tel);
 

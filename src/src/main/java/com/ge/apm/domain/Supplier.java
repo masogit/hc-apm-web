@@ -44,6 +44,12 @@ public class Supplier implements Serializable, ChineseName {
     @NotNull
     @Column(name = "site_id")
     private int siteId;
+
+    //hospital id is actually not needed, but micro service require it. so just sync
+    @Basic(optional = false)
+    @Column(name = "hospital_id")
+    private Integer hospitalId;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 64)
@@ -162,6 +168,14 @@ public class Supplier implements Serializable, ChineseName {
 
     public void setSiteId(int siteId) {
         this.siteId = siteId;
+    }
+
+    public Integer getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(Integer hospitalId) {
+        this.hospitalId = hospitalId;
     }
 
     public String getName() {

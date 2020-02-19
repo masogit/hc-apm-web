@@ -32,8 +32,8 @@
 
                         <p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="EQ" >
                             <f:facet name="filter">
-                                <p:selectOneMenu value="#{qrCodeLibController.tenantUIDFilter}" onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" disabled="#{qrCodeLibController.isChooseTenant()}">
-                                    <p:ajax  listener="#{qrCodeLibController.onTenantFilterChange}" update="hospitalIdSelect_list" />
+                                <p:selectOneMenu value="#{qrCodeLibController.tenantUIDFilter}" autoWidth="false" style="max-width: 150px;" disabled="#{qrCodeLibController.isChooseTenant()}">
+                                    <p:ajax  listener="#{qrCodeLibController.onTenantFilterChange}" update="datalist" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
                                     <f:selectItems value="#{qrCodeLibController.tenantList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>

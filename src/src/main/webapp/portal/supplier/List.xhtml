@@ -3,7 +3,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template-polymer.xhtml">
+                template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
         <div class="ui-g clearfix">
@@ -23,7 +23,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" listener="#{supplierController.onSelectSupplier()}" update="createButton editButton deleteButton"/>
+                        <p:ajax event="rowSelect" listener="#{supplierController.onSelectSupplier()}" update="createButton editButton editSupplierUserButton deleteButton"/>
                         <p:ajax event="filter" listener="#{supplierController.onFilter}" oncomplete="rc();"/>
 
                         <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -56,6 +56,7 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update=":SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update=":SupplierEditDlg @(.modiSupplyDlg)" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected}"/>
+                            <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update=":supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" disabled="#{not supplierController.selected.supplierT}"/>
                             <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{supplierController.delete}" update="datalist" disabled="#{empty supplierController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
@@ -68,6 +69,7 @@
                 </h:form>
 
                 <ui:include src="Edit.xhtml"/>
+                <ui:include src="supplierUser.xhtml"/>
             </div>
         </div>
 

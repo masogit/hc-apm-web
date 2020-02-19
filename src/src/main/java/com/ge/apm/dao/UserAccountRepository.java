@@ -193,6 +193,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value= "select exists(select 1 from user_account where tenant_uid = ?1)",nativeQuery = true)
     boolean findRecordByTenantUid(String uid);
 
+    @Query("select u from UserAccount u, UserRole r where u.tenantUID=?1 and u.id=r.userId and r.roleId=9")
+    List<UserAccount> findByTenantUIDAndTempStaffRole(String tenantUID);
+
     List<UserAccount> findByUidIn(List<String> userListUid);
 
     int deleteUserAccountsByTenantUID(String tenantUid);

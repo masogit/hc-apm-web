@@ -21,6 +21,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -92,6 +94,11 @@ public class ArrivalList implements Serializable {
     @Column(name = "invoice_num")
     private String invoiceNum;
 
+    //发票日期
+    @Column(name = "invoice_date")
+    @Temporal(TemporalType.DATE)
+    private Date invoiceDate;
+
     //合同价格
     @Column(name = "contract_price")
     private Double contractPrice;
@@ -113,6 +120,11 @@ public class ArrivalList implements Serializable {
     //供应商Id
     @Column(name = "supplier_id")
     private Integer supplierId;
+
+    //供应商负责人
+    @Column(name = "supplier_user_id")
+    private Integer supplierUserId;
+
     //经办人
     @Size(max = 64)
     @Column(name = "agent")
@@ -140,6 +152,37 @@ public class ArrivalList implements Serializable {
     @NotNull
     @Column(name = "status")
     private int status;
+
+    //供应商接口信息
+    //外贸协议
+    @Column(name = "foreign_trade_agreements")
+    private String foreignTradeAgreements;
+    //开箱安装日期
+    @Column(name = "box_installation_date")
+    @Temporal(TemporalType.DATE)
+    private Date boxInstallationDate;
+    //使用日期
+    @Column(name = "using_date")
+    @Temporal(TemporalType.DATE)
+    private Date usingDate;
+    //使用人
+    @Column(name = "using_person")
+    private String usingPerson;
+    //使用人电话
+    @Column(name = "using_person_tel")
+    private String usingPersonTel;
+    //联系人
+    @Column(name = "contact_person")
+    private String contactPerson;
+    //联系人电话
+    @Column(name = "contact_person_tel")
+    private String contactPersonTel;
+    //维修联系人
+    @Column(name = "repairer")
+    private String repairer;
+    //维修联系人电话
+    @Column(name = "repairer_tel")
+    private String repairerTel;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -238,6 +281,14 @@ public class ArrivalList implements Serializable {
 
     public void setInvoiceNum(String invoiceNum) {
         this.invoiceNum = invoiceNum;
+    }
+
+    public Date getInvoiceDate() {
+        return invoiceDate;
+    }
+
+    public void setInvoiceDate(Date invoiceDate) {
+        this.invoiceDate = invoiceDate;
     }
 
     public Double getContractPrice() {
@@ -391,7 +442,86 @@ public class ArrivalList implements Serializable {
     public void setManufactureId(String manufactureId) {
         this.manufactureId = manufactureId;
     }
-    
+
+    public Integer getSupplierUserId() {
+        return supplierUserId;
+    }
+
+    public void setSupplierUserId(Integer supplierUserId) {
+        this.supplierUserId = supplierUserId;
+    }
+
+    public String getForeignTradeAgreements() {
+        return foreignTradeAgreements;
+    }
+
+    public void setForeignTradeAgreements(String foreignTradeAgreements) {
+        this.foreignTradeAgreements = foreignTradeAgreements;
+    }
+
+    public Date getBoxInstallationDate() {
+        return boxInstallationDate;
+    }
+
+    public void setBoxInstallationDate(Date boxInstallationDate) {
+        this.boxInstallationDate = boxInstallationDate;
+    }
+
+    public Date getUsingDate() {
+        return usingDate;
+    }
+
+    public void setUsingDate(Date usingDate) {
+        this.usingDate = usingDate;
+    }
+
+    public String getUsingPerson() {
+        return usingPerson;
+    }
+
+    public void setUsingPerson(String usingPerson) {
+        this.usingPerson = usingPerson;
+    }
+
+    public String getUsingPersonTel() {
+        return usingPersonTel;
+    }
+
+    public void setUsingPersonTel(String usingPersonTel) {
+        this.usingPersonTel = usingPersonTel;
+    }
+
+    public String getContactPerson() {
+        return contactPerson;
+    }
+
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public String getContactPersonTel() {
+        return contactPersonTel;
+    }
+
+    public void setContactPersonTel(String contactPersonTel) {
+        this.contactPersonTel = contactPersonTel;
+    }
+
+    public String getRepairer() {
+        return repairer;
+    }
+
+    public void setRepairer(String repairer) {
+        this.repairer = repairer;
+    }
+
+    public String getRepairerTel() {
+        return repairerTel;
+    }
+
+    public void setRepairerTel(String repairerTel) {
+        this.repairerTel = repairerTel;
+    }
 
     @Override
     public int hashCode() {

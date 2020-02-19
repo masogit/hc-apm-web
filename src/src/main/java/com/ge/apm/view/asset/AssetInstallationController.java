@@ -677,6 +677,12 @@ public class AssetInstallationController {
                 } else {
                     arrivalListItem.setBusinessAckDate(null);
                 }
+            case "fixasset":
+                if (ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getFixassetAckStatus())) {
+                    arrivalListItem.setFixassetAckDate(new Date());
+                } else {
+                    arrivalListItem.setFixassetAckDate(null);
+                }
         }
     }
 
