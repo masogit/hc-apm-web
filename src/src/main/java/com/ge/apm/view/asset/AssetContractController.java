@@ -202,6 +202,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         AssetDepreciation depre = new AssetDepreciation();
         depre.setAssetId(selected.getAssetId());
         depre.setSiteId(selected.getSiteId());
+        depre.setHospitalId(selected.getHospitalId());
         depre.setContractId(selected.getId());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(selected.getEndDate());

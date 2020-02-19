@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.*;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -22,24 +24,7 @@ import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.domain.ArrivalList;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.ContractInfo;
-import com.ge.apm.domain.ContractInfoItem;
-import com.ge.apm.domain.GbCode;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
-import com.ge.apm.service.asset.AssetInstallationService;
-import com.ge.apm.service.asset.AutoCompleteService;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.ContractInfoService;
-import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -106,6 +91,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private List<ContractInfo> contractList;
     private List<ContractInfoItem> contractItemList = new ArrayList();
 
+    private SupplierService supplierService;
+    private List<UserAccount> supplierUserList;
+
     @Getter
     private CustomConfigObject customConfig;
 
@@ -126,6 +114,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
+        supplierService = WebUtil.getBean(SupplierService.class);
         TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(UserContextService.getCurrentUserAccount().getSiteUID(), UserContextService.getCurrentUserAccount().getUid());
         orgTree = new DefaultTreeNode("org", null, null);
         orgTree.getChildren().add(subTree);
@@ -160,6 +149,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
             if (selected.getSupplierId() != null) {
                 supplier = aiService.getSupplierById(selected.getSupplierId());
+                this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
 //                supplierName = supplier == null ? null : supplier.getName();
             }
             if (selected.getManufactureId() != null) {
@@ -508,6 +498,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         if (null != supplier) {
             selected.setSupplierId(supplier.getId());
             selected.setVendor(supplier.getName());
+
+            this.supplierUserList = supplierService.getApprovedUserList(supplier.getId());
         } else {
             selected.setSupplierId(null);
             selected.setVendor(null);
@@ -735,6 +727,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setManufacture(Supplier manufacture) {
         this.manufacture = manufacture;
+    }
+
+    public List<UserAccount> getSupplierUserList() {
+        return supplierUserList;
+    }
+
+    public void setSupplierUserList(List<UserAccount> supplierUserList) {
+        this.supplierUserList = supplierUserList;
     }
 
     public CustomConfigObject getCustomConfig() {

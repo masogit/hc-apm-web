@@ -10,6 +10,7 @@
             <p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{appContextService.reloadI18nMessage()}" value="重新加载 i18n_message"/>
             <p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{appContextService.reloadChartConfig()}" value="重新加载 chart_config"/>
             <p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{appContextService.reloadDataTableConfig()}" value="重新加载 chart_config"/>
+            <p:commandButton icon="ui-icon-refresh" ajax="true" actionListener="#{appContextService.clearJPACache()}" value="清除数据库缓存"/>
         </h:form>
     </ui:define>
 

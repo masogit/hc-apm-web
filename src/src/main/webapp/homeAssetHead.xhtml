@@ -1,20 +1,16 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:jsf="http://xmlns.jcp.org/jsf"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template-polymer.xhtml">
+                template="/WEB-INF/template.xhtml">
 
-  <ui:define name="elements">
-    <link rel="import" href="pages/asset-overview.html" />
-  </ui:define>
-
-  <ui:define name="content">
-    <device-status-chart></device-status-chart>
-    <!--<ui:include src="authorization.xhtml"/>-->
-
-  </ui:define>
-
-
+    <ui:define name="content">
+        <iframe id="chartFrame" src="/geapm/resources/device_status.html" width="100%" height="900"></iframe>
+        <script type="text/javascript">
+			function whoami(){
+				document.getElementById("chartFrame").contentWindow.update(#{userContextService.loginUserId});
+			}
+        </script>
+    </ui:define>
 </ui:composition>
