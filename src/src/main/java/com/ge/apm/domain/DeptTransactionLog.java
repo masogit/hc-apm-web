@@ -43,17 +43,17 @@ public class DeptTransactionLog implements Serializable {
     @Column(name = "hours")
     private Double hours;
 
-    @Basic(optional = false)
-    @Column(name = "start_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date startTime;
-
-    @Basic(optional = false)
-    @Column(name = "end_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date endTime;
+//    @Basic(optional = false)
+//    @Column(name = "start_time")
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+//    private Date startTime;
+//
+//    @Basic(optional = false)
+//    @Column(name = "end_time")
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+//    private Date endTime;
 
     @Column(name = "date")
     @Temporal(TemporalType.DATE)
@@ -123,21 +123,21 @@ public class DeptTransactionLog implements Serializable {
         this.uid = uid;
     }
 
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-    
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
+//    public Date getStartTime() {
+//        return startTime;
+//    }
+//
+//    public void setStartTime(Date startTime) {
+//        this.startTime = startTime;
+//    }
+//
+//    public Date getEndTime() {
+//        return endTime;
+//    }
+//
+//    public void setEndTime(Date endTime) {
+//        this.endTime = endTime;
+//    }
 
     public String getTenantUID() {
         return tenantUID;
