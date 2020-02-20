@@ -1107,6 +1107,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void saveNewSupplier() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         this.newSupplier.setSiteId(loginUser.getSiteId());
+        this.newSupplier.setHospitalId(loginUser.getHospitalId());
+
         if (newSupplier.getMaintainerT()) {
             supplierController.setMaintainerT(true);
             selectedObjectMap.put("maintainer",newSupplier);
