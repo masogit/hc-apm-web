@@ -19,6 +19,8 @@ import java.util.UUID;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.domain.*;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -42,15 +44,6 @@ import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.dao.UserRoleRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysRole;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UploadFileErrorTypeEnum;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserModel;
-import com.ge.apm.domain.UserOrgInfo;
-import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.apm.service.utils.PasswordUtil;
@@ -59,6 +52,10 @@ import com.ge.apm.view.sysutil.UserContextService;
 @Service
 public class UserAccountExportService {
 	private Logger logger = LoggerFactory.getLogger(getClass());
+
+	protected Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+	public List<I18nMessage> userPositionList = FieldValueMessageController.getFieldValueList("userPosition", siteId);
+
 	private static final String HEADER_INSTITUTION="所属集团";
 	private static final String HEADER_HOSPITAL="所属医院";
 	private static final String HEADER_SITE="所属院区";
@@ -73,6 +70,7 @@ public class UserAccountExportService {
 	private static final String HEADER_ISLOCKED="锁定?*";
 	private static final String HEADER_ROLENAME="角色*";
 	private static final String HEADER_ACCESSSCOPE="可见范围（科室）";
+	private static final String HEADER_POSITION="职务";
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
 	private static Map<String,Integer> sysRoleMap;
@@ -151,6 +149,7 @@ public class UserAccountExportService {
 				tempMap.put(HEADER_ISACTIVE, tempUser.getIsActive()?"是":"否");
 				tempMap.put(HEADER_ISLOCKED, tempUser.getIsLocked()?"是":"否");
 				tempMap.put(HEADER_ROLENAME, tempUser.getUserRoleNames());
+				tempMap.put(HEADER_POSITION, convertPositionIdToLabel(tempUser.getPosition()));
 				tempMap.put(HEADER_ACCESSSCOPE, getOrgInfoName(tempUser.getListOrgInfo()));
 				tempMap.put(HEADER_UUID, tempUser.getUid());
 				listMapResult.add(tempMap);
@@ -220,5 +219,19 @@ public class UserAccountExportService {
 			result=result.substring(0, result.length()-1);
 		}
 		return result;
+	}
+
+	private String convertPositionIdToLabel(String position) {
+		if (StringUtils.isEmpty(position)) {
+			return null;
+		}
+
+		for (I18nMessage message: userPositionList) {
+			if (message.getMsgKey().equals(position)) {
+				return message.getValue();
+			}
+		}
+
+		return null;
 	}
 }
