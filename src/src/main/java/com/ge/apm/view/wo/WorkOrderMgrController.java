@@ -13,6 +13,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
@@ -1315,16 +1316,18 @@ public void test1(){
         currentStatus = asset.getStatus();
 
         if(customConfig ==null){
-            if (currentStatus == 1) {
-                currentStatus = 3;
+            if (currentStatus == AssetConstant.ASSET_STATUS_NORMAL
+                    || currentStatus == AssetConstant.ASSET_STATUS_TO_TERMINATED
+                    || currentStatus == AssetConstant.ASSET_STATUS_STOP) {
+                currentStatus = AssetConstant.ASSET_STATUS_ILL;
             }
             needConfirmTime = false;
         }else{ //如果有自定义配置
             String strAssetStatus =JSONPath.eval(currentCustomConfig,"$.mobilePage.pageWorkOrder.group[type='orderFields'].assetStatus.defaultValue[0]").toString();
             currentStatus= Integer.valueOf(strAssetStatus);
-            if(currentStatus==3) //限制功能使用
+            if(currentStatus == AssetConstant.ASSET_STATUS_ILL) //限制功能使用
                  needConfirmTime=false;
-            if(currentStatus==2)//停机
+            if(currentStatus == AssetConstant.ASSET_STATUS_DOWN)//停机
                 needConfirmTime=true;
         }
 
