@@ -381,6 +381,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setIsPm(easyInstallItem.getIsPm());
             item.setIsChecked(easyInstallItem.getIsChecked());
             item.setWarrantyYear(easyInstallItem.getWarrantyYear());
+            if(item.getFixassetAckStatus() == null){
+                item.setFixassetAckStatus(ArrivalListItem.ACK_STATUS_NONE);
+            }
         });
         itemDao.save(saveList);
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
