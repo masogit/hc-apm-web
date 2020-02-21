@@ -466,6 +466,9 @@
                                 <p:column headerText="#{msg.AssetArrivalListTechnicalAck}" rendered="#{assetArrivedListEditController.selected.processType ne 'Easy'}" >
                                     <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',item.technicalAckStatus)}"/>
                                 </p:column>
+                                <p:column headerText="固定资产验收" rendered="#{assetArrivedListEditController.selected.processType ne 'Easy'}" >
+                                    <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',item.fixassetAckStatus)}"/>
+                                </p:column>
                                 <p:column headerText="#{msg.status}">
                                     <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.installStatus)}"/>
                                 </p:column>

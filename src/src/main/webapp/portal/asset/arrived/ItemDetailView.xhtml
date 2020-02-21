@@ -280,7 +280,7 @@
                             </h:panelGroup>
                             <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.technicalAckDate}">
                                 <label class="label">#{msg.AssetArrivalListTechnicalAckDate}</label>
-                                <p:inputText  value="#{assetArrivedItemsController.selected.technicalAckDate}" rendered="#{not empty assetArrivedItemsController.selected.businessAckDate}" readonly="true">
+                                <p:inputText  value="#{assetArrivedItemsController.selected.technicalAckDate}" readonly="true">
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                 </p:inputText>
                             </h:panelGroup>
@@ -289,8 +289,25 @@
                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                             </p:dataList>
                         </h:panelGroup>
-                    </p:panelGrid>
 
+                        <h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">固定资产验收</label>
+                                <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus','none')}" rendered="#{empty assetArrivedItemsController.selected.fixassetAckStatus}"/>
+                                <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.fixassetAckStatus)}" rendered="#{not empty assetArrivedItemsController.selected.fixassetAckStatus}" />
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.fixassetAckDate}">
+                                <label class="label">固定资产验收日期</label>
+                                <p:inputText  value="#{assetArrivedItemsController.selected.fixassetAckDate}" readonly="true">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </p:inputText>
+                            </h:panelGroup>
+                            <p:dataList id="pictureList4" value="#{assetArrivedItemsController.getAckPicList('fixasset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">相关附件</f:facet>
+                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            </p:dataList>
+                        </h:panelGroup>
+                    </p:panelGrid>
                 </p:fieldset>
             </p:fieldset>
         </h:form>
