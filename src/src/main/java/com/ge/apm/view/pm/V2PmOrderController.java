@@ -1248,6 +1248,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void saveNewSupplier() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         this.newSupplier.setSiteId(loginUser.getSiteId());
+        this.newSupplier.setHospitalId(loginUser.getHospitalId());
+
         if (newSupplier.getMaintainerT()) {
             supplierController.setMaintainerT(true);
         } else {
