@@ -138,6 +138,8 @@ public class MaintainExportController implements ServerEventInterface{
     }
 
     public void exportAll() {
+        clearStream();
+
         if (listMaintainData == null || listMaintainData.size() == 0) {
             addMessage("无数据");
             return;
@@ -147,6 +149,8 @@ public class MaintainExportController implements ServerEventInterface{
     }
 
     public void exportSelected() {
+        clearStream();
+
         if (selectedListMaintain == null || selectedListMaintain.size() == 0) {
             addMessage("未选中需要导出的记录");
             return;
@@ -156,6 +160,8 @@ public class MaintainExportController implements ServerEventInterface{
     }
 
     public void exportAllDetail() {
+        clearStream();
+
         if (listMaintainData == null || listMaintainData.size() == 0) {
             addMessage("无数据");
             return;
@@ -173,6 +179,8 @@ public class MaintainExportController implements ServerEventInterface{
     }
 
     public void exportSelectedDetail() {
+        clearStream();
+
         if (selectedListMaintain == null || selectedListMaintain.size() == 0) {
             addMessage("未选中需要导出的记录");
             return;
@@ -190,6 +198,8 @@ public class MaintainExportController implements ServerEventInterface{
     }
 
     public void exportSelected2Docx() {
+        clearStream();
+
         if (selectedListMaintain == null || selectedListMaintain.size() == 0) {
             addMessage("未选中需要导出的记录");
             return;
@@ -199,6 +209,8 @@ public class MaintainExportController implements ServerEventInterface{
     }
 
     public void exportAll2Docx() {
+        clearStream();
+
         if (listMaintainData == null || listMaintainData.size() == 0) {
             addMessage("无数据");
             return;
@@ -347,6 +359,13 @@ public class MaintainExportController implements ServerEventInterface{
 	public void setCustomRoleAuth(UserAuth customRoleAuth) {
 		this.customRoleAuth = customRoleAuth;
 	}
+
+    /**
+     * clear the stream, if not, the second export will download the previous stream even if there is no data
+     */
+    private void clearStream() {
+        exportFile = null;
+    }
 
 	@Override
     public void onServerEvent(String eventName, Object eventObject) {
