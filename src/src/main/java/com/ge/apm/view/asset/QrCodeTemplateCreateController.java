@@ -17,6 +17,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -44,7 +45,9 @@ public class QrCodeTemplateCreateController {
     String importJsonString;
 
     Map<String, String> qrCodeEncodingMethods = QrcodeConfigConstant.getQrCodeEncodingMethod();
-    
+
+    private List<OrgInfo> siteList;
+
     @PostConstruct
     protected void init() {
         templateDao = WebUtil.getBean(QrCodeTemplateRepository.class);
@@ -53,11 +56,13 @@ public class QrCodeTemplateCreateController {
         templateService = WebUtil.getBean(QrCodeTemplateService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+
+        initSiteList();
         
         String actionName = WebUtil.getRequestParameter("action");
         if (actionName.equals("Create")) {
             String copyFrom = WebUtil.getRequestParameter("copyFrom");
-            thisTemplate = templateService.getDefaultTemplate();
+            thisTemplate = templateService.getDefaultTemplate(getInitialSite());
             if (!Strings.isNullOrEmpty(copyFrom)) {
                 QrCodeTemplate copyFromTemplate = templateDao.findById(copyFrom);
                 if (null != copyFromTemplate) {
@@ -141,13 +146,27 @@ public class QrCodeTemplateCreateController {
     public void removeElement(JSONObject element) {
         templateJsonObject.getJSONArray("Elements").remove(element);
     }
-    
-    public List<OrgInfo> getHospitalFileterList() {
-        List<OrgInfo> orgInfoList = null;
+
+    public void initSiteList() {
+
         UserAccount user = UserContextService.getCurrentUserAccount();
-        orgInfoList = uaaService.getUserAccessibleSiteList(user.getUid());
-        return orgInfoList;
+        this.siteList = uaaService.getUserAccessibleSiteList(user.getUid());
     }
+
+    private Optional<OrgInfo> getInitialSite() {
+        if (null == this.siteList || this.siteList.size() == 0) {
+            return Optional.empty();
+        } else {
+            return Optional.of(this.siteList.get(0));
+        }
+    }
+
+//    public List<OrgInfo> getHospitalFileterList() {
+//        List<OrgInfo> orgInfoList = null;
+//        UserAccount user = UserContextService.getCurrentUserAccount();
+//        orgInfoList = uaaService.getUserAccessibleSiteList(user.getUid());
+//        return orgInfoList;
+//    }
     
     public void onExportAction() {
         importJsonString = templateJsonObject.toJSONString();
@@ -199,5 +218,13 @@ public class QrCodeTemplateCreateController {
 
     public void setQrCodeEncodingMethods(Map<String, String> qrCodeEncodingMethods) {
         this.qrCodeEncodingMethods = qrCodeEncodingMethods;
+    }
+
+    public List<OrgInfo> getSiteList() {
+        return siteList;
+    }
+
+    public void setSiteList(List<OrgInfo> siteList) {
+        this.siteList = siteList;
     }
 }
