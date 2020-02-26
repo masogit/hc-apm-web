@@ -480,7 +480,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
 
-                            <h:panelGroup style="display: #{(workflowConfigController.selected.generateMethod == 1) or (workflowConfigController.selected.generateMethod == 3) ? 'auto' : 'none'}">
+                            <h:panelGroup rendered="#{workflowConfigController.displayAssetIdPrefix}">
                                 <label class ="label" >#{msg.AssetIDPrefix}</label>
                                 <p:inputText id="prefix" value="#{workflowConfigController.selected.prefix}" maxlength="3" ><p:ajax process="@this"></p:ajax></p:inputText>
                             </h:panelGroup>
