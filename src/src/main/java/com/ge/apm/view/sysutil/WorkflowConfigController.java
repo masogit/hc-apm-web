@@ -759,6 +759,15 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		return result;
 	}
 
+	public boolean isDisplayAssetIdPrefix() {
+		if (this.selected == null || this.selected.getGenerateMethod() == null
+				|| this.selected.getGenerateMethod() == 0) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public OrgInfo getSelectedUserOrg() {
 		return selectedUserOrg;
 	}
