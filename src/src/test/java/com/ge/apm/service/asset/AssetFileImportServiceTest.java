@@ -394,7 +394,7 @@ public class AssetFileImportServiceTest {
         rowData.put("采购日期", "2017-12-02");
         rowData.put("到货日期", "2017-12-03");
         rowData.put("启用日期", "2017-12-04");
-        rowData.put("质保日期", "2017-12-05");
+        rowData.put("质保截止日期", "2017-12-05");
         rowData.put("维保截止日期", "2017-12-06");
         rowData.put("报废日期", "2017-12-07");
         rowData.put("上次保养日期", "2017-12-08");

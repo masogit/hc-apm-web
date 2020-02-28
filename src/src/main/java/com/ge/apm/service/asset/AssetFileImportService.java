@@ -157,7 +157,7 @@ public class AssetFileImportService extends AssetFileImportBaseService {
                 assetRow.setFieldDateValue("采购日期", "setPurchaseDate");
                 assetRow.setFieldDateValue("到货日期", "setArriveDate");
                 assetRow.setFieldDateValue("启用日期", "setInstallDate");
-                assetRow.setFieldDateValue("质保日期", "setFactoryWarrantyDate");
+                assetRow.setFieldDateValue("质保截止日期", "setFactoryWarrantyDate");
                 assetRow.setFieldDateValue("维保截止日期", "setWarrantyDate");
                 assetRow.setFieldDateValue("报废日期", "setTerminateDate");
                 assetRow.setFieldDateValue("上次保养日期", "setLastPmDate");
