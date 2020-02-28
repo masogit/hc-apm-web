@@ -453,7 +453,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'clinicalOwnerName', '使用责任人', 'Clinical Dept Owner', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'clinicalOwnerTel', '使用责任人电话', 'Clinical Dept Owner Tel', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'registrationNo', '注册证号', 'Registration No', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'factoryWarrantyDate', '质保日期', 'Manhour Price(RMB)', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'factoryWarrantyDate', '质保截止日期', 'Manhour Price(RMB)', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'contractType', '合同类型', 'Contract Type', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'assetOwnerId2', '维修负责人2', '2nd Asset Owner Id', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'assetOwnerName2', '维修负责人2', '2nd Asset Owner Name', NULL, '-1');
