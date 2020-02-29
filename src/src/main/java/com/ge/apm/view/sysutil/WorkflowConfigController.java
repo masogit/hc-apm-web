@@ -760,8 +760,11 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	}
 
 	public boolean isDisplayAssetIdPrefix() {
-		if (this.selected == null || this.selected.getGenerateMethod() == null
-				|| this.selected.getGenerateMethod() == 0) {
+		if (this.selected.getGenerateMethod() == null) {
+			return false;
+		}
+
+		if (this.selected.getGenerateMethod() == 0 || this.selected.getGenerateMethod() == 2) {
 			return false;
 		}
 
