@@ -1450,6 +1450,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','21','CT Premium','CT Premium',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','22','CT Distribution','CT Distribution',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','23','CT Value','CT Value',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','24','NM CT','NM CT',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','31','U/S LOGIQ E9','U/S LOGIQ E9',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','32','U/S VIVID E9','U/S VIVID E9',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','33','U/S VOLUSON E8','U/S VOLUSON E8',NULL,-1);
@@ -1687,9 +1688,10 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('alertConfigDeviceType','3','US','US',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','4','IGS','IGS',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('alertConfigDeviceType','4','IGS','IGS',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','5','Pet CT','Pet CT',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','5','Pet CT 非DIQ/DIM/DIM DR','Pet CT 非DIQ/DIM/DIM DR',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','51','Pet CT DIQ/DIM/DIM DR','Pet CT DIQ/DIM/DIM DR',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('alertConfigDeviceType','5','Pet CT','Pet CT',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','6','NM CT','NM CT',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','6','NM','NM',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('alertConfigDeviceType','6','NM CT','NM CT',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','AssetsIsBlank','设备列表不能为空！','Equipment List cannot be null!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('pmOrderRuleLevel','2','二级规则','Level 2 Rule',NULL,-1);
