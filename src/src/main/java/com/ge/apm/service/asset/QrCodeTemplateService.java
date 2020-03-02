@@ -5,29 +5,21 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.QrCodeLibRepository;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.QrCodeTemplateElementRepository;
 import com.ge.apm.dao.QrCodeTemplateRepository;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.QrCodeTemplate;
-import com.ge.apm.domain.QrCodeTemplateElement;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.common.QrcodeConfigConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.ImmutableMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONArray;
-import com.ge.apm.service.common.QrcodeConfigConstant;
-import webapp.framework.web.WebUtil;
 
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -58,6 +50,17 @@ public class QrCodeTemplateService {
         template.setSiteUID(siteUID);
         template.setJSONObject(getDefaultJsonText(template));
         return template;
+    }
+
+    public QrCodeTemplate getDefaultTemplate(Optional<OrgInfo> defaultSite) {
+        if (defaultSite.isPresent()) {
+            OrgInfo site = defaultSite.get();
+            return getDefaultTemplate(site.getTenantUID(), site.getInstitutionUID(), site.getHospitalUID(), site.getSiteUID());
+
+        } else {
+            UserAccount loginUser = UserContextService.getCurrentUserAccount();
+            return getDefaultTemplate(loginUser.getTenantUID(), loginUser.getInstitutionUID(), loginUser.getHospitalUID(), loginUser.getSiteUID());
+        }
     }
 
     private JSONObject getDefaultJsonText(QrCodeTemplate template) {

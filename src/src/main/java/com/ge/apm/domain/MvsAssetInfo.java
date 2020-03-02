@@ -68,7 +68,7 @@ public class MvsAssetInfo implements Serializable {
 
     @Column(name = "factory_warranty_date")
     @Temporal(TemporalType.DATE)
-    private Date factoryWarrantyDate;//质保日期
+    private Date factoryWarrantyDate;//质保截止日期
 
     @Column(name = "warranty_date")
     @Temporal(TemporalType.DATE)

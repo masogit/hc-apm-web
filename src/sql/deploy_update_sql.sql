@@ -267,7 +267,7 @@ INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(5
 INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(6, '报修人', 'requestorName', '0');
 INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(7, '维修人', 'currentPersonName', '0');
 INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(8, '启用日期', 'installDate', NULL);
-INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(9, '质保日期', 'factoryWarrantyDate', NULL);
+INSERT INTO public.msg_config(id, msg_name, msg_bind_field, msg_status) VALUES(9, '质保截止日期', 'factoryWarrantyDate', NULL);
 INSERT INTO inventory_check_list (id, item) VALUES (replace(uuid_generate_v4() || '', '-', ''), '设备不在本次盘点范围内');
 
 --v12.1
