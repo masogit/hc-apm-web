@@ -469,3 +469,5 @@ values ('21d87039ea3e45cab62f843e9b008629', 9952, now(), 20, 65, 4, 99, true, fa
 '%', '报警', '环境湿度异常（上下限： {upper_limit}/{lower_limit} {unit_of_measure}），请检查设备间空调工作状态，否则影响图像质量，造成设备损坏。', true, true);
 --v20.3.1
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'AppTrainingExcel', '应用培训列表', 'App Training List', NULL, '-1');
+
+update asset_alert_config set mute_period = 4320 where  config_type in ('9901', '9902', '9903', '9904', '101', '102', '113', '104', '105', '115', '201')  and ole_config = false
