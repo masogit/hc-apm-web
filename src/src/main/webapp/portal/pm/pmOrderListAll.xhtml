@@ -18,13 +18,13 @@
                    <!-- <p:ajax event="tabChange"/>-->
                  <!--   <p:ajax event="tabChange" listener="#{v2PmOrderController.onChange}" update="@(.pmOrderListFormRemote)"></p:ajax>-->
 <!---->
-                    <p:tab class="ui-g-12" title="#{msg.innerPm}" id="pmOrderList" rendered="#{not userContextService.isIBTenant()}">
+                    <p:tab class="ui-g-12" title="#{msg.innerPm}" id="pmOrderList" rendered="#{not (userContextService.isIBTenant() or userContextService.isZtbTenant())}">
                         <ui:include src="pmOrderList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="#{msg.outerPm}" id="pmOrderListOut" rendered="#{not userContextService.isAccountEndUser()}">
+                    <p:tab class="ui-g-12" title="#{msg.outerPm}" id="pmOrderListOut" rendered="#{not userContextService.isAccountEndUser() or userContextService.isZtbTenant()}">
                         <ui:include src="pmOrderListOut.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="#{msg.outerRemotePm}"  id="pmOrderListRemote" rendered="#{not userContextService.isAccountEndUser()}">
+                    <p:tab class="ui-g-12" title="#{msg.outerRemotePm}"  id="pmOrderListRemote" rendered="#{not userContextService.isAccountEndUser() or userContextService.isZtbTenant()}">
                         <ui:include src="pmOrderListRemote.xhtml"/>
                     </p:tab>
                 </p:tabView>
