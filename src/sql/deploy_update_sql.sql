@@ -471,3 +471,5 @@ values ('21d87039ea3e45cab62f843e9b008629', 9952, now(), 20, 65, 4, 99, true, fa
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'AppTrainingExcel', '应用培训列表', 'App Training List', NULL, '-1');
 
 update asset_alert_config set mute_period = 4320 where  config_type in ('9901', '9902', '102', '105', '115', '201', '404', '405')  and ole_config = false
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'OLERulesExcel', 'OLE规则列表', 'OLE Rule List', NULL, '-1');
