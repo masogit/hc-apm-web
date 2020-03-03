@@ -802,8 +802,12 @@ public class UserContextService implements Serializable {
         if (ApmConstant.USER_ACCOUNT_TYPE_PARTNER == user.getType() && user.getIsSuperAdmin()) {
             return true;
         }
-
         return false;
+    }
+
+    public boolean isZtbTenant() {
+        TenantInfo tenantInfo = getTenantInfo();
+        return StringUtils.equals("GE智通保", tenantInfo.getName());
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){
