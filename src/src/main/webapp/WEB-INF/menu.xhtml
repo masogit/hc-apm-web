@@ -3,6 +3,7 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
     xmlns:p="http://primefaces.org/ui"
     xmlns:pu="http://primefaces.org/ultima">
 
@@ -12,12 +13,23 @@
             <a id="menu-button" class="menu-button flex flex--row flex--middle flex--center u-mv--" href="javascript:;" style="text-decoration:none;">
               <i class="material-icons">play_circle_outlined</i>
             </a>
-            <ui:fragment rendered="#{userContextService.partnerAccount}" >
-                <ui:include src="./menu-content-partner.xhtml"/>
-            </ui:fragment>
-            <ui:fragment rendered="#{!userContextService.partnerAccount}">
-                <ui:include src="./menu-content.xhtml"/>
-            </ui:fragment>
+            <c:choose>
+                <c:when test="${userContextService.ztbTenant}">
+                    <ui:fragment>
+                        <ui:include src="./menu-content-ztb.xhtml"/>
+                    </ui:fragment>
+                </c:when>
+                <c:when test="${userContextService.partnerAccount}">
+                    <ui:fragment>
+                        <ui:include src="./menu-content-partner.xhtml"/>
+                    </ui:fragment>
+                </c:when>
+                <c:otherwise>
+                    <ui:fragment>
+                        <ui:include src="./menu-content.xhtml"/>
+                    </ui:fragment>
+                </c:otherwise>
+            </c:choose>
         </div>
         <script>
           window.onload = function () {
