@@ -409,6 +409,11 @@ public class UserContextService implements Serializable {
         return Option.of(getLoginUser()).map(UserAccount::getId).getOrElse(-1);
     }
 
+    public String getUserTenantType(){
+        TenantInfo tenantInfo = getTenantInfo();
+        return tenantInfo.getType() != null ? tenantInfo.getType().toString() : "";
+    }
+
     public String getLoginUserUid() {
         return Option.of(getLoginUser()).map(UserAccount::getUid).getOrElse("");
     }
@@ -800,6 +805,14 @@ public class UserContextService implements Serializable {
             return false;
         }
         if (ApmConstant.USER_ACCOUNT_TYPE_PARTNER == user.getType() && user.getIsSuperAdmin()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isZkbAccount() {
+        TenantInfo tenantInfo = getTenantInfo();
+        if(tenantInfo.getType() != null && tenantInfo.getType() == 3){
             return true;
         }
         return false;

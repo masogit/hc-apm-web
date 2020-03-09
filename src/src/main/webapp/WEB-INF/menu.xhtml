@@ -9,7 +9,18 @@
 
     <h:form id="menuform">
         <div class="layout-menu #{guestPreferences.menuClass}">
-            <ui:include src="./ge-logo.xhtml" />
+            <c:choose>
+                <c:when test="${userContextService.zkbAccount}">
+                    <ui:fragment>
+                        <ui:include src="./zkb-logo.xhtml" />
+                    </ui:fragment>
+                </c:when>
+                <c:otherwise>
+                    <ui:fragment>
+                        <ui:include src="./ge-logo.xhtml" />
+                    </ui:fragment>
+                </c:otherwise>
+            </c:choose>
             <a id="menu-button" class="menu-button flex flex--row flex--middle flex--center u-mv--" href="javascript:;" style="text-decoration:none;">
               <i class="material-icons">play_circle_outlined</i>
             </a>
@@ -17,6 +28,11 @@
                 <c:when test="${userContextService.ztbTenant}">
                     <ui:fragment>
                         <ui:include src="./menu-content-ztb.xhtml"/>
+                    </ui:fragment>
+                </c:when>
+                <c:when test="${userContextService.zkbAccount}">
+                    <ui:fragment>
+                        <ui:include src="./menu-content-zkb.xhtml"/>
                     </ui:fragment>
                 </c:when>
                 <c:when test="${userContextService.partnerAccount}">
