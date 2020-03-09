@@ -180,6 +180,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("ExternalExpenses_xlsx"), workOrderExportPojo.getExternalExpense());
             workOrderMap.put(WebUtil.getMessage("TotalRepairPrice_xlsx"), workOrderExportPojo.getTotalPrice());
             workOrderMap.put(WebUtil.getMessage("AcknowledgedBy_xlsx"), workOrderExportPojo.getEvaluateStepOwnerName());
+            workOrderMap.put(WebUtil.getMessage("maintanenceValue_xlsx"), workOrderExportPojo.getMaintanenceValue());
             workOrderMap.put(WebUtil.getMessage("AcceptTime_xlsx2"), formatDate(workOrderExportPojo.getEvaluateStepEndTime()));
             workOrderMap.put(WebUtil.getMessage("Closedby_xlsx"), workOrderExportPojo.getCloseStepOwnerName());
             workOrderMap.put(WebUtil.getMessage("CloseTime_xlsx"), formatDate(workOrderExportPojo.getCloseStepEndTime()));
