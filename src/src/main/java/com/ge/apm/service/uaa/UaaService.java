@@ -95,6 +95,8 @@ public class UaaService {
             url = getDefautHomePage("DeptHead");
         else if(userContextService.hasRole("AssetStaff"))
             url = getDefautHomePage("AssetStaff");
+        else if(userContextService.hasRole("ClinicalStaff"))
+            url = getDefautHomePage("ClinicalStaff");
         else
             url = "/home.xhtml";
         
