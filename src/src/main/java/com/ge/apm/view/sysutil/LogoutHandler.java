@@ -1,5 +1,6 @@
 package com.ge.apm.view.sysutil;
 
+import com.ge.apm.domain.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -22,7 +23,14 @@ public class LogoutHandler extends SimpleUrlLogoutSuccessHandler implements Logo
   @Override
   public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth)
     throws IOException, ServletException {
-    logoutSuccessUrl = String.format("/login.xhtml?uid=%s", request.getParameter("uid"));
+    String userTenantType = request.getParameter("userTenantType");
+
+    if("3".equals(userTenantType)){
+      logoutSuccessUrl = String.format("/loginzkb.xhtml?uid=%s", request.getParameter("uid"));
+    }else {
+      logoutSuccessUrl = String.format("/login.xhtml?uid=%s", request.getParameter("uid"));
+    }
+
     if (auth != null) {
       super.onLogoutSuccess(request, response, auth);
     } else
