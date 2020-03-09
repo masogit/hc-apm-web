@@ -310,7 +310,7 @@ public class WorkOrderReportProvider {
             "ua.telephone as telephone," +
             "aft.fault_name as caseTypeName, " +
             "ai.status as assetStatus," +
-            "wo.signature as signature,wo.ack_signature as ackSignature,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes " +
+            "wo.signature as signature,wo.ack_signature as ackSignature,wo.maintenance_value as maintenanceValue,wo.pat_problems as patProblems,wo.pat_actions as patActions,wo.pat_tests as patTests,wo.comment as comment, wo.attributes as attributes " +
             "from v2_work_order wo " +
             "INNER JOIN v2_service_request sr ON wo.sr_id = sr.id " +
             "INNER JOIN asset_info ai ON ai.id = wo.asset_id " +

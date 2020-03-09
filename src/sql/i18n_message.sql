@@ -3076,6 +3076,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ExternalExpenses_xlsx', '外修费用', 'ExternalExpenses', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TotalRepairPrice_xlsx', '维修总费用', 'TotalRepairPrice', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AcknowledgedBy_xlsx', '验收人', 'AcknowledgedBy', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'maintanenceValue_xlsx', '维修价值', 'maintanenceValue', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AcceptTime_xlsx2', '验收时间', 'AcceptTime', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Closedby_xlsx', '关单人', 'Closedby', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CloseTime_xlsx', '关单时间', 'CloseTime', NULL, '-1');
