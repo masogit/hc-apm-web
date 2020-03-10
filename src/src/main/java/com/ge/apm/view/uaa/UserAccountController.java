@@ -1168,4 +1168,21 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void setShowButton(boolean showButton) {
         isShowButton = showButton;
     }
+
+    public List<String> autoCompleteTags(String query) {
+        if (StringUtils.isEmpty(query)) {
+            return Collections.emptyList();
+        }
+
+        List<String> list = new ArrayList<>(5);
+        if (query.startsWith("xxx")) {
+            for (int i = 0; i < 5; i++){
+                list.add(query + i);
+            }
+        } else {
+            list.add(query);
+        }
+
+        return list;
+    }
 }
