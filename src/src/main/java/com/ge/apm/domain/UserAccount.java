@@ -46,6 +46,17 @@ public class UserAccount implements ChineseName, Serializable {
 	public static final int SALT_SIZE = 8;
 	public static final int LI_XIANG = -1;
 
+	@Transient
+	private List<String> tags;
+
+	public List<String> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<String> tags) {
+		this.tags = tags;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
