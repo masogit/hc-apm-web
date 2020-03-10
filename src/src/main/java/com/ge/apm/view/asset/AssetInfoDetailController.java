@@ -7,6 +7,7 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoMgrService;
@@ -51,6 +52,8 @@ public class AssetInfoDetailController {
     private AssetInfoMgrService aimService;
     private ContractInfoService contractService;
     private ContractInfoItemRepository contractItemDao;
+    private AssetTagsMapper assetTagsMapper;
+
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
@@ -79,6 +82,8 @@ public class AssetInfoDetailController {
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
+        assetTagsMapper = WebUtil.getBean(AssetTagsMapper.class);
+
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
@@ -105,6 +110,9 @@ public class AssetInfoDetailController {
                 mvsAssetInfo = found;
             }
         }
+
+        List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
+        this.selected.setTags(existingTags);
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {
