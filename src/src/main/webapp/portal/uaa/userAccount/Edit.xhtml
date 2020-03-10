@@ -8,6 +8,13 @@
 
     <ui:composition>
 
+        <style type="text/css">
+            div.ui-autocomplete.ui-autocomplete-multiple.user-tags ul.ui-autocomplete-multiple-container{
+                max-width: 200px;
+                max-height: 100px;
+                overflow-y: auto;
+            }
+        </style>
         <p:dialog id="UserAccountEditDlg" widgetVar="UserAccountEditDialog" modal="true" resizable="true" draggable="true"  appendTo="@(body)" header="#{userAccountController.CRUDActionName} #{msg.UserAccount}" >
             <h:form id="UserAccountEditForm" >
                 <h:panelGroup id="display" rendered="#{userAccountController.selected ne null}">
@@ -71,11 +78,7 @@
                             <label class="label">#{msg.InitialPassword}</label>
                             <p:password id="password" value="#{userAccountController.selected.plainPassword}"  autocomplete="new-password"/>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">tags</label>
-                            <p:autoComplete id="tags" multiple="true" value="#{userAccountController.selected.tags}" completeMethod="#{userAccountController.autoCompleteTags}"
-                                            var="theme" itemLabel="#{theme}" itemValue="#{theme}" forceSelection="false"/>
-                        </h:panelGroup>
+
                         <!--<h:panelGroup rendered="false">-->
                             <!--<p:selectBooleanCheckbox itemLabel="#{msg.isSiteAdmin}*" value="#{userAccountController.selected.isSiteAdmin}" required="true" requiredMessage="#{msg.isSiteAdmin} #{msg.ValidationRequire}"/>-->
                         <!--</h:panelGroup>-->
@@ -85,6 +88,11 @@
                         </h:panelGroup>-->
                         <h:panelGroup>
                             <p:selectBooleanCheckbox itemLabel="#{msg.Locked}?*" value="#{userAccountController.selected.isLocked}" required="true" requiredMessage="#{msg.isLocked} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.userTags}</label>
+                            <p:autoComplete id="tags" multiple="true" value="#{userAccountController.selected.tags}" completeMethod="#{userAccountController.autoCompleteTags}"
+                                            var="tag" itemLabel="#{tag}" itemValue="#{tag}" forceSelection="false" styleClass="user-tags" />
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>

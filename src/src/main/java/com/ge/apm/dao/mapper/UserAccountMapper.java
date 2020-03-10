@@ -76,4 +76,7 @@ public interface UserAccountMapper {
 
 	@Select("select default_lang from tenant_info where uid = (select tenant_uid from user_account where login_name = #{loginName})")
 	public String getUserLanguageByLoginName(String loginName);
+
+	@Select("select distinct tags.tag from user_tags tags inner join user_account u on tags.id = u.id where u.tenant_uid = #{tenantUid}")
+	public List<String> getTagsByTenant(String tenantUid);
 }

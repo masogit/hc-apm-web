@@ -226,6 +226,7 @@ public class CustomConfigConstant {
             allFields.put("orgPath", WebUtil.getMessage("orgPath"));
             allFields.put("assetLocation", WebUtil.getMessage("assetLocation"));
             allFields.put("UCMID", WebUtil.getMessage("UCMID"));
+            allFields.put("assetTags", WebUtil.getMessage("assetTags"));
 //        }
         return allFields;
     }
