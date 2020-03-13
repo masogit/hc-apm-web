@@ -6,6 +6,7 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -95,6 +96,9 @@ public class AssetFileImportBaseService {
 
     @Autowired
     protected I18nMessageRepository i18nDao;
+
+    @Autowired
+    public AssetTagsMapper assetTagsMapper;
 
     @Autowired
     MvsUtil mvsUtil;
