@@ -8,6 +8,7 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -166,6 +167,7 @@ public class AssetFileImportBaseService {
     protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode) {
 
         AssetInfo newAsset = (AssetInfo) item.get("asset");
+        Map<String, ExcelDocument.ValueWrapper> rowMap = (Map<String, ExcelDocument.ValueWrapper>) item.get("rowData");
 
         //if site uid not match, ignore update
         if (newAsset.getUid() != null) {
@@ -376,6 +378,8 @@ public class AssetFileImportBaseService {
         //if import status failure, already returned, will not reach here.
         assetDao.save(newAsset);
         assetDepreciationService.saveAssetDerpeciation(newAsset);
+
+        supportingService.saveOrUpdateAssetTags(newAsset, rowMap);
 
         if (UserContextService.isMVSRole()) {
             if (newAsset.getMvsEquip() == null) {

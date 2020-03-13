@@ -131,6 +131,7 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("subjectProject"), "subjectProject");
             exportFields.put(WebUtil.getMessage("createdDate"), "createdDate");
             exportFields.put(WebUtil.getMessage("proprietaryClass"), "proprietaryClass");
+            exportFields.put(WebUtil.getMessage("assetTags"), "assetTags");
 
             exportFields.put(WebUtil.getMessage("UUID"), "UUID");
 

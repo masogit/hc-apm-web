@@ -17,4 +17,7 @@ public interface AssetTagsMapper {
 
 	@Delete("delete from asset_tags tags where tags.asset_uid = #{assetUid} and tags.tag = #{tag}")
 	public int removeTag(@Param("assetUid")String assetUid, @Param("tag")String tag);
+
+	@Delete("delete from asset_tags tags where tags.asset_uid = #{assetUid}")
+	public int removeTagsForAsset(@Param("assetUid") String assetUid);
 }
