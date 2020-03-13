@@ -1,7 +1,6 @@
 package com.ge.apm.domain.pure;
 
 import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
@@ -720,6 +719,17 @@ public class AssetInfoFormatter {
 
     }
 
+    private String joinTags() {
+        List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
+        if (assetTags.isEmpty()) {
+            return null;
+        }
+
+        //use space as delimiter
+        String joinedAssetTags = String.join(" ", assetTags);
+        return joinedAssetTags;
+    }
+
     private String findMatchValue(Integer item, List<I18nMessage> msgList) {
 
         String msgKey = String.valueOf(item);
@@ -841,6 +851,7 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("createdDate"), assetInfo.getCreatedDate());
 
         map.put(WebUtil.getMessage("proprietaryClass"), this.getProprietaryClassAsString());
+        map.put(WebUtil.getMessage("assetTags"), this.joinTags());
 
         map.put(WebUtil.getMessage("UUID"), this.getUid());
 

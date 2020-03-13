@@ -19,6 +19,8 @@ import java.util.UUID;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import org.apache.commons.collections.CollectionUtils;
@@ -36,12 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SysRoleRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
-import com.ge.apm.dao.UserRoleRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -71,6 +67,7 @@ public class UserAccountExportService {
 	private static final String HEADER_ROLENAME="角色*";
 	private static final String HEADER_ACCESSSCOPE="可见范围（科室）";
 	private static final String HEADER_POSITION="职务";
+	private static final String HEADER_TAGS="标签";
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
 	private static Map<String,Integer> sysRoleMap;
@@ -112,6 +109,12 @@ public class UserAccountExportService {
 	@Autowired
 	UserRoleRepository userRoleRepository;
 
+	@Autowired
+	UserTagsMapper userTagsMapper;
+
+	@Autowired
+	UserTagsRepository userTagsDao;
+
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
 
@@ -150,6 +153,7 @@ public class UserAccountExportService {
 				tempMap.put(HEADER_ISLOCKED, tempUser.getIsLocked()?"是":"否");
 				tempMap.put(HEADER_ROLENAME, tempUser.getUserRoleNames());
 				tempMap.put(HEADER_POSITION, convertPositionIdToLabel(tempUser.getPosition()));
+				tempMap.put(HEADER_TAGS, joinTags(tempUser));
 				tempMap.put(HEADER_ACCESSSCOPE, getOrgInfoName(tempUser.getListOrgInfo()));
 				tempMap.put(HEADER_UUID, tempUser.getUid());
 				listMapResult.add(tempMap);
@@ -157,7 +161,19 @@ public class UserAccountExportService {
 		}
 		return listMapResult;
 	}
-	
+
+	/**
+	 * use space as delimiter to group tags to export
+	 * @param tempUser
+	 * @return
+	 */
+	private String joinTags(UserAccount tempUser) {
+		List<String> existingTags = userTagsMapper.getTagsByUser(tempUser.getUid());
+
+		return String.join(" ", existingTags);
+
+	}
+
 	public void supplementUserAccount(List<UserAccount> listUserAccount){
 		if(listUserAccount!=null && listUserAccount.size()>0){
 			Set<String> setUserUid=new HashSet<String>();

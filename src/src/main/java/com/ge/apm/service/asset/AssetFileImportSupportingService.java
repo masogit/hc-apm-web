@@ -331,9 +331,7 @@ public class AssetFileImportSupportingService {
 
         //merge tags
         List<String> existingTags = assetTagsMapper.getTagsByAsset(assetInfo.getUid());
-        List<String> currentTags = Arrays.stream(assetTagsJoined.split(","))
-                .filter(item -> !StringUtils.isEmpty(item))
-                .collect(Collectors.toList());
+        List<String> currentTags = separateTags(assetTagsJoined);
 
         List<String> newTags = new ArrayList<>(currentTags);
         newTags.removeAll(existingTags);
@@ -355,8 +353,18 @@ public class AssetFileImportSupportingService {
             assetTagsMapper.removeTag(assetInfo.getUid(), item);
         });
 
+    }
 
+    private List<String> separateTags(String assetTagsJoined) {
+        if (org.apache.commons.lang3.StringUtils.isEmpty(assetTagsJoined)) {
+            return Collections.emptyList();
+        }
 
+        List<String> tags = Arrays.stream(assetTagsJoined.split("[, ]"))
+                .filter(item -> !StringUtils.isEmpty(item))
+                .collect(Collectors.toList());
+
+        return tags;
     }
 
     /**
