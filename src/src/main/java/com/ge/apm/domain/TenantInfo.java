@@ -99,7 +99,7 @@ public class TenantInfo implements Serializable {
     private Integer passwordLifeTime; //密码有效天数
     
     @Column(name = "type")
-    private Integer type = 0;//0、普通租户，1、代理商租户 2、临时租户 3,zkb租户
+    private Integer type = 0;//0、普通租户，1、代理商租户 2、临时租户 3,zkb租户 4, ztb租户
 
     @Column(name = "is_insulate")
     private Boolean isInsulate;
