@@ -820,7 +820,7 @@ public class UserContextService implements Serializable {
 
     public boolean isZtbTenant() {
         TenantInfo tenantInfo = getTenantInfo();
-        return StringUtils.equals("GE智通保", tenantInfo.getName());
+        return tenantInfo.getType() == 4;
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){
