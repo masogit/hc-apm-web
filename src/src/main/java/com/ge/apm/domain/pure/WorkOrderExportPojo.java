@@ -147,16 +147,18 @@ public class WorkOrderExportPojo {
     private String evaluateStepInfo;
     //关单信息
     private String closeStepInfo;
+
+    public Double getMaintenanceValue() {
+        return maintenanceValue;
+    }
+
+    public void setMaintenanceValue(Double maintenanceValue) {
+        this.maintenanceValue = maintenanceValue;
+    }
+
     //维修价值
-    private Double maintanenceValue;
+    private Double maintenanceValue;
 
-    public Double getMaintanenceValue() {
-        return maintanenceValue;
-    }
-
-    public void setMaintanenceValue(Double maintanenceValue) {
-        this.maintanenceValue = maintanenceValue;
-    }
 
     public String getId() {
         return Id;
