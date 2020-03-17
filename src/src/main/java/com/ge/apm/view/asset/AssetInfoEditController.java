@@ -1,57 +1,10 @@
 package com.ge.apm.view.asset;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
-import com.ge.apm.service.asset.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.GbCodeRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.MvsAssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.GbCode;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.MvsAssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetTagsMapper;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.AssetCreateService;
-import com.ge.apm.service.asset.AssetDepreciationService;
-import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
-import com.ge.apm.service.asset.AssetInfoMgrService;
-import com.ge.apm.service.asset.AssetInfoService;
-import com.ge.apm.service.asset.AutoCompleteService;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.service.asset.GbCodeService;
-import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
@@ -64,10 +17,25 @@ import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -102,6 +70,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> clinicalDeptList;
     private List<UserAccount> ownerList;
     private List<I18nMessage> code68List;
+
+    private AssetTagsMapper assetTagsMapper;
+    private AssetTagsRepository assetTagsDao;
+
     @Getter
     @Setter
     private List<Supplier> supplierList = Collections.emptyList();
@@ -169,6 +141,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         mvsUtil = WebUtil.getBean(MvsUtil.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
+        assetTagsMapper = WebUtil.getBean(AssetTagsMapper.class);
+        assetTagsDao = WebUtil.getBean(AssetTagsRepository.class);
+
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
 
@@ -189,6 +164,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             prepareEdit();
             beforeEdit();
             assetLifecyleStatus = selected.getStatus();
+
+            List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
+            this.selected.setTags(existingTags);
         }
         if(selected ==null){
             try {
@@ -551,8 +529,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-        int status = selected.getStatus();
+
         this.save();
+
+        // do other stuff after save
+        int status = selected.getStatus();
         if(status != assetLifecyleStatus){
             assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,UserContextService.getCurrentUserAccount());
         }
@@ -563,11 +544,40 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
 
+        saveOrUpdateAssetTags();
+
         if (resultStatus) {
             return getListPageLink();
         } else {
             return "";
         }
+    }
+
+    private void saveOrUpdateAssetTags() {
+
+        List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
+        List<String> currentTags = this.selected.getTags();
+
+        List<String> newTags = new ArrayList<>(currentTags);
+        newTags.removeAll(existingTags);
+
+        List<String> removeTags = new ArrayList<>(existingTags);
+        removeTags.removeAll(currentTags);
+
+        //add new tags
+        newTags.stream().distinct().forEach(item -> {
+            AssetTags assetTags = new AssetTags();
+            assetTags.setAssetUid(this.selected.getUid());
+            assetTags.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+            assetTags.setTag(item);
+            assetTagsDao.save(assetTags);
+        });
+
+        //remove useless tags
+        removeTags.stream().distinct().forEach(item -> {
+            assetTagsMapper.removeTag(this.selected.getUid(), item);
+        });
+
     }
 
     public String getListPageLink() {
@@ -1136,6 +1146,23 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         changeSelect(createTpye);
 
+    }
+
+    public List<String> autoCompleteTags(String query) {
+
+        List<String> tags = assetTagsMapper.getTagsByTenant(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        if (org.springframework.util.StringUtils.isEmpty(query)) {
+            return tags;
+        }
+
+        tags = tags.stream().filter(tag -> tag.contains(query)).collect(Collectors.toList());
+
+        if (tags.isEmpty()) {
+            tags.add(query);
+        }
+
+        return tags;
     }
 
 }

@@ -46,6 +46,8 @@ public class UserAccount implements ChineseName, Serializable {
 	public static final int SALT_SIZE = 8;
 	public static final int LI_XIANG = -1;
 
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
@@ -262,6 +264,9 @@ public class UserAccount implements ChineseName, Serializable {
 	private Boolean isDeleted;//是否删除
 
 	@Transient
+	private List<String> tags = new ArrayList<>();
+
+	@Transient
 	private Integer excelIdex;
 
 	@Transient
@@ -290,6 +295,8 @@ public class UserAccount implements ChineseName, Serializable {
 	
 	@Transient
 	private boolean isGeSSO=false;
+
+
 
 	@PrePersist
 	public void initializeUid() {
@@ -1105,5 +1112,17 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setPosition(String position) {
 		this.position = position;
+	}
+
+	public List<String> getTags() {
+		if (null == tags) {
+			return Collections.emptyList();
+		} else {
+			return tags;
+		}
+	}
+
+	public void setTags(List<String> tags) {
+		this.tags = tags;
 	}
 }

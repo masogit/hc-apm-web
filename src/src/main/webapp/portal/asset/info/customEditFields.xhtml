@@ -765,4 +765,12 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetTags')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetTags}</label>
+            <p:autoComplete id="tags" multiple="true" value="#{assetInfoEditController.selected.tags}" completeMethod="#{assetInfoEditController.autoCompleteTags}"
+                            var="tag" itemLabel="#{tag}" itemValue="#{tag}" forceSelection="false" styleClass="asset-tags"/>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>
