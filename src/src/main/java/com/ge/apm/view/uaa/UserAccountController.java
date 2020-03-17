@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.UserAccountMapper;
+import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.view.sysutil.UserInfo;
@@ -77,6 +79,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     UserOrgInfoRepository userOrgInfoRepository;
     UserAccountRepository dao = null;
+    UserAccountMapper userAccountMapper;
+    UserTagsMapper userTagsMapper;
+    UserTagsRepository userTagsDao;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
 
     private String tenantUid;
@@ -129,10 +134,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userOrgInfoRepository= WebUtil.getBean(UserOrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(UserAccountRepository.class);
+        userAccountMapper = WebUtil.getBean(UserAccountMapper.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         userAccountService = WebUtil.getBean(UserAccountService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        userTagsDao = WebUtil.getBean(UserTagsRepository.class);
+        userTagsMapper = WebUtil.getBean(UserTagsMapper.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
 
@@ -311,6 +319,20 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Override
     public String getKeyFieldNameValue(UserAccount obj) {
         return WebUtil.getMessage("login_name") + "=" + obj.getLoginName();
+    }
+
+    @Override
+    public void setSelected(UserAccount selectedObj) {
+        if (selectedObj == null) {
+            return;
+        }
+
+        this.selected = selectedObj;
+
+        //fetch tags before display
+        List<String> existingTags = userTagsMapper.getTagsByUser(this.selected.getUid());
+        this.selected.setTags(existingTags);
+
     }
 
     private List<String> allRoles;
@@ -642,6 +664,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
             }
             super.save();
+
+            saveTags();
+
             if (this.crudActionName.equals("Create")) {
                 updateUserRole(loginUser.getType());
             }
@@ -650,6 +675,31 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
 
+    }
+
+    private void saveTags() {
+        List<String> existingTags = userTagsMapper.getTagsByUser(this.selected.getUid());
+        List<String> currentTags = this.selected.getTags();
+
+        List<String> newTags = new ArrayList<>(currentTags);
+        newTags.removeAll(existingTags);
+
+        List<String> removeTags = new ArrayList<>(existingTags);
+        removeTags.removeAll(currentTags);
+
+        //add new tags
+        newTags.stream().distinct().forEach(item -> {
+            UserTags tags = new UserTags();
+            tags.setUserUid(this.selected.getUid());
+            tags.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+            tags.setTag(item);
+            userTagsDao.save(tags);
+        });
+
+        //remove useless tags
+        removeTags.stream().distinct().forEach(item -> {
+            userTagsMapper.removeTag(this.selected.getUid(), item);
+        });
     }
 
     @Transactional
@@ -1167,5 +1217,22 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setShowButton(boolean showButton) {
         isShowButton = showButton;
+    }
+
+    public List<String> autoCompleteTags(String query) {
+
+        List<String> tags = userTagsMapper.getTagsByTenant(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        if (StringUtils.isEmpty(query)) {
+            return tags;
+        }
+
+        tags = tags.stream().filter(tag -> tag.contains(query)).collect(Collectors.toList());
+
+        if (tags.isEmpty()) {
+            tags.add(query);
+        }
+
+        return tags;
     }
 }

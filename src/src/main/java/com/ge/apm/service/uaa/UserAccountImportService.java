@@ -2,26 +2,17 @@ package com.ge.apm.service.uaa;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -36,15 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SysRoleRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
-import com.ge.apm.dao.UserRoleRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
-import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -72,6 +56,7 @@ public class UserAccountImportService {
 	private static final String HEADER_ROLENAME="角色*";
 	private static final String HEADER_ACCESSSCOPE="可见范围（科室）";
 	private static final String HEADER_POSITION="职务";
+	private static final String HEADER_TAGS="标签";
 	private static final String HEADER_PASSWORD="初始密码";
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
@@ -115,6 +100,12 @@ public class UserAccountImportService {
 	
 	@Autowired
 	UserRoleRepository userRoleRepository;
+
+	@Autowired
+	UserTagsMapper userTagsMapper;
+
+	@Autowired
+	UserTagsRepository userTagsDao;
 
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
@@ -750,6 +741,7 @@ public class UserAccountImportService {
 		String roleName;
 		String accessScope;
 		String position;
+		String tagsJoined;
 		String password;
 		String UUID;
 
@@ -768,6 +760,7 @@ public class UserAccountImportService {
 		int rolenameIndex=header.get(HEADER_ROLENAME);
 		int accessScopeIndex=header.get(HEADER_ACCESSSCOPE);
 		int positionIndex=header.get(HEADER_POSITION);
+		int tagsIndex=header.get(HEADER_TAGS);
 		Integer passwordIndex=header.get(HEADER_PASSWORD);
 		int uuidIndex=header.get(HEADER_UUID);
 
@@ -825,6 +818,8 @@ public class UserAccountImportService {
 
 				position=ExcelParser.getCellStringValue(row, positionIndex);
 
+				tagsJoined=ExcelParser.getCellStringValue(row, tagsIndex);
+
 				if (passwordIndex != null) {
 					password = ExcelParser.getCellStringValue(row, passwordIndex);
 				} else {
@@ -864,6 +859,7 @@ public class UserAccountImportService {
 				newUser.setAccessScope(accessScope);
 				newUser.setImportRoleNames(roleName);
 				newUser.setPosition(getPositionKey(position));
+				newUser.setTags(separateTags(tagsJoined));
 
 				//handle password
 				if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(password.trim())) {
@@ -948,7 +944,20 @@ public class UserAccountImportService {
 		addWarnMessage();
 		return importFailedDataList;
 	}
-	
+
+	private List<String> separateTags(String tagsJoined) {
+		if (StringUtils.isEmpty(tagsJoined)) {
+			return Collections.emptyList();
+		}
+
+		// use space or comma as delimiter
+		List<String> tags = Arrays.stream(tagsJoined.split("[, ]"))
+				.filter(item -> !StringUtils.isEmpty(item))
+				.map(item -> item.trim())
+				.collect(Collectors.toList());
+		return tags;
+	}
+
 	private void addWarnMessage(){
 		FacesMessage message=null;
 		message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败！");
@@ -979,11 +988,41 @@ public class UserAccountImportService {
 			userAccountRepository.save(user);
 			saveUserRole(user,true);
 			saveUserOrgInfo(user, true);
+
+			// need user uid to save
+			saveOrUpdateTags(user);
+
 		} catch (Exception e) {
 			logger.error("create user error : {}", e.getMessage());
 		}
 	}
-	
+
+	private void saveOrUpdateTags(UserAccount user) {
+		List<String> existingTags = userTagsMapper.getTagsByUser(user.getUid());
+		List<String> currentTags = user.getTags();
+
+		List<String> newTags = new ArrayList<>(currentTags);
+		newTags.removeAll(existingTags);
+
+		List<String> removeTags = new ArrayList<>(existingTags);
+		removeTags.removeAll(currentTags);
+
+		//add new tags
+		newTags.stream().distinct().forEach(item -> {
+			UserTags tags = new UserTags();
+			tags.setUserUid(user.getUid());
+			tags.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+			tags.setTag(item);
+			userTagsDao.save(tags);
+		});
+
+		//remove useless tags
+		removeTags.stream().distinct().forEach(item -> {
+			userTagsMapper.removeTag(user.getUid(), item);
+		});
+
+	}
+
 	private void deleteUserRole(UserAccount user){
 		List<UserRole> listUserRole=user.getUserRoleList();
 		if(listUserRole!=null && listUserRole.size()>0 && user.getListImportUserRole()!=null && user.getListImportUserRole().size()>0){
@@ -1035,6 +1074,10 @@ public class UserAccountImportService {
 			userAccountMapper.updateUserAccount(user);
 			saveUserRole(user,false);
 			saveUserOrgInfo(user,false);
+
+			// need user uid to save tags
+			saveOrUpdateTags(user);
+
 		} catch (Exception e) {
 			logger.error("update user error : {}", e.getMessage());
 		}

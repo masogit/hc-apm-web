@@ -557,6 +557,21 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private Supplier supplier;
+
+    @Transient
+    private List<String> tags = new ArrayList<>();
+
+    public List<String> getTags() {
+        if (tags == null) {
+            return Collections.emptyList();
+        } else {
+            return tags;
+        }
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
     
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
 		return sharedAssetReqDetailList;

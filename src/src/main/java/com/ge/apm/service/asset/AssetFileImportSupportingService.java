@@ -1,6 +1,7 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoBuilder;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -10,11 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AssetFileImportSupportingService {
@@ -41,6 +41,11 @@ public class AssetFileImportSupportingService {
     @Autowired
     private QrCodeService qrCodeService;
 
+    @Autowired
+    private AssetTagsMapper assetTagsMapper;
+
+    @Autowired
+    private AssetTagsRepository assetTagsDao;
 
     @Transactional
     public OrgInfo importOrgIfNeeded(OrgInfo selectedOrgToImport, String name) {
@@ -310,6 +315,56 @@ public class AssetFileImportSupportingService {
 
             cleanRelatedFieldsWhenUpdating(asset);
         }
+    }
+
+    public void saveOrUpdateAssetTags(AssetInfo assetInfo, Map<String, ExcelDocument.ValueWrapper> rowMap) {
+        String assetTagsJoined = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("assetTags")));
+        if (StringUtils.isEmpty(assetTagsJoined)) {
+            //if excel content is empty, keep the tags in db
+            return;
+        }
+
+        if (AssetRow.DELETE_MARK.equalsIgnoreCase(assetTagsJoined)) {
+            assetTagsMapper.removeTagsForAsset(assetInfo.getUid());
+            return;
+        }
+
+        //merge tags
+        List<String> existingTags = assetTagsMapper.getTagsByAsset(assetInfo.getUid());
+        List<String> currentTags = separateTags(assetTagsJoined);
+
+        List<String> newTags = new ArrayList<>(currentTags);
+        newTags.removeAll(existingTags);
+
+        List<String> removeTags = new ArrayList<>(existingTags);
+        removeTags.removeAll(currentTags);
+
+        //add new tags
+        newTags.stream().distinct().forEach(item -> {
+            AssetTags assetTags = new AssetTags();
+            assetTags.setAssetUid(assetInfo.getUid());
+            assetTags.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+            assetTags.setTag(item);
+            assetTagsDao.save(assetTags);
+        });
+
+        //remove useless tags
+        removeTags.stream().distinct().forEach(item -> {
+            assetTagsMapper.removeTag(assetInfo.getUid(), item);
+        });
+
+    }
+
+    private List<String> separateTags(String assetTagsJoined) {
+        if (org.apache.commons.lang3.StringUtils.isEmpty(assetTagsJoined)) {
+            return Collections.emptyList();
+        }
+
+        List<String> tags = Arrays.stream(assetTagsJoined.split("[, ]"))
+                .filter(item -> !StringUtils.isEmpty(item))
+                .collect(Collectors.toList());
+
+        return tags;
     }
 
     /**
