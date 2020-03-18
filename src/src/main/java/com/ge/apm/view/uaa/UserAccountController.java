@@ -1,5 +1,54 @@
 package com.ge.apm.view.uaa;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.UserAccountMapper;
+import com.ge.apm.dao.mapper.UserTagsMapper;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.security.UserDetailsServiceImpl;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.uaa.UserAccountExportService;
+import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.service.utils.*;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import webapp.framework.context.LocaleHolder;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.JpaCRUDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.PhaseId;
+import javax.faces.event.ValueChangeEvent;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
@@ -7,58 +56,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
-import javax.faces.event.ValueChangeEvent;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.ge.apm.dao.*;
-import com.ge.apm.dao.mapper.UserAccountMapper;
-import com.ge.apm.dao.mapper.UserTagsMapper;
-import com.ge.apm.domain.*;
-import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
-import com.ge.apm.view.sysutil.UserInfo;
-import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.NodeUnselectEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.service.common.UserCommonService;
-import com.ge.apm.service.orginfo.OrgInfoTreeService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.uaa.UserAccountExportService;
-import com.ge.apm.service.uaa.UserAccountService;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.service.utils.PasswordUtil;
-import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.utils.TreeNodeUtil;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
-import javax.faces.event.AjaxBehaviorEvent;
-import org.primefaces.event.SelectEvent;
-
-import org.springframework.util.StringUtils;
-import webapp.framework.context.LocaleHolder;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.TimeUtil;
-import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.JpaCRUDController;
 
 @ManagedBean
 @ViewScoped
@@ -83,6 +80,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     UserTagsMapper userTagsMapper;
     UserTagsRepository userTagsDao;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
+    UserDetailsService userDetailsService;
 
     private String tenantUid;
 
@@ -151,7 +149,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         protocol = jsonTemplateRepository.findByType(3);
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
-
+        userDetailsService = WebUtil.getBean(UserDetailsServiceImpl.class);
 
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             //if current user belongs to test tenant, then use the first tenant in non test tenant list
@@ -1084,8 +1082,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void loginAs() {
         if(this.selected==null) return;
 
-        UserContextService.setLoginUser(this.selected);
-
         //call microServices to get Access Token...
         try{
             ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
@@ -1094,11 +1090,25 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
             String accessToken = msUtil.getAuthenticateByUserPasswordEncrypted(selected.getLoginName(), selected.getPassword(),request.getHeader("User-Agent"));
             request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+
+            //make sure microservice works before apm web
+            UserContextService.setLoginUser(this.selected);
+
+            attemptSwitchUserInSpringSecurityContext(this.selected);
+
         }catch(Exception e){
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-    
+
+    private void attemptSwitchUserInSpringSecurityContext(UserAccount loginAsUser) {
+        UserDetails targetUser = userDetailsService.loadUserByUsername(loginAsUser.getLoginName());
+
+        Collection<? extends GrantedAuthority> auths = targetUser.getAuthorities();
+        UsernamePasswordAuthenticationToken targetUserRequest = new UsernamePasswordAuthenticationToken(targetUser, targetUser.getPassword(), auths);
+        SecurityContextHolder.getContext().setAuthentication(targetUserRequest);
+    }
+
     public void exportAll(){
     	generateListSearchFilter();
     	List<UserAccount> listUserAccount=dao.findBySearchFilter(searchFilters);
