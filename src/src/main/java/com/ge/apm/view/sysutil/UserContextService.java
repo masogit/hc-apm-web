@@ -991,4 +991,14 @@ public class UserContextService implements Serializable {
 
         return Boolean.FALSE;
     }
+
+    public boolean isNinth(){
+        TenantInfo currentTenantInfo = this.getCurrentUserTenantInfo();
+
+        if(currentTenantInfo.getName().contains("九") || currentTenantInfo.getId() == 112){
+            return Boolean.TRUE;
+        }
+
+        return Boolean.FALSE;
+    }
 }
