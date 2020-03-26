@@ -44,8 +44,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     private Boolean supplierT =false;
 
     private String supplierType;
-    private List<UserAccount> tempStaffList;
-    private List<UserAccount> approvedUserList;
+    private List<SupplierUser> approvedUserList;
     private List<SupplierUser> pendingApprovalUserList;
 
     @Override
@@ -278,8 +277,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     }
 
     public void initSupplierUser(){
-        tempStaffList = supplierService.getTempStaffList(this.selected.getTenantUID());
-        approvedUserList = supplierService.getApprovedUserList(this.selected.getId());
+        approvedUserList = supplierService.getSupplierUserList(this.selected.getId(), SupplierUser.Status.Approved.name());
         pendingApprovalUserList = supplierService.getSupplierUserList(this.selected.getId(), SupplierUser.Status.PendingApproval.name());
     }
 
@@ -291,10 +289,6 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     public void onRefuse(SupplierUser supplierUser){
         supplierService.refuse(supplierUser);
         initSupplierUser();
-    }
-
-    public void saveSupplierUserList(){
-        supplierService.updateSupplierUserList(this.selected, this.approvedUserList);
     }
 
     public String getSupplierType() {
@@ -329,14 +323,6 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         this.supplierT = supplierT;
     }
 
-    public List<UserAccount> getTempStaffList() {
-        return tempStaffList;
-    }
-
-    public void setTempStaffList(List<UserAccount> tempStaffList) {
-        this.tempStaffList = tempStaffList;
-    }
-
     public List<SupplierUser> getPendingApprovalUserList() {
         return pendingApprovalUserList;
     }
@@ -345,11 +331,11 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         this.pendingApprovalUserList = pendingApprovalUserList;
     }
 
-    public List<UserAccount> getApprovedUserList() {
+    public List<SupplierUser> getApprovedUserList() {
         return approvedUserList;
     }
 
-    public void setApprovedUserList(List<UserAccount> approvedUserList) {
+    public void setApprovedUserList(List<SupplierUser> approvedUserList) {
         this.approvedUserList = approvedUserList;
     }
 
