@@ -135,6 +135,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
 	public OrgInfo findFirstByParentUIDAndNameAndUidIsNot(String parentUid, String name, String uid);
 
+	public OrgInfo findFirstByTenantUIDAndHospitalUcmid(String tenantUID, String hospitalUcmid);
+
 	public int countByParentUIDAndUidIsNot(String parentUid, String uid);
 
 	public int countByParentUIDAndOrgType(String parentUid, int orgType);

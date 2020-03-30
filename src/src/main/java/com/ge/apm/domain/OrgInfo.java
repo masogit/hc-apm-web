@@ -135,6 +135,9 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "asset_owner_id2")
     private Integer assetOwnerId2;
 
+    @Column(name = "hospital_ucmid")
+    private String hospitalUcmid;
+
     public OrgInfo() {
     }
 
@@ -405,6 +408,14 @@ public class OrgInfo implements Serializable, ChineseName {
         this.shortName = shortName;
         this.shortNamePyCode = shortName == null ? null : PinyinUtil.getShortPinyin(shortName).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
 
+    }
+
+    public String getHospitalUcmid() {
+        return hospitalUcmid;
+    }
+
+    public void setHospitalUcmid(String hospitalUcmid) {
+        this.hospitalUcmid = hospitalUcmid;
     }
 
     public String getShortNamePyCode() {
