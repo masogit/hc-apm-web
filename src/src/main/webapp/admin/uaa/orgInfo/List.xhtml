@@ -97,7 +97,7 @@
                                     <br/>
                                     <h:panelGroup rendered="#{orgInfoController.isShow}">
                                         <label class="label">#{msg.hospitalUcmid}</label>
-                                        <p:inputText id="hospitalUcmid" value="#{orgInfoController.hospitalUcmid}" required="true" requiredMessage="#{msg.hospitalUcmid} #{msg.ValidationRequire}">
+                                        <p:inputText id="hospitalUcmid" value="#{orgInfoController.hospitalUcmid}" required="false" requiredMessage="#{msg.hospitalUcmid} #{msg.ValidationRequire}">
                                             <p:ajax listener="#{orgInfoController.checkHospitalUcmid()}" process="@this"  update=":growl" ></p:ajax>
                                         </p:inputText>
                                     </h:panelGroup>
