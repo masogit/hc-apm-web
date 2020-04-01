@@ -82,10 +82,15 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     SXSSFSheet dynamicListSheet;
     SXSSFSheet staticListSheet;
 
+    //if cross site is true clinical dept is useless.
+    boolean crossSite;
+
 //    int siteId;
 
-    public AssetFileDynamicTemplate() throws IOException {
+    public AssetFileDynamicTemplate(boolean crossSite) throws IOException {
 //        this.siteId = siteId;
+
+        this.crossSite = crossSite;
 
         WebApplicationContext webAppContext = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance());
 
@@ -146,8 +151,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         createFunctionTypeSecondaryLevel();
 
-        createFormulaForExistingDropdown(WebUtil.getMessage("clinicalDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
-        createFormulaForExistingDropdown( WebUtil.getMessage("assetDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+        if (!crossSite) {
+            createFormulaForExistingDropdown(WebUtil.getMessage("clinicalDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+            createFormulaForExistingDropdown( WebUtil.getMessage("assetDeptId"), "OFFSET('Org List'!$A$5,0,0,COUNTA('Org List'!$A:$A) - 2, 1)");
+        }
+
     }
 
     private void createDynamicList() {
@@ -398,7 +406,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         int startRow = EXCEL_ASSET_DATA_ROW;
         for (AssetInfo assetInfo: assetList) {
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap();
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite);
 
             writer.writeRowData(startRow, rowMap);
 

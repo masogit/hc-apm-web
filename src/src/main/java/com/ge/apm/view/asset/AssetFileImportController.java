@@ -10,13 +10,14 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
-import com.ge.apm.service.common.CustomConfigConstant;
+import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +29,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,6 +55,9 @@ public class AssetFileImportController {
     private AssetFileExportService exportService;
 
     private AssetFileImportStreamingService streamingService;
+
+    private OrgInfoLocalCacheService orgInfoLocalCacheService;
+
     private CustomConfigService ccService;
 
     private UaaService uaaService;
@@ -76,13 +81,22 @@ public class AssetFileImportController {
 
     private boolean displayErrorsOnly;
 
+    private int activeTabIndex;
+
+    private Map<String, OrgInfo> orgNamesUriCache;
+
+    private boolean crossSite;
+
     @PostConstruct
     protected void init() {
         exportService = WebUtil.getBean(AssetFileExportService.class);
         streamingService = WebUtil.getBean(AssetFileImportStreamingService.class);
+        orgInfoLocalCacheService = WebUtil.getBean(OrgInfoLocalCacheService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
+
+        orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
 
         initOrgTree();
 
@@ -97,6 +111,26 @@ public class AssetFileImportController {
 
         this.file = event.getFile();
 
+        crossSite = false;
+
+        uploadAssetFile(selectedOrg);
+    }
+
+    public void uploadCrossSiteDataFile(FileUploadEvent event) {
+        this.file = event.getFile();
+
+        //need tenant org to get workflow
+        OrgInfo tenantOrg = orgDao.findFirstByTenantUIDAndOrgType(UserContextService.getCurrentUserAccount().getTenantUID(), 0);
+
+        crossSite = true;
+
+        uploadAssetFile(tenantOrg);
+
+    }
+
+    public void uploadAssetFile(OrgInfo siteOrg) {
+
+        streamingService.setSelectedOrgToImport(siteOrg);
 
         try (ExcelDocumentStreamingReader assetDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
              ExcelDocumentStreamingReader orgDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, null, null))
@@ -107,7 +141,7 @@ public class AssetFileImportController {
                 return;
             }
 
-            importAssetMap = streamingService.getAssetMapFromTemplate(assetDoc);
+            importAssetMap = streamingService.getAssetMapFromTemplate(assetDoc, orgNamesUriCache);
 
             if(importAssetMap.size() > 5000){
                 WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
@@ -116,7 +150,7 @@ public class AssetFileImportController {
 
             importOrgMap = streamingService.getOrgInfoMapFromTemplate(orgDoc);
 
-            
+
             canbeImported = streamingService.checkData(importOrgMap, importAssetMap);
 
             filterErrorRecords();
@@ -131,9 +165,10 @@ public class AssetFileImportController {
         }
     }
 
+
     public void importData() {
         try {
-            streamingService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
+            streamingService.importData(importOrgMap, importAssetMap, autoGenerateQrcode, crossSite);
             isImported = true;
 
             filterErrorRecords();
@@ -148,6 +183,7 @@ public class AssetFileImportController {
     }
 
     public void exportAssetExcelTemplate() throws IOException {
+
         CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         //field name using english
         List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
@@ -157,7 +193,7 @@ public class AssetFileImportController {
 
         List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
 
-        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate();
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(false);
         template.exportSampleAsset(orgList, exportFields);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         if(userContextService.isLocale()){
@@ -165,6 +201,36 @@ public class AssetFileImportController {
         }else{
             assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
         }
+    }
+
+    public void exportCrossSiteAssetExcelTemplate() throws IOException {
+        CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        //field name using english
+        List<String> exportFields = ccService.getLocalizedExportableAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        insertCrossSiteColumns(exportFields);
+
+        List<OrgInfo> orgList = orgDao.findBySiteUIDAndOrgType(UserContextService.getCurrentUserAccount().getSiteUID(), 4);
+
+        AssetFileDynamicTemplate template = new AssetFileDynamicTemplate(true);
+        template.exportSampleAsset(orgList, exportFields);
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        if(userContextService.isLocale()){
+            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template.xlsx");
+        }else{
+            assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
+        }
+    }
+
+    private void insertCrossSiteColumns(List<String> exportFields) {
+        List<String> crossSiteColumns = new ArrayList<>();
+        crossSiteColumns.add(WebUtil.getMessage("Institution"));
+        crossSiteColumns.add(WebUtil.getMessage("Hospital"));
+
+        String siteColumn = WebUtil.getMessage("Site");
+        int siteIndex = exportFields.indexOf(siteColumn);
+        exportFields.addAll(siteIndex, crossSiteColumns);
+
     }
 
     public void downloadImportFailureData() {
@@ -235,11 +301,6 @@ public class AssetFileImportController {
             selectedOrg = orgInfo;
         }
 
-        if (selectedOrg != null) {
-//            aiService.setSelectedOrgToImport(selectedOrg);
-            streamingService.setSelectedOrgToImport(selectedOrg);
-        }
-
     }
 
     public void switchAssetCheckStatus(AjaxBehaviorEvent event) {
@@ -308,6 +369,9 @@ public class AssetFileImportController {
             return importOrgMap;
         }
 
+    }
+
+    public void onTabChange(TabChangeEvent event) {
     }
 
     public List<Map<String, Object>> getImportOrgMap() {
@@ -408,5 +472,13 @@ public class AssetFileImportController {
 
     public void setAssetTemplateFile(StreamedContent assetTemplateFile) {
         this.assetTemplateFile = assetTemplateFile;
+    }
+
+    public int getActiveTabIndex() {
+        return activeTabIndex;
+    }
+
+    public void setActiveTabIndex(int activeTabIndex) {
+        this.activeTabIndex = activeTabIndex;
     }
 }

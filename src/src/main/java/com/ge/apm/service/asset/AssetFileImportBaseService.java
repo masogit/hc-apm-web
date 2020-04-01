@@ -128,20 +128,23 @@ public class AssetFileImportBaseService {
 
 
     public void importData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,
-                           Boolean autoGenerateQrcode, Boolean isGeneratePmOrder) {
+                           Boolean autoGenerateQrcode, boolean crossSite) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
-        importOrgMap.forEach(item -> {
-            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-            OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
+        if (!crossSite) {
+            //if import all cross site, the dept is useless
+            importOrgMap.forEach(item -> {
+                OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+                OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
 
-            if (orgInfo == null) {
-                supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getName());
-            }
+                if (orgInfo == null) {
+                    supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getName());
+                }
 
-            item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
-        });
+                item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
+            });
+        }
 
         int row = 0;
         try {
@@ -173,13 +176,13 @@ public class AssetFileImportBaseService {
         AssetInfo newAsset = (AssetInfo) item.get("asset");
         Map<String, ExcelDocument.ValueWrapper> rowMap = (Map<String, ExcelDocument.ValueWrapper>) item.get("rowData");
 
-        //if site uid not match, ignore update
-        if (newAsset.getUid() != null) {
-            if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
-                return ;
-            }
-
-        }
+//        //if site uid not match, ignore update
+//        if (newAsset.getUid() != null) {
+//            if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
+//                return ;
+//            }
+//
+//        }
 
         AssetRow.clearErrMessage(item);
 
