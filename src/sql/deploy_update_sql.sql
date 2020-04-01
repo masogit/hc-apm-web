@@ -509,3 +509,11 @@ insert into asset_alert_config(id, config_type, create_date, lower_limit, upper_
 is_notify_fe, is_notify_ole, is_notify_sales, label, mute_period, pad_message, unit_of_measure, valid_values, wechat_message, is_enabled, ole_config)
 values ('21d87039ea3e45pet68f843e9b008629', 512, now(), 90, null, 6, 5, true, true, true, false, true, '校正源寿命', 10080, null,
 'M', null, '为保证PET图像质量，请您每天完成Daily QA质量控制，谢谢！', true, false);
+
+insert into asset_alert_config(id, config_type, create_date, lower_limit, upper_limit, check_type, device_type, is_default, is_notify_customer,
+is_notify_fe, is_notify_ole, is_notify_sales, label, mute_period, pad_message, unit_of_measure, valid_values, wechat_message, is_enabled, ole_config)
+values ('21d87039ea3e45cca68f843e9b295222', 601, now(), null, null, 7, 6, true, true, true, false, true, 'Body Contour', 0, null,
+null, 'ff0000', '身体轮廓线装置（Body Contour）状态异常，请您检查探头和机架确认没有异物遮挡，并测试身体轮廓线装置功能是否正常，若有进一步问题请与GE400热线联系。', true, false);
+
+update asset_alert_config set message_delay = false;
+update asset_alert_config set message_delay = true where config_type in ('101','102','113','105','115','153','403','405');
