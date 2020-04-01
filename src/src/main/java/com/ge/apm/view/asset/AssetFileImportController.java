@@ -83,7 +83,7 @@ public class AssetFileImportController {
 
     private int activeTabIndex;
 
-    private Map<String, OrgInfo> orgNamesUriCache;
+//    private Map<String, OrgInfo> orgNamesUriCache;
 
     private boolean crossSite;
 
@@ -95,8 +95,6 @@ public class AssetFileImportController {
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
-
-        orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
 
         initOrgTree();
 
@@ -113,7 +111,7 @@ public class AssetFileImportController {
 
         crossSite = false;
 
-        uploadAssetFile(selectedOrg);
+        uploadAssetFile(selectedOrg, crossSite);
     }
 
     public void uploadCrossSiteDataFile(FileUploadEvent event) {
@@ -124,13 +122,13 @@ public class AssetFileImportController {
 
         crossSite = true;
 
-        uploadAssetFile(tenantOrg);
+        uploadAssetFile(tenantOrg, crossSite);
 
     }
 
-    public void uploadAssetFile(OrgInfo siteOrg) {
+    public void uploadAssetFile(OrgInfo siteOrg, boolean crossSite) {
 
-        streamingService.setSelectedOrgToImport(siteOrg);
+        streamingService.setSelectedOrgToImport(siteOrg, crossSite);
 
         try (ExcelDocumentStreamingReader assetDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
              ExcelDocumentStreamingReader orgDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, null, null))
@@ -141,6 +139,7 @@ public class AssetFileImportController {
                 return;
             }
 
+            Map<String, OrgInfo> orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
             importAssetMap = streamingService.getAssetMapFromTemplate(assetDoc, orgNamesUriCache);
 
             if(importAssetMap.size() > 5000){
@@ -149,7 +148,6 @@ public class AssetFileImportController {
             }
 
             importOrgMap = streamingService.getOrgInfoMapFromTemplate(orgDoc);
-
 
             canbeImported = streamingService.checkData(importOrgMap, importAssetMap);
 
@@ -168,7 +166,13 @@ public class AssetFileImportController {
 
     public void importData() {
         try {
-            streamingService.importData(importOrgMap, importAssetMap, autoGenerateQrcode, crossSite);
+            if (!crossSite) {
+                //if cross site import, org list excel sheet is useless, no need to import org
+                streamingService.importOrgData(importOrgMap);
+            }
+
+            Map<String, OrgInfo> orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
+            streamingService.importAssetData(importAssetMap, autoGenerateQrcode, orgNamesUriCache);
             isImported = true;
 
             filterErrorRecords();
