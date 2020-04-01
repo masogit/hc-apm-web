@@ -4,6 +4,8 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.orginfo.OrgInfoBuilder;
+import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
+import com.ge.apm.service.orginfo.SiteOrgWithDeptOrg;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,9 @@ public class AssetFileImportSupportingService {
 
     @Autowired
     private AssetTagsRepository assetTagsDao;
+
+    @Autowired
+    private OrgInfoLocalCacheService orgInfoLocalCacheService;
 
     @Transactional
     public OrgInfo importOrgIfNeeded(OrgInfo selectedOrgToImport, String name) {
@@ -392,38 +397,38 @@ public class AssetFileImportSupportingService {
         return true;
     }
 
-    public void releaseOldQRCodeInUse(OrgInfo selectedOrgToImport, List<Map<String, Object>> importAssetMap) {
-
-        importAssetMap.forEach(item -> {
-            AssetInfo newAsset = (AssetInfo) item.get("asset");
-
-            //if site uid not match, ignore update
-            if (newAsset.getUid() != null) {
-                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
-                    return ;
-                }
-
-            }
-
-            String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
-            if (StringUtils.isEmpty(oldQrCode)) return;
-            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
-
-            boolean releaseable = true;
-            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
-                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
-                if (!exists) {
-                    releaseable = false;
-                }
-            }
-
-            if (releaseable) {
-                qrCodeService.releaseQrCode(oldQrCode, selectedOrgToImport.getUid());
-            }
-
-        });
-
-    }
+//    public void releaseOldQRCodeInUse(OrgInfo selectedOrgToImport, List<Map<String, Object>> importAssetMap) {
+//
+//        importAssetMap.forEach(item -> {
+//            AssetInfo newAsset = (AssetInfo) item.get("asset");
+//
+//            //if site uid not match, ignore update
+//            if (newAsset.getUid() != null) {
+//                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
+//                    return ;
+//                }
+//
+//            }
+//
+//            String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
+//            if (StringUtils.isEmpty(oldQrCode)) return;
+//            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
+//
+//            boolean releaseable = true;
+//            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+//                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+//                if (!exists) {
+//                    releaseable = false;
+//                }
+//            }
+//
+//            if (releaseable) {
+//                qrCodeService.releaseQrCode(oldQrCode, selectedOrgToImport.getUid());
+//            }
+//
+//        });
+//
+//    }
 
     /**
      * release qrcode only one asset
@@ -462,7 +467,7 @@ public class AssetFileImportSupportingService {
 
     public void setAssetDeptId(AssetInfo assetInfo, OrgInfo selectedOrgToImport, Map<String, Object> item) {
         Map< String, Object> rowMap = (Map<String, Object>) item.get("rowData");
-        String assetDeptName = ExcelDocument.getCellStringValue(rowMap.get("使用科室"));
+        String assetDeptName = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("assetDeptId")));
         if (!StringUtils.isEmpty(assetDeptName)) {
             OrgInfo orgInfo = importOrgIfNeeded(selectedOrgToImport, assetDeptName);
             if (orgInfo != null) {
@@ -472,15 +477,28 @@ public class AssetFileImportSupportingService {
         }
     }
 
-    public String tryFormatQrCodeIfPossible(Map<String, ExcelDocument.ValueWrapper> rowMap, AssetInfo assetInfo) {
-        String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
-        if (!StringUtils.isEmpty(inputQrcode) && inputQrcode.length() > 16) {
-            inputQrcode = inputQrcode.replace("-", "");
-        }
+//    public String tryFormatQrCodeIfPossible(Map<String, ExcelDocument.ValueWrapper> rowMap, AssetInfo assetInfo) {
+//        String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
+//        if (!StringUtils.isEmpty(inputQrcode) && inputQrcode.length() > 16) {
+//            inputQrcode = inputQrcode.replace("-", "");
+//        }
+//
+//        assetInfo.setQrCode(inputQrcode);
+//
+//        return inputQrcode;
+//    }
 
-        assetInfo.setQrCode(inputQrcode);
 
-        return inputQrcode;
+    public SiteOrgWithDeptOrg findSiteOrgInAssetExcelRow(Map<String, ExcelDocument.ValueWrapper> rowMap, Map<String, OrgInfo> orgNamesUriCache) {
+        String institution = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("Institution")));
+        String hospital = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("Hospital")));
+        String site = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("Site")));
+        String clinicalDept = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("clinicalDeptId")));
+        String assetDept = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("assetDeptId")));
+
+        SiteOrgWithDeptOrg siteOrgWithDeptOrg = orgInfoLocalCacheService.findSiteOrgByFlatternedMap(orgNamesUriCache, institution, hospital, site, clinicalDept, assetDept);
+
+        return siteOrgWithDeptOrg;
     }
 
 }
