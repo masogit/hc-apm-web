@@ -111,10 +111,12 @@ public class AssetFileImportBaseService {
 
     protected boolean isNeedAudit;
 
+    protected boolean crossSite;
 
 
-    public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
+    public void setSelectedOrgToImport(OrgInfo selectedOrgToImport, boolean crossSite) {
         this.selectedOrgToImport = selectedOrgToImport;
+        this.crossSite = crossSite;
 
         workflowConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
 
@@ -126,25 +128,27 @@ public class AssetFileImportBaseService {
 
     }
 
+    @Transactional
+    public void importOrgData(List<Map<String, Object>> importOrgMap) {
 
-    public void importData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,
-                           Boolean autoGenerateQrcode, boolean crossSite) {
+        importOrgMap.forEach(item -> {
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
+
+            if (orgInfo == null) {
+                supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getName());
+            }
+
+            item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
+        });
+
+    }
+
+    @Transactional
+    public void importAssetData(List<Map<String, Object>> importAssetMap,
+                           Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
 
         LocalDateTime startTime = LocalDateTime.now();
-
-        if (!crossSite) {
-            //if import all cross site, the dept is useless
-            importOrgMap.forEach(item -> {
-                OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-                OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
-
-                if (orgInfo == null) {
-                    supportingService.importOrgIfNeeded(selectedOrgToImport, newOrgInfo.getName());
-                }
-
-                item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
-            });
-        }
 
         int row = 0;
         try {
@@ -155,7 +159,7 @@ public class AssetFileImportBaseService {
                 }
 
                 ++row;
-                importOneAsset(item, autoGenerateQrcode);
+                importOneAsset(item, autoGenerateQrcode, orgNamesUriCache);
             }
 
         } catch (Exception e) {
@@ -171,25 +175,21 @@ public class AssetFileImportBaseService {
     }
 
     @Transactional
-    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode) {
+    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
 
         AssetInfo newAsset = (AssetInfo) item.get("asset");
         Map<String, ExcelDocument.ValueWrapper> rowMap = (Map<String, ExcelDocument.ValueWrapper>) item.get("rowData");
-
-//        //if site uid not match, ignore update
-//        if (newAsset.getUid() != null) {
-//            if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
-//                return ;
-//            }
-//
-//        }
 
         AssetRow.clearErrMessage(item);
 
         item.put("status", StringUtils.isEmpty(newAsset.getUid()) ? ImportStatus.Created : ImportStatus.Exist);
 
+        OrgInfo siteOrg = selectedOrgToImport;
+        if (crossSite) {
+            siteOrg = supportingService.findSiteOrgInAssetExcelRow(rowMap, orgNamesUriCache).getSiteOrg();
+        }
         //check depart num to avoid duplicate when update
-        boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(selectedOrgToImport, newAsset);
+        boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(siteOrg.getUid(), newAsset);
         if (isDuplicate) {
             item.put("status", ImportStatus.Failure);
             AssetRow.addErrMessage(item, "错误: 设备编号重复");
@@ -205,7 +205,7 @@ public class AssetFileImportBaseService {
             }
 
         } else {
-            OrgInfo orgInfo = supportingService.findOrgOnly(selectedOrgToImport, orgName);
+            OrgInfo orgInfo = supportingService.findOrgOnly(siteOrg, orgName);
             if (orgInfo != null) {
                 //new child clinical will reach here
                 newAsset.setClinicalDeptId(orgInfo.getId());
@@ -216,7 +216,7 @@ public class AssetFileImportBaseService {
 
         }
 
-        supportingService.setAssetDeptId(newAsset, selectedOrgToImport, item);
+        supportingService.setAssetDeptId(newAsset, siteOrg, item);
 
         List<UserAccount> userAccounts;
         //for AssetOwner
@@ -297,7 +297,7 @@ public class AssetFileImportBaseService {
         Supplier supplier;
         //导入供应商，并修正ID
         if (!StringUtils.isEmpty(newAsset.getVendor())) {
-            supplier = supportingService.importSupplierIfNeeded(selectedOrgToImport, newAsset.getVendor(), newAsset.getVendorTel());
+            supplier = supportingService.importSupplierIfNeeded(siteOrg, newAsset.getVendor(), newAsset.getVendorTel());
             newAsset.setSupplierId(supplier.getId());
         } else {
             newAsset.setSupplierId(null);
@@ -305,7 +305,7 @@ public class AssetFileImportBaseService {
 
         ////导入维修商，并修正ID
         if (!StringUtils.isEmpty(newAsset.getMaitanance())) {
-            supplier = supportingService.importMaintainancerIfNeeded(selectedOrgToImport, newAsset.getMaitanance(), newAsset.getMaitananceTel());
+            supplier = supportingService.importMaintainancerIfNeeded(siteOrg, newAsset.getMaitanance(), newAsset.getMaitananceTel());
             newAsset.setMaitananceId(supplier.getId().toString());
         } else {
             newAsset.setMaitananceId(null);
@@ -313,7 +313,7 @@ public class AssetFileImportBaseService {
 
         ////导入制造商，并修正ID
         if (!StringUtils.isEmpty(newAsset.getManufacture())) {
-            supplier = supportingService.importManufacturerIfNeeded(selectedOrgToImport, newAsset.getManufacture());
+            supplier = supportingService.importManufacturerIfNeeded(siteOrg, newAsset.getManufacture());
             newAsset.setManufactureId(supplier.getId().toString());
         } else {
             newAsset.setManufactureId(null);
@@ -350,12 +350,12 @@ public class AssetFileImportBaseService {
         }
 
 
-        supportingService.releaseOldQRCodeInUse(selectedOrgToImport, item);
+        supportingService.releaseOldQRCodeInUse(siteOrg, item);
 
         //create qr code if needed, make new qrcode in used.
         if (StringUtils.isEmpty(newAsset.getQrCode())) {
             if (autoGenerateQrcode) {
-                QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
+                QrCodeLib newCode = qrCodeService.createOneQrCode(siteOrg, 3);
                 newAsset.setQrCode(newCode.getQrCode());
             }
         } else {
@@ -365,7 +365,7 @@ public class AssetFileImportBaseService {
             if (changed) {
                 QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(newAsset.getQrCode(),newAsset.getSiteUID());
                 if (qrCodeLib == null) {
-                    qrCodeService.createSpecifiedQrCode(newAsset.getQrCode(), selectedOrgToImport, 3);
+                    qrCodeService.createSpecifiedQrCode(newAsset.getQrCode(), siteOrg, 3);
 
                 } else {
                     if (qrCodeLib.getStatus() == 1) {//已发行
@@ -404,15 +404,19 @@ public class AssetFileImportBaseService {
 
         LocalDateTime startTime = LocalDateTime.now();
 
+        if (!crossSite) {
+            //only selected site can import clinical dept, otherwise clinical dept excel sheet is meaningless.
+            importOrgMap.forEach(item -> {
+                OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+
+                //parent uid is not working for child clinical dept, so we use site id
+                OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
+
+                item.put("status", orgInfo == null ? ImportStatus.New : ImportStatus.Exist);
+            });
+        }
+
         HashSet<Boolean> result = new HashSet<>();
-        importOrgMap.forEach(item -> {
-            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-
-            //parent uid is not working for child clinical dept, so we use site id
-            OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), newOrgInfo.getName(), 4);
-
-            item.put("status", orgInfo == null ? ImportStatus.New : ImportStatus.Exist);
-        });
 
         int row = 0;
         for (Map<String, Object> item: importAssetMap) {
@@ -457,7 +461,7 @@ public class AssetFileImportBaseService {
 
                 //if child clinical dept not found, we don't create. we only create parent clinical dept in later steps.
                 if (!supportingService.isShortName(orgName)) {
-                    OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(selectedOrgToImport.getUid(), orgName, 4);
+                    OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(newAsset.getSiteUID(), orgName, 4);
                     if (orgInfo == null) {
                         item.put("status", ImportStatus.CheckFail);
                         result.add(Boolean.FALSE);
@@ -468,7 +472,7 @@ public class AssetFileImportBaseService {
             }
 
             //check depart num to avoid duplicate when update
-            boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(selectedOrgToImport, newAsset);
+            boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(newAsset.getSiteUID(), newAsset);
             if (isDuplicate) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
@@ -517,7 +521,7 @@ public class AssetFileImportBaseService {
                 if (supportingService.isQrCodeNewOrChanged(newAsset, item)) {
                     if (AssetFileImportSupportingService.ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
                         //三码合一情况下，可以创建新的二维码或者二维码已发行
-                        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(newAsset.getQrCode(), selectedOrgToImport.getUid());
+                        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(newAsset.getQrCode(), newAsset.getSiteUID());
                         if (qrCodeLib != null && qrCodeLib.getStatus() != 1) {
                             item.put("status", ImportStatus.CheckFail);
                             result.add(Boolean.FALSE);
@@ -526,7 +530,7 @@ public class AssetFileImportBaseService {
                         }
                     } else {
                         //非三码合一情况下，二维码需要已发行
-                        boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+                        boolean isAvailable = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), newAsset.getSiteUID(), 1);
                         if (!isAvailable) {
                             item.put("status", ImportStatus.CheckFail);
                             result.add(Boolean.FALSE);

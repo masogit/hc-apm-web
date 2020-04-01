@@ -77,10 +77,10 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
         int dataRow = 7;
 
-        boolean crossSite = false;
-        if (doc.containsColumn(WebUtil.getMessage("Institution"))) {
-            crossSite = true;
-        }
+//        boolean crossSite = false;
+//        if (doc.containsColumn(WebUtil.getMessage("Institution"))) {
+//            crossSite = true;
+//        }
 
         Iterator<Map<String, ExcelDocument.ValueWrapper>> iterator = doc.iterator();
         while (iterator.hasNext()) {

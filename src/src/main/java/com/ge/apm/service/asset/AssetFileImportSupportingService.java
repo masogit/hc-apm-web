@@ -194,18 +194,17 @@ public class AssetFileImportSupportingService {
 
     }
 
-    public boolean isAssetDepartNumDuplicate(OrgInfo selectedOrgToImport, AssetInfo asset) {
+    public boolean isAssetDepartNumDuplicate(String siteUid, AssetInfo asset) {
 
         if (StringUtils.isEmpty(asset.getDepartNum())) {
             return false;
         }
 
         List<SearchFilter> assetFilters = new ArrayList<>();
-        String orgUid = selectedOrgToImport.getUid();
 
         assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUid));
 
         if (null != asset.getUid()) {
             assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NE, asset.getUid()));
