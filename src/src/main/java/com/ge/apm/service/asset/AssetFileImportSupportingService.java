@@ -101,6 +101,10 @@ public class AssetFileImportSupportingService {
         return !orgName.contains("-");
     }
 
+    public boolean isLongName(String orgName) {
+        return orgName.contains("-");
+    }
+
     @Transactional
     public Supplier importSupplierIfNeeded(OrgInfo selectedOrgToImport, String name, String tel) {
 

@@ -3244,3 +3244,4 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','crossSiteImport','跨院区导入','Cross Site Import',NULL,-1);
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','disableUploadInSiteSeparationMode','院区隔离下不能上传跨院区文件！','You cannot upload cross site asset file in site separation mode.',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','organizationNotFound','机构没有找到！','Organization not found.',NULL,-1);

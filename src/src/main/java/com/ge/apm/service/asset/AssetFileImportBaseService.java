@@ -459,8 +459,9 @@ public class AssetFileImportBaseService {
                 continue;
             }
 
-            String orgName = newAsset.getClinicalDeptName();
-            if (StringUtils.isEmpty(orgName)) {
+            //check clinical dept
+            String clinicalDeptName = newAsset.getClinicalDeptName();
+            if (StringUtils.isEmpty(clinicalDeptName)) {
                 //新增的时候不允许为空，更新的时候允许为空。
                 if (StringUtils.isEmpty(newAsset.getUid())) {
                     item.put("status", ImportStatus.CheckFail);
@@ -470,17 +471,53 @@ public class AssetFileImportBaseService {
                     newAsset.setClinicalDeptUID(null);
                 }
             } else {
-
+                OrgInfo clinicalDept =  null;
                 //if child clinical dept not found, we don't create. we only create parent clinical dept in later steps.
-                if (!supportingService.isShortName(orgName)) {
-                    OrgInfo orgInfo = orgDao.findFirstBySiteUIDAndNameAndOrgType(newAsset.getSiteUID(), orgName, 4);
-                    if (orgInfo == null) {
+                if (supportingService.isLongName(clinicalDeptName)) {
+                    clinicalDept = orgDao.findFirstBySiteUIDAndNameAndOrgType(newAsset.getSiteUID(), clinicalDeptName, 4);
+                    if (clinicalDept == null) {
                         item.put("status", ImportStatus.CheckFail);
                         result.add(Boolean.FALSE);
-                        AssetRow.addErrMessage(item, "错误: 所属子科室没有找到");
+                        AssetRow.addErrMessage(item, "错误: 所属科室没有找到! " + clinicalDeptName);
                     }
+
+                } else {
+                    if (crossSite) {
+                        //single site mode, we will import org in later steps, so no need to check.
+                        clinicalDept = orgDao.findFirstByParentUIDAndShortName(newAsset.getSiteUID(), clinicalDeptName);
+                        if (clinicalDept == null) {
+                            item.put("status", ImportStatus.CheckFail);
+                            result.add(Boolean.FALSE);
+                            AssetRow.addErrMessage(item, "错误: 所属科室没有找到! " + clinicalDeptName);
+                        }
+                    }
+
                 }
 
+            }
+
+            //check asset dept
+            String assetDeptName = newAsset.getAssetDeptName();
+            if (!StringUtils.isEmpty(assetDeptName)) {
+                OrgInfo assetDept;
+                if (supportingService.isLongName(assetDeptName)) {
+                    assetDept = orgDao.findFirstBySiteUIDAndNameAndOrgType(newAsset.getSiteUID(), assetDeptName, 4);
+                    if (assetDept == null) {
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 使用科室没有找到! " + assetDeptName);
+                    }
+                } else {
+                    if (crossSite) {
+                        //single site mode, we will import org in later steps, so no need to check.
+                        assetDept = orgDao.findFirstByParentUIDAndShortName(newAsset.getSiteUID(), assetDeptName);
+                        if (assetDept == null) {
+                            item.put("status", ImportStatus.CheckFail);
+                            result.add(Boolean.FALSE);
+                            AssetRow.addErrMessage(item, "错误: 使用科室没有找到! " + assetDeptName);
+                        }
+                    }
+                }
             }
 
             //check depart num to avoid duplicate when update
