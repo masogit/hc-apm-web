@@ -1,5 +1,6 @@
 package com.ge.apm.service.orginfo;
 
+import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,9 @@ public class OrgInfoLocalCacheService {
     }
 
     public OrgInfo findSiteOrgByFlatternedMap(Map orgNamesCache, String institutionName, String hospitalName, String siteName) {
+
+        checkOrgHierachy(institutionName, hospitalName, siteName);
+
         if (null == institutionName) {
             //dept is directly under tenant, return them
             OrgInfo tenantOrg = (OrgInfo) orgNamesCache.get(TENANT_ORG_KEY);
@@ -125,6 +129,25 @@ public class OrgInfoLocalCacheService {
 
         return siteOrg;
 
+    }
+
+    public void checkOrgHierachy(String institutionName, String hospitalName, String siteName) {
+        int institution = StringUtils.isEmpty(institutionName) ? 0 : 1;
+        int hospital = StringUtils.isEmpty(hospitalName) ? 0 : 1;
+        int site = StringUtils.isEmpty(siteName) ? 0 : 1;
+
+        if (institution < hospital || institution < site || hospital < site) {
+            throw new IllegalArgumentException(WebUtil.getMessage("organizationHierarchyWrong")
+                    + "(" + emptyStringIfNull(institutionName) + "," + emptyStringIfNull(hospitalName) + "," + emptyStringIfNull(siteName) + ")");
+        }
+
+    }
+
+    private String emptyStringIfNull(String name) {
+        if (null == name) {
+            return "";
+        }
+        return  name;
     }
 
     private String flatterOrgHierachyAsKey(String ... names) {
