@@ -8,9 +8,11 @@ package com.ge.apm.service.asset;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.service.orginfo.SiteOrgWithDeptOrg;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -65,7 +67,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
         return result;
     }
 
-    public List<Map<String, Object>> getAssetMapFromTemplate(ExcelDocumentStreamingReader doc) throws Exception {
+    public List<Map<String, Object>> getAssetMapFromTemplate(ExcelDocumentStreamingReader doc, Map<String, OrgInfo> orgNamesUriCache) throws Exception {
 
         LocalDateTime startTime = LocalDateTime.now();
 
@@ -74,6 +76,11 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
         List<Map<String, Object>> result = new ArrayList<>();
 
         int dataRow = 7;
+
+//        boolean crossSite = false;
+//        if (doc.containsColumn(WebUtil.getMessage("Institution"))) {
+//            crossSite = true;
+//        }
 
         Iterator<Map<String, ExcelDocument.ValueWrapper>> iterator = doc.iterator();
         while (iterator.hasNext()) {
@@ -86,7 +93,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
                 if (!StringUtils.isEmpty(uuid)) {
                     asset = assetDao.findByUid(uuid);
-                    if (asset == null || !asset.getTenantUID().equals(selectedOrgToImport.getTenantUID())) throw new Exception(WebUtil.getMessage("InvalidUUID"));
+                    if (asset == null || !asset.getTenantUID().equals(UserContextService.getCurrentUserAccount().getTenantUID())) throw new Exception(WebUtil.getMessage("InvalidUUID"));
 
                     //save old data to compare later
                     map.put(AssetFileImportSupportingService.OLD_QRCODE_KEY, asset.getQrCode());
@@ -111,6 +118,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("RepairOwner3")), "setAssetOwnerName3", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("PMOwner")), "setPmOwnerName", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("clinicalDeptId")), "setClinicalDeptName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("assetDeptName")), "setAssetDeptName", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("manufacture")), "setManufacture", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("BrandManufacturerShortName")), "setMakerShortName", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentStandardName")), "setDeviceName", true);
@@ -190,11 +198,16 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldIntegerValue(trimMsgKey(WebUtil.getMessage("WarrantyPeriodMonths")), "setWarrantyMonth");
 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("QRCode")), "setQrCode", true);
-//                supportingService.tryFormatQrCodeIfPossible(rowMap, asset);
 
                 assetRow.setFieldDropdownValueAsString(trimMsgKey(WebUtil.getMessage("ProprietaryClass")), "setProprietaryClass", proprietaryClassList, map, null);
 
-                supportingService.markDefautValue(selectedOrgToImport, asset, now, isNeedAudit);
+                if (crossSite) {
+                    SiteOrgWithDeptOrg siteOrgWithDeptOrg = supportingService.findSiteOrgInAssetExcelRow(rowMap, orgNamesUriCache);
+                    supportingService.markDefautValue(siteOrgWithDeptOrg.getSiteOrg(), asset, now, false);
+                } else {
+                    supportingService.markDefautValue(selectedOrgToImport, asset, now, isNeedAudit);
+                }
+
 
                 map.put("asset", asset);
                 map.put("status", StringUtils.isEmpty(asset.getUid()) ? ImportStatus.New : ImportStatus.Exist);
