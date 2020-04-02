@@ -4,6 +4,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import webapp.framework.web.WebUtil;
 
 import java.util.*;
 
@@ -97,7 +98,8 @@ public class OrgInfoLocalCacheService {
 
         OrgInfo institutionOrg = (OrgInfo)orgNamesCache.get(flatterOrgHierachyAsKey(institutionName));
         if (null == institutionOrg) {
-            throw new IllegalArgumentException(String.format("institution not found %s", institutionName));
+
+            throw new IllegalArgumentException(WebUtil.getMessage("organizationNotFound") + "(" + institutionName + ")");
         }
 
         if (null == hospitalName) {
@@ -107,7 +109,7 @@ public class OrgInfoLocalCacheService {
 
         OrgInfo hospitalOrg = (OrgInfo) orgNamesCache.get(flatterOrgHierachyAsKey(institutionName, hospitalName));
         if (null == hospitalOrg) {
-            throw new IllegalArgumentException(String.format("hospital not found %s", hospitalName));
+            throw new IllegalArgumentException(WebUtil.getMessage("organizationNotFound") + "(" + hospitalName + ")");
         }
 
         if (null == siteName) {
@@ -118,7 +120,7 @@ public class OrgInfoLocalCacheService {
         //dept is under site
         OrgInfo siteOrg = (OrgInfo) orgNamesCache.get(flatterOrgHierachyAsKey(institutionName, hospitalName, siteName));
         if (null == siteOrg) {
-            throw new IllegalArgumentException(String.format("site not found %s", siteName));
+            throw new IllegalArgumentException(WebUtil.getMessage("organizationNotFound") + "(" + siteName + ")");
         }
 
         return siteOrg;
