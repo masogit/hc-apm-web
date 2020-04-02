@@ -196,8 +196,8 @@ public class AssetFileImportBaseService {
             return;
         }
 
-        String orgName = newAsset.getClinicalDeptName();
-        if (StringUtils.isEmpty(orgName)) {
+        String clinicalDeptName = newAsset.getClinicalDeptName();
+        if (StringUtils.isEmpty(clinicalDeptName)) {
             if (StringUtils.isEmpty(newAsset.getUid())) {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误: 科室为空");
@@ -205,18 +205,30 @@ public class AssetFileImportBaseService {
             }
 
         } else {
-            OrgInfo orgInfo = supportingService.findOrgOnly(siteOrg, orgName);
-            if (orgInfo != null) {
+            OrgInfo clinicalDept = supportingService.findOrgOnly(siteOrg, clinicalDeptName);
+            if (clinicalDept != null) {
                 //new child clinical will reach here
-                newAsset.setClinicalDeptId(orgInfo.getId());
-                newAsset.setClinicalDeptUID(orgInfo.getUid());
+                newAsset.setClinicalDeptId(clinicalDept.getId());
+                newAsset.setClinicalDeptUID(clinicalDept.getUid());
             } else {
                 newAsset.setClinicalDeptName(null);
             }
 
         }
 
-        supportingService.setAssetDeptId(newAsset, siteOrg, item);
+        String assetDeptName = newAsset.getAssetDeptName();
+        if (!StringUtils.isEmpty(assetDeptName)) {
+            OrgInfo assetDept = supportingService.findOrgOnly(siteOrg, assetDeptName);
+            if (assetDept != null) {
+                newAsset.setAssetDeptId(assetDept.getId());
+                newAsset.setAssetDeptUID(assetDept.getUid());
+            } else {
+                newAsset.setAssetDeptName(null);
+            }
+
+        }
+
+//        supportingService.setAssetDeptId(newAsset, siteOrg, item);
 
         List<UserAccount> userAccounts;
         //for AssetOwner

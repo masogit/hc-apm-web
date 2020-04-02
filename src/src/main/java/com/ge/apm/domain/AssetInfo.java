@@ -144,6 +144,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "clinical_dept_name")
     private String clinicalDeptName;//所属科室
 
+    @Transient
+    private String assetDeptName;//使用科室
+
     @Column(name = "asset_group")
     private Integer assetGroup;//设备分类
 
@@ -1061,6 +1064,14 @@ public class AssetInfo implements ChineseName,Serializable {
         if (!StringUtils.isEmpty(clinicalDeptName)) {
             this.clinicalDeptNamePyCode = PinyinUtil.getShortPinyin(clinicalDeptName).toLowerCase();
         }
+    }
+
+    public String getAssetDeptName() {
+        return assetDeptName;
+    }
+
+    public void setAssetDeptName(String assetDeptName) {
+        this.assetDeptName = assetDeptName;
     }
 
     public Integer getAssetGroup() {
