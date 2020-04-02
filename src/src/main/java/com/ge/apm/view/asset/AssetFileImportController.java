@@ -6,7 +6,9 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
@@ -63,6 +65,7 @@ public class AssetFileImportController {
     private UaaService uaaService;
 
     private OrgInfoRepository orgDao;
+    private TenantInfoRepository tenantInfoDao;
 
     private Boolean isImported = false;
     private Boolean hasExportData = false;
@@ -95,6 +98,7 @@ public class AssetFileImportController {
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
 
         initOrgTree();
 
@@ -111,18 +115,23 @@ public class AssetFileImportController {
 
         crossSite = false;
 
-        uploadAssetFile(selectedOrg, crossSite);
+        uploadAssetFile(selectedOrg, false);
     }
 
     public void uploadCrossSiteDataFile(FileUploadEvent event) {
         this.file = event.getFile();
 
-        //need tenant org to get workflow
-        OrgInfo tenantOrg = orgDao.findFirstByTenantUIDAndOrgType(UserContextService.getCurrentUserAccount().getTenantUID(), 0);
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+        if (tenantInfo.getInsulate() != null && tenantInfo.getInsulate().booleanValue()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("disableUploadInSiteSeparationMode"));
+            return;
+        }
 
         crossSite = true;
 
-        uploadAssetFile(tenantOrg, crossSite);
+        //need tenant org to get workflow
+        OrgInfo tenantOrg = orgDao.findFirstByTenantUIDAndOrgType(UserContextService.getCurrentUserAccount().getTenantUID(), 0);
+        uploadAssetFile(tenantOrg, true);
 
     }
 

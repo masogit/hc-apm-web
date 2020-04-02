@@ -69,7 +69,7 @@
                     </div>
                 </p:tab>
 
-                <p:tab title="跨院区导入">
+                <p:tab title="跨院区导入" rendered="#{userContextService.hasAnyRole('ITAdmin')}">
                     <div class="ui-g-12 card">
 
                         <h:form id="crossSiteImportForm">

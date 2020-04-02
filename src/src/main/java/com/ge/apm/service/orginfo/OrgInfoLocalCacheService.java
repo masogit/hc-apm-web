@@ -58,6 +58,8 @@ public class OrgInfoLocalCacheService {
             orgInfo.setInstitutionUID((String)objArr[index++]);
             orgInfo.setTenantUID((String)objArr[index++]);
 
+            orgInfo.setSiteId((Integer)objArr[index++]);
+
             orgInfo.setOrgUri((String)objArr[index++]);
 
             orgInfos.add(orgInfo);
