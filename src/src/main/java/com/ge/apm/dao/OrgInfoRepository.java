@@ -158,14 +158,14 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 	public List<OrgInfo> getDeptListBySiteUid(String siteUid);
 
 	@Query(value = "with recursive cte_site as (\n" +
-			"select o.id, o.uid, o.short_name, o.name, o.parent_id, o.parent_uid, o.org_level, o.org_type, o.site_uid, o.hospital_uid, o.institution_uid, o.tenant_uid, cast('' as varchar(1000)) as org_uri\n" +
+			"select o.id, o.uid, o.short_name, o.name, o.parent_id, o.parent_uid, o.org_level, o.org_type, o.site_uid, o.hospital_uid, o.institution_uid, o.tenant_uid, o.site_id, cast('' as varchar(1000)) as org_uri\n" +
 			"from org_info o\n" +
 			"join tenant_info t on o.tenant_uid = t.uid\n" +
 			"where o.parent_uid is null and t.uid = ?1 \n" +
 			"\n" +
 			"union\n" +
 			"\n" +
-			"select o.id, o.uid, o.short_name, o.name, o.parent_id, o.parent_uid, o.org_level, o.org_type, o.site_uid, o.hospital_uid, o.institution_uid, o.tenant_uid, cast(cte.org_uri || '->' || o.short_name as varchar(1000)) as org_uri\n" +
+			"select o.id, o.uid, o.short_name, o.name, o.parent_id, o.parent_uid, o.org_level, o.org_type, o.site_uid, o.hospital_uid, o.institution_uid, o.tenant_uid, o.site_id, cast(cte.org_uri || '->' || o.short_name as varchar(1000)) as org_uri\n" +
 			"from org_info o\n" +
 			"join tenant_info t on o.tenant_uid = t.uid\n" +
 			"inner join cte_site cte on o.parent_uid = cte.uid\n" +
