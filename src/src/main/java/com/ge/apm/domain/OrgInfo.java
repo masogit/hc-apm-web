@@ -2,35 +2,19 @@
  */
 package com.ge.apm.domain;
 
-import java.io.Serializable;
-import java.util.UUID;
-
-import javax.persistence.Basic;
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import com.ge.apm.service.utils.ChineseName;
-import com.ge.apm.service.utils.PinyinUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import com.ge.apm.service.utils.ChineseName;
+import com.ge.apm.service.utils.PinyinUtil;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import webapp.framework.web.WebUtil;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * @author 212547631
@@ -137,6 +121,9 @@ public class OrgInfo implements Serializable, ChineseName {
 
     @Column(name = "hospital_ucmid")
     private String hospitalUcmid;
+
+    @Transient
+    private String orgUri;
 
     public OrgInfo() {
     }
@@ -426,7 +413,15 @@ public class OrgInfo implements Serializable, ChineseName {
         this.shortNamePyCode = shortNamePyCode;
     }
 
-	public OrgInfo(Integer id) {
+    public String getOrgUri() {
+        return orgUri;
+    }
+
+    public void setOrgUri(String orgUri) {
+        this.orgUri = orgUri;
+    }
+
+    public OrgInfo(Integer id) {
 		super();
 		this.id = id;
 	}

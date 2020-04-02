@@ -284,4 +284,8 @@ public class ExcelDocumentStreamingReader implements Closeable, Iterable<Map<Str
     public String getVersion() {
         return version;
     }
+
+    public boolean containsColumn(String col) {
+        return Arrays.stream(columnTitles).anyMatch(item -> item.equalsIgnoreCase(col));
+    }
 }
