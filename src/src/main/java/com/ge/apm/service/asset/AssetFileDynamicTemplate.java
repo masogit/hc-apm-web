@@ -450,7 +450,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
-    public void writeClinicalDeptList(List<OrgInfo> clinicalDeptList) {
+    private void writeClinicalDeptList(List<OrgInfo> clinicalDeptList) {
 
         ExcelDocumentStreamingWriter writer = new ExcelDocumentStreamingWriter(workBook, orgSheet.getSheetName(), null);
 
@@ -470,15 +470,23 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     public void exportAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) throws IOException {
         logger.info("export asset meta data");
         writeMetaData(exportFields);
-        logger.info("export clinical dept list");
-        writeClinicalDeptList(clinicalDeptList);
+
+        if (!crossSite) {
+            logger.info("export clinical dept list");
+            writeClinicalDeptList(clinicalDeptList);
+        }
+
         logger.info("export asset list");
         writeAsset(assetList, sites, exportFields);
     }
 
     public void exportSampleAsset(List<OrgInfo> clinicalDeptList, List<String> exportFields) throws IOException {
         writeMetaData(exportFields);
-        writeClinicalDeptList(clinicalDeptList);
+
+        if (!crossSite) {
+            writeClinicalDeptList(clinicalDeptList);
+        }
+
         writeSampleAsset(exportFields, clinicalDeptList);
     }
 
