@@ -9,6 +9,7 @@ import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.mock.FacesContextTestExecutionListener;
 import com.ge.apm.mock.FakeData;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -30,7 +32,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"/config/springmvc-parent.xml"})
+@ContextConfiguration({"/config/applicationContext.xml"})
 @TestExecutionListeners(listeners = {FacesContextTestExecutionListener.class}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AssetFileImportServiceTest {
 
@@ -39,7 +41,7 @@ public class AssetFileImportServiceTest {
 
 
     @Autowired
-    AssetFileImportService service;
+    AssetFileImportStreamingService service;
 
     @Autowired
     AssetInfoRepository assetInfoDao;
@@ -74,35 +76,27 @@ public class AssetFileImportServiceTest {
 //        clearData();
     }
 
-    @Ignore
-    @Test
-    public void getOrgInfoMapFromTemplate() throws Exception {
-        ExcelDocument excelDoc = ExcelDocumentGenerator.getDefaultTestDoc();
-        List<Map<String, Object>> map = service.getOrgInfoMapFromTemplate(excelDoc);
-
-    }
-
-    @Ignore
-    @Test
-    public void getAssetMapFromTemplate() throws Exception {
-    }
-
 //    @Ignore
     @Test
     public void importData_performance_test() throws Exception {
 
-        ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc(5000);
+        InputStream orgInputStream = ExcelDocumentGenerator.getTestDocByInputStream(10);
+        InputStream assetInputStream = ExcelDocumentGenerator.getTestDocByInputStream(10);
+
+        ExcelDocumentStreamingReader assetDoc = new ExcelDocumentStreamingReader(assetInputStream, 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
+        ExcelDocumentStreamingReader orgDoc = new ExcelDocumentStreamingReader(orgInputStream, 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, 2, 3);
+
 
         logger.info("start to import excel");
         long startTime = System.currentTimeMillis();
 
-        service.setSelectedOrgToImport(defaultImportSite);
+        service.setSelectedOrgToImport(defaultImportSite, false);
 
-        List<Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+        List<Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(orgDoc);
+        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(assetDoc, null);
 
-        service.importData(orgMap, assetMap, false, false);
-
+        service.importOrgData(orgMap);
+        service.importAssetData(assetMap, false, null);
         long endTime = System.currentTimeMillis();
         logger.info("finish to import excel");
 
@@ -113,22 +107,27 @@ public class AssetFileImportServiceTest {
     @Test
     public void importData_add_new_data() throws Exception {
 
-        ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc(0);
+        InputStream inputStream = ExcelDocumentGenerator.getTestDocByInputStream(10);
+
+        ExcelDocumentStreamingReader excelDoc = new ExcelDocumentStreamingReader(inputStream, 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, 2, 3);
+
+
         Map<String, Object> rowData = buildDefaultExcelMap();
 
-        excelDoc.writeRowData(AssetFileImportService.SHEET_ASSET,
-                                AssetFileImportService.EXCEL_ASSET_HEADER_ROW,
-                                AssetFileImportService.EXCEL_ASSET_DATA_ROW,
-                                rowData
-        );
+//        excelDoc.writeRowData(AssetFileImportBaseService.SHEET_ASSET,
+//                AssetFileImportBaseService.EXCEL_ASSET_HEADER_ROW,
+//                AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW,
+//                                rowData
+//        );
 
         logger.info("start to import excel");
         long startTime = System.currentTimeMillis();
 
         List<Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc, null);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importOrgData(orgMap);
+        service.importAssetData(assetMap, false, null);
 
         long endTime = System.currentTimeMillis();
         logger.info("finish to import excel");
@@ -217,38 +216,44 @@ public class AssetFileImportServiceTest {
     @Test
     public void importData_update_data() throws Exception {
         //insert
-        ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc(0);
+        InputStream inputStream = ExcelDocumentGenerator.getTestDocByInputStream(10);
+
+        ExcelDocumentStreamingReader excelDoc = new ExcelDocumentStreamingReader(inputStream, 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, 2, 3);
+
         Map<String, Object> rowData = buildDefaultExcelMap();
 
-        excelDoc.writeRowData(AssetFileImportService.SHEET_ASSET,
-                AssetFileImportService.EXCEL_ASSET_HEADER_ROW,
-                AssetFileImportService.EXCEL_ASSET_DATA_ROW,
-                rowData
-        );
+//        excelDoc.writeRowData(AssetFileImportService.SHEET_ASSET,
+//                AssetFileImportService.EXCEL_ASSET_HEADER_ROW,
+//                AssetFileImportService.EXCEL_ASSET_DATA_ROW,
+//                rowData
+//        );
 
         List<Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc, null);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importOrgData(orgMap);
+        service.importAssetData(assetMap, false, null);
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
         assertEquals("制造商A", assetInfo.getManufacture());
 
         //update
-        excelDoc = ExcelDocumentGenerator.getTestDoc(0);
-        rowData.put("制造商", "制造商B");
-
-        excelDoc.writeRowData(AssetFileImportService.SHEET_ASSET,
-                AssetFileImportService.EXCEL_ASSET_HEADER_ROW,
-                AssetFileImportService.EXCEL_ASSET_DATA_ROW,
-                rowData
-        );
+//        excelDoc = ExcelDocumentGenerator.getTestDoc(0);
+//        rowData.put("制造商", "制造商B");
+//
+//        excelDoc.writeRowData(AssetFileImportService.SHEET_ASSET,
+//                AssetFileImportService.EXCEL_ASSET_HEADER_ROW,
+//                AssetFileImportService.EXCEL_ASSET_DATA_ROW,
+//                rowData
+//        );
 
         orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        assetMap = service.getAssetMapFromTemplate(excelDoc);
+        assetMap = service.getAssetMapFromTemplate(excelDoc, null);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importOrgData(orgMap);
+        service.importAssetData(assetMap, false, null);
+
         assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         assetInfo = assetInfoList.get(0);
 
@@ -270,10 +275,10 @@ public class AssetFileImportServiceTest {
                 rowData
         );
 
-        List<Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+//        List<Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
+//        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+//        service.importData(orgMap, assetMap, false, false);
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
@@ -288,11 +293,11 @@ public class AssetFileImportServiceTest {
                 AssetFileImportService.EXCEL_ASSET_DATA_ROW,
                 rowData
         );
+//
+//        orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
+//        assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        assetMap = service.getAssetMapFromTemplate(excelDoc);
-
-        service.importData(orgMap, assetMap, false, false);
+//        service.importData(orgMap, assetMap, false, false);
         assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         assetInfo = assetInfoList.get(0);
 
@@ -314,10 +319,10 @@ public class AssetFileImportServiceTest {
                 rowData
         );
 
-        List<Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+//        List<Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
+//        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+//        service.importData(orgMap, assetMap, false, false);
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
@@ -333,10 +338,10 @@ public class AssetFileImportServiceTest {
                 rowData
         );
 
-        orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        assetMap = service.getAssetMapFromTemplate(excelDoc);
+//        orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
+//        assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+//        service.importData(orgMap, assetMap, false, false);
         assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         assetInfo = assetInfoList.get(0);
 
