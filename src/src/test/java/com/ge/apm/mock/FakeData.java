@@ -163,6 +163,7 @@ public class FakeData {
 
         orgInfo.setOrgLevel(0);
         orgInfo.setOrgType(0);
+        orgInfo.setShortName(tenantInfo.getName());
         orgInfo.setName(tenantInfo.getName());
 
         orgInfo.setSiteId(tenantInfo.getId());
@@ -182,6 +183,7 @@ public class FakeData {
 
         orgInfo.setOrgLevel(1);
         orgInfo.setOrgType(1);
+        orgInfo.setShortName(name);
         orgInfo.setName(name);
 
         orgInfo.setSiteId(tenantInfo.getId());
@@ -201,11 +203,12 @@ public class FakeData {
 
         orgInfo.setOrgLevel(2);
         orgInfo.setOrgType(2);
+        orgInfo.setShortName(name);
         orgInfo.setName(name);
 
         orgInfo.setSiteId(tenantInfo.getId());
         orgInfo.setTenantUID(tenantInfo.getUid());
-        orgInfo.setInstitutionUID(parentOrg.getUid());
+        orgInfo.setInstitutionUID(parentOrg.getInstitutionUID());
         orgInfo.setHospitalUID(orgInfo.getUid());
         orgInfo.setSiteUID(orgInfo.getUid());
         orgInfo.setParentUID(parentOrg.getUid());
@@ -220,12 +223,13 @@ public class FakeData {
 
         orgInfo.setOrgLevel(3);
         orgInfo.setOrgType(3);
+        orgInfo.setShortName(name);
         orgInfo.setName(name);
 
         orgInfo.setSiteId(tenantInfo.getId());
         orgInfo.setTenantUID(tenantInfo.getUid());
-        orgInfo.setInstitutionUID(parentOrg.getUid());
-        orgInfo.setHospitalUID(parentOrg.getUid());
+        orgInfo.setInstitutionUID(parentOrg.getInstitutionUID());
+        orgInfo.setHospitalUID(parentOrg.getHospitalUID());
         orgInfo.setSiteUID(orgInfo.getUid());
         orgInfo.setParentUID(parentOrg.getUid());
 
@@ -239,13 +243,14 @@ public class FakeData {
 
         orgInfo.setOrgLevel(3);
         orgInfo.setOrgType(4);
+        orgInfo.setShortName(name);
         orgInfo.setName(name);
 
         orgInfo.setSiteId(tenantInfo.getId());
         orgInfo.setTenantUID(tenantInfo.getUid());
 
-        orgInfo.setInstitutionUID(siteOrg.getUid());
-        orgInfo.setHospitalUID(siteOrg.getUid());
+        orgInfo.setInstitutionUID(siteOrg.getInstitutionUID());
+        orgInfo.setHospitalUID(siteOrg.getHospitalUID());
         orgInfo.setSiteUID(siteOrg.getUid());
         orgInfo.setParentUID(siteOrg.getUid());
 

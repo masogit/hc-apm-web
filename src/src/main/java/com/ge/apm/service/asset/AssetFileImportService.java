@@ -93,7 +93,7 @@ public class AssetFileImportService extends AssetFileImportBaseService {
                 String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
                 if (!StringUtils.isEmpty(uuid)) {
                     asset = assetDao.findByUid(uuid);
-                    if (asset == null || !asset.getTenantUID().equals(selectedOrgToImport.getTenantUID())) throw new Exception("无效UUID");
+                    if (asset == null || !asset.getTenantUID().equals(UserContextService.getCurrentUserAccount().getTenantUID())) throw new Exception("无效UUID");
 
                     //save old data to compare later
                     map.put(AssetFileImportSupportingService.OLD_QRCODE_KEY, asset.getQrCode());
