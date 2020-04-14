@@ -704,6 +704,11 @@ public void test1(){
             if(!(userContextService.hasRole("AssetHead")||userContextService.hasRole("DeptHead"))){
             searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
 }
+            if(userContextService.hasRole("DeptHead")){
+                List<String> clinicalUidList =  orgDao.findClinicalUidBySiteUid(Arrays.asList(userContextService.getCurrentUserAccount().getSiteUID()));
+
+                searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalUidList,"1*2+"));
+            }
 
         } else if (queryIndex == 11) { //全部维修单
             if(stepFileter!=null) {
