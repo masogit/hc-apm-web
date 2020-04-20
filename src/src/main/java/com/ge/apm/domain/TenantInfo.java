@@ -155,6 +155,9 @@ public class TenantInfo implements Serializable {
     @Column(name = "international_version")
     private Integer internationalVersion;//是否是国际化租户 0或null:不是 1：是
 
+    @Column(name = "have_ib_device")
+    private Boolean haveIbDevice;
+
     public Integer getInternationalVersion() {
         return internationalVersion;
     }
@@ -532,4 +535,11 @@ public class TenantInfo implements Serializable {
         isDeleted = deleted;
     }
 
+    public Boolean getHaveIbDevice() {
+        return haveIbDevice;
+    }
+
+    public void setHaveIbDevice(Boolean haveIbDevice) {
+        this.haveIbDevice = haveIbDevice;
+    }
 }
