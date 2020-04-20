@@ -788,53 +788,53 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isAccountEndUser(){
-      UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-      UserAccount currentUser = getLoginUser();
-      int siteId = currentUser.getSiteId();
-      /* 如果ib是46的话，工程师AssetStaff和医工主任AssetHead可以看到3个tab，其它人不能看到内部保养*/
-      if (siteId == 46) {
-        if (userContextService.hasRole("AssetStaff") || userContextService.hasRole("AssetHead")) {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccount currentUser = getLoginUser();
+        int siteId = currentUser.getSiteId();
+        /* 如果ib是46的话，工程师AssetStaff和医工主任AssetHead可以看到3个tab，其它人不能看到内部保养*/
+        if (siteId == 46) {
+          if (userContextService.hasRole("AssetStaff") || userContextService.hasRole("AssetHead")) {
+            return false;
+          }
+        }
+
+        if (isOpsOrSiteAdminUser()) {
           return false;
         }
-      }
-
-      if (isOpsOrSiteAdminUser()) {
-        return false;
-      }
-      if (isDealerEndUser()) {
-        return false;
-      }
-      if (isIBEndUser()) {
-        return false;
-      }
-      return !isUltraSoundIBEndUser();
+        if (isDealerEndUser()) {
+          return false;
+        }
+        if (isIBEndUser()) {
+          return false;
+        }
+        return !isUltraSoundIBEndUser();
   }
 
     public boolean isAccountAndHaveIbDeviceUser() {
-      UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-      UserAccount currentUser = getLoginUser();
-      int siteId = currentUser.getSiteId();
-      /* 如果ib是46的话，工程师AssetStaff和医工主任AssetHead可以看到3个tab，其它人不能看到内部保养*/
-      if (siteId == 46) {
-        if (userContextService.hasRole("AssetStaff") || userContextService.hasRole("AssetHead")) {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccount currentUser = getLoginUser();
+        int siteId = currentUser.getSiteId();
+        /* 如果ib是46的话，工程师AssetStaff和医工主任AssetHead可以看到3个tab，其它人不能看到内部保养*/
+        if (siteId == 46) {
+          if (userContextService.hasRole("AssetStaff") || userContextService.hasRole("AssetHead")) {
+            return false;
+          }
+        }
+
+        if (isOpsOrSiteAdminUser()) {
           return false;
         }
-      }
+        if (isDealerEndUser()) {
+          return false;
+        }
+        if (isIBEndUser()) {
+          return false;
+        }
+        if (isUltraSoundIBEndUser()) {
+          return false;
+        }
 
-      if (isOpsOrSiteAdminUser()) {
-        return false;
-      }
-      if (isDealerEndUser()) {
-        return false;
-      }
-      if (isIBEndUser()) {
-        return false;
-      }
-      if (isUltraSoundIBEndUser()) {
-        return false;
-      }
-
-      return tenant.getHaveIbDevice();
+        return tenant.getHaveIbDevice();
     }
     /**
      * this api is to check whether login user is for lixiang company.
