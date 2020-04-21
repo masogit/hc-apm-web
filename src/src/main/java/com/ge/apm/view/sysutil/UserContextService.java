@@ -2,13 +2,37 @@ package com.ge.apm.view.sysutil;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
+import com.ge.apm.dao.CustomRoleRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SysRoleRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.domain.CustomRole;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SysRole;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserAuth;
+import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import javaslang.control.Option;
+import javax.faces.application.ConfigurableNavigationHandler;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.B64Code;
@@ -16,15 +40,6 @@ import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
-
-import javax.faces.application.ConfigurableNavigationHandler;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @ManagedBean(name = "userContextService")
 @SessionScoped
@@ -819,7 +834,7 @@ public class UserContextService implements Serializable {
             return false;
         }
 
-        return tenant.getHaveIbDevice();
+        return tenant.getHaveIbDevice() == null ? false : tenant.getHaveIbDevice();
     }
     /**
      * this api is to check whether login user is for lixiang company.
