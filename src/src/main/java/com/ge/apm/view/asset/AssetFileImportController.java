@@ -119,6 +119,8 @@ public class AssetFileImportController {
     }
 
     public void uploadCrossSiteDataFile(FileUploadEvent event) {
+        logger.info("start to upload file");
+
         this.file = event.getFile();
 
         TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
@@ -129,8 +131,10 @@ public class AssetFileImportController {
 
         crossSite = true;
 
+        logger.info("start to locate tenant org");
         //need tenant org to get workflow
         OrgInfo tenantOrg = orgDao.findFirstByTenantUIDAndOrgType(UserContextService.getCurrentUserAccount().getTenantUID(), 0);
+
         uploadAssetFile(tenantOrg, true);
 
     }
@@ -142,22 +146,28 @@ public class AssetFileImportController {
         try (ExcelDocumentStreamingReader assetDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 0, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, 2, 3);
              ExcelDocumentStreamingReader orgDoc = new ExcelDocumentStreamingReader(file.getInputstream(), 1, AssetFileImportService.EXCEL_ORG_HEADER_ROW, null, null))
         {
+            logger.info("check upload asset file version");
 
             if(!streamingService.checkDocVersion(assetDoc)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--"+WebUtil.getMessage("TemplateVersionIncorrect"));
                 return;
             }
 
+            logger.info("fetch org cache for quick lookup");
             Map<String, OrgInfo> orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
             importAssetMap = streamingService.getAssetMapFromTemplate(assetDoc, orgNamesUriCache);
+
+            logger.info("found asset record count: {}", importAssetMap.size());
 
             if(importAssetMap.size() > 5000){
                 WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
                 return;
             }
 
+            logger.info("fetch org info in list");
             importOrgMap = streamingService.getOrgInfoMapFromTemplate(orgDoc);
 
+            logger.info("start to check data");
             canbeImported = streamingService.checkData(importOrgMap, importAssetMap);
 
             filterErrorRecords();
@@ -166,7 +176,7 @@ public class AssetFileImportController {
             WebUtil.addErrorMessage("File can not be read!", null);
             logger.error(e.getMessage(),e);
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage(), null);
             logger.error(e.getMessage(),e);
         }
