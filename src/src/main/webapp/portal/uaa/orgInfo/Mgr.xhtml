@@ -101,6 +101,12 @@
                                         </h:panelGroup>
 
                                     </c:if>
+                                    <h:panelGroup rendered="#{orgInfoController.isShow}">
+                                        <label class="label">#{msg.hospitalUcmid}</label>
+                                        <p:inputText id="hospitalUcmid" value="#{orgInfoController.hospitalUcmid}" required="false" requiredMessage="#{msg.hospitalUcmid} #{msg.ValidationRequire}">
+                                            <p:ajax listener="#{orgInfoController.checkHospitalUcmid()}" process="@this"  update=":growl" ></p:ajax>
+                                        </p:inputText>
+                                    </h:panelGroup>
 
                                     <p:commandButton style="width: 90px;" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}" update="orgTree :growl"/>
                                 </p:panelGrid>
