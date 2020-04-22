@@ -1,7 +1,19 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.QrCodeLibRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.UserOrgInfoRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.QrCodeLib;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserOrgInfo;
+import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.orginfo.OrgInfoService;
@@ -9,7 +21,13 @@ import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.apache.commons.lang.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,13 +36,6 @@ import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -41,11 +52,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private UserOrgInfoRepository userOrgDao;
 
     private boolean acShow = false;
+    private boolean isShow = false;
 
     private String orgName;
     private String orgNameEn;
     private String retrieval;
     private UserAccount loginUser;
+    private String hospitalUcmid;
 
     private UserCommonService userCommonService;
 
@@ -164,6 +177,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void prepareCreateInstitution() {
+        isShow = false;
         orgName = null;
         orgNameEn = null;
         OrgInfo org = new OrgInfo();
@@ -185,8 +199,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void prepareCreateHospital() {
+        isShow = true;
         orgName = null;
         orgNameEn = null;
+        hospitalUcmid = null;
         if (selected == null) {
             return;
         }
@@ -211,6 +227,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void prepareCreateSite() {
+        isShow = false;
         orgName = null;
         orgNameEn = null;
         if (selected == null) {
@@ -237,6 +254,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void prepareCreateDepartment() {
+        isShow = false;
         orgName = null;
         orgNameEn = null;
         if (selected == null) {
@@ -297,6 +315,19 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return false;
     }
 
+    public boolean checkHospitalUcmid() {
+        if (StringUtils.isEmpty(hospitalUcmid)) {
+            return false;
+        }
+        OrgInfo orgInfo = dao
+            .findFirstByTenantUIDAndHospitalUcmid(selected.getTenantUID(), hospitalUcmid);
+        if (orgInfo != null) {
+            WebUtil.addErrorMessage(hospitalUcmid + "已经存在");
+            return true;
+        }
+        return false;
+    }
+
     public void saveSelectedOrg() {
 
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
@@ -307,6 +338,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         //重复增加不被允许
         boolean isDuplicate = checkName();
         if (isDuplicate) return;
+        if (checkHospitalUcmid()) {
+            return;
+        }
 
         boolean isNew = selected.getId() == null ? true : false;
 
@@ -314,6 +348,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         String name = orgInfoService.buildFullPathOrgName(selected);
         selected.setName(name);
         selected.setNameEn(orgNameEn);
+        selected.setHospitalUcmid(hospitalUcmid);
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
 
@@ -346,6 +381,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         buildOrdTree();
         orgName = null;
         orgNameEn = null;
+        hospitalUcmid = null;
     }
 
     private void updateClinicalDeptOrgName(TreeNode parentClinicalDeptNode) {
@@ -516,7 +552,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         preName = selected.getShortName();
         orgName = selected.getShortName();
         orgNameEn = selected.getNameEn();
+        hospitalUcmid = selected.getHospitalUcmid();
         if (selected != null) {
+            if (selected.getOrgType() == 2) {
+                isShow = true;
+            } else {
+                isShow = false;
+            }
             if (selected.getOrgType() == 4) {
                 acShow = true;
             } else {
@@ -550,6 +592,22 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void setAcShow(boolean acShow) {
         this.acShow = acShow;
+    }
+
+    public boolean getIsShow() {
+        return isShow;
+    }
+
+    public void setIsShow(boolean isShow) {
+        this.isShow = isShow;
+    }
+
+    public String getHospitalUcmid() {
+        return hospitalUcmid;
+    }
+
+    public void setHospitalUcmid(String hospitalUcmid) {
+        this.hospitalUcmid = hospitalUcmid;
     }
 
     public boolean getIsCreateInstitutionDisabled() {
