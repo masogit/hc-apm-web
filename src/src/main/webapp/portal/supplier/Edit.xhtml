@@ -10,7 +10,7 @@
         <!--设备档案  修改 供应商信息-->
         <p:dialog id="SupplierEditDlg" width="1000" height="600" class="modiSupplyDlg" widgetVar="SupplierEditDialog" modal="true" resizable="false" draggable="true" appendTo="@this" header="#{supplierController.CRUDActionName} #{msg.Supplier}" >
             <h:form id="SupplierEditForm">
-                <h:panelGroup id="display">
+                <p:fieldset legend="供应商基本信息">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
                         <h:panelGroup>
                             <label class="label">#{msg.name}*</label>
@@ -36,67 +36,186 @@
                             <label class="label">#{msg.tel}</label>
                             <p:inputText id="tel" value="#{supplierController.selected.tel}" />
                         </h:panelGroup>
-                        <h:panelGroup class="test1">
-                            <label  class="label">#{msg.type}*</label>
-                                <h:panelGrid columns="3">
-                                        <h:panelGrid columns="3">
-                                        <h:panelGroup>
-                                            <h:panelGrid columns="2">
-                                                <p:selectBooleanCheckbox id="wxs" value="#{supplierController.maintainerT}"/>
-                                                <p:outputLabel  value="#{msg.maitanance} " />
-                                            </h:panelGrid>
-                                        </h:panelGroup>
-                                    <h:panelGroup>
-                                        <h:panelGrid columns="2">
-                                            <p:selectBooleanCheckbox   value="#{supplierController.manufacturerT}"/>
-                                            <p:outputLabel value="#{msg.manufacture} " />
-                                        </h:panelGrid>
-                                    </h:panelGroup>
-                                            <h:panelGroup >
-                                                <h:panelGrid columns="2">
-                                                    <p:selectBooleanCheckbox  value="#{supplierController.supplierT}"/>
-                                                    <p:outputLabel value="#{msg.vendor} " />
-                                                </h:panelGrid>
-                                            </h:panelGroup>
-                                        </h:panelGrid>
-                                </h:panelGrid>
-                        </h:panelGroup>
-
                     </p:panelGrid>
-                    <h:panelGroup>
-
-                        <p:fieldset legend="#{msg.AttachmentUpload}"><!--供应商的附件上传-->
-                            <h:panelGroup >
-                                <p:dataList id="pictureList" class="pictureListCls" value="#{supplierController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 10)}</f:facet>
-                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                    <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="@(.pictureListCls)" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                    </p:commandButton>
-                                </p:dataList>
-                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                              multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
-                            </h:panelGroup>
-
-
-                        </p:fieldset>
+                    <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.type}*</label>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:selectBooleanCheckbox id="wxs" label="#{msg.maitanance}" value="#{supplierController.selected.maintainerT}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:selectBooleanCheckbox label="#{msg.manufacture}" value="#{supplierController.selected.manufacturerT}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:selectBooleanCheckbox label="#{msg.vendor}" value="#{supplierController.selected.supplierT}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup >
+                        <p:dataList id="pictureList" value="#{supplierController.getAttachList('1')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                    </h:panelGroup>
+                </p:fieldset>
+                <p:fieldset legend="供应商基本信息" rendered="#{supplierController.activeSupplier()}">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">供应商编码</label>
+                            <p:inputText value="#{supplierController.selected.supplierCode}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">供应商名称缩写</label>
+                            <p:inputText value="#{supplierController.selected.supplierAbbreviation}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">企业法人</label>
+                            <p:inputText value="#{supplierController.selected.corporate}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">统一社会信用编码</label>
+                            <p:inputText value="#{supplierController.selected.creditCode}" />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="营业执照信息" rendered="#{supplierController.activeSupplier()}">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">营业执照编码</label>
+                            <p:inputText value="#{supplierController.selected.licenseCode}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">营业执照截止日期</label>
+                            <p:calendar timeZone="GMT+8" id="licenseEndDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.licenseEndDate}" required="false" requiredMessage="营业执照截止日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup >
+                        <p:dataList id="licenseAttachements" value="#{supplierController.getAttachList('License')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">营业执照附件</f:facet>
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="licenseAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="typeLicense" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="licenseAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                    </h:panelGroup>
+                </p:fieldset>
+                <p:fieldset legend="营业许可证信息" rendered="#{supplierController.activeSupplier()}">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">营业许可证编码</label>
+                            <p:inputText value="#{supplierController.selected.permitCode}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">营业许可证截止日期</label>
+                            <p:calendar timeZone="GMT+8" id="permitEndDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.permitEndDate}" required="false" requiredMessage="营业许可证截止日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup >
+                        <p:dataList id="permitAttachements" value="#{supplierController.getAttachList('Permit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">营业许可证附件</f:facet>
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="permitAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="typePermit" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="permitAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{supplierController.saveSubmit}" value="#{msg.Save}" update=":SupplierListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleToSubmit(xhr, status, args)"/>
-                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SupplierEditDialog').hide()"/>
-                </h:panelGroup>
+                    <h:panelGroup >
+                        <p:dataList id="afterServiceAttachements" value="#{supplierController.getAttachList('afterService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">售后服务承诺附件</f:facet>
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="afterServiceAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="typeAfterService" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="afterServiceAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                    </h:panelGroup>
+                    <br/>
+                    <h:panelGroup >
+                        <p:dataList id="authorizationAttachements" value="#{supplierController.getAttachList('authorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">授权书附件</f:facet>
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="authorizationAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="typeAuthorization" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="authorizationAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                    </h:panelGroup>
+                </p:fieldset>
+                <p:fieldset legend="生产许可证信息" rendered="#{supplierController.activeSupplier()}">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">生产许可证编码</label>
+                            <p:inputText value="#{supplierController.selected.manufacturingPermitCode}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">生产许可证截止日期</label>
+                            <p:calendar timeZone="GMT+8" id="manufacturingPermitEndDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.manufacturingPermitEndDate}" required="false" requiredMessage="生产许可证截止日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup >
+                        <p:dataList id="manufacturingPermitAttachements" value="#{supplierController.getAttachList('ManufacturingPermit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">生产许可证附件</f:facet>
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="manufacturingPermitAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="typeManufacturingPermit" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="manufacturingPermitAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                    </h:panelGroup>
+                </p:fieldset>
+                <p:fieldset legend="产品注册证信息" rendered="#{supplierController.activeSupplier()}">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">产品注册证编号</label>
+                            <p:inputText value="#{supplierController.selected.productRegistrationCode}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">产品注册证开始日期</label>
+                            <p:calendar timeZone="GMT+8" id="productRegistrationStartDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.productRegistrationStartDate}" required="false" requiredMessage="产品注册证开始日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">产品注册证结束日期</label>
+                            <p:calendar timeZone="GMT+8" id="productRegistrationEndDate" pattern="yyyy/MM/dd" value="#{supplierController.selected.productRegistrationEndDate}" required="false" requiredMessage="产品注册证结束日期 #{msg.ValidationRequire}" showOn="button" disabled="false" Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup >
+                        <p:dataList id="productRegistrationAttachements" value="#{supplierController.getAttachList('ProductRegistration')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">生产许可证附件</f:facet>
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="productRegistrationAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="typeProductRegistration" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{supplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="productRegistrationAttachements" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                    </h:panelGroup>
+                </p:fieldset>
+                <p:commandButton validateClient="true" actionListener="#{supplierController.saveSubmit}" value="#{msg.Save}" update=":SupplierListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleToSubmit(xhr, status, args)"/>
+                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SupplierEditDialog').hide()"/>
             </h:form>
         </p:dialog>
         <script>
-function  handleToSubmit(xhr,status,args) {
-    if(args.spType){
-        $('#SupplierEditForm\\:wxs').addClass("ui-state-error");
-    }else{
-       // handleSubmit(args, 'SupplierEditDlg');
-        PF('SupplierEditDialog').hide();
-    }
-}
-
+            function  handleToSubmit(xhr,status,args) {
+                if(args.spType){
+                    $('#SupplierEditForm\\:wxs').addClass("ui-state-error");
+                }else{
+                   // handleSubmit(args, 'SupplierEditDlg');
+                    PF('SupplierEditDialog').hide();
+                }
+            }
         </script>
     </ui:composition>
 </html>
