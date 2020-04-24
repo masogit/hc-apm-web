@@ -64,6 +64,8 @@ public enum GatewayURL {
     USER_VACATION_CREATE("/hcapmassetservice/api/apm/userschedule/userVacation"),
     // Batch Operation
     BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
+    //supplier Api
+    SUPPLIER_WX_CODE_IMAGE("/hcapmgateway/api/apm/weChat/wxaCodeImage"),
 
     //备件增删
     ACCESSADD("/hcapmassetservice/api/apm/asset/workOrderDetails/{assetUid}"),

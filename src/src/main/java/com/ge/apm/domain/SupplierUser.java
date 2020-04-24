@@ -41,6 +41,10 @@ public class SupplierUser implements Serializable {
     @JoinColumn(insertable=false, updatable=false, name = "user_id", referencedColumnName = "id")
     private UserAccount userAccount;
 
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @JoinColumn(insertable=false, updatable=false, name = "supplier_id", referencedColumnName = "id")
+    private Supplier supplier;
+
 
     public String getId() {
         return id;
@@ -92,6 +96,14 @@ public class SupplierUser implements Serializable {
 
     public UserAccount getUserAccount() {
         return userAccount;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
     public void setUserAccount(UserAccount userAccount) {

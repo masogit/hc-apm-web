@@ -1,11 +1,14 @@
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.dao.SupplierUserRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.SupplierUser;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
@@ -15,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SupplierService {
@@ -26,6 +31,10 @@ public class SupplierService {
     private SupplierUserRepository supplierUserDao;
     @Autowired
     private UserAccountRepository userAccountDao;
+    @Autowired
+    private SupplierApiService supplierApiService;
+    @Autowired
+    private WorkflowConfigRepository workflowConfigDao;
 
     public List<String> getSupplier(String name) {
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -49,8 +58,29 @@ public class SupplierService {
         return userAccountDao.findByTenantUIDAndTempStaffRole(tenantUID);
     }
 
-    public List<SupplierUser> getSupplierUserList(Integer supplierId, String status){
-        return supplierUserDao.findBySupplierIDAndStatus(supplierId, status);
+    public List<SupplierUser> getSupplierUserList(Integer supplierId, String status, String queryStr){
+
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+
+        searchFilterList.add(new SearchFilter("supplier.tenantUID", SearchFilter.Operator.EQ, currentUserAccount.getTenantUID(),"1*"));
+
+        if(supplierId != null){
+            searchFilterList.add(new SearchFilter("supplierID", SearchFilter.Operator.EQ, supplierId,"1*"));
+        }
+
+        if(StringUtils.isNotEmpty(status)){
+            searchFilterList.add(new SearchFilter("status", SearchFilter.Operator.EQ, status,"1*"));
+        }
+
+        if(StringUtils.isNotEmpty(queryStr)){
+            searchFilterList.add(new SearchFilter("supplier.name", SearchFilter.Operator.LIKE, queryStr,"1*2+"));
+            searchFilterList.add(new SearchFilter("userAccount.name", SearchFilter.Operator.LIKE, queryStr,"1*2+"));
+            searchFilterList.add(new SearchFilter("userAccount.telephone", SearchFilter.Operator.LIKE, queryStr,"1*2+"));
+        }
+
+        return supplierUserDao.findBySearchFilter(searchFilterList);
     }
 
     public List<UserAccount> getApprovedUserList(Integer supplierId){
@@ -71,6 +101,16 @@ public class SupplierService {
 
     public void refuse(SupplierUser supplierUser){
         supplierUserDao.delete(supplierUser.getId());
+    }
+
+    public void approveByID(String id){
+        SupplierUser supplierUser = supplierUserDao.findById(id);
+        supplierUser.setStatus(SupplierUser.Status.Approved.name());
+        supplierUserDao.save(supplierUser);
+    }
+
+    public void refuseByID(String id){
+        supplierUserDao.delete(id);
     }
 
     @Transactional
@@ -94,4 +134,47 @@ public class SupplierService {
         supplierUserDao.deleteBySupplierIDAndStatusAndUserIDIn(supplier.getId(), SupplierUser.Status.PendingApproval.name(), userIDList);
 
     }
+
+    public byte[] getWxaCodeImage(){
+
+        String token = UserContextService.getAccessToken();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        String path = "pages/index/index?tenantName="+ user.getTenantName() +"&tenantUID=" + user.getTenantUID();
+        String appName ="hc-apm-supplier";
+
+        Map<String, Object> payloadMap = new HashMap<>();
+        payloadMap.put("path", path);
+        payloadMap.put("appName", appName);
+
+        JSONObject payload = new JSONObject(payloadMap);
+
+        return supplierApiService.getWxaCodeImage(token ,payload);
+
+    }
+
+    public boolean activeSupplier(){
+
+        UserAccount user = UserContextService.getCurrentUserAccount();
+
+        List<WorkflowConfig> workflowConfigList = workflowConfigDao.findBySiteUID(user.getSiteUID());
+        if(workflowConfigList.isEmpty()){
+            workflowConfigList = workflowConfigDao.findBySiteUID(user.getHospitalUID());
+        }
+        if(workflowConfigList.isEmpty()){
+            workflowConfigList = workflowConfigDao.findBySiteUID(user.getInstitutionUID());
+        }
+        if(workflowConfigList.isEmpty()){
+            workflowConfigList = workflowConfigDao.findBySiteUID(user.getTenantUID());
+        }
+
+        if(!workflowConfigList.isEmpty()){
+            if (workflowConfigList.get(0).getActiveSupplier() != null && workflowConfigList.get(0).getActiveSupplier()){
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
 }

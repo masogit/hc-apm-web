@@ -1835,22 +1835,13 @@ public void test1(){
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         this.newSupplier.setSiteId(loginUser.getSiteId());
         this.newSupplier.setHospitalId(loginUser.getHospitalId());
+        this.newSupplier.setTenantUID(loginUser.getTenantUID());
+        this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+        this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
+        this.newSupplier.setSiteUID(loginUser.getSiteUID());
+        this.newSupplier.setCreatedDate(new Date());
+        this.newSupplier.setCreatedBy(loginUser.getLoginName());
 
-        if (newSupplier.getMaintainerT()) {
-            supplierController.setMaintainerT(true);
-        } else {
-            supplierController.setMaintainerT(false);
-        }
-        if (newSupplier.getManufacturerT()) {
-            supplierController.setManufacturerT(true);
-        } else {
-            supplierController.setManufacturerT(false);
-        }
-        if (newSupplier.getSupplierT()) {
-            supplierController.setSupplierT(true);
-        } else {
-            supplierController.setSupplierT(false);
-        }
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
         supplierList.add(newSupplier);
