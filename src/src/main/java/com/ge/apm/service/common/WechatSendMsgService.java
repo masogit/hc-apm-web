@@ -41,7 +41,17 @@ public class WechatSendMsgService extends MicroServiceInvoker {
         String gatewayURL = getGatewayURL(GatewayURL.SEND_WECHAT_MSG);
         ResponseEntity<String> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, String.class);
         return response.getStatusCode().equals(HttpStatus.OK);
-    } 
+    }
+
+    public Boolean sendArrivalSubmitMsg(String token, Map<String, Object> map){
+        WechatPushModel model = new WechatPushModel();
+        model.setMessage(JSON.toJSONString(map));
+        HttpEntity<WechatPushModel> requestEntity = new HttpEntity<WechatPushModel>(model,createHttpHeaders(token));
+
+        String gatewayURL = getGatewayURL(GatewayURL.SEND_WECHAT_MSG);
+        ResponseEntity<String> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, String.class);
+        return response.getStatusCode().equals(HttpStatus.OK);
+    }
 
 }
 

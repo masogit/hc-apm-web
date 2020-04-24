@@ -11,6 +11,8 @@ public interface SupplierUserRepository extends GenericRepositoryUUID<SupplierUs
 
     List<SupplierUser> findBySupplierIDAndUserIDAndStatus(Integer supplierID, Integer userID, String status);
 
+    List<SupplierUser> findByStatus(String status);
+
     void deleteBySupplierIDAndStatus(Integer supplierID, String status);
 
     void deleteBySupplierIDAndStatusAndUserIDIn(Integer supplierID, String status, List<Integer> userIDList);
