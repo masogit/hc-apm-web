@@ -338,7 +338,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         //重复增加不被允许
         boolean isDuplicate = checkName();
         if (isDuplicate) return;
-        if (checkHospitalUcmid()) {
+        if (selected.getOrgType() == 2 && checkHospitalUcmid()) {
             return;
         }
 
