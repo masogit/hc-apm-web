@@ -99,18 +99,18 @@ public class SupplierService {
         supplierUserDao.save(supplierUser);
     }
 
-    public void refuse(SupplierUser supplierUser){
-        supplierUserDao.delete(supplierUser.getId());
-    }
-
     public void approveByID(String id){
         SupplierUser supplierUser = supplierUserDao.findById(id);
         supplierUser.setStatus(SupplierUser.Status.Approved.name());
         supplierUserDao.save(supplierUser);
     }
 
-    public void refuseByID(String id){
+    @Transactional
+    public void refuse(String id){
+        SupplierUser supplierUser = supplierUserDao.findById(id);
         supplierUserDao.delete(id);
+        supplierUserDao.deleteUserWxApp(supplierUser.getUserAccount().getId());
+        userAccountDao.delete(supplierUser.getUserAccount());
     }
 
     @Transactional
