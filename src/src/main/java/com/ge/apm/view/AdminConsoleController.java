@@ -46,6 +46,12 @@ public class AdminConsoleController {
 	private String sysRoleName;
 	@Getter
 	@Setter
+	private String userUid;
+	@Getter
+	@Setter
+	private String date;
+	@Getter
+	@Setter
 	private List<String> listSysRoleName;
 	@Getter
 	@Setter
@@ -150,6 +156,11 @@ public class AdminConsoleController {
 			}
 		});
 		t.start();
+		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
+	}
+
+	public void updatePmOrders(){
+		adminConsoleService.updatePmOrders(userUid,date);
 		WebUtil.addSuccessMessage("数据已更新，请检查数据库！");
 	}
 	private void formatVersionInfo(){

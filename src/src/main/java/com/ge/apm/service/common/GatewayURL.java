@@ -46,6 +46,7 @@ public enum GatewayURL {
     GET_APPROVE_BY_ASSET("/hcapmworkflowservice/api/apm/pmOrders/{assetUid}/approver"),
     PM_ORDER_STEPS("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/pmOrderSteps"),
     CREATE_PM_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/pmOrders/batch"),
+    CREATE_PM_ORDER_BY_CONTINUEFAILEDPMORDER("/hcapmworkflowservice/api/apm/pmOrders/continueFailedPmOrder"),
     CREATE_MEASURE_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
     AUTO_GENERATE_FINANCING_NUM("/hcapmassetservice/api/apm/asset/assetinfos/finacing_num"),
     CANCEL_PM_ORDER("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/cancel"),
