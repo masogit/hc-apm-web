@@ -329,7 +329,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void saveSelectedOrg() {
-
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)) {
             return;
@@ -338,7 +337,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         //重复增加不被允许
         boolean isDuplicate = checkName();
         if (isDuplicate) return;
-        if (checkHospitalUcmid()) {
+        if (selected.getOrgType() == 2 && checkHospitalUcmid()) {
             return;
         }
 
