@@ -6,13 +6,38 @@
 package com.ge.apm.view.wo;
 
 import com.alibaba.druid.util.StringUtils;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.MvsAssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.UserOrgInfoRepository;
+import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
+import com.ge.apm.dao.V2_WorkOrderRepository;
+import com.ge.apm.dao.WorkOrderDetailRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.domain.AssetFaultType;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.CustomConfig;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.MvsAssetInfo;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.ServiceRequestMsg;
+import com.ge.apm.domain.Supplier;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.domain.V2_WorkOrder;
+import com.ge.apm.domain.V2_WorkOrderCoworker;
+import com.ge.apm.domain.V2_WorkOrder_Detail;
+import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.*;
+import com.ge.apm.service.asset.AssetFaultTypeService;
+import com.ge.apm.service.asset.AssetInfoMgrService;
+import com.ge.apm.service.asset.AutoCompleteService;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -27,37 +52,37 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
-import webapp.framework.util.StringUtil;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
-import javax.servlet.http.HttpSession;
-
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 /**
@@ -182,14 +207,12 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private TenantInfo tenantInfo;
     @Override
     protected void init() {
-        LOGGER.info("init start");
         supplierController = WebUtil.getBean(SupplierController .class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         mvsAssetInfoRepository = WebUtil.getBean(MvsAssetInfoRepository.class);
-        LOGGER.info("1");
         userOrgInfoRepository=WebUtil.getBean(UserOrgInfoRepository.class);
         token = UserContextService.getAccessToken();
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
@@ -200,7 +223,6 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         userContextService = WebUtil.getBean(UserContextService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         assetFaultTypeService = WebUtil.getBean(AssetFaultTypeService.class);
-        LOGGER.info("2");
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
@@ -212,7 +234,6 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         tenantInfo= userContextService.getTenantInfo();
         customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
-        LOGGER.info("3");
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
         String queryAssetUID_href = WebUtil.getRequestParameter("queryAssetUID");
@@ -404,8 +425,13 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 
     private void loadClinicalDeptList() {
         /*clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());*/
-        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        clinicalDeptList = null;
+        List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
+        if (!CollectionUtils.isEmpty(deptList)) {
+            clinicalDeptList = deptList.stream().filter(item -> item.getOrgType() != null && item.getOrgType() == 4)
+                    .collect(Collectors.toList());
+        }
+
 
         if (null != selectSite) {
             clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
