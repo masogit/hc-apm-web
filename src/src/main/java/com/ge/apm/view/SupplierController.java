@@ -269,7 +269,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     public void onRefuse(){
         selectedMapPending.forEach((key, value) -> {
             if (value) {
-                supplierService.refuse(key);
+                supplierService.refuseByID(key);
             }
         });
         initSupplierUser();
@@ -277,7 +277,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     //供应商责任人停用
     public void onRefuse(SupplierUser supplierUser){
-        supplierService.refuse(supplierUser.getId());
+        supplierService.deleteByID(supplierUser.getId());
         initSupplierUser();
     }
 
