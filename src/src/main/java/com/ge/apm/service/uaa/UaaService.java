@@ -821,12 +821,7 @@ public class UaaService {
 
     public List<OrgInfo> getAllAccessibleClinicalDeptList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<OrgInfo> sitesList = this.getUserAccessibleSiteListWithClinicalDept(user.getUid());
-        Set<String> sites = sitesList.stream().map(item -> item.getUid()).collect(Collectors.toSet());
-
-        List<OrgInfo> dropdownList = getClinicalDeptListByAnySiteLevel(sites);
-
-        return sitesList;
+        return this.getUserAccessibleSiteListWithClinicalDept(user.getUid());
     }
 
     public List<OrgInfo> getClinicalDeptListByAnySiteLevel(String siteUID) {
