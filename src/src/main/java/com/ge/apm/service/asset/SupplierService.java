@@ -105,8 +105,12 @@ public class SupplierService {
         supplierUserDao.save(supplierUser);
     }
 
+    public void deleteByID(String id){
+        supplierUserDao.delete(id);
+    }
+
     @Transactional
-    public void refuse(String id){
+    public void refuseByID(String id){
         SupplierUser supplierUser = supplierUserDao.findById(id);
         supplierUserDao.delete(id);
         supplierUserDao.deleteUserWxApp(supplierUser.getUserAccount().getId());
