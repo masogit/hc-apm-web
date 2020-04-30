@@ -27,6 +27,7 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.wo.WorkOrderMgrController;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
@@ -44,6 +45,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -73,6 +75,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements ServerEventInterface {
+    protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(V2PmOrderController.class);
     V2_WorkOrderDetailRepository v2_workOrderDetailRepository;
     @Setter @Getter
     private List<PmOrderRule> ruleList;
@@ -1837,15 +1840,36 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     private void loadClinicalDeptList() {
-       /* clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());*/
-        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
-                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
-        if (null != selectSite) {
-            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
-                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
+        try {
+            /*clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());*/
+            clinicalDeptList = Collections.emptyList();
+            List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
+            if (!org.springframework.util.CollectionUtils.isEmpty(deptList)) {
+                clinicalDeptList = deptList.stream()
+                        .filter(item ->
+                        {
+                            if (item == null) {
+                                LOGGER.info("null");
+                            }
+                            return item.getOrgType() != null && item.getOrgType() == 4;
+                        })
+                        .collect(Collectors.toList());
+            }
+
+            if (null != selectSite && !clinicalDeptList.isEmpty()) {
+                clinicalDeptList = clinicalDeptList.stream()
+                        .filter(item -> com.alibaba.druid.util.StringUtils.equals(item.getSiteUID(), selectSite.getSiteUID())
+                                || com.alibaba.druid.util.StringUtils.equals(item.getHospitalUID(), selectSite.getSiteUID())
+                                || com.alibaba.druid.util.StringUtils.equals(item.getInstitutionUID(), selectSite.getSiteUID())
+                                || com.alibaba.druid.util.StringUtils.equals(item.getTenantUID(), selectSite.getSiteUID()))
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            LOGGER.error("loadClinicalDeptList occur exception", e);
+            throw e;
         }
     }
+
     public void setSearchFilterForOrg(){
         if (null != selectSite) {
             this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));

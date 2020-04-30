@@ -267,7 +267,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
                     item -> woStatus.put(item.getValueZh(), Integer.parseInt(item.getMsgKey())));
             loadClinicalDeptList();
         } catch (Exception e) {
-            LOGGER.error("init occur exception,{}", e.getMessage());
+            LOGGER.error("init occur exception", e);
             throw e;
         }
     }
@@ -437,24 +437,30 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private void loadClinicalDeptList() {
         try {
             /*clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid()).stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());*/
-            clinicalDeptList = null;
+            clinicalDeptList = Collections.emptyList();
             List<OrgInfo> deptList = uaaService.getAllAccessibleClinicalDeptList();
             if (!CollectionUtils.isEmpty(deptList)) {
                 clinicalDeptList = deptList.stream()
-                        .filter(item -> item.getOrgType() != null && item.getOrgType() == 4)
+                        .filter(item ->
+                        {
+                            if (item == null) {
+                                LOGGER.info("null");
+                            }
+                            return item.getOrgType() != null && item.getOrgType() == 4;
+                        })
                         .collect(Collectors.toList());
             }
 
-            if (null != selectSite && clinicalDeptList != null) {
+            if (null != selectSite && !clinicalDeptList.isEmpty()) {
                 clinicalDeptList = clinicalDeptList.stream()
-                        .filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item
-                                .getHospitalUID().equals(selectSite.getSiteUID())
-                                || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item
-                                .getTenantUID().equals(selectSite.getSiteUID()))
+                        .filter(item -> StringUtils.equals(item.getSiteUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getHospitalUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getInstitutionUID(), selectSite.getSiteUID())
+                                || StringUtils.equals(item.getTenantUID(), selectSite.getSiteUID()))
                         .collect(Collectors.toList());
             }
         } catch (Exception e) {
-            LOGGER.error("loadClinicalDeptList occur exception {}", e.getMessage());
+            LOGGER.error("loadClinicalDeptList occur exception", e);
             throw e;
         }
     }
