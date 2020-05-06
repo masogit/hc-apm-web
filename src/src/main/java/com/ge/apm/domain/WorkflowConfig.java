@@ -504,6 +504,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "aa_enable_log_patient_info")
     private Boolean enableLogPatientInfo = Boolean.FALSE;
 
+    @Column(name = "is_active_supplier")
+    private Boolean isActiveSupplier = Boolean.FALSE;//是否激活供应商流程
+
     public Integer getShareAutoConfirm() {
         return shareAutoConfirm;
     }
@@ -1016,6 +1019,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setCloseWithoutParts(Boolean closeWithoutParts) {
         this.closeWithoutParts = closeWithoutParts;
+    }
+
+    public Boolean getActiveSupplier() {
+        return isActiveSupplier;
+    }
+
+    public void setActiveSupplier(Boolean activeSupplier) {
+        isActiveSupplier = activeSupplier;
     }
 
     @Override

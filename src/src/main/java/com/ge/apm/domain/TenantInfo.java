@@ -99,7 +99,7 @@ public class TenantInfo implements Serializable {
     private Integer passwordLifeTime; //密码有效天数
     
     @Column(name = "type")
-    private Integer type = 0;//0、普通租户，1、代理商租户 2、临时租户 3,zkb租户
+    private Integer type = 0;//0、普通租户，1、代理商租户 2、临时租户 3,zkb租户 4, ztb租户
 
     @Column(name = "is_insulate")
     private Boolean isInsulate;
@@ -154,6 +154,9 @@ public class TenantInfo implements Serializable {
 
     @Column(name = "international_version")
     private Integer internationalVersion;//是否是国际化租户 0或null:不是 1：是
+
+    @Column(name = "have_ib_device")
+    private Boolean haveIbDevice;
 
     public Integer getInternationalVersion() {
         return internationalVersion;
@@ -532,4 +535,11 @@ public class TenantInfo implements Serializable {
         isDeleted = deleted;
     }
 
+    public Boolean getHaveIbDevice() {
+        return haveIbDevice;
+    }
+
+    public void setHaveIbDevice(Boolean haveIbDevice) {
+        this.haveIbDevice = haveIbDevice;
+    }
 }

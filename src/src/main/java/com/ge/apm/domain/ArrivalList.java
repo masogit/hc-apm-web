@@ -183,6 +183,9 @@ public class ArrivalList implements Serializable {
     //维修联系人电话
     @Column(name = "repairer_tel")
     private String repairerTel;
+    //培训资料
+    @Column(name = "training_info")
+    private String trainingInfo;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -521,6 +524,14 @@ public class ArrivalList implements Serializable {
 
     public void setRepairerTel(String repairerTel) {
         this.repairerTel = repairerTel;
+    }
+
+    public String getTrainingInfo() {
+        return trainingInfo;
+    }
+
+    public void setTrainingInfo(String trainingInfo) {
+        this.trainingInfo = trainingInfo;
     }
 
     @Override

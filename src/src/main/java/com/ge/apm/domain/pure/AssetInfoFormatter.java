@@ -1,9 +1,11 @@
 package com.ge.apm.domain.pure;
 
 import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.Brand;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -21,7 +23,7 @@ public class AssetInfoFormatter {
     private List<OrgInfo> sites;
     private AssetFileImportBaseService importService;
     private AssetInfoRepository assetDao;
-//    private OrgInfoRepository orgDao;
+    private OrgInfoRepository orgDao;
 //    private I18nMessageRepository i18nDao;
     private int siteId;
 
@@ -33,7 +35,7 @@ public class AssetInfoFormatter {
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
-//        this.orgDao = orgDao;
+        this.orgDao = orgDao;
 //        this.i18nDao = i18nDao;
         this.siteId = UserContextService.getCurrentUserAccount().getSiteId();
     }
@@ -242,6 +244,22 @@ public class AssetInfoFormatter {
     public String getSiteName() {
 
         OrgInfo orgInfo = findDeptOrg(this.getSiteUID());
+        if (orgInfo == null) return null;
+
+        return orgInfo.getName();
+    }
+
+    public String getHospitalName() {
+
+        OrgInfo orgInfo = findDeptOrg(this.getHospitalUID());
+        if (orgInfo == null) return null;
+
+        return orgInfo.getName();
+    }
+
+    public String getInstitutionName() {
+
+        OrgInfo orgInfo = findDeptOrg(this.getInstitutionUID());
         if (orgInfo == null) return null;
 
         return orgInfo.getName();
@@ -720,6 +738,17 @@ public class AssetInfoFormatter {
 
     }
 
+    private String joinTags() {
+        List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
+        if (assetTags.isEmpty()) {
+            return null;
+        }
+
+        //use space as delimiter
+        String joinedAssetTags = String.join(" ", assetTags);
+        return joinedAssetTags;
+    }
+
     private String findMatchValue(Integer item, List<I18nMessage> msgList) {
 
         String msgKey = String.valueOf(item);
@@ -757,7 +786,7 @@ public class AssetInfoFormatter {
         return null;
     }
 
-    public Map<String, Object> buildExcelColumnKeyValueMap() {
+    public Map<String, Object> buildExcelColumnKeyValueMap(boolean crossSite) {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -769,6 +798,12 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("RepairOwner2"), this.getAssetOwnerName2());
         map.put(WebUtil.getMessage("RepairOwner3"), this.getAssetOwnerName3());
         map.put(WebUtil.getMessage("pmOwnerName"), this.getPmOwnerName());
+
+        if (crossSite) {
+            map.put(WebUtil.getMessage("Hospital"), this.getHospitalName());
+            map.put(WebUtil.getMessage("Institution"), this.getInstitutionName());
+        }
+
         map.put(WebUtil.getMessage("Site"), this.getSiteName());
         map.put(WebUtil.getMessage("clinicalDeptId"), this.getClinicalDeptName());
         map.put(WebUtil.getMessage("assetDeptId"), this.getAssetDeptName());
@@ -841,6 +876,7 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("createdDate"), assetInfo.getCreatedDate());
 
         map.put(WebUtil.getMessage("proprietaryClass"), this.getProprietaryClassAsString());
+        map.put(WebUtil.getMessage("assetTags"), this.joinTags());
 
         map.put(WebUtil.getMessage("UUID"), this.getUid());
 

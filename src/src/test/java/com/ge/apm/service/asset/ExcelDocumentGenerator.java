@@ -28,6 +28,8 @@ public class ExcelDocumentGenerator {
     public static String[] headerTitles = {
             WebUtil.getMessage("EquipmentID"),
             WebUtil.getMessage("EquipmentName"),
+            WebUtil.getMessage("clinicalDeptId"),
+            WebUtil.getMessage("assetDeptId"),
             WebUtil.getMessage("EquipmentAlias"),
             WebUtil.getMessage("RepairOwner"),
             WebUtil.getMessage("RepairOwner2"),
@@ -279,13 +281,14 @@ public class ExcelDocumentGenerator {
 
 
         for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-            Row dataRow = sheet.createRow(AssetFileImportService.EXCEL_ASSET_DATA_ROW - 1 + rowIndex);
+            Row dataRow = sheet.createRow(AssetFileImportBaseService.EXCEL_ASSET_DATA_ROW - 1 + rowIndex);
 
-            applyCellData(dataRow, "设备编号", String.format("SBBH%07d", rowIndex + 1));
-            applyCellData(dataRow, "设备名称", "测试名称");
-            applyCellData(dataRow, "设备分类", "其他类");
-            applyCellData(dataRow, "资产编号", null);
-            applyCellData(dataRow, "二维码", null);
+            applyCellData(dataRow, WebUtil.getMessage("EquipmentID"), String.format("SBBH%07d", rowIndex + 1));
+            applyCellData(dataRow, WebUtil.getMessage("EquipmentName"), "测试名称");
+            applyCellData(dataRow, WebUtil.getMessage("clinicalDeptId"), "内科");
+            applyCellData(dataRow, WebUtil.getMessage("EquipmentClassification"), "其他类");
+//            applyCellData(dataRow, "资产编号", null);
+//            applyCellData(dataRow, "二维码", null);
 
         }
 

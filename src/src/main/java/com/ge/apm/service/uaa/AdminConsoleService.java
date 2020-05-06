@@ -1,66 +1,33 @@
 package com.ge.apm.service.uaa;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.toolkit.StringUtils;
+import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.UserAccountMapper;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.toolkit.StringUtils;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.AssetLifecycleEventRepository;
-import com.ge.apm.dao.BatchJobRepository;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
-import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
-import com.ge.apm.dao.NurseSiteMaintainDataRepository;
-import com.ge.apm.dao.NurseSiteMaintainItemRepository;
-import com.ge.apm.dao.NurseSiteMaintainRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SysRoleRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
-import com.ge.apm.dao.UserRoleRepository;
-import com.ge.apm.dao.mapper.UserAccountMapper;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.AssetLifecycleEvent;
-import com.ge.apm.domain.BatchJob;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.NurseSiteMaintain;
-import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.NurseSiteMaintainConfigItem;
-import com.ge.apm.domain.NurseSiteMaintainItem;
-import com.ge.apm.domain.SysRole;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.common.GatewayURL;
-import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
-public class AdminConsoleService {
+public class AdminConsoleService extends MicroServiceInvoker {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
@@ -586,7 +553,7 @@ public class AdminConsoleService {
 	public String getGatewayURL(GatewayURL url) {
         return baseURL + url.toString();
     }
-	private Boolean isOkay(ResponseEntity res) {
+	public Boolean isOkay(ResponseEntity res) {
 
         if (!res.getStatusCode().equals(HttpStatus.OK)) {
             return false;
@@ -594,4 +561,18 @@ public class AdminConsoleService {
         LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) res.getBody();
         return body.containsKey("bizStatusCode") && body.get("bizStatusCode").equals("OK");
     }
+
+	public void updatePmOrders(String userUid,String date) {
+		String token = UserContextService.getAccessToken();
+		HttpEntity<String> requestEntity = new HttpEntity<>(createHttpHeaders(token));
+		String gatewayURL = getGatewayURL(GatewayURL.CREATE_PM_ORDER_BY_CONTINUEFAILEDPMORDER);
+		String url = gatewayURL.concat("?userUid=").concat(userUid);
+		url = url.concat("&date=").concat(date);
+		ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.PUT, requestEntity, LinkedHashMap.class,userUid,date);
+		if (isOkay(response)) {
+			 List<V2_PmOrder> pmOrders = (List<V2_PmOrder>) response.getBody();
+			logger.info("批量创建保养失败记录：{}",pmOrders);
+		} else {
+		}
+	}
 }

@@ -158,6 +158,10 @@
                                         <label class="label">维修联系人电话</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.repairerTel}" />
                                     </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">培训资料</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.trainingInfo}" />
+                                    </h:panelGroup>
 
                                 </p:panelGrid>
                                 <h:panelGroup rendered="#{assetArrivedListEditController.selected.status eq 2 and assetArrivedListEditController.getInstalledCount() eq 0}">

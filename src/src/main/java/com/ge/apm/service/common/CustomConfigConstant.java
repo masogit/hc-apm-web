@@ -131,6 +131,7 @@ public class CustomConfigConstant {
             exportFields.put(WebUtil.getMessage("subjectProject"), "subjectProject");
             exportFields.put(WebUtil.getMessage("createdDate"), "createdDate");
             exportFields.put(WebUtil.getMessage("proprietaryClass"), "proprietaryClass");
+            exportFields.put(WebUtil.getMessage("assetTags"), "assetTags");
 
             exportFields.put(WebUtil.getMessage("UUID"), "UUID");
 
@@ -226,6 +227,7 @@ public class CustomConfigConstant {
             allFields.put("orgPath", WebUtil.getMessage("orgPath"));
             allFields.put("assetLocation", WebUtil.getMessage("assetLocation"));
             allFields.put("UCMID", WebUtil.getMessage("UCMID"));
+            allFields.put("assetTags", WebUtil.getMessage("assetTags"));
 //        }
         return allFields;
     }

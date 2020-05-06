@@ -2,6 +2,7 @@
  */
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import org.springframework.data.annotation.CreatedBy;
@@ -12,14 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -72,6 +66,8 @@ public class Supplier implements Serializable, ChineseName {
     @Size(max = 16)
     @Column(name = "tel")
     private String tel;
+    @Column(name = "email")
+    private String email;
     @Column(name = "supplier_type")
     private String supplierType;
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
@@ -87,13 +83,13 @@ public class Supplier implements Serializable, ChineseName {
     private String siteUID;
 
     @Column(name = "supplier_t")
-    private Boolean supplierT;
+    private Boolean supplierT = Boolean.FALSE;
 
     @Column(name = "maintainer_t")
-    private Boolean maintainerT;
+    private Boolean maintainerT = Boolean.FALSE;
 
     @Column(name = "manufacturer_t")
-    private Boolean manufacturerT;
+    private Boolean manufacturerT = Boolean.FALSE;
 
     @CreatedBy
     @Column(name = "created_by", nullable = true, length = 50)
@@ -110,6 +106,57 @@ public class Supplier implements Serializable, ChineseName {
     @LastModifiedDate
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
+
+    //供应商资质
+    //供应商编码
+    @Column(name = "supplier_code")
+    private String supplierCode;
+    //供应商名称缩写
+    @Column(name = "supplier_abbreviation")
+    private String supplierAbbreviation;
+    //企业法人
+    @Column(name = "corporate")
+    private String corporate;
+    //统一社会信用编码
+    @Column(name = "credit_code")
+    private String creditCode;
+    //营业执照编码
+    @Column(name = "license_code")
+    private String licenseCode;
+    //营业执照截止日期
+    @Column(name = "license_end_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date licenseEndDate;
+    //营业许可证编码
+    @Column(name = "permit_code")
+    private String permitCode;
+    //营业许可证截止日期
+    @Column(name = "permit_end_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date permitEndDate;
+    //生产许可证编码
+    @Column(name = "manufacturing_permit_code")
+    private String manufacturingPermitCode;
+    //生产许可证截止日期
+    @Column(name = "manufacturing_permit_end_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date manufacturingPermitEndDate;
+    //产品注册证编号
+    @Column(name = "product_registration_code")
+    private String productRegistrationCode;
+    //产品注册证开始日期
+    @Column(name = "product_registration_start_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date productRegistrationStartDate;
+    //产品注册证结束日期
+    @Column(name = "product_registration_end_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date productRegistrationEndDate;
 
 
     @PrePersist
@@ -275,36 +322,6 @@ public class Supplier implements Serializable, ChineseName {
         this.manufacturerT = manufacturerT;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Supplier)) {
-            return false;
-        }
-        Supplier other = (Supplier) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.ge.apm.domain.Supplier[ id=" + id + " ]";
-    }
-
-    @Override
-    public String getPinYin() {
-        return namePyCode;
-    }
-
     public String getCreatedBy() {
         return createdBy;
     }
@@ -336,4 +353,147 @@ public class Supplier implements Serializable, ChineseName {
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getSupplierCode() {
+        return supplierCode;
+    }
+
+    public void setSupplierCode(String supplierCode) {
+        this.supplierCode = supplierCode;
+    }
+
+    public String getSupplierAbbreviation() {
+        return supplierAbbreviation;
+    }
+
+    public void setSupplierAbbreviation(String supplierAbbreviation) {
+        this.supplierAbbreviation = supplierAbbreviation;
+    }
+
+    public String getCorporate() {
+        return corporate;
+    }
+
+    public void setCorporate(String corporate) {
+        this.corporate = corporate;
+    }
+
+    public String getCreditCode() {
+        return creditCode;
+    }
+
+    public void setCreditCode(String creditCode) {
+        this.creditCode = creditCode;
+    }
+
+    public String getLicenseCode() {
+        return licenseCode;
+    }
+
+    public void setLicenseCode(String licenseCode) {
+        this.licenseCode = licenseCode;
+    }
+
+    public Date getLicenseEndDate() {
+        return licenseEndDate;
+    }
+
+    public void setLicenseEndDate(Date licenseEndDate) {
+        this.licenseEndDate = licenseEndDate;
+    }
+
+    public String getPermitCode() {
+        return permitCode;
+    }
+
+    public void setPermitCode(String permitCode) {
+        this.permitCode = permitCode;
+    }
+
+    public Date getPermitEndDate() {
+        return permitEndDate;
+    }
+
+    public void setPermitEndDate(Date permitEndDate) {
+        this.permitEndDate = permitEndDate;
+    }
+
+    public String getManufacturingPermitCode() {
+        return manufacturingPermitCode;
+    }
+
+    public void setManufacturingPermitCode(String manufacturingPermitCode) {
+        this.manufacturingPermitCode = manufacturingPermitCode;
+    }
+
+    public Date getManufacturingPermitEndDate() {
+        return manufacturingPermitEndDate;
+    }
+
+    public void setManufacturingPermitEndDate(Date manufacturingPermitEndDate) {
+        this.manufacturingPermitEndDate = manufacturingPermitEndDate;
+    }
+
+    public String getProductRegistrationCode() {
+        return productRegistrationCode;
+    }
+
+    public void setProductRegistrationCode(String productRegistrationCode) {
+        this.productRegistrationCode = productRegistrationCode;
+    }
+
+    public Date getProductRegistrationStartDate() {
+        return productRegistrationStartDate;
+    }
+
+    public void setProductRegistrationStartDate(Date productRegistrationStartDate) {
+        this.productRegistrationStartDate = productRegistrationStartDate;
+    }
+
+    public Date getProductRegistrationEndDate() {
+        return productRegistrationEndDate;
+    }
+
+    public void setProductRegistrationEndDate(Date productRegistrationEndDate) {
+        this.productRegistrationEndDate = productRegistrationEndDate;
+    }
+
+    @Override
+    public String getPinYin() {
+        return namePyCode;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Supplier)) {
+            return false;
+        }
+        Supplier other = (Supplier) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "com.ge.apm.domain.Supplier[ id=" + id + " ]";
+    }
+
 }
