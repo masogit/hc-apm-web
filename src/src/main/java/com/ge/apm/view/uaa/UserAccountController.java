@@ -1,5 +1,54 @@
 package com.ge.apm.view.uaa;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.UserAccountMapper;
+import com.ge.apm.dao.mapper.UserTagsMapper;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.security.UserDetailsServiceImpl;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.uaa.UserAccountExportService;
+import com.ge.apm.service.uaa.UserAccountService;
+import com.ge.apm.service.utils.*;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import webapp.framework.context.LocaleHolder;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.JpaCRUDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.PhaseId;
+import javax.faces.event.ValueChangeEvent;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
@@ -7,56 +56,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
-import javax.faces.event.ValueChangeEvent;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
-import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
-import com.ge.apm.view.sysutil.UserInfo;
-import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.NodeUnselectEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.service.common.UserCommonService;
-import com.ge.apm.service.orginfo.OrgInfoTreeService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.uaa.UserAccountExportService;
-import com.ge.apm.service.uaa.UserAccountService;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.MicroServiceUtil;
-import com.ge.apm.service.utils.PasswordUtil;
-import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.utils.TreeNodeUtil;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
-import javax.faces.event.AjaxBehaviorEvent;
-import org.primefaces.event.SelectEvent;
-
-import org.springframework.util.StringUtils;
-import webapp.framework.context.LocaleHolder;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.TimeUtil;
-import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.JpaCRUDController;
 
 @ManagedBean
 @ViewScoped
@@ -77,7 +76,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     UserOrgInfoRepository userOrgInfoRepository;
     UserAccountRepository dao = null;
+    UserAccountMapper userAccountMapper;
+    UserTagsMapper userTagsMapper;
+    UserTagsRepository userTagsDao;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
+    UserDetailsService userDetailsService;
 
     private String tenantUid;
 
@@ -129,10 +132,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userOrgInfoRepository= WebUtil.getBean(UserOrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(UserAccountRepository.class);
+        userAccountMapper = WebUtil.getBean(UserAccountMapper.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         userAccountService = WebUtil.getBean(UserAccountService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
+        userTagsDao = WebUtil.getBean(UserTagsRepository.class);
+        userTagsMapper = WebUtil.getBean(UserTagsMapper.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
 
@@ -143,7 +149,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         protocol = jsonTemplateRepository.findByType(3);
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
-
+        userDetailsService = WebUtil.getBean(UserDetailsServiceImpl.class);
 
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             //if current user belongs to test tenant, then use the first tenant in non test tenant list
@@ -311,6 +317,20 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Override
     public String getKeyFieldNameValue(UserAccount obj) {
         return WebUtil.getMessage("login_name") + "=" + obj.getLoginName();
+    }
+
+    @Override
+    public void setSelected(UserAccount selectedObj) {
+        if (selectedObj == null) {
+            return;
+        }
+
+        this.selected = selectedObj;
+
+        //fetch tags before display
+        List<String> existingTags = userTagsMapper.getTagsByUser(this.selected.getUid());
+        this.selected.setTags(existingTags);
+
     }
 
     private List<String> allRoles;
@@ -642,6 +662,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
             }
             super.save();
+
+            saveTags();
+
             if (this.crudActionName.equals("Create")) {
                 updateUserRole(loginUser.getType());
             }
@@ -650,6 +673,31 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
 
+    }
+
+    private void saveTags() {
+        List<String> existingTags = userTagsMapper.getTagsByUser(this.selected.getUid());
+        List<String> currentTags = this.selected.getTags();
+
+        List<String> newTags = new ArrayList<>(currentTags);
+        newTags.removeAll(existingTags);
+
+        List<String> removeTags = new ArrayList<>(existingTags);
+        removeTags.removeAll(currentTags);
+
+        //add new tags
+        newTags.stream().distinct().forEach(item -> {
+            UserTags tags = new UserTags();
+            tags.setUserUid(this.selected.getUid());
+            tags.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+            tags.setTag(item);
+            userTagsDao.save(tags);
+        });
+
+        //remove useless tags
+        removeTags.stream().distinct().forEach(item -> {
+            userTagsMapper.removeTag(this.selected.getUid(), item);
+        });
     }
 
     @Transactional
@@ -1034,8 +1082,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void loginAs() {
         if(this.selected==null) return;
 
-        UserContextService.setLoginUser(this.selected);
-
         //call microServices to get Access Token...
         try{
             ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
@@ -1044,11 +1090,25 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
             String accessToken = msUtil.getAuthenticateByUserPasswordEncrypted(selected.getLoginName(), selected.getPassword(),request.getHeader("User-Agent"));
             request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+
+            //make sure microservice works before apm web
+            UserContextService.setLoginUser(this.selected);
+
+            attemptSwitchUserInSpringSecurityContext(this.selected);
+
         }catch(Exception e){
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-    
+
+    private void attemptSwitchUserInSpringSecurityContext(UserAccount loginAsUser) {
+        UserDetails targetUser = userDetailsService.loadUserByUsername(loginAsUser.getLoginName());
+
+        Collection<? extends GrantedAuthority> auths = targetUser.getAuthorities();
+        UsernamePasswordAuthenticationToken targetUserRequest = new UsernamePasswordAuthenticationToken(targetUser, targetUser.getPassword(), auths);
+        SecurityContextHolder.getContext().setAuthentication(targetUserRequest);
+    }
+
     public void exportAll(){
     	generateListSearchFilter();
     	List<UserAccount> listUserAccount=dao.findBySearchFilter(searchFilters);
@@ -1167,5 +1227,22 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setShowButton(boolean showButton) {
         isShowButton = showButton;
+    }
+
+    public List<String> autoCompleteTags(String query) {
+
+        List<String> tags = userTagsMapper.getTagsByTenant(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        if (StringUtils.isEmpty(query)) {
+            return tags;
+        }
+
+        tags = tags.stream().filter(tag -> tag.contains(query)).collect(Collectors.toList());
+
+        if (tags.isEmpty()) {
+            tags.add(query);
+        }
+
+        return tags;
     }
 }

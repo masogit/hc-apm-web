@@ -520,4 +520,11 @@
             </p:selectOneRadio>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetTags')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetTags}</label>
+            <p:autoComplete id="tags" multiple="true" value="#{assetInfoDetailController.selected.tags}" readonly="true" disabled="true"
+                            var="tag" itemLabel="#{tag}" itemValue="#{tag}" forceSelection="false" styleClass="asset-tags"/>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>

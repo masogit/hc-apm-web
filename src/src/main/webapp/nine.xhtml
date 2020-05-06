@@ -1,0 +1,30 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+
+        <div class="ui-g-12">
+            <p:tabView id="measuringTab" class="ui-g-12">
+                <p:tab title="全部设备" id="tab1">
+                    <p:graphicImage name="/img/ninthAsset_1.png"/>
+                </p:tab>
+                <p:tab title="口腔设备" id="tab2">
+                    <p:graphicImage name="/img/ninthAsset_2.png"/>
+                </p:tab>
+                <p:tab title="急救和生命支持设备" id="tab3">
+                    <p:graphicImage name="/img/ninthAsset_3.png"/>
+                </p:tab>
+                <p:tab title="放射放疗及核医学设备" id="tab4">
+                    <p:graphicImage name="/img/ninthAsset_4.png"/>
+                </p:tab>
+            </p:tabView>
+        </div>
+
+    </ui:define>
+
+
+</ui:composition>

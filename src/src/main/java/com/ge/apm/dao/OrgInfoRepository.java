@@ -1,15 +1,13 @@
 package com.ge.apm.dao;
 
-import java.util.List;
-import java.util.Set;
-
+import com.ge.apm.domain.OrgInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-
-import com.ge.apm.domain.OrgInfo;
-
 import webapp.framework.dao.GenericRepository;
+
+import java.util.List;
+import java.util.Set;
 
 public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 	// @QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true")
@@ -135,6 +133,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
 	public OrgInfo findFirstByParentUIDAndNameAndUidIsNot(String parentUid, String name, String uid);
 
+	public OrgInfo findFirstByTenantUIDAndHospitalUcmid(String tenantUID, String hospitalUcmid);
+
 	public int countByParentUIDAndUidIsNot(String parentUid, String uid);
 
 	public int countByParentUIDAndOrgType(String parentUid, int orgType);
@@ -156,4 +156,20 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
 	@Query(value = "select o.* from org_info o where o.site_uid=?1 and o.org_type=4", nativeQuery = true)
 	public List<OrgInfo> getDeptListBySiteUid(String siteUid);
+
+	@Query(value = "with recursive cte_site as (\n" +
+			"select o.id, o.uid, o.short_name, o.name, o.parent_id, o.parent_uid, o.org_level, o.org_type, o.site_uid, o.hospital_uid, o.institution_uid, o.tenant_uid, o.site_id, cast('' as varchar(1000)) as org_uri\n" +
+			"from org_info o\n" +
+			"join tenant_info t on o.tenant_uid = t.uid\n" +
+			"where o.parent_uid is null and t.uid = ?1 \n" +
+			"\n" +
+			"union\n" +
+			"\n" +
+			"select o.id, o.uid, o.short_name, o.name, o.parent_id, o.parent_uid, o.org_level, o.org_type, o.site_uid, o.hospital_uid, o.institution_uid, o.tenant_uid, o.site_id, cast(cte.org_uri || '->' || o.short_name as varchar(1000)) as org_uri\n" +
+			"from org_info o\n" +
+			"join tenant_info t on o.tenant_uid = t.uid\n" +
+			"inner join cte_site cte on o.parent_uid = cte.uid\n" +
+			"where t.uid = ?1 \n" +
+			") select  * from cte_site;", nativeQuery = true)
+	public List<Object[]> getOrgHierarchyForTenant(String tenantUid);
 }

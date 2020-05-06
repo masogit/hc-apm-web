@@ -69,7 +69,7 @@
                                         <label class="label">#{msg.EquipmentOwnerA}</label>
                                         <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>d
+                                            <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                         </p:selectOneMenu>
 
 
@@ -94,6 +94,14 @@
                                         <label class="label">#{msg.nameEn}</label>
                                         <p:inputText id="nameEn" value="#{orgInfoController.orgNameEn}" />
                                     </h:panelGroup>
+                                    <br/>
+                                    <h:panelGroup rendered="#{orgInfoController.isShow}">
+                                        <label class="label">#{msg.hospitalUcmid}</label>
+                                        <p:inputText id="hospitalUcmid" value="#{orgInfoController.hospitalUcmid}" required="false" requiredMessage="#{msg.hospitalUcmid} #{msg.ValidationRequire}">
+                                            <p:ajax listener="#{orgInfoController.checkHospitalUcmid()}" process="@this"  update=":growl" ></p:ajax>
+                                        </p:inputText>
+                                    </h:panelGroup>
+                                    <br/>
                                     <p:spacer></p:spacer>
                                     <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
 

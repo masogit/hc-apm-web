@@ -21,8 +21,10 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,16 +32,15 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import javaslang.Tuple2;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+import com.ge.apm.service.common.WechatSendMsgService;
 
 /**
  *
@@ -82,6 +83,8 @@ public class AssetInstallationService {
     private V2_PmOrderService pmService;
     @Autowired
     private ContractInfoItemRepository contractItemDao;
+    @Autowired
+    private WechatSendMsgService wechatSendMsgService;
 
 
     public List<Supplier> getOnlySuplierListBySiteUid(String tenantUid) {
@@ -305,6 +308,20 @@ public class AssetInstallationService {
 //        }else{
 //            return supplierDao.getBySiteUID(siteUID);
 //        }
+    }
+
+    public Boolean sendArrivalSubmitMsg(String arrivalListId){
+        String token = UserContextService.getAccessToken();
+        String appPath = "pages/index/index?arrivalListId=" + arrivalListId;
+        String appName = "hc-apm-supplier";
+        String template = "un_take_task_template_id";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("appPath", appPath);
+        map.put("appName", appName);
+        map.put("template", template);
+
+        return wechatSendMsgService.sendArrivalSubmitMsg(token, map);
     }
 
 }

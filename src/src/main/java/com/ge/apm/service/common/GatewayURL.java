@@ -46,6 +46,7 @@ public enum GatewayURL {
     GET_APPROVE_BY_ASSET("/hcapmworkflowservice/api/apm/pmOrders/{assetUid}/approver"),
     PM_ORDER_STEPS("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/pmOrderSteps"),
     CREATE_PM_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/pmOrders/batch"),
+    CREATE_PM_ORDER_BY_CONTINUEFAILEDPMORDER("/hcapmworkflowservice/api/apm/pmOrders/continueFailedPmOrder"),
     CREATE_MEASURE_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
     AUTO_GENERATE_FINANCING_NUM("/hcapmassetservice/api/apm/asset/assetinfos/finacing_num"),
     CANCEL_PM_ORDER("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/cancel"),
@@ -64,6 +65,8 @@ public enum GatewayURL {
     USER_VACATION_CREATE("/hcapmassetservice/api/apm/userschedule/userVacation"),
     // Batch Operation
     BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
+    //supplier Api
+    SUPPLIER_WX_CODE_IMAGE("/hcapmgateway/api/apm/weChat/wxaCodeImage"),
 
     //备件增删
     ACCESSADD("/hcapmassetservice/api/apm/asset/workOrderDetails/{assetUid}"),
