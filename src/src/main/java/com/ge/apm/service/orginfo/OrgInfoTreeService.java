@@ -26,35 +26,6 @@ public class OrgInfoTreeService {
     @Autowired
     private TenantInfoRepository tenantInfoDao;
 
-    public TreeNode buildHierachyClinicalDept(String siteUid, List<OrgInfo> orgInfoList) {
-
-        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
-
-        for(OrgInfo org: orgInfoList){
-            TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setRowKey("org_"+org.getId());
-            treeMap.put(org.getUid(), node);
-        }
-
-        TreeNode rootNode = new DefaultTreeNode("root", null, null);
-        rootNode.setSelectable(false);
-
-        for(OrgInfo org: orgInfoList){
-            TreeNode currentNode = treeMap.get(org.getUid());
-
-            if (org.getParentUID().equals(siteUid)) {
-
-                rootNode.getChildren().add(currentNode);
-            } else {
-                TreeNode parentNode = treeMap.get(org.getParentUID());
-                parentNode.getChildren().add(currentNode);
-            }
-
-        }
-
-        return rootNode;
-    }
-
     public Set<String> collectChildClinicalDept(String parentUid) {
         Set<String> orgUidSet = new HashSet<>();
         collectChildClinicalDept(parentUid, orgUidSet);
