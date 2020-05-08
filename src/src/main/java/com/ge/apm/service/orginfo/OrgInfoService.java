@@ -3,6 +3,7 @@ package com.ge.apm.service.orginfo;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.mapper.OrgInfoMapper;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
@@ -30,6 +31,9 @@ public class OrgInfoService {
 
     @Autowired
     private OrgInfoRepository orgDao;
+
+    @Autowired
+    private OrgInfoMapper orgInfoMapper;
 
     @Autowired
     private AssetInfoRepository assetInfoDao;
@@ -470,35 +474,31 @@ public class OrgInfoService {
 
     }
 
-    @Transactional
-    public void saveOrg(OrgInfo selected) {
-
-    }
-
     public String buildFullPathOrgName(OrgInfo currentOrg) {
-        if (currentOrg.getOrgType() < 4) return currentOrg.getShortName();
-
-        LinkedList<String> names = new LinkedList<>();
-        while (currentOrg != null && (currentOrg.getOrgType() == 4)) {
-            names.addFirst(currentOrg.getShortName());
-            currentOrg = orgDao.findByUid(currentOrg.getParentUID());
+        if (currentOrg.getOrgType() < 4)  {
+            return currentOrg.getShortName();
         }
 
-        return names.stream().collect(Collectors.joining("-"));
+        //the current org maybe is a new org, new persisted in the database, so use its parent org in db.
+        List<OrgInfo> orgInfos = orgInfoMapper.listParentClinicalDeptsWithSelectedClinicalDept(currentOrg.getParentUID());
 
+        //the most far away ancestor is the last record, reverse to make it the first
+        Collections.reverse(orgInfos);
+
+        //add the current org, it is the lowest level
+        orgInfos.add(currentOrg);
+
+        return orgInfos.stream().map(OrgInfo::getShortName).collect(Collectors.joining("-"));
     }
 
     public int getClinicalLevel(OrgInfo currentOrg) {
-        if (currentOrg.getOrgType() != 4) return 0;
-
-        int level = 0;
-        while (currentOrg != null && (currentOrg.getOrgType() == 4)) {
-            ++level;
-            currentOrg = orgDao.findByUid(currentOrg.getParentUID());
+        if (currentOrg.getOrgType() != 4) {
+            return 0;
         }
 
-        return level;
+        List<OrgInfo> orgInfos = orgInfoMapper.listParentClinicalDeptsWithSelectedClinicalDept(currentOrg.getUid());
 
+        return orgInfos.size();
     }
 
 }
