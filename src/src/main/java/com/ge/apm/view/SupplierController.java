@@ -117,6 +117,12 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     }
 
     @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        super.prepareCreate();
+        attachements = new ArrayList<>();
+    }
+
+    @Override
     public void prepareEdit(){
         super.prepareEdit();
         attachements = blobService.findBlobObjectsByBoUid(selected.getUid());
@@ -142,6 +148,17 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     }
 
     @Override
+    public void onAfterNewObject(Supplier object, boolean isOK) {
+        super.onAfterNewObject(object, isOK);
+        if(isOK){
+            for (V2_BlobObject blobObject: attachements) {
+                blobObject.setBoUuid(object.getUid());
+                blobService.saveBlobObject(blobObject);
+            }
+        }
+    }
+
+    @Override
     public void onAfterUpdateObject(Supplier object, boolean isOK) {
         super.onAfterUpdateObject(object, isOK);
 
@@ -155,14 +172,15 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         assetInfoDao.updateManufactureName(selected.getName(), String.valueOf(selected.getId()), selected.getTenantUID());
     }
 
-    @Override
-    public void delete(Supplier obj) {
+    public void deleteSupplier() {
 
-        List<AssetInfo> assetInfoList = assetInfoDao.findBySupplierIdOrMaitananceIdOrManufactureId(obj.getId(), obj.getId(), obj.getId());
-        List<ArrivalList> arrivalListList = arrivalListDao.findBySupplierId(obj.getId());
+        List<AssetInfo> assetInfoList = assetInfoDao.findBySupplierIdOrMaitananceIdOrManufactureId(selected.getId(), selected.getUid(), selected.getUid());
+        List<ArrivalList> arrivalListList = arrivalListDao.findBySupplierId(selected.getId());
 
         if(assetInfoList.isEmpty() && arrivalListList.isEmpty()){
-            super.delete(obj);
+            dao.delete(selected);
+            List<V2_BlobObject> tempBlobObject = blobService.findBlobObjectsByBoUid(selected.getUid());
+            blobService.deleteBlobFile(tempBlobObject);
         }
 
     }
