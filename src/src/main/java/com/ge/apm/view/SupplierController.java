@@ -45,6 +45,8 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     private Map<String, Boolean> selectedMapPending;
     private Map<String, Boolean> selectedMapApproved;
 
+    private boolean isShowQrCode = Boolean.FALSE;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(SupplierRepository.class);
@@ -287,8 +289,18 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         return  res + Base64.encodeBase64String(supplierService.getWxaCodeImage());
     }
 
+    //微信公众号二维码
+    public String getWeChatQrCodeImage(){
+        String res = "data:image/png;base64,";
+        return  res + Base64.encodeBase64String(supplierService.getWeChatCodeImage());
+    }
+
     public boolean activeSupplier(){
         return supplierService.activeSupplier();
+    }
+
+    public void onShowQrCode(){
+        isShowQrCode = Boolean.TRUE;
     }
 
     public String getSupplierType() {
@@ -345,5 +357,13 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     public void setSelectedMapApproved(Map<String, Boolean> selectedMapApproved) {
         this.selectedMapApproved = selectedMapApproved;
+    }
+
+    public boolean isShowQrCode() {
+        return isShowQrCode;
+    }
+
+    public void setShowQrCode(boolean showQrCode) {
+        isShowQrCode = showQrCode;
     }
 }
