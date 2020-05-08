@@ -1,6 +1,7 @@
 package com.ge.apm.service.orginfo;
 
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.mapper.OrgInfoMapper;
 import com.ge.apm.domain.OrgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,24 +19,10 @@ public class OrgInfoClinicalDeptService {
     @Autowired
     private OrgInfoRepository orgDao;
 
+    @Autowired
+    private OrgInfoMapper orgInfoMapper;
+
     public List<OrgInfo> collectChildClinicalDept(OrgInfo parentOrg) {
-        List<OrgInfo> orgInfoSet = new ArrayList<>();
-        collectChildClinicalDept(parentOrg, orgInfoSet);
-        return orgInfoSet;
+        return orgInfoMapper.listOrgHierarchyUnderCurrentOrg(parentOrg.getUid());
     }
-
-    public void collectChildClinicalDept(OrgInfo parentOrg, List<OrgInfo> orgInfoSet) {
-
-        orgInfoSet.add(parentOrg);
-
-        List<OrgInfo> orgInfos = orgDao.findByParentUID(parentOrg.getUid());
-
-        for (OrgInfo orgInfo: orgInfos) {
-            collectChildClinicalDept(orgInfo, orgInfoSet);
-        }
-
-    }
-
-
-
 }
