@@ -823,28 +823,6 @@ public class UaaService {
         UserAccount user = UserContextService.getCurrentUserAccount();
         return this.getUserAccessibleSiteListWithClinicalDept(user.getUid());
     }
-
-    public List<OrgInfo> getClinicalDeptListByAnySiteLevel(String siteUID) {
-        List<SearchFilter> orgFilters = new ArrayList<>();
-        orgFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, siteUID, "1*2+"));
-        orgFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, siteUID, "1*2+"));
-        orgFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, siteUID, "1*2+"));
-        orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUID, "1*2+"));
-        orgFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-        return orgInfoDao.findBySearchFilter(orgFilters);
-    }
-
-    public List<OrgInfo> getClinicalDeptListByAnySiteLevel(Set<String> sites) {
-        List<String> siteList = new ArrayList<>(sites);
-
-        List<SearchFilter> orgFilters = new ArrayList<>();
-        orgFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, siteList, "1*2+"));
-        orgFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, siteList, "1*2+"));
-        orgFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, siteList, "1*2+"));
-        orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, siteList, "1*2+"));
-        orgFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-        return orgInfoDao.findBySearchFilter(orgFilters);
-    }
     
     public List<OrgInfo> getClinicalDeptListBySiteUID(String siteUID) {
         List<SearchFilter> orgFilters = new ArrayList<>();
