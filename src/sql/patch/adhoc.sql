@@ -5,6 +5,7 @@ insert into asset_alert_config (id, asset_uid, config_type, create_by, create_da
 
 --磁体压力 删掉message中多余的>符号
 update asset_alert_config set wechat_message='磁体压力异常，磁体压力过低，有磁体结冰风险；磁体压力过高，会影响图像质量。请关注设备是否有其他异常，若有进一步问题请与GE400热线联系。' where config_type = '104';
+update asset_alert_config set pad_message='磁体压力异常，磁体压力过低，有磁体结冰风险；磁体压力过高，会影响图像质量。请关注设备是否有其他异常，若有进一步问题请与GE400热线联系。' where config_type = '104';
 
 -- 2020.04.30 YHAAO-6543 GEOPS发送消息增加定时发送
 ALTER TABLE ops_message ALTER COLUMN status SET DATA TYPE int4 USING status::int4, ALTER COLUMN status SET DEFAULT 0;

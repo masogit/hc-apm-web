@@ -1,5 +1,15 @@
 package com.ge.apm.view.wo;
 
+import com.ge.apm.dao.AssetLifecycleEventRepository;
+import com.ge.apm.domain.AssetLifecycleEvent;
+import com.ge.apm.domain.ServiceRequestReport;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.wo.AssetLifecycleEventService;
+import com.ge.apm.view.sysutil.FileDownloadService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,10 +28,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,22 +38,9 @@ import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-
-import com.ge.apm.dao.AssetLifecycleEventRepository;
-import com.ge.apm.domain.AssetLifecycleEvent;
-import com.ge.apm.domain.ServiceRequestReport;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.wo.AssetLifecycleEventService;
-import com.ge.apm.view.sysutil.FileDownloadService;
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
-
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -206,7 +201,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		if (this.searchFilters == null) {
 			searchFilters = new ArrayList<>();
 		}
-		if (!this.hasFilterOnField("assetInfo.siteUID")) {
+		if (!this.hasFilterOnField("assetInfo.siteUID") && tabStatus != 9) {
 			List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid())
 					.collect(Collectors.toList());
 			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
