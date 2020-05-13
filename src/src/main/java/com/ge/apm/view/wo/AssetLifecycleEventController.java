@@ -201,7 +201,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		if (this.searchFilters == null) {
 			searchFilters = new ArrayList<>();
 		}
-		if (!this.hasFilterOnField("assetInfo.siteUID") && tabStatus != 9) {
+		if (!this.hasFilterOnField("assetInfo.siteUID")) {
 			List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid())
 					.collect(Collectors.toList());
 			searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));

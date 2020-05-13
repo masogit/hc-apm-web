@@ -10,13 +10,11 @@ import webapp.framework.dao.SearchFilter;
  */
 @ManagedBean
 @ViewScoped
-public class AssetLifecycleEvent7Controller extends AssetLifecycleEventController {
+public class AssetLifecycleEvent9Controller extends AssetLifecycleEventController {
 
     protected void init() {
         super.init();
         tabStatus = 9;
-        searchFilters = new ArrayList<>();
-        searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, tabStatus));
     }
 
 }
