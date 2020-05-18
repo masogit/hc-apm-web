@@ -18,8 +18,7 @@
                         <h:panelGroup id="display">
                             <p:fieldset legend="到货单信息" id="arrivalListHeader">
 
-                                <p:commandLink value="选择订购合同"  process="@this" 
-                                               update=":ChoseContractForm" oncomplete="PF('ChoseContractDlg').show()" disabled="#{not empty assetArrivedListEditController.selected.id}" />
+                                <p:commandLink value="选择订购合同"  process="@this" update=":ChoseContractForm" oncomplete="PF('ChoseContractDlg').show()" disabled="#{not empty assetArrivedListEditController.selected.id}" />
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
                                     <h:panelGroup>
@@ -44,8 +43,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.assetName}*</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}"  
-                                                     />
+                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.assetGroup}*</label>
@@ -108,7 +106,7 @@
                                             <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                         </p:autoComplete>
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier()}">
                                         <label class="label">供应商责任人</label>
                                         <p:selectOneMenu id="supplierUser" value="#{assetArrivedListEditController.selected.supplierUserId}" style="width:125px" required="false" requiredMessage="#{msg.PersonnelCannotBeEmpty}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -121,6 +119,12 @@
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListProcessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetArrivedListEditController.activeSupplier()}">
+                                    <h:panelGroup >
+                                        <label class="label">合同签订日期</label>
+                                        <p:inputText value="#{assetArrivedListEditController.selected.contractDate}" />
                                     </h:panelGroup>
                                     <h:panelGroup >
                                         <label class="label">外贸协议</label>
@@ -162,7 +166,6 @@
                                         <label class="label">培训资料</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.trainingInfo}" />
                                     </h:panelGroup>
-
                                 </p:panelGrid>
                                 <h:panelGroup rendered="#{assetArrivedListEditController.selected.status eq 2 and assetArrivedListEditController.getInstalledCount() eq 0}">
                                     <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveArrivalList()}" process="arrivalListHeader"  update=":growl"/>
@@ -500,7 +503,7 @@
 
         <p:dialog id="ChoseContractDlg" widgetVar="ChoseContractDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="选择合同订购项">
             <h:form id="ChoseContractForm" >
-                <h:panelGroup id="display">
+                <h:panelGroup id="choseContractPanel">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
                             <label class="label">设备合同</label>
