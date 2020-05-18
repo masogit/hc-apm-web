@@ -121,7 +121,7 @@ public class AssetPurchaseListController extends GenericCRUDUUIDController<Asset
             try {
                 prepareCreate();
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(AssetPurchaseListController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }    
         else if ("View".equalsIgnoreCase(actionName)) {

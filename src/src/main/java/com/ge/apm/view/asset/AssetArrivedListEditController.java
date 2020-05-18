@@ -141,7 +141,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 contractList.removeAll(completeEquipmentContracts);
 
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(AssetArrivedListEditController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else if ("Edit".equalsIgnoreCase(actionName)) {
             String listId = (String) UrlEncryptController.getValueFromMap(encodeStr, "listId");

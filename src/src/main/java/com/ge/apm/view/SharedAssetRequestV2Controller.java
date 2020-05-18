@@ -1,5 +1,6 @@
 
 package com.ge.apm.view;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
@@ -9,13 +10,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.AllocationCenterUtils;
 import com.ge.apm.service.utils.ChargingType;
 import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-
-import java.lang.reflect.InvocationTargetException;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import javaslang.Tuple3;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,16 +26,18 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.logging.Level;
@@ -193,7 +191,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             try {
                 prepareCreate();
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
             }
         }    
         else if ("View".equalsIgnoreCase(actionName)) {
