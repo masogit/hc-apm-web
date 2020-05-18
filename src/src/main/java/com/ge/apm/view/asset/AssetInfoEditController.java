@@ -153,7 +153,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
                 assetLifecyleStatus = 0;
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(AssetInfoEditController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else if ("Edit".equalsIgnoreCase(actionName)) {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
