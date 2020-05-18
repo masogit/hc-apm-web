@@ -55,8 +55,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetCreateService acService;
     private UserContextService userContextService;
     private OrgInfoRepository orgDao;
-//    private AssetFileImportService importService;
-    private AssetFileExportService exportService;
     private QrCodeService qrCodeService;
     private UaaService uaaService;
     private CustomConfigService ccService;
@@ -146,8 +144,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         supplierDao = WebUtil.getBean(SupplierRepository.class);
 
-//        importService = WebUtil.getBean(AssetFileImportService.class);
-        exportService = WebUtil.getBean(AssetFileExportService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
