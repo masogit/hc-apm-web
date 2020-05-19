@@ -124,7 +124,7 @@
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetArrivedListEditController.activeSupplier()}">
                                     <h:panelGroup >
                                         <label class="label">合同签订日期</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.contractDate}" />
+                                        <p:calendar value="#{assetArrivedListEditController.selected.contractDate}" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
                                     <h:panelGroup >
                                         <label class="label">外贸协议</label>
