@@ -54,8 +54,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalDate}*</label>
-                                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}"
-                                                    required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListFunctionType}</label>
@@ -83,8 +82,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">发票日期</label>
-                                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.invoiceDate}" maxdate="#{appContextService.curentDate}"
-                                                     converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                        <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.invoiceDate}" maxdate="#{appContextService.curentDate}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListContractNum}</label>
@@ -124,7 +122,7 @@
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetArrivedListEditController.activeSupplier()}">
                                     <h:panelGroup >
                                         <label class="label">合同签订日期</label>
-                                        <p:calendar value="#{assetArrivedListEditController.selected.contractDate}" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                        <p:calendar value="#{assetArrivedListEditController.selected.contractDate}" timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
                                     <h:panelGroup >
                                         <label class="label">外贸协议</label>
@@ -132,11 +130,11 @@
                                     </h:panelGroup>
                                     <h:panelGroup >
                                         <label class="label">开箱安装日期</label>
-                                        <p:calendar value="#{assetArrivedListEditController.selected.boxInstallationDate}" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                        <p:calendar value="#{assetArrivedListEditController.selected.boxInstallationDate}" timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">使用日期</label>
-                                        <p:calendar value="#{assetArrivedListEditController.selected.usingDate}" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                        <p:calendar value="#{assetArrivedListEditController.selected.usingDate}" timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
                                     <h:panelGroup >
                                         <label class="label">使用人</label>
