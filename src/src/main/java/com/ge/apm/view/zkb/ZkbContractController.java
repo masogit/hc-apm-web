@@ -1,0 +1,195 @@
+package com.ge.apm.view.zkb;
+
+import com.ge.apm.dao.ZkbContractRepository;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.zkb.ZkbContractService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+/**
+ * @author : 503189362
+ * @date : 2020/4/16
+ * @description :
+ */
+@ManagedBean
+@ViewScoped
+public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract> {
+
+    private ZkbContractRepository dao;
+    private UserContextService userContextService;
+    private ZkbContractService zkbContractService;
+
+    private UserAccount currentUser;
+    private List<TenantInfo> tenantInfoList;
+    private String actionName;
+    private String actionDetailName;
+    private String selectionTenantInfo;
+    private Page<ZkbContract> zkbContractPage;
+
+
+    @Override
+    protected void init() {
+        super.init();
+
+        dao = WebUtil.getBean(ZkbContractRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        zkbContractService = WebUtil.getBean(ZkbContractService.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        tenantInfoList = zkbContractService.getSourceTenantInfoList();
+        if(userContextService.isZkbUser()) {
+            this.selectionTenantInfo = currentUser.getTenantUID();
+        }
+    }
+
+    @Override
+    protected GenericRepositoryUUID<ZkbContract> getDAO() {
+        return dao;
+    }
+
+    @Override
+    protected Page<ZkbContract> loadData(PageRequest pageRequest) {
+        List<SearchFilter> searchFilters = this.searchFilters;
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+
+        if(this.selectionTenantInfo != null){
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
+        }
+
+        zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
+        return zkbContractPage;
+    }
+
+    public TenantInfo getTenantInfo(String tenantInfoUID){
+        return zkbContractService.getTenantInfo(tenantInfoUID);
+    }
+    /**
+     * @author : 503189362
+     * @description : 租户选择变化时，那么重新进行编辑页面
+     * @date : 2020/4/21 15:06
+     */
+    public void tenantInfoSelect(){
+        this.cancel();
+    }
+
+    public String getContractState(String value){
+        if(value == null || value.isEmpty()) {
+            return "";
+        } else if(String.valueOf(ZkbContract.ContractState.effective).equals(value)){
+            return  "有效";
+        }else if(String.valueOf(ZkbContract.ContractState.noactive).equals(value)){
+            return  "未生效";
+        }else if(String.valueOf(ZkbContract.ContractState.expired).equals(value)){
+            return  "已过期";
+        }else{
+            return "";
+        }
+    }
+
+
+    public String importAction(){
+        return UrlEncryptController.encodeUrlParam("ContractImport?1=1");
+    }
+
+
+    public String createAction() {
+        return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo));
+    }
+    public String editAction() {
+        return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedid=".concat(selected.getId()));
+    }
+
+
+    private StreamedContent exportFile;
+    public void exportAll(){
+
+        List<Map<String, Object>> zkbContractDataList = zkbContractService.createZkbContractData(zkbContractPage.getContent());
+
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/contract/excel/APM_ZKB_Contract_Exp_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            zkbContractService.exportData(doc, zkbContractDataList, zkbContractService.createZkbContractCourseData(zkbContractDataList), zkbContractService.createZkbContractAssetData(zkbContractDataList));
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZKBContractData.xlsx");
+        } catch (IOException ex) {
+            Logger.getLogger(ZkbEngineerController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public void cancel() {
+        this.selected = null;
+    }
+
+
+    public UserAccount getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(UserAccount currentUser) {
+        this.currentUser = currentUser;
+    }
+
+    public List<TenantInfo> getTenantInfoList() {
+        return tenantInfoList;
+    }
+
+    public void setTenantInfoList(List<TenantInfo> tenantInfoList) {
+        this.tenantInfoList = tenantInfoList;
+    }
+
+    public String getActionName() {
+        return actionName;
+    }
+
+    public void setActionName(String actionName) {
+        this.actionName = actionName;
+    }
+
+    public String getActionDetailName() {
+        return actionDetailName;
+    }
+
+    public void setActionDetailName(String actionDetailName) {
+        this.actionDetailName = actionDetailName;
+    }
+
+    public String getSelectionTenantInfo() {
+        return selectionTenantInfo;
+    }
+
+    public void setSelectionTenantInfo(String selectionTenantInfo) {
+        this.selectionTenantInfo = selectionTenantInfo;
+    }
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
+}
