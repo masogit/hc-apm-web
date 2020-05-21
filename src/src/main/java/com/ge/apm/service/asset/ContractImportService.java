@@ -29,7 +29,7 @@ public class ContractImportService {
 
     public static final String EXCEL_CONTRACT_TEMPLATE_VERSION = "v1.0";
 
-    public static final String SHEET_SERVICE_CONTRACT = "Contract List";
+    public static final String SHEET_SERVICE_CONTRACT = "Contract_List";
     public static final int EXCEL_CONTRACT_HEADER_ROW = 1;
     public static final int EXCEL_CONTRACT_DATA_ROW = 2;
 
