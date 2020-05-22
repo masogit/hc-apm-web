@@ -11,6 +11,8 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','assetAdjust.returnApply','归还申请','Request for Return',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','assetAdjust.returnAccept','归还受理','Return Acceptance',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','assetAdjust.batch','设备批量调剂','Batch Equipment Swap',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','review','质控评审','Quality review',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','review','质控评审','Quality review',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','MeasureOrderRule','计量规则','Measurement Rule',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','MeasureRuleManager','计量规则管理','Measurement Rule Management',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ValidationRequire','输入不可为空！','Input cannot be empty!',NULL,-1);
@@ -2844,6 +2846,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AutomaticConfirmationTime', '自动确认时间（分钟）', 'Automatic Confirmation Time (Minutes)', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'OtherConfiguration', '其他配置', 'Other Configuration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetCreationApprover', '资产创建审核人', 'Asset Creation Approver', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PriorDaysOfReview', '质控评审文件过期提醒提前天数', 'Prior Days of Review Reminder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PriorDaysOfMaintenance', '维保/质保提醒提前天数', 'Prior Days of Maintenance/Warranty Reminder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FrequencyOfMaintenance', '维保/质保提醒次数', 'Frequency of Maintenance/Warranty Reminder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PriorDaysOfMeasurementReminder', '计量提醒提前天数', 'Prior Days of Measurement Reminder', NULL, '-1');
