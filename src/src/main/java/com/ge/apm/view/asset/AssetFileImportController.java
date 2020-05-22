@@ -54,8 +54,6 @@ public class AssetFileImportController {
     private List<Map<String, Object>> importOrgMap;
     private List<Map<String, Object>> importAssetMap;
 
-    private AssetFileExportService exportService;
-
     private AssetFileImportStreamingService streamingService;
 
     private OrgInfoLocalCacheService orgInfoLocalCacheService;
@@ -92,7 +90,6 @@ public class AssetFileImportController {
 
     @PostConstruct
     protected void init() {
-        exportService = WebUtil.getBean(AssetFileExportService.class);
         streamingService = WebUtil.getBean(AssetFileImportStreamingService.class);
         orgInfoLocalCacheService = WebUtil.getBean(OrgInfoLocalCacheService.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -254,17 +251,6 @@ public class AssetFileImportController {
         int siteIndex = exportFields.indexOf(siteColumn);
         exportFields.addAll(siteIndex, crossSiteColumns);
 
-    }
-
-    public void downloadImportFailureData() {
-        try {
-            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
-            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            hasExportData = exportService.exportFailData(doc, importOrgMap, importAssetMap);
-            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "failedData.xlsx");
-        } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
     }
 
     public void cancel() {

@@ -30,6 +30,21 @@
             <f:metadata>
                 <f:viewParam name="session_expired" value="#{loginController.sessionExpired}" />
             </f:metadata>
+            <script type="text/javascript">
+                window.onload = function(){
+                    var now = new Date();
+                    var startDate = new Date();
+                    startDate.setFullYear(2020, 04, 25);
+                    startDate.setHours(0, 0, 0);
+                    var endDate = new Date();
+                    endDate.setFullYear(2020, 04, 31);
+                    endDate.setHours(23, 59, 59);
+
+                    if (now >= startDate &amp;&amp; now &lt;= endDate) {
+                        document.getElementById("updateNotice").style.display="inline";
+                    }
+                }
+            </script>
             <style type="text/css">
                 html{
                     background-color: transparent;
@@ -78,6 +93,17 @@
                     bottom: 12px;
                     left: 0;
                     color: #fff;
+                }
+                .top-ctner{
+                    display:none;
+                    width:100%;
+                    position: absolute;
+                    z-index: 4;
+                    left: 0;
+                    padding-top: 14px;
+                    color: #735C0F;
+                    background-color: #FFFBDD;
+                    font-size: 16px;
                 }
                 .ui-growl > .ui-growl-item-container {
                     background-color: #5180ce!important;
@@ -137,6 +163,9 @@
         </h:head>
 
         <h:body styleClass="login-body">
+            <div id="updateNotice" class="top-ctner">
+                <table align="center"><tr><td>APM 定于北京时间5月30日中午12点至5月31日晚间24点进行系统日常维护，维护期间系统PC端与手机端将无法访问，请提前做好相关准备通知工作&nbsp;</td></tr></table>
+            </div>
             <h:outputStylesheet name="css/ripple.css" library="ultima-layout" />
             <h:outputStylesheet name="css/layout-#{guestPreferences.theme}.css" library="ultima-layout" />
 

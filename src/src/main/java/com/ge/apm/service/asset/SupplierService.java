@@ -156,6 +156,14 @@ public class SupplierService {
 
     }
 
+    public byte[] getWeChatCodeImage(){
+
+        String token = UserContextService.getAccessToken();
+
+        return supplierApiService.getWeChatQrCodeImage(token);
+
+    }
+
     public boolean activeSupplier(){
 
         UserAccount user = UserContextService.getCurrentUserAccount();
