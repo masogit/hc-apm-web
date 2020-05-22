@@ -43,6 +43,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.dao.SearchFilter.Operator;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -98,6 +99,12 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		listProp.add("assetUid");
 		listProp.add("createTime");
 		Sort sort = new Sort(Direction.DESC, listProp);
+		//filter work order that status is cancelled
+		boolean cancelled = searchFilters.stream().anyMatch(
+				searchFilter -> searchFilter.value != null && StringUtils.contains(searchFilter.value.toString(), "Cancelled"));
+		if(!cancelled){
+			searchFilters.add(new SearchFilter("status", Operator.NE, 3));
+		}
 		PageRequest pr = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
 		Page<AssetLifecycleEvent> pageResult = dao.findBySearchFilter(this.searchFilters, pr);
 		updateSelectStatus(pageResult);
