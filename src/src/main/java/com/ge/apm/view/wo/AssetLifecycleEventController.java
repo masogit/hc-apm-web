@@ -100,7 +100,11 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		listProp.add("createTime");
 		Sort sort = new Sort(Direction.DESC, listProp);
 		//filter work order that status is cancelled
-		searchFilters.add(new SearchFilter("status", Operator.NE, 3));
+		boolean cancelled = searchFilters.stream().anyMatch(
+				searchFilter -> searchFilter.value != null && StringUtils.contains(searchFilter.value.toString(), "Cancelled"));
+		if(!cancelled){
+			searchFilters.add(new SearchFilter("status", Operator.NE, 3));
+		}
 		PageRequest pr = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
 		Page<AssetLifecycleEvent> pageResult = dao.findBySearchFilter(this.searchFilters, pr);
 		updateSelectStatus(pageResult);
