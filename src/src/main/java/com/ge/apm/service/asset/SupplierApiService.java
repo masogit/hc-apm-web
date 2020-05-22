@@ -27,4 +27,15 @@ public class SupplierApiService extends MicroServiceInvoker {
         }
     }
 
+    public byte[] getWeChatQrCodeImage (String token){
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.SUPPLIER_WX_QRCODE_IMAGE);
+        ResponseEntity<byte[]> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, byte[].class);
+        if (response.getBody() != null) {
+            return response.getBody();
+        } else {
+            return null;
+        }
+    }
+
 }

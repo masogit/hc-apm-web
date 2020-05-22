@@ -1,40 +1,35 @@
 package com.ge.apm.view;
 
-import java.util.List;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import com.ge.apm.dao.AssetPurchaseListRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.domain.ArrivalList;
-import com.ge.apm.domain.AssetPurchaseList;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetArrivedListEditController;
-import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 @ManagedBean
 @ViewScoped
@@ -121,7 +116,7 @@ public class AssetPurchaseListController extends GenericCRUDUUIDController<Asset
             try {
                 prepareCreate();
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(AssetPurchaseListController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }    
         else if ("View".equalsIgnoreCase(actionName)) {

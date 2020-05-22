@@ -3250,3 +3250,6 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','disableUploadInSiteSeparationMode','院区隔离下不能上传跨院区文件！','You cannot upload cross site asset file in site separation mode.',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','organizationNotFound','机构没有找到！','Organization not found.',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','organizationHierarchyWrong','机构层级设置错误！','Organization hierarchy wrong.',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','MyTrain','我的培训','My Train',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','TrainReport','培训报告','Train Report',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TrainBookTime', '培训预约时间', 'Train Appointment Time', NULL, '-1');
