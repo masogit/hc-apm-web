@@ -68,7 +68,7 @@ public class Supplier implements Serializable, ChineseName {
     @Size(max = 16)
     @Column(name = "contactor")
     private String contactor;
-    @Size(max = 16)
+    @Size(max = 30)
     @Column(name = "tel")
     private String tel;
     @Column(name = "email")
