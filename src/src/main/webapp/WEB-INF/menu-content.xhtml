@@ -129,7 +129,7 @@
                 <p:menuitem id="um43" value="#{msg.DeviceCostAnalysis}" rendered="false" outcome="/empty"/>
                 <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
             </p:submenu>
-            <p:menuitem id="um444" value="#{msg.review}" icon="scanner" rendered="#{userContextService.accessContains('review') and userContextService.hasAnyRole('ReviewStaff')}" url="/geapm/review.xhtml"></p:menuitem>
+            <p:menuitem id="um444" value="#{msg.review}" icon="scanner" rendered="#{userContextService.accessContains('audit') and userContextService.hasAnyRole('AuditStaff')}" url="/audit/#/dashboard" target="_blank"></p:menuitem>
             <p:submenu id="um100" label="#{msg.otherLink}" icon="fa fa-external-link" rendered="#{userContextService.accessContains('link')}">
                 <p:menuitem id="um102" value="#{msg.assetMgt}" url="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContains('link.CPM') and (not empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
                 <p:menuitem id="um103" value="#{msg.assetMgt}" outcome="/portal/asset/assetMgtNone.xhtml" rendered="#{userContextService.accessContains('link.CPM') and (empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
