@@ -1,0 +1,1 @@
+INSERT INTO sys_role ("name",home_page,role_desc,role_desc_en,menus) VALUES ('AuditStaff','/','评审老师','Judge Teacher ','audit');
