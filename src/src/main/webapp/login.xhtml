@@ -32,6 +32,10 @@
             </f:metadata>
             <script type="text/javascript">
                 window.onload = function(){
+                    var token = "#{userContextService.getSystemInMaintainConfig()}";
+                    if (token === '1') {
+                        window.location = "/wx/mrr?message=系统维护中…预计6月1日恢复";
+                    }
                     var now = new Date();
                     var startDate = new Date();
                     startDate.setFullYear(2020, 04, 25);
