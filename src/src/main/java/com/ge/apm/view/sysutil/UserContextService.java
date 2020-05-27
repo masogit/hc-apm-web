@@ -2,30 +2,14 @@ package com.ge.apm.view.sysutil;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.CustomRoleRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SysRoleRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.CustomRole;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysRole;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserAuth;
-import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import javaslang.control.Option;
 import javax.faces.application.ConfigurableNavigationHandler;
@@ -641,6 +625,22 @@ public class UserContextService implements Serializable {
             token = (String) request.getSession().getAttribute("ACCESS_TOKEN");
         }
         return token;
+    }
+
+    public String getSystemInMaintainConfig() {
+        ApmConfigInfoRepository repository = WebUtil.getBean(ApmConfigInfoRepository.class);
+        ApmConfigInfo info = null;
+        try {
+            info = repository.findByItem("system_maintain");
+            if (info != null && info.getExpireDate() != null && (new Date()).after(info.getExpireDate())) {
+                info = null;
+            }
+        } catch (Exception e) {
+        }
+        if (info != null) {
+            return info.getValue();
+        }
+        return "0";
     }
 
     private Boolean isDispatcher = null;
