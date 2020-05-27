@@ -8,6 +8,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,6 +17,7 @@ import javaslang.control.Option;
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
@@ -57,7 +60,7 @@ public class UserContextService implements Serializable {
         userContextService.needAssetApproval = null;
         userContextService.needInstorageCheck = null;
 
-        userContextService.flagIsAgentTenant = null;        
+        userContextService.flagIsAgentTenant = null;
         userContextService.flagIsUltraSoundTenant = null;
         userContextService.flagIsHospitalUser = null;
 
@@ -117,7 +120,7 @@ public class UserContextService implements Serializable {
     public static List<String> getRoles() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount user = userContextService.getLoginUser();
-        
+
         return user.getRoleNames();
     }
 
@@ -178,7 +181,7 @@ public class UserContextService implements Serializable {
         }
         return false;
     }
-    
+
     //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {
         return !hasAnyRole(roleList);
@@ -220,11 +223,11 @@ public class UserContextService implements Serializable {
     	}
     	return listSysRole;
     }
-    
+
     public boolean accessContains(String menuName){
     	return authContains(menuName)&&versionContains(menuName);
     }
-    
+
     public boolean authContains(String menuName){
     	if(userAccount.getIsSuperAdmin()||userAccount.getIsSiteAdmin()||userAccount.getIsGeOp()){
     		return true;
@@ -263,7 +266,7 @@ public class UserContextService implements Serializable {
     	}
     	return false;
     }
-    
+
     public boolean versionContains(String menuName){
     	TenantInfo tenantInfo=getTenantInfo();
     	String configStr=tenantInfo.getTenantConfig();
@@ -328,7 +331,7 @@ public class UserContextService implements Serializable {
             if (userName == null) {
                 return null; // user is not logined
             }
-            
+
             UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
             userAccount = dao.getByLoginName(userName);
         }
@@ -360,29 +363,29 @@ public class UserContextService implements Serializable {
         }
         return siteId==46;
     }
-    
+
     private Boolean flagIsAgentTenant = null;
     public boolean isAgentTenant() {
         if(flagIsAgentTenant!=null) return flagIsAgentTenant;
-            
+
         UserAccount user = getLoginUser();
         tenant = getTenantInfo();
         flagIsAgentTenant = tenant.getType() != null && tenant.getType() == 1;
-        
+
         return flagIsAgentTenant;
     }
 
     private Boolean flagIsUltraSoundTenant = null;
     public boolean isUltraSoundTenant() {
         if(flagIsUltraSoundTenant!=null) return flagIsUltraSoundTenant;
-            
+
         UserAccount user = getLoginUser();
         TenantInfo tenant = getTenantInfo();
         flagIsUltraSoundTenant = tenant.getTenantConfig() != null && tenant.getTenantConfig().contains("\"edition\":\"ultrasound\"");
-        
+
         return flagIsUltraSoundTenant;
     }
-    
+
     WorkflowConfigRepository wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
 
     private Boolean flagIsHospitalUser = null;
@@ -397,7 +400,7 @@ public class UserContextService implements Serializable {
         } else {
             flagIsHospitalUser = Boolean.FALSE;
         }
-        
+
         return flagIsHospitalUser;
     }
 
@@ -466,17 +469,17 @@ public class UserContextService implements Serializable {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.getLoginUser();
     }
-    
+
     public static List<CustomRole> getCustomRole(Integer userId){
     	UserContextService userContextService = WebUtil.getBean(UserContextService.class);
     	return userContextService.getListCustomRole(userId);
     }
-    
+
     public static List<SysRole> getSysRole(Integer userId){
     	UserContextService userContextService = WebUtil.getBean(UserContextService.class);
     	return userContextService.getListSysRole(userId);
     }
-    
+
     public static UserAuth getCustomRoleAuth(Integer userId,String authKey){
     	UserAuth customRoleAuth=new UserAuth();
     	customRoleAuth.setAuthKey(authKey);
@@ -505,7 +508,7 @@ public class UserContextService implements Serializable {
 						}
 					}
 				}
-				
+
 			}
 		}
 		else{
@@ -533,7 +536,7 @@ public class UserContextService implements Serializable {
         UserAccount userAccount = getCurrentUserAccount();
         return userAccount.getIsGeOp();
     }
-    
+
     public static boolean isMVSAdmin(){
     	UserAccount userAccount=getCurrentUserAccount();
     	Integer mvsRoleType=userAccount.getMvsRoleType();
@@ -603,7 +606,7 @@ public class UserContextService implements Serializable {
 
             if(isIBorUltraSoundIBEndUser())
                 return "portal/profile.xhtml";
-            
+
             UaaService uaaService = WebUtil.getBean(UaaService.class);
             return uaaService.getUserDefaultHomePage(userAccount);
         }
@@ -638,7 +641,11 @@ public class UserContextService implements Serializable {
         } catch (Exception e) {
         }
         if (info != null) {
-            return info.getValue();
+            ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+            try {
+                ec.redirect("/wx/mrr?message=" + info.getMessage());
+            } catch (IOException e) {
+            }
         }
         return "0";
     }
@@ -648,9 +655,9 @@ public class UserContextService implements Serializable {
     private Boolean isMeasuringDispatcher = null;
 
     private Boolean isAssetApprover = null;
-    
+
     private Boolean needAssetApproval = null;
-    
+
     private Boolean needInstorageCheck = null;
 
     public Boolean needInstorageCheck(){
@@ -659,7 +666,7 @@ public class UserContextService implements Serializable {
         }
         return needInstorageCheck;
     }
-    
+
     public Boolean needAssetApproval(){
         if (needAssetApproval == null) {
             getUserPrivilege();
@@ -709,12 +716,12 @@ public class UserContextService implements Serializable {
                 || Optional.ofNullable(item.getMeasureDispatchUserId2()).orElse(0).equals(userAccount.getId()));
 
         isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
-        
+
         needAssetApproval = wcList.stream().anyMatch(item -> !Strings.isNullOrEmpty(item.getAssetApprover()));
-        
+
         needInstorageCheck = wcList.stream().anyMatch(item -> null!=item.getNeedInstorageCheck() && item.getNeedInstorageCheck());
     }
-    
+
     private List<WorkflowConfig> getSiteConfigurations(){
         UaaService uuaService = WebUtil.getBean(UaaService.class);
         List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
@@ -763,13 +770,13 @@ public class UserContextService implements Serializable {
 
     public boolean isIBEndUser(){
         if(isOpsOrSiteAdminUser()) return false;
-        
+
         return isIBTenant();
     }
-    
+
     public boolean isUltraSoundIBEndUser(){
         if(isOpsOrSiteAdminUser()) return false;
-        
+
         return isUltraSoundTenant();
     }
 
@@ -779,7 +786,7 @@ public class UserContextService implements Serializable {
 
     public boolean isDealerEndUser(){
         if(isOpsOrSiteAdminUser()) return false;
-        
+
         return isAgentTenant();
     }
 
@@ -845,12 +852,12 @@ public class UserContextService implements Serializable {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.isPartnerAccount();
     }
-    
+
     public static boolean isOnlyLocalITAdmin() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount user = userContextService.getLoginUser();
         List<String> userRoles = user.getRoleNames();
-        
+
         if(userRoles.contains("LocalITAdmin")){
             if(userRoles.contains("ITAdmin") || isSuperAdmin()){
                 return false;
