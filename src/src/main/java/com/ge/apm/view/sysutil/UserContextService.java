@@ -636,7 +636,7 @@ public class UserContextService implements Serializable {
         ApmConfigInfo info = null;
         try {
             info = repository.findByItem("system_maintain");
-            if (info != null && info.getExpireDate() != null && (new Date()).after(info.getExpireDate())) {
+            if (info != null && info.getExpireDate() != null && (new Date()).after(info.getExpireDate()) && "1".equals(info.getValue())) {
                 info = null;
             }
         } catch (Exception e) {
