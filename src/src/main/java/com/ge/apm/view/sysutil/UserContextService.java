@@ -636,12 +636,12 @@ public class UserContextService implements Serializable {
         ApmConfigInfo info = null;
         try {
             info = repository.findByItem("system_maintain");
-            if (info != null && info.getExpireDate() != null && (new Date()).after(info.getExpireDate()) && "1".equals(info.getValue())) {
+            if (info != null && info.getExpireDate() != null && (new Date()).after(info.getExpireDate())) {
                 info = null;
             }
         } catch (Exception e) {
         }
-        if (info != null) {
+        if (info != null && "1".equals(info.getValue())) {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
             try {
                 ec.redirect("/wx/mrr?message=" + URLEncoder.encode(info.getMessage(), "UTF-8"));
