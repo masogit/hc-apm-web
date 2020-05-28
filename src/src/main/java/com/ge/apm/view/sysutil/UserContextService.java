@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 import javaslang.control.Option;
@@ -643,7 +644,7 @@ public class UserContextService implements Serializable {
         if (info != null) {
             ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
             try {
-                ec.redirect("/wx/mrr?message=" + info.getMessage());
+                ec.redirect("/wx/mrr?message=" + URLEncoder.encode(info.getMessage(), "UTF-8"));
             } catch (IOException e) {
             }
         }
