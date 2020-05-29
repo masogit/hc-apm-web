@@ -33,9 +33,6 @@
             <script type="text/javascript">
                 window.onload = function(){
                     var token = "#{userContextService.getSystemInMaintainConfig()}";
-                    if (token === '1') {
-                        window.location = "/wx/mrr?message=系统维护中…预计6月1日恢复";
-                    }
                     var now = new Date();
                     var startDate = new Date();
                     startDate.setFullYear(2020, 04, 25);
@@ -43,7 +40,6 @@
                     var endDate = new Date();
                     endDate.setFullYear(2020, 04, 31);
                     endDate.setHours(23, 59, 59);
-
                     if (now >= startDate &amp;&amp; now &lt;= endDate) {
                         document.getElementById("updateNotice").style.display="inline";
                     }
