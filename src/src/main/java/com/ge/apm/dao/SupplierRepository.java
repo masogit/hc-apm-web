@@ -40,4 +40,8 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
     public List<Supplier> findByManufacturerTAndTenantUID(Boolean manufacturerT, String tenantUid);
 
     public Supplier findFirstByTenantUIDAndName(String tenantUid, String name);
+
+    List<Supplier> findByProductRegistrationCodeAndTenantUIDAndIdNot(String productRegistrationCode, String tenantUID, Integer id);
+
+    List<Supplier> findBySupplierCodeAndTenantUIDAndIdNot(String supplierCode, String tenantUID, Integer id);
 }
