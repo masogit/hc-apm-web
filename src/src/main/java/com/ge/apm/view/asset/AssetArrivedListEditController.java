@@ -167,8 +167,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             prepareEdit();
         }
 
-        customConfig = ccService.getCurrentCustomConfig(selectedOrg.getSiteUID());
-        suppliersList = aiService.getSupplierListBySiteUid(selected.getSiteUID());
+        customConfig = ccService.getCurrentCustomConfig(currentUser.getSiteUID());
+        suppliersList = aiService.getSupplierListBySiteUid(currentUser.getSiteUID());
         maintainerList = aiService.getOnlyMaintainListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
         manueList=aiService.getOnlyManuListBySiteUid(UserContextService.getCurrentUserAccount().getTenantUID());
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
