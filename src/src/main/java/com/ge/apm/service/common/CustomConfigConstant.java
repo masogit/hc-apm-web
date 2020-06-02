@@ -51,97 +51,25 @@ public class CustomConfigConstant {
         return Arrays.asList("AssetHead", "AssetStaff");
     }
 
-    public synchronized static Map<String, String> getExportFields() {
-//        if (null == exportFields) {
-            exportFields = new LinkedHashMap();
-            exportFields.put(WebUtil.getMessage("EquipmentID"), "departNum");
-            exportFields.put(WebUtil.getMessage("EquipmentName"), "name");
-            exportFields.put(WebUtil.getMessage("EquipmentAlias"), "aliasName");
-            exportFields.put(WebUtil.getMessage("RepairOwner"), "assetOwnerName");
-            exportFields.put(WebUtil.getMessage("RepairOwner2"), "assetOwnerName2");
-            exportFields.put(WebUtil.getMessage("RepairOwner3"), "assetOwnerName3");
-            exportFields.put(WebUtil.getMessage("pmOwnerName"), "pmOwnerName");
-            exportFields.put(WebUtil.getMessage("Site"), "siteUID");
-            exportFields.put(WebUtil.getMessage("clinicalDeptId"), "clinicalDeptName");
-            exportFields.put(WebUtil.getMessage("assetDeptName"), "assetDeptName");
-            exportFields.put(WebUtil.getMessage("manufacture"), "manufacture");
-            exportFields.put(WebUtil.getMessage("BrandManufacturerShortName"), "makerShortName");
-
-            exportFields.put(WebUtil.getMessage("EquipmentStandardName"), "deviceName");
-            exportFields.put(WebUtil.getMessage("RegistrationNumber"),"registrationNo");
-            exportFields.put(WebUtil.getMessage("Vendor"), "vendor");
-            exportFields.put(WebUtil.getMessage("MedicalDeviceClassification"), "functionGroup");
-            exportFields.put(WebUtil.getMessage("MedicalDeviceSubclassification"), "assetCode68");
-            exportFields.put(WebUtil.getMessage("assetGroup"),"assetGroup");
-            exportFields.put(WebUtil.getMessage("assetGroupSecondary"), "assetGroupSecondary");
-            exportFields.put(WebUtil.getMessage("parentAsset"), "parentAssetId");
-            exportFields.put(WebUtil.getMessage("FunctionGrade"), "functionGrade");
-            exportFields.put(WebUtil.getMessage("RepairType"), "repairForm");
-            exportFields.put(WebUtil.getMessage("EquipmentModel"), "functionType");
-            exportFields.put(WebUtil.getMessage("ManufacturerSerialNumber"), "serialNum");
-
-            exportFields.put(WebUtil.getMessage("SystemIDManufacturerRequestID"), "systemId");
-            exportFields.put(WebUtil.getMessage("2010NationalCode"), "nationalStandardCode");
-            exportFields.put(WebUtil.getMessage("AssetID"),"financingNum");
-            exportFields.put(WebUtil.getMessage("BarCode"), "barcode");
-            exportFields.put(WebUtil.getMessage("ITSystemID"),"modalityId");
-            exportFields.put(WebUtil.getMessage("PurchasePrice"), "purchasePrice");
-            exportFields.put(WebUtil.getMessage("FinalSalvageValue"), "salvageValue");
-            exportFields.put(WebUtil.getMessage("LifeCycle"), "lifecycle");
-            exportFields.put(WebUtil.getMessage("DepreciationMethod"), "depreciationMethod");
-
-            exportFields.put(WebUtil.getMessage("ManufactureDate"), "manufactDate");
-            exportFields.put(WebUtil.getMessage("PurchaseDate"), "purchaseDate");
-            exportFields.put(WebUtil.getMessage("ArrivalDate"), "arriveDate");
-            exportFields.put(WebUtil.getMessage("StartUsingDate"),"installDate");
-            exportFields.put(WebUtil.getMessage("factoryWarrantyDate"), "factoryWarrantyDate");
-            exportFields.put(WebUtil.getMessage("warrantyDate"), "warrantyDate");
-            exportFields.put(WebUtil.getMessage("TerminateDate"), "terminateDate");
-            exportFields.put(WebUtil.getMessage("LastMaintenanceDate"), "lastPmDate");
-            exportFields.put(WebUtil.getMessage("LastMeasurementDate"), "lastQaDate");
-            exportFields.put(WebUtil.getMessage("LastInspectionDate"), "lastMeteringDate");
-            exportFields.put(WebUtil.getMessage("acceptDate"), "acceptDate");
-            exportFields.put(WebUtil.getMessage("warrantyMonth"), "warrantyMonth");
-
-            exportFields.put(WebUtil.getMessage("Maintainer"),"maitanance");
-            exportFields.put(WebUtil.getMessage("MaintainerTelephone"), "maitananceTel");
-            exportFields.put(WebUtil.getMessage("QRCode"), "qrCode");
-            exportFields.put(WebUtil.getMessage("InstallationLocationCode"), "locationCode");
-            exportFields.put(WebUtil.getMessage("InstallationLocation"), "locationName");
-            exportFields.put(WebUtil.getMessage("UseOwner"), "clinicalOwnerName");
-            exportFields.put(WebUtil.getMessage("Remark"), "comments");
-
-
-            exportFields.put(WebUtil.getMessage("UsageClassification"), "assetUsage");
-            exportFields.put(WebUtil.getMessage("CapitalSource"), "capitalSource");
-            exportFields.put(WebUtil.getMessage("capitalSource2"), "capitalSource2");
-            exportFields.put(WebUtil.getMessage("MeasurementGrade"), "measureGrade");
-            exportFields.put(WebUtil.getMessage("RiskGrade"), "riskGrade");
-            exportFields.put(WebUtil.getMessage("emergencyEquipment"), "emergencyEquipment");
-            exportFields.put(WebUtil.getMessage("IsImportEquipment"), "importEquipment");
-            exportFields.put(WebUtil.getMessage("MeasurementItemCategory"), "measuringItemCategory");
-            exportFields.put(WebUtil.getMessage("accountingCategory"), "accountingCategory");
-            exportFields.put(WebUtil.getMessage("CurrentStatus"), "status");
-
-            exportFields.put(WebUtil.getMessage("IsPM"),"isPm");
-            exportFields.put(WebUtil.getMessage("IsChecked2"), "isChecked");
-            exportFields.put(WebUtil.getMessage("assetValueCategory"), "assetValueCategory");
-            exportFields.put(WebUtil.getMessage("deviceStatus"), "deviceStatus");
-            exportFields.put(WebUtil.getMessage("isWarrantyNotice"), "warranty");
-            exportFields.put(WebUtil.getMessage("subjectProject"), "subjectProject");
-            exportFields.put(WebUtil.getMessage("createdDate"), "createdDate");
-            exportFields.put(WebUtil.getMessage("proprietaryClass"), "proprietaryClass");
-            exportFields.put(WebUtil.getMessage("assetTags"), "assetTags");
-
-            exportFields.put(WebUtil.getMessage("UUID"), "UUID");
-
-//            exportFields.put(WebUtil.getMessage("assetOwnerTel"), "assetOwnerTel");
-//            exportFields.put(WebUtil.getMessage("assetOwnerTel2"), "assetOwnerTel2");
-//            exportFields.put(WebUtil.getMessage("assetOwnerTel3"), "assetOwnerTel3");
-//            exportFields.put(WebUtil.getMessage("clinicalOwnerTel"), "clinicalOwnerTel");
-//            exportFields.put(WebUtil.getMessage("pmOwnerTel"), "pmOwnerTel");
-//        }
-        return exportFields;
+    public static List<String> getExportFieldsOrder() {
+        return Arrays.asList(
+                "departNum", "name", "aliasName",
+                "assetOwnerName", "assetOwnerTel", "assetOwnerName2", "assetOwnerTel2", "assetOwnerName3", "assetOwnerTel3",
+                "pmOwnerName", "pmOwnerTel", "measuringOwner",
+                "siteUID", "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "assetDeptName",
+                "manufacture", "makerShortName",
+                "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","assetGroup",
+                "assetGroupSecondary", "parentAssetId", "functionGrade", "repairForm", "functionType", "serialNum",
+                "systemId", "nationalStandardCode", "financingNum", "barcode", "modalityId", "purchasePrice",
+                "salvageValue", "lifecycle", "depreciationMethod", "manufactDate", "purchaseDate", "arriveDate",
+                "installDate", "factoryWarrantyDate", "warrantyDate", "terminateDate", "lastPmDate", "lastQaDate",
+                "lastMeteringDate", "acceptDate", "warrantyMonth","maitanance", "maitananceTel", "qrCode",
+                "locationCode", "locationName", "comments", "assetUsage", "capitalSource",
+                "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
+                "accountingCategory", "status","isPm", "isChecked", "assetValueCategory", "deviceStatus",
+                "warranty", "subjectProject", "proprietaryClass", "assetTags", "UCMID", "createdDate",
+                "UUID"
+        );
     }
 
      public static synchronized LinkedHashMap<String, String> getAllFields() {
@@ -299,5 +227,13 @@ public class CustomConfigConstant {
     
     public static List<String> getAssetsMobilepageHeaderFields() {
         return Arrays.asList("clinicalDeptName", "departNum", "installDate", "assetGroup", "siteUID");
+    }
+
+    /**
+     * the below fields are only used by wechat, no need to export in asset
+     * @return
+     */
+    public static List<String> getAssetsDisabledExportFields() {
+        return Arrays.asList("orgPath", "assetLocation");
     }
 }
