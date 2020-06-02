@@ -4,6 +4,7 @@ import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
@@ -56,7 +57,7 @@ public class ArrivalSupplierReportService {
                 Map<String, Object> arrivalItemMap = new HashMap<>();
 
                 arrivalItemMap.put("asset_name", arrivalList.getAssetName());
-                arrivalItemMap.put("asset_group", arrivalList.getAssetGroup());
+                arrivalItemMap.put("asset_group", arrivalList.getAssetGroup() != null? FieldValueMessageController.fieldValue("assetGroup", arrivalList.getAssetGroup().toString()) : "");
                 arrivalItemMap.put("function_type", arrivalList.getFunctionType());
                 arrivalItemMap.put("depart_num", arrivalListItem.getDepartNum());
                 arrivalItemMap.put("serial_num", arrivalListItem.getSerialNum());
