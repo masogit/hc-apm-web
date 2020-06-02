@@ -71,6 +71,9 @@ public class AssetFileImportBaseService {
     protected AssetInfoRepository assetDao;
 
     @Autowired
+    protected SupplierRepository supplierDao;
+
+    @Autowired
     protected OrgInfoRepository orgDao;
 
     @Autowired
