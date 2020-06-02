@@ -311,6 +311,34 @@ public class AssetInstallationService {
 //        }
     }
 
+    public Map<String, Object> getArrivalExportData(String arrivalListId){
+
+        Map<String, Object> arrivalMap = new HashMap<>();
+
+        List<ArrivalListItem> arrivalListItemList = itemDao.findByArrivalListId(arrivalListId);
+        for (ArrivalListItem arrivalListItem : arrivalListItemList) {
+            arrivalMap.put("开箱安装日期", arrivalListItem.getArrivalList().getBoxInstallationDate());
+            arrivalMap.put("使用日期", arrivalListItem.getArrivalList().getUsingDate());
+            arrivalMap.put("使用人名称", arrivalListItem.getArrivalList().getUsingPerson());
+            arrivalMap.put("使用人电话", arrivalListItem.getArrivalList().getUsingPersonTel());
+            arrivalMap.put("联系人", arrivalListItem.getArrivalList().getContactPerson());
+            arrivalMap.put("联系人电话", arrivalListItem.getArrivalList().getContactPersonTel());
+            arrivalMap.put("维修联系人", arrivalListItem.getArrivalList().getRepairer());
+            arrivalMap.put("维修联系人电话", arrivalListItem.getArrivalList().getRepairerTel());
+            arrivalMap.put("培训资料", arrivalListItem.getArrivalList().getTrainingInfo());
+
+            arrivalMap.put("设备名称", arrivalListItem.getArrivalList().getAssetName());
+            arrivalMap.put("设备分类", arrivalListItem.getArrivalList().getAssetGroup());
+            arrivalMap.put("规格型号", arrivalListItem.getArrivalList().getFunctionType());
+            arrivalMap.put("设备编号", arrivalListItem.getDepartNum());
+            arrivalMap.put("安置地点", arrivalListItem.getLocationName());
+            arrivalMap.put("制造商序列号", arrivalListItem.getSerialNum());
+            arrivalMap.put("安装工时", arrivalListItem.getWorkHours());
+      }
+
+        return arrivalMap;
+    }
+
     public Boolean sendArrivalSubmitMsg(String arrivalListId){
         String token = UserContextService.getAccessToken();
         String appPath = "pages/index/index?arrivalListId=" + arrivalListId;
