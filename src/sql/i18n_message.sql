@@ -3086,7 +3086,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AcceptTime_xlsx2', '验收时间', 'AcceptTime', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Closedby_xlsx', '关单人', 'Closedby', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CloseTime_xlsx', '关单时间', 'CloseTime', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CoworkerManhours_xlsx', '协助者工时', 'CoworkerManhours', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CoworkerManhours_xlsx', '协作者工时', 'CoworkerManhours', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'DownTime_xlsx', '停机时间', 'DownTime', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'RecoveryTime_xlsx', '恢复时间', 'RecoveryTime', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NearestWorkDays_xlsx', '修复后无故障天数', 'NearestWorkDays', NULL, '-1');
