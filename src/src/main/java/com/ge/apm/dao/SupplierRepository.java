@@ -35,8 +35,8 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
     @Query(value="select o.* from supplier o where o.uid=?1 limit 1",nativeQuery=true)
     public Supplier getByUid(String uid);
 
-    @Query(value="select o.* from supplier o where o.name=?1 limit 1",nativeQuery=true)
-    public Supplier getByName(String name);
+    @Query(value="select o.* from supplier o where o.id=?1 limit 1",nativeQuery=true)
+    public Supplier getById(int id);
 
     public List<Supplier> findBySupplierTAndTenantUID(Boolean supplierT, String tenantUid);
     public List<Supplier> findByMaintainerTAndTenantUID(Boolean maintainerT, String tenantUid);
