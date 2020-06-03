@@ -801,7 +801,10 @@ public class AssetInfoFormatter {
 
         Map<String, Object> map = new HashMap<>();
 
-        map.put(WebUtil.getMessage("name"), this.getName());
+        // key "name" is used by a lot of modules, the definition is wrong, so use a new key name to redefine
+        map.put(WebUtil.getMessage("EquipmentName"), this.getName());
+//        map.put(WebUtil.getMessage("name"), this.getName());
+
         map.put(WebUtil.getMessage("departNum"), this.getDepartNum());
         map.put(WebUtil.getMessage("financingNum"), this.getFinancingNum());
         map.put(WebUtil.getMessage("aliasName"), this.getAliasName());
