@@ -787,10 +787,13 @@ public class AssetInfoFormatter {
 
     public String getVendorTel(){
         String vendor = assetInfo.getVendor();
-        if(vendor!=null){
+        if(vendor != null){
             Supplier supplier= supplierDao.getByName(vendor);
-            return supplier.getTel();
+            if (null != supplier) {
+                return supplier.getTel();
+            }
         }
+
         return null;
     }
 
