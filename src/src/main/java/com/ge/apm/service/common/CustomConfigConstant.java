@@ -77,7 +77,7 @@ public class CustomConfigConstant {
             allFields = new LinkedHashMap();
             allFields.put("serialNum", WebUtil.getMessage("serialNum"));
             allFields.put("departNum", WebUtil.getMessage("departNum"));
-            allFields.put("name", WebUtil.getMessage("name"));
+            allFields.put("name", WebUtil.getMessage("EquipmentName"));
             allFields.put("aliasName", WebUtil.getMessage("aliasName"));
             allFields.put("assetGroup", WebUtil.getMessage("assetGroup"));
             allFields.put("assetGroupSecondary", WebUtil.getMessage("assetGroupSecondary"));
