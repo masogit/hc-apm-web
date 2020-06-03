@@ -9,7 +9,7 @@
     <ui:composition>
         <p:dialog id="supplierQrCodeDlg" widgetVar="supplierQrCodeDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="邀请二维码">
             <h:form id="supplierQrCodeForm">
-                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.showQrCode}">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{supplierController.showQrCode}">
                     <h:panelGroup>
                         <p:panel header="小程序二维码" style="text-align:center">
                             <!--<p:barcode value="#{qrCodeLibController.qrCode}" type="qr" height="200" width="200" format="png"/>-->
