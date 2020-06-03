@@ -1872,7 +1872,7 @@
 
 
 
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentID', '设备编号', 'Equipment ID ', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentID', '设备编号（院方）', 'Equipment ID ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentName', '设备名称 ', 'Equipment Name ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentAlias', '设备别名', 'Equipment Alias ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'RepairOwner', '维修负责人 ', 'Repair Owner ', NULL, '-1');
@@ -2507,7 +2507,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ReassignDialog', '转单框', 'Reassign Dialog', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'WorkRequirements', '工作需要', 'Work Requirements', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'BatchOrderCompetitionDialog', '批量抢单对话框', 'Batch Order Competition Dialog', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'EquipmentID', '设备编号', 'Equipment ID', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'EquipmentID', '设备编号（院方）', 'Equipment ID', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ManhoursHours', '工时（小时）', 'Manhours(Hours)', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MaintenanceResult', '保养结果', 'Maintenance Result', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'Cancelor', '取消人', 'Cancelor', NULL, '-1');
