@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="zkbContractCourseEditDlg" widgetVar="zkbContractCourseEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="合同详情" height="300">
+    <p:dialog id="zkbContractCourseEditDlg" widgetVar="zkbContractCourseEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="合同详情" height="320">
 
         <h:form id="zkbContractCourseEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -17,14 +17,21 @@
                     </p:autoComplete>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">数量</label>
-                    <p:inputText id="remark" value="#{zkbContractEditController.zkbContractCourseSelected.courseCount}" />
+                    <label class="label">课程额度*</label>
+                    <p:spinner id="courseCount" value="#{zkbContractEditController.zkbContractCourseSelected.courseCount}" min="0" max="1000" />
+                </h:panelGroup>
+                <h:panelGroup rendered="#{zkbContractEditController.actionDetailName eq 'Edit'}">
+                    <label class="label">操作原因*</label>
+                    <p:inputTextarea rows="5" cols="30" id="opRemark" value="#{zkbContractEditController.reason}" required="true" requiredMessage="原因不能为空">
+                    </p:inputTextarea>
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbContractEditController.saveDetail}" update=":growl :zkbContractEditForm:zkbContractCourseDatalist" icon="ui-icon-check" />
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbContractEditController.saveDetail}" update=":growl :zkbContractEditForm:zkbContractCourseDatalist"
+                 icon="ui-icon-check" oncomplete="PF('zkbContractCourseEditDlg').hide()" />
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbContractCourseEditDlg').hide()"/>
         </h:form>
     </p:dialog>
+    
 </ui:composition>
 </html>

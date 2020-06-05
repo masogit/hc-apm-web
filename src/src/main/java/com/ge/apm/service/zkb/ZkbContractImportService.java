@@ -2,10 +2,8 @@ package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.ContractRow;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.xerces.xs.datatypes.ObjectList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -27,8 +25,8 @@ public class ZkbContractImportService {
 
     public static final String EXCEL_CONTRACT_TEMPLATE_VERSION = "v1.0";
 
-    public static final String SHEET_SERVICE_CONTRACT = "Contract_List";
-    public static final String SHEET_SERVICE_CONTRACT_COURSE = "Contract_List_Course";
+    public static final String SHEET_SERVICE_CONTRACT = "Contract";
+    public static final String SHEET_SERVICE_CONTRACT_COURSE = "ContractCourse";
     public static final String SHEET_SERVICE_CONTRACT_Asset = "Contract_Asset";
     public static final int EXCEL_CONTRACT_HEADER_ROW = 1;
     public static final int EXCEL_CONTRACT_DATA_ROW = 2;
@@ -53,7 +51,8 @@ public class ZkbContractImportService {
 
     @Autowired
     private TenantInfoRepository tenantInfoDao;
-
+    @Autowired
+    private ZkbContractLogService zkbContractLogService;
 
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
@@ -420,11 +419,11 @@ public class ZkbContractImportService {
         return result;
     }
 
-    public List<ZkbContractCourse> importAssetData(List<Map<String, Object>>impAssetMap){
+    public List<ZkbContractCourse> importAssetData(List<Map<String, Object>>impAssetMap,UserAccount currentUser){
         for (Map<String, Object> item : impAssetMap) {
             ZkbContractAssetVO zkbContractAssetVO = (ZkbContractAssetVO)item.get("zkbContractAssetVO");
             if(zkbContractAssetVO != null && checkAssetData(item,impAssetMap)) {
-                importOneContractAsset(zkbContractAssetVO);
+                importOneContractAsset(zkbContractAssetVO,currentUser);
             }
         }
         return null;
@@ -501,14 +500,16 @@ public class ZkbContractImportService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void  importOneContractAsset(ZkbContractAssetVO zkbContractAssetVO){
+    public void  importOneContractAsset(ZkbContractAssetVO zkbContractAssetVO,UserAccount currentUser){
         if(StringUtils.isEmpty(zkbContractAssetVO.getFlag())) {
             ZkbContractAsset newZkbContractAsset = new ZkbContractAsset();
             newZkbContractAsset.setContractId(zkbContractAssetVO.getContractId());
             newZkbContractAsset.setAssetId(zkbContractAssetVO.getAssetId());
             zkbContractAssetRepository.save(newZkbContractAsset);
+            zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser);
         }else if("Y".equals(zkbContractAssetVO.getFlag())){
             zkbContractAssetRepository.delete(zkbContractAssetVO.getZkbContractAssetId());
+            zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetDelete","",zkbContractAssetVO.getQrCode(),"导入删除",currentUser);
         }
     }
     //endregion

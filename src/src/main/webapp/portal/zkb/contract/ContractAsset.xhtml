@@ -38,6 +38,10 @@
                         <label class="label">#{msg.assetName}</label>
                         <p:inputText id="assetName" value="#{zkbContractEditController.assetName}" maxlength="100" required="false"/>
                     </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.qrCode}</label>
+                        <p:inputText id="qrCode" value="#{zkbContractEditController.queryAsset.qrCode}" maxlength="100" required="false"/>
+                    </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
             <h:panelGroup>

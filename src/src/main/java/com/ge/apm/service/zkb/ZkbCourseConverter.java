@@ -1,9 +1,6 @@
 package com.ge.apm.service.zkb;
 
-import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.ZkbCourseRepository;
-import com.ge.apm.dao.ZkbCourseRepository;
-import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.ZkbCourse;
 import webapp.framework.web.WebUtil;
 

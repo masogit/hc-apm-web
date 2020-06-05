@@ -5,7 +5,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,14 +22,13 @@ import java.util.*;
 public class ZkbContractService {
 
 
-    private static final String SHEET_ZKB_CONTRACT = "Contract_List";
-    private static final String SHEET_ZKB_CONTRACT_COURSE = "Contract_List_Course";
+    private static final String SHEET_ZKB_CONTRACT = "Contract";
+    private static final String SHEET_ZKB_CONTRACT_COURSE = "Contract_Course";
     private static final String SHEET_ZKB_CONTRACT_ASSET = "Contract_Asset";
 
 
     @Autowired
     private TenantInfoRepository tenantInfoDao;
-
 
     @Autowired
     private ZkbCourseRepository courseRepository;
@@ -43,6 +41,9 @@ public class ZkbContractService {
 
     @Autowired
     private ZkbContractAssetRepository zkbContractAssetRepository;
+
+    @Autowired
+    private ZkbContractLogService zkbContractLogService;
 
     public List<TenantInfo> getSourceTenantInfoList(){
 
@@ -88,9 +89,9 @@ public class ZkbContractService {
     }
 
     public String calcContractState(Date startDate,Date endDate){
-        if(whenEQ(new Date(),startDate)){
+        if(whenEQ(startDate,new Date())){
             return "未生效";
-        }else if(whenEQ(new Date(),endDate)){
+        }else if(!whenEQ(new Date(),endDate)){
             return "有效";
         }else{
             return "已过期";
@@ -98,11 +99,10 @@ public class ZkbContractService {
     }
 
     /**
-     * 比较两日期是否相等
-     *
+     * 比较两日期是否大小
      * @param date      日期
      * @param otherDate 另一个日期
-     * @return 比较两日期大小。如果date==otherDate则返回true,否则false
+     * @return 比较两日期大小。如果date>=otherDate则返回true,否则false
      */
     public static Boolean whenEQ(Date date, Date otherDate) {
         Boolean flag = true;
@@ -218,8 +218,37 @@ public class ZkbContractService {
     /**
      * 保存合同
      */
-    public ZkbContract saveContract(ZkbContract zkbContract){
-        return contractRepository.save(zkbContract);
+    public ZkbContract saveContract(ZkbContract zkbContract,String actionName,String reason,UserAccount currentUser){
+        zkbContract = contractRepository.save(zkbContract);
+        if("Edit".equals(actionName)){
+            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractUpdate","","",reason,currentUser);
+        }
+        return zkbContract;
+    }
+
+    public void deleteContract(ZkbContract zkbContract,String reason,UserAccount currentUser){
+        String courseData = "";
+        String assetData = "";
+        if(zkbContract.getZkbContractCourses() != null && zkbContract.getZkbContractCourses().size() > 0){
+            for(ZkbContractCourse c : zkbContract.getZkbContractCourses()){
+                courseData += c.getZkbCourse().getCid()+",";
+            }
+            if(courseData.length() >0){
+                courseData = courseData.substring(0,courseData.length()-1);
+            }
+        }
+        List<ZkbContractAsset> zkbContractAssets = zkbContractAssetRepository.findByContractId(zkbContract.getId());
+        if(zkbContractAssets != null && zkbContractAssets.size() > 0){
+            for(ZkbContractAsset c : zkbContractAssets){
+                assetData += c.getAssetInfo().getQrCode()+",";
+            }
+            if(assetData.length() >0){
+                assetData = assetData.substring(0,assetData.length()-1);
+            }
+        }
+        contractRepository.delete(zkbContract);
+        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractDelete",courseData,assetData,reason,currentUser);
+
     }
 
 
@@ -227,7 +256,7 @@ public class ZkbContractService {
      * 保存合同的课程，并且将合同课程加入列表中
      */
     @Transactional
-    public List<ZkbContractCourse> saveContractCourse(ZkbContractCourse zkbContractCourse,List<ZkbContractCourse> contractCourseList){
+    public List<ZkbContractCourse> saveContractCourse(ZkbContractCourse zkbContractCourse,List<ZkbContractCourse> contractCourseList,ZkbContract zkbContract,String actionDetailName,String reason,UserAccount currentUser){
         contractCourseRepository.save(zkbContractCourse);
         List<ZkbContractCourse> tempZkbContractCourseList = new ArrayList<>();
         contractCourseList.forEach((item) -> {
@@ -237,6 +266,9 @@ public class ZkbContractService {
         });
         tempZkbContractCourseList.add(zkbContractCourse);
 
+        if("Edit".equals(actionDetailName)){
+            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"courseUpdate",zkbContractCourse.getZkbCourse().getCid(),"",reason,currentUser);
+        }
         return tempZkbContractCourseList;
     }
 
@@ -244,8 +276,10 @@ public class ZkbContractService {
      * 删除合同课程，并把列表中课程删除
      */
     @Transactional
-    public List<ZkbContractCourse> delContractCourse(ZkbContractCourse zkbContractCourse,List<ZkbContractCourse> contractCourseList){
+    public List<ZkbContractCourse> delContractCourse(ZkbContractCourse zkbContractCourse,List<ZkbContractCourse> contractCourseList,ZkbContract zkbContract,UserAccount currentUser,String reason){
         contractCourseRepository.delete(zkbContractCourse);
+        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"courseDelete",zkbContractCourse.getZkbCourse().getCid(),"",reason,currentUser);
+
         List<ZkbContractCourse> tempZkbContractCourseList = new ArrayList<>();
         contractCourseList.forEach((item) -> {
             if(!item.getId().equals(zkbContractCourse.getId())){
@@ -268,18 +302,33 @@ public class ZkbContractService {
      * 根据选择的设备，保存合同设备数据
      */
     @Transactional(rollbackFor = Exception.class)
-    public void saveAsset(List<AssetInfo> targetAssets,ZkbContract zkbContract){
+    public void saveAsset(List<AssetInfo> targetAssets,ZkbContract zkbContract,UserAccount currentUser,List<ZkbContractAsset> zkbContractAssetList){
         for(AssetInfo a : targetAssets){
+            boolean flag = false;
+            if(zkbContractAssetList != null && zkbContractAssetList.size() > 0){
+                for(ZkbContractAsset asset : zkbContractAssetList){
+                    if(a.getUid().equals(asset.getAssetId())){
+                        flag=true;
+                        break;
+                    }
+                }
+            }
+            if(flag){
+                continue;
+            }
             ZkbContractAsset zkbContractAsset = new ZkbContractAsset();
             zkbContractAsset.setContractId(zkbContract.getId());
             zkbContractAsset.setAssetId(a.getUid());
             zkbContractAssetRepository.save(zkbContractAsset);
+
+            zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetAdd","",a.getQrCode(),"",currentUser);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteAsset(ZkbContractAsset zkbContractAsset) {
+    public void deleteAsset(ZkbContractAsset zkbContractAsset,ZkbContract zkbContract,UserAccount currentUser,String reason) {
         zkbContractAssetRepository.delete(zkbContractAsset);
+        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetDelete","",zkbContractAsset.getAssetInfo().getQrCode(),reason,currentUser);
     }
 
 }
