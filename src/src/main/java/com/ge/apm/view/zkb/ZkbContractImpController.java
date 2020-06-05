@@ -1,7 +1,6 @@
 package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbContractRepository;
-import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.service.asset.ContractImportService;
@@ -9,7 +8,6 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbContractImportService;
 import com.ge.apm.service.zkb.ZkbContractService;
 import com.ge.apm.view.asset.ContractImportController;
-import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -70,12 +68,6 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
         this.file = event.getFile();
         try {
             doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
-            //检查导入模板版本
-            /*if(!contractImportService.checkDocVersion(doc)){
-                WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--模版版本不正确");
-                return;
-            }*/
-
             int maxRowNum = ContractImportService.EXCEL_CONTRACT_HEADER_ROW + 5000;
             if(doc.exceedMaxRowNum(ContractImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
@@ -136,7 +128,7 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
         try {
             impContractAssetMapList = zkbContractImportService.getContractAssetMapFromTemplate(doc);
             if(impContractAssetMapList != null && impContractAssetMapList.size() > 0){
-                zkbContractImportService.importAssetData(impContractAssetMapList);
+                zkbContractImportService.importAssetData(impContractAssetMapList,currentUser);
                 errorContractAssetList = zkbContractImportService.filterErrorRecords(impContractAssetMapList);
             }else{
                 errorContractAssetList = new ArrayList<>();
@@ -148,7 +140,7 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
 
     public String getTemplateName(){
         UserContextService ucs = WebUtil.getBean(UserContextService.class);
-        return ucs.isLocale() == true ? "APM_Contract_Service_Template.xlsx":"APM_Contract_Service_Template_en.xlsx";
+        return ucs.isLocale() == true ? "excel/APM_ZKB_Contract_imp_Template.xlsx":"excel/APM_ZKB_Contract_imp_Template.xlsx";
     }
 
     private StreamedContent exportFile;

@@ -1,6 +1,5 @@
 package com.ge.apm.view.zkb;
 
-import com.ge.apm.dao.ZkbContractCourseRepository;
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
@@ -9,15 +8,9 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
-import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
-import org.primefaces.model.UploadedFile;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -46,7 +39,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private UserContextService userContextService;
     private AssetTagService assetTagService;
 
-
     private UserAccount currentUser;
     private String actionName;
     private String selectionTenantInfo;
@@ -54,6 +46,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     private List<ZkbContractCourse> contractCourseList ;
     private List<ZkbContractAsset> zkbContractAssetList;
+    private String reason;
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -121,8 +114,24 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         this.initCourseList();
     }
 
+    /**
+     * 新增保存，主要是保存完后需要重进加载一下详情页面
+     * 同时将状态变更为编辑，并且更新selectedid值
+     */
+    public String createContract(){
+        selected = zkbContractService.saveContract(this.selected,actionName,reason,currentUser);
+        this.reason="";
+        actionName = "Edit";
+        WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
+        return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedid=".concat(selected.getId()));
+    }
+
+    /**
+     * 编辑保存
+     */
     public void saveContract(){
-        selected = zkbContractService.saveContract(selected);
+        selected = zkbContractService.saveContract(this.selected,actionName,reason,currentUser);
+        this.reason="";
         WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
     }
 
@@ -135,7 +144,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public List<ZkbCourse> autoCompleteCourse(String query){
         List<ZkbCourse> res = courseList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getCname().contains(query)).collect(Collectors.toList());
-        if(contractCourseList != null && contractCourseList.size() > 0){
+        /*if(contractCourseList != null && contractCourseList.size() > 0){
             List<ZkbCourse> delCourse = new ArrayList<>();
             for(ZkbCourse z : res){
                 for(ZkbContractCourse zkbContractCourse : contractCourseList){
@@ -156,7 +165,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
                 res.removeAll(delCourse);
             }
         }
-
+*/
         return res;
     }
 
@@ -164,29 +173,55 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     public void prepareDetailCreate(){
         actionDetailName="Create";
         zkbContractCourseSelected = new ZkbContractCourse();
+        this.reason = "";
     }
 
     public void prepareDetailEdit(){
         actionDetailName="Edit";
-
+        this.reason = "";
     }
 
     public void saveDetail(){
+        boolean flag=true;
+        for(ZkbContractCourse zkbContractCourse : contractCourseList){
+            if(zkbContractCourseSelected.getZkbCourse().getId().equals(zkbContractCourse.getCourseId())){
+                if("Create".equals(actionDetailName)){
+                    flag=false;
+                    break;
+                }else if("Edit".equals(actionDetailName)){
+                    if(!zkbContractCourse.getId().equals(this.zkbContractCourseSelected.getId())){
+                        flag=false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!flag){
+            WebUtil.addErrorMessage("课程已存在");
+            return;
+        }
         if("Create".equals(actionDetailName)){
             zkbContractCourseSelected.setContractId(this.selected.getId());
-            zkbContractCourseSelected.setCourseId(zkbContractCourseSelected.getZkbCourse().getId());
-        }else{
-            zkbContractCourseSelected.setCourseId(zkbContractCourseSelected.getZkbCourse().getId());
         }
-        contractCourseList = zkbContractService.saveContractCourse(zkbContractCourseSelected,contractCourseList);
+        zkbContractCourseSelected.setCourseId(zkbContractCourseSelected.getZkbCourse().getId());
+        contractCourseList = zkbContractService.saveContractCourse(zkbContractCourseSelected,contractCourseList,this.selected,actionDetailName,reason,currentUser);
         this.zkbContractCourseSelected =null;
     }
 
     public void deleteDetail(){
-        contractCourseList = zkbContractService.delContractCourse(zkbContractCourseSelected,contractCourseList);
+        contractCourseList = zkbContractService.delContractCourse(zkbContractCourseSelected,contractCourseList,this.selected,currentUser,reason);
         this.zkbContractCourseSelected =null;
     }
     //endregion
+
+    //region 设备
+    public String getAssetGroup(String assetGroup){
+        if(StringUtils.isEmpty(assetGroup)){
+            return "";
+        }
+        String v = WebUtil.getMessage("assetGroup"+"-"+assetGroup);
+        return v;
+    }
 
     private String assetName;
     private List<AssetInfo> sourceAssets;
@@ -202,7 +237,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     }
 
    public void deleteAsset(){
-        zkbContractService.deleteAsset(this.zkbContractAssetSelected);
+        zkbContractService.deleteAsset(this.zkbContractAssetSelected,this.selected,currentUser,reason);
         this.zkbContractAssetList.remove(this.zkbContractAssetSelected);
         this.zkbContractAssetSelected = null;
    }
@@ -222,7 +257,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             sourceAssets = new ArrayList(sourceAssets);
             sourceAssets.removeAll(targetAssets);
             //将已选择的设备从查询去除
-            if(zkbContractAssetList != null && zkbContractAssetList.size() > 0){
+            /*if(zkbContractAssetList != null && zkbContractAssetList.size() > 0){
                 List<AssetInfo> exsitAssets = new ArrayList<>();
                 for(ZkbContractAsset asset : zkbContractAssetList){
                     for (AssetInfo a : sourceAssets){
@@ -233,7 +268,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
                     }
                 }
                 sourceAssets.removeAll(exsitAssets);
-            }
+            }*/
         } else {
             sourceAssets = new ArrayList<AssetInfo>();
             targetAssets = new ArrayList<AssetInfo>();
@@ -257,9 +292,38 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void saveAsset(){
         if(targetAssets.size() > 0){
-            zkbContractService.saveAsset(targetAssets,this.selected);
+            zkbContractService.saveAsset(targetAssets,this.selected,currentUser,zkbContractAssetList);
             zkbContractAssetList = zkbContractService.queryAssetByContractId(this.selected.getId());
         }
+    }
+    //endregion
+
+    private String logType;
+    public void preForLog(String _logType){
+        this.logType = _logType;
+        this.reason="";
+    }
+
+    public void operateByLogType(){
+        if(StringUtils.isEmpty(logType)){
+            return;
+        }
+        ZkbContractLog.LogType ly =ZkbContractLog.LogType.valueOf(logType);
+        switch (ly) {
+            case contractUpdate:
+                saveContract();
+                break;
+            case courseUpdate:
+                //System.out.println("None");
+                break;
+            case CourseDelete:
+                deleteDetail();
+                break;
+            case assetDelete:
+                deleteAsset();
+                break;
+        }
+        this.reason="";
     }
 
     public DualListModel<AssetInfo> getAvailableAssets() {
@@ -364,6 +428,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void setZkbContractAssetSelected(ZkbContractAsset zkbContractAssetSelected) {
         this.zkbContractAssetSelected = zkbContractAssetSelected;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     @Override

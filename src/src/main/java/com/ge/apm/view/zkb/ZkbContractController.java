@@ -21,12 +21,10 @@ import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -47,7 +45,7 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
     private String actionDetailName;
     private String selectionTenantInfo;
     private Page<ZkbContract> zkbContractPage;
-
+    private String reason;
 
     @Override
     protected void init() {
@@ -82,6 +80,13 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
         return zkbContractPage;
+    }
+
+    @Override
+    public void delete() {
+        zkbContractService.deleteContract(this.selected,reason,currentUser);
+        this.selected= null;
+        this.reason="";
     }
 
     public TenantInfo getTenantInfo(String tenantInfoUID){
@@ -191,5 +196,13 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     public void setExportFile(StreamedContent exportFile) {
         this.exportFile = exportFile;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }
