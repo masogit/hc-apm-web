@@ -1,6 +1,5 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.ZkbContactPerson;
 import com.ge.apm.domain.ZkbContract;
 import webapp.framework.dao.GenericRepositoryUUID;
 
@@ -12,4 +11,10 @@ import java.util.List;
 public interface ZkbContractRepository extends GenericRepositoryUUID<ZkbContract> {
 
     ZkbContract findFirstByContractNo(String contractNo);
+
+    /**
+     *
+     *
+     */
+    List<ZkbContract> findByTenantUIDAndContractNo(String tenantUID, String contractNo);
 }

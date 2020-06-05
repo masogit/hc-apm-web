@@ -119,20 +119,29 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
      * 同时将状态变更为编辑，并且更新selectedid值
      */
     public String createContract(){
-        selected = zkbContractService.saveContract(this.selected,actionName,reason,currentUser);
-        this.reason="";
-        actionName = "Edit";
-        WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
-        return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedid=".concat(selected.getId()));
+        if(zkbContractService.checkContractNo(selected,actionName)){
+            selected = zkbContractService.saveContract(this.selected,actionName,reason,currentUser);
+            this.reason="";
+            actionName = "Edit";
+            WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
+            return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedid=".concat(selected.getId()));
+        }else{
+            WebUtil.addErrorMessage(WebUtil.getMessage("ErrorContractNoIsExist"));
+            return "";
+        }
     }
 
     /**
      * 编辑保存
      */
     public void saveContract(){
-        selected = zkbContractService.saveContract(this.selected,actionName,reason,currentUser);
-        this.reason="";
-        WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
+        if(zkbContractService.checkContractNo(selected,actionName)) {
+            selected = zkbContractService.saveContract(this.selected, actionName, reason, currentUser);
+            this.reason = "";
+            WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
+        }else{
+            WebUtil.addErrorMessage(WebUtil.getMessage("ErrorContractNoIsExist"));
+        }
     }
 
     //region 课程
