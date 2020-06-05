@@ -216,6 +216,26 @@ public class ZkbContractService {
     }
 
     /**
+     * 判断合同号是否存在，同一个租户只能存在一个合同号
+     * 区分新增与编辑的情况
+     */
+    public boolean checkContractNo(ZkbContract zkbContract,String actionName){
+        List<ZkbContract> contractList = contractRepository.findByTenantUIDAndContractNo(zkbContract.getTenantUID(),zkbContract.getContractNo());
+        if(contractList.size() ==0){
+            return true;
+        }else if (contractList.size() == 1 && "Edit".equals(actionName)){
+            ZkbContract exist = contractList.get(0);
+            if(exist.getId().equals(zkbContract.getId())){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+
+    /**
      * 保存合同
      */
     public ZkbContract saveContract(ZkbContract zkbContract,String actionName,String reason,UserAccount currentUser){
