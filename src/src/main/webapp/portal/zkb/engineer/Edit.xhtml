@@ -33,35 +33,35 @@
                         <p:inputText id="email" value="#{zkbEngineerController.selected.email}" required="false" requiredMessage="#{msg.zkbEngineer_email} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
-                    <h:panelGroup>
+                    <!--<h:panelGroup>
                         <label class="label">#{msg.zkbEngineer_status}*</label>
                         <p:selectOneMenu id="status" value="#{zkbEngineerController.selected.status}" required="true" requiredMessage="#{msg.zkbEngineer_status} #{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="Y" itemValue="Y"/>
                             <f:selectItem itemLabel="N" itemValue="N"/>
                         </p:selectOneMenu>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbEngineer_age}</label>
-                        <p:inputNumber id="age"  decimalPlaces="0" minValue="0" maxValue="999" value="#{zkbEngineerController.selected.age}" required="false" requiredMessage="#{msg.zkbEngineer_age} #{msg.ValidationRequire}">
+                        <label class="label">#{msg.zkbEngineer_age}*</label>
+                        <p:inputNumber id="age"  decimalPlaces="0" minValue="0" maxValue="999" value="#{zkbEngineerController.selected.age}" required="true" requiredMessage="#{msg.zkbEngineer_age} #{msg.ValidationRequire}">
                             <f:convertNumber pattern="0" type="number"/>
                         </p:inputNumber>
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbEngineer_educationalBackground}</label>
-                        <p:inputText id="educationalBackground" value="#{zkbEngineerController.selected.educationalBackground}" required="false" requiredMessage="#{msg.zkbEngineer_educationalBackground} #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.zkbEngineer_educationalBackground}*</label>
+                        <p:inputText id="educationalBackground" value="#{zkbEngineerController.selected.educationalBackground}" required="true" requiredMessage="#{msg.zkbEngineer_educationalBackground} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbEngineer_graduateSchool}</label>
-                        <p:inputText id="graduateSchool" value="#{zkbEngineerController.selected.graduateSchool}" required="false" requiredMessage="#{msg.zkbEngineer_graduateSchool} #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.zkbEngineer_graduateSchool}*</label>
+                        <p:inputText id="graduateSchool" value="#{zkbEngineerController.selected.graduateSchool}" required="true" requiredMessage="#{msg.zkbEngineer_graduateSchool} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbEngineer_specialty}</label>
-                        <p:inputText id="specialty" value="#{zkbEngineerController.selected.specialty}" required="false" requiredMessage="#{msg.zkbEngineer_specialty} #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.zkbEngineer_specialty}*</label>
+                        <p:inputText id="specialty" value="#{zkbEngineerController.selected.specialty}" required="true" requiredMessage="#{msg.zkbEngineer_specialty} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                 </p:panelGrid>
