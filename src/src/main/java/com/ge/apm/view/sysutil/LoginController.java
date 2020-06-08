@@ -206,18 +206,28 @@ public class LoginController extends LoginService {
         request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, loginName);
 
         //登录信息记录
-        String addr = request.getRemoteAddr();
-        String origin = ctx.getRequestHeaderMap().get("origin");
-        LoginRecordRepository loginRecordRepository = WebUtil.getBean(LoginRecordRepository.class);
-        LoginRecord loginRecord =  new LoginRecord();
-        loginRecord.setLoginName(loginName);
-        loginRecord.setLoginUrl(origin);
-        loginRecord.setLoginTime(new Date());
-        loginRecord.setLoginIp(addr);
-        loginRecord.setIsDeleted(false);
-        loginRecordRepository.save(loginRecord);
+        saveLoginRecord(ctx,user);
     }
-    
+
+    private void saveLoginRecord(ExternalContext ctx, UserAccount user) {
+        try {
+            HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+            String loginName = user.getLoginName();
+            String addr = request.getRemoteAddr();
+            String origin = ctx.getRequestHeaderMap().get("origin");
+            LoginRecordRepository loginRecordRepository = WebUtil.getBean(LoginRecordRepository.class);
+            LoginRecord loginRecord =  new LoginRecord();
+            loginRecord.setLoginName(loginName);
+            loginRecord.setLoginUrl(origin);
+            loginRecord.setLoginTime(new Date());
+            loginRecord.setLoginIp(addr);
+            loginRecord.setIsDeleted(false);
+            loginRecordRepository.save(loginRecord);
+        }catch (Exception ex) {
+            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public String getHomePage() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.getUserDefaultHomePage();
