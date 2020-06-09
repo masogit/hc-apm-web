@@ -1,12 +1,15 @@
 package com.ge.apm.view.sysutil;
 
+import com.ge.apm.dao.LoginRecordRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.LoginRecord;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.Digests;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PasswordUtil;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -165,15 +168,16 @@ public class LoginController extends LoginService {
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
         HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
         MicroServiceUtil msUtil = WebUtil.getBean(MicroServiceUtil.class);
+        String loginName = user.getLoginName();
         UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
         if(user.getIsActive()){
             try{
                 String accessToken = null;
                 if(user.isGeSSO()){
-                	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(user.getLoginName(), user.getPassword(),userAgent);
+                	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(loginName, user.getPassword(),userAgent);
                 }
                 else{
-                	accessToken=msUtil.getAuthenticateByUserPassword(user.getLoginName(), user.getPlainPassword(),userAgent);
+                	accessToken=msUtil.getAuthenticateByUserPassword(loginName, user.getPlainPassword(),userAgent);
                 }
                 request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
             }catch(Exception e){
@@ -186,10 +190,10 @@ public class LoginController extends LoginService {
             try{
             	String accessToken = null;
                 if(user.isGeSSO()){
-                	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(user.getLoginName(), user.getPassword(),userAgent);
+                	accessToken=msUtil.getAuthenticateByUserPasswordEncrypted(loginName, user.getPassword(),userAgent);
                 }
                 else{
-                	accessToken=msUtil.getAuthenticateByUserPassword(user.getLoginName(), user.getPlainPassword(),userAgent);
+                	accessToken=msUtil.getAuthenticateByUserPassword(loginName, user.getPlainPassword(),userAgent);
                 }
                 request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
             }catch(Exception e){
@@ -199,10 +203,31 @@ public class LoginController extends LoginService {
             user.setIsActive(false);
             dao.save(user);
         }
+        request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, loginName);
 
-        request.getSession().setAttribute(CBoardController.LOGIN_NAME_KEY, user.getLoginName());
+        //登录信息记录
+        saveLoginRecord(ctx,user);
     }
-    
+
+    private void saveLoginRecord(ExternalContext ctx, UserAccount user) {
+        try {
+            HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+            String loginName = user.getLoginName();
+            String addr = request.getRemoteAddr();
+            String origin = ctx.getRequestHeaderMap().get("origin");
+            LoginRecordRepository loginRecordRepository = WebUtil.getBean(LoginRecordRepository.class);
+            LoginRecord loginRecord =  new LoginRecord();
+            loginRecord.setLoginName(loginName);
+            loginRecord.setLoginUrl(origin);
+            loginRecord.setLoginTime(new Date());
+            loginRecord.setLoginIp(addr);
+            loginRecord.setIsDeleted(false);
+            loginRecordRepository.save(loginRecord);
+        }catch (Exception ex) {
+            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public String getHomePage() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.getUserDefaultHomePage();
