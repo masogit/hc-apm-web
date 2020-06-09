@@ -7,15 +7,7 @@ package com.ge.apm.view.wo;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONPath;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.MvsAssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
-import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
-import com.ge.apm.dao.WorkOrderDetailRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.AssetFaultType;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.CustomConfig;
@@ -138,6 +130,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private Set<String> clinicalDeptOrgUidSet;
     private Set<String> assetDeptOrgUidSet;
     private  UserOrgInfoRepository userOrgInfoRepository;
+    private BlobObjectRepository blobObjectRepository;
     private V2_ServiceRequest newServiceRequest;
 private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private V2_WorkOrder selectedWorkOrder;
@@ -210,6 +203,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         try {
             supplierController = WebUtil.getBean(SupplierController.class);
             ccService = WebUtil.getBean(CustomConfigService.class);
+            blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
             customConfigService = WebUtil.getBean(CustomConfigService.class);
             currentCustomConfig = customConfigService.getCurrentCustomConfig(
                     UserContextService.getCurrentUserAccount().getSiteUID());
@@ -1528,6 +1522,12 @@ public void test1(){
             }
         }
 
+    }
+
+    public List<V2_BlobObject> getPartPictures(String id){
+        accessoryList = getWorkOrderDetail(id);
+        Set<String> ids = accessoryList.stream().map(p->p.getId()).collect(Collectors.toSet());
+        return blobObjectRepository.getPartPictures(ids);
     }
 
     public void prepareEditCoWorkerDetail(String itemId) {
