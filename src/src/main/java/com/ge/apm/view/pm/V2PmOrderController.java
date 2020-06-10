@@ -226,6 +226,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Getter @Setter
     private StreamedContent excelFile;
 
+    private BlobObjectRepository blobObjectRepository;
+
     public boolean downloadButton(){
         if(queryIndex==10){
             return false;
@@ -1178,6 +1180,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         this.selectedMap = new HashMap();
         pmReportService = WebUtil.getBean(PmReportService.class);
+        blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
         String enCodeParameters = WebUtil.getRequestParameter("str");
@@ -2623,4 +2626,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.cancelInt = cancelInt;
     }
 
+    public List<V2_BlobObject> getPartPictures(String id) {
+        if(StringUtils.isNotEmpty(id)) {
+            accessoryList = getWorkOrderDetail(id);
+            Set<String> ids = accessoryList.stream().map(p -> p.getId()).collect(Collectors.toSet());
+            if(!ids.isEmpty()) {
+                return blobObjectRepository.getPartPictures(ids);
+            }
+            return null;
+        } else {
+            logger.warn("V2PmOrderController selected is null");
+            return null;
+        }
+    }
 }
