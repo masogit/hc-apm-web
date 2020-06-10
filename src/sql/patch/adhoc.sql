@@ -1,5 +1,14 @@
 -- Drop table
 
+DROP TABLE IF EXISTS public.audit_config;
+DROP TABLE IF EXISTS public.audit_file;
+DROP TABLE IF EXISTS public.audit_group;
+DROP TABLE IF EXISTS public.audit_item;
+DROP TABLE IF EXISTS public.audit_link;
+DROP TABLE IF EXISTS public.audit_module;
+DROP TABLE IF EXISTS public.audit_summary;
+
+
 DROP TABLE IF EXISTS public.audit_default_file;
 
 CREATE TABLE public.audit_default_file (
