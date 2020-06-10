@@ -1,6 +1,6 @@
 -- Drop table
 
-DROP TABLE public.audit_default_file;
+DROP TABLE IF EXISTS public.audit_default_file;
 
 CREATE TABLE public.audit_default_file (
 	id serial NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE public.audit_default_file (
 
 -- Drop table
 
-DROP TABLE public.audit_default_group;
+DROP TABLE IF EXISTS public.audit_default_group;
 
 CREATE TABLE public.audit_default_group (
 	id serial NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE public.audit_default_group (
 
 -- Drop table
 
-DROP TABLE public.audit_default_item;
+DROP TABLE IF EXISTS public.audit_default_item;
 
 CREATE TABLE public.audit_default_item (
 	id serial NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE public.audit_default_item (
 
 -- Drop table
 
-DROP TABLE public.audit_default_link;
+DROP TABLE IF EXISTS public.audit_default_link;
 
 CREATE TABLE public.audit_default_link (
 	id serial NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE public.audit_default_link (
 
 -- Drop table
 
-DROP TABLE public.audit_default_module;
+DROP TABLE IF EXISTS public.audit_default_module;
 
 CREATE TABLE public.audit_default_module (
 	id serial NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE public.audit_default_module (
 
 -- Drop table
 
-DROP TABLE public.audit_default_summary;
+DROP TABLE IF EXISTS public.audit_default_summary;
 
 CREATE TABLE public.audit_default_summary (
 	id serial NOT NULL,
