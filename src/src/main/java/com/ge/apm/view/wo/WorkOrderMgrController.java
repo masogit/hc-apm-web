@@ -5,31 +5,11 @@
  */
 package com.ge.apm.view.wo;
 
-import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.AssetFaultType;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.CustomConfig;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.MvsAssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.ServiceRequestMsg;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_WorkOrder;
-import com.ge.apm.domain.V2_WorkOrderCoworker;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
-import com.ge.apm.domain.V2_WorkOrder_Step;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.asset.AssetFaultTypeService;
-import com.ge.apm.service.asset.AssetInfoMgrService;
-import com.ge.apm.service.asset.AutoCompleteService;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.asset.*;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -42,26 +22,10 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
@@ -76,6 +40,14 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -1525,9 +1497,17 @@ public void test1(){
     }
 
     public List<V2_BlobObject> getPartPictures(String id){
-        accessoryList = getWorkOrderDetail(id);
-        Set<String> ids = accessoryList.stream().map(p->p.getId()).collect(Collectors.toSet());
-        return blobObjectRepository.getPartPictures(ids);
+        if(StringUtils.isNotEmpty(id)) {
+            accessoryList = getWorkOrderDetail(id);
+            Set<String> ids = accessoryList.stream().map(p -> p.getId()).collect(Collectors.toSet());
+            if(!ids.isEmpty()){
+              return blobObjectRepository.getPartPictures(ids);
+            }
+            return  null;
+        } else {
+            logger.warn("V2WorkOrderController selected is null");
+            return null;
+        }
     }
 
     public void prepareEditCoWorkerDetail(String itemId) {
