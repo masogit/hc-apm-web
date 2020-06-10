@@ -87,8 +87,7 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
         if(!this.isHaveZKBAdmin()){
             this.selected.setPosition("ZKBAdmin");
             this.positionDisabled = Boolean.TRUE;
-        }
-        if(!this.isHaveMaintenanceManager()){
+        }else if(!this.isHaveMaintenanceManager()){
             this.selected.setPosition("MaintenanceManager");
             this.positionDisabled = Boolean.TRUE;
         }
