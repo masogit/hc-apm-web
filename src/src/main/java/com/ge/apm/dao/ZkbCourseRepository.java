@@ -14,6 +14,5 @@ public interface ZkbCourseRepository extends GenericRepositoryUUID<ZkbCourse> {
 
     List<ZkbCourse> findByCname(String cname);
 
-    /*@Query("select count(id) from ZkbContactCourse c where c.cid = ?1")
-    Integer findContractByCourseId(String cid);*/
+
 }
