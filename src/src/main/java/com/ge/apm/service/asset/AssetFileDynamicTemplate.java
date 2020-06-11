@@ -405,7 +405,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         int startRow = EXCEL_ASSET_DATA_ROW;
         for (AssetInfo assetInfo: assetList) {
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao);
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, supplierDao);
             Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite);
 
             writer.writeRowData(startRow, rowMap);

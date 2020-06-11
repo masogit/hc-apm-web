@@ -154,6 +154,10 @@ public class ArrivalList implements Serializable {
     private int status;
 
     //供应商接口信息
+    //合同签订日期
+    @Column(name = "contract_date")
+    @Temporal(TemporalType.DATE)
+    private Date contractDate;
     //外贸协议
     @Column(name = "foreign_trade_agreements")
     private String foreignTradeAgreements;
@@ -532,6 +536,14 @@ public class ArrivalList implements Serializable {
 
     public void setTrainingInfo(String trainingInfo) {
         this.trainingInfo = trainingInfo;
+    }
+
+    public Date getContractDate() {
+        return contractDate;
+    }
+
+    public void setContractDate(Date contractDate) {
+        this.contractDate = contractDate;
     }
 
     @Override
