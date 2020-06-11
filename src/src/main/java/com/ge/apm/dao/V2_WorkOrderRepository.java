@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.ge.apm.domain.V2_BlobObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -61,4 +62,6 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
     public List<V2_WorkOrder> getWorkOrderById(Set<String> ids);
     
     public List<V2_WorkOrder> findByAssetId(Integer asstId);
+
+
 }

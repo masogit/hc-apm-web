@@ -8,6 +8,8 @@ public enum ExportFields {
     RUNLEVEL("保养等级", "Measurement Grade"),
     PMTYPE("保养类型", "Maintenance Type"),
     CLINICALNAME("所属科室", "Clinical Department"),
+    PMRULE("保养规则", "PM Rule"),
+    MAINTENANCEPERIOD("保养周期(月)", "Maintenance Period"),
     CREATOR("创建人", "Creator"),
     OWNER("负责人", "Owner"),
     PMNUM("保养编号", "Maintenance ID"),

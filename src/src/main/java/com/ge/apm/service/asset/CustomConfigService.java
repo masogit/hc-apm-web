@@ -20,12 +20,9 @@ import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Date;
+
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -150,15 +147,41 @@ public class CustomConfigService {
 
     public List<String> getLocalizedExportableAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
         List<String> exportFields = getExportAssetFieldsByRoles(config, userRoles);
-        //uuid is required to export, but not in custom config fields, so include it here.
-        exportFields.add("UUID");
 
-        List<String> localizedExportFields = CustomConfigConstant.getExportFields().entrySet().stream()
-                .filter(item -> exportFields.contains(item.getValue()))
-                .map(Entry::getKey)
-                .collect(Collectors.toList());
+        removeDisabledExportFields(exportFields);
+
+        orderByExportFields(exportFields);
+
+        List<String> localizedExportFields = exportFields.stream()
+                .map(item -> CustomConfigConstant.getAllFields().get(item)).collect(Collectors.toList());
+
+        //uuid is required to export, but not in custom config fields, so include it here.
+        localizedExportFields.add("UUID");
 
         return localizedExportFields;
+    }
+
+    private void removeDisabledExportFields(List<String> exportFields) {
+        exportFields.removeAll(CustomConfigConstant.getAssetsDisabledExportFields());
+    }
+
+    private void orderByExportFields(List<String> exportFields) {
+        List<String> exportFieldsOrder = CustomConfigConstant.getExportFieldsOrder();
+        Collections.sort(exportFields, (o1, o2) -> {
+            int index1 = exportFieldsOrder.indexOf(o1);
+            int index2 = exportFieldsOrder.indexOf(o2);
+
+            if (index1 == -1 && index2 == -1) {
+                return 0;
+            } else if (index1 == -1) {
+                return 1;
+            } else if (index2 == -1) {
+                return -1;
+            } else {
+                return Integer.compare(index1, index2);
+            }
+        });
+
     }
 
     public void removeAssetField(CustomConfigObject customConfigObject, String key) {

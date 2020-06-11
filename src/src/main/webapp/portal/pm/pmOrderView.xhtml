@@ -80,6 +80,16 @@
 
 
                     </p:panelGrid>
+                    <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
+                        <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage   url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" > #{msg.DownloadFile}
+                                </p:link>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
 
                     <p:dataTable value="#{v2PmOrderController.aquirePmOrderStep()}" var="stepItem">
                         <p:column headerText="#{msg.stepName}">
@@ -179,7 +189,7 @@
                     </h:panelGroup>
 
 
-                    <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
+                    <p:dataGrid id="partPictureList" var="fileitem" value="#{v2PmOrderController.getPartPictures(v2PmOrderController.selected.id)}" columns="5" layout="grid">
                         <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >

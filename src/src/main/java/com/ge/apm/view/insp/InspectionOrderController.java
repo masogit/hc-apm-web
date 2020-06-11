@@ -6,7 +6,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.insp.InspectionService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
@@ -85,7 +84,7 @@ public class InspectionOrderController extends JpaCRUDController<InspectionOrder
                 owner = new UserAccount();
                 ownerList = uuaService.getUserList(hospitalId);
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(InspectionOrderController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else if ("View".equalsIgnoreCase(actionName)) {
             //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));

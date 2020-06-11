@@ -66,7 +66,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 	@Query("select o from OrgInfo o where institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1 order by name")
 	public List<OrgInfo> getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(String siteId);
 
-	@Query("select o from OrgInfo o where orgType<>4 and orgType<>5 and (institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1)")
+	@Query("select o from OrgInfo o where orgType<>4 and (institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1)")
 	public List<OrgInfo> getOrgInfosByParentId(String siteId);
 
 	@Query(value = "select o.* from org_info o where o.uid in (select c.parent_uid from org_info c where c.org_type=4 and c.uid in (?1)) order by o.name_py_code asc", nativeQuery = true)

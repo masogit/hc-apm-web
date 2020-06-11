@@ -130,7 +130,7 @@
                            <h:panelGroup id="importReportTemplate">
                                <p:commandButton value="#{msg.ImportTemplate}" process="@this" update="importReportTemplate" oncomplete="PF('uploadEditDialog').show()" rendered="#{empty pmOrderRuleController.selected.reportStorageId}"/>
                                <p:link href="#{fileDownloadService.getFileUrl(pmOrderRuleController.selected.reportStorageId)}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}">#{pmOrderRuleController.selected.reportTemplateName}</p:link>
-                               <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="${msg.Delete}" update=":PmOrderRuleEditForm:importReportTemplate :uploadEditDialogForm :growl" process="@this" actionListener="#{pmOrderRuleController.removeReportTemplate}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}"/>
+                               <p:commandButton icon="ui-icon-close" style="zoom:0.8;" class="btn btn-sm btn-gray" title="${msg.Delete}" update=":PmOrderRuleEditForm:importReportTemplate :uploadEditDialogForm :growl" process="@this" actionListener="#{pmOrderRuleController.removeReportTemplate}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}"/>
                            </h:panelGroup>
                        </h:panelGroup>
                    </p:panelGrid>
@@ -170,7 +170,7 @@
                     update="display,:PmOrderRuleEditForm, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
                     &nbsp;&nbsp;
 
-                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" 
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{pmOrderRuleController.cancelSave()}" icon="ui-icon-cancel"
                     onclick="PF('PmOrderRuleEditDialog').hide()" update = ":PmOrderRuleListForm" />
                     &nbsp;&nbsp;
                 </h:panelGroup>
@@ -185,9 +185,9 @@
         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
             <h:panelGroup>
                 <label class="label">#{msg.choseFileToUpload}</label>
-                <h:outputText   value="#{pmOrderRuleController.uploadedFile.fileName}"  rendered="#{not empty pmOrderRuleController.uploadedFile}"/>
+                <h:outputText   value="#{pmOrderRuleController.uploadedFile.fileName}"  rendered="#{not empty pmOrderRuleController.uploadedFile.fileName}"/>
                 <p:fileUpload  fileUploadListener="#{pmOrderRuleController.uploadDataFile}" value="#{pmOrderRuleController.uploadedFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                               multiple="false" sizeLimit="10000000" update=":uploadEditDialogForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(docx)$/" label="#{msg.Add}" rendered="#{empty pmOrderRuleController.uploadedFile}" />
+                               multiple="false" sizeLimit="10000000" update=":uploadEditDialogForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(docx)$/" label="#{msg.Add}" rendered="#{empty pmOrderRuleController.uploadedFile.fileName}" />
             </h:panelGroup>
             <h:panelGroup>
                 <p>#{msg.Description}</p>
