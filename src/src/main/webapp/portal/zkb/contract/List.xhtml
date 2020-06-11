@@ -1,0 +1,160 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.ZKBAgentContractMgt}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="zkbContractListForm">
+                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5">
+                        <p:outputLabel value="#{msg.TenantInfo}*:"/>
+                        <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbContractController.selectionTenantInfo}" disabled="#{userContextService.zkbUser}">
+                            <p:ajax listener="#{zkbContractController.tenantInfoSelect}" update="datalist :zkbContractListForm"/>
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <c:forEach items="#{zkbContractController.tenantInfoList}" var="v">
+                                <f:selectItem itemLabel="#{v.name}" itemValue="#{v.uid}"/>
+                            </c:forEach>
+                        </p:selectOneMenu>
+
+                    </h:panelGrid>
+                    <p:dataTable id="datalist" value="#{zkbContractController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbContractController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500" >
+
+                        <p:ajax event="rowSelect" listener="#{zkbContractController.prepareEdit}" update="deleteButton :zkbContractListForm"/>
+                        <p:ajax event="filter" listener="#{zkbContractController.onFilter}" />
+
+                        <p:column headerText="#{msg.zkbContact_tenant}" sortBy="#{item.tenantUID}">
+                            <h:outputText value="#{zkbContractController.getTenantInfo(item.tenantUID).name}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContract_contractNo}" filterBy="#{item.contractNo}" sortBy="#{item.contractNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.contractNo}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContract_region}" filterBy="#{item.region}" sortBy="#{item.region}"  filterMatchMode="EQ">
+                            <h:outputText value="#{item.region}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContract_contractType}" filterBy="#{item.contractType}" sortBy="#{item.contractType}"  filterMatchMode="EQ">
+                            <h:outputText value="#{item.contractType}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContract_startDate}" filterBy="#{item.startDate}" sortBy="#{item.startDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterStartDate" widgetVar="varFilteStartDate" />
+                            </f:facet>
+                            <h:outputText value="#{item.startDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_endDate}"  filterBy="#{item.endDate}" sortBy="#{item.endDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterEndDate" widgetVar="varFilteEndDate" />
+                            </f:facet>
+                            <h:outputText value="#{item.endDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContract_ibNumber}" sortBy="#{item.zkbContract_ibNumber}">
+                            <h:outputText value="#{item.ibNumber}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_spareQuota}" sortBy="#{item.zkbContract_spareQuota}">
+                            <h:outputText value="#{item.spareQuota}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_probeQuota}" sortBy="#{item.zkbContract_probeQuota}">
+                            <h:outputText value="#{item.probeQuota}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" sortBy="#{item.zkbContract_geArtificialSupportTimes}" >
+                            <h:outputText value="#{item.geArtificialSupportTimes}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_spareArtificail}" sortBy="#{item.zkbContract_spareArtificail}">
+                            <h:outputText value="#{item.spareArtificail}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{zkbContractController.createAction}"  disabled="#{empty zkbContractController.selectionTenantInfo}"/>
+                            <p:commandButton id="editButton" style="margin-left: 0px" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{zkbContractController.editAction}" disabled="#{empty zkbContractController.selected.id}"/>
+                            <!--  <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{zkbContractController.delete}" update=":zkbContractListForm:datalist, :growl" disabled="#{empty zkbContractController.selected.id}">
+                                  <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                              </p:commandButton>-->
+                            <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" oncomplete="PF('zkbConfigDlg').show()" update=":growl :zkbConfigDlg" disabled="#{empty zkbContractController.selected.id}">
+                                <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>-->
+                            </p:commandButton>
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbContractController.exportAll}" icon="ui-icon-arrowthick-1-s">
+                                <p:fileDownload value="#{zkbContractController.exportFile}"/>
+                            </p:commandButton>
+                            <!--<p:commandButton title="#{msg.Import}" icon="fa fa-upload" class="btn btn-sm btn-gray" action="#{zkbContractController.importAction}"></p:commandButton>-->
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+
+                <p:overlayPanel widgetVar="panelFilterStartDate" for=":zkbContractListForm:datalist:filterStartDate" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="GMT+8"  widgetVar="varStartDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="GMT+8"  widgetVar="varStartDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('varDataList','varFilteStartDate','varStartDateFrom','varStartDateTo'); PF('panelFilterStartDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterStartDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+
+                <p:overlayPanel widgetVar="panelFilterEndDate" for=":zkbContractListForm:datalist:filterEndDate" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{msg.From}"/>
+                        <p:calendar timeZone="GMT+8"  widgetVar="varEndDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                        <p:outputLabel value="#{msg.To}"/>
+                        <p:calendar timeZone="GMT+8"  widgetVar="varEndDateTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                    </h:panelGrid>
+                    <p:commandButton onclick="setDateFilter('varDataList','varFilteEndDate','varEndDateFrom','varEndDateTo'); PF('panelFilterEndDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterEndDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+            </div>
+
+            <p:dialog id="zkbConfigDlg" widgetVar="zkbConfigDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="操作原因" height="300">
+
+                <h:form id="zkbConfigForm">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">原因*</label>
+                            <p:inputTextarea rows="10" cols="50" id="opRemark" value="#{zkbContractController.reason}" required="true" requiredMessage="原因不能为空">
+                            </p:inputTextarea>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <br/>
+                </h:form>
+                <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{zkbContractController.delete}" update="zkbContractListForm:datalist, :growl :zkbConfigDlg" icon="ui-icon-check" />
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfigDlg').hide()"/>
+            </p:dialog>
+        </div>
+
+
+    </ui:define>
+</ui:composition>
