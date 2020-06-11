@@ -1,3 +1,4 @@
+INSERT INTO public.sys_role (id,home_page,name,role_desc,menus,web_authorities,role_desc_en) VALUES (15,'/','AuditStaff','评审老师','audit',NULL,'Judge Teacher ');
 -- Drop table
 
 DROP TABLE IF EXISTS public.audit_config;
