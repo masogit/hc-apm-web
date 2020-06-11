@@ -3,7 +3,9 @@ package com.ge.apm.domain.pure;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.V2_PmOrder;
+import com.ge.apm.view.pm.V2PmOrderController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import webapp.framework.web.WebUtil;
@@ -30,6 +32,9 @@ public class PmExportFormatter<T> {
     private List<I18nMessage> i18OrderTypeList=null;
     private V2_PmOrder v2_pmOrder;
     private String type = null;
+
+    private V2PmOrderController v2PmOrderController;
+    private PmOrderRule pmOrderRule;
     public String getCreator() {
         return v2_pmOrder.getCreatorName();
     }
@@ -45,6 +50,9 @@ public class PmExportFormatter<T> {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         i18PmtypeList =I18dao.getByMsgType("pmType");
         i18OrderTypeList  =I18dao.getByMsgType("intExtType");
+
+        v2PmOrderController = WebUtil.getBean(V2PmOrderController.class);
+        pmOrderRule = v2PmOrderController.getRulePm(v2_pmOrder);
     }
 
     public String getFromI18(List<I18nMessage> msgList, Object tmpType ){
@@ -68,6 +76,8 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
             map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getChinese(), this.getClincialName());
+            map.put(ExportFields.PMRULE.getChinese(), this.pmOrderRule.getName());
+            map.put(ExportFields.MAINTENANCEPERIOD.getChinese(), this.pmOrderRule.getPeriod());
             map.put(ExportFields.CREATOR.getChinese(), this.getCreator());
             map.put(ExportFields.OWNER.getChinese(), this.getOwner());
             map.put(ExportFields.PMNUM.getChinese(), this.getPmNum());
@@ -81,6 +91,8 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.RUNLEVEL.getEnglish(), this.getRuleLevel());
             map.put(ExportFields.PMTYPE.getEnglish(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getEnglish(), this.getClincialName());
+            map.put(ExportFields.PMRULE.getEnglish(), this.pmOrderRule.getName());
+            map.put(ExportFields.MAINTENANCEPERIOD.getEnglish(), this.pmOrderRule.getPeriod());
             map.put(ExportFields.CREATOR.getEnglish(), this.getCreator());
             map.put(ExportFields.OWNER.getEnglish(), this.getOwner());
             map.put(ExportFields.PMNUM.getEnglish(), this.getPmNum());

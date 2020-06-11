@@ -2,15 +2,7 @@ package com.ge.apm.view.asset;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -63,8 +55,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetCreateService acService;
     private UserContextService userContextService;
     private OrgInfoRepository orgDao;
-//    private AssetFileImportService importService;
-    private AssetFileExportService exportService;
     private QrCodeService qrCodeService;
     private UaaService uaaService;
     private CustomConfigService ccService;
@@ -154,8 +144,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         supplierDao = WebUtil.getBean(SupplierRepository.class);
 
-//        importService = WebUtil.getBean(AssetFileImportService.class);
-        exportService = WebUtil.getBean(AssetFileExportService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -212,11 +200,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         setUserSearchFilters();
         selected = null;
 
-        //JIRA#4065
-        if(pageRequest.getSort().toString().contains("namePyCode")) {
-            Sort sortWithId = new Sort(Sort.DEFAULT_DIRECTION.ASC, "id");
-            pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortWithId));
-        }
+        pageRequest =addRequiredSortById(pageRequest);
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
 
@@ -227,6 +211,24 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         setSupplier(currentPageAssets);
 
         return res;
+    }
+
+    private PageRequest addRequiredSortById(PageRequest pageRequest) {
+        Iterator<Sort.Order> orders = pageRequest.getSort().iterator();
+        boolean exists = false;
+        while(orders.hasNext()){
+            if(orders.next().getProperty().equals("id")){
+                exists = true;
+                break;
+            }
+        }
+        if (exists) {
+            return pageRequest;
+        } else {
+            Sort sortWithId = new Sort(Sort.DEFAULT_DIRECTION.ASC, "id");
+            pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortWithId));
+        }
+        return pageRequest;
     }
 
     private void setWarrantyAlerts(List<AssetInfo> assets){

@@ -13,7 +13,7 @@
 
             <div class="ui-g-12 card">
                 <h:form rendered="#{supplierController.activeSupplier()}">
-                    <p:commandButton id="supplierQrCodeButton" value="邀请二维码" title="邀请二维码" update=":supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
+                    <p:commandButton id="supplierQrCodeButton" actionListener="#{supplierController.onShowQrCode}" value="邀请二维码" title="邀请二维码" update=":supplierQrCodeDlg" oncomplete="PF('supplierQrCodeDialog').show()"/>
                 </h:form>
 
                 <h:form id="SupplierListForm">
@@ -60,7 +60,7 @@
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update=":SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update=":SupplierEditDlg @(.modiSupplyDlg)" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected}"/>
                             <p:commandButton id="editSupplierUserButton" icon="ui-icon-people" title="#{msg.Edit}" actionListener="#{supplierController.initSupplierUser}" update=":supplierUserDlg" oncomplete="PF('supplierUserDialog').show()" rendered="#{supplierController.activeSupplier()}"/>
-                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{supplierController.delete}" update="datalist" disabled="#{empty supplierController.selected}">
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{supplierController.deleteSupplier}" update="datalist" disabled="#{empty supplierController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">

@@ -75,6 +75,9 @@
         <p:menuitem id="um403" value="SAP" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml"/>
         <p:menuitem id="um404" value="SAPReport" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/> -->
             </p:submenu>
+            <p:submenu id="um25" label="#{msg.MyTrain}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('maintain')}">
+                <p:menuitem value="#{msg.TrainReport}" outcome="/portal/trainreport/trainReport.xhtml" rendered="#{userContextService.accessContains('maintain.workbench')}"/>
+            </p:submenu>
             <p:submenu id="um5024" label="#{msg.DeviceMetrologyMgmt}" icon="fa fa-check-square-o" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')  and userContextService.accessContains('measure')}">
 
               <!--  <p:menuitem id="um404" value="计量管理" outcome="/portal/measuring/measureOrderListAll.xhtml" rendered="#{userContextService.accessContains('measure.config')}"/>-->
@@ -127,6 +130,7 @@
                 <p:menuitem id="um43" value="#{msg.DeviceCostAnalysis}" rendered="false" outcome="/empty"/>
                 <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
             </p:submenu>
+            <p:menuitem id="um444" value="#{msg.review}" icon="scanner" rendered="#{userContextService.accessContains('audit') and userContextService.hasAnyRole('AuditStaff')}" url="/audit/#/dashboard" target="_blank"></p:menuitem>
             <p:submenu id="um100" label="#{msg.otherLink}" icon="fa fa-external-link" rendered="#{userContextService.accessContains('link')}">
                 <p:menuitem id="um102" value="#{msg.assetMgt}" url="#{userContextService.getTenantInfo().cpmURL}" rendered="#{userContextService.accessContains('link.CPM') and (not empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>
                 <p:menuitem id="um103" value="#{msg.assetMgt}" outcome="/portal/asset/assetMgtNone.xhtml" rendered="#{userContextService.accessContains('link.CPM') and (empty userContextService.getTenantInfo().cpmURL)}" ></p:menuitem>

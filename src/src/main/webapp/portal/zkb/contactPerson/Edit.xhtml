@@ -24,18 +24,18 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbContact_phone}</label>
-                        <p:inputText id="phone" value="#{zkbContactPersonController.selected.phone}" required="false" requiredMessage="#{msg.zkbContact_phone} #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.zkbContact_phone}*</label>
+                        <p:inputText id="phone" value="#{zkbContactPersonController.selected.phone}" required="true" requiredMessage="#{msg.zkbContact_phone} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbContact_email}</label>
-                        <p:inputText id="email" value="#{zkbContactPersonController.selected.email}" required="false" requiredMessage="#{msg.zkbContact_email} #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.zkbContact_email}*</label>
+                        <p:inputText id="email" value="#{zkbContactPersonController.selected.email}" required="true" requiredMessage="#{msg.zkbContact_email} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
                         <label class="label">#{msg.zkbContact_position}*(“智康保管理员”为派工、备件订购联系人)</label>
-                        <p:selectOneMenu id="position" value="#{zkbContactPersonController.selected.position}" required="true" requiredMessage="#{msg.zkbContact_position} #{msg.ValidationRequire}">
+                        <p:selectOneMenu id="position" value="#{zkbContactPersonController.selected.position}" required="true" requiredMessage="#{msg.zkbContact_position} #{msg.ValidationRequire}" disabled="#{zkbContactPersonController.positionDisabled}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <c:forEach items="#{fieldMsg.getFieldValueList('zkbContactPosition')}" var="v">
                                 <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}"/>
@@ -49,8 +49,8 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbContact_address}</label>
-                        <p:inputText id="address" value="#{zkbContactPersonController.selected.address}" required="false" requiredMessage="#{msg.zkbContact_address} #{msg.ValidationRequire}" />
+                        <label class="label">#{msg.zkbContact_address}*</label>
+                        <p:inputText id="address" value="#{zkbContactPersonController.selected.address}" required="true" requiredMessage="#{msg.zkbContact_address} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
                     <h:panelGroup>

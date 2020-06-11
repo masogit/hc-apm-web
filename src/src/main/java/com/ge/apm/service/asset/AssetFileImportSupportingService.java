@@ -139,13 +139,9 @@ public class AssetFileImportSupportingService {
             supplierDao.save(supplier);
         }
 
-        //existing records, update type or update telephone
+        //existing records, update type
         if (supplier.getMaintainerT() == null || !supplier.getMaintainerT() || (!StringUtils.isEmpty(tel) && !tel.equals(supplier.getTel()))) {
             supplier.setMaintainerT(true);
-            if (!StringUtils.isEmpty(tel)) {
-                supplier.setTel(tel);
-            }
-
             supplierDao.save(supplier);
         }
 

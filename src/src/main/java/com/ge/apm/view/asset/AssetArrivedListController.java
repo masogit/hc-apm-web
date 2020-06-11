@@ -1,9 +1,6 @@
 package com.ge.apm.view.asset;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.StringReader;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +8,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
@@ -22,6 +21,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import com.ge.apm.service.asset.ArrivalSupplierReportService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
@@ -57,9 +57,11 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     private ArrivalListRepository dao = null;
 
+    private ArrivalSupplierReportService arrivalSupplierReportService;
     private AssetInstallationService aiService;
     private UaaService uaaService;
     private StreamedContent exportPdf;
+    private StreamedContent exportDoc;
     private Date varArrivalDateTo = null;
     private String arrivalFormatTime = null;
 
@@ -68,6 +70,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         dao = WebUtil.getBean(ArrivalListRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        arrivalSupplierReportService = WebUtil.getBean(ArrivalSupplierReportService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
     }
@@ -320,6 +323,20 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         }
     }
 
+    public void exportArrivalSupplierReportToDoc() {
+        try {
+            Map<String, Object> data = arrivalSupplierReportService.createReportData(selected);
+            byte[] templateBytes = arrivalSupplierReportService.buildReportTemplate();
+
+            if (templateBytes != null) {
+                exportDoc = arrivalSupplierReportService.exportDocx(data, templateBytes);
+            }
+        } catch (IOException e) {
+            Logger.getLogger(AssetArrivedListController.class.getName()).log(Level.SEVERE, null, e);
+            WebUtil.addErrorMessage("导出失败");
+        }
+    }
+
     public void setArrivalFormatTime(String arrivalFormatTime) {
         this.arrivalFormatTime = arrivalFormatTime;
     }
@@ -332,5 +349,11 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         this.varArrivalDateTo = varArrivalDateTo;
     }
 
-    
+    public StreamedContent getExportDoc() {
+        return exportDoc;
+    }
+
+    public void setExportDoc(StreamedContent exportDoc) {
+        this.exportDoc = exportDoc;
+    }
 }

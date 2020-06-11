@@ -16,6 +16,8 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
     public List<Supplier> getByTenantUID(String tenantUid);
 
 
+    @Query(value= "select su.* from supplier su where tenant_uid=?1 and supplier_t is true and (status is null or status ='Enable')" ,nativeQuery = true)
+    List<Supplier> findSupplierByTenantUIDAndStatus(String tenantUid);
 
     @Query(value= "select su.* from supplier su where tenant_uid=?1 and supplier_t is true " ,nativeQuery = true)
     List<Supplier> findSupplierByTenantUID(String tenantUid);
@@ -33,9 +35,16 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
     @Query(value="select o.* from supplier o where o.uid=?1 limit 1",nativeQuery=true)
     public Supplier getByUid(String uid);
 
+    @Query(value="select o.* from supplier o where o.id=?1 limit 1",nativeQuery=true)
+    public Supplier getById(int id);
+
     public List<Supplier> findBySupplierTAndTenantUID(Boolean supplierT, String tenantUid);
     public List<Supplier> findByMaintainerTAndTenantUID(Boolean maintainerT, String tenantUid);
     public List<Supplier> findByManufacturerTAndTenantUID(Boolean manufacturerT, String tenantUid);
 
     public Supplier findFirstByTenantUIDAndName(String tenantUid, String name);
+
+    List<Supplier> findByProductRegistrationCodeAndTenantUIDAndIdNot(String productRegistrationCode, String tenantUID, Integer id);
+
+    List<Supplier> findBySupplierCodeAndTenantUIDAndIdNot(String supplierCode, String tenantUID, Integer id);
 }

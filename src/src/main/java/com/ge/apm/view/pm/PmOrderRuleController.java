@@ -6,26 +6,21 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.github.stuxuhai.jpinyin.PinyinException;
-import com.github.stuxuhai.jpinyin.PinyinFormat;
-import com.github.stuxuhai.jpinyin.PinyinHelper;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.*;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -106,6 +101,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
         //initTree(user.getTenantUID());
+//        BeanUtils.copyProperties(selected,pmOrderRule);
         initOrgTree();
     }
 
@@ -705,7 +701,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         if (uploadedFileObject != null) {
             String storageId = uploadedFileObject.getObjectStorageId();
             this.selected.setReportStorageId(storageId);
-            this.dao.save(selected);
+//            this.dao.save(selected);
         }
     }
 
@@ -714,6 +710,17 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     }
 
     public void setNothing(){
+
+    }
+
+    public void cancelSave(){
+        if(crudActionName.equalsIgnoreCase("Create")){
+            prepareCreate();
+            removeReportTemplate();
+        }
+        if(crudActionName.equalsIgnoreCase("Edit")){
+            prepareEdit();
+        }
 
     }
 
