@@ -31,16 +31,18 @@ public class ZkbCourseService {
 
     public boolean isCourseExist(ZkbCourse selected) {
         List<ZkbCourse> courseList = courseDao.find(selected.getCid());
-        if(courseList!=null && courseList.size()>0){
-            for(ZkbCourse c:courseList){
-                try {
-                    if(!c.getId().equals(selected.getId()))
-                        return true;
-                } catch (Exception e) {
-                    System.out.println("NPE");;
-                }
-            }
+        ZkbCourse course = courseDao.findFirstByCid(selected.getCid());
+        try {
+            if(!course.getId().equals(selected.getId()))
+                return true;
+        } catch (Exception e) {
+            System.out.println("NPE");;
         }
+        /*if(courseList!=null && courseList.size()>0){
+            for(ZkbCourse c:courseList){
+
+            }
+        }*/
         return false;
     }
 
@@ -58,8 +60,15 @@ public class ZkbCourseService {
 
     public boolean isContractUsed(ZkbCourse course) {
 
-        if(course.getCid().equals("GEHC-Seno (ZKB)"))
+        /*Integer count = courseDao.findContractByCourseId(course.getCid());
+        if(count!=null && count>0){
             return true;
+        }*/
+
+        if(course.getCid().equals("GEHC-Seno (ZKB)")) {
+
+            return true;
+        }
 
         return false;
     }
