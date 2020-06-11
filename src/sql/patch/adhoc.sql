@@ -14,7 +14,7 @@ is_notify_fe, is_notify_ole, is_notify_sales, label, mute_period, pad_message, u
 values ('21d87039ea3e45pet64f843e9b008629', 508, now(), 60, 90, 5, 5, true, true, true, false, true, '校正源寿命', 10080, null,
 'D', null, 'PETCT设备所配置的校正源即将到期，由于校正源购买周期很长，请您尽早开始准备校正源更换事宜，谢谢！', true, false, true);
 
-
+INSERT INTO public.sys_role (id,home_page,name,role_desc,menus,web_authorities,role_desc_en) VALUES (15,'/','AuditStaff','评审老师','audit',NULL,'Judge Teacher ');
 
 -- 2020.06.11 YHAAO-7278 质控读取新增默认配置数据
 -- Drop table
