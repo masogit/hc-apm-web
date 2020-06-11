@@ -81,6 +81,13 @@
                             <label class="label">统一社会信用编码</label>
                             <p:inputText value="#{supplierController.selected.creditCode}" />
                         </h:panelGroup>
+                        <!--<h:panelGroup>
+                            <label class="label">状态</label>
+                            <p:selectOneMenu id="status" value="#{supplierController.selected.status}" required="false" requiredMessage="供应商状态 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="启用" itemValue="Enable"/>
+                                <f:selectItem itemLabel="停用" itemValue="Disable"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>-->
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset legend="营业执照信息" rendered="#{supplierController.activeSupplier()}">

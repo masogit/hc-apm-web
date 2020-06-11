@@ -109,7 +109,9 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 }
 
                 AssetRow assetRow = new AssetRow(asset, rowMap);
+                // key "name" is used by a lot of modules, the definition is wrong, so use a new key name "EquipmentName" to redefine
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentName")), "setName", false);
+
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentID")), "setDepartNum", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("AssetID")), "setFinancingNum", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("EquipmentAlias")), "setAliasName", true);

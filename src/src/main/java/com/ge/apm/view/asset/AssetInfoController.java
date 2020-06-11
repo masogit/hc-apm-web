@@ -78,7 +78,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private static final long serialVersionUID = -1L;
 
     AssetInfoRepository dao = null;
-    AssetFileExportService exportService;
 
     AssetInfoService assetInfoService;
     
@@ -293,7 +292,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
         autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
-        exportService= WebUtil.getBean(AssetFileExportService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
 
@@ -1921,46 +1919,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setExcelFile(StreamedContent excelFile) {
         this.excelFile = excelFile;
-    }
-
-    @Deprecated
-    public void exportExcel() throws IOException {
-
-        //非设备科的人导出的时候，导出部分数据
-        boolean allColumns = false;
-        if (userContextService.hasRole("AssetHead") || userContextService.hasRole("AssetStaff")) {
-            allColumns = true;
-        }
-
-        Pageable pageable = new PageRequest(0, 100000000, lastPageSort);
-
-        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters, pageable).getContent();
-
-        List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
-        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
-
-        List<OrgInfo> sites = orgDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
-
-
-        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-        if (!assetUids.isEmpty()) {
-            assetList = assetList.stream().filter(assetInfo -> {
-                Boolean exists = this.selectedMap.get(assetInfo.getUid());
-                if (exists == null) {
-                    return false;
-                }
-                return exists.booleanValue();
-            }).collect(Collectors.toList());
-        }
-
-        //不可用
-        ExcelDocument doc = exportService.exportAsset(assetList, sites, orgList, Collections.EMPTY_LIST);
-
-        DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
-        streamedContent.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        streamedContent.setName("AssetInfo_export.xlsx");
-
-        excelFile = streamedContent;
     }
 
     //三码合一设置
