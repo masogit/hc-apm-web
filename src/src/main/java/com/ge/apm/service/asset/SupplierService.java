@@ -156,6 +156,14 @@ public class SupplierService {
 
     }
 
+    public byte[] getWeChatCodeImage(){
+
+        String token = UserContextService.getAccessToken();
+
+        return supplierApiService.getWeChatQrCodeImage(token);
+
+    }
+
     public boolean activeSupplier(){
 
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -179,6 +187,40 @@ public class SupplierService {
 
         return false;
 
+    }
+
+    public boolean validateSupplierCode(Supplier supplier){
+
+        UserAccount user = UserContextService.getCurrentUserAccount();
+
+        List<Supplier> supplierList = new ArrayList<>();
+
+        if (StringUtils.isNotEmpty(supplier.getSupplierCode())) {
+            supplierList = supplierDao.findBySupplierCodeAndTenantUIDAndIdNot(supplier.getSupplierCode(), user.getTenantUID(), supplier.getId());
+        }
+
+        if(supplierList.isEmpty()){
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean validateSupplierRegistrationCode(Supplier supplier){
+
+        UserAccount user = UserContextService.getCurrentUserAccount();
+
+        List<Supplier> supplierList = new ArrayList<>();
+
+        if (StringUtils.isNotEmpty(supplier.getProductRegistrationCode())) {
+            supplierList = supplierDao.findByProductRegistrationCodeAndTenantUIDAndIdNot(supplier.getProductRegistrationCode(), user.getTenantUID(), supplier.getId());
+        }
+
+        if(supplierList.isEmpty()){
+            return true;
+        }
+
+        return false;
     }
 
 }

@@ -324,6 +324,15 @@
                                     </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
+
+                            <p:dataGrid id="partPictureList" var="fileitem" value="#{workOrderMgrController.getPartPictures(woItem.id)}" columns="5" layout="grid">
+                                <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
+                                <p:panel  style="text-align:center">
+                                    <h:panelGrid columns="1" style="width:100%" >
+                                        <p:graphicImage   url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                    </h:panelGrid>
+                                </p:panel>
+                            </p:dataGrid>
                             <h:panelGroup >
                                 <p:dataList value="#{workOrderMgrController.getServiceRequestMessageList(woItem.id)}" var="msgItem" rendered="#{not empty workOrderMgrController.getServiceRequestMessageList(woItem.id)}">
                             <!--#{msgItem.message} #{msgItem.sendTime} #{msgItem.senderUserName}-->

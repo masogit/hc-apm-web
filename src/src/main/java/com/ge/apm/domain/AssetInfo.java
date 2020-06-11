@@ -358,7 +358,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @NotNull
     private Integer hospitalId;
 
-    @JoinColumn(insertable = false, updatable = false, name = "hospital_id", referencedColumnName = "id")
+    @JoinColumn(insertable = false, updatable = false, name = "hospital_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
     private OrgInfo hospital;

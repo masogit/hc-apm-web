@@ -9,7 +9,6 @@ import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
@@ -54,7 +53,7 @@ public class SharedAssetRequestController extends GenericCRUDUUIDController<Shar
             try {
                 prepareCreate();
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SharedAssetRequestController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }    
         else if ("View".equalsIgnoreCase(actionName)) {
