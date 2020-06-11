@@ -67,6 +67,7 @@ public enum GatewayURL {
     BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
     //supplier Api
     SUPPLIER_WX_CODE_IMAGE("/hcapmgateway/api/apm/weChat/wxaCodeImage"),
+    SUPPLIER_WX_QRCODE_IMAGE("/hcapmgateway/api/apm/weChat/qrCodeImage"),
 
     //备件增删
     ACCESSADD("/hcapmassetservice/api/apm/asset/workOrderDetails/{assetUid}"),

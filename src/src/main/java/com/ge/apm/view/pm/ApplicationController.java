@@ -1,29 +1,23 @@
 package com.ge.apm.view.pm;
 
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
-
-import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.asset.AssetInfoController;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.PurchaseApplicationRepository;
+import com.ge.apm.domain.PurchaseApplication;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.model.SelectItem;
-import javax.faces.model.SelectItemGroup;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +53,7 @@ private OrgInfoRepository orgInfoRepository =null;
             try {
                 prepareCreate();
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ApplicationController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else if ("Edit".equalsIgnoreCase(actionName)) {
           //  setSelectedByUrlParam(encodeStr, "selectedid");

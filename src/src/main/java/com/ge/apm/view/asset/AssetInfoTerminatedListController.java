@@ -53,7 +53,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
     private UserContextService userContextService;
     private OrgInfoRepository orgDao;
     //    private AssetFileImportService importService;
-    private AssetFileExportService exportService;
     private UaaService uaaService;
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
@@ -130,7 +129,6 @@ public class AssetInfoTerminatedListController extends JpaCRUDController<AssetIn
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-        exportService = WebUtil.getBean(AssetFileExportService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();

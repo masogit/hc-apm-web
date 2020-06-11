@@ -93,7 +93,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private GbCode selectedGb;
     private TreeNode gbTree;
     private TreeNode orgTree;
-    private TreeNode clinicalOrgTree;
 
     private boolean assetGroupSecondarySupport = false;
     private List<I18nMessage> assetGroupSecondaryList;
@@ -154,7 +153,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
                 assetLifecyleStatus = 0;
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(AssetInfoEditController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else if ("Edit".equalsIgnoreCase(actionName)) {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
@@ -277,21 +276,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         rootNode.setExpanded(true);
     }
 
-    public void initClinicalOrgTree() {
-        OrgInfo siteOrg = (OrgInfo) selectedObjectMap.get("selectedOrg");
-        if (siteOrg != null) {
-            List<OrgInfo> clinicalDeptList = assetInfoService.getHierachyClinicalDeptList(siteOrg.getSiteUID());
-            clinicalOrgTree = orgInfoTreeService.buildHierachyClinicalDept(siteOrg.getSiteUID(), clinicalDeptList);
-
-            OrgInfo clinicalDept = orgDao.findByUid(selected.getClinicalDeptUID());
-            selectedObjectMap.put("clinicalDept", clinicalDept);
-
-            OrgInfo assetDept = orgDao.findByUid(selected.getAssetDeptUID());
-            selectedObjectMap.put("assetDept", assetDept);
-        }
-
-    }
-
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
@@ -299,24 +283,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("selectedOrg", orgInfo);
 
         changeAssetOrg(orgInfo);
-    }
-
-    public void onSelectClinicalDeptTreeNode(NodeSelectEvent event) {
-        TreeNode node = event.getTreeNode();
-        OrgInfo orgInfo = (OrgInfo) node.getData();
-
-        selectedObjectMap.put("clinicalDept", orgInfo);
-
-        onAssetDeptChange("clinicalDept");
-    }
-
-    public void onSelectAssetDeptTreeNode(NodeSelectEvent event) {
-        TreeNode node = event.getTreeNode();
-        OrgInfo orgInfo = (OrgInfo) node.getData();
-
-        selectedObjectMap.put("assetDept", orgInfo);
-
-        onAssetDeptChange("assetDept");
     }
 
     public List<UserAccount> completeOwnerList(String query) {
@@ -1059,14 +1025,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
         this.selectedObjectMap = selectedObjectMap;
-    }
-
-    public TreeNode getClinicalOrgTree() {
-        return clinicalOrgTree;
-    }
-
-    public void setClinicalOrgTree(TreeNode clinicalOrgTree) {
-        this.clinicalOrgTree = clinicalOrgTree;
     }
 
     public boolean isAssetGroupSecondarySupport() {

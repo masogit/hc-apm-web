@@ -25,6 +25,11 @@ import javax.validation.constraints.Size;
 public class Supplier implements Serializable, ChineseName {
 
     private static final long serialVersionUID = 1L;
+
+    public enum Status {
+        Enable, Disable
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -63,7 +68,7 @@ public class Supplier implements Serializable, ChineseName {
     @Size(max = 16)
     @Column(name = "contactor")
     private String contactor;
-    @Size(max = 16)
+    @Size(max = 30)
     @Column(name = "tel")
     private String tel;
     @Column(name = "email")
@@ -158,6 +163,8 @@ public class Supplier implements Serializable, ChineseName {
     @Temporal(TemporalType.TIMESTAMP)
     private Date productRegistrationEndDate;
 
+    //供应商状态
+    private String status = "Enable";
 
     @PrePersist
     public void initializeUid() {
@@ -464,6 +471,14 @@ public class Supplier implements Serializable, ChineseName {
 
     public void setProductRegistrationEndDate(Date productRegistrationEndDate) {
         this.productRegistrationEndDate = productRegistrationEndDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override

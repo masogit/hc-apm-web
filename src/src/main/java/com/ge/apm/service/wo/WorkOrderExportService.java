@@ -513,8 +513,8 @@ public class WorkOrderExportService {
                 workOrderMap.put("工时" + String.valueOf(i), woc.getManHours());
                 workOrderMap.put("协作者" + String.valueOf(i), woc.getCowokerUserName());
             }
-            workOrderMap.put("协助者", coworkerStr);
-            workOrderMap.put("协助者工时", coworkManHourStr);
+            workOrderMap.put("协作者", coworkerStr);
+            workOrderMap.put("协作者工时", coworkManHourStr);
             workOrderMap.put("最终评价", workOrder.getFeedbackRating());
 
             if (workOrder.getCaseType() != null) {

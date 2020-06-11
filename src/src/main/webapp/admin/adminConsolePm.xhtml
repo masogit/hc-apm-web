@@ -1,0 +1,25 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<h1>超级管理员控制台</h1>
+		<h:form id="adminConsoleFormId">
+			<h:panelGroup>
+				<p:fieldset legend="批量创建保养数据维护（需指定用户uid和操作日期）">
+					<h:panelGroup>
+						<label class="label">用户uid</label>
+						<p:inputText id="userUid" value="#{adminConsoleController.userUid}" required="true"
+									 requiredMessage="用户uid为必输项" />
+					</h:panelGroup>
+					<h:panelGroup>
+						<label class="label">用户操作日期（格式：yyyy-MM-dd）</label>
+						<p:inputText id="date" value="#{adminConsoleController.date}" required="true"
+									 requiredMessage="用户操作日期为必输项" />
+					</h:panelGroup>
+					<p:commandButton actionListener="#{adminConsoleController.updatePmOrders()}" value="批量创建保养数据维护" update=":growl"></p:commandButton>
+				</p:fieldset>
+			</h:panelGroup>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

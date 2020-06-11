@@ -35,6 +35,7 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
     private List<TenantInfo> tenantInfoList;
     private String selectionTenantInfo;
     private String actionName;
+    private boolean positionDisabled = Boolean.FALSE;
 
     @Override
     protected void init() {
@@ -81,6 +82,15 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
         this.selected.setTenantUID(this.selectionTenantInfo);
         this.selected.setCreatedBy(this.currentUser.getLoginName());
         this.selected.setCreatedDate(new Date());
+        this.positionDisabled = Boolean.FALSE;
+
+        if(!this.isHaveZKBAdmin()){
+            this.selected.setPosition("ZKBAdmin");
+            this.positionDisabled = Boolean.TRUE;
+        }else if(!this.isHaveMaintenanceManager()){
+            this.selected.setPosition("MaintenanceManager");
+            this.positionDisabled = Boolean.TRUE;
+        }
     }
 
     @Override
@@ -90,6 +100,8 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
 
         this.selected.setLastModifiedBy(this.currentUser.getLoginName());
         this.selected.setLastModifiedDate(new Date());
+
+        this.positionDisabled = Boolean.FALSE;
     }
 
     @Override
@@ -154,5 +166,13 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
 
     public void setActionName(String actionName) {
         this.actionName = actionName;
+    }
+
+    public boolean isPositionDisabled() {
+        return positionDisabled;
+    }
+
+    public void setPositionDisabled(boolean positionDisabled) {
+        this.positionDisabled = positionDisabled;
     }
 }
