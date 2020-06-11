@@ -13,12 +13,17 @@
 
                 <h:panelGroup>
                     <label class="label">课程ID*</label>
-                    <p:inputText id="cid" value="#{zkbCourseController.selected.cid}" required="true" requiredMessage="#{'课程ID'} #{msg.ValidationRequire}" />
+                    <p:inputText id="cid" value="#{zkbCourseController.selected.cid}" required="true" requiredMessage="#{'课程ID'} #{msg.ValidationRequire}" disabled="#{not empty zkbCourseController.selected.cid}"/>
                 </h:panelGroup>
 
                 <h:panelGroup>
                     <label class="label">课程名称*</label>
                     <p:inputText id="cname" value="#{zkbCourseController.selected.cname}" required="true" requiredMessage="#{'课程名称'} #{msg.ValidationRequire}" />
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">课程描述</label>
+                    <p:inputText id="description" value="#{zkbCourseController.selected.description}"  />
                 </h:panelGroup>
 
             </p:panelGrid>
