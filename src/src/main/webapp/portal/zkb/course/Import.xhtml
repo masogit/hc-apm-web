@@ -6,12 +6,12 @@
 				template="/WEB-INF/template.xhtml">
 
 
-	<ui:define name="content"><br></br>
+	<ui:define name="content">
 <div class="ui-g">
+	<div class="ui-g-12 card cardTitle">
+		<p:outputLabel class="pageTitle" value="课程导入"/><!--#{msg.ZKBCourseMgt}-->
+	</div>
 	<div class="ui-g-12 card"><br/><br/>
-		<h:panelGroup>
-			<p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="List.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
-		</h:panelGroup><br/><br/><br/>
 		<h:form enctype="multipart/form-data">
 			<p:fieldset legend="批量导入 课程报表" id="uploaderContainer">
 				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -24,14 +24,18 @@
 				<h:panelGroup>
 					<p>说明</p>
 					<p>
-						1. <a href="APM_Course_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
+						1. <a href="APM_ZKB_Course_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
 					</p>
 					<p>2. 文件中填入要导入的数据，其中 [课程ID] 必填</p>
 					<p>3. 上传文件进行导入</p>
 				</h:panelGroup>
 			</p:fieldset>
 		</h:form>
+		<h:panelGroup>
+			<p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="List.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
+		</h:panelGroup>
 	</div>
+
 
 	<div class="ui-g-12 card">
 		<h:form id="dataListForm">
@@ -49,6 +53,9 @@
 					</p:column>
 					<p:column headerText="课程名称">
 						<h:outputText value="#{item.cname}" />
+					</p:column>
+					<p:column headerText="课程描述">
+						<h:outputText value="#{item.description}" />
 					</p:column>
 					<p:column headerText="备注">
 						<h:outputText value="#{item.errorMsg}" />
