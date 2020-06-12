@@ -125,8 +125,8 @@ public class ZkbContract implements ChineseName, Serializable {
     /**
      * 管理员
      */
-    @Column(name = "adminer")
-    private String adminer;
+    @Column(name = "admin")
+    private String admin;
 
     /**
      * 管理员电话
@@ -143,8 +143,8 @@ public class ZkbContract implements ChineseName, Serializable {
     /**
      * 地址
      */
-    @Column(name = "address")
-    private String address;
+    @Column(name = "adminAddress")
+    private String adminAddress;
 
     @Column(name = "remark")
     @Size(max = 2000)
@@ -369,12 +369,12 @@ public class ZkbContract implements ChineseName, Serializable {
         this.principalEmail = principalEmail;
     }
 
-    public String getAdminer() {
-        return adminer;
+    public String getAdmin() {
+        return admin;
     }
 
-    public void setAdminer(String adminer) {
-        this.adminer = adminer;
+    public void setAdmin(String admin) {
+        this.admin = admin;
     }
 
     public String getAdminPhone() {
@@ -393,12 +393,12 @@ public class ZkbContract implements ChineseName, Serializable {
         this.adminEmail = adminEmail;
     }
 
-    public String getAddress() {
-        return address;
+    public String getAdminAddress() {
+        return adminAddress;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setAdminAddress(String adminAddress) {
+        this.adminAddress = adminAddress;
     }
 
     @Override
