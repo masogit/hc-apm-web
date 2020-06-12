@@ -2,7 +2,9 @@ package com.ge.apm.service.zkb;
 
 
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.ZkbContractCourseRepository;
 import com.ge.apm.dao.ZkbCourseRepository;
+import com.ge.apm.domain.ZkbContractCourse;
 import com.ge.apm.domain.ZkbCourse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,9 @@ public class ZkbCourseService {
     @Autowired
     private ZkbCourseRepository courseDao;
 
+    @Autowired
+    private ZkbContractCourseRepository zkbContractCourseRepository;
+
     public ZkbCourseRepository getCourseDao() {
         return courseDao;
     }
@@ -31,16 +36,18 @@ public class ZkbCourseService {
 
     public boolean isCourseExist(ZkbCourse selected) {
         List<ZkbCourse> courseList = courseDao.find(selected.getCid());
-        if(courseList!=null && courseList.size()>0){
-            for(ZkbCourse c:courseList){
-                try {
-                    if(!c.getId().equals(selected.getId()))
-                        return true;
-                } catch (Exception e) {
-                    System.out.println("NPE");;
-                }
-            }
+        ZkbCourse course = courseDao.findFirstByCid(selected.getCid());
+        try {
+            if(!course.getId().equals(selected.getId()))
+                return true;
+        } catch (Exception e) {
+            System.out.println("NPE");;
         }
+        /*if(courseList!=null && courseList.size()>0){
+            for(ZkbCourse c:courseList){
+
+            }
+        }*/
         return false;
     }
 
@@ -58,8 +65,14 @@ public class ZkbCourseService {
 
     public boolean isContractUsed(ZkbCourse course) {
 
-        if(course.getCid().equals("GEHC-Seno (ZKB)"))
+
+        List<ZkbContractCourse> list = zkbContractCourseRepository.findByCourseId(course.getId());
+
+        if(list!=null && list.size()>0){
+
             return true;
+        }
+
 
         return false;
     }
