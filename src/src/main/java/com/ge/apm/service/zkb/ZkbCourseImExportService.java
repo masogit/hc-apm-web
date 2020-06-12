@@ -29,6 +29,7 @@ public class ZkbCourseImExportService {
 
     private final String HEADER_CID = "课程ID";
     private final String HEADER_CNAME = "课程名称";
+    private final String HEADER_DESCRIPTION = "课程描述";
 
     @Autowired
     private ZkbCourseRepository zkbCourseDao;
@@ -51,6 +52,7 @@ public class ZkbCourseImExportService {
             //zkbCourseDataMap.put("租户", tempTenantInfo != null ? tempTenantInfo.getName() : "");//WebUtil.getMessage("zkbEngineer_tenant")
             zkbCourseDataMap.put("课程ID", zkbCourse.getCid());
             zkbCourseDataMap.put("课程名称", zkbCourse.getCname());
+            zkbCourseDataMap.put("课程描述",zkbCourse.getDescription());
 
             zkbCourseDataList.add(zkbCourseDataMap);
 
@@ -86,15 +88,18 @@ public class ZkbCourseImExportService {
         List<String> headers = new ArrayList<>();
         headers.add(HEADER_CID);
         headers.add(HEADER_CNAME);
+        headers.add(HEADER_DESCRIPTION);
         Map<String, Integer> header = ExcelParser.findHeader(sheet, headers);
         if (header.isEmpty()) {
             return null;
         }
         String cid;
         String cname;
+        String description;
 
         int cidIdx = header.get(HEADER_CID);
         int cnameIdx = header.get(HEADER_CNAME);
+        int descriptionIdx = header.get(HEADER_DESCRIPTION);
         List<ZkbCourse> listRe = new ArrayList<ZkbCourse>();
         int len = sheet.getLastRowNum();
         for (int j = header.get("HEADER_ROW") + 1; j <= len; j++) {
@@ -109,6 +114,7 @@ public class ZkbCourseImExportService {
                 detail.setTenantUID(user.getTenantUID());
                 cid = StringUtils.trim(ExcelParser.getCellStringValue(row, cidIdx));
                 cname = StringUtils.trim(ExcelParser.getCellStringValue(row, cnameIdx));
+                description = StringUtils.trim(ExcelParser.getCellStringValue(row, descriptionIdx));
                 if(StringUtils.isEmpty(cid)){
                     detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "课程ID不能为空；");
                     pass = false;
@@ -133,6 +139,7 @@ public class ZkbCourseImExportService {
 
                 detail.setCid(cid);
                 detail.setCname(cname);
+                detail.setDescription(description);
 
                 if (!pass) {
                     importFailedDataList.add(detail);
