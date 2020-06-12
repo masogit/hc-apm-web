@@ -3255,10 +3255,10 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_principal','负责人','principal',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_principalPhone','负责人电话','principalPhone',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_principalEmail','负责人邮箱','principalEmail',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_principal','管理员','principal',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_principal','管理员电话','principal',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_principal','管理员邮箱','principal',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_principal','管理员邮箱','principal',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_adminer','管理员','adminer',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_adminPhone','管理员电话','adminPhone',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_adminEmail','管理员邮箱','adminEmail',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_address','管理员地址','address',NULL,-1);
 
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbContract_courseUID','课程','courseUID',NULL,-1);
