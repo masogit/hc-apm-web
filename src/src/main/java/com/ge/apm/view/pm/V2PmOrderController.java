@@ -2093,6 +2093,23 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
+    //流程配置项勾选批量保养完成 已计划显示批量保养完成按钮，同时勾选简化保养 待接单和待抢单才能显示批量保养完成按钮，其他情况均不显示。
+    public boolean isAllowBatchComplate() {
+        WorkflowConfig wfc = configService.findConfigBySite(user.getSiteUID());
+        if (isBatchOp) {
+            if (queryIndex == 0) {
+                return true;
+            }
+            if (wfc.getPmSimplify() && (queryIndex == 31 || queryIndex == 3)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
 
 
     //map : item.uid(pmorderrulecheck.uid) value: unstrundata
