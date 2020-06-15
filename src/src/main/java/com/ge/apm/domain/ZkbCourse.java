@@ -24,6 +24,9 @@ public class ZkbCourse {
     @Column(name = "cname")
     private String cname;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     @Size(max = 32)
     private String tenantUID;
@@ -68,6 +71,14 @@ public class ZkbCourse {
 
     public void setCname(String cname) {
         this.cname = cname;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getTenantUID() {
