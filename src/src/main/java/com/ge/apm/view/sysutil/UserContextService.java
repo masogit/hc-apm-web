@@ -822,8 +822,9 @@ public class UserContextService implements Serializable {
     public boolean isAccessMyTrain(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         UserAccount currentUser = getLoginUser();
+        TenantInfo currentTenantInfo = userContextService.getCurrentUserTenantInfo();
         int siteId = currentUser.getSiteId();
-        if (siteId == 46 || BooleanUtils.isTrue(tenant.getHaveIbDevice())) {
+        if (siteId == 46 || BooleanUtils.isTrue(currentTenantInfo.getHaveIbDevice())) {
             return true;
         }
         return false;
