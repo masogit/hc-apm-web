@@ -22,6 +22,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.B64Code;
 import webapp.framework.context.LocaleHolder;
@@ -816,6 +817,16 @@ public class UserContextService implements Serializable {
             return false;
         }
         return !isUltraSoundIBEndUser();
+    }
+
+    public boolean isAccessMyTrain(){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccount currentUser = getLoginUser();
+        int siteId = currentUser.getSiteId();
+        if (siteId == 46 || BooleanUtils.isTrue(tenant.getHaveIbDevice())) {
+            return true;
+        }
+        return false;
     }
 
     public boolean isHaveIbDeviceUser() {
