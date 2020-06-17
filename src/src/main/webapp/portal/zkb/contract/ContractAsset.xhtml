@@ -6,22 +6,22 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
 <ui:composition>
-    <p:dialog id="zkbContractAssetEditDlg" widgetVar="zkbContractAssetEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="合同详情" height="600">
+    <p:dialog id="zkbContractAssetEditDlg" widgetVar="zkbContractAssetEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="设备操作" width="70%" height="600">
         <h:form id="FileSearchForm">
-            <p:fieldset legend="#{msg.assetSearchingConditions}">
+            <p:fieldset legend="相关设备查询条件最少要填写或选择一个)">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
-                    <h:panelGroup>
+                   <!-- <h:panelGroup>
                         <label class="label">#{msg.TenantInfo}</label>
-                        <!--<p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbContractEditController.queryAsset.tenantUID}" disabled="#{userContextService.zkbUser}">
+                        &lt;!&ndash;<p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbContractEditController.queryAsset.tenantUID}" disabled="#{userContextService.zkbUser}">
                             <p:ajax listener="#{zkbContractController.tenantInfoSelect}" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <c:forEach items="#{zkbContractController.tenantInfoList}" var="v">
                                 <f:selectItem itemLabel="#{v.name}" itemValue="#{v.uid}"/>
                             </c:forEach>
-                        </p:selectOneMenu>-->
+                        </p:selectOneMenu>&ndash;&gt;
                         <p:outputLabel value="#{zkbContractEditController.getTenantInfo(zkbContractEditController.queryAsset.tenantUID).name}"/>
-                    </h:panelGroup>
+                    </h:panelGroup>-->
                     <h:panelGroup>
                         <label class="label">#{msg.assetGroup}</label>
                         <p:selectOneMenu id="assetGroup" value="#{zkbContractEditController.queryAsset.assetGroup}">
