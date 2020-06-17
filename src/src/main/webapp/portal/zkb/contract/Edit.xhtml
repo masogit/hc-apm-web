@@ -17,7 +17,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContact_tenant}</label>
                             <!--<p:outputLabel value="#{zkbContractEditController.getTenantInfo(zkbContractEditController.selected.tenantUID).name}"/>-->
-                            <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbContractEditController.selected.tenantUID}" disabled="#{zkbContractEditController.actionName eq 'Edit'}">
+                            <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbContractEditController.selected.tenantUID}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <c:forEach items="#{zkbContractController.tenantInfoList}" var="v">
                                     <f:selectItem itemLabel="#{v.name}" itemValue="#{v.uid}"/>
@@ -117,7 +117,7 @@
                     </p:panelGrid>
 
 
-                    <p:fieldset id="zkbContractCourseFieldset" legend="课程详情" rendered="#{not empty zkbContractEditController.selected.id}">
+                    <p:fieldset id="zkbContractCourseFieldset" legend="相关课程" rendered="#{not empty zkbContractEditController.selected.id}">
                         <p:dataTable id="zkbContractCourseDatalist" value="#{zkbContractEditController.contractCourseList}" var="zkbContractCourseItem"
                                      widgetVar="zkbContractCourseDatalist" selectionMode="single" selection="#{zkbContractEditController.zkbContractCourseSelected}"
                                      lazy="false" paginator="true" rowKey="#{zkbContractCourseItem.zkbCourse.cname}" sortMode="single" sortOrder="ascending" sortBy="#{zkbContractCourseItem.contractId}"
@@ -147,7 +147,7 @@
                     </p:fieldset>
 
 
-                    <p:fieldset id="zkbContractAssetFieldset" legend="设备详情" rendered="#{not empty zkbContractEditController.selected.id}">
+                    <p:fieldset id="zkbContractAssetFieldset" legend="相关设备" rendered="#{not empty zkbContractEditController.selected.id}">
                         <p:dataTable id="zkbContractAssetDatalist" value="#{zkbContractEditController.zkbContractAssetList}" var="zkbContractAssetItem"
                                      widgetVar="zkbContractAssetDatalist" selectionMode="single" selection="#{zkbContractEditController.zkbContractAssetSelected}"
                                      lazy="false" paginator="true" rowKey="#{zkbContractAssetItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{zkbContractAssetItem.contractId}"
@@ -163,6 +163,10 @@
 
                             <p:column headerText="设备编号" >
                                 <h:outputText value="#{zkbContractAssetItem.assetInfo.departNum}" />
+                            </p:column>
+
+                            <p:column headerText="所属科室" >
+                                <h:outputText value="#{zkbContractAssetItem.assetInfo.clinicalDeptName}" />
                             </p:column>
 
                             <p:column headerText="设备型号" >
