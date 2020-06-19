@@ -219,20 +219,35 @@ public class ZkbContractService {
      * 判断合同号是否存在，同一个租户只能存在一个合同号
      * 区分新增与编辑的情况
      */
-    public boolean checkContractNo(ZkbContract zkbContract,String actionName){
+    public HashMap<String,Object> checkContract(ZkbContract zkbContract,String actionName){
+        HashMap<String,Object> resut = new HashMap<>();
+        boolean flag = true;
+        String errorLog = "";
         List<ZkbContract> contractList = contractRepository.findByTenantUIDAndContractNo(zkbContract.getTenantUID(),zkbContract.getContractNo());
         if(contractList.size() ==0){
-            return true;
+            flag = true;
         }else if (contractList.size() == 1 && "Edit".equals(actionName)){
             ZkbContract exist = contractList.get(0);
-            if(exist.getId().equals(zkbContract.getId())){
-                return true;
-            }else{
-                return false;
+            if(!exist.getId().equals(zkbContract.getId())){
+                flag = false;
+                errorLog += WebUtil.getMessage("ErrorContractNoIsExist")+",";
             }
         }else{
-            return false;
+            flag = false;
+            errorLog += WebUtil.getMessage("ErrorContractNoIsExist")+",";
         }
+
+        if(zkbContract.getStartDate().compareTo(zkbContract.getEndDate()) > 0){
+            flag = false;
+            errorLog += "开始时间不能大于结束时间,";
+        }
+
+        if (errorLog.length()>0){
+            errorLog = errorLog.substring(0,errorLog.length()-1);
+        }
+        resut.put("flag",flag);
+        resut.put("errorLog",errorLog);
+        return resut;
     }
 
     /**
