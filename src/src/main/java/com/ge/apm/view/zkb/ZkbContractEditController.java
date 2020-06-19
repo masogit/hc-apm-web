@@ -19,6 +19,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,7 +120,9 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
      * 同时将状态变更为编辑，并且更新selectedid值
      */
     public String createContract(){
-        if(zkbContractService.checkContractNo(selected,actionName)){
+        HashMap<String, Object> r = zkbContractService.checkContract(selected,actionName);
+        boolean flag = (boolean)r.get("flag");
+        if(flag){
             selected = zkbContractService.saveContract(this.selected,actionName,reason,currentUser);
             this.reason="";
             actionName = "Edit";
@@ -135,12 +138,16 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
      * 编辑保存
      */
     public void saveContract(){
-        if(zkbContractService.checkContractNo(selected,actionName)) {
+        HashMap<String, Object> r = zkbContractService.checkContract(selected,actionName);
+        boolean flag = (boolean)r.get("flag");
+        if(flag) {
             selected = zkbContractService.saveContract(this.selected, actionName, reason, currentUser);
             this.reason = "";
             WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
         }else{
-            WebUtil.addErrorMessage(WebUtil.getMessage("ErrorContractNoIsExist"));
+            String errorLog = (String) r.get("errorLog");
+            WebUtil.addErrorMessage(errorLog);
+            //WebUtil.addErrorMessage(WebUtil.getMessage("ErrorContractNoIsExist"));
         }
     }
 
