@@ -210,4 +210,5 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     List<AssetInfo> findBySupplierIdOrMaitananceIdOrManufactureId(Integer supplierId, String maitananceId, String manufactureId);
 
+    AssetInfo findFirstByQrCode(String qrCode);
 }

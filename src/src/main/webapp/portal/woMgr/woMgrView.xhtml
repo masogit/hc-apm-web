@@ -325,13 +325,11 @@
                                 </p:dataTable>
                             </h:panelGroup>
 
-                            <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="5" layout="grid">
+                            <p:dataGrid id="partPictureList" var="fileitem" value="#{workOrderMgrController.getPartPictures(woItem.id)}" columns="5" layout="grid">
                                 <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                                 <p:panel  style="text-align:center">
                                     <h:panelGrid columns="1" style="width:100%" >
                                         <p:graphicImage   url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
-                                        <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" > #{msg.DownloadFile}
-                                        </p:link>
                                     </h:panelGrid>
                                 </p:panel>
                             </p:dataGrid>
