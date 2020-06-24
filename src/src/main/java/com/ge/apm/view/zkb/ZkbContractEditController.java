@@ -99,6 +99,11 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         this.selected.setTenantUID(this.selectionTenantInfo);
         this.selected.setCreatedBy(this.currentUser.getLoginName());
         this.selected.setCreatedDate(new Date());
+        this.selected.setIbNumber(0);
+        this.selected.setSpareQuota(0);
+        this.selected.setGeArtificialSupportTimes(0);
+        this.selected.setProbeQuota(0);
+        this.selected.setMaintenanceQuota(0);
         this.initCourseList();
         contractCourseList = new ArrayList<>();
         zkbContractAssetList = new ArrayList<>();

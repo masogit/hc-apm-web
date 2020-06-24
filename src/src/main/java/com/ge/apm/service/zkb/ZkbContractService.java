@@ -21,9 +21,9 @@ import java.util.*;
 @Service
 public class ZkbContractService {
 
-    public static final String SHEET_ZKB_CONTRACT = "Contract";
-    public static final String SHEET_ZKB_CONTRACT_COURSE = "Contract_Course";
-    public static final String SHEET_ZKB_CONTRACT_ASSET = "Contract_Asset";
+    public static final String SHEET_ZKB_CONTRACT = "合同";
+    public static final String SHEET_ZKB_CONTRACT_COURSE = "相关课程";
+    public static final String SHEET_ZKB_CONTRACT_ASSET = "相关设备";
 
 
     @Autowired
