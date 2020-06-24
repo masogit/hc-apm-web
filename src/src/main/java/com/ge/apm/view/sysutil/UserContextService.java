@@ -858,7 +858,10 @@ public class UserContextService implements Serializable {
 
     public boolean isZtbTenant() {
         TenantInfo tenantInfo = getTenantInfo();
-        return tenantInfo.getType() == 4;
+        if(tenantInfo.getType() != null && tenantInfo.getType() == 4){
+            return true;
+        }
+        return false;
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){
