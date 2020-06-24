@@ -117,13 +117,11 @@ public class ContractInfo implements Serializable {
 
 
     //论证会结果/时间
-    @Basic(optional = true)
     @Column(name = "argument_end_date")
     @Temporal(TemporalType.DATE)
     private Date argumentEndDate;
 
     //技术参数送出时间
-    @Basic(optional = true)
     @Column(name = "parameter_end_date")
     @Temporal(TemporalType.DATE)
     private Date parameterEndDate;
@@ -133,7 +131,6 @@ public class ContractInfo implements Serializable {
     private String parameterPerson;
 
     //开标时间
-    @Basic(optional = true)
     @Column(name = "tender_open_date")
     @Temporal(TemporalType.DATE)
     private Date tenderOpenDate;
@@ -151,7 +148,6 @@ public class ContractInfo implements Serializable {
     private String bidWinnerTelphone;
 
     //中标通知书时间
-    @Basic(optional = true)
     @Column(name = "tender_notice_date")
     @Temporal(TemporalType.DATE)
     private Date tenderNoticeDate;
@@ -161,46 +157,67 @@ public class ContractInfo implements Serializable {
     private String tenderType;
     
     //接招标文件材料
-    @Basic(optional = true)
     @Column(name = "receive_file_date")
     @Temporal(TemporalType.DATE)
     private Date receiveFileDate;
     //拷样本、发《供货通知书》
-    @Basic(optional = true)
     @Column(name = "copy_file_date")
     @Temporal(TemporalType.DATE)
     private Date copyFileDate;
     //接电子版合同#初审返修
-    @Basic(optional = true)
     @Column(name = "first_check_date")
     @Temporal(TemporalType.DATE)
     private Date firstCheckDate;
     //送审#接审计修改意见
-    @Basic(optional = true)
     @Column(name = "change_comment_date")
     @Temporal(TemporalType.DATE)
     private Date changeCommentDate;
     //律 师#律师意见及签字
-    @Basic(optional = true)
     @Column(name = "lawer_sign_date")
     @Temporal(TemporalType.DATE)
     private Date lawerDignDate;
     //返回供货商修改意见
-    @Basic(optional = true)
     @Column(name = "return_supplier_date")
     @Temporal(TemporalType.DATE)
     private Date returnSupplierDate;
     //收合同定稿【4份】
-    @Basic(optional = true)
     @Column(name = "file_contract_date")
     @Temporal(TemporalType.DATE)
     private Date fileContractDate;
     //签字并盖合同专用章
-    @Basic(optional = true)
     @Column(name = "sign_contract_date")
     @Temporal(TemporalType.DATE)
     private Date signContractDate;
-    
+
+    //中标时间
+    @Column(name = "bid_date")
+    @Temporal(TemporalType.DATE)
+    private Date bidDate;
+    //接电子版合同时间
+    @Column(name = "receive_digital_contract_date")
+    @Temporal(TemporalType.DATE)
+    private Date receiveDigitalContractDate;
+    //送审时间
+    @Column(name = "send_contract_date")
+    @Temporal(TemporalType.DATE)
+    private Date sendContractDate;
+    //送律师时间
+    @Column(name = "send_lawer_date")
+    @Temporal(TemporalType.DATE)
+    private Date sendLawerDate;
+    //中标单位领【1】份合同时间
+    @Column(name = "receive_contract_date")
+    @Temporal(TemporalType.DATE)
+    private Date receiveContractDate;
+    //合同转交存档时间
+    @Column(name = "archive_date")
+    @Temporal(TemporalType.DATE)
+    private Date archiveDate;
+    //应到货时间
+    @Column(name = "expect_arrival_date")
+    @Temporal(TemporalType.DATE)
+    private Date expectArrivalDate;
+
     //备注
     @Column(name = "comments")
     @Size(min = 0, max = 256)
@@ -579,6 +596,62 @@ public class ContractInfo implements Serializable {
 
     public void setContractStatus(String contractStatus) {
         this.contractStatus = contractStatus;
+    }
+
+    public Date getBidDate() {
+        return bidDate;
+    }
+
+    public void setBidDate(Date bidDate) {
+        this.bidDate = bidDate;
+    }
+
+    public Date getReceiveDigitalContractDate() {
+        return receiveDigitalContractDate;
+    }
+
+    public void setReceiveDigitalContractDate(Date receiveDigitalContractDate) {
+        this.receiveDigitalContractDate = receiveDigitalContractDate;
+    }
+
+    public Date getSendContractDate() {
+        return sendContractDate;
+    }
+
+    public void setSendContractDate(Date sendContractDate) {
+        this.sendContractDate = sendContractDate;
+    }
+
+    public Date getSendLawerDate() {
+        return sendLawerDate;
+    }
+
+    public void setSendLawerDate(Date sendLawerDate) {
+        this.sendLawerDate = sendLawerDate;
+    }
+
+    public Date getReceiveContractDate() {
+        return receiveContractDate;
+    }
+
+    public void setReceiveContractDate(Date receiveContractDate) {
+        this.receiveContractDate = receiveContractDate;
+    }
+
+    public Date getArchiveDate() {
+        return archiveDate;
+    }
+
+    public void setArchiveDate(Date archiveDate) {
+        this.archiveDate = archiveDate;
+    }
+
+    public Date getExpectArrivalDate() {
+        return expectArrivalDate;
+    }
+
+    public void setExpectArrivalDate(Date expectArrivalDate) {
+        this.expectArrivalDate = expectArrivalDate;
     }
 
     @Override
