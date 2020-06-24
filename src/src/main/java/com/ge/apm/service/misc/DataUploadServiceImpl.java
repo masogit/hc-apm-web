@@ -134,6 +134,10 @@ public class DataUploadServiceImpl implements DataUploadService {
                 record.setAmount(record.getOutpatientRevenue());
                 record.setQuantity(record.getOutpatientCount());
                 record.setCostType("outpatient");
+            } else if (record.getTechCount() > 0){
+                record.setAmount(record.getTechRevenue());
+                record.setQuantity(record.getTechCount());
+                record.setCostType("tech");
             } else {
                 logger.error("Invalid record: {}", record.print());
                 throw new IllegalStateException("Invalid record");
