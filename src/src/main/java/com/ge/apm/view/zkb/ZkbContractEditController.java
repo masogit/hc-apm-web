@@ -259,15 +259,13 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
    }
 
     public void getQueryAssetsList() {
-
-        if (StringUtils.isNotEmpty(queryAsset.getTenantUID()) && (queryAsset.getClinicalDeptId() != null || queryAsset.getAssetGroup() != null || queryAsset.getFunctionType() != null)) {
+        if(this.assetName != null){
+            queryAsset.setName(this.assetName);
+        }else{
+            queryAsset.setName(null);
+        }
+        if (StringUtils.isNotEmpty(queryAsset.getTenantUID()) && (queryAsset.getAssetGroup() != null || queryAsset.getName() != null || queryAsset.getQrCode() != null || queryAsset.getFunctionType() != null)) {
             //if (StringUtils.isNotEmpty(queryAsset.getTenantUID())){
-
-            if(this.assetName != null){
-                queryAsset.setName(this.assetName);
-            }else{
-                queryAsset.setName(null);
-            }
             sourceAssets = assetTagService.getAssetList(queryAsset);
 
             sourceAssets = new ArrayList(sourceAssets);
