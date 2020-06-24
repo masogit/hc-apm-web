@@ -84,14 +84,14 @@ public class SmallAssetPerformance implements Serializable {
 	@Column(name = "pre_exam_department_code")
 	private String preExamDepartmentCode;
 
-	@Column(name = "hospital_name", columnDefinition = "CHAR(32)")
-	private String hospitalName;
+	@Column(name = "second_dept_name")
+	private String secondDeptName;
 
 	@Column(name = "second_dept_code")
 	private String secondDeptCode;
 
-	@Column(name = "second_dept_name")
-	private String secondDeptName;
+	@Column(name = "hospital_name", columnDefinition = "CHAR(32)")
+	private String hospitalName;
 
 	@Column(name = "tec_people")
 	private String tecPeople;
@@ -116,6 +116,12 @@ public class SmallAssetPerformance implements Serializable {
 
 	@Transient
 	private Double emergencyRevenue;
+
+	@Transient
+	private Double techCount;
+
+	@Transient
+	private Double techRevenue;
 
 	@Transient
 	private Integer excelIdex;
@@ -351,6 +357,23 @@ public class SmallAssetPerformance implements Serializable {
 
 	public void setHospitalName(String hospitalName) {
 		this.hospitalName = hospitalName;
+	}
+
+
+	public Double getTechCount() {
+		return techCount;
+	}
+
+	public void setTechCount(Double techCount) {
+		this.techCount = techCount;
+	}
+
+	public Double getTechRevenue() {
+		return techRevenue;
+	}
+
+	public void setTechRevenue(Double techRevenue) {
+		this.techRevenue = techRevenue;
 	}
 
 	public String getSecondDeptCode() {
