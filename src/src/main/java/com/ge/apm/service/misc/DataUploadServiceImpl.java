@@ -99,13 +99,20 @@ public class DataUploadServiceImpl implements DataUploadService {
         String edgeServerKey = request.getEdgeServerKey();
         SmallAssetPerformance record = request.getPerformanceRecord();
         try {
+            EdgeServerInfo edgeServerInfo = getEdgeServerInfo(edgeServerKey);
             OrgInfoRepository orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+            //得到site_uid
+            if ("第九人民医院南部".equals(record.getHospitalName())){
+                record.setSiteUID(orgInfoRepository.getSiteUidByHospitalName("南部院区",edgeServerInfo.getSiteId()));
+            }else if("第九人民医院北部".equals(record.getHospitalName())) {
+                record.setSiteUID(orgInfoRepository.getSiteUidByHospitalName("北部院区",edgeServerInfo.getSiteId()));
+            }
+            //再查机构信息
             OrgInfo recordSiteOrg = orgInfoRepository.findByUid(record.getSiteUID());
             if (recordSiteOrg == null) {
                 throw new IllegalStateException("Empty site id: " + record.getSiteUID());
             }
 
-            EdgeServerInfo edgeServerInfo = getEdgeServerInfo(edgeServerKey);
 //            OrgInfo edgeSiteOrg = orgInfoRepository.findById(edgeServerInfo.getSiteId());
 //            if (!StringUtils.equals(recordSiteOrg.getTenantUID(), edgeSiteOrg.getTenantUID())) {
 //                throw new IllegalStateException("Invalid site id: " + record.getSiteUID());
