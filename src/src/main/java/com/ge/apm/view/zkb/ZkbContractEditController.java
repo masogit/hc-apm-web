@@ -99,6 +99,11 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         this.selected.setTenantUID(this.selectionTenantInfo);
         this.selected.setCreatedBy(this.currentUser.getLoginName());
         this.selected.setCreatedDate(new Date());
+        this.selected.setIbNumber(0);
+        this.selected.setSpareQuota(0);
+        this.selected.setGeArtificialSupportTimes(0);
+        this.selected.setProbeQuota(0);
+        this.selected.setMaintenanceQuota(0);
         this.initCourseList();
         contractCourseList = new ArrayList<>();
         zkbContractAssetList = new ArrayList<>();
@@ -259,15 +264,13 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
    }
 
     public void getQueryAssetsList() {
-
-        if (StringUtils.isNotEmpty(queryAsset.getTenantUID()) && (queryAsset.getClinicalDeptId() != null || queryAsset.getAssetGroup() != null || queryAsset.getFunctionType() != null)) {
+        if(this.assetName != null){
+            queryAsset.setName(this.assetName);
+        }else{
+            queryAsset.setName(null);
+        }
+        if (StringUtils.isNotEmpty(queryAsset.getTenantUID()) && (queryAsset.getAssetGroup() != null || queryAsset.getName() != null || queryAsset.getQrCode() != null || queryAsset.getFunctionType() != null)) {
             //if (StringUtils.isNotEmpty(queryAsset.getTenantUID())){
-
-            if(this.assetName != null){
-                queryAsset.setName(this.assetName);
-            }else{
-                queryAsset.setName(null);
-            }
             sourceAssets = assetTagService.getAssetList(queryAsset);
 
             sourceAssets = new ArrayList(sourceAssets);
@@ -340,6 +343,22 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
                 break;
         }
         this.reason="";
+    }
+
+    public boolean isAssetDeleteCanOperate(){
+        if(zkbContractAssetSelected == null || StringUtils.isEmpty(zkbContractAssetSelected.getId()) || userContextService.isZkbUser()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean isCourseCanOperate(){
+        if(zkbContractCourseSelected == null || zkbContractCourseSelected.getZkbCourse() ==null || userContextService.isZkbUser()){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public DualListModel<AssetInfo> getAvailableAssets() {

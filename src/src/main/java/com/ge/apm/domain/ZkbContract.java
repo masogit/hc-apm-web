@@ -72,37 +72,37 @@ public class ZkbContract implements ChineseName, Serializable {
      * IB数量
      */
     @Column(name = "ib_number")
-    private Integer ibNumber;
+    private Integer ibNumber = 0;
 
     /**
      *备件名额
      */
     @Column(name = "spare_quota")
-    private Integer spareQuota;
+    private Integer spareQuota = 0;
 
     /**
      *探头名额
      */
     @Column(name = "probe_quota")
-    private Integer probeQuota;
+    private Integer probeQuota = 0;
 
     /**
      *GE人工支持次数
      */
     @Column(name = "ge_support_times")
-    private Integer geArtificialSupportTimes;
+    private Integer geArtificialSupportTimes = 0;
 
     /**
      * 保养名额
      */
     @Column(name = "maintenance_quota")
-    private Integer maintenanceQuota;
+    private Integer maintenanceQuota = 0;
 
     /**
      *备件/人工/保养
      */
     @Column(name = "spare_artificai")
-    private Integer spareArtificail;
+    private Integer spareArtificail = 0;
 
     /**
      * 负责人
