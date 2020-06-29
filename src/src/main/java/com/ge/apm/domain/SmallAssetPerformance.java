@@ -93,6 +93,12 @@ public class SmallAssetPerformance implements Serializable {
 	@Column(name = "hospital_name", columnDefinition = "CHAR(32)")
 	private String hospitalName;
 
+	@Column(name = "tec_people")
+	private String tecPeople;
+
+	@Column(name = "tec_income")
+	private Double tecIncome;
+
 	@Transient
 	private Double inpatientCount;
 
@@ -353,21 +359,6 @@ public class SmallAssetPerformance implements Serializable {
 		this.hospitalName = hospitalName;
 	}
 
-	public String getSecondDeptName() {
-		return secondDeptName;
-	}
-
-	public void setSecondDeptName(String secondDeptName) {
-		this.secondDeptName = secondDeptName;
-	}
-
-	public String getSecondDeptCode() {
-		return secondDeptCode;
-	}
-
-	public void setSecondDeptCode(String secondDeptCode) {
-		this.secondDeptCode = secondDeptCode;
-	}
 
 	public Double getTechCount() {
 		return techCount;
@@ -383,6 +374,38 @@ public class SmallAssetPerformance implements Serializable {
 
 	public void setTechRevenue(Double techRevenue) {
 		this.techRevenue = techRevenue;
+	}
+
+	public String getSecondDeptCode() {
+		return secondDeptCode;
+	}
+
+	public void setSecondDeptCode(String secondDeptCode) {
+		this.secondDeptCode = secondDeptCode;
+	}
+
+	public String getSecondDeptName() {
+		return secondDeptName;
+	}
+
+	public void setSecondDeptName(String secondDeptName) {
+		this.secondDeptName = secondDeptName;
+	}
+
+	public String getTecPeople() {
+		return tecPeople;
+	}
+
+	public void setTecPeople(String tecPeople) {
+		this.tecPeople = tecPeople;
+	}
+
+	public Double getTecIncome() {
+		return tecIncome;
+	}
+
+	public void setTecIncome(Double tecIncome) {
+		this.tecIncome = tecIncome;
 	}
 
 	public String getStatusDisplay() {
