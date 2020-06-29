@@ -345,6 +345,22 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         this.reason="";
     }
 
+    public boolean isAssetDeleteCanOperate(){
+        if(zkbContractAssetSelected == null || StringUtils.isEmpty(zkbContractAssetSelected.getId()) || userContextService.isZkbUser()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean isCourseCanOperate(){
+        if(zkbContractCourseSelected == null || zkbContractCourseSelected.getZkbCourse() ==null || userContextService.isZkbUser()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public DualListModel<AssetInfo> getAvailableAssets() {
         return availableAssets;
     }

@@ -133,12 +133,12 @@
                             </p:column>
 
                            <f:facet name="{Toolbar}">
-                                <p:commandButton immediate="false"  process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareDetailCreate}" update=":growl :zkbContractCourseEditDlg" oncomplete="PF('zkbContractCourseEditDlg').show()"/>
-                                <p:commandButton id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareDetailEdit}" update=":growl :zkbContractCourseEditDlg" disabled="#{empty zkbContractEditController.zkbContractCourseSelected.zkbCourse.cname}" oncomplete="PF('zkbContractCourseEditDlg').show()"/>
+                                <p:commandButton immediate="false"  process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareDetailCreate}" update=":growl :zkbContractCourseEditDlg" oncomplete="PF('zkbContractCourseEditDlg').show()" disabled="#{userContextService.zkbUser}"/>
+                                <p:commandButton id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareDetailEdit}" update=":growl :zkbContractCourseEditDlg" disabled="#{zkbContractEditController.courseCanOperate}" oncomplete="PF('zkbContractCourseEditDlg').show()"/>
                                <!-- <p:commandButton id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.deleteDetail}" update=":growl :zkbContractEditForm:zkbContractCourseDatalist" disabled="#{empty zkbContractEditController.zkbContractCourseSelected.zkbCourse.cname}">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                 </p:commandButton>-->
-                               <p:commandButton id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('CourseDelete')}" update=":growl :zkbConfigDlg" disabled="#{empty zkbContractEditController.zkbContractCourseSelected.zkbCourse.cname}" oncomplete="PF('zkbConfigDlg').show()" >
+                               <p:commandButton id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('CourseDelete')}" update=":growl :zkbConfigDlg" disabled="#{zkbContractEditController.courseCanOperate}" oncomplete="PF('zkbConfigDlg').show()" >
                                    <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
                                </p:commandButton>
                             </f:facet>
@@ -175,18 +175,18 @@
                             <p:column headerText="Sys ID" >
                                 <h:outputText value="#{zkbContractAssetItem.assetInfo.systemId}" />
                             </p:column>
-                            <p:column headerText="维修类型" >
+                            <p:column headerText="设备分类" >
                                 <h:outputText value="#{zkbContractEditController.getAssetGroup(zkbContractAssetItem.assetInfo.assetGroup)}" />
                             </p:column>
                             <p:column headerText="品牌" >
-                                <h:outputText value="#{zkbContractAssetItem.assetInfo.brand.name}" />
+                                <h:outputText value="#{zkbContractAssetItem.assetInfo.makerShortName}" />
                             </p:column>
                             <f:facet name="{Toolbar}">
-                                <p:commandButton immediate="false"  process="@this" id="createAssetButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareAssetCreate}" update=":growl :zkbContractAssetEditDlg" oncomplete="PF('zkbContractAssetEditDlg').show()"/>
+                                <p:commandButton immediate="false"  process="@this" id="createAssetButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareAssetCreate}" update=":growl :zkbContractAssetEditDlg" oncomplete="PF('zkbContractAssetEditDlg').show()" disabled="#{userContextService.zkbUser}"/>
                                <!-- <p:commandButton id="deleteAssetButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.deleteAsset}" update=":growl :zkbContractEditForm:zkbContractAssetDatalist" disabled="#{empty zkbContractEditController.zkbContractAssetSelected.id}">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                 </p:commandButton>-->
-                                <p:commandButton id="deleteAssetButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('assetDelete')}" update=":growl :zkbConfigDlg" disabled="#{empty zkbContractEditController.zkbContractAssetSelected.id}" oncomplete="PF('zkbConfigDlg').show()" >
+                                <p:commandButton id="deleteAssetButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('assetDelete')}" update=":growl :zkbConfigDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbConfigDlg').show()" >
                                     <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
                                 </p:commandButton>
                             </f:facet>
@@ -194,8 +194,8 @@
                         </p:dataTable>
                     </p:fieldset>
 
-                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" action="#{zkbContractEditController.createContract}" update=":zkbContractEditForm :growl " style="float:left" rendered="#{zkbContractEditController.actionName eq 'Create'}"/>
-                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbContractEditController.preForLog('contractUpdate')}" update=":growl :zkbConfigDlg" oncomplete="PF('zkbConfigDlg').show()" rendered="#{zkbContractEditController.actionName eq 'Edit'}"/>
+                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" action="#{zkbContractEditController.createContract}" update=":zkbContractEditForm :growl " disabled="#{userContextService.zkbUser}" style="float:left" rendered="#{zkbContractEditController.actionName eq 'Create'}"/>
+                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbContractEditController.preForLog('contractUpdate')}" update=":growl :zkbConfigDlg" oncomplete="PF('zkbConfigDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.actionName eq 'Edit'}"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" />
 
                 </p:fieldset>

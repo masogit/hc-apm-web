@@ -154,8 +154,8 @@ public class ZkbContractService {
             zkbContractAssetDataMap.put("科室", zkbContractAsset.getAssetInfo().getClinicalDeptName());
             zkbContractAssetDataMap.put("设备名称", zkbContractAsset.getAssetInfo().getName());
             zkbContractAssetDataMap.put("维修类型", WebUtil.getMessage("assetGroup"+"-"+zkbContractAsset.getAssetInfo().getAssetGroup()));
-            if(zkbContractAsset.getAssetInfo() != null && zkbContractAsset.getAssetInfo().getBrand() != null){
-                zkbContractAssetDataMap.put("品牌", zkbContractAsset.getAssetInfo().getBrand().getName());
+            if(zkbContractAsset.getAssetInfo() != null){
+                zkbContractAssetDataMap.put("品牌", zkbContractAsset.getAssetInfo().getMakerShortName());
             }
             zkbContractAssetDataMap.put("备注", zkbContractAsset.getAssetInfo().getComments());
 
