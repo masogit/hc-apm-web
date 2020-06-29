@@ -3,11 +3,9 @@ package com.ge.apm.view.zkb;
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContract;
-import com.ge.apm.service.asset.ContractImportService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbContractImportService;
 import com.ge.apm.service.zkb.ZkbContractService;
-import com.ge.apm.view.asset.ContractImportController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -46,9 +44,9 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
 
     private ZkbContractService zkbContractService;
     private ZkbContractImportService zkbContractImportService;
-    private List<Map<String, Object>> errorContractList;
-    private List<Map<String, Object>> errorContractCourseList;
-    private List<Map<String, Object>> errorContractAssetList;
+    private List<Map<String, Object>> errorContractList = new ArrayList<>();
+    private List<Map<String, Object>> errorContractCourseList = new ArrayList<>();
+    private List<Map<String, Object>> errorContractAssetList = new ArrayList<>();
     private UserAccount currentUser;
 
     @Override
@@ -68,8 +66,8 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
         this.file = event.getFile();
         try {
             doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
-            int maxRowNum = ContractImportService.EXCEL_CONTRACT_HEADER_ROW + 5000;
-            if(doc.exceedMaxRowNum(ContractImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
+            int maxRowNum = ZkbContractImportService.EXCEL_CONTRACT_HEADER_ROW + 5000;
+            if(doc.exceedMaxRowNum(ZkbContractImportService.SHEET_SERVICE_CONTRACT, maxRowNum)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
                 return;
             }
@@ -84,10 +82,10 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
             }
         } catch (IOException ex) {
             WebUtil.addErrorMessage("File can not be read!");
-            Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ZkbContractService.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception e) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
-            Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(ZkbContractService.class.getName()).log(Level.SEVERE, null, e);
         } finally {
             if (doc != null) {
                 doc.release();
@@ -101,6 +99,9 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
             if(importContractMapList != null && importContractMapList.size() > 0){
                 zkbContractImportService.importData(importContractMapList,currentUser);
                 errorContractList = zkbContractImportService.filterErrorRecords(importContractMapList);
+                if(errorContractList ==null){
+                    errorContractList = new ArrayList<>();
+                }
             }else {
                 errorContractList = new ArrayList<>();
             }
@@ -116,6 +117,9 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
             if(impContractCourseMapList != null && impContractCourseMapList.size() > 0){
                 zkbContractImportService.importCourseData(impContractCourseMapList);
                 errorContractCourseList = zkbContractImportService.filterCourseErrorRecords(impContractCourseMapList);
+                if(errorContractCourseList == null){
+                    errorContractCourseList = new ArrayList<>();
+                }
             }else{
                 errorContractCourseList = new ArrayList<>();
             }
@@ -130,6 +134,9 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
             if(impContractAssetMapList != null && impContractAssetMapList.size() > 0){
                 zkbContractImportService.importAssetData(impContractAssetMapList,currentUser);
                 errorContractAssetList = zkbContractImportService.filterErrorRecords(impContractAssetMapList);
+                if(errorContractAssetList == null){
+                    errorContractAssetList = new ArrayList<>();
+                }
             }else{
                 errorContractAssetList = new ArrayList<>();
             }
