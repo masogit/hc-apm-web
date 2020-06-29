@@ -25,9 +25,9 @@ public class ZkbContractImportService {
 
     public static final String EXCEL_CONTRACT_TEMPLATE_VERSION = "v1.0";
 
-    public static final String SHEET_SERVICE_CONTRACT = "Contract";
-    public static final String SHEET_SERVICE_CONTRACT_COURSE = "ContractCourse";
-    public static final String SHEET_SERVICE_CONTRACT_Asset = "Contract_Asset";
+    public static final String SHEET_SERVICE_CONTRACT = "合同";
+    public static final String SHEET_SERVICE_CONTRACT_COURSE = "相关课程";
+    public static final String SHEET_SERVICE_CONTRACT_Asset = "相关设备";
     public static final int EXCEL_CONTRACT_HEADER_ROW = 1;
     public static final int EXCEL_CONTRACT_DATA_ROW = 2;
 
@@ -287,7 +287,7 @@ public class ZkbContractImportService {
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
-        logger.info("Duration for getContractMapFromTemplate: {} seconds", duration.getSeconds());
+        logger.info("Duration for getContractCourseMapFromTemplate: {} seconds", duration.getSeconds());
 
         return result;
     }

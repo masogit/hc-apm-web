@@ -681,3 +681,15 @@ VALUES(7, 'system', '2020-06-16 00:00:00.0', '', '', 'system', '2020-06-16 00:00
 INSERT INTO public.audit_default_file
 (id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, system_file, deleted, expired, file_id, file_type, template, item_id, name, upload_by, upload_time, url)
 VALUES(8, 'system', '2020-06-16 00:00:00.0', '', '', 'system', '2020-06-16 00:00:00.0', '', '', true, false, false, '5eec21ace3a5402f90381aa7', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', true, '19', '权限清单.xlsx', 'system', '2020-06-16 00:00:00.0', '/hcapmobjecthubservice/api/apm/objectHub/objects/download/5eec21ace3a5402f90381aa7');
+
+-- 2020.06.24 新增角色：远程培训管理员
+INSERT INTO sys_role (home_page, name, role_desc, created_by, created_date, last_modified_by, last_modified_date, authorities, authorities_ch, cards, cards_ch, menus, role_desc_en) VALUES (null, 'RemoteTrainingAdmin', '远程培训管理员', null, null, null, null, null, null, null, null, 'homePage', 'Remote Training Administrator');
+
+-- 2020.06.29 新增合同字段
+ALTER TABLE contract_info ADD bid_date date;
+ALTER TABLE contract_info ADD receive_digital_contract_date date;
+ALTER TABLE contract_info ADD send_contract_date date;
+ALTER TABLE contract_info ADD send_lawer_date date;
+ALTER TABLE contract_info ADD receive_contract_date date;
+ALTER TABLE contract_info ADD archive_date date;
+ALTER TABLE contract_info ADD expect_arrival_date date;

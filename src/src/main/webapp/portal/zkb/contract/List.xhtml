@@ -37,15 +37,15 @@
                         <p:ajax event="rowSelect" listener="#{zkbContractController.prepareEdit}" update="deleteButton :zkbContractListForm"/>
                         <p:ajax event="filter" listener="#{zkbContractController.onFilter}" />
 
-                        <p:column headerText="#{msg.zkbContact_tenant}" sortBy="#{item.tenantUID}">
+                        <p:column headerText="#{msg.zkbContact_tenant}">
                             <h:outputText value="#{zkbContractController.getTenantInfo(item.tenantUID).name}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.zkbContract_contractNo}" filterBy="#{item.contractNo}" sortBy="#{item.contractNo}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.zkbContract_contractNo}" filterBy="#{item.contractNo}"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.contractNo}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.zkbContract_region}" filterBy="#{item.region}" sortBy="#{item.region}"  filterMatchMode="EQ">
+                        <p:column headerText="#{msg.zkbContract_region}" filterBy="#{item.region}" filterMatchMode="EQ">
                             <h:outputText value="#{item.region}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -55,7 +55,7 @@
                             </f:facet>
                         </p:column>
 
-                        <p:column headerText="#{msg.zkbContract_contractType}" filterBy="#{item.contractType}" sortBy="#{item.contractType}"  filterMatchMode="EQ">
+                        <p:column headerText="#{msg.zkbContract_contractType}" filterBy="#{item.contractType}" filterMatchMode="EQ">
                             <h:outputText value="#{item.contractType}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -65,6 +65,21 @@
                             </f:facet>
                         </p:column>
 
+                        <p:column headerText="#{msg.zkbContract_ibNumber}">
+                            <h:outputText value="#{item.ibNumber}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_spareQuota}">
+                            <h:outputText value="#{item.spareQuota}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_probeQuota}" >
+                            <h:outputText value="#{item.probeQuota}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
+                            <h:outputText value="#{item.geArtificialSupportTimes}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_spareArtificail}">
+                            <h:outputText value="#{item.spareArtificail}"/>
+                        </p:column>
                         <p:column headerText="#{msg.zkbContract_startDate}" filterBy="#{item.startDate}" sortBy="#{item.startDate}" filterMatchMode="GTE">
                             <f:facet name="filter">
                                 <p:inputText id="filterStartDate" widgetVar="varFilteStartDate" />
@@ -81,36 +96,19 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-
-                        <p:column headerText="#{msg.zkbContract_ibNumber}" sortBy="#{item.zkbContract_ibNumber}">
-                            <h:outputText value="#{item.ibNumber}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.zkbContract_spareQuota}" sortBy="#{item.zkbContract_spareQuota}">
-                            <h:outputText value="#{item.spareQuota}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.zkbContract_probeQuota}" sortBy="#{item.zkbContract_probeQuota}">
-                            <h:outputText value="#{item.probeQuota}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" sortBy="#{item.zkbContract_geArtificialSupportTimes}" >
-                            <h:outputText value="#{item.geArtificialSupportTimes}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.zkbContract_spareArtificail}" sortBy="#{item.zkbContract_spareArtificail}">
-                            <h:outputText value="#{item.spareArtificail}"/>
-                        </p:column>
-
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{zkbContractController.createAction}"  disabled="#{empty zkbContractController.selectionTenantInfo}"/>
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{zkbContractController.createAction}"  disabled="#{zkbContractController.addCanOperate}"/>
                             <p:commandButton id="editButton" style="margin-left: 0px" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{zkbContractController.editAction}" disabled="#{empty zkbContractController.selected.id}"/>
                             <!--  <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{zkbContractController.delete}" update=":zkbContractListForm:datalist, :growl" disabled="#{empty zkbContractController.selected.id}">
                                   <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                               </p:commandButton>-->
-                            <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" oncomplete="PF('zkbConfigDlg').show()" update=":growl :zkbConfigDlg" disabled="#{empty zkbContractController.selected.id}">
+                            <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" oncomplete="PF('zkbConfigDlg').show()" update=":growl :zkbConfigDlg" disabled="#{zkbContractController.deleteCanOperate}">
                                 <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>-->
                             </p:commandButton>
-                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbContractController.exportAll}" icon="ui-icon-arrowthick-1-s">
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbContractController.exportAll}" icon="ui-icon-arrowstop-1-s">
                                 <p:fileDownload value="#{zkbContractController.exportFile}"/>
                             </p:commandButton>
-                            <p:commandButton title="#{msg.Import}" icon="fa fa-upload" class="btn btn-sm btn-gray" action="#{zkbContractController.importAction}"></p:commandButton>
+                            <p:commandButton title="#{msg.Import}" icon="ui-icon-arrowstop-1-n" class="btn btn-sm btn-gray" action="#{zkbContractController.importAction}"></p:commandButton>
                         </f:facet>
                     </p:dataTable>
                 </h:form>

@@ -21,10 +21,9 @@ import java.util.*;
 @Service
 public class ZkbContractService {
 
-
-    private static final String SHEET_ZKB_CONTRACT = "Contract";
-    private static final String SHEET_ZKB_CONTRACT_COURSE = "Contract_Course";
-    private static final String SHEET_ZKB_CONTRACT_ASSET = "Contract_Asset";
+    public static final String SHEET_ZKB_CONTRACT = "合同";
+    public static final String SHEET_ZKB_CONTRACT_COURSE = "相关课程";
+    public static final String SHEET_ZKB_CONTRACT_ASSET = "相关设备";
 
 
     @Autowired
@@ -155,8 +154,8 @@ public class ZkbContractService {
             zkbContractAssetDataMap.put("科室", zkbContractAsset.getAssetInfo().getClinicalDeptName());
             zkbContractAssetDataMap.put("设备名称", zkbContractAsset.getAssetInfo().getName());
             zkbContractAssetDataMap.put("维修类型", WebUtil.getMessage("assetGroup"+"-"+zkbContractAsset.getAssetInfo().getAssetGroup()));
-            if(zkbContractAsset.getAssetInfo() != null && zkbContractAsset.getAssetInfo().getBrand() != null){
-                zkbContractAssetDataMap.put("品牌", zkbContractAsset.getAssetInfo().getBrand().getName());
+            if(zkbContractAsset.getAssetInfo() != null){
+                zkbContractAssetDataMap.put("品牌", zkbContractAsset.getAssetInfo().getMakerShortName());
             }
             zkbContractAssetDataMap.put("备注", zkbContractAsset.getAssetInfo().getComments());
 
