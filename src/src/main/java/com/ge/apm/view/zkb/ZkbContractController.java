@@ -6,12 +6,14 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbContractService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -149,6 +151,28 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
         this.selected = null;
     }
 
+    public boolean isAddCanOperate(){
+
+        if(StringUtils.isNotEmpty(selectionTenantInfo) && !userContextService.isZkbUser()){
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isDeleteCanOperate(){
+        if(this.selected == null){
+            return true;
+        }
+        if(StringUtils.isEmpty(this.selected.getId())){
+            return true;
+        }else{
+            if(userContextService.isZkbUser()){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
 
     public UserAccount getCurrentUser() {
         return currentUser;
