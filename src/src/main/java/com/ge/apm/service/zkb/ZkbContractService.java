@@ -153,7 +153,8 @@ public class ZkbContractService {
             zkbContractAssetDataMap.put("Sys ID", zkbContractAsset.getAssetInfo().getSystemId());
             zkbContractAssetDataMap.put("科室", zkbContractAsset.getAssetInfo().getClinicalDeptName());
             zkbContractAssetDataMap.put("设备名称", zkbContractAsset.getAssetInfo().getName());
-            zkbContractAssetDataMap.put("维修类型", WebUtil.getMessage("assetGroup"+"-"+zkbContractAsset.getAssetInfo().getAssetGroup()));
+            String rfValue = zkbContractAsset.getAssetInfo().getRepairForm() ==null ? "" : String.valueOf(zkbContractAsset.getAssetInfo().getRepairForm());
+            zkbContractAssetDataMap.put("维修类型", WebUtil.getFieldValueMessage("repairForm",rfValue));
             if(zkbContractAsset.getAssetInfo() != null){
                 zkbContractAssetDataMap.put("品牌", zkbContractAsset.getAssetInfo().getMakerShortName());
             }
