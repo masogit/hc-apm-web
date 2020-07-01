@@ -409,6 +409,11 @@ public class ZkbContractImportService {
             zkbContractAssetRow.setFieldStringValue("合同号", "setContractNo");
             zkbContractAssetRow.setFieldStringValue("设备二维码","setQrCode");
             zkbContractAssetRow.setFieldStringValue("是否删除","setFlag");
+            zkbContractAssetRow.setFieldStringValue("高低端机","setHighLowMachine");
+            zkbContractAssetRow.setFieldStringValue("Sub Region","setSubRegion");
+            zkbContractAssetRow.setFieldStringValue("Modality","setModality");
+            zkbContractAssetRow.setFieldStringValue("责任工程师","setResponsiblEngineer");
+            zkbContractAssetRow.setFieldStringValue("KA","setKa");
 
             map.put("zkbContractAssetVO", zkbContractAssetVO);
             map.put("rowData", rowMap);
@@ -505,6 +510,11 @@ public class ZkbContractImportService {
             ZkbContractAsset newZkbContractAsset = new ZkbContractAsset();
             newZkbContractAsset.setContractId(zkbContractAssetVO.getContractId());
             newZkbContractAsset.setAssetId(zkbContractAssetVO.getAssetId());
+            newZkbContractAsset.setHighLowMachine(zkbContractAssetVO.getHighLowMachine());
+            newZkbContractAsset.setSubRegion(zkbContractAssetVO.getSubRegion());
+            newZkbContractAsset.setModality(zkbContractAssetVO.getModality());
+            newZkbContractAsset.setResponsiblEngineer(zkbContractAssetVO.getResponsiblEngineer());
+            newZkbContractAsset.setKa(zkbContractAssetVO.getKa());
             zkbContractAssetRepository.save(newZkbContractAsset);
             zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser);
         }else if("Y".equals(zkbContractAssetVO.getFlag())){

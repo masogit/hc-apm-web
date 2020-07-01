@@ -236,11 +236,11 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     //endregion
 
     //region 设备
-    public String getAssetGroup(String assetGroup){
-        if(StringUtils.isEmpty(assetGroup)){
+    public String getRepairForm(String value){
+        if(StringUtils.isEmpty(value)){
             return "";
         }
-        String v = WebUtil.getMessage("assetGroup"+"-"+assetGroup);
+        String v = WebUtil.getFieldValueMessage("repairForm",value);
         return v;
     }
 

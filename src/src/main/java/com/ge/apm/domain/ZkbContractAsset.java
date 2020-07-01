@@ -29,9 +29,38 @@ public class ZkbContractAsset {
     @Size(max = 32)
     private String assetId;
 
+    /**
+     * 高低端机
+     */
+    @Column(name = "high_low_machine")
+    private String highLowMachine;
+
+    @Column(name = "sub_region")
+    private String subRegion;
+
+    @Column(name = "modality")
+    private String modality;
+
+    /**
+     * 责任工程师
+     */
+    @Column(name = "responsibl_engineer")
+    private String responsiblEngineer;
+
+    @Column(name = "ka")
+    private String ka;
+
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false, name = "asset_id", referencedColumnName = "uid")
     private AssetInfo assetInfo;
+
+    public String getKa() {
+        return ka;
+    }
+
+    public void setKa(String ka) {
+        this.ka = ka;
+    }
 
     public String getId() {
         return id;
@@ -63,6 +92,38 @@ public class ZkbContractAsset {
 
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
+    }
+
+    public String getHighLowMachine() {
+        return highLowMachine;
+    }
+
+    public void setHighLowMachine(String highLowMachine) {
+        this.highLowMachine = highLowMachine;
+    }
+
+    public String getSubRegion() {
+        return subRegion;
+    }
+
+    public void setSubRegion(String subRegion) {
+        this.subRegion = subRegion;
+    }
+
+    public String getModality() {
+        return modality;
+    }
+
+    public void setModality(String modality) {
+        this.modality = modality;
+    }
+
+    public String getResponsiblEngineer() {
+        return responsiblEngineer;
+    }
+
+    public void setResponsiblEngineer(String responsiblEngineer) {
+        this.responsiblEngineer = responsiblEngineer;
     }
 
     @Override
