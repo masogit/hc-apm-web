@@ -684,3 +684,12 @@ VALUES(8, 'system', '2020-06-16 00:00:00.0', '', '', 'system', '2020-06-16 00:00
 
 -- 2020.06.24 新增角色：远程培训管理员
 INSERT INTO sys_role (home_page, name, role_desc, created_by, created_date, last_modified_by, last_modified_date, authorities, authorities_ch, cards, cards_ch, menus, role_desc_en) VALUES (null, 'RemoteTrainingAdmin', '远程培训管理员', null, null, null, null, null, null, null, null, 'homePage', 'Remote Training Administrator');
+
+-- 2020.06.29 新增合同字段
+ALTER TABLE contract_info ADD bid_date date;
+ALTER TABLE contract_info ADD receive_digital_contract_date date;
+ALTER TABLE contract_info ADD send_contract_date date;
+ALTER TABLE contract_info ADD send_lawer_date date;
+ALTER TABLE contract_info ADD receive_contract_date date;
+ALTER TABLE contract_info ADD archive_date date;
+ALTER TABLE contract_info ADD expect_arrival_date date;
