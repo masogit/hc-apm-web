@@ -55,6 +55,7 @@ public class AssetInstallationReportService {
         reportData.put("asset_name", arrivalListItem.getArrivalList().getAssetName());//设备名称
         reportData.put("financing_num", arrivalListItem.getFinancingNum());//设备财产编号
         reportData.put("function_type", arrivalListItem.getArrivalList().getFunctionType());//型号规格
+        reportData.put("brand", arrivalListItem.getArrivalList().getBrand());//品牌
         reportData.put("manufact_num", arrivalListItem.getSerialNum());//出厂编号
         reportData.put("clinical_dept_name", orgInfoDao.findByUid(arrivalListItem.getClinicalDeptUID()));//设备所属科室
 
@@ -75,6 +76,7 @@ public class AssetInstallationReportService {
         reportData.put("supplier_name", arrivalListItem.getArrivalList().getVendor());//外贸协议
         reportData.put("invoice_date", arrivalListItem.getArrivalList().getInvoiceDate());//发票号
         reportData.put("foreign_trade_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
+        reportData.put("foreign_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
         reportData.put("box_installation_date", arrivalListItem.getArrivalList().getBoxInstallationDate());//开箱安装日期
         reportData.put("using_date", arrivalListItem.getArrivalList().getUsingDate());//使用日期
         reportData.put("using_person", arrivalListItem.getArrivalList().getUsingPerson());//使用人
