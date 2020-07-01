@@ -194,8 +194,8 @@
                         </p:dataTable>
                     </p:fieldset>
 
-                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" action="#{zkbContractEditController.createContract}" update=":zkbContractEditForm :growl " disabled="#{userContextService.zkbUser}" style="float:left" rendered="#{zkbContractEditController.actionName eq 'Create'}"/>
-                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbContractEditController.preForLog('contractUpdate')}" update=":growl :zkbConfigDlg" oncomplete="PF('zkbConfigDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.actionName eq 'Edit'}"/>
+                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" action="#{zkbContractEditController.createContract}" update=":zkbContractEditForm :growl " style="float:left" rendered="#{zkbContractEditController.createHide}"/>
+                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbContractEditController.preForLog('contractUpdate')}" update=":growl :zkbConfigDlg" oncomplete="PF('zkbConfigDlg').show()" rendered="#{zkbContractEditController.editHide}"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" />
 
                 </p:fieldset>
