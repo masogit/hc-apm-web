@@ -52,7 +52,7 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
     @Override
     protected void init() {
         super.init();
-
+        reason="";
         dao = WebUtil.getBean(ZkbContractRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         zkbContractService = WebUtil.getBean(ZkbContractService.class);
@@ -86,7 +86,7 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     @Override
     public void delete() {
-        zkbContractService.deleteContract(this.selected,reason,currentUser);
+        zkbContractService.deleteContract(this.selected,this.reason,currentUser);
         this.selected= null;
         this.reason="";
     }
