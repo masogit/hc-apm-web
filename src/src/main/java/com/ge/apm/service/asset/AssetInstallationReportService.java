@@ -74,7 +74,7 @@ public class AssetInstallationReportService {
 
         //固定资产验收单
         reportData.put("supplier_name", arrivalListItem.getArrivalList().getVendor());//外贸协议
-        reportData.put("invoice_date", arrivalListItem.getArrivalList().getInvoiceDate());//发票号
+        reportData.put("contract_date", arrivalListItem.getArrivalList().getContractDate());//发票号
         reportData.put("foreign_trade_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
         reportData.put("foreign_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
         reportData.put("box_installation_date", arrivalListItem.getArrivalList().getBoxInstallationDate());//开箱安装日期
