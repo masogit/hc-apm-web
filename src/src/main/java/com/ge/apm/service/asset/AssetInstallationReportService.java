@@ -73,10 +73,9 @@ public class AssetInstallationReportService {
         reportData.put("technical_ack_name", "");//验收人/经办人
 
         //固定资产验收单
-        reportData.put("supplier_name", arrivalListItem.getArrivalList().getVendor());//外贸协议
-        reportData.put("contract_date", arrivalListItem.getArrivalList().getContractDate());//发票号
+        reportData.put("supplier_name", arrivalListItem.getArrivalList().getVendor());//供应商
+        reportData.put("contract_date", arrivalListItem.getArrivalList().getContractDate());//合同签订日期
         reportData.put("foreign_trade_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
-        reportData.put("foreign_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
         reportData.put("box_installation_date", arrivalListItem.getArrivalList().getBoxInstallationDate());//开箱安装日期
         reportData.put("using_date", arrivalListItem.getArrivalList().getUsingDate());//使用日期
         reportData.put("using_person", arrivalListItem.getArrivalList().getUsingPerson());//使用人
