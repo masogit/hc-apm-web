@@ -361,6 +361,22 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }
     }
 
+    public boolean isCreateHide(){
+        if("Create".equals(actionName)){
+            return !userContextService.isZkbUser();
+        }else {
+            return false;
+        }
+    }
+
+    public boolean isEditHide(){
+        if("Edit".equals(actionName)){
+            return !userContextService.isZkbUser();
+        }else{
+            return false;
+        }
+    }
+
     public DualListModel<AssetInfo> getAvailableAssets() {
         return availableAssets;
     }
