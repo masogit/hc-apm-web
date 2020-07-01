@@ -175,8 +175,8 @@
                             <p:column headerText="Sys ID" >
                                 <h:outputText value="#{zkbContractAssetItem.assetInfo.systemId}" />
                             </p:column>
-                            <p:column headerText="设备分类" >
-                                <h:outputText value="#{zkbContractEditController.getAssetGroup(zkbContractAssetItem.assetInfo.assetGroup)}" />
+                            <p:column headerText="维修类型" >
+                                <h:outputText value="#{zkbContractEditController.getRepairForm(zkbContractAssetItem.assetInfo.repairForm)}" />
                             </p:column>
                             <p:column headerText="品牌" >
                                 <h:outputText value="#{zkbContractAssetItem.assetInfo.makerShortName}" />
@@ -194,8 +194,8 @@
                         </p:dataTable>
                     </p:fieldset>
 
-                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" action="#{zkbContractEditController.createContract}" update=":zkbContractEditForm :growl " disabled="#{userContextService.zkbUser}" style="float:left" rendered="#{zkbContractEditController.actionName eq 'Create'}"/>
-                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbContractEditController.preForLog('contractUpdate')}" update=":growl :zkbConfigDlg" oncomplete="PF('zkbConfigDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.actionName eq 'Edit'}"/>
+                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" action="#{zkbContractEditController.createContract}" update=":zkbContractEditForm :growl " style="float:left" rendered="#{zkbContractEditController.createHide}"/>
+                    <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbContractEditController.preForLog('contractUpdate')}" update=":growl :zkbConfigDlg" oncomplete="PF('zkbConfigDlg').show()" rendered="#{zkbContractEditController.editHide}"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" />
 
                 </p:fieldset>

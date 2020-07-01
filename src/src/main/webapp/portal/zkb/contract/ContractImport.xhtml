@@ -27,12 +27,35 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <div style="white-space:pre">#{msg.Description}   1. <a href="#{zkbContractImpController.getTemplateName()}" title="download">#{msg.downloadTemplateFile}</a>        2. #{msg.FileNeedData}        3. #{msg.UpFileImport}</div>
+                            <table style="width: 100%;padding:0px;margin: 0px;height: 100%;">
+                                <tr>
+                                    <td style="text-align:left;">#{msg.Description}:</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">
+                                        1. <a href="#{zkbContractImpController.getTemplateName()}" title="download">#{msg.downloadTemplateFile}</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">
+                                        2. 文件中填入要导入的合同数据<br/>
+                                        其中：<br/>
+                                        合同页面：区域、代理商、合同号、合同类型、合同开始日期、合同结束日期为必填字段<br/>
+                                        相关课程页面：合同号、课程ID、课程名称、课程额度为必填字段<br/>
+                                        相关设备页面：合同号、设备二维码为必填字段
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">
+                                        3. #{msg.UpFileImport}
+                                    </td>
+                                </tr>
+                            </table>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 
-                <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/zkb/contract/List?faces-redirect=true" immediate="true" />
+                <p:commandButton value=" #{msg.Return}" icon="ui-icon-arrow-back" action="/portal/zkb/contract/List?faces-redirect=true" immediate="true" />
             </h:form>
         </div>
 

@@ -236,11 +236,11 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     //endregion
 
     //region 设备
-    public String getAssetGroup(String assetGroup){
-        if(StringUtils.isEmpty(assetGroup)){
+    public String getRepairForm(String value){
+        if(StringUtils.isEmpty(value)){
             return "";
         }
-        String v = WebUtil.getMessage("assetGroup"+"-"+assetGroup);
+        String v = WebUtil.getFieldValueMessage("repairForm",value);
         return v;
     }
 
@@ -356,6 +356,22 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     public boolean isCourseCanOperate(){
         if(zkbContractCourseSelected == null || zkbContractCourseSelected.getZkbCourse() ==null || userContextService.isZkbUser()){
             return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean isCreateHide(){
+        if("Create".equals(actionName)){
+            return !userContextService.isZkbUser();
+        }else {
+            return false;
+        }
+    }
+
+    public boolean isEditHide(){
+        if("Edit".equals(actionName)){
+            return !userContextService.isZkbUser();
         }else{
             return false;
         }
