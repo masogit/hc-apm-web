@@ -2,12 +2,166 @@
 -- Drop table
 
 DROP TABLE IF EXISTS public.audit_config;
+
+CREATE TABLE public.audit_config (
+	id serial NOT NULL,
+	created_by varchar(50) NULL,
+	created_date timestamp NULL,
+	hospital_uid bpchar(32) NULL,
+	institution_uid bpchar(32) NULL,
+	last_modified_by varchar(50) NULL,
+	last_modified_date timestamp NULL,
+	site_uid bpchar(32) NULL,
+	tenant_uid bpchar(32) NULL,
+	active bool NULL,
+	CONSTRAINT audit_config_pkey PRIMARY KEY (id)
+);
+
+-- Drop table
+
 DROP TABLE IF EXISTS public.audit_file;
+
+CREATE TABLE public.audit_file (
+	pid serial NOT NULL,
+	created_by varchar(50) NULL,
+	created_date timestamp NULL,
+	hospital_uid bpchar(32) NULL,
+	institution_uid bpchar(32) NULL,
+	last_modified_by varchar(50) NULL,
+	last_modified_date timestamp NULL,
+	site_uid bpchar(32) NULL,
+	tenant_uid bpchar(32) NULL,
+	deleted bool NULL,
+	expired bool NULL,
+	file_id varchar(255) NULL,
+	file_type varchar(255) NULL,
+	id int4 NULL,
+	item_id int4 NULL,
+	"name" varchar(255) NULL,
+	system_file bool NULL,
+	"template" bool NULL,
+	upload_by varchar(255) NULL,
+	upload_time timestamp NULL,
+	url varchar(255) NULL,
+	CONSTRAINT audit_file_pkey PRIMARY KEY (pid)
+);
+
+-- Drop table
+
 DROP TABLE IF EXISTS public.audit_group;
+
+CREATE TABLE public.audit_group (
+	pid serial NOT NULL,
+	created_by varchar(50) NULL,
+	created_date timestamp NULL,
+	hospital_uid bpchar(32) NULL,
+	institution_uid bpchar(32) NULL,
+	last_modified_by varchar(50) NULL,
+	last_modified_date timestamp NULL,
+	site_uid bpchar(32) NULL,
+	tenant_uid bpchar(32) NULL,
+	"comments" text NULL,
+	completed bool NULL,
+	expired bool NULL,
+	id int4 NULL,
+	module_id int4 NULL,
+	"name" varchar(255) NULL,
+	order_num int4 NULL,
+	"version" varchar(255) NULL,
+	CONSTRAINT audit_group_pkey PRIMARY KEY (pid)
+);
+
+-- Drop table
+
 DROP TABLE IF EXISTS public.audit_item;
+
+CREATE TABLE public.audit_item (
+	pid serial NOT NULL,
+	created_by varchar(50) NULL,
+	created_date timestamp NULL,
+	hospital_uid bpchar(32) NULL,
+	institution_uid bpchar(32) NULL,
+	last_modified_by varchar(50) NULL,
+	last_modified_date timestamp NULL,
+	site_uid bpchar(32) NULL,
+	tenant_uid bpchar(32) NULL,
+	completed bool NULL,
+	group_id int4 NULL,
+	id int4 NULL,
+	"name" varchar(255) NULL,
+	order_num int4 NULL,
+	"owner" varchar(255) NULL,
+	system_item bool NULL,
+	CONSTRAINT audit_item_pkey PRIMARY KEY (pid)
+);
+
+-- Drop table
+
 DROP TABLE IF EXISTS public.audit_link;
+
+CREATE TABLE public.audit_link (
+	pid serial NOT NULL,
+	created_by varchar(50) NULL,
+	created_date timestamp NULL,
+	hospital_uid bpchar(32) NULL,
+	institution_uid bpchar(32) NULL,
+	last_modified_by varchar(50) NULL,
+	last_modified_date timestamp NULL,
+	site_uid bpchar(32) NULL,
+	tenant_uid bpchar(32) NULL,
+	group_id int4 NULL,
+	id int4 NULL,
+	link varchar(255) NULL,
+	"name" varchar(255) NULL,
+	order_num int4 NULL,
+	CONSTRAINT audit_link_pkey PRIMARY KEY (pid)
+);
+
+-- Drop table
+
 DROP TABLE IF EXISTS public.audit_module;
+
+CREATE TABLE public.audit_module (
+	pid serial NOT NULL,
+	created_by varchar(50) NULL,
+	created_date timestamp NULL,
+	hospital_uid bpchar(32) NULL,
+	institution_uid bpchar(32) NULL,
+	last_modified_by varchar(50) NULL,
+	last_modified_date timestamp NULL,
+	site_uid bpchar(32) NULL,
+	tenant_uid bpchar(32) NULL,
+	completed bool NULL,
+	id int4 NULL,
+	"name" varchar(255) NULL,
+	order_num int4 NULL,
+	summary_id int4 NULL,
+	CONSTRAINT audit_module_pkey PRIMARY KEY (pid)
+);
+
+-- Drop table
+
 DROP TABLE IF EXISTS public.audit_summary;
+
+CREATE TABLE public.audit_summary (
+	pid serial NOT NULL,
+	created_by varchar(50) NULL,
+	created_date timestamp NULL,
+	hospital_uid bpchar(32) NULL,
+	institution_uid bpchar(32) NULL,
+	last_modified_by varchar(50) NULL,
+	last_modified_date timestamp NULL,
+	site_uid bpchar(32) NULL,
+	tenant_uid bpchar(32) NULL,
+	config_id int4 NULL,
+	except_progress numeric(19,2) NULL,
+	id int4 NULL,
+	"level" varchar(255) NULL,
+	"name" varchar(255) NULL,
+	order_num int4 NULL,
+	progress numeric(19,2) NULL,
+	CONSTRAINT audit_summary_pkey PRIMARY KEY (pid)
+);
 
 
 DROP TABLE IF EXISTS public.audit_default_file;
