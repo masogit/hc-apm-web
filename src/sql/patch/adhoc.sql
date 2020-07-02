@@ -985,7 +985,7 @@ VALUES(116, 'system', '2020-06-18 18:07:14.093', '', '', 'system', '2020-06-18 1
 
 INSERT INTO public.audit_default_file
 (id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, system_file, deleted, expired, file_id, file_type, template, item_id, name, upload_by, upload_time, url)
-VALUES(1, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', true, false, false, '5ecf99a26c470ebbc7d7c990', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', true, '1', '资产管理总制度及廉政制度.docx', 'system', '2020-05-20 00:00:00.0', '/hcapmobjecthubservice/api/apm/objectHub/objects/download/5ecf99a26c470ebbc7d7c990');
+VALUES(1, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', true, false, false, '5ee88275e3a5402f9038046a', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', true, '1', '资产管理处制度总则.docx', 'system', '2020-05-20 00:00:00.0', '/hcapmobjecthubservice/api/apm/objectHub/objects/download/5ee88275e3a5402f9038046a');
 INSERT INTO public.audit_default_file
 (id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, system_file, deleted, expired, file_id, file_type, template, item_id, name, upload_by, upload_time, url)
 VALUES(2, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', true, false, false, '5ecf99d66c470ebbc7d7c992', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', true, '9', '医疗装备维护与保养制度.docx', 'system', '2020-05-20 00:00:00.0', '/hcapmobjecthubservice/api/apm/objectHub/objects/download/5ecf99d66c470ebbc7d7c992');
