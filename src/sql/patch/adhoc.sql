@@ -2818,3 +2818,6 @@ ALTER TABLE contract_info ADD send_lawer_date date;
 ALTER TABLE contract_info ADD receive_contract_date date;
 ALTER TABLE contract_info ADD archive_date date;
 ALTER TABLE contract_info ADD expect_arrival_date date;
+
+--ACCOUNT 资产 联通、设备状态 置空（7.1发布后 删除）
+update asset_info set connect_to_insite = null,ib_device_status = null where ib_status is null;
