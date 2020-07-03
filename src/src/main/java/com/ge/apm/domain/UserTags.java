@@ -30,7 +30,6 @@ public class UserTags implements Serializable {
     private String userUid;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)", nullable = false)
-    @org.hibernate.annotations.Index(name="idx_tenant_uid", columnNames = {"tenant_uid"})
     private String tenantUID;
 
     @NotNull

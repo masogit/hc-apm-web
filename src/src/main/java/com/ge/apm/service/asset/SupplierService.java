@@ -1,14 +1,8 @@
 package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.dao.SupplierUserRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.SupplierUser;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
@@ -35,6 +29,10 @@ public class SupplierService {
     private SupplierApiService supplierApiService;
     @Autowired
     private WorkflowConfigRepository workflowConfigDao;
+    @Autowired
+    private TenantInfoRepository tenantInfoDao;
+    @Autowired
+    private SupplierQrCodeRepository supplierQrCodeDao;
 
     public List<String> getSupplier(String name) {
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -141,9 +139,25 @@ public class SupplierService {
 
     public byte[] getWxaCodeImage(){
 
-        String token = UserContextService.getAccessToken();
         UserAccount user = UserContextService.getCurrentUserAccount();
-        String path = "pages/index/index?tenantName="+ user.getTenantName() +"&tenantUID=" + user.getTenantUID();
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
+
+        SupplierQrCode supplierQrCode = supplierQrCodeDao.findFirstByTenantUIDAndType(tenantInfo.getUid(), SupplierQrCode.Type.Wxa.name());
+
+        SupplierQrCode tempSupplierQrCode = new SupplierQrCode();
+
+        if(supplierQrCode != null){
+
+            if(supplierQrCode.getQrCode() != null){
+                return supplierQrCode.getQrCode();
+            }
+
+            tempSupplierQrCode.setId(supplierQrCode.getId());
+
+        }
+
+        String token = UserContextService.getAccessToken();
+        String path = "pages/index/index?tenantName="+ tenantInfo.getName() +"&tenantUID=" + tenantInfo.getUid();
         String appName ="hc-apm-supplier";
 
         Map<String, Object> payloadMap = new HashMap<>();
@@ -152,15 +166,59 @@ public class SupplierService {
 
         JSONObject payload = new JSONObject(payloadMap);
 
-        return supplierApiService.getWxaCodeImage(token ,payload);
+        byte [] wxaCodeByte = supplierApiService.getWxaCodeImage(token ,payload);
 
+        if(this.isValidPic(wxaCodeByte)){
+
+            tempSupplierQrCode.setTenantUID(tenantInfo.getUid());
+            tempSupplierQrCode.setQrCode(wxaCodeByte);
+            tempSupplierQrCode.setType(SupplierQrCode.Type.Wxa.name());
+
+            supplierQrCodeDao.save(tempSupplierQrCode);
+
+        }else {
+            wxaCodeByte = null;
+        }
+
+        return wxaCodeByte;
     }
 
     public byte[] getWeChatCodeImage(){
 
-        String token = UserContextService.getAccessToken();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
 
-        return supplierApiService.getWeChatQrCodeImage(token);
+        SupplierQrCode supplierQrCode = supplierQrCodeDao.findFirstByTenantUIDAndType(tenantInfo.getUid(), SupplierQrCode.Type.WeChat.name());
+
+        SupplierQrCode tempSupplierQrCode = new SupplierQrCode();
+
+        if(supplierQrCode != null){
+
+            if(supplierQrCode.getQrCode() != null){
+                return supplierQrCode.getQrCode();
+            }
+
+            tempSupplierQrCode.setId(supplierQrCode.getId());
+
+        }
+
+        String token = UserContextService.getAccessToken();
+        byte [] weChatCodeByte = supplierApiService.getWeChatQrCodeImage(token);
+
+        if(this.isValidPic(weChatCodeByte)){
+
+            tempSupplierQrCode.setTenantUID(tenantInfo.getUid());
+            tempSupplierQrCode.setQrCode(weChatCodeByte);
+            tempSupplierQrCode.setType(SupplierQrCode.Type.WeChat.name());
+
+            supplierQrCodeDao.save(tempSupplierQrCode);
+
+        }else {
+            weChatCodeByte = null;
+        }
+
+
+        return weChatCodeByte;
 
     }
 
@@ -221,6 +279,36 @@ public class SupplierService {
         }
 
         return false;
+    }
+
+    public boolean isValidPic(byte[] bts){
+
+        if (bts == null || bts.length < 4){
+            return false;
+        }
+
+        int len = bts.length;
+
+        byte[] jpg = new byte[4];
+
+        jpg[0] = -1;
+        jpg[1] = -40;
+        jpg[2] = -1;
+        jpg[3] = -39;
+
+        try{
+
+            if (bts[0] == jpg[0] && bts[1] == jpg[1] && bts[len - 2] == jpg[2] && bts[len - 1] == jpg[3]){
+                return true;
+            }else {
+                return false;
+            }
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return false;
+        }
+
     }
 
 }

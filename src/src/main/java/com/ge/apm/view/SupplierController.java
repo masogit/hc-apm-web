@@ -303,14 +303,28 @@ public class SupplierController extends JpaCRUDController<Supplier> {
 
     //供应商小程序二维码
     public String getWxaCodeImage(){
-        String res = "data:image/png;base64,";
-        return  res + Base64.encodeBase64String(supplierService.getWxaCodeImage());
+
+        byte [] tempPicByte = supplierService.getWxaCodeImage();
+        if(tempPicByte != null){
+            String res = "data:image/png;base64,";
+            return  res + Base64.encodeBase64String(tempPicByte);
+        }else {
+            return "";
+        }
+
     }
 
     //微信公众号二维码
     public String getWeChatQrCodeImage(){
-        String res = "data:image/png;base64,";
-        return  res + Base64.encodeBase64String(supplierService.getWeChatCodeImage());
+
+        byte [] tempPicByte = supplierService.getWeChatCodeImage();
+        if(tempPicByte != null){
+            String res = "data:image/png;base64,";
+            return  res + Base64.encodeBase64String(tempPicByte);
+        }else {
+            return "";
+        }
+
     }
 
     public boolean activeSupplier(){
