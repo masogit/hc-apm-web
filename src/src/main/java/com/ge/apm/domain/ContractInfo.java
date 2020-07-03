@@ -35,7 +35,7 @@ public class ContractInfo implements Serializable {
     public enum PurchaseType {
         Tenders, Negotiated, Continue
     }
-    
+
     public enum AttachmentType {
         Contract, Tenders, Other
     }
@@ -60,15 +60,15 @@ public class ContractInfo implements Serializable {
     // 合同编号    
     @Column(name = "contract_num")
     private String contractNum;
-    
+
     // 外贸合同号
     @Column(name = "foreign_trade_num")
     private String foreignTradeNum;
-    
+
     // 发票号
     @Column(name = "invoice_num")
     private String invoiceNum;
-    
+
 
     //开始时间
     @Basic(optional = true)
@@ -159,7 +159,7 @@ public class ContractInfo implements Serializable {
     //购入方式
     @Column(name = "tender_type")
     private String tenderType;
-    
+
     //接招标文件材料
     @Basic(optional = true)
     @Column(name = "receive_file_date")
@@ -200,7 +200,36 @@ public class ContractInfo implements Serializable {
     @Column(name = "sign_contract_date")
     @Temporal(TemporalType.DATE)
     private Date signContractDate;
-    
+
+    //中标时间
+    @Column(name = "bid_date")
+    @Temporal(TemporalType.DATE)
+    private Date bidDate;
+    //接电子版合同时间
+    @Column(name = "receive_digital_contract_date")
+    @Temporal(TemporalType.DATE)
+    private Date receiveDigitalContractDate;
+    //送审时间
+    @Column(name = "send_contract_date")
+    @Temporal(TemporalType.DATE)
+    private Date sendContractDate;
+    //送律师时间
+    @Column(name = "send_lawer_date")
+    @Temporal(TemporalType.DATE)
+    private Date sendLawerDate;
+    //中标单位领【1】份合同时间
+    @Column(name = "receive_contract_date")
+    @Temporal(TemporalType.DATE)
+    private Date receiveContractDate;
+    //合同转交存档时间
+    @Column(name = "archive_date")
+    @Temporal(TemporalType.DATE)
+    private Date archiveDate;
+    //应到货时间
+    @Column(name = "expect_arrival_date")
+    @Temporal(TemporalType.DATE)
+    private Date expectArrivalDate;
+
     //备注
     @Column(name = "comments")
     @Size(min = 0, max = 256)
@@ -221,7 +250,7 @@ public class ContractInfo implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
-    
+
     @Column(name = "created_by", nullable = true, length = 50)
     private String createdBy;
 
@@ -581,13 +610,69 @@ public class ContractInfo implements Serializable {
         this.contractStatus = contractStatus;
     }
 
+    public Date getBidDate() {
+        return bidDate;
+    }
+
+    public void setBidDate(Date bidDate) {
+        this.bidDate = bidDate;
+    }
+
+    public Date getReceiveDigitalContractDate() {
+        return receiveDigitalContractDate;
+    }
+
+    public void setReceiveDigitalContractDate(Date receiveDigitalContractDate) {
+        this.receiveDigitalContractDate = receiveDigitalContractDate;
+    }
+
+    public Date getSendContractDate() {
+        return sendContractDate;
+    }
+
+    public void setSendContractDate(Date sendContractDate) {
+        this.sendContractDate = sendContractDate;
+    }
+
+    public Date getSendLawerDate() {
+        return sendLawerDate;
+    }
+
+    public void setSendLawerDate(Date sendLawerDate) {
+        this.sendLawerDate = sendLawerDate;
+    }
+
+    public Date getReceiveContractDate() {
+        return receiveContractDate;
+    }
+
+    public void setReceiveContractDate(Date receiveContractDate) {
+        this.receiveContractDate = receiveContractDate;
+    }
+
+    public Date getArchiveDate() {
+        return archiveDate;
+    }
+
+    public void setArchiveDate(Date archiveDate) {
+        this.archiveDate = archiveDate;
+    }
+
+    public Date getExpectArrivalDate() {
+        return expectArrivalDate;
+    }
+
+    public void setExpectArrivalDate(Date expectArrivalDate) {
+        this.expectArrivalDate = expectArrivalDate;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
-    
+
 
     @Override
     public boolean equals(Object object) {

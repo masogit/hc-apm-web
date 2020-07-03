@@ -252,6 +252,9 @@ public class TenantInfoConfigService {
 			if(key.contains("zkbBasicInfo")){
 				tempItem.setValue(false);
 			}
+			if(key.contains("zkbContract")){
+				tempItem.setValue(false);
+			}
 			if (edition.equals(VERSION_ASSETMGT)) {
 				if(key.equals("link")){
 					tempItem.setValue(true);
@@ -300,6 +303,9 @@ public class TenantInfoConfigService {
                 if(key.contains("zkbBasicInfo")){
                     tempItem.setValue(true);
                 }
+				if(key.contains("zkbContract")){
+					tempItem.setValue(true);
+				}
 			}
 		}
 		if (root != null) {

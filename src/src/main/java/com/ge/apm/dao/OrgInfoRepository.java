@@ -172,4 +172,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 			"where t.uid = ?1 \n" +
 			") select  * from cte_site;", nativeQuery = true)
 	public List<Object[]> getOrgHierarchyForTenant(String tenantUid);
+
+	@Query(value = "select site_uid from org_info where name=?1 and site_id=?2", nativeQuery = true)
+	String getSiteUidByHospitalName(String hospitalName,Integer siteId);
 }
