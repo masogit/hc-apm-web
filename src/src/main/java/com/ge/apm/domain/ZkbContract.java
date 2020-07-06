@@ -143,7 +143,7 @@ public class ZkbContract implements ChineseName, Serializable {
     /**
      * 地址
      */
-    @Column(name = "adminAddress")
+    @Column(name = "adminaddress")
     private String adminAddress;
 
     @Column(name = "remark")
@@ -175,6 +175,19 @@ public class ZkbContract implements ChineseName, Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false,name = "contract_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     List<ZkbContractCourse> zkbContractCourses = new ArrayList<>();
+
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(insertable=false, updatable=false,name = "contract_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    Set<ZkbContractAsset> zkbContractAssets = new HashSet<>();
+
+    public Set<ZkbContractAsset> getZkbContractAssets() {
+        return zkbContractAssets;
+    }
+
+    public void setZkbContractAssets(Set<ZkbContractAsset> zkbContractAssets) {
+        this.zkbContractAssets = zkbContractAssets;
+    }
 
     public List<ZkbContractCourse> getZkbContractCourses() {
         return zkbContractCourses;
