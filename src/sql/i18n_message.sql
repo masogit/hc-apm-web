@@ -1438,6 +1438,8 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'OLERulesExcel', 'OLE规则列表', 'OLE Rule List', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'AssetInfoImportExcel', '资产台账创建列表', 'Asset Info Import List', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'ZkbAssetTransferExcel', '智康宝资产转移', 'ZKB Asset Transfer', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'UsConnectStatusExcel', '超声inisite状态导入列表', 'US Inisite Status Import List', NULL,
+    '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileProcessStatus','FAILEDUPLOAD','上传失败','Failed Upload',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileProcessStatus','STARTING','待处理','Starting',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileProcessStatus','STARTED','已开始','Started',NULL,-1);
