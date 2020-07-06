@@ -174,34 +174,24 @@ public class UserAccountExportService {
 
 	}
 
-	public void supplementUserAccount(List<UserAccount> listUserAccount){
-		if(listUserAccount!=null && listUserAccount.size()>0){
-			Set<String> setUserUid=new HashSet<String>();
-			Set<String> setUserOrgUid=new HashSet<String>();
-			
-			List<UserOrgInfo> listUserOrgInfo=null;
-			List<OrgInfo> listSelfOrgInfo=null;
-			
-			for(int i=0;i<listUserAccount.size();++i){
-				UserAccount tempUser=listUserAccount.get(i);
-				setUserUid.add(tempUser.getUid());
-				setUserOrgUid.add(tempUser.getOrgInfoUID());
+	public void supplementUserAccount(List<UserAccount> listUserAccount) {
+		if (listUserAccount != null && listUserAccount.size() > 0) {
+			Set<String> setUserOrgUid = new HashSet<>();
+
+			for (UserAccount tempUser : listUserAccount) {
+				if (StringUtils.isNotEmpty(tempUser.getOrgInfoUID())) {
+					setUserOrgUid.add(tempUser.getOrgInfoUID());
+				}
 			}
-			if(setUserUid.size()>0){
-				listUserOrgInfo=userOrgInfoRepository.findOrgUidListByUserUid(setUserUid);
-			}
-			if(setUserOrgUid.size()>0){
-				listSelfOrgInfo=orgInfoRepository.findByUids(setUserOrgUid);
-			}
-			if(listSelfOrgInfo!=null){
-				for(int j=0;j<listSelfOrgInfo.size();++j){
-					for(int i=0;i<listUserAccount.size();++i){
-						UserAccount tempUser=listUserAccount.get(i);
-						OrgInfo tempOrgInfo=listSelfOrgInfo.get(j);
-						String tempOrgUid=tempUser.getOrgInfoUID();
-						if(tempOrgUid.equals(tempOrgInfo.getUid())){
-							tempUser.setOrgInfo(tempOrgInfo);
-						}
+
+			List<OrgInfo> listSelfOrgInfo = orgInfoRepository.findByUids(setUserOrgUid);
+
+			for (OrgInfo orgInfo : listSelfOrgInfo) {
+				for (UserAccount tempUser : listUserAccount) {
+					OrgInfo tempOrgInfo = orgInfo;
+					String tempOrgUid = tempUser.getOrgInfoUID();
+					if (tempOrgUid.equals(tempOrgInfo.getUid())) {
+						tempUser.setOrgInfo(tempOrgInfo);
 					}
 				}
 			}
