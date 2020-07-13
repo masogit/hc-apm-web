@@ -188,10 +188,9 @@ public class UserAccountExportService {
 
 			for (OrgInfo orgInfo : listSelfOrgInfo) {
 				for (UserAccount tempUser : listUserAccount) {
-					OrgInfo tempOrgInfo = orgInfo;
 					String tempOrgUid = tempUser.getOrgInfoUID();
-					if (tempOrgUid.equals(tempOrgInfo.getUid())) {
-						tempUser.setOrgInfo(tempOrgInfo);
+					if (StringUtils.equals(tempOrgUid, orgInfo.getUid())) {
+						tempUser.setOrgInfo(orgInfo);
 					}
 				}
 			}
