@@ -18,6 +18,8 @@ import webapp.framework.web.WebUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.ge.apm.service.utils.ApmConstant.CHILD_CLINICAL_DEPT_SEPARATOR;
+
 @Service
 public class AssetFileImportSupportingService {
 
@@ -98,11 +100,11 @@ public class AssetFileImportSupportingService {
     }
 
     public boolean isShortName(String orgName) {
-        return !orgName.contains("-");
+        return !orgName.contains(CHILD_CLINICAL_DEPT_SEPARATOR);
     }
 
     public boolean isLongName(String orgName) {
-        return orgName.contains("-");
+        return orgName.contains(CHILD_CLINICAL_DEPT_SEPARATOR);
     }
 
     @Transactional
