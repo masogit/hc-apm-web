@@ -98,6 +98,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     @Getter
     private CustomConfigObject customConfig;
 
+    private String imageZoom;
+    private String imageName;
+
     @Override
     protected void init() {
 
@@ -548,6 +551,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.selected.setContractItemId(selectedContractItem.getId());
         this.selected.setAssetName(selectedContractItem.getContractAssetName());
         this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+        if(selectedContractItem.getContractAssetQuantity() != null && selectedContractItem.getContractAssetPrice() != null){
+            this.selected.setContractPrice(selectedContractItem.getContractAssetQuantity() * selectedContractItem.getContractAssetPrice());
+        }else {
+            this.selected.setContractPrice(0d);
+        }
 //        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
         this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
         this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
@@ -576,6 +584,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
         }
         selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
+    }
+
+    public void showImageZoom(String objectStorageId, String objctName){
+        this.imageZoom = objectStorageId;
+        this.imageName = objctName;
     }
 
     public boolean activeSupplier(){
@@ -749,4 +762,19 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         return customConfig;
     }
 
+    public String getImageZoom() {
+        return imageZoom;
+    }
+
+    public void setImageZoom(String imageZoom) {
+        this.imageZoom = imageZoom;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
 }
