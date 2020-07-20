@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "small_asset_performance")
-public class SmallAssetPerformance implements Serializable {
+public class SmallAssetPerformance implements Serializable, Cloneable  {
 
 	private static final long serialVersionUID = 1L;
 
@@ -517,5 +517,9 @@ public class SmallAssetPerformance implements Serializable {
 				", emergencyCount=" + emergencyCount +
 				", emergencyRevenue=" + emergencyRevenue +
 				'}';
+	}
+
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 }

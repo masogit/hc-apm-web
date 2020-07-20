@@ -175,7 +175,7 @@
             </p:submenu>
             <p:submenu label="合同管理" icon="settings" rendered="#{userContextService.accessContains('zkbContract')}">
                 <p:menuitem value="合同管理" outcome="/portal/zkb/contract/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.contractMgt')}"/>
-                <p:menuitem value="课程管理" outcome="/portal/zkb/course/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.courseMgt')}"/>
+                <p:menuitem value="课程管理" outcome="/portal/zkb/course/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.courseMgt') and userContextService.zkbAdmin}"/>
             </p:submenu>
             <p:submenu label="#{msg.ZKBBasicInfo}" icon="settings" rendered="#{userContextService.accessContains('zkbBasicInfo')}">
                 <p:menuitem value="#{msg.ZKBAgentContactPersonMgt}" outcome="/portal/zkb/contactPerson/List.xhtml" rendered="#{userContextService.accessContains('zkbBasicInfo.agentContactPersonMgt')}"/>

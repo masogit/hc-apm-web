@@ -18,6 +18,8 @@ public interface ApmConstant {
     //this type value is for company IDEAL
     public static final int USER_ACCOUNT_TYPE_PARTNER = -1;
 
+    String CHILD_CLINICAL_DEPT_SEPARATOR = "-";
+
 
 
 }
