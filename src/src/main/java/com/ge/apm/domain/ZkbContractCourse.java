@@ -33,6 +33,15 @@ public class ZkbContractCourse implements Serializable {
     @Column(name = "course_count")
     private Integer courseCount;
 
+    @Column(name = "course_count_total")
+    private Integer courseCountTotal;
+
+    @Column(name = "course_count_apply")
+    private Integer courseCountApply;
+
+    @Transient
+    private Integer courseCountUse;
+
     @Column(name = "contract_id")
     @Size(max = 32)
     private String contractId;
@@ -75,6 +84,30 @@ public class ZkbContractCourse implements Serializable {
 
     public void setCourseCount(Integer courseCount) {
         this.courseCount = courseCount;
+    }
+
+    public Integer getCourseCountTotal() {
+        return courseCountTotal;
+    }
+
+    public void setCourseCountTotal(Integer courseCountTotal) {
+        this.courseCountTotal = courseCountTotal;
+    }
+
+    public Integer getCourseCountApply() {
+        return courseCountApply;
+    }
+
+    public void setCourseCountApply(Integer courseCountApply) {
+        this.courseCountApply = courseCountApply;
+    }
+
+    public Integer getCourseCountUse() {
+        return courseCountUse;
+    }
+
+    public void setCourseCountUse(Integer courseCountUse) {
+        this.courseCountUse = courseCountUse;
     }
 
     @Override

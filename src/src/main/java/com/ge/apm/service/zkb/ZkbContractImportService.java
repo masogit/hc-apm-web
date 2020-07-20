@@ -15,6 +15,7 @@ import webapp.framework.web.WebUtil;
 
 import java.time.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by 212605082 on 2018/8/20.
@@ -102,10 +103,18 @@ public class ZkbContractImportService {
             contractRow.setFieldDateValue("合同开始日期", "setStartDate");
             contractRow.setFieldDateValue("合同结束日期", "setEndDate");
             contractRow.setFieldNumValue("IB数量", "setIbNumber");
-            contractRow.setFieldNumValue("备件名额", "setSpareQuota");
-            contractRow.setFieldNumValue("人工支持次数", "setGeArtificialSupportTimes");
-            contractRow.setFieldNumValue("备件+人工+保养", "setSpareArtificail");
-            contractRow.setFieldNumValue("探头名额", "setProbeQuota");
+            contractRow.setFieldNumValue("备件剩余名额", "setSpareQuota");
+            contractRow.setFieldNumValue("备件总额", "setSpareQuotaTotal");
+            contractRow.setFieldNumValue("备件申请名额", "setSpareQuotaApply");
+            contractRow.setFieldNumValue("人工支持总次数", "setGeArtificialSupportTimesTotal");
+            contractRow.setFieldNumValue("人工支持剩余次数", "setGeArtificialSupportTimes");
+            contractRow.setFieldNumValue("人工支持申请次数", "setGeArtificialSupportTimesApply");
+            contractRow.setFieldNumValue("探头总额", "setProbeQuotaTotal");
+            contractRow.setFieldNumValue("探头剩余名额", "setProbeQuota");
+            contractRow.setFieldNumValue("探头申请名额", "setProbeQuotaApply");
+            contractRow.setFieldNumValue("备件+人工+保养总额", "setSpareArtificailTotal");
+            contractRow.setFieldNumValue("备件+人工+保养剩余名额", "setSpareArtificail");
+            contractRow.setFieldNumValue("备件+人工+保养申请名额", "setSpareArtificailApply");
 
             if(contractInfoVO.isNull()){
                 break;
@@ -126,6 +135,7 @@ public class ZkbContractImportService {
 
         return result;
     }
+
 
     public void importData(List<Map<String, Object>> importContractMapList,UserAccount currentUser) {
 
@@ -275,7 +285,9 @@ public class ZkbContractImportService {
             contractCourseRow.setFieldStringValue("合同号", "setContractNo");
             contractCourseRow.setFieldStringValue("课程ID","setCid");
             contractCourseRow.setFieldStringValue("课程名称","setCname");
-            contractCourseRow.setFieldIntegerValue("课程额度", "setCourseCount");
+            contractCourseRow.setFieldIntegerValue("课程总额", "setCourseCountTotal");
+            contractCourseRow.setFieldIntegerValue("课程剩余名额", "setCourseCount");
+            contractCourseRow.setFieldIntegerValue("课程申请名额", "setCourseCountApply");
 
             map.put("contractCourseVO", contractCourseVO);
             map.put("rowData", rowMap);
@@ -392,6 +404,8 @@ public class ZkbContractImportService {
         zkbContractCourse.setCourseCount(contractCourseVO.getCourseCount());
         zkbContractCourse.setCourseId(contractCourseVO.getZkbCourse().getId());
         zkbContractCourse.setContractId(contractCourseVO.getContractId());
+        zkbContractCourse.setCourseCountTotal(contractCourseVO.getCourseCountTotal());
+        zkbContractCourse.setCourseCountApply(contractCourseVO.getCourseCountApply());
         zkbContractCourseRepository.save(zkbContractCourse);
     }
     //endregion
