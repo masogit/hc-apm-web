@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by 212605082 on 2018/8/21.
@@ -80,9 +81,11 @@ public class ZkbContractRow {
         try {
             fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
             Integer fieldValueOfInteger = null;
-            if(fieldValueOfString.isEmpty()){
+            if(fieldValueOfString ==null || fieldValueOfString.isEmpty()){
                 fieldValueOfInteger = 0;
             }else if("N/A".equals(fieldValueOfString)){
+                fieldValueOfInteger = 0;
+            }else if(!isNumeric(fieldValueOfString)){
                 fieldValueOfInteger = 0;
             }else if (!DELETE_MARK.equals(fieldValueOfString)) {
                 fieldValueOfInteger = ExcelDocument.getCellIntegerValue(rowMap.get(fieldName));
@@ -281,4 +284,9 @@ public class ZkbContractRow {
         }
     }
 
+
+    public boolean isNumeric(String str){
+        Pattern pattern = Pattern.compile("-?[0-9]+(\\.[0-9]+)?");
+        return pattern.matcher(str).matches();
+    }
 }
