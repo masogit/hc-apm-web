@@ -18,7 +18,7 @@ public class ApmConfigInfo {
     @Column(name = "item")
     private String item;
 
-    @Column(name = "value")
+    @Column(name = "value", columnDefinition = "text")
     private String value;
 
     @Column(name = "description", length = 1024)
