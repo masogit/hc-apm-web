@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="zkbContractCourseEditDlg" widgetVar="zkbContractCourseEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="课程操作"   height="320">
+    <p:dialog id="zkbContractCourseEditDlg" widgetVar="zkbContractCourseEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="课程操作"   height="380">
 
         <h:form id="zkbContractCourseEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -17,8 +17,16 @@
                     </p:autoComplete>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">课程额度*</label>
+                    <label class="label">课程总额度*</label>
+                    <p:spinner id="courseCountTotal" value="#{zkbContractEditController.zkbContractCourseSelected.courseCountTotal}" min="1" max="1000" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">课程剩余额度*</label>
                     <p:spinner id="courseCount" value="#{zkbContractEditController.zkbContractCourseSelected.courseCount}" min="1" max="1000" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">课程申请额度*</label>
+                    <p:spinner id="courseCountApply" value="#{zkbContractEditController.zkbContractCourseSelected.courseCountApply}" min="1" max="1000" />
                 </h:panelGroup>
                 <h:panelGroup rendered="#{zkbContractEditController.actionDetailName eq 'Edit'}">
                     <label class="label">操作原因*</label>

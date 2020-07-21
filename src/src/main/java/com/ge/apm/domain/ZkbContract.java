@@ -75,22 +75,75 @@ public class ZkbContract implements ChineseName, Serializable {
     private Integer ibNumber = 0;
 
     /**
-     *备件名额
+     *备件剩余名额
      */
     @Column(name = "spare_quota")
     private Integer spareQuota = 0;
 
     /**
-     *探头名额
+     *备件总额
+     */
+    @Column(name = "spare_quota_total")
+    private Integer spareQuotaTotal = 0;
+
+    /**
+     *备件申请名额
+     */
+    @Column(name = "spare_quota_apply")
+    private Integer spareQuotaApply = 0;
+    /**
+     *备件已使用名额
+     */
+    @Transient
+    private Integer spareQuotaUse = 0;
+
+    /**
+     *探头剩余名额
      */
     @Column(name = "probe_quota")
     private Integer probeQuota = 0;
 
     /**
-     *GE人工支持次数
+     *探头名额
+     */
+    @Column(name = "probe_quota_total")
+    private Integer probeQuotaTotal = 0;
+
+    /**
+     *探头申请名额
+     */
+    @Column(name = "probe_quota_apply")
+    private Integer probeQuotaApply = 0;
+
+    /**
+     *探头已使用名额
+     */
+    @Transient
+    private Integer probeQuotaUse = 0;
+
+    /**
+     *GE人工支持剩余次数
      */
     @Column(name = "ge_support_times")
     private Integer geArtificialSupportTimes = 0;
+
+    /**
+     *GE人工支持次数
+     */
+    @Column(name = "ge_support_times_total")
+    private Integer geArtificialSupportTimesTotal = 0;
+
+    /**
+     *GE人工支持申请次数
+     */
+    @Column(name = "ge_support_times_apply")
+    private Integer geArtificialSupportTimesApply = 0;
+
+    /**
+     *GE人工支持使用次数
+     */
+    @Transient
+    private Integer geArtificialSupportTimesUse = 0;
 
     /**
      * 保养名额
@@ -99,10 +152,28 @@ public class ZkbContract implements ChineseName, Serializable {
     private Integer maintenanceQuota = 0;
 
     /**
-     *备件/人工/保养
+     *备件/人工/保养剩余名额
      */
-    @Column(name = "spare_artificai")
+    @Column(name = "spare_artificail")
     private Integer spareArtificail = 0;
+
+    /**
+     *备件/人工/保养总额
+     */
+    @Column(name = "spare_artificail_total")
+    private Integer spareArtificailTotal = 0;
+
+    /**
+     *备件/人工/保养申请名额
+     */
+    @Column(name = "spare_artificail_apply")
+    private Integer spareArtificailApply = 0;
+
+    /**
+     *备件/人工/保养已使用名额
+     */
+    @Transient
+    private Integer spareArtificailUse = 0;
 
     /**
      * 负责人
@@ -182,6 +253,102 @@ public class ZkbContract implements ChineseName, Serializable {
 
     public void setZkbContractCourses(List<ZkbContractCourse> zkbContractCourses) {
         this.zkbContractCourses = zkbContractCourses;
+    }
+
+    public Integer getSpareQuotaTotal() {
+        return spareQuotaTotal;
+    }
+
+    public void setSpareQuotaTotal(Integer spareQuotaTotal) {
+        this.spareQuotaTotal = spareQuotaTotal;
+    }
+
+    public Integer getSpareQuotaApply() {
+        return spareQuotaApply;
+    }
+
+    public void setSpareQuotaApply(Integer spareQuotaApply) {
+        this.spareQuotaApply = spareQuotaApply;
+    }
+
+    public Integer getSpareQuotaUse() {
+        return spareQuotaUse;
+    }
+
+    public void setSpareQuotaUse(Integer spareQuotaUse) {
+        this.spareQuotaUse = spareQuotaUse;
+    }
+
+    public Integer getProbeQuotaTotal() {
+        return probeQuotaTotal;
+    }
+
+    public void setProbeQuotaTotal(Integer probeQuotaTotal) {
+        this.probeQuotaTotal = probeQuotaTotal;
+    }
+
+    public Integer getProbeQuotaApply() {
+        return probeQuotaApply;
+    }
+
+    public void setProbeQuotaApply(Integer probeQuotaApply) {
+        this.probeQuotaApply = probeQuotaApply;
+    }
+
+    public Integer getProbeQuotaUse() {
+        return probeQuotaUse;
+    }
+
+    public void setProbeQuotaUse(Integer probeQuotaUse) {
+        this.probeQuotaUse = probeQuotaUse;
+    }
+
+    public Integer getGeArtificialSupportTimesTotal() {
+        return geArtificialSupportTimesTotal;
+    }
+
+    public void setGeArtificialSupportTimesTotal(Integer geArtificialSupportTimesTotal) {
+        this.geArtificialSupportTimesTotal = geArtificialSupportTimesTotal;
+    }
+
+    public Integer getGeArtificialSupportTimesApply() {
+        return geArtificialSupportTimesApply;
+    }
+
+    public void setGeArtificialSupportTimesApply(Integer geArtificialSupportTimesApply) {
+        this.geArtificialSupportTimesApply = geArtificialSupportTimesApply;
+    }
+
+    public Integer getGeArtificialSupportTimesUse() {
+        return geArtificialSupportTimesUse;
+    }
+
+    public void setGeArtificialSupportTimesUse(Integer geArtificialSupportTimesUse) {
+        this.geArtificialSupportTimesUse = geArtificialSupportTimesUse;
+    }
+
+    public Integer getSpareArtificailTotal() {
+        return spareArtificailTotal;
+    }
+
+    public void setSpareArtificailTotal(Integer spareArtificailTotal) {
+        this.spareArtificailTotal = spareArtificailTotal;
+    }
+
+    public Integer getSpareArtificailApply() {
+        return spareArtificailApply;
+    }
+
+    public void setSpareArtificailApply(Integer spareArtificailApply) {
+        this.spareArtificailApply = spareArtificailApply;
+    }
+
+    public Integer getSpareArtificailUse() {
+        return spareArtificailUse;
+    }
+
+    public void setSpareArtificailUse(Integer spareArtificailUse) {
+        this.spareArtificailUse = spareArtificailUse;
     }
 
     public String getTenantUID() {
