@@ -2826,3 +2826,6 @@ VALUES(27, 'system', '2020-06-18 18:06:30.61', '', '', 'system', '2020-06-18 18:
 delete from sys_role  where name= 'AuditStaff';
 
 INSERT INTO public.sys_role (id,home_page,name,role_desc,menus,role_desc_en) VALUES (15,'/','AuditStaff','评审老师','audit','Judge Teacher ');
+
+--2020.07.21 apm_config_info 中 value值为text类型
+ALTER TABLE apm_config_info ALTER COLUMN  "value" TYPE TEXT;
