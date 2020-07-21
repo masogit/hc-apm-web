@@ -79,8 +79,8 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
-                        <label class="label">#{msg.TenantInfo}*</label>
-                        <p:selectManyMenu value="#{zkbFileAttachmentController.selectedTenantInfoList}" var="t" converter="tenantInfoConverter" required="true" filter="true" filterMatchMode="contains" showCheckbox="true" requiredMessage="#{msg.TenantInfo} #{msg.ValidationRequire}" style="width:50%">
+                        <label class="label">#{msg.TenantInfo}</label>
+                        <p:selectManyMenu value="#{zkbFileAttachmentController.selectedTenantInfoList}" var="t" converter="tenantInfoConverter" required="false" filter="true" filterMatchMode="contains" showCheckbox="true" requiredMessage="#{msg.TenantInfo} #{msg.ValidationRequire}" style="width:50%">
                             <f:selectItems value="#{zkbFileAttachmentController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
                             <p:column>
                                 <h:outputText value="#{t.name}" />
