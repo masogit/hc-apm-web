@@ -63,55 +63,23 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">#{msg.zkbContract_spareQuota_total}</label>
-                            <p:spinner id="spareQuotaTotal" value="#{zkbContractEditController.selected.spareQuotaTotal}" min="0" max="1000"  />
-                        </h:panelGroup>
-                        <h:panelGroup>
                             <label class="label">#{msg.zkbContract_spareQuota}</label>
                             <p:spinner id="spareQuota" value="#{zkbContractEditController.selected.spareQuota}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.zkbContract_spareQuota_apply}</label>
-                            <p:spinner id="spareQuotaApply" value="#{zkbContractEditController.selected.spareQuotaApply}" min="0" max="1000"  />
-                        </h:panelGroup>
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.zkbContract_probeQuota_total}</label>
-                            <p:spinner id="probeQuotaTotal" value="#{zkbContractEditController.selected.probeQuotaTotal}" min="0" max="1000"  />
-                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_probeQuota}</label>
                             <p:spinner id="probeQuota" value="#{zkbContractEditController.selected.probeQuota}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.zkbContract_probeQuota_apply}</label>
-                            <p:spinner id="probeQuotaApply" value="#{zkbContractEditController.selected.probeQuotaApply}" min="0" max="1000"  />
-                        </h:panelGroup>
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.zkbContract_geArtificialSupportTimes_total}</label>
-                            <p:spinner id="geArtificialSupportTimesTotal" value="#{zkbContractEditController.selected.geArtificialSupportTimesTotal}" min="0" max="1000"  />
-                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_geArtificialSupportTimes}</label>
                             <p:spinner id="geArtificialSupportTimes" value="#{zkbContractEditController.selected.geArtificialSupportTimes}" min="0" max="1000"  />
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.zkbContract_geArtificialSupportTimes_apply}</label>
-                            <p:spinner id="geArtificialSupportTimesApply" value="#{zkbContractEditController.selected.geArtificialSupportTimesApply}" min="0" max="1000"  />
-                        </h:panelGroup>
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.zkbContract_spareArtificail_total}</label>
-                            <p:spinner id="spareArtificailTotal" value="#{zkbContractEditController.selected.spareArtificailTotal}" min="0" max="1000"  />
-                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_spareArtificail}</label>
                             <p:spinner id="maintenanceQuota" value="#{zkbContractEditController.selected.spareArtificail}" min="0" max="1000"  />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.zkbContract_spareArtificail_apply}</label>
-                            <p:spinner id="maintenanceQuota_apply" value="#{zkbContractEditController.selected.spareArtificailApply}" min="0" max="1000"  />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_principal}</label>
@@ -160,15 +128,10 @@
                             <p:column headerText="课程名称">
                                 <h:outputText value="#{zkbContractCourseItem.zkbCourse.cname}"/>
                             </p:column>
-                            <p:column headerText="课程总额">
-                                <h:outputText value="#{zkbContractCourseItem.courseCountTotal}"/>
-                            </p:column>
-                            <p:column headerText="课程剩余额度">
+                            <p:column headerText="课程额度">
                                 <h:outputText value="#{zkbContractCourseItem.courseCount}"/>
                             </p:column>
-                            <p:column headerText="课程申请额度">
-                                <h:outputText value="#{zkbContractCourseItem.courseCountApply}"/>
-                            </p:column>
+
                            <f:facet name="{Toolbar}">
                                 <p:commandButton immediate="false"  process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareDetailCreate}" update=":growl :zkbContractCourseEditDlg" oncomplete="PF('zkbContractCourseEditDlg').show()" disabled="#{userContextService.zkbUser}"/>
                                 <p:commandButton id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareDetailEdit}" update=":growl :zkbContractCourseEditDlg" disabled="#{zkbContractEditController.courseCanOperate}" oncomplete="PF('zkbContractCourseEditDlg').show()"/>
