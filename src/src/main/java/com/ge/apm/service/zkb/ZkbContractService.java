@@ -69,27 +69,10 @@ public class ZkbContractService {
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_endDate"), DateFormatUtils.format(zkbContract.getEndDate(),"yyyy-MM-dd"));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractState"), zkbContract.getContractState());
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_ibNumber"), zkbContract.getIbNumber());
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota"), isEmptyInteger(zkbContract.getSpareQuota()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota"), isEmptyInteger(zkbContract.getProbeQuota()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes"), isEmptyInteger(zkbContract.getGeArtificialSupportTimes()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail"), isEmptyInteger(zkbContract.getSpareArtificail()));
-
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_total"), isEmptyInteger(zkbContract.getSpareQuotaTotal()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_apply"), isEmptyInteger(zkbContract.getSpareQuotaApply()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_use"), isEmptyInteger(zkbContract.getSpareQuotaTotal()) - isEmptyInteger(zkbContract.getSpareQuota()));
-
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_total"), isEmptyInteger(zkbContract.getProbeQuotaTotal()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_apply"), isEmptyInteger(zkbContract.getProbeQuotaApply()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_use"), isEmptyInteger(zkbContract.getProbeQuotaTotal()) - isEmptyInteger(zkbContract.getProbeQuota()));
-
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes_total"), isEmptyInteger(zkbContract.getGeArtificialSupportTimesTotal()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes_apply"), isEmptyInteger(zkbContract.getGeArtificialSupportTimesApply()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes_use"), isEmptyInteger(zkbContract.getGeArtificialSupportTimesTotal()) - isEmptyInteger(zkbContract.getGeArtificialSupportTimes()));
-
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail_total"), isEmptyInteger(zkbContract.getSpareArtificailTotal()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail_apply"), isEmptyInteger(zkbContract.getSpareArtificailApply()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail_use"), isEmptyInteger(zkbContract.getSpareArtificailTotal()) - isEmptyInteger(zkbContract.getSpareArtificail()));
-
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota"), zkbContract.getSpareQuota());
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota"), zkbContract.getProbeQuota());
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes"), zkbContract.getGeArtificialSupportTimes());
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail"), zkbContract.getSpareArtificail());
             zkbContract.setContractState(calcContractState(zkbContract.getStartDate(),zkbContract.getEndDate()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractState"),zkbContract.getContractState());
 
@@ -102,14 +85,6 @@ public class ZkbContractService {
         }
 
         return zkbContractDataList;
-    }
-
-    public Integer isEmptyInteger(Integer value){
-        if(value == null){
-            return 0;
-        }else{
-            return value;
-        }
     }
 
     public String calcContractState(Date startDate,Date endDate){
@@ -154,10 +129,7 @@ public class ZkbContractService {
             zkbContractCourseDataMap.put(WebUtil.getMessage("zkbContract_contractState"), zkbContract.getContractState());
             zkbContractCourseDataMap.put("课程ID", zkbContractCourse.getZkbCourse().getCid());
             zkbContractCourseDataMap.put("课程名称", zkbContractCourse.getZkbCourse().getCname());
-            zkbContractCourseDataMap.put("课程剩余名额", isEmptyInteger(zkbContractCourse.getCourseCount()));
-            zkbContractCourseDataMap.put("课程总额", isEmptyInteger(zkbContractCourse.getCourseCountTotal()));
-            zkbContractCourseDataMap.put("课程申请名额", isEmptyInteger(zkbContractCourse.getCourseCountApply()));
-            zkbContractCourseDataMap.put("课程已使用名额", isEmptyInteger(zkbContractCourse.getCourseCountTotal()) - isEmptyInteger(zkbContractCourse.getCourseCount()));
+            zkbContractCourseDataMap.put("课程额度", zkbContractCourse.getCourseCount());
 
             zkbContractCourseDataList.add(zkbContractCourseDataMap);
         }
