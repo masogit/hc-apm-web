@@ -342,6 +342,9 @@
                             <p:column headerText="#{msg.contractAssetQuantity}">
                                 <h:outputText value="#{item.contractAssetQuantity}"/>
                             </p:column>
+                            <p:column headerText="单价">
+                                <h:outputText value="#{item.contractAssetPrice}"/>
+                            </p:column>
                             <p:column headerText="#{msg.manufacture}">
                                 <h:outputText value="#{contractInfoEditController.getSupplierName(item.manufacturer)}"/>
                             </p:column>
@@ -493,6 +496,10 @@
                              <label class="label">#{msg.contractAssetPrice}</label>
                              <p:inputNumber  decimalPlaces="4"  value="#{contractInfoEditController.selectedContractItem.contractAssetPrice}" />
                          </h:panelGroup> -->
+                        <h:panelGroup>
+                            <label class="label">单价</label>
+                            <p:inputNumber  decimalPlaces="4"  value="#{contractInfoEditController.selectedContractItem.contractAssetPrice}" />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.contractAssetQuantity}*</label>
                             <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{contractInfoEditController.selectedContractItem.contractAssetQuantity}" required="true" requiredMessage="#{msg.contractAssetQuantity} #{msg.ValidationRequire}" />

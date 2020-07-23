@@ -1,49 +1,25 @@
 package com.ge.apm.service.uaa;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserTagsMapper;
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
-import org.apache.commons.collections.CollectionUtils;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.mapper.AssetInfoMapper;
-import com.ge.apm.dao.mapper.UserAccountMapper;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.ExcelParser;
-import com.ge.apm.service.utils.PasswordUtil;
-import com.ge.apm.view.sysutil.UserContextService;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class UserAccountExportService {
@@ -174,34 +150,23 @@ public class UserAccountExportService {
 
 	}
 
-	public void supplementUserAccount(List<UserAccount> listUserAccount){
-		if(listUserAccount!=null && listUserAccount.size()>0){
-			Set<String> setUserUid=new HashSet<String>();
-			Set<String> setUserOrgUid=new HashSet<String>();
-			
-			List<UserOrgInfo> listUserOrgInfo=null;
-			List<OrgInfo> listSelfOrgInfo=null;
-			
-			for(int i=0;i<listUserAccount.size();++i){
-				UserAccount tempUser=listUserAccount.get(i);
-				setUserUid.add(tempUser.getUid());
-				setUserOrgUid.add(tempUser.getOrgInfoUID());
+	public void supplementUserAccount(List<UserAccount> listUserAccount) {
+		if (listUserAccount != null && listUserAccount.size() > 0) {
+			Set<String> setUserOrgUid = new HashSet<>();
+
+			for (UserAccount tempUser : listUserAccount) {
+				if (StringUtils.isNotEmpty(tempUser.getOrgInfoUID())) {
+					setUserOrgUid.add(tempUser.getOrgInfoUID());
+				}
 			}
-			if(setUserUid.size()>0){
-				listUserOrgInfo=userOrgInfoRepository.findOrgUidListByUserUid(setUserUid);
-			}
-			if(setUserOrgUid.size()>0){
-				listSelfOrgInfo=orgInfoRepository.findByUids(setUserOrgUid);
-			}
-			if(listSelfOrgInfo!=null){
-				for(int j=0;j<listSelfOrgInfo.size();++j){
-					for(int i=0;i<listUserAccount.size();++i){
-						UserAccount tempUser=listUserAccount.get(i);
-						OrgInfo tempOrgInfo=listSelfOrgInfo.get(j);
-						String tempOrgUid=tempUser.getOrgInfoUID();
-						if(tempOrgUid.equals(tempOrgInfo.getUid())){
-							tempUser.setOrgInfo(tempOrgInfo);
-						}
+
+			List<OrgInfo> listSelfOrgInfo = orgInfoRepository.findByUids(setUserOrgUid);
+
+			for (OrgInfo orgInfo : listSelfOrgInfo) {
+				for (UserAccount tempUser : listUserAccount) {
+					String tempOrgUid = tempUser.getOrgInfoUID();
+					if (StringUtils.equals(tempOrgUid, orgInfo.getUid())) {
+						tempUser.setOrgInfo(orgInfo);
 					}
 				}
 			}
