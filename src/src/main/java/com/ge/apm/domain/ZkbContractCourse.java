@@ -39,7 +39,7 @@ public class ZkbContractCourse implements Serializable {
     @Column(name = "course_count_apply")
     private Integer courseCountApply;
 
-    @Transient
+    @Column(name = "course_count_use")
     private Integer courseCountUse;
 
     @Column(name = "contract_id")

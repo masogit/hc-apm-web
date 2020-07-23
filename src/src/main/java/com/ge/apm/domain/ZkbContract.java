@@ -94,7 +94,7 @@ public class ZkbContract implements ChineseName, Serializable {
     /**
      *备件已使用名额
      */
-    @Transient
+    @Column(name = "spare_quota_use")
     private Integer spareQuotaUse = 0;
 
     /**
@@ -118,7 +118,7 @@ public class ZkbContract implements ChineseName, Serializable {
     /**
      *探头已使用名额
      */
-    @Transient
+    @Column(name = "probe_quota_use")
     private Integer probeQuotaUse = 0;
 
     /**
@@ -142,7 +142,7 @@ public class ZkbContract implements ChineseName, Serializable {
     /**
      *GE人工支持使用次数
      */
-    @Transient
+    @Column(name = "ge_support_times_use")
     private Integer geArtificialSupportTimesUse = 0;
 
     /**
@@ -172,7 +172,7 @@ public class ZkbContract implements ChineseName, Serializable {
     /**
      *备件/人工/保养已使用名额
      */
-    @Transient
+    @Column(name = "spare_artificail_use")
     private Integer spareArtificailUse = 0;
 
     /**
