@@ -2808,16 +2808,24 @@ VALUES(27, 'system', '2020-06-18 18:06:30.61', '', '', 'system', '2020-06-18 18:
 
 
 -- 2020.06.24 新增角色：远程培训管理员
-INSERT INTO sys_role (home_page, name, role_desc, created_by, created_date, last_modified_by, last_modified_date, authorities, authorities_ch, cards, cards_ch, menus, role_desc_en) VALUES (null, 'RemoteTrainingAdmin', '远程培训管理员', null, null, null, null, null, null, null, null, 'homePage', 'Remote Training Administrator');
+-- INSERT INTO sys_role (home_page, name, role_desc, created_by, created_date, last_modified_by, last_modified_date, authorities, authorities_ch, cards, cards_ch, menus, role_desc_en) VALUES (null, 'RemoteTrainingAdmin', '远程培训管理员', null, null, null, null, null, null, null, null, 'homePage', 'Remote Training Administrator');
 
 -- 2020.06.29 新增合同字段
-ALTER TABLE contract_info ADD bid_date date;
-ALTER TABLE contract_info ADD receive_digital_contract_date date;
-ALTER TABLE contract_info ADD send_contract_date date;
-ALTER TABLE contract_info ADD send_lawer_date date;
-ALTER TABLE contract_info ADD receive_contract_date date;
-ALTER TABLE contract_info ADD archive_date date;
-ALTER TABLE contract_info ADD expect_arrival_date date;
+-- ALTER TABLE contract_info ADD bid_date date;
+-- ALTER TABLE contract_info ADD receive_digital_contract_date date;
+-- ALTER TABLE contract_info ADD send_contract_date date;
+-- ALTER TABLE contract_info ADD send_lawer_date date;
+-- ALTER TABLE contract_info ADD receive_contract_date date;
+-- ALTER TABLE contract_info ADD archive_date date;
+-- ALTER TABLE contract_info ADD expect_arrival_date date;
 
 --ACCOUNT 资产 联通、设备状态 置空（7.1发布后 删除）
-update asset_info set connect_to_insite = null,ib_device_status = null;
+-- update asset_info set connect_to_insite = null,ib_device_status = null;
+
+--IB 添加评审老师角色
+delete from sys_role  where name= 'AuditStaff';
+
+INSERT INTO public.sys_role (id,home_page,name,role_desc,menus,role_desc_en) VALUES (15,'/','AuditStaff','评审老师','audit','Judge Teacher ');
+
+--2020.07.21 apm_config_info 中 value值为text类型
+ALTER TABLE apm_config_info ALTER COLUMN  "value" TYPE TEXT;
