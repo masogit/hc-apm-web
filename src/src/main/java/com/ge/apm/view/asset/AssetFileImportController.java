@@ -247,7 +247,7 @@ public class AssetFileImportController {
         crossSiteColumns.add(WebUtil.getMessage("Institution"));
         crossSiteColumns.add(WebUtil.getMessage("Hospital"));
 
-        String siteColumn = WebUtil.getMessage("Site");
+        String siteColumn = WebUtil.getMessage("hospitalId");
         int siteIndex = exportFields.indexOf(siteColumn);
         exportFields.addAll(siteIndex, crossSiteColumns);
 
