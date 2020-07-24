@@ -221,6 +221,15 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             WebUtil.addErrorMessage("课程已存在");
             return;
         }
+
+        int courseCountTotal = zkbContractCourseSelected.getCourseCountTotal() == null ? 0 : zkbContractCourseSelected.getCourseCountTotal();
+        int courseCount = zkbContractCourseSelected.getCourseCount() == null ? 0 : zkbContractCourseSelected.getCourseCount();
+        int courseCountApply = zkbContractCourseSelected.getCourseCountApply() == null ? 0 : zkbContractCourseSelected.getCourseCountApply();
+        int courseCountUse = zkbContractCourseSelected.getCourseCountUse() == null ? 0 : zkbContractCourseSelected.getCourseCountUse();
+        if(courseCountTotal != (courseCount + courseCountApply + courseCountUse)){
+            WebUtil.addErrorMessage("课程总额不等于课程剩余名额、课程申请名额、课程已使用名额之和,");
+            return;
+        }
         if("Create".equals(actionDetailName)){
             zkbContractCourseSelected.setContractId(this.selected.getId());
         }
