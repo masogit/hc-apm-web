@@ -75,7 +75,8 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
             impContractCourseOp(doc);
             impContractAssetOp(doc);
             if(!errorContractList.isEmpty() || !errorContractCourseList.isEmpty()){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+errorContractList.size()+WebUtil.getMessage("RecordsOfFailure"));
+                int failCount = errorContractList.size() + errorContractCourseList.size() + errorContractAssetList.size();
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+failCount+WebUtil.getMessage("RecordsOfFailure"));
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }else {
                 WebUtil.addSuccessMessage(WebUtil.getMessage("ImportComplete"));
