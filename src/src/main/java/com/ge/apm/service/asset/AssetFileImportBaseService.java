@@ -213,10 +213,7 @@ public class AssetFileImportBaseService {
                 //new child clinical will reach here
                 newAsset.setClinicalDeptId(clinicalDept.getId());
                 newAsset.setClinicalDeptUID(clinicalDept.getUid());
-            } else {
-                newAsset.setClinicalDeptName(null);
             }
-
         }
 
         String assetDeptName = newAsset.getAssetDeptName();
