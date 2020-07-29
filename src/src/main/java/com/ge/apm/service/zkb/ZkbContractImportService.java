@@ -254,6 +254,42 @@ public class ZkbContractImportService {
             }
         }
 
+        int spareQuotaTotal = contractInfoVO.getSpareQuotaTotal() == null ? 0 : contractInfoVO.getSpareQuotaTotal();
+        int spareQuota = contractInfoVO.getSpareQuota() == null ? 0 : contractInfoVO.getSpareQuota();
+        int spareQuotaUse = contractInfoVO.getSpareQuotaUse() == null ? 0 : contractInfoVO.getSpareQuotaUse();
+        if(spareQuotaTotal < (spareQuota + spareQuotaUse)){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item,  "备件总额小于备件剩余名额、备件已使用名额之和");
+            isValidateData = false;
+        }
+
+        int probeQuotaTotal = contractInfoVO.getProbeQuotaTotal() == null ? 0 : contractInfoVO.getProbeQuotaTotal();
+        int probeQuota = contractInfoVO.getProbeQuota() == null ? 0 : contractInfoVO.getProbeQuota();
+        int probeQuotaUse = contractInfoVO.getProbeQuotaUse() == null ? 0 : contractInfoVO.getProbeQuotaUse();
+        if(probeQuotaTotal < (probeQuota  + probeQuotaUse)){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item,  "探头总额小于探头剩余名额、探头已使用名额之和");
+            isValidateData = false;
+        }
+
+        int geArtificialSupportTimesTotal = contractInfoVO.getGeArtificialSupportTimesTotal() == null ? 0 : contractInfoVO.getGeArtificialSupportTimesTotal();
+        int geArtificialSupportTimes = contractInfoVO.getGeArtificialSupportTimes() == null ? 0 : contractInfoVO.getGeArtificialSupportTimes();
+        int geArtificialSupportTimesUse = contractInfoVO.getGeArtificialSupportTimesUse() == null ? 0 : contractInfoVO.getGeArtificialSupportTimesUse();
+        if(geArtificialSupportTimesTotal < (geArtificialSupportTimes + geArtificialSupportTimesUse)){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item,  "人工支持总次数小于人工支持剩余次数、人工支持已使用次数之和");
+            isValidateData = false;
+        }
+
+        int spareArtificailTotal = contractInfoVO.getSpareArtificailTotal() == null ? 0 : contractInfoVO.getSpareArtificailTotal();
+        int spareArtificail = contractInfoVO.getSpareArtificail() == null ? 0 : contractInfoVO.getSpareArtificail();
+        int spareArtificailUse = contractInfoVO.getSpareArtificailUse() == null ? 0 : contractInfoVO.getSpareArtificailUse();
+        if(spareArtificailTotal < (spareArtificail + spareArtificailUse)){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item,  "备件/人工/保养总额小于备件/人工/保养剩余名额、备件/人工/保养已使用名额之和");
+            isValidateData = false;
+        }
+
         for (Map<String, Object> tempContractMap: importContractMapList) {
             ZkbContractVO tempZkbContractVO = (ZkbContractVO)tempContractMap.get("contractInfoVO");
             Integer tempHashCode = Integer.valueOf(tempContractMap.get("hashCode").toString());
@@ -387,6 +423,15 @@ public class ZkbContractImportService {
                     item.put("status", ImportStatus.Failure);
                     ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorContractCourseIsExist"));
                 }
+            }
+
+            int courseCountTotal = contractCourseVO.getCourseCountTotal() == null ? 0 : contractCourseVO.getCourseCountTotal();
+            int courseCount = contractCourseVO.getCourseCount() == null ? 0 : contractCourseVO.getCourseCount();
+            int courseCountUse = contractCourseVO.getCourseCountUse() == null ? 0 : contractCourseVO.getCourseCountUse();
+            if(courseCountTotal < (courseCount + courseCountUse)){
+                isValidateData = false;
+                item.put("status", ImportStatus.Failure);
+                ZkbContractCourseRow.addErrMessage(item, "课程总额小于课程剩余名额、课程已使用名额之和");
             }
 
             for (Map<String, Object> tempContractMap: importContractCourseMapList) {
