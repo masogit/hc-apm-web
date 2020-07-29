@@ -495,7 +495,7 @@ public class ZkbContractImportService {
             ZkbContractAssetVO zkbContractAssetVO = (ZkbContractAssetVO)item.get("zkbContractAssetVO");
             if(zkbContractAssetVO != null && checkAssetData(item,impAssetMap)) {
                 importOneContractAsset(zkbContractAssetVO,currentUser);
-            }
+            } 
         }
         return null;
     }
