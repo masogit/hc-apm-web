@@ -411,6 +411,7 @@ public class ZkbContractImportService {
         zkbContractCourse.setCourseId(contractCourseVO.getZkbCourse().getId());
         zkbContractCourse.setContractId(contractCourseVO.getContractId());
         zkbContractCourse.setCourseCountTotal(contractCourseVO.getCourseCountTotal());
+        zkbContractCourse.setCourseCountUse(contractCourseVO.getCourseCountUse());
         zkbContractCourse.setCourseCountApply(contractCourseVO.getCourseCountTotal() - contractCourseVO.getCourseCountUse() - contractCourseVO.getCourseCount());
         zkbContractCourseRepository.save(zkbContractCourse);
     }
