@@ -186,6 +186,9 @@
                             <p:column headerText="课程申请额度">
                                 <h:outputText value="#{zkbContractCourseItem.courseCountApply}"/>
                             </p:column>
+                            <p:column headerText="课程已使用额度">
+                                <h:outputText value="#{zkbContractCourseItem.courseCountUse}"/>
+                            </p:column>
                            <f:facet name="{Toolbar}">
                                 <p:commandButton immediate="false"  process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareDetailCreate}" update=":growl :zkbContractCourseEditDlg" oncomplete="PF('zkbContractCourseEditDlg').show()" disabled="#{userContextService.zkbUser}"/>
                                 <p:commandButton id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareDetailEdit}" update=":growl :zkbContractCourseEditDlg" disabled="#{zkbContractEditController.courseCanOperate}" oncomplete="PF('zkbContractCourseEditDlg').show()"/>
