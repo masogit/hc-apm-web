@@ -43,8 +43,7 @@
                          rowsPerPageTemplate="20,50,100,500">
 
                         <!--<p:ajax  event="rowSelect" oncomplete="PF('AssetEditDialog').show()" update="AssetEditDlg"/>-->
-                        <p:ajax event="filter" listener="#{sharedAssetInfoController.onFilter}" oncomplete="rc2()"/>
-                        <p:ajax event="page" oncomplete="rc2();" />
+                        <p:ajax event="filter" listener="#{sharedAssetInfoController.onFilter}"/>
 
                         <p:column width="50">
                             <p:selectBooleanCheckbox value="#{sharedAssetInfoController.selectedMap[item.uid]}" rendered="#{!sharedAssetInfoController.isBorrow(item.uid)}"  class="selectCheckBox">
@@ -116,7 +115,6 @@
 
                     </p:dataTable>
 
-                    <p:remoteCommand name="rc2" update=":AssetInfoListForm:datalist"/>
                 </h:form>
                 <p:dialog id="AssetEditDlg" widgetVar="AssetEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="调剂名称设置">
                 <h:form id="AssetEditForm" style="width: 300px">
