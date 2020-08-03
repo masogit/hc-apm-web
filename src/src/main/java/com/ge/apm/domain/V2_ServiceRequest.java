@@ -168,6 +168,15 @@ public class V2_ServiceRequest  implements Serializable {
     @Column(name = "sr_num")
     private String srNum;
 
+    @Column(name="customer_name")
+    private String customerName;
+
+    @Column(name="customer_tel")
+    private String customerTel;
+
+    @Column(name="customer_position")
+    private String customerPosition;
+
     @Transient
     private String clinicalDeptName;
 
@@ -457,6 +466,30 @@ public class V2_ServiceRequest  implements Serializable {
 
     public void setSrRepairType(String srRepairType) {
         this.srRepairType = srRepairType;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerTel() {
+        return customerTel;
+    }
+
+    public void setCustomerTel(String customerTel) {
+        this.customerTel = customerTel;
+    }
+
+    public String getCustomerPosition() {
+        return customerPosition;
+    }
+
+    public void setCustomerPosition(String customerPosition) {
+        this.customerPosition = customerPosition;
     }
 
     public String getAssetLocation() {
