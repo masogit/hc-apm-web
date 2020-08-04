@@ -45,7 +45,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_SUB_TYPE_IMG = "Image";
     public static final String BO_SUB_TYPE_EXCEL = "Excel";
     public static final String BO_SUB_TYPE_AssetInfo_Measuring = "Measuring";
-
+    public static final String BO_TYPE_ZKB_PART_ORDER = "ZkbPartOrder";
 
 
     @Id
