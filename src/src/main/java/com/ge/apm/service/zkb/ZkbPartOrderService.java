@@ -106,6 +106,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(v2_workOrder.getAssetInfo() != null && StringUtils.isNotEmpty(v2_workOrder.getAssetInfo().getSystemId())){
             assetFilters.add(new SearchFilter("assetInfo.systemId", SearchFilter.Operator.EQ, v2_workOrder.getAssetInfo().getSystemId()));
         }
+        assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 2));
+        assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 3));
+
         Pageable pageable = new PageRequest(0, 5000);
         Page page = v2_workOrderRepository.findBySearchFilter(assetFilters, pageable);
         List<V2_WorkOrder> v2_workOrderList = page.getContent();
