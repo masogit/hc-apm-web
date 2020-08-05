@@ -18,7 +18,11 @@ import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -90,6 +94,11 @@ public class AssetCreateController {
     private Map<String, Object> selectedObjectMap = new HashMap();
 
     private List<AssetInfo> parentAssetList;
+    private SupplierController supplierController;
+    @Getter
+    @Setter
+    private Supplier newSupplier;
+
     @PostConstruct
     protected void init() {
         String qrCode = WebUtil.getRequestParameter("qrCode");
@@ -102,6 +111,7 @@ public class AssetCreateController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         assetMgrService = WebUtil.getBean(AssetInfoMgrService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
+        supplierController = WebUtil.getBean(SupplierController.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
 
@@ -399,6 +409,43 @@ public class AssetCreateController {
         }
         if (financingNum != null && (StringUtils.isEmpty(this.assetInfo.getFinancingNum()) || this.assetInfo.getFinancingNum().length() <= 4)) {
             this.assetInfo.setFinancingNum(financingNum);
+        }
+    }
+
+    public String createTpye=null;
+    public void prepareCreateSupplier(String type) {
+        newSupplier = new Supplier();
+        if("manufacturer".equals(type)){
+            createTpye=type;
+            newSupplier.setManufacturerT(true);
+        }
+        if("supplier".equals(type)){
+            createTpye=type;
+            newSupplier.setSupplierT(true);
+        }
+        if("maintainer".equals(type)){
+            createTpye=type;
+            newSupplier.setMaintainerT(true);
+        }
+
+    }
+
+    public void saveNewSupplier() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        this.newSupplier.setSiteId(loginUser.getSiteId());
+        this.newSupplier.setHospitalId(loginUser.getHospitalId());
+        this.newSupplier.setTenantUID(loginUser.getTenantUID());
+        this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+        this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
+        this.newSupplier.setSiteUID(loginUser.getSiteUID());
+        this.newSupplier.setCreatedDate(new Date());
+        this.newSupplier.setCreatedBy(loginUser.getLoginName());
+
+        supplierController.setSelected(newSupplier);
+        supplierController.saveSubmit();
+        supplierList.add(newSupplier);
+        if (StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
+            supplierList.add(newSupplier);
         }
     }
 
