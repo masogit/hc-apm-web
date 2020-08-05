@@ -447,29 +447,7 @@ public class AssetCreateController {
         if (StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
             supplierList.add(newSupplier);
         }
-//        changeSelect(createTpye);
-
     }
-
-//    private void changeSelect(String idx){
-//        Supplier supplier = (Supplier) selectedObjectMap.get(idx);
-//        switch (idx) {
-//            case "supplier":
-//                selected.setSupplierId(supplier == null ? null : supplier.getId());
-//                selected.setVendor(supplier == null ? null : supplier.getName());
-//                selected.setVendorTel(supplier == null ? null : supplier.getTel());
-//                break;
-//            case "maintainer":
-//                selected.setMaitananceId(supplier == null ? null : supplier.getId().toString());
-//                selected.setMaitanance(supplier == null ? null : supplier.getName());
-//                selected.setMaitananceTel(supplier == null ? null : supplier.getTel());
-//                break;
-//            case "manufacturer":
-//                selected.setManufactureId(supplier == null ? null : supplier.getId().toString());
-//                selected.setManufacture(supplier == null ? null : supplier.getName());
-//                break;
-//        }
-//    }
 
     //getter and setter
     public QrCodeLib getCreateRequest() {
