@@ -296,13 +296,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.saveUploadFile(v2_blobObjectList,this.selected.getId());
         zkbPartOrderService.sendEmail(selected);
         zkbPartOrderService.sendMessage(selected);
-        try {
-            zkbPartOrderService.sendWeChatMessages(selected);
-        } catch (Exception e) {
-            System.out.println("微信异常：-------------------------");
-
-            e.printStackTrace();
-        }
         return "List?faces-redirect=true";
     }
 

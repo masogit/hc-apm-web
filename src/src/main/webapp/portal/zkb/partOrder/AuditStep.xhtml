@@ -249,7 +249,7 @@
                             <h:outputText value="#{item.serialNumber}"/>
                         </p:column>
                         <p:column headerText="价格">
-                            <p:inputNumber value="#{item.price}" readonly="#{zkbPartOrderAuditController.selected.currentStep eq 'OrderPending'}" > </p:inputNumber>
+                            <p:inputNumber value="#{item.price}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending')}" > </p:inputNumber>
 
                         </p:column>
                         <p:column headerText="备注（说明是否DOA或者Short life）">

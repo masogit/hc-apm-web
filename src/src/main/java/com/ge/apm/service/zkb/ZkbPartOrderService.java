@@ -1,6 +1,5 @@
 package com.ge.apm.service.zkb;
 
-import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
@@ -19,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.HttpUtils;
 import webapp.framework.web.WebUtil;
 
 import java.text.SimpleDateFormat;
@@ -65,13 +63,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Autowired
     ZkbPartOrderReturnRepository zkbPartOrderReturnRepository;
-
-    //@Value("#{wxProperties.woChangeTemplateId}")
-    private String woChangeTemplateId;
-    //@Value("#{wxProperties.wxPush2URL}")
-    private String wxPushURL;
-
-
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYYMMdd");
 
@@ -537,26 +528,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     public void sendWeChatMessages(ZkbPartOrder zkbPartOrder){
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
             if (ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(zkbPartOrder.getCurrentStep())) {
-                UserAccount userAccount = userAccountRepository.getByLoginName(zkbPartOrder.getCreatedBy());
-                Map<String, Object> param = combineMsg(WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()) + "通知",
-                        "您的申请已被" + WebUtil.getFieldValueMessage("zkbPoStatus", zkbPartOrder.getStatus()) + "，请登录智康保管理系统查看");
-                param.put("_openId", userAccount.getWeChatId());
-                param.put("_templateId", woChangeTemplateId);
-                String message = JSON.toJSON(param).toString();
-                WechatPushModel model = new WechatPushModel();
-                model.setMessage(message);
-                String result = HttpUtils.doJSONPost(wxPushURL, JSON.toJSONString(model));
-                System.out.println(result);
+                String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
+                String token = UserContextService.getAccessToken();
+                HttpHeaders header = createHttpHeaders(token);
+                HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+                ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+                System.out.println(requestEntity);
             }
         }
-    }
-
-
-    private Map<String, Object> combineMsg(String title,  String remark) {
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("first", title);
-        params.put("remark", remark);
-        return params;
     }
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
