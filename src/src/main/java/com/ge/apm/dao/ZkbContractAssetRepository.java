@@ -1,6 +1,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ZkbContractAsset;
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
@@ -11,8 +12,12 @@ import java.util.List;
  */
 public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbContractAsset> {
 
-    public List<ZkbContractAsset> findByContractId(String contractId);
+    List<ZkbContractAsset> findByContractId(String contractId);
 
     ZkbContractAsset findFirstByContractIdAndAssetId(String contractId, String assetId);
+
+    @Query(value = "select distinct a.contract_id from zkb_contract_asset a where a.asset_id=?1", nativeQuery = true)
+    List<String> findDistinctContractId(String assetId);
+
 
 }
