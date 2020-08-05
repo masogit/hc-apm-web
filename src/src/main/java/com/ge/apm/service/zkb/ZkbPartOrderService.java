@@ -66,9 +66,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Autowired
     ZkbPartOrderReturnRepository zkbPartOrderReturnRepository;
 
-    @Value("#{wxProperties.woChangeTemplateId}")
+    //@Value("#{wxProperties.woChangeTemplateId}")
     private String woChangeTemplateId;
-    @Value("#{wxProperties.wxPushURL}")
+    //@Value("#{wxProperties.wxPush2URL}")
     private String wxPushURL;
 
 
