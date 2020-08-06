@@ -151,9 +151,11 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     public void onAfterNewObject(Supplier object, boolean isOK) {
         super.onAfterNewObject(object, isOK);
         if(isOK){
-            for (V2_BlobObject blobObject: attachements) {
-                blobObject.setBoUuid(object.getUid());
-                blobService.saveBlobObject(blobObject);
+            if (attachements != null){
+                for (V2_BlobObject blobObject: attachements) {
+                    blobObject.setBoUuid(object.getUid());
+                    blobService.saveBlobObject(blobObject);
+                }
             }
         }
     }
