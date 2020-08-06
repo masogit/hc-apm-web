@@ -114,7 +114,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             showClosed = false;
         }else{
             if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus())){
-                if(selected.getAssetInfo().getFunctionGroup() == 1){
+                if(selected.getAssetInfo() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     showManage = true;
                 }else{
                     showTech =true;
@@ -136,14 +136,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showOrder = true;
                 showBtn = "1";
             } else if(ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus())){
-                if(selected.getAssetInfo().getFunctionGroup() == 1){
+                if(selected.getAssetInfo() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     showTech= false;
                 }else {
                     showTech= true;
                 }
                 showManage = true;
             } else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
-                if(selected.getAssetInfo().getFunctionGroup() == 1){
+                if(selected.getAssetInfo() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     showTech= false;
                 }else {
                     showTech= true;
@@ -153,7 +153,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showReturn = true;
                 showBtn = "1";
             } else if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus())){
-                if(selected.getAssetInfo().getFunctionGroup() == 1){
+                if(selected.getAssetInfo() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     showTech= false;
                 }else {
                     showTech= true;
@@ -164,7 +164,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showClosed = true;
                 showBtn = "1";
             } else if(ZkbPartOrder.PartOrderStatus.Closed.toString().equals(selected.getStatus())){
-                if(selected.getAssetInfo().getFunctionGroup() == 1){
+                if(selected.getAssetInfo() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     showTech= false;
                 }else {
                     showTech= true;

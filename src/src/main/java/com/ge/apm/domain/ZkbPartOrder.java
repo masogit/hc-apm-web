@@ -327,7 +327,7 @@ public class ZkbPartOrder implements Serializable {
     @JoinColumn(insertable=false, updatable=false, name = "cat_id", referencedColumnName = "id")
     private ZkbPartOrderCat zkbPartOrderCat;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false, name = "asset_id", referencedColumnName = "uid")
     private AssetInfo assetInfo;
 
