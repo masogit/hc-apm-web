@@ -75,7 +75,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             selectedWorkFlow = m.get("V2_WorkOrder") == null ? null : (V2_WorkOrder)m.get("V2_WorkOrder");
             v2_blobObjectList = m.get("v2_blobObjectList") == new ArrayList<>() ? null : (List<V2_BlobObject>)m.get("v2_blobObjectList");
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selectedId);
-
+            System.out.println(this.selected);
+            System.out.println(this.selected.getAssetInfo());
             isFieldRendered();
         }
     }
@@ -127,7 +128,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             } else if(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(selected.getStatus())){
                 showTech= true;
             } else if(ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(selected.getStatus())){
-                if(selected.getAssetInfo().getFunctionGroup() == 1){
+                if(selected.getAssetInfo() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     showTech= false;
                 }else {
                     showTech= true;
