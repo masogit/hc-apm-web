@@ -278,7 +278,8 @@
 
                         <h:panelGroup>
                             <label class="label">价值类型</label>
-                            <p:inputText id="valueType" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat.valueType}" disabled="true" />
+                            <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderEditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
+
                         </h:panelGroup>
 
                         <h:panelGroup>
