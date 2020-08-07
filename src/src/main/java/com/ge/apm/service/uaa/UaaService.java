@@ -196,6 +196,13 @@ public class UaaService {
                     continue;
                 }
             }
+            //判断是否是智康宝用户，如果不是就移除掉智康宝的角色
+            if(srVO.getName().equals("zkbProxySales") || srVO.getName().equals("zkbProxyFE") ){
+                if(null != ti.getType() && ti.getType()!=3){
+                    continue;
+                }
+            }
+
             sysRoleList.add(srVO);
         }
 
