@@ -7,6 +7,7 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="content">
+        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
         <style>
             div.ui-panelgrid-cell>label+div.ui-selectonemenu {
                 min-width: 75px !important;
@@ -17,112 +18,319 @@
                 max-height: 100px;
                 overflow-y: auto;
             }
+            .demo-container {
+                border: 1px solid #009BE3;
+                padding:0 20px;
+                font-family: "Myriad Pro Regular","Trebuchet MS";
+            }
+
+            .demo-container a, .demo-container a:link, .demo-container a:visited, .demo-container a:hover, .demo-container a:focus, .demo-container a:active {
+                color: #009BE3;
+            }
+
+            .demo-container ul {
+                list-style-type:none;
+                padding:0;
+                margin:1em 0;
+                width:100%;
+                overflow:hidden;
+            }
+
+            .demo-container ul span {
+                color: #A0A600;
+            }
+
+            .demo-container li {
+                float:left;
+                margin-right:1em;
+            }
+
+            .demo-container p span.track-name {
+                color: #CC0090;
+            }
         </style>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{assetInfoEditController.CRUDActionName} #{assetInfoEditController.terminate? msg.TerminateAssetInfo :msg.AssetInfo}"/>
             </div>
+            <div class="ui-g-12 card ">
+                <p:fieldset legend="#{msg.BasicInformation}" id="accordion" rendered="#{assetInfoEditController.isStatus()}">
+                    <div class="ui-g-7">
+                        <p:galleria value="#{assetInfoEditController.pictureList}" var="attach" panelWidth="500" panelHeight="313" showCaption="false"  autoPlay="false">
+                            <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"  onclick="javascript:showthis(this);"/>
+                        </p:galleria>
+                    </div>
+                    <div class="ui-g-5">
+                        <p:fieldset legend="#{msg.VoiceDescription}" id="audioComment" >
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
+                                <div id="jquery_jplayer"></div>
+                                <div id="jp_container" class="demo-container">
+                                    <ul id="audioUl">
+                                        <li><span>#{msg.VoiceList} : </span></li>
+                                    </ul>
+                                    <p>
+                                        <span class="play-state"></span> :
+                                        <span class="track-name">#{msg.None}</span>
+                                        <span class="extra-play-info"></span>
+                                        #{msg.ATotalOf} <span class="jp-duration"></span>, #{msg.PlayTo}
+                                        <span class="jp-current-time"></span>
+                                    </p>
+                                    <ul>
+                                        <li><a class="jp-play" href="#">Play</a></li>
+                                        <li><a class="jp-pause" href="#">Pause</a></li>
+                                        <li><a class="jp-stop" href="#">Stop</a></li>
+                                    </ul>
+                                </div>
+                                <c:forEach items="#{assetInfoEditController.audioList}" var="item" varStatus="status">
+                                    <h:inputHidden class="mp3Link" value="#{fileDownloadService.getFileUrl(item.objectStorageId)}" id="audio#{status.index}"/>
+                                </c:forEach>
+                            </p:panelGrid>
+                        </p:fieldset>
+
+                        <p:fieldset legend="#{msg.TextDescription}" id="textComment" >
+                            <c:forEach items="#{assetInfoEditController.getCommentsList()}" var="item">
+                                <p>#{item}</p>
+                            </c:forEach>
+                        </p:fieldset>
+
+                    </div>
+
+                </p:fieldset>
+            </div>
             <div class="ui-g-12 card">
 
                 <!--<p:separator/>-->
-                <h:form id="AssetInfoEditForm">
-                    <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
-                                <ui:include src="customEditFields.xhtml"/>
-                            </c:forEach>
-                        </p:panelGrid>
-                    </p:fieldset>
+                <p:tabView id="tab">
+                    <p:tab title="#{msg.Create2}">
+                        <h:form id="AssetInfoEditForm">
+                            <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
+                                </p:panelGrid>
+                            </p:fieldset>
 
-                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCodesFields}" >
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCodesFields}" var="fieldItem" >
-                                <ui:include src="customEditFields.xhtml"/>
-                            </c:forEach>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageStatusFields}">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageStatusFields}" var="fieldItem" >
-                                <ui:include src="customEditFields.xhtml"/>
-                            </c:forEach>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset legend="#{msg.assetCategory}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCatalogFields}">
-                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCatalogFields}" var="fieldItem" >
-                                    <ui:include src="customEditFields.xhtml"/>
-                                </c:forEach>
-                            </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageDateFields}">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageDateFields}" var="fieldItem" >
-                                    <ui:include src="customEditFields.xhtml"/>
-                                </c:forEach>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageFinicialFields}">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageFinicialFields}" var="fieldItem" >
-                                    <ui:include src="customEditFields.xhtml"/>
-                                </c:forEach>
-                            
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <p:fieldset legend="GE MVS" style="margin-bottom:20px" rendered="#{userContextService.isMVSRole()}">
-                        <ui:include src="MvsEditFields.xhtml"/>
-                    </p:fieldset>
+                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCodesFields}" >
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCodesFields}" var="fieldItem" >
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageStatusFields}">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageStatusFields}" var="fieldItem" >
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="#{msg.assetCategory}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCatalogFields}">
+                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                        <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCatalogFields}" var="fieldItem" >
+                                            <ui:include src="customEditFields.xhtml"/>
+                                        </c:forEach>
+                                    </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageDateFields}">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageDateFields}" var="fieldItem" >
+                                            <ui:include src="customEditFields.xhtml"/>
+                                        </c:forEach>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageFinicialFields}">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageFinicialFields}" var="fieldItem" >
+                                            <ui:include src="customEditFields.xhtml"/>
+                                        </c:forEach>
 
-                    <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px">
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <h:panelGroup >
-                                <p:dataList id="pictureList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
-                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                    <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                    </p:commandButton>
-                                </p:dataList>
-                                <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                              multiple="true"  sizeLimit="500000000"  update="pictureList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <p:dataList id="contractList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
-                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                    <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                    </p:commandButton>
-                                </p:dataList>
-                                <p:fileUpload id="type2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                              multiple="true"  sizeLimit="500000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <p:dataList id="manualList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
-                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                    <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                    </p:commandButton>
-                                </p:dataList>
-                                <p:fileUpload id="type3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                              multiple="true"  sizeLimit="500000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
-                            </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-                    <h:panelGroup id="buttonGroup">
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="GE MVS" style="margin-bottom:20px" rendered="#{userContextService.isMVSRole()}">
+                                <ui:include src="MvsEditFields.xhtml"/>
+                            </p:fieldset>
+                            <p:fieldset legend="#{msg.Attachment222}" style="margin-bottom:20px" rendered="#{!assetInfoEditController.isStatus()}">
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <h:panelGroup >
+                                        <p:dataList id="pictureList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
+                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      multiple="true"  sizeLimit="500000000"  update="pictureList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:dataList id="contractList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
+                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="type2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      multiple="true"  sizeLimit="500000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:dataList id="manualList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
+                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                            <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="type3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      multiple="true"  sizeLimit="500000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="#{msg.SelectAndSaveTheImageAsAnAttachmentToTheAsset}"  style="margin-bottom:20px" rendered="#{assetInfoEditController.isStatus()}">
+                                <p:selectManyCheckbox id="custom" value="#{assetCreateController.selectedPictures}"  layout="custom">
+                                    <f:selectItems value="#{assetInfoEditController.pictureList}" var="item"  itemValue="#{item.objectStorageId}" />
+                                </p:selectManyCheckbox>
+                                <c:forEach items="#{assetInfoEditController.pictureList}" var="item" varStatus="status">
+                                    <div class="ui-grid-col-2" style="text-align:center">
+                                        <p:graphicImage url="#{fileDownloadService.getFileUrl(item.objectStorageId)}"  height="60"  width="80" />
+                                        <p:checkbox id="opt#{item.id}" for="custom" itemIndex="#{status.index}" />
+                                    </div>
+                                </c:forEach>
+                            </p:fieldset>
+                            <h:panelGroup id="buttonGroup">
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.applyChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3))}"/>
                         <p:commandButton value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval()}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3)}"/>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
                         <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4)}" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
                         <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
                     </h:panelGroup>
+                          </h:form>
+                    </p:tab>
+                    <p:tab title="#{msg.RefuseToReturnBack}" rendered="#{assetInfoEditController.isStatus()}">
+                        <h:form id="returnback">
+                            <p:fieldset id="returnBackHistory" legend="#{msg.ReturnBackHistory}" rendered="#{not empty assetInfoEditController.rejectTextHistory}">
+                                <c:forEach items="#{assetInfoEditController.rejectTextHistory}" var="item">
+                                    <p>#{item}</p>
+                                </c:forEach>
+                            </p:fieldset>
+                            <p:fieldset legend="#{msg.ReturnBackReason}">
+                                <p:inputTextarea id ="rejectTextarea" value="#{assetInfoEditController.rejectText}" counter="comentsCounts" counterTemplate="#{msg.remainingCharacters}" maxlength="100"  rows="6" cols="50" required="true" requiredMessage="#{msg.ReasonRequired}"/>
+                                <p><h:outputText id="comentsCounts" /></p>
+                            </p:fieldset>
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <h:panelGroup >
+                                    <p:commandButton value="#{msg.ReturnBack}" icon="ui-icon-check" action="#{assetInfoEditController.returnBack()}" validateClient="true" update=":growl returnback" style="float:left"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
 
-                </h:form>
+                        </h:form>
+                    </p:tab>
+                </p:tabView>
+
                 <ui:include src="createSupplier.xhtml" />
             </div>
         </div>
+        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">
+            <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
+                <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
+                <span class="ui-icon ui-icon-closethick"></span></a>
+                <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
+            </div>
+            <div class="ui-dialog-content ui-widget-content"  style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">
+
+                <image id="shwoPicDialogImg" src="" ></image>
+            </div>
+        </div>
+        <script id="shwoPicDialog_s" type="text/javascript">$(function () {
+            PrimeFaces.cw("Dialog", "shwoPicDialog", {id: "shwoPicDialog", modal: true, appendTo: "@(body)"});
+        });
+        </script>
+        <script>
+            //<![CDATA[
+            function showthis(pic) {
+                var s = $('#shwoPicDialogImg')[0]
+                s.src = pic.src;
+                PF('shwoPicDialog').show();
+            }
+            $(document).ready(function () {
+
+
+                var $audioUlEle = $("#audioUl");
+                var audioList = $("input[id*='audio']");
+                $.each(audioList, function (index) {
+                    var audioClass = (index == 0 ? "track-default" : "");
+                    var templ = "<li><a href=" + this.value + " class='track " + audioClass + "'>语音" + (index + 1) + "</a></li>";
+                    $audioUlEle.append(templ);
+                });
+
+
+
+                // Local copy of jQuery selectors, for performance.
+                var my_jPlayer = $("#jquery_jplayer"),
+                    my_trackName = $("#jp_container .track-name"),
+                    my_playState = $("#jp_container .play-state"),
+                    my_extraPlayInfo = $("#jp_container .extra-play-info");
+
+                // Some options
+                var opt_play_first = false, // If true, will attempt to auto-play the default track on page loads. No effect on mobile devices, like iOS.
+                    opt_auto_play = true, // If true, when a track is selected, it will auto-play.
+                    opt_text_playing = "播放", // Text when playing
+                    opt_text_selected = "选择"; // Text when not playing
+
+                // A flag to capture the first track
+                var first_track = true;
+
+                // Change the time format
+                $.jPlayer.timeFormat.padMin = false;
+                $.jPlayer.timeFormat.padSec = false;
+                $.jPlayer.timeFormat.sepMin = " 分 ";
+                $.jPlayer.timeFormat.sepSec = " 秒";
+
+                // Initialize the play state text
+                my_playState.text(opt_text_selected);
+
+                // Instance jPlayer
+                my_jPlayer.jPlayer({
+                    ready: function () {
+                        $("#jp_container .track-default").click();
+                    },
+                    timeupdate: function (event) {
+                        my_extraPlayInfo.text(parseInt(event.jPlayer.status.currentPercentAbsolute, 10) + "%");
+                    },
+                    play: function (event) {
+                        my_playState.text(opt_text_playing);
+                    },
+                    pause: function (event) {
+                        my_playState.text(opt_text_selected);
+                    },
+                    ended: function (event) {
+                        my_playState.text(opt_text_selected);
+                    },
+                    swfPath: "../../dist/jplayer",
+                    cssSelectorAncestor: "#jp_container",
+                    supplied: "mp3",
+                    wmode: "window"
+                });
+
+                // Create click handlers for the different tracks
+                var temp = $("#jp_container .track");
+                $("#jp_container .track").click(function (e) {
+                    my_trackName.text($(this).text());
+                    my_jPlayer.jPlayer("setMedia", {
+                        mp3: $(this).attr("href")
+                    });
+                    if ((opt_play_first && first_track) || (opt_auto_play && !first_track)) {
+                        my_jPlayer.jPlayer("play");
+                    }
+                    first_track = false;
+                    $(this).blur();
+                    return false;
+                });
+
+            });
+            //]]>
+        </script>
     </ui:define>
 </ui:composition>
