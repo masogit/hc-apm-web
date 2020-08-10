@@ -1,5 +1,6 @@
 package com.ge.apm.view.zkb;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
@@ -116,6 +117,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void workFlowSelected(SelectEvent event){
         if(selectedWorkFlow != null){
+            if(v2_listHashMap ==null || v2_listHashMap.get(0) ==null || v2_listHashMap.get(0).get("assetId") == null){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "未查询出合同数据！", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                return;
+            }
             contractList = zkbPartOrderService.queryContractByAsset(selectionTenantInfo,String.valueOf(v2_listHashMap.get(0).get("assetId")));
             if(contractList.size() == 0){
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "未查询出合同数据！", "");
@@ -155,6 +161,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         }
                     }
                 }
+
+                if(v2_listHashMap.get(0).get("customerName") != null){
+                    selected.setHospitalRepairer(v2_listHashMap.get(0).get("customerName").toString());
+                }
+                if(v2_listHashMap.get(0).get("customerTel") != null){
+                    selected.setHospitalRepairerPhone(v2_listHashMap.get(0).get("customerTel").toString());
+                }
             }
             calcRemainQty();
         }else{
@@ -164,6 +177,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void contractRowSelected(SelectEvent event){
 
+    }
+
+    private boolean showProblemOrderNumber = false;
+    public void orderAnnotationChange(){
+        if("NormalOrder".equals(selected.getOrderAnnotation())){
+            showProblemOrderNumber = true;
+        }else{
+            showProblemOrderNumber = false;
+        }
     }
 
     public void prepareItemCreate(){
@@ -465,6 +487,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.artificialType = artificialType;
     }
 
+    public boolean isShowProblemOrderNumber() {
+        return showProblemOrderNumber;
+    }
+
+    public void setShowProblemOrderNumber(boolean showProblemOrderNumber) {
+        this.showProblemOrderNumber = showProblemOrderNumber;
+    }
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {

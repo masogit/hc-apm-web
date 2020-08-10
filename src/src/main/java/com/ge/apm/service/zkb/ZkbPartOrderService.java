@@ -83,6 +83,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderItemRepository.deleteByPartOrderId(zkbPartOrder.getId());
         zkbPartOrderStepRepository.deleteByPartOrderId(zkbPartOrder.getId());
         zkbPartOrderRepository.delete(zkbPartOrder);
+        ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+        subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty());
     }
 
 
@@ -110,6 +112,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             m.put("srNum",v.getServiceRequest().getSrNum());
             m.put("id",v.getId());
             m.put("assetId",v.getAssetInfo().getUid());
+            m.put("customerName",v.getServiceRequest().getCustomerName());
+            m.put("customerTel",v.getServiceRequest().getCustomerTel());
             v2_listHashMap.add(m);
         }
         return v2_listHashMap;
@@ -249,6 +253,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 m.put("name",v.getAssetInfo().getName());
                 m.put("systemId",v.getAssetInfo().getSystemId());
                 m.put("srNum",v.getServiceRequest().getSrNum());
+                m.put("customerName",v.getServiceRequest().getCustomerName());
+                m.put("customerTel",v.getServiceRequest().getCustomerTel());
                 m.put("id",v.getId());
                 m.put("assetId",v.getAssetInfo().getUid());
                 map.put("v2", m);
@@ -321,7 +327,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         if(!nextFlag){
             ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-            subUseQty(zkbContract,zkbPartOrder,Math.abs(zkbPartOrder.getQty()));
+            subApplyQty(zkbContract,zkbPartOrder,Math.abs(zkbPartOrder.getQty()));
         }
     }
 
@@ -531,7 +537,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      */
     public void sendWeChatMessages(ZkbPartOrder zkbPartOrder){
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
-            if (ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(zkbPartOrder.getCurrentStep())) {
+            if (ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) || ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(zkbPartOrder.getStatus()) ||
+                    ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(zkbPartOrder.getStatus())) {
                 String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
                 String token = UserContextService.getAccessToken();
                 HttpHeaders header = createHttpHeaders(token);
