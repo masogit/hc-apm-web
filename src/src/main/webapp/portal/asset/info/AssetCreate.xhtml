@@ -151,7 +151,7 @@
                             <p:fieldset legend="GE MVS" style="margin-bottom:20px" rendered="#{userContextService.isMVSRole()}">
                                 <ui:include src="MvsEditFields.xhtml"/>
                             </p:fieldset>
-                            <p:fieldset legend="#{msg.Attachment222}" style="margin-bottom:20px" rendered="#{!assetInfoEditController.isStatus()}">
+                            <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" rendered="#{!assetInfoEditController.isStatus()}">
                                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup >
                                         <p:dataList id="pictureList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
