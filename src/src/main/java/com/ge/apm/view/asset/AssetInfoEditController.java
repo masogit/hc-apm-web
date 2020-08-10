@@ -1056,20 +1056,25 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public boolean isValidParentAsset() {
-        //check whether parent asset is valid when editing
-        if (selected.getId() != null) {
-            if (selected.getParentAssetId() != null) {
-                AssetInfo assetInfo = dao.findById(selected.getParentAssetId());
-                if (assetInfo != null) {
-                    if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
-                        return false;
-                    }
-                }//parent asset found
 
-            }//parent asset exists
+        if (selected.getParentAssetId() == null) {
+            return true;
+        }
 
+        AssetInfo assetInfo = dao.findById(selected.getParentAssetId());
 
-        }//editing
+        if (null == assetInfo) {
+            return false;
+        }
+
+        if (StringUtils.isEmpty(selected.getClinicalDeptUID())) {
+            return false;
+        }
+
+        //parent asset and child asset will be in the same dept
+        if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
+            return false;
+        }
 
         return true;
     }
