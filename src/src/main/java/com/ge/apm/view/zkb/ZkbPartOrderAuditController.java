@@ -41,7 +41,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean showOrder=false;
     private boolean showReturn=false;
     private boolean showClosed=false;
-    private boolean canEditFlag=true;
+    private boolean canEditFlag=false;
     private String showBtn = "";
     private ZkbPartOrderReturn zkbPartOrderReturn;
     private List<ZkbPartOrderReturn> zkbPartOrderReturnList;
@@ -96,6 +96,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }
+        }else {
+            canEditFlag = true;
         }
 
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
