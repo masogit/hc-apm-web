@@ -78,8 +78,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             selectedWorkFlow = m.get("V2_WorkOrder") == null ? null : (V2_WorkOrder)m.get("V2_WorkOrder");
             v2_blobObjectList = m.get("v2_blobObjectList") == new ArrayList<>() ? null : (List<V2_BlobObject>)m.get("v2_blobObjectList");
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selectedId);
-            System.out.println(this.selected);
-            System.out.println(this.selected.getAssetInfo());
             fieldRendered();
 
             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
@@ -89,14 +87,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void fieldRendered(){
-        /*List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(selected.getCurrentStep());
-        if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
-            for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
-                if(currentUser.getLoginName().equals(c.getLoginName())){
-                    canEditFlag = true;
+        if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(selected.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
+            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(selected.getCurrentStep());
+            if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
+                for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
+                    if(currentUser.getLoginName().equals(c.getLoginName())){
+                        canEditFlag = true;
+                    }
                 }
             }
-        }*/
+        }
 
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
             showTech = false;
@@ -205,11 +205,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String acceptNext(){
         zkbPartOrderService.auditNext(this.selected,true,currentUser);
+        ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        zkbPartOrderService.sendMessage(zkbPartOrder);
+        zkbPartOrderService.sendEmail(zkbPartOrder);
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         return "List?faces-redirect=true";
     }
 
     public String rejectNext(){
         zkbPartOrderService.auditNext(this.selected,false,currentUser);
+        ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         return "List?faces-redirect=true";
     }
 

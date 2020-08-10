@@ -136,74 +136,82 @@
 
                         <h:panelGroup>
                             <label class="label">订单日期*</label>
-                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.partOrderDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.partOrderDate}" required="true" requiredMessage="#{msg.zkbPartOrder_partOrderDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">申请人*</label>
-                            <p:inputText id="requestUser" value="#{zkbPartOrderEditController.selected.requestUser}" required="true" requiredMessage="#{msg.zkbContract_contractNo} #{msg.ValidationRequire}" />
+                            <p:inputText id="requestUser" value="#{zkbPartOrderEditController.selected.requestUser}" required="true" requiredMessage="#{msg.zkbPartOrder_requestUser} #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请人电话*</label>
-                            <p:inputText id="requestPhone" value="#{zkbPartOrderEditController.selected.requestPhone}" required="true" requiredMessage="#{msg.zkbContract_contractNo} #{msg.ValidationRequire}" />
+                            <p:inputText id="requestPhone" value="#{zkbPartOrderEditController.selected.requestPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_requestPhone} #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请时间*</label>
-                            <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.requestDate}" required="true" requiredMessage="#{msg.zkbContract_startDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.requestDate}" required="true" requiredMessage="#{msg.zkbPartOrder_requestDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">医院名称</label>
-                            <p:inputText id="hospitalName" value="#{zkbPartOrderEditController.selected.hospitalName}"  />
+                            <label class="label">医院名称*</label>
+                            <p:inputText id="hospitalName" value="#{zkbPartOrderEditController.selected.hospitalName}"  required="true" requiredMessage="#{msg.zkbPartOrder_hospitalName} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">医院报修人姓名</label>
-                            <p:inputText id="hospitalRepairer" value="#{zkbPartOrderEditController.selected.hospitalRepairer}"  />
+                            <label class="label">医院报修人姓名*</label>
+                            <p:inputText id="hospitalRepairer" value="#{zkbPartOrderEditController.selected.hospitalRepairer}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">医院报修人电话</label>
-                            <p:inputText id="hospitalRepairerPhone" value="#{zkbPartOrderEditController.selected.hospitalRepairerPhone}"  />
+                            <label class="label">医院报修人电话*</label>
+                            <p:inputText id="hospitalRepairerPhone" value="#{zkbPartOrderEditController.selected.hospitalRepairerPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairerPhone} #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">产品型号</label>
-                            <p:inputText id="productNumber" value="#{zkbPartOrderEditController.selected.productNumber}"  />
+                            <label class="label">产品型号*</label>
+                            <p:inputText id="productNumber" value="#{zkbPartOrderEditController.selected.productNumber}" required="true" requiredMessage="#{msg.zkbPartOrder_productNumber} #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">软件版本</label>
-                            <p:inputText id="softwareVersion" value="#{zkbPartOrderEditController.selected.softwareVersion}"  />
+                            <label class="label">软件版本*</label>
+                            <p:inputText id="softwareVersion" value="#{zkbPartOrderEditController.selected.softwareVersion}" required="true" requiredMessage="#{msg.zkbPartOrder_softwareVersion} #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">故障描述</label>
-                            <p:inputText id="faultDescription" value="#{zkbPartOrderEditController.selected.faultDescription}"  >
+                            <label class="label">故障描述*</label>
+                            <p:inputText id="faultDescription" value="#{zkbPartOrderEditController.selected.faultDescription}" required="true" requiredMessage="#{msg.zkbPartOrder_faultDescription} #{msg.ValidationRequire}" >
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">订单标注</label>
-                            <p:inputText id="orderAnnotation" value="#{zkbPartOrderEditController.selected.orderAnnotation}"/>
+                            <p:selectOneMenu id="orderAnnotation" value="#{zkbPartOrderEditController.selected.orderAnnotation}" required="true" requiredMessage="#{msg.zkbPartOrder_orderAnnotation} #{msg.ValidationRequire}">
+                                <p:ajax update="problemOrderNumberGrid" listener="#{zkbPartOrderEditController.orderAnnotationChange}"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoOrderAnnotationType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">发生问题的order number</label>
-                            <p:inputText id="problemOrderNumber" value="#{zkbPartOrderEditController.selected.problemOrderNumber}"  />
-                        </h:panelGroup>
+                        <h:panelGrid id="problemOrderNumberGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup id="problemOrderNumberGroup" rendered="#{!(zkbPartOrderEditController.showProblemOrderNumber)}" style="text-align: left">
+                                <label class="label">发生问题的order number</label>
+                                <p:inputText id="problemOrderNumber" value="#{zkbPartOrderEditController.selected.problemOrderNumber}"  required="true" requiredMessage="#{msg.zkbPartOrder_problemOrderNumber} #{msg.ValidationRequire}"  />
+                            </h:panelGroup>
+                        </h:panelGrid>
                         <h:panelGroup>
                             <label class="label">是否为紧急订单</label>
-                            <p:selectOneMenu id="urgentOrder" value="#{zkbPartOrderEditController.selected.urgentOrder}" >
-                                <p:ajax event="change" update="urgencyReasons" />
+                            <p:selectOneMenu id="urgentOrder" value="#{zkbPartOrderEditController.selected.urgentOrder}" required="true" requiredMessage="#{msg.zkbPartOrder_urgentOrder} #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="urgencyReasonsGrid" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="紧急" itemValue="t"/>
                                 <f:selectItem itemLabel="不紧急" itemValue="f"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        <h:panelGrid id="urgencyReasonsGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" >
+                            <h:panelGroup id="urgencyReasonsGroup" rendered="#{(zkbPartOrderEditController.selected.urgentOrder eq 't')}" style="text-align: left">
+                                <label class="label">订单紧急的原因</label>
+                                <p:selectOneMenu id="urgencyReasons" value="#{zkbPartOrderEditController.selected.urgencyReasons}"  >
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbUrgentReasonType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGrid>
                         <h:panelGroup>
-                            <label class="label">订单紧急的原因</label>
-                            <p:selectOneMenu id="urgencyReasons" value="#{zkbPartOrderEditController.selected.urgencyReasons}" disabled="#{!(zkbPartOrderEditController.selected.urgentOrder eq 't')}" >
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbUrgentReasonType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">订单数量</label>
-                            <p:inputText id="qty" value="#{zkbPartOrderEditController.selected.qty}" required="true"  requiredMessage="订单数量 #{msg.ValidationRequire}" disabled="true" />
+                            <label class="label">订单数量*</label>
+                            <p:inputText id="qty" value="#{zkbPartOrderEditController.selected.qty}" required="true"  requiredMessage="#{msg.zkbPartOrder_qty} #{msg.ValidationRequire}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">剩余数量</label>
