@@ -157,8 +157,10 @@ public class AssetCreateService {
 
     public void updateQrLib(String qrCode, int i,String siteUid) {
         QrCodeLib qrLibItem = qrLibDao.findByQrCode(qrCode,siteUid);
-        qrLibItem.setStatus(i);
-        qrLibDao.save(qrLibItem);
+        if (qrLibItem != null){
+            qrLibItem.setStatus(i);
+            qrLibDao.save(qrLibItem);
+        }
     }
 
     public List<V2_BlobObject> getQrCodeAudioList(String qrCodeLibUid) {
