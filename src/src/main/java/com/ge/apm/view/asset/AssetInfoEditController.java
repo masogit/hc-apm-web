@@ -177,6 +177,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         siteUid = WebUtil.getRequestParameter("siteUid");
         createRequest = acService.getCreateRequest(qr_Code, siteUid);
         if(createRequest != null){
+            qrCode = qr_Code;
             isStatus = true;
             createAssetInfo();
             rejectTextHistory = new ArrayList();
@@ -595,6 +596,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 }
             }
         }
+        //新增资产建档时
+        if(isStatus){
+            selected.setQrCode(qr_Code);
+        }
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
             if (null == gbCode) {
@@ -629,7 +634,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
 
         saveOrUpdateAssetTags();
-
+        if(isStatus){
+            return "/portal/asset/createAsset/RequestsList.xhtml";
+        }
         if (resultStatus) {
             return getListPageLink();
         } else {
@@ -665,6 +672,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getListPageLink() {
+        if(isStatus){
+            return "/portal/asset/createAsset/RequestsList.xhtml";
+        }
         if (!selected.getIsValid() || 4 == selected.getStatus()) {
             return "AssetTerminateEntryList?faces-redirect=true";
         }
