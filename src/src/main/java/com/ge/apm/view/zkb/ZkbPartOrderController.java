@@ -104,8 +104,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     @Override
     public void delete() {
-        zkbPartOrderService.delete(this.selected);
-        this.selected= null;
+        if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus())){
+            zkbPartOrderService.delete(this.selected);
+            this.selected= null;
+        }else {
+            WebUtil.addErrorMessage("数据已审批不能删除！","");
+            return;
+        }
     }
 
     public String createAction() {
