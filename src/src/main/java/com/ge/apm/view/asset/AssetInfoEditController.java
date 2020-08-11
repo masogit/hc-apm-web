@@ -292,6 +292,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         OrgInfo siteOrg = orgDao.findByUid(createRequest.getSiteUID());
         selectedObjectMap.put("selectedOrg", siteOrg.getSiteUID() == null ? null : orgDao.findByUid(siteOrg.getSiteUID()));//业务单元
+        selected.setParentAssetId(createRequest.getParentAssetId());
         selectedObjectMap.put("parentAsset", createRequest.getParentAssetId() == null ? null : dao.findById(createRequest.getParentAssetId()));//主设备
         if (null != createRequest.getUserId()) {
             UserAccount owner = acService.getUserInfo(createRequest.getUserId());
@@ -615,10 +616,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
+
+        this.save();
         if(selected != null && selected.getId() != null && selectedPictures != null){
             acService.createAttachments(selected, selectedPictures);
         }
-        this.save();
         if(qr_Code !=null && siteUid != null){
             acService.updateQrLib(qr_Code, 3, siteUid);
         }
