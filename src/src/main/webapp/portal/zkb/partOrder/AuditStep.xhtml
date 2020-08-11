@@ -340,9 +340,9 @@
                 <br/>
                 <p:commandButton validateClient="true" value="保存" action="#{zkbPartOrderAuditController.save}" update=":growl" icon="ui-icon-check" rendered="false" />
                 <p:commandButton validateClient="true" value="提交" action="#{zkbPartOrderAuditController.normalNext}" update=":growl" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.showBtn eq '1' and zkbPartOrderAuditController.canEditFlag}"/>
-                <p:commandButton immediate="false" process="@this" value="发货取消" update=":growl :zkbCancelReasonDlg" oncomplete="PF('zkbCancelReasonDlg').show()" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and !zkbPartOrderAuditController.canEditFlag}"/>
-              <!--  <p:commandButton validateClient="true" value="审批通过" action="#{zkbPartOrderAuditController.acceptNext}" update=":growl" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.showBtn eq '0'}"/>
-                <p:commandButton validateClient="true" value="审批不通过" action="#{zkbPartOrderAuditController.rejectNext}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.showBtn eq '0'}"/>-->
+                <p:commandButton immediate="false" process="@this" value="发货取消" update=":growl :zkbCancelReasonDlg" oncomplete="PF('zkbCancelReasonDlg').show()" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag}"/>
+               <p:commandButton validateClient="true" value="审批通过" action="#{zkbPartOrderAuditController.acceptNext}" update=":growl" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.showBtn eq '0') and zkbPartOrderAuditController.canEditFlag}"/>
+                <p:commandButton validateClient="true" value="审批不通过" action="#{zkbPartOrderAuditController.rejectNext}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.showBtn eq '0' and zkbPartOrderAuditController.canEditFlag}"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" />
             </h:form>
             <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="取消原因" height="300">
