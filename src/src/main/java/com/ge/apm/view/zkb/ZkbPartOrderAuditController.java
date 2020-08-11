@@ -254,6 +254,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void initPartList(){
+        partNoList = new ArrayList<>();
         List<ZkbPartOrderItem> zkbPartOrderItemList = zkbPartOrderService.queryItemBuPartOrderId(selected.getId());
         for(ZkbPartOrderItem i :zkbPartOrderItemList){
             HashMap<String, String> m = new HashMap<>();
