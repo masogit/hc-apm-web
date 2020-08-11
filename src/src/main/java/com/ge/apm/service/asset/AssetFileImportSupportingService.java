@@ -3,6 +3,7 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.orginfo.OrgInfoBuilder;
 import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.orginfo.SiteOrgWithDeptOrg;
@@ -309,9 +310,9 @@ public class AssetFileImportSupportingService {
 
             //only new asset need to set this
             if(isNeedAudit){
-                asset.setUsageStatus(2); //待审核
+                asset.setUsageStatus(UsageStatusConstant.UNDER_REVIEW); //待审核
             } else {
-                asset.setUsageStatus(3); //已建档
+                asset.setUsageStatus(UsageStatusConstant.ARCHIVED); //已建档
             }
 
         } else {
