@@ -7,6 +7,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -291,6 +292,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         OrgInfo siteOrg = orgDao.findByUid(createRequest.getSiteUID());
         selectedObjectMap.put("selectedOrg", siteOrg.getSiteUID() == null ? null : orgDao.findByUid(siteOrg.getSiteUID()));//业务单元
+        selected.setParentAssetId(createRequest.getParentAssetId());
         selectedObjectMap.put("parentAsset", createRequest.getParentAssetId() == null ? null : dao.findById(createRequest.getParentAssetId()));//主设备
         if (null != createRequest.getUserId()) {
             UserAccount owner = acService.getUserInfo(createRequest.getUserId());
@@ -305,7 +307,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setHospitalUID(createRequest.getHospitalUID());
         selected.setInstitutionUID(createRequest.getInstitutionUID());
         selected.setSiteUID(createRequest.getSiteUID());
-        selected.setUsageStatus(acService.needAssetApproval(createRequest.getSiteUID()) ? 2 : 3);
+        selected.setUsageStatus(acService.needAssetApproval(createRequest.getSiteUID()) ? UsageStatusConstant.UNDER_REVIEW : UsageStatusConstant.ARCHIVED);
 
         if (null != createRequest.getUserId()) {
              UserAccount owner = acService.getUserInfo(createRequest.getUserId());
@@ -566,7 +568,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
         if (selected.getUsageStatus() == null) {
-            selected.setUsageStatus(3);
+            selected.setUsageStatus(UsageStatusConstant.ARCHIVED);
         }
         if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim())) {
             if ("DFQ".equals(getAssetCodeConfig())) {
@@ -614,10 +616,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
+
+        this.save();
         if(selected != null && selected.getId() != null && selectedPictures != null){
             acService.createAttachments(selected, selectedPictures);
         }
-        this.save();
         if(qr_Code !=null && siteUid != null){
             acService.updateQrLib(qr_Code, 3, siteUid);
         }
@@ -1030,7 +1033,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String submitApproval() {
-        selected.setUsageStatus(2);
+        selected.setUsageStatus(UsageStatusConstant.UNDER_REVIEW);
         return applyChange();
     }
 

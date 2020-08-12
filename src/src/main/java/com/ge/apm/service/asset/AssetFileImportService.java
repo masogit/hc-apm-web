@@ -5,33 +5,22 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.*;
-import com.ge.apm.domain.pure.AssetInfoFormatter;
-import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.common.CustomConfigConstant;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import webapp.framework.web.WebUtil;
 
-import javax.faces.context.FacesContext;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -188,10 +177,10 @@ public class AssetFileImportService extends AssetFileImportBaseService {
                 if (StringUtils.isEmpty(asset.getUid())) {
 
                     //only new asset need to set this
-                    asset.setUsageStatus(3); //已建档
+                    asset.setUsageStatus(UsageStatusConstant.ARCHIVED); //已建档
 
                     if(isNeedAudit){
-                        asset.setUsageStatus(2); //待审核
+                        asset.setUsageStatus(UsageStatusConstant.UNDER_REVIEW); //待审核
                     }
 
                 } else {
