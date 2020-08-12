@@ -116,69 +116,68 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void workFlowSelected(SelectEvent event){
-        if(selectedWorkFlow != null){
-            if(v2_listHashMap ==null || v2_listHashMap.get(0) ==null || v2_listHashMap.get(0).get("assetId") == null){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "未查询出合同数据！", "");
-                FacesContext.getCurrentInstance().addMessage(null, message);
-                return;
-            }
-            contractList = zkbPartOrderService.queryContractByAsset(selectionTenantInfo,String.valueOf(v2_listHashMap.get(0).get("assetId")));
-            if(contractList.size() == 0){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "未查询出合同数据！", "");
-                FacesContext.getCurrentInstance().addMessage(null, message);
-            }else if(contractList.size() > 1){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "合同超过两条数据，请检查！", "");
-                FacesContext.getCurrentInstance().addMessage(null, message);
-            }else if(contractList.size() == 1){
-                ZkbContract zkbContract = contractList.get(0);
-                if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
-                    if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "合同备件数量小于等于1，请检查！", "");
+
+        if(v2_listHashMap ==null || v2_listHashMap.get(0) ==null || event.getObject() == null ){
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "未查询出合同数据！", "");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            return;
+        }
+        selectedWorkFlow = (HashMap<String, String>) event.getObject();
+        contractList = zkbPartOrderService.queryContractByAsset(selectionTenantInfo,String.valueOf(selectedWorkFlow.get("assetId")));
+        if(contractList.size() == 0){
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "未查询出合同数据！", "");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }else if(contractList.size() > 1){
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "合同超过两条数据，请检查！", "");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }else if(contractList.size() == 1){
+            ZkbContract zkbContract = contractList.get(0);
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
+                if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "合同备件数量小于等于1，请检查！", "");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                }
+            } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
+                if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "合同探头数量小于等于1，请检查！", "");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                }
+            } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+                if("1".equals(artificialType)){
+                    if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "备件+人工+保养剩余名额小于等于1，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
-                } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                    if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "合同探头数量小于等于1，请检查！", "");
-                        FacesContext.getCurrentInstance().addMessage(null, message);
-                    }
-                } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-                    if("1".equals(artificialType)){
+                }else if("3".equals(artificialType)){
+                    if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
                         if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
                             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "备件+人工+保养剩余名额小于等于1，请检查！", "");
                             FacesContext.getCurrentInstance().addMessage(null, message);
                         }
-                    }else if("3".equals(artificialType)){
-                        if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
-                            if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
-                                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "备件+人工+保养剩余名额小于等于1，请检查！", "");
-                                FacesContext.getCurrentInstance().addMessage(null, message);
-                            }
-                        }else if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
-                            if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 1){
-                                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "人工支持次数小于等于1，请检查！", "");
-                                FacesContext.getCurrentInstance().addMessage(null, message);
-                            }
+                    }else if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
+                        if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 1){
+                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "人工支持次数小于等于1，请检查！", "");
+                            FacesContext.getCurrentInstance().addMessage(null, message);
                         }
                     }
                 }
-
-                if(v2_listHashMap.get(0).get("customerName") != null){
-                    selected.setHospitalRepairer(v2_listHashMap.get(0).get("customerName").toString());
-                }
-                if(v2_listHashMap.get(0).get("customerTel") != null){
-                    selected.setHospitalRepairerPhone(v2_listHashMap.get(0).get("customerTel").toString());
-                }
-                if(v2_listHashMap.get(0).get("hospitalName") != null){
-                    selected.setHospitalName(v2_listHashMap.get(0).get("hospitalName").toString());
-                }
-                if(v2_listHashMap.get(0).get("faultDescription") != null){
-                    selected.setFaultDescription(v2_listHashMap.get(0).get("faultDescription").toString());
-                }
             }
-            calcRemainQty();
-        }else{
-            contractList = new ArrayList<>();
+
+            if(v2_listHashMap.get(0).get("customerName") != null){
+                selected.setHospitalRepairer(v2_listHashMap.get(0).get("customerName").toString());
+            }
+            if(v2_listHashMap.get(0).get("customerTel") != null){
+                selected.setHospitalRepairerPhone(v2_listHashMap.get(0).get("customerTel").toString());
+            }
+            if(v2_listHashMap.get(0).get("hospitalName") != null){
+                selected.setHospitalName(v2_listHashMap.get(0).get("hospitalName").toString());
+            }
+            if(v2_listHashMap.get(0).get("faultDescription") != null){
+                selected.setFaultDescription(v2_listHashMap.get(0).get("faultDescription").toString());
+            }
         }
+        calcRemainQty();
+
     }
 
     public void contractRowSelected(SelectEvent event){
