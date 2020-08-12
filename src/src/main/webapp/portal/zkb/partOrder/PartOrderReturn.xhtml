@@ -13,7 +13,7 @@
                     <label class="label">配件号*</label>
                     <p:selectOneMenu id="partNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partNo}" >
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItems value="#{zkbPartOrderAuditController.partNoList}" var="item" itemLabel="#{item.text}" itemValue="#{item.value}"/>
+                        <f:selectItems value="#{zkbPartOrderAuditController.partNoList}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>
