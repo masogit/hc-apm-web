@@ -119,17 +119,21 @@
                                 <f:selectItem itemLabel="其他特殊原因（需注明在备注栏）" itemValue="2"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
                             <label class="label">ZKB工程师姓名*</label>
                             <p:inputText id="zkbEngineerName" value="#{zkbPartOrderEditController.selected.zkbEngineerName}" required="true"  requiredMessage="ZKB工程师姓名 #{msg.ValidationRequire}" disabled="true" />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
                             <label class="label">ZKB工程师电话*</label>
                             <p:inputText id="zkbEngineerPhone" value="#{zkbPartOrderEditController.selected.zkbEngineerPhone}" required="true"  requiredMessage="ZKB工程师电话 #{msg.ValidationRequire}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">订单数量</label>
                             <p:inputText id="qty" value="#{zkbPartOrderAuditController.selected.qty}" required="true" readonly="true" requiredMessage="订单数量 #{msg.ValidationRequire}" disabled="true" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">备注</label>
+                            <p:inputText id="remark" value="#{zkbPartOrderEditController.selected.remark}" disabled="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid>
