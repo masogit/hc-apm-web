@@ -163,17 +163,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
 
-            if(v2_listHashMap.get(0).get("customerName") != null){
-                selected.setHospitalRepairer(v2_listHashMap.get(0).get("customerName").toString());
+            if(selectedWorkFlow.get("customerName") != null){
+                selected.setHospitalRepairer(selectedWorkFlow.get("customerName").toString());
             }
-            if(v2_listHashMap.get(0).get("customerTel") != null){
-                selected.setHospitalRepairerPhone(v2_listHashMap.get(0).get("customerTel").toString());
+            if(selectedWorkFlow.get("customerTel") != null){
+                selected.setHospitalRepairerPhone(selectedWorkFlow.get("customerTel").toString());
             }
-            if(v2_listHashMap.get(0).get("hospitalName") != null){
-                selected.setHospitalName(v2_listHashMap.get(0).get("hospitalName").toString());
+            if(selectedWorkFlow.get("hospitalName") != null){
+                selected.setHospitalName(selectedWorkFlow.get("hospitalName").toString());
             }
-            if(v2_listHashMap.get(0).get("faultDescription") != null){
-                selected.setFaultDescription(v2_listHashMap.get(0).get("faultDescription").toString());
+            if(selectedWorkFlow.get("faultDescription") != null){
+                selected.setFaultDescription(selectedWorkFlow.get("faultDescription").toString());
             }
         }
         calcRemainQty();
