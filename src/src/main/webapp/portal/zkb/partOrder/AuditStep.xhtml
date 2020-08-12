@@ -93,11 +93,11 @@
                             <label class="label">故障描述</label>
                             <p:inputText id="faultDescription" value="#{zkbPartOrderAuditController.selected.faultDescription}" disabled="true" />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Tool')}">
                             <label class="label">订单标注</label>
                             <p:inputText id="orderAnnotation" value="#{zkbPartOrderAuditController.selected.orderAnnotation}" disabled="true" />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Tool')}">
                             <label class="label">发生问题的order number</label>
                             <p:inputText id="problemOrderNumber" value="#{zkbPartOrderAuditController.selected.problemOrderNumber}" disabled="true" />
                         </h:panelGroup>
@@ -134,7 +134,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-                <p:fieldset id="zkbPartOrderDetailFieldset" legend="额度明细"  rendered="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
+                <p:fieldset id="zkbPartOrderDetailFieldset" legend="额度明细"  rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' or zkbPartOrderEditController.orderType eq 'Tool'}">
                     <p:dataTable id="zkbDetailDatalist" value="#{zkbPartOrderAuditController.selected.zkbPartOrderItems}" var="item"
                                  widgetVar="zkbContractCourseDatalist" selectionMode="single"
                                  lazy="false" paginator="true" rowKey="#{item.partNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
@@ -212,9 +212,13 @@
                 </p:fieldset>
                 <p:fieldset id="orderedFieldset" legend="订货信息" rendered="#{zkbPartOrderAuditController.showOrder}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Tool')}">
                             <label class="label">SR#*</label>
                             <p:inputText id="srNo" value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Tool'}">
+                            <label class="label">SR#</label>
+                            <p:inputText id="srNo_tool" value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">Act#*</label>
@@ -233,7 +237,7 @@
                     <p:dataTable id="zkbOrderDatalist" value="#{zkbPartOrderAuditController.selected.zkbPartOrderItems}" var="item"
                                  widgetVar="zkbContractCourseDatalist" selectionMode="single"
                                  lazy="false" paginator="true" rowKey="#{item.partNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
-                                 paginatorTemplate="" rows="20" emptyMessage="#{msg.noRecordFound}" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}">
+                                 paginatorTemplate="" rows="20" emptyMessage="#{msg.noRecordFound}" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Tool'}">
                         <p:column headerText="配件号">
                             <h:outputText value="#{item.partNo}"/>
                         </p:column>
@@ -267,7 +271,7 @@
                             <label class="label">归还类型*</label>
                             <p:selectOneMenu id="returnType" value="#{zkbPartOrderAuditController.selected.returnType}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" >
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <f:selectItems value="#{zkbPartOrderAuditController.returnTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
@@ -300,7 +304,7 @@
                             </p:inputTextarea>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:dataTable id="zkbReturnDatalist" value="#{zkbPartOrderAuditController.zkbPartOrderReturnList}" var="item" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}"
+                    <p:dataTable id="zkbReturnDatalist" value="#{zkbPartOrderAuditController.zkbPartOrderReturnList}" var="item" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Tool'}"
                                  widgetVar="zkbReturnDatalist" selectionMode="single" selection="#{zkbPartOrderAuditController.zkbPartOrderReturn}"
                                  lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
                                  paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}" >

@@ -20,7 +20,8 @@
                     <label class="label">归还类型*</label>
                     <p:selectOneMenu id="returnType" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnType}" >
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        <!--<f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
+                        <f:selectItems value="#{zkbPartOrderAuditController.returnTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>
