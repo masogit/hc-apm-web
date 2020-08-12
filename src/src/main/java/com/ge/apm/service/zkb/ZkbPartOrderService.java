@@ -64,6 +64,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Autowired
     ZkbPartOrderReturnRepository zkbPartOrderReturnRepository;
 
+    @Autowired
+    OrgInfoRepository orgInfoRepository;
+
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYYMMdd");
 
 
@@ -114,6 +117,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             m.put("assetId",v.getAssetInfo().getUid());
             m.put("customerName",v.getServiceRequest().getCustomerName());
             m.put("customerTel",v.getServiceRequest().getCustomerTel());
+            m.put("faultDescription",v.getServiceRequest().getRequestReason());
+            String siteUid = v.getAssetInfo().getSiteUID();
+            if(StringUtils.isNotEmpty(siteUid)){
+                OrgInfo orgInfo = orgInfoRepository.getByUid(siteUid);
+                if(orgInfo != null){
+                    m.put("hospitalName",orgInfo.getName());
+                }
+            }
             v2_listHashMap.add(m);
         }
         return v2_listHashMap;
@@ -266,6 +277,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 m.put("customerTel",v.getServiceRequest().getCustomerTel());
                 m.put("id",v.getId());
                 m.put("assetId",v.getAssetInfo().getUid());
+                m.put("faultDescription",v.getServiceRequest().getRequestReason());
+                String siteUid = v.getAssetInfo().getSiteUID();
+                if(StringUtils.isNotEmpty(siteUid)){
+                    OrgInfo orgInfo = orgInfoRepository.getByUid(siteUid);
+                    if(orgInfo != null){
+                        m.put("hospitalName",orgInfo.getName());
+                    }
+                }
                 map.put("v2", m);
             }
         }
@@ -408,7 +427,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subReturnQty(zkbContract,zkbPartOrder, zkbPartOrder.getReturnQty());
             }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
-                List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderIdAndReturnType(zkbPartOrder.getId(),"goodReturn");
+                List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderIdAndReturnTypeIsNot(zkbPartOrder.getId(),"badReturn");
                 if(zkbPartOrderReturns != null && zkbPartOrderReturns.size() > 0){
                     int v = 0;
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());

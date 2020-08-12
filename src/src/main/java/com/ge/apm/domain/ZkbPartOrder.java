@@ -305,6 +305,30 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "online_engineer")
     private String onlineEngineer;
 
+    /**
+     * GE工程师
+     */
+    @Column(name = "ge_engineer_name")
+    private String geEngineerName;
+
+    /**
+     * GE工程师电话
+     */
+    @Column(name = "ge_engineer_phone")
+    private String geEngineerPhone;
+
+    /**
+     * ZKB工程师姓名
+     */
+    @Column(name = "zkb_engineer_name")
+    private String zkbEngineerName;
+
+    /**
+     * ZKB工程师电话
+     */
+    @Column(name = "zkb_engineer_phone")
+    private String zkbEngineerPhone;
+
     @Transient
     List<ZkbPartOrderItem> zkbPartOrderItems = new ArrayList<>();
 
@@ -782,6 +806,37 @@ public class ZkbPartOrder implements Serializable {
         this.problemOrderNumber = problemOrderNumber;
     }
 
+    public String getGeEngineerName() {
+        return geEngineerName;
+    }
+
+    public void setGeEngineerName(String geEngineerName) {
+        this.geEngineerName = geEngineerName;
+    }
+
+    public String getGeEngineerPhone() {
+        return geEngineerPhone;
+    }
+
+    public void setGeEngineerPhone(String geEngineerPhone) {
+        this.geEngineerPhone = geEngineerPhone;
+    }
+
+    public String getZkbEngineerName() {
+        return zkbEngineerName;
+    }
+
+    public void setZkbEngineerName(String zkbEngineerName) {
+        this.zkbEngineerName = zkbEngineerName;
+    }
+
+    public String getZkbEngineerPhone() {
+        return zkbEngineerPhone;
+    }
+
+    public void setZkbEngineerPhone(String zkbEngineerPhone) {
+        this.zkbEngineerPhone = zkbEngineerPhone;
+    }
 
     @Override
     public int hashCode() {
