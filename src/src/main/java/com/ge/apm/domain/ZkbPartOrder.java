@@ -37,7 +37,7 @@ public class ZkbPartOrder implements Serializable {
      * Artificial:人工申请
      */
     public enum OrderType {
-        Parts,Probe,Artificial
+        Parts,Probe,Artificial,Tool
     }
 
     @Id

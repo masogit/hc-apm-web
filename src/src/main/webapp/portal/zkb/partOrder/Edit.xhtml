@@ -158,11 +158,11 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医院报修人姓名*</label>
-                            <p:inputText id="hospitalRepairer" value="#{zkbPartOrderEditController.selected.hospitalRepairer}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" />
+                            <p:inputText id="hospitalRepairer" value="#{zkbPartOrderEditController.selected.hospitalRepairer}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" disabled="#{!(empty zkbPartOrderEditController.selected.hospitalRepairer)}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医院报修人电话*</label>
-                            <p:inputText id="hospitalRepairerPhone" value="#{zkbPartOrderEditController.selected.hospitalRepairerPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairerPhone} #{msg.ValidationRequire}" />
+                            <p:inputText id="hospitalRepairerPhone" value="#{zkbPartOrderEditController.selected.hospitalRepairerPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairerPhone} #{msg.ValidationRequire}" disabled="#{!(empty zkbPartOrderEditController.selected.hospitalRepairerPhone)}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">产品型号*</label>
@@ -177,15 +177,19 @@
                             <p:inputText id="faultDescription" value="#{zkbPartOrderEditController.selected.faultDescription}" required="true" requiredMessage="#{msg.zkbPartOrder_faultDescription} #{msg.ValidationRequire}" >
                             </p:inputText>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Tool')}">
                             <label class="label">订单标注</label>
                             <p:selectOneMenu id="orderAnnotation" value="#{zkbPartOrderEditController.selected.orderAnnotation}" required="true" requiredMessage="#{msg.zkbPartOrder_orderAnnotation} #{msg.ValidationRequire}">
                                 <p:ajax update="problemOrderNumberGrid" listener="#{zkbPartOrderEditController.orderAnnotationChange}"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoOrderAnnotationType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <!--<f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoOrderAnnotationType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
+                                <f:selectItem itemLabel="常规订单" itemValue="NormalOrder"/>
+                                <f:selectItem itemLabel="DOA" itemValue="DOA"/>
+                                <f:selectItem itemLabel="Wrong Part" itemValue="Wrong Part"/>
+                                <f:selectItem itemLabel="Short Life" itemValue="Short Life"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGrid id="problemOrderNumberGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGrid id="problemOrderNumberGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{!(zkbPartOrderEditController.orderType eq 'Tool')}">
                             <h:panelGroup id="problemOrderNumberGroup" rendered="#{!(zkbPartOrderEditController.showProblemOrderNumber)}" style="text-align: left">
                                 <label class="label">发生问题的order number</label>
                                 <p:inputText id="problemOrderNumber" value="#{zkbPartOrderEditController.selected.problemOrderNumber}"  required="true" requiredMessage="#{msg.zkbPartOrder_problemOrderNumber} #{msg.ValidationRequire}"  />
@@ -232,7 +236,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-                <p:fieldset id="zkbPartOrderDetailFieldset" legend="额度明细" rendered="#{zkbPartOrderEditController.showPartOrder and zkbPartOrderEditController.orderType eq 'Parts'}" >
+                <p:fieldset id="zkbPartOrderDetailFieldset" legend="额度明细" rendered="#{zkbPartOrderEditController.showPartOrder and (zkbPartOrderEditController.orderType eq 'Parts' or zkbPartOrderEditController.orderType eq 'Tool')}" >
                     <p:dataTable id="zkbDetailDatalist" value="#{zkbPartOrderEditController.selected.zkbPartOrderItems}" var="item"
                                  widgetVar="zkbContractCourseDatalist" selectionMode="single" selection="#{zkbPartOrderEditController.zkbPartOrderItem}"
                                  lazy="false" paginator="true" rowKey="#{item.partNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.index}"

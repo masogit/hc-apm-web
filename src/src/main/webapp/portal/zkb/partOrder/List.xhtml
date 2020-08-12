@@ -44,13 +44,12 @@
                             <h:outputText value="#{item.partOrderNo}"/>
                         </p:column>
                          <p:column headerText="订单类型" filterBy="#{item.orderType}"  filterMatchMode="LIKE">
-                            <h:outputText value="#{zkbPartOrderController.getOrderTypeText(item.orderType)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbPartOrderType',item.orderType)}"/>
                              <f:facet name="filter">
                                  <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                      <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                     <f:selectItem itemLabel="备件申请" itemValue="Parts" />
-                                     <f:selectItem itemLabel="探头申请" itemValue="Probe" />
-                                     <f:selectItem itemLabel="人工申请" itemValue="Artificial" />                                 </p:selectOneMenu>
+                                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPartOrderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                 </p:selectOneMenu>
                              </f:facet>
                         </p:column>
 

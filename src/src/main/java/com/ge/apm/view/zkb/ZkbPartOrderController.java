@@ -76,19 +76,6 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         return zkbPartOrderService.getTenantInfo(tenantInfoUID);
     }
 
-    public String getOrderTypeText(String value){
-        switch (value){
-            case "Parts" :
-                return "备件申请";
-            case "Probe" :
-                return "探头申请";
-            case "Artificial" :
-                return "人工申请";
-            default:
-                return "";
-        }
-    }
-
     /**
      * @author : 503189362
      * @description : 租户选择变化时，那么重新进行编辑页面
