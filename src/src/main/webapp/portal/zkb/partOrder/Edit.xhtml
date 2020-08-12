@@ -158,11 +158,11 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医院报修人姓名*</label>
-                            <p:inputText id="hospitalRepairer" value="#{zkbPartOrderEditController.selected.hospitalRepairer}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" disabled="#{!(empty zkbPartOrderEditController.selected.hospitalRepairer)}"/>
+                            <p:inputText id="hospitalRepairer" value="#{zkbPartOrderEditController.selected.hospitalRepairer}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医院报修人电话*</label>
-                            <p:inputText id="hospitalRepairerPhone" value="#{zkbPartOrderEditController.selected.hospitalRepairerPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairerPhone} #{msg.ValidationRequire}" disabled="#{!(empty zkbPartOrderEditController.selected.hospitalRepairerPhone)}" />
+                            <p:inputText id="hospitalRepairerPhone" value="#{zkbPartOrderEditController.selected.hospitalRepairerPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairerPhone} #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">产品型号*</label>
@@ -213,6 +213,14 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGrid>
+                        <h:panelGroup>
+                            <label class="label">ZKB工程师姓名*</label>
+                            <p:inputText id="zkbEngineerName" value="#{zkbPartOrderEditController.selected.zkbEngineerName}" required="true"  requiredMessage="ZKB工程师姓名 #{msg.ValidationRequire}" disabled="true" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">ZKB工程师电话*</label>
+                            <p:inputText id="zkbEngineerPhone" value="#{zkbPartOrderEditController.selected.zkbEngineerPhone}" required="true"  requiredMessage="ZKB工程师电话 #{msg.ValidationRequire}" disabled="true" />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">订单数量*</label>
                             <p:inputText id="qty" value="#{zkbPartOrderEditController.selected.qty}" required="true"  requiredMessage="#{msg.zkbPartOrder_qty} #{msg.ValidationRequire}" disabled="true" />

@@ -110,7 +110,7 @@
                                 <f:selectItem itemLabel="不紧急" itemValue="f"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.selected.urgentOrder eq 't'}">
                             <label class="label">订单紧急的原因</label>
                             <p:selectOneMenu id="urgencyReasons" value="#{zkbPartOrderAuditController.selected.urgencyReasons}" disabled="true" >
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -118,6 +118,14 @@
                                 <f:selectItem itemLabel="场地维修有其他第三方竞争" itemValue="1"/>
                                 <f:selectItem itemLabel="其他特殊原因（需注明在备注栏）" itemValue="2"/>
                             </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">ZKB工程师姓名*</label>
+                            <p:inputText id="zkbEngineerName" value="#{zkbPartOrderEditController.selected.zkbEngineerName}" required="true"  requiredMessage="ZKB工程师姓名 #{msg.ValidationRequire}" disabled="true" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">ZKB工程师电话*</label>
+                            <p:inputText id="zkbEngineerPhone" value="#{zkbPartOrderEditController.selected.zkbEngineerPhone}" required="true"  requiredMessage="ZKB工程师电话 #{msg.ValidationRequire}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">订单数量</label>
@@ -220,13 +228,21 @@
                             <label class="label">SR#</label>
                             <p:inputText id="srNo_tool" value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
                             <label class="label">Act#*</label>
                             <p:inputText id="activityNo" value="#{zkbPartOrderAuditController.selected.activityNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_activityNo} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
                             <label class="label">Order#*</label>
                             <p:inputText id="orderNo" value="#{zkbPartOrderAuditController.selected.orderNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_orderNo} #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
+                            <label class="label">GE工程师姓名*</label>
+                            <p:inputText id="geEngineerName" value="#{zkbPartOrderAuditController.selected.geEngineerName}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="GE工程师姓名 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
+                            <label class="label">GE工程师电话*</label>
+                            <p:inputText id="geEngineerPhone" value="#{zkbPartOrderAuditController.selected.geEngineerPhone}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="GE工程师电话 #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">订货备注</label>

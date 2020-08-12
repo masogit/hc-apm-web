@@ -168,6 +168,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 if(v2_listHashMap.get(0).get("customerTel") != null){
                     selected.setHospitalRepairerPhone(v2_listHashMap.get(0).get("customerTel").toString());
                 }
+                if(v2_listHashMap.get(0).get("hospitalName") != null){
+                    selected.setHospitalName(v2_listHashMap.get(0).get("hospitalName").toString());
+                }
+                if(v2_listHashMap.get(0).get("faultDescription") != null){
+                    selected.setFaultDescription(v2_listHashMap.get(0).get("faultDescription").toString());
+                }
             }
             calcRemainQty();
         }else{
