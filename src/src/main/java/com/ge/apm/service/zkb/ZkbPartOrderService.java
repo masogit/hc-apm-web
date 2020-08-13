@@ -395,7 +395,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }else{
             if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())) {
                 newZkbPartOrderStep.setStepKey("ReturnPending");
-                newZkbPartOrderStep.setStepName("待归还");
+                newZkbPartOrderStep.setStepName("已下单");
             }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())) {
                 newZkbPartOrderStep.setStepKey("ClosePending");
                 newZkbPartOrderStep.setStepName("待关单");
