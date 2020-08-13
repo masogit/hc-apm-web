@@ -313,7 +313,7 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{zkbPartOrderEditController.saveEntity}" update=":growl" icon="ui-icon-check" />
+                <p:commandButton validateClient="true" value="#{msg.Submit}" action="#{zkbPartOrderEditController.saveEntity}" update=":growl" icon="ui-icon-check" />
                 <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" />
             </h:form>
             <ui:include src="PartOrderItem.xhtml"/>
