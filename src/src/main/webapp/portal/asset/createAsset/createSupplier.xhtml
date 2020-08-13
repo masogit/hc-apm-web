@@ -1,0 +1,92 @@
+<html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="SupplierEditDlg" class="SupplierEditDlgCls" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true"
+              draggable="true" appendTo="@this" header="#{msg.Supplier}">
+        <h:form id="SupplierEditForm">
+            <h:panelGroup id="display">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
+                    <h:panelGroup>
+                        <label class="label">#{msg.name}*</label>
+                        <p:inputText id="name" value="#{assetCreateController.newSupplier.name}"
+                                     required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.city}</label>
+                        <p:inputText id="city" value="#{assetCreateController.newSupplier.city}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.address}</label>
+                        <p:inputText id="address"
+                                     value="#{assetCreateController.newSupplier.address}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zipcode}</label>
+                        <p:inputText id="zipcode"
+                                     value="#{assetCreateController.newSupplier.zipcode}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.contactor}</label>
+                        <p:inputText id="contactor"
+                                     value="#{assetCreateController.newSupplier.contactor}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.tel}</label>
+                        <p:inputText id="tel" value="#{assetCreateController.newSupplier.tel}"/>
+                    </h:panelGroup>
+                    <!--纳税人识别号-->
+                    <!-- <h:panelGroup>
+                         <label class="label">#{msg.taxpayerIdentityNumber}</label>
+                         <p:inputText id="taxpayerIdentityNumber" value="#{assetCreateController.newSupplier.taxpayerIdentityNumber}" />
+                     </h:panelGroup>-->
+
+                    <h:panelGroup class="typepanel">
+                        <label class="label">#{msg.type}*</label>
+                        <h:panelGrid columns="3">
+                            <h:panelGrid columns="3">
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2">
+                                        <p:selectBooleanCheckbox id="wxs" value="#{assetCreateController.newSupplier.maintainerT}"/>
+                                        <p:outputLabel value="#{msg.maitanance}"/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2">
+                                        <p:selectBooleanCheckbox
+                                                value="#{assetCreateController.newSupplier.manufacturerT}"/>
+                                        <p:outputLabel value="#{msg.manufacture}"/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2">
+                                        <p:selectBooleanCheckbox
+                                                value="#{assetCreateController.newSupplier.supplierT}"/>
+                                        <p:outputLabel value="#{msg.vendor}"/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <br/>
+                <p:commandButton validateClient="true"
+                                 actionListener="#{assetCreateController.saveNewSupplier}"
+                                 value="#{msg.Save}"
+                                 icon="ui-icon-check"
+                                 update="@(.inputManufacture) @(.inputVendor3) @(.inputVendor) @(.inputVendor) @(.vendorChange) @(.telephone) :growl"
+                                 oncomplete="handleSubmit(args, 'SupplierEditDialog');"/>
+
+                <p:commandButton immediate="true"
+                                 value="#{msg.Cancel}"
+                                 icon="ui-icon-cancel"
+                                 onclick="PF('SupplierEditDialog').hide()"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

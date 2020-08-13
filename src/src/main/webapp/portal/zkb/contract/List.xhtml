@@ -68,14 +68,26 @@
                         <p:column headerText="#{msg.zkbContract_ibNumber}">
                             <h:outputText value="#{item.ibNumber}"/>
                         </p:column>
+                        <p:column headerText="#{msg.zkbContract_spareQuota_total}">
+                            <h:outputText value="#{item.spareQuotaTotal}"/>
+                        </p:column>
                         <p:column headerText="#{msg.zkbContract_spareQuota}">
                             <h:outputText value="#{item.spareQuota}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_probeQuota_total}" >
+                            <h:outputText value="#{item.probeQuotaTotal}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_probeQuota}" >
                             <h:outputText value="#{item.probeQuota}"/>
                         </p:column>
+                        <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes_total}" >
+                            <h:outputText value="#{item.geArtificialSupportTimesTotal}"/>
+                        </p:column>
                         <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
                             <h:outputText value="#{item.geArtificialSupportTimes}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContract_spareArtificail_total}">
+                            <h:outputText value="#{item.spareArtificailTotal}"/>
                         </p:column>
                         <p:column headerText="#{msg.zkbContract_spareArtificail}">
                             <h:outputText value="#{item.spareArtificail}"/>
