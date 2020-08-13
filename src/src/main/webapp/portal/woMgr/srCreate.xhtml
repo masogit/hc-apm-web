@@ -63,6 +63,19 @@
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
 
+                        <h:panelGroup rendered="#{userContextService.zkbAccount}">
+                            <label class="label">医院客户姓名*</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.customerName}" maxlength="256" required="true" requiredMessage="医院客户姓名 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{userContextService.zkbAccount}">
+                            <label class="label">医院客户电话*</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.customerTel}" maxlength="256" required="true" requiredMessage="医院客户电话 #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{userContextService.zkbAccount}">
+                            <label class="label">医院客户职务</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.customerPosition}" maxlength="256"/>
+                        </h:panelGroup>
+
 
                     </p:panelGrid>
                     

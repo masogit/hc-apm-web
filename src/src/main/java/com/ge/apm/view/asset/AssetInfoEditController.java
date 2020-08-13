@@ -7,12 +7,14 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -93,6 +95,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private GbCode selectedGb;
     private TreeNode gbTree;
     private TreeNode orgTree;
+    private QrCodeLib createRequest;
+
 
     private boolean assetGroupSecondarySupport = false;
     private List<I18nMessage> assetGroupSecondaryList;
@@ -110,11 +114,35 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Getter
     @Setter
     private int assetLifecyleStatus;// 0、初始状态，其他对应资产status
+    @Setter
+    @Getter
+    private List<String> rejectTextHistory;
+    @Getter
+    @Setter
+    private String rejectText;
+    @Setter
+    @Getter
+    private boolean isStatus;
+    @Getter
+    @Setter
+    private List<V2_BlobObject> pictureList;
+    @Setter
+    @Getter
+    private List<V2_BlobObject> audioList;
+    @Setter
+    @Getter
+    private List<String> commentsList;
+    @Setter
+    @Getter
+    private String[] selectedPictures;
 
     AssetLifecyleService assetLifecyleService;
+    private String qr_Code = null;
+    private String siteUid = null;
 
     @Override
     protected void init() {
+        isStatus = false;
         dao = WebUtil.getBean(AssetInfoRepository.class);
         mvsAssetInfoDao = WebUtil.getBean(MvsAssetInfoRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
@@ -145,6 +173,31 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
+
+        qr_Code = WebUtil.getRequestParameter("qrCode");
+        siteUid = WebUtil.getRequestParameter("siteUid");
+        createRequest = acService.getCreateRequest(qr_Code, siteUid);
+        if(createRequest != null){
+            qrCode = qr_Code;
+            isStatus = true;
+            createAssetInfo();
+            rejectTextHistory = new ArrayList();
+            if (null != createRequest.getFeedback()) {
+                Collections.addAll(rejectTextHistory, createRequest.getFeedback().split("//"));
+            }
+            commentsList = new ArrayList();
+            if (null != createRequest.getComment()) {
+                Collections.addAll(commentsList, createRequest.getComment().split("\\|"));
+            }
+            pictureList = acService.getQrCodePictureList(createRequest.getUid());
+            audioList = acService.getQrCodeAudioList(createRequest.getUid());
+            //默认图片全选
+            selectedPictures = new String[pictureList.size()];
+            for (int i = 0; i < pictureList.size(); i++) {
+                selectedPictures[i] = pictureList.get(i).getObjectStorageId();
+            }
+
+        }
 
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
@@ -210,6 +263,67 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
 
+    }
+    public void returnBack() {
+        acService.rejectReturn(createRequest, rejectText);
+        this.rejectTextHistory.add(TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText));
+        rejectText = "";
+        WebUtil.addSuccessMessage(WebUtil.getMessage("MessageSent"));
+    }
+    private AssetInfo createAssetInfo() {
+        if (selected == null){
+            selected = new AssetInfo();
+        }
+        selected.setQrCode(createRequest.getQrCode());
+        selected.setSerialNum(createRequest.getSerialNum());//制造商序列号
+        selected.setFunctionType(createRequest.getModelNum());//设备型号
+        selected.setManufactDate(createRequest.getManufactureDate());//出厂日期
+        selected.setIsValid(true);
+        selected.setStatus(1);
+        selected.setDeviceStatus(0);
+        selected.setIsDeleted(Boolean.FALSE);
+        selected.setName(createRequest.getAssetName());//名称
+        selected.setAssetGroup(createRequest.getAssetGroup());//设备分类
+        if (null != createRequest.getOrgId() && createRequest.getOrgId() > 0) {
+            OrgInfo org = acService.getOrgInfo(createRequest.getOrgId());
+            selected.setClinicalDeptId(createRequest.getOrgId());
+            selected.setClinicalDeptUID(org.getUid());
+            selectedObjectMap.put("clinicalDept", org.getUid() == null ? null : orgDao.findByUid(org.getUid()));
+        }
+        OrgInfo siteOrg = orgDao.findByUid(createRequest.getSiteUID());
+        selectedObjectMap.put("selectedOrg", siteOrg.getSiteUID() == null ? null : orgDao.findByUid(siteOrg.getSiteUID()));//业务单元
+        selected.setParentAssetId(createRequest.getParentAssetId());
+        selectedObjectMap.put("parentAsset", createRequest.getParentAssetId() == null ? null : dao.findById(createRequest.getParentAssetId()));//主设备
+        if (null != createRequest.getUserId()) {
+            UserAccount owner = acService.getUserInfo(createRequest.getUserId());
+            selected.setAssetOwnerId(owner.getId());
+            selected.setAssetOwnerName(owner.getName());
+            selected.setAssetOwnerTel(owner.getTelephone());
+            selectedObjectMap.put("assetOwner", selected.getAssetOwnerId() == null ? null : userDao.findById(selected.getAssetOwnerId()));//维修负责人
+        }
+        selected.setHospitalId(siteOrg.getId());
+        selected.setSiteId(siteOrg.getSiteId());
+        selected.setTenantUID(createRequest.getTenantUID());
+        selected.setHospitalUID(createRequest.getHospitalUID());
+        selected.setInstitutionUID(createRequest.getInstitutionUID());
+        selected.setSiteUID(createRequest.getSiteUID());
+        selected.setUsageStatus(acService.needAssetApproval(createRequest.getSiteUID()) ? UsageStatusConstant.UNDER_REVIEW : UsageStatusConstant.ARCHIVED);
+
+        if (null != createRequest.getUserId()) {
+             UserAccount owner = acService.getUserInfo(createRequest.getUserId());
+            selected.setAssetOwnerId(owner.getId());
+            selected.setAssetOwnerName(owner.getName());
+            selected.setAssetOwnerTel(owner.getTelephone());
+        }
+
+        if (!Strings.isNullOrEmpty(createRequest.getSubmitWechatId())) {
+            UserAccount submitter = acService.getUserByWechatId(createRequest.getSubmitWechatId());
+            if (null != submitter) {
+                selected.setCreatedBy(submitter.getUid());
+            }
+        }
+        selected.setCreatedDate(createRequest.getSubmitDate());
+        return selected;
     }
 
     @Override
@@ -401,15 +515,18 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Override
     public void onAfterNewObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
-        if (isOK) {
-            attachements.forEach(item -> {
-                if (item.getBoId() == null) {
-                    item.setBoId(object.getId());
-                    item.setBoUuid(object.getUid());
-                    blobService.saveBlobObject(item);
-                }
-            });
+        if(attachements !=null){
+            if (isOK) {
+                attachements.forEach(item -> {
+                    if (item.getBoId() == null) {
+                        item.setBoId(object.getId());
+                        item.setBoUuid(object.getUid());
+                        blobService.saveBlobObject(item);
+                    }
+                });
+            }
         }
+
     }
 
     public void removeAttachmentById(String blobId) {
@@ -451,7 +568,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
         if (selected.getUsageStatus() == null) {
-            selected.setUsageStatus(3);
+            selected.setUsageStatus(UsageStatusConstant.ARCHIVED);
         }
         if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim())) {
             if ("DFQ".equals(getAssetCodeConfig())) {
@@ -481,6 +598,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 }
             }
         }
+        //新增资产建档时
+        if(isStatus){
+            selected.setQrCode(qr_Code);
+        }
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
             if (null == gbCode) {
@@ -497,7 +618,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
         this.save();
-
+        if(selected != null && selected.getId() != null && selectedPictures != null){
+            acService.createAttachments(selected, selectedPictures);
+        }
+        if(qr_Code !=null && siteUid != null){
+            acService.updateQrLib(qr_Code, 3, siteUid);
+        }
         // do other stuff after save
         int status = selected.getStatus();
         if(status != assetLifecyleStatus){
@@ -511,7 +637,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         mvsUtil.copyToMvsTableIfMvsEquip(selected, mvsAssetInfo);
 
         saveOrUpdateAssetTags();
-
+        if(isStatus){
+            return "/portal/asset/createAsset/RequestsList.xhtml";
+        }
         if (resultStatus) {
             return getListPageLink();
         } else {
@@ -547,6 +675,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getListPageLink() {
+        if(isStatus){
+            return "/portal/asset/createAsset/RequestsList.xhtml";
+        }
         if (!selected.getIsValid() || 4 == selected.getStatus()) {
             return "AssetTerminateEntryList?faces-redirect=true";
         }
@@ -902,7 +1033,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public String submitApproval() {
-        selected.setUsageStatus(2);
+        selected.setUsageStatus(UsageStatusConstant.UNDER_REVIEW);
         return applyChange();
     }
 
@@ -928,20 +1059,25 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public boolean isValidParentAsset() {
-        //check whether parent asset is valid when editing
-        if (selected.getId() != null) {
-            if (selected.getParentAssetId() != null) {
-                AssetInfo assetInfo = dao.findById(selected.getParentAssetId());
-                if (assetInfo != null) {
-                    if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
-                        return false;
-                    }
-                }//parent asset found
 
-            }//parent asset exists
+        if (selected.getParentAssetId() == null) {
+            return true;
+        }
 
+        AssetInfo assetInfo = dao.findById(selected.getParentAssetId());
 
-        }//editing
+        if (null == assetInfo) {
+            return false;
+        }
+
+        if (StringUtils.isEmpty(selected.getClinicalDeptUID())) {
+            return false;
+        }
+
+        //parent asset and child asset will be in the same dept
+        if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
+            return false;
+        }
 
         return true;
     }

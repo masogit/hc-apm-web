@@ -155,6 +155,9 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setRequestReason(newServiceRequest.getRequestReason());
         formData.setAttachments(picList);
         formData.setAssetLocation(newServiceRequest.getAssetLocation());
+        formData.setCustomerName(newServiceRequest.getCustomerName());
+        formData.setCustomerTel(newServiceRequest.getCustomerTel());
+        formData.setCustomerPosition(newServiceRequest.getCustomerPosition());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
@@ -220,6 +223,9 @@ class ServiceRequestForm {
     String wechatId;
     String nickName;
     String assetLocation;
+    String customerName;
+    String customerTel;
+    String customerPosition;
 
     public String getAssetLocation() {
         return assetLocation;
@@ -315,6 +321,30 @@ class ServiceRequestForm {
 
     public void setAttachments(List<V2_BlobObject> attachments) {
         this.attachments = attachments;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerTel() {
+        return customerTel;
+    }
+
+    public void setCustomerTel(String customerTel) {
+        this.customerTel = customerTel;
+    }
+
+    public String getCustomerPosition() {
+        return customerPosition;
+    }
+
+    public void setCustomerPosition(String customerPosition) {
+        this.customerPosition = customerPosition;
     }
 }
 

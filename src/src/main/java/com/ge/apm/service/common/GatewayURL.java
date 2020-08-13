@@ -86,7 +86,11 @@ public enum GatewayURL {
     RETURN_SHORTCUT("/hcapmworkflowservice/api/apm/allocation/return/shortcut"),
     GET_VOUCHER_NUM("/hcapmworkflowservice/api/apm/allocation/voucherNum"),
 
-    BATCH_FILE_UPLOAD("/hcapmreportservice/api/apm/batchFile/upload");
+    BATCH_FILE_UPLOAD("/hcapmreportservice/api/apm/batchFile/upload"),
+
+    PART_ORDER_SEND_EMAIL("/hcapmreportservice/api/apm/report/partOrder/sendHtmlForPartOrder"),
+    PART_ORDER_SEND_MESSAGE("/hcapmreportservice/api/apm/report/partOrder/sendMessage"),
+    PART_ORDER_SEND_WECHAT_MESSAGE("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatMessages");
 
     private final String url;
 
