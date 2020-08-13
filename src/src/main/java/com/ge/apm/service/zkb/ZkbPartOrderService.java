@@ -433,8 +433,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                     for (ZkbPartOrderReturn r : zkbPartOrderReturns){
                         v += r.getQty();
-                        subReturnQty(zkbContract,zkbPartOrder,v);
                     }
+                    subReturnQty(zkbContract,zkbPartOrder,v);
                 }
             }
             //归还时发送邮件
