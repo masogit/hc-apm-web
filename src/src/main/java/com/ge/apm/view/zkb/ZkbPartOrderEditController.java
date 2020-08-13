@@ -305,7 +305,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if((this.selected.getZkbPartOrderItems() ==null || this.selected.getZkbPartOrderItems().size() == 0) && "Parts".equals(orderType)){
             flag=false;
-            errorLog += "额度申请明细不呢为空！";
+            errorLog += "额度申请明细不能为空！";
+        }
+        if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
+                flag=false;
+                errorLog += "附件不能为空！";
+            }
         }
         if(!flag){
             WebUtil.addErrorMessage(errorLog);

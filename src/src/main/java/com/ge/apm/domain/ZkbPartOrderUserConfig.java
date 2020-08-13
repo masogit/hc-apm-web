@@ -68,6 +68,13 @@ public class ZkbPartOrderUserConfig implements Serializable {
     @Column(name = "config_type")
     private String configType;
 
+    //DI CT x-ray
+    /**
+     * DI 是手动选择的在线工程师
+     * CT X-RAY是不同的公用邮箱
+     */
+    private String assetType;
+
     /**
      * 备注
      */
@@ -158,6 +165,14 @@ public class ZkbPartOrderUserConfig implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 
     @Override
