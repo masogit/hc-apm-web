@@ -177,7 +177,7 @@
                             <p:inputText id="faultDescription" value="#{zkbPartOrderEditController.selected.faultDescription}" required="true" requiredMessage="#{msg.zkbPartOrder_faultDescription} #{msg.ValidationRequire}" >
                             </p:inputText>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Tool')}">
+                        <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                             <label class="label">订单标注</label>
                             <p:selectOneMenu id="orderAnnotation" value="#{zkbPartOrderEditController.selected.orderAnnotation}" required="true" requiredMessage="#{msg.zkbPartOrder_orderAnnotation} #{msg.ValidationRequire}">
                                 <p:ajax update="problemOrderNumberGrid" listener="#{zkbPartOrderEditController.orderAnnotationChange}"/>
@@ -189,7 +189,7 @@
                                 <f:selectItem itemLabel="Short Life" itemValue="Short Life"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGrid id="problemOrderNumberGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{!(zkbPartOrderEditController.orderType eq 'Tool')}">
+                        <h:panelGrid id="problemOrderNumberGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                             <h:panelGroup id="problemOrderNumberGroup" rendered="#{!(zkbPartOrderEditController.showProblemOrderNumber)}" style="text-align: left">
                                 <label class="label">发生问题的order number</label>
                                 <p:inputText id="problemOrderNumber" value="#{zkbPartOrderEditController.selected.problemOrderNumber}"  required="true" requiredMessage="#{msg.zkbPartOrder_problemOrderNumber} #{msg.ValidationRequire}"  />
@@ -246,7 +246,7 @@
                             <p:inputText id="remark" value="#{zkbPartOrderEditController.selected.remark}" />
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:panelGrid>
+                    <p:panelGrid rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                         <h:panelGroup>
                             <p:dataList id="uploadList" value="#{zkbPartOrderEditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">附件列表</f:facet>
@@ -297,7 +297,7 @@
                         <h:panelGroup>
                             <label class="label">探头</label>
                             <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true"
-                                            completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catNo}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
+                                            completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
                                 <p:ajax event="itemSelect" update="zkbPartOrderProbeFieldset qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
                             </p:autoComplete>
                         </h:panelGroup>
