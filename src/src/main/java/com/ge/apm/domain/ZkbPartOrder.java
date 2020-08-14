@@ -347,6 +347,27 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "artificial_type")
     private String artificialType;
 
+    /**
+     * 探头号
+     */
+    @Column(name = "cat_no")
+    private String catNo;
+
+    /**
+     * 旧探头SN号
+     */
+    @Column(name = "old_cat_sn")
+    private String oldCatSn;
+
+    /**
+     * 新探头SN编号
+     */
+    @Column(name = "new_cat_sn")
+    private String newCatSn;
+
+    @Column(name = "cat_num")
+    private Integer catNum;
+
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false, name = "cat_id", referencedColumnName = "id")
     private ZkbPartOrderCat zkbPartOrderCat;
@@ -357,6 +378,38 @@ public class ZkbPartOrder implements Serializable {
 
     @Transient
     private int remainQty = 0;
+
+    public String getCatNo() {
+        return catNo;
+    }
+
+    public void setCatNo(String catNo) {
+        this.catNo = catNo;
+    }
+
+    public String getOldCatSn() {
+        return oldCatSn;
+    }
+
+    public void setOldCatSn(String oldCatSn) {
+        this.oldCatSn = oldCatSn;
+    }
+
+    public String getNewCatSn() {
+        return newCatSn;
+    }
+
+    public void setNewCatSn(String newCatSn) {
+        this.newCatSn = newCatSn;
+    }
+
+    public Integer getCatNum() {
+        return catNum;
+    }
+
+    public void setCatNum(Integer catNum) {
+        this.catNum = catNum;
+    }
 
     public int getReturnQty() {
         return returnQty;

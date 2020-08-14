@@ -187,32 +187,30 @@
                 <p:fieldset id="zkbPartOrderProbeFieldset" legend="探头明细" rendered="#{zkbPartOrderAuditController.orderType eq 'Probe'}" >
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <label class="label">探头</label>
-                            <p:autoComplete dropdown="true" value="#{zkbPartOrderAuditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" disabled="true"
-                                            completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catNo}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
-                                <p:ajax event="itemSelect" update="zkbPartOrderProbeFieldset" />
+                            <label class="label">探头号</label>
+                            <p:inputText id="catModel" value="#{zkbPartOrderEditController.selected.catNo}" disabled="true" />
+                        </h:panelGroup>
 
+                        <h:panelGroup>
+                            <label class="label">探头型号</label>
+                            <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" disabled="true"
+                                            completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
                             </p:autoComplete>
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">型号</label>
-                            <p:inputText id="catModel" value="#{zkbPartOrderAuditController.selected.zkbPartOrderCat.catModel}" disabled="true" />
-                        </h:panelGroup>
-
-                        <h:panelGroup>
-                            <label class="label">探头类型</label>
-                            <p:inputText id="catType" value="#{zkbPartOrderAuditController.selected.zkbPartOrderCat.catType}" disabled="true" />
-                        </h:panelGroup>
-
-                        <h:panelGroup>
                             <label class="label">价值类型</label>
-                            <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
+                            <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderEditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">价格</label>
-                            <p:inputText id="price" value="#{zkbPartOrderAuditController.selected.zkbPartOrderCat.price}" disabled="true" />
+                            <label class="label">旧探头SN号输入框</label>
+                            <p:inputText id="oldCatSn" value="#{zkbPartOrderEditController.selected.oldCatSn}" disabled="true" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">数量</label>
+                            <p:inputText id="catNum" value="#{zkbPartOrderEditController.selected.catNum}" disabled="true" />
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
@@ -317,6 +315,10 @@
                         <h:panelGroup>
                             <label class="label">归还日期*</label>
                             <p:calendar timeZone="GMT+8"  id="returnDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.selected.returnDate}" showOn="button" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup  rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                            <label class="label">新探头SN编号*</label>
+                            <p:inputText id="newCatSn" value="#{zkbPartOrderAuditController.selected.newCatSn}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="新探头SN编号 #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">归还备注</label>
