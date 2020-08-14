@@ -290,7 +290,7 @@
                 </p:fieldset>
                 <p:fieldset id="orderedCancelFieldset" legend="订货信息" rendered="#{zkbPartOrderAuditController.selected.status eq 'OrderedReject'}">
                     <h:panelGroup>
-                        <label class="label">取消原因*</label>
+                        <label class="label">拒绝原因*</label>
                         <p:inputTextarea id="orderedCancelRemark" value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
                         </p:inputTextarea>
                     </h:panelGroup>
