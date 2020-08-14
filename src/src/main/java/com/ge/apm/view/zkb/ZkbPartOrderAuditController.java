@@ -282,6 +282,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return "List?faces-redirect=true";
     }
 
+    public String dialogComplete(){
+        return "List?faces-redirect=true";
+    }
+
     public void prepareReturnCreate(){
         this.actionReturnName = "Create";
         this.zkbPartOrderReturn = new ZkbPartOrderReturn();
