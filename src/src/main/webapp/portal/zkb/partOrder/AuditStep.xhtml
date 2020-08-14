@@ -119,25 +119,25 @@
                                 <f:selectItem itemLabel="其他特殊原因（需注明在备注栏）" itemValue="2"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{!(zkbPartOrderEditController.selected.orderType eq 'Artificial')}">
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
                             <label class="label">收货人*</label>
                             <p:inputText id="receiver" value="#{zkbPartOrderAuditController.selected.receiver}" disabled="true"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{!(zkbPartOrderEditController.selected.orderType eq 'Artificial')}">
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
                             <label class="label">收货人电话*</label>
                             <p:inputText id="receiverPhone" value="#{zkbPartOrderAuditController.selected.receiverPhone}" disabled="true"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{!(zkbPartOrderEditController.selected.orderType eq 'Artificial')}">
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
                             <label class="label">收货地址*</label>
                             <p:inputText id="receiverAddress" value="#{zkbPartOrderAuditController.selected.receiverAddress}" disabled="true"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
                             <label class="label">ZKB工程师姓名*</label>
-                            <p:inputText id="zkbEngineerName" value="#{zkbPartOrderEditController.selected.zkbEngineerName}" />
+                            <p:inputText id="zkbEngineerName" value="#{zkbPartOrderAuditController.selected.zkbEngineerName}" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
                             <label class="label">ZKB工程师电话*</label>
-                            <p:inputText id="zkbEngineerPhone" value="#{zkbPartOrderEditController.selected.zkbEngineerPhone}"/>
+                            <p:inputText id="zkbEngineerPhone" value="#{zkbPartOrderAuditController.selected.zkbEngineerPhone}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">订单数量</label>
@@ -380,7 +380,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{zkbPartOrderAuditController.orderCancelNext}" oncomplete="PF('zkbCancelReasonDlg').hide()" update=":growl" icon="ui-icon-check" />
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.orderCancelNext}" oncomplete="PF('zkbConfigDlg').hide()" update=":growl" icon="ui-icon-check" />
                     <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfigDlg').hide()"/>
                 </h:form>
                 <ui:include src="PartOrderReturn.xhtml"/>

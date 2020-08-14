@@ -215,23 +215,23 @@
                         </h:panelGrid>
                         <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                             <label class="label">收货人*</label>
-                            <p:inputText id="receiver" value="#{zkbPartOrderAuditController.selected.receiver}" required="true" requiredMessage="#{msg.zkbPartOrder_receiver} #{msg.ValidationRequire}"/>
+                            <p:inputText id="receiver" value="#{zkbPartOrderEditController.selected.receiver}" required="true" requiredMessage="#{msg.zkbPartOrder_receiver} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                             <label class="label">收货人电话*</label>
-                            <p:inputText id="receiverPhone" value="#{zkbPartOrderAuditController.selected.receiverPhone}"  required="true" requiredMessage="#{msg.zkbPartOrder_receiverPhone} #{msg.ValidationRequire}"/>
+                            <p:inputText id="receiverPhone" value="#{zkbPartOrderEditController.selected.receiverPhone}"  required="true" requiredMessage="#{msg.zkbPartOrder_receiverPhone} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                             <label class="label">收货地址*</label>
-                            <p:inputText id="receiverAddress" value="#{zkbPartOrderAuditController.selected.receiverAddress}" required="true" requiredMessage="#{msg.zkbPartOrder_receiverAddress} #{msg.ValidationRequire}"/>
+                            <p:inputText id="receiverAddress" value="#{zkbPartOrderEditController.selected.receiverAddress}" required="true" requiredMessage="#{msg.zkbPartOrder_receiverAddress} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">
                             <label class="label">ZKB工程师姓名*</label>
-                            <p:inputText id="zkbEngineerName" value="#{zkbPartOrderEditController.selected.zkbEngineerName}" required="true"  requiredMessage="ZKB工程师姓名 #{msg.ValidationRequire}" disabled="true" />
+                            <p:inputText id="zkbEngineerName" value="#{zkbPartOrderEditController.selected.zkbEngineerName}" required="true"  requiredMessage="ZKB工程师姓名 #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">
                             <label class="label">ZKB工程师电话*</label>
-                            <p:inputText id="zkbEngineerPhone" value="#{zkbPartOrderEditController.selected.zkbEngineerPhone}" required="true"  requiredMessage="ZKB工程师电话 #{msg.ValidationRequire}" disabled="true" />
+                            <p:inputText id="zkbEngineerPhone" value="#{zkbPartOrderEditController.selected.zkbEngineerPhone}" required="true"  requiredMessage="ZKB工程师电话 #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">订单数量*</label>
