@@ -309,13 +309,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setSiteUID(createRequest.getSiteUID());
         selected.setUsageStatus(acService.needAssetApproval(createRequest.getSiteUID()) ? UsageStatusConstant.UNDER_REVIEW : UsageStatusConstant.ARCHIVED);
 
-        if (null != createRequest.getUserId()) {
-             UserAccount owner = acService.getUserInfo(createRequest.getUserId());
-            selected.setAssetOwnerId(owner.getId());
-            selected.setAssetOwnerName(owner.getName());
-            selected.setAssetOwnerTel(owner.getTelephone());
-        }
-
         if (!Strings.isNullOrEmpty(createRequest.getSubmitWechatId())) {
             UserAccount submitter = acService.getUserByWechatId(createRequest.getSubmitWechatId());
             if (null != submitter) {
