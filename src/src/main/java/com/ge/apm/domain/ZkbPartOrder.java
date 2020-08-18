@@ -37,7 +37,7 @@ public class ZkbPartOrder implements Serializable {
      * Artificial:人工申请
      */
     public enum OrderType {
-        Parts,Probe,Artificial
+        Parts,Probe,Artificial,Tool
     }
 
     @Id
@@ -305,6 +305,30 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "online_engineer")
     private String onlineEngineer;
 
+    /**
+     * GE工程师
+     */
+    @Column(name = "ge_engineer_name")
+    private String geEngineerName;
+
+    /**
+     * GE工程师电话
+     */
+    @Column(name = "ge_engineer_phone")
+    private String geEngineerPhone;
+
+    /**
+     * ZKB工程师姓名
+     */
+    @Column(name = "zkb_engineer_name")
+    private String zkbEngineerName;
+
+    /**
+     * ZKB工程师电话
+     */
+    @Column(name = "zkb_engineer_phone")
+    private String zkbEngineerPhone;
+
     @Transient
     List<ZkbPartOrderItem> zkbPartOrderItems = new ArrayList<>();
 
@@ -323,16 +347,69 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "artificial_type")
     private String artificialType;
 
+    /**
+     * 探头号
+     */
+    @Column(name = "cat_no")
+    private String catNo;
+
+    /**
+     * 旧探头SN号
+     */
+    @Column(name = "old_cat_sn")
+    private String oldCatSn;
+
+    /**
+     * 新探头SN编号
+     */
+    @Column(name = "new_cat_sn")
+    private String newCatSn;
+
+    @Column(name = "cat_num")
+    private Integer catNum;
+
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false, name = "cat_id", referencedColumnName = "id")
     private ZkbPartOrderCat zkbPartOrderCat;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false, name = "asset_id", referencedColumnName = "uid")
     private AssetInfo assetInfo;
 
     @Transient
     private int remainQty = 0;
+
+    public String getCatNo() {
+        return catNo;
+    }
+
+    public void setCatNo(String catNo) {
+        this.catNo = catNo;
+    }
+
+    public String getOldCatSn() {
+        return oldCatSn;
+    }
+
+    public void setOldCatSn(String oldCatSn) {
+        this.oldCatSn = oldCatSn;
+    }
+
+    public String getNewCatSn() {
+        return newCatSn;
+    }
+
+    public void setNewCatSn(String newCatSn) {
+        this.newCatSn = newCatSn;
+    }
+
+    public Integer getCatNum() {
+        return catNum;
+    }
+
+    public void setCatNum(Integer catNum) {
+        this.catNum = catNum;
+    }
 
     public int getReturnQty() {
         return returnQty;
@@ -782,6 +859,37 @@ public class ZkbPartOrder implements Serializable {
         this.problemOrderNumber = problemOrderNumber;
     }
 
+    public String getGeEngineerName() {
+        return geEngineerName;
+    }
+
+    public void setGeEngineerName(String geEngineerName) {
+        this.geEngineerName = geEngineerName;
+    }
+
+    public String getGeEngineerPhone() {
+        return geEngineerPhone;
+    }
+
+    public void setGeEngineerPhone(String geEngineerPhone) {
+        this.geEngineerPhone = geEngineerPhone;
+    }
+
+    public String getZkbEngineerName() {
+        return zkbEngineerName;
+    }
+
+    public void setZkbEngineerName(String zkbEngineerName) {
+        this.zkbEngineerName = zkbEngineerName;
+    }
+
+    public String getZkbEngineerPhone() {
+        return zkbEngineerPhone;
+    }
+
+    public void setZkbEngineerPhone(String zkbEngineerPhone) {
+        this.zkbEngineerPhone = zkbEngineerPhone;
+    }
 
     @Override
     public int hashCode() {
