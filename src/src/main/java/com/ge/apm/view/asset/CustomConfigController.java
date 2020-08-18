@@ -188,7 +188,7 @@ public class CustomConfigController {
         }
 
         addFieldsList.sort((String o1, String o2) -> {
-            return pinYinComparator.compare(CustomConfigConstant.getAllFields().get(o1), CustomConfigConstant.getAllFields().get(o2));
+            return pinYinComparator.compare(allFields.get(o1), allFields.get(o2));
         });
 
     }
@@ -387,9 +387,11 @@ public class CustomConfigController {
     //使用的字段
     public List<CustomConfigAssetField> getAssetFieldsList() {
         List<CustomConfigAssetField> res = customConfigObject.getAssetFields().entrySet().stream().map(Entry::getValue).collect(Collectors.toList());
+
         res.sort((CustomConfigAssetField o1, CustomConfigAssetField o2) -> {
-            return pinYinComparator.compare(CustomConfigConstant.getAllFields().get(o1.getKey()), CustomConfigConstant.getAllFields().get(o2.getKey()));
+            return pinYinComparator.compare(allFields.get(o1.getKey()), allFields.get(o2.getKey()));
         });
+
         return res;
     }
 

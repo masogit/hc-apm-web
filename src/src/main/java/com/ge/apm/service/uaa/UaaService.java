@@ -172,10 +172,8 @@ public class UaaService {
             SysRoleVO srVO = new SysRoleVO();
             srVO.setId(tempSysRole.getId());
             srVO.setName(tempSysRole.getName());
-
             srVO.setRoleDesc(tempSysRole.getRoleDesc());
             srVO.setRoleDescEn(tempSysRole.getRoleDescEn());
-
             /*if(isLocale()){
                 srVO.setRoleDesc(tempSysRole.getRoleDesc());
             }else{
@@ -196,9 +194,14 @@ public class UaaService {
                     continue;
                 }
             }
+            //判断是否是智康宝用户，如果不是就移除掉智康宝的角色
+            if(srVO.getName().equals("zkbDealerSales") || srVO.getName().equals("zkbDealerFE")){
+                if(null != ti.getType() && ti.getType()!=3){
+                    continue;
+                }
+            }
             sysRoleList.add(srVO);
         }
-
         List<CustomRole> customRoles = getTenantCustomRoles(ti.getUid());
         if(CollectionUtils.isNotEmpty(customRoles)){
             for (CustomRole customRole: customRoles) {
