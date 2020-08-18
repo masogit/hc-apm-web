@@ -114,7 +114,7 @@ public class CustomConfigConstant {
             allFields.put("repairForm", WebUtil.getMessage("repairForm"));
             allFields.put("locationCode", WebUtil.getMessage("locationCode"));
             allFields.put("locationName", WebUtil.getMessage("locationName"));
-            allFields.put("status", WebUtil.getMessage("CurrentStatus"));
+            allFields.put("status", WebUtil.getMessage("status"));
             allFields.put("deviceStatus", WebUtil.getMessage("deviceStatus"));
             allFields.put("comments", WebUtil.getMessage("comments"));
             allFields.put("assetUsage", WebUtil.getMessage("assetUsage"));
