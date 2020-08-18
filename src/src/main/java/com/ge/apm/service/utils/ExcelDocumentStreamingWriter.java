@@ -65,6 +65,11 @@ public class ExcelDocumentStreamingWriter implements Closeable {
     }
 
     private void setDefaultColumnStyles() {
+
+        if (null == columnTitles || columnTitles.isEmpty()) {
+            return;
+        }
+
         for (int index = 0; index < columnTitles.size(); index++) {
             String columnTitle = columnTitles.get(index);
             if (columnTitle == null || columnTitle.isEmpty()) {
