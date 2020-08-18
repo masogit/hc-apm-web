@@ -14,6 +14,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -21,6 +22,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.event.FileUploadEvent;
@@ -75,6 +77,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private AssetTagsMapper assetTagsMapper;
     private AssetTagsRepository assetTagsDao;
+    private List<ZkbFileDirectory> subZkbFileDirectoryList=null;
 
     @Getter
     @Setter
@@ -140,6 +143,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private String qr_Code = null;
     private String siteUid = null;
 
+    /**
+     * 目录关系service
+     */
+    private ZkbFileDirectoryService zkbFileDirectoryService;
+
     @Override
     protected void init() {
         isStatus = false;
@@ -170,6 +178,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         assetTagsMapper = WebUtil.getBean(AssetTagsMapper.class);
         assetTagsDao = WebUtil.getBean(AssetTagsRepository.class);
+        zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -1239,4 +1248,37 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return tags;
     }
 
+    /**
+     * 获取所有主目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> findMainDirectory() {
+        return zkbFileDirectoryService.findMainDirectory(null);
+    }
+
+    /**
+     * 根据主目录值获取子目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> getSubZkbFileDirectoryList() {
+        if(this.selected==null||this.selected.getMainDirectory()==null)
+        {
+            return null;
+        }
+        List<ZkbFileDirectory> mainZkbFileDirectory = this.zkbFileDirectoryService.findByLevelAndName(
+                ZkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,
+                this.selected.getMainDirectory());
+        if(CollectionUtils.isEmpty(mainZkbFileDirectory))
+        {
+            return null;
+        }
+        ZkbFileDirectory zkbFileDirectory = new ZkbFileDirectory();
+        zkbFileDirectory=mainZkbFileDirectory.get(0);
+        subZkbFileDirectoryList=this.zkbFileDirectoryService.findByZkbFileDirectory(zkbFileDirectory);
+        return subZkbFileDirectoryList;
+    }
+
+    public void setSubZkbFileDirectoryList(List<ZkbFileDirectory> subZkbFileDirectoryList) {
+        this.subZkbFileDirectoryList = subZkbFileDirectoryList;
+    }
 }

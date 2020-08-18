@@ -3454,3 +3454,22 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoOrderAnnotationType','DOA','DOA','DOA',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoOrderAnnotationType','Wrong Part','Wrong Part','Wrong Part',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoOrderAnnotationType','Short Life','Short Life','Short Life',NULL,-1);
+
+
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','directory','目录','DIRECTORY',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('directoryLevel','1','主目录','Main Directory',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('directoryLevel','2','子目录','Sub Directory',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','directoryName','目录名称','Directory Name',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','importDirectorySystemId','系统ID','System Id',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','directoryLevel','目录级别','Directory Level',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorSubDirectoryExist', '错误：主目录包含子目录信息', 'Error: sub directory exist', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorDirectoryNameExist', '错误：目录名称已存在', 'Error: directory name exist', NULL, '-1');
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','DirectoryInfoImport','目录信息导入','Directory Infomation Import',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','FileNeedDataOfDirectory','文件中填入要导入的目录信息','Fill in the file with the directory information to be imported',NULL,	-1	);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorDirectorySystemIdIsEmpty', '错误：system id为空', 'Error: system id is empty', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorDirectoryMainDirectoryIsEmpty', '错误：主目录为空', 'Error: main directory is empty', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorDirectorySecondDirectoryIsEmpty', '错误：子目录为空', 'Error: second directory is empty', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorDirectory', '错误：目录信息不存在', 'Error: directory information is not exist', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorCountDirectory', '错误：未找到需要更新的数据', 'Error:needed data has not been find', NULL, '-1');
