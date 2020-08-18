@@ -41,6 +41,7 @@ public class ExcelDocumentStreamingWriter implements Closeable {
 
     final CellStyle DEFAULT_CELL_STYLE_DATE;
     final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
+    final String transferColumnStyleToDate = "出厂日期,采购日期,到货日期,启用日期,质保截止日期,维保截止日期";
 
     public ExcelDocumentStreamingWriter(SXSSFWorkbook workBook, String sheetName, List<String> columnTitles) {
         SXSSFSheet sheet = workBook.getSheet(sheetName);
@@ -115,7 +116,12 @@ public class ExcelDocumentStreamingWriter implements Closeable {
             return;
         }
 
-        if (data instanceof String) {
+        if(transferColumnStyleToDate.contains(data.toString())){
+            int columnIndex = cell.getColumnIndex();
+            sheet.setDefaultColumnStyle(columnIndex, DEFAULT_CELL_STYLE_DATE);
+            cell.setCellType(CellType.NUMERIC);
+            cell.setCellValue((String) data);
+        }else if (data instanceof String) {
             cell.setCellType(CellType.STRING);
             cell.setCellValue((String) data);
 
