@@ -131,6 +131,27 @@
                                         <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCatalogFields}" var="fieldItem" >
                                             <ui:include src="customEditFields.xhtml"/>
                                         </c:forEach>
+                                        <c:if test="#{userContextService.zkbAccount}" >
+                                            <h:panelGroup>
+                                                <label class="label">#{msg.mainDirectory}<span style="color:red">*</span></label>
+                                                <p:selectOneMenu id="fileMainDirectory" value="#{assetInfoEditController.selected.mainDirectory}" required="true" requiredMessage="#{msg.mainDirectory} #{msg.ValidationRequire}">
+                                                    <p:ajax update="fileSecondDirectory"/>
+                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                    <c:forEach items="#{assetInfoEditController.findMainDirectory()}" var="v">
+                                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                                    </c:forEach>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <label class="label">#{msg.secondDirectory}<span style="color:red">*</span></label>
+                                                <p:selectOneMenu id="fileSecondDirectory" value="#{assetInfoEditController.selected.secondDirectory}" required="true" requiredMessage="#{msg.secondDirectory} #{msg.ValidationRequire}">
+                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                    <c:forEach items="#{assetInfoEditController.subZkbFileDirectoryList}" var="v">
+                                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                                    </c:forEach>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                        </c:if>
                                     </p:panelGrid>
                             </p:fieldset>
                             <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageDateFields}">
