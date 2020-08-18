@@ -71,7 +71,9 @@ public class ExcelDocumentStreamingWriter implements Closeable {
                 continue;
             }
 
-            sheet.setDefaultColumnStyle(index, DEFAULT_CELL_STYLE_DATE);
+            if (columnTitle.toLowerCase().endsWith("date") || columnTitle.endsWith("日期")) {
+                sheet.setDefaultColumnStyle(index, DEFAULT_CELL_STYLE_DATE);
+            }
         }
     }
 
