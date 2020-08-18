@@ -534,6 +534,18 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "UCMID")
     private String UCMID;
 
+    /**
+     * 主目录
+     */
+    @Column(name = "main_directory")
+    private String mainDirectory;
+
+    /**
+     * 子目录
+     */
+    @Column(name = "second_directory")
+    private String secondDirectory;
+
     @Transient
     private int lineNum;
 
@@ -1940,5 +1952,21 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setUCMID(String UCMID) {
       this.UCMID = UCMID;
+    }
+
+    public String getMainDirectory() {
+        return mainDirectory;
+    }
+
+    public void setMainDirectory(String mainDirectory) {
+        this.mainDirectory = mainDirectory;
+    }
+
+    public String getSecondDirectory() {
+        return secondDirectory;
+    }
+
+    public void setSecondDirectory(String secondDirectory) {
+        this.secondDirectory = secondDirectory;
     }
 }

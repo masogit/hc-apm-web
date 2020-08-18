@@ -5,8 +5,12 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.ZkbFileDirectory;
 import com.ge.apm.service.asset.ZkbFileAttachmentService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
@@ -15,12 +19,17 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -33,6 +42,12 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
     private BlobObjectRepository dao;
     private TenantInfoRepository tenantInfoDao;
     private ZkbFileAttachmentService zkbFileAttachmentService;
+    private List<ZkbFileDirectory> subZkbFileDirectoryList=null;
+
+    /**
+     * 目录关系service
+     */
+    private ZkbFileDirectoryService zkbFileDirectoryService;
 
     private List<V2_BlobObject> attachements;
     private String actionName;
@@ -47,12 +62,20 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
 
     private Map<String, List<String>> zkbSecondDirectoryData;
 
+    private List<Map<String, Object>> errorDirectoryList;
+
+    /**
+     * 导入文件
+     */
+    private UploadedFile file;
+
     @Override
     protected void init() {
 
         dao = WebUtil.getBean(BlobObjectRepository.class);
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         zkbFileAttachmentService = WebUtil.getBean(ZkbFileAttachmentService.class);
+        zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
         this.selectedMap = new HashMap();
@@ -141,10 +164,10 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
     public void saveZkbFileAttachment(){
 
         if(this.actionName.equals("Create")){
-            if(attachements.isEmpty()){
-                WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
-                return;
-            }
+//            if(attachements.isEmpty()){
+//                WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
+//                return;
+//            }
             zkbFileAttachmentService.saveZkbFileAttachment(this.selected, this.attachements, this.selectedTenantInfoList);
         }else if(this.actionName.equals("Edit")){
             zkbFileAttachmentService.updateZkbFileAttachment(this.selected, this.selectedTenantInfoList);
@@ -235,4 +258,101 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
         this.selectedTenantInfoList = selectedTenantInfoList;
     }
 
+    /**;v
+     * 获取所有主目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> findMainDirectory() {
+        return zkbFileDirectoryService.findMainDirectory(null);
+    }
+
+    /**
+     * 根据主目录值获取子目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> getSubZkbFileDirectoryList() {
+        if(this.selected==null||this.selected.getMainDirectory()==null)
+        {
+            return null;
+        }
+        List<ZkbFileDirectory> mainZkbFileDirectory = this.zkbFileDirectoryService.findByLevelAndName(
+                ZkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,
+                this.selected.getMainDirectory());
+        if(CollectionUtils.isEmpty(mainZkbFileDirectory))
+        {
+            return null;
+        }
+        ZkbFileDirectory zkbFileDirectory = new ZkbFileDirectory();
+        zkbFileDirectory=mainZkbFileDirectory.get(0);
+        subZkbFileDirectoryList=this.zkbFileDirectoryService.findByZkbFileDirectory(zkbFileDirectory);
+        return subZkbFileDirectoryList;
+    }
+
+    public void setSubZkbFileDirectoryList(List<ZkbFileDirectory> subZkbFileDirectoryList) {
+
+        this.subZkbFileDirectoryList = subZkbFileDirectoryList;
+    }
+
+    /**
+     * 跳转导入页面
+     * @return
+     */
+    public String importAction() {
+        return "DirectoryInfoImport?faces-redirect=true";
+    }
+
+    /**
+     * 文件下载
+     * @return
+     */
+    public String getTemplateName(){
+        UserContextService ucs = WebUtil.getBean(UserContextService.class);
+        return ucs.isLocale() == true ? "Directory_Service_Template.xlsx":"Directory_Service_Template_en.xlsx";
+    }
+
+    /**
+     * 文件上传
+     * @param event  文件流
+     */
+    public void uploadDataFile(FileUploadEvent event) {
+        ExcelDocument doc = null;
+        this.file = event.getFile();
+        try {
+            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+            int maxRowNum = ZkbFileAttachmentService.EXCEL_DIRECTORY_HEADER_ROW + ZkbFileAttachmentService.EXCEL_DIRECTORY_IMPORT_MAX_ROW;
+            if(doc.exceedMaxRowNum(ZkbFileAttachmentService.SHEET_SERVICE_DIRECTORY, maxRowNum)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
+                return;
+            }
+            List<Map<String, Object>> importDirectoryMapList = zkbFileAttachmentService.getDirectoryMapFromTemplate(doc);
+            zkbFileAttachmentService.importData(importDirectoryMapList);
+            errorDirectoryList = zkbFileAttachmentService.filterErrorRecords(importDirectoryMapList);
+            if(!errorDirectoryList.isEmpty()){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+errorDirectoryList.size()+WebUtil.getMessage("RecordsOfFailure"));
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }else {
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ImportComplete"));
+            }
+
+        } catch (IOException ex) {
+            WebUtil.addErrorMessage("File can not be read!");
+            Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
+            Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            if (doc != null) {
+                doc.release();
+            }
+        }
+
+    }
+
+    public List<Map<String, Object>> getErrorDirectoryList() {
+        return errorDirectoryList;
+    }
+
+    public void setErrorDirectoryList(List<Map<String, Object>> errorDirectoryList) {
+        this.errorDirectoryList = errorDirectoryList;
+    }
 }
