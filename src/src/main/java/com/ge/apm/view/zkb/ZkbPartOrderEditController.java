@@ -20,10 +20,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -76,6 +73,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         queryWorkFlow.setServiceRequest(new V2_ServiceRequest());
         if("Create".equals(actionName)){
             this.selected = new ZkbPartOrder();
+            selected.setRequestDate(new Date());
             v2_blobObjectList = new ArrayList<>();
         }else{
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
@@ -125,7 +123,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     public void workFlowSelected(SelectEvent event){
 
         if(v2_listHashMap ==null || v2_listHashMap.get(0) ==null || event.getObject() == null ){
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "未查询出合同数据！", "");
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "未查询出合同数据！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
             return;
         }
@@ -133,40 +131,54 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         assetInfo = assetInfoRepository.findByUid(String.valueOf(selectedWorkFlow.get("assetId")));
         selected.setProductNumber(assetInfo.getFunctionType());
 
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
+            if(assetInfo.getAssetGroup() == null || assetInfo.getAssetGroup() != 2){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "探头申请只能选择超声类设备！", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                return;
+            }
+        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
+            if(assetInfo.getAssetGroup() != null && (assetInfo.getAssetGroup() == 2 || assetInfo.getAssetGroup() == 1)){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件申请只能选择超声类或者放射类设备！", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                return;
+            }
+        }
+
         contractList = zkbPartOrderService.queryContractByAsset(selectionTenantInfo,String.valueOf(selectedWorkFlow.get("assetId")));
         if(contractList.size() == 0){
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "未查询出合同数据！", "");
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "未查询出合同数据！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }else if(contractList.size() > 1){
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "合同超过两条数据，请检查！", "");
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同超过两条数据，请检查！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }else if(contractList.size() == 1){
             ZkbContract zkbContract = contractList.get(0);
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
                 if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
-                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "合同备件数量小于等于1，请检查！", "");
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于1，请检查！", "");
                     FacesContext.getCurrentInstance().addMessage(null, message);
                 }
             } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
-                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "合同探头数量小于等于1，请检查！", "");
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同探头数量小于等于1，请检查！", "");
                     FacesContext.getCurrentInstance().addMessage(null, message);
                 }
             } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
                 if("1".equals(artificialType)){
                     if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "备件+人工+保养剩余名额小于等于1，请检查！", "");
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于1，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                     }
                 }else if("3".equals(artificialType)){
                     if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
                         if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
-                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "备件+人工+保养剩余名额小于等于1，请检查！", "");
+                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于1，请检查！", "");
                             FacesContext.getCurrentInstance().addMessage(null, message);
                         }
                     }else if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
                         if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 1){
-                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "人工支持次数小于等于1，请检查！", "");
+                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于1，请检查！", "");
                             FacesContext.getCurrentInstance().addMessage(null, message);
                         }
                     }
