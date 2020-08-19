@@ -175,4 +175,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
 	@Query(value = "select site_uid from org_info where name=?1 and site_id=?2", nativeQuery = true)
 	String getSiteUidByHospitalName(String hospitalName,Integer siteId);
+
+	@Query(value = "select uid from org_info where name like concat('%',?1,'%') and org_type = 1 and site_id = ?2 limit 50", nativeQuery = true)
+	List<String> findByInstitutionByNameLike(String name, Integer siteId);
 }

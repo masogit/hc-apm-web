@@ -427,7 +427,16 @@ public class UaaService {
     public List<OrgInfo> getOrgListByUser(String userUid){
         return orgInfoDao.getByUser(userUid);
     }
-    
+
+    public boolean isIbSiteAdmin(UserAccount userAccount) {
+        if (userAccount.getSiteId() == 46) {
+            List<OrgInfo> orgListByUser = getOrgListByUser(userAccount.getUid());
+            // available to see the all institutions in ib site
+            return orgListByUser.size() == 1 && orgListByUser.get(0).getOrgLevel() == 0;
+        }
+        return false;
+    }
+
     //get tree for user to access
     public TreeNode getOrgAccessTreeByUser(UserAccount user){
         OrgInfo rootOrg = orgInfoDao.getByUid(user.getSiteUID());
@@ -753,6 +762,16 @@ public class UaaService {
     public UserAccount getUserById(int userId){
         UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         return userAccountDao.findById(userId);
+    }
+
+    //用户可以显示的医院列表
+    public List<OrgInfo> getUserAccessibleSiteList(String userUid, String name, Integer siteId) {
+        List<String> institutions = orgInfoDao.findByInstitutionByNameLike(name, siteId);
+        //for accessible sites
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
+        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4)); //非科室
+        return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 
     //用户可以显示的医院列表(不包含科室)
