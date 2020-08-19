@@ -305,6 +305,10 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "online_engineer")
     private String onlineEngineer;
 
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @JoinColumn(insertable=false, updatable=false, name = "online_engineer", referencedColumnName = "id")
+    private ZkbPartOrderUserConfig onlineEngine;
+
     /**
      * GE工程师
      */
@@ -378,6 +382,17 @@ public class ZkbPartOrder implements Serializable {
 
     @Transient
     private int remainQty = 0;
+
+    @Column(name = "asset_type_di")
+    private String assetTypeDi; //ct xr
+
+    public String getAssetTypeDi() {
+        return assetTypeDi;
+    }
+
+    public void setAssetTypeDi(String assetTypeDi) {
+        this.assetTypeDi = assetTypeDi;
+    }
 
     public String getCatNo() {
         return catNo;
@@ -889,6 +904,14 @@ public class ZkbPartOrder implements Serializable {
 
     public void setZkbEngineerPhone(String zkbEngineerPhone) {
         this.zkbEngineerPhone = zkbEngineerPhone;
+    }
+
+    public ZkbPartOrderUserConfig getOnlineEngine() {
+        return onlineEngine;
+    }
+
+    public void setOnlineEngine(ZkbPartOrderUserConfig onlineEngine) {
+        this.onlineEngine = onlineEngine;
     }
 
     @Override

@@ -73,7 +73,11 @@ public class ZkbPartOrderUserConfig implements Serializable {
      * DI 是手动选择的在线工程师
      * CT X-RAY是不同的公用邮箱
      */
+    @Column(name = "asset_type")
     private String assetType;
+
+    @Column(name = "sub_config_type")
+    private String subConfigType;
 
     /**
      * 备注
@@ -86,6 +90,14 @@ public class ZkbPartOrderUserConfig implements Serializable {
      */
     @Column(name = "tenant_uid")
     private String tenantUID;
+
+    public String getSubConfigType() {
+        return subConfigType;
+    }
+
+    public void setSubConfigType(String subConfigType) {
+        this.subConfigType = subConfigType;
+    }
 
     public String getTenantUID() {
         return tenantUID;

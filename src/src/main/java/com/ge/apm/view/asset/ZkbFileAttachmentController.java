@@ -164,10 +164,10 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
     public void saveZkbFileAttachment(){
 
         if(this.actionName.equals("Create")){
-//            if(attachements.isEmpty()){
-//                WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
-//                return;
-//            }
+            if(attachements.isEmpty()){
+                WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
+                return;
+            }
             zkbFileAttachmentService.saveZkbFileAttachment(this.selected, this.attachements, this.selectedTenantInfoList);
         }else if(this.actionName.equals("Edit")){
             zkbFileAttachmentService.updateZkbFileAttachment(this.selected, this.selectedTenantInfoList);
