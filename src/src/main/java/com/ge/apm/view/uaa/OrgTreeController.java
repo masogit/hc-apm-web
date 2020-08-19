@@ -7,25 +7,23 @@ package com.ge.apm.view.uaa;
 
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import org.apache.commons.lang3.StringUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import webapp.framework.web.WebUtil;
+
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
- *
  * @author 212579464
  */
 @ManagedBean
@@ -34,11 +32,11 @@ public class OrgTreeController {
 
     UaaService uaaService = WebUtil.getBean(UaaService.class);
     private OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
-    
-    
+
+
     private TreeNode siteOrgTree;
     private TreeNode selectedOrgNode;
-    
+
     private TreeNode tenantOrgTree;
     private TreeNode selectedTenantOrgNode;
 
@@ -55,25 +53,25 @@ public class OrgTreeController {
         siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
     }
 
-    public OrgInfo getOrgInfoByUID(String uid){
+    public OrgInfo getOrgInfoByUID(String uid) {
         return orgDao.getByUid(uid);
     }
-    
+
     public TreeNode createTenantOrgTree() {
-        
-         OrgInfo rootOrg = new OrgInfo();
+
+        OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
         TreeNode rootNode = new DefaultTreeNode("org", null, null);
         rootNode.getChildren().add(new DefaultTreeNode("org", rootOrg, null));
         List<OrgInfo> siteList = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID())
-                .stream().filter(item -> item.getOrgType()<4).collect(Collectors.toList());
+                .stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
         TreeNode siteTree = buildTree(siteList);
         expandedByOrgType(siteTree, 2);
         rootNode.getChildren().addAll(siteTree.getChildren());
         return rootNode;
     }
-    
+
     public TreeNode createSiteOrgTree() {
         List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
         TreeNode siteTree = buildTree(siteList);
@@ -111,16 +109,28 @@ public class OrgTreeController {
     }
 
     public void filterTreeNodeByName() {
-        uaaService.filterTreeNode(siteOrgTree, treeNodeNameFilter, 3, 3);
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        if (uaaService.isIbSiteAdmin(currentUserAccount)) {
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid(), treeNodeNameFilter, currentUserAccount.getSiteId());
+            TreeNode siteTree = buildTree(siteList);
+            expandedByOrgType(siteTree, 2);
+            siteOrgTree = siteTree;
+        } else {
+            uaaService.filterTreeNode(siteOrgTree, treeNodeNameFilter, 3, 3);
+        }
     }
-    
+
     public TreeNode getSiteOrgTree() {
         if (null == siteOrgTree) {
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            if (uaaService.isIbSiteAdmin(currentUserAccount)) {
+                return null;
+            }
             siteOrgTree = createSiteOrgTree();
         }
         return siteOrgTree;
     }
-    
+
     public TreeNode getTenantOrgTree() {
         if (null == tenantOrgTree) {
             tenantOrgTree = createTenantOrgTree();
@@ -139,7 +149,7 @@ public class OrgTreeController {
                     || item.getInstitutionUID().equals(siteUid) || item.getHospitalUID().equals(siteUid) || item.getSiteUID().equals(siteUid)).collect(Collectors.toList()));
             deptOrgTree.setRowKey(siteUid);
             selectedDeptOrgNode = null;
-            expandedByOrgType(deptOrgTree,4);
+            expandedByOrgType(deptOrgTree, 4);
         }
         return deptOrgTree;
     }
@@ -167,7 +177,7 @@ public class OrgTreeController {
     public void setSelectedTenantOrgNode(TreeNode selectedTenantOrgNode) {
         this.selectedTenantOrgNode = selectedTenantOrgNode;
     }
-    
+
     public String getTreeNodeNameFilter() {
         return treeNodeNameFilter;
     }
