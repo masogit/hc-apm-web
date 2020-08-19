@@ -47,8 +47,8 @@
                         <p:selectOneMenu id="fileMainDirectory" value="#{zkbFileAttachmentController.selected.mainDirectory}" required="true" requiredMessage="#{msg.mainDirectory} #{msg.ValidationRequire}">
                             <p:ajax update="fileSecondDirectory"/>
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <c:forEach items="#{fieldMsg.getFieldValueList('zkbMainDirectory')}" var="v">
-                                <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}"/>
+                            <c:forEach items="#{zkbFileAttachmentController.findMainDirectory()}" var="v">
+                                <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
                             </c:forEach>
                         </p:selectOneMenu>
                     </h:panelGroup>
@@ -57,8 +57,8 @@
                         <label class="label">#{msg.secondDirectory}*</label>
                         <p:selectOneMenu id="fileSecondDirectory" value="#{zkbFileAttachmentController.selected.secondDirectory}" required="true" requiredMessage="#{msg.secondDirectory} #{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <c:forEach items="#{zkbFileAttachmentController.zkbSecondDirectoryList}" var="v">
-                                <f:selectItem itemLabel="#{v}" itemValue="#{v}"/>
+                            <c:forEach items="#{zkbFileAttachmentController.subZkbFileDirectoryList}" var="v">
+                                <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
                             </c:forEach>
                         </p:selectOneMenu>
                     </h:panelGroup>

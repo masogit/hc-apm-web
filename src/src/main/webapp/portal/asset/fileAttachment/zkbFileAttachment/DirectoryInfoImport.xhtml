@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.DirectoryInfoImport}"/>
+            </div>
+        </div>
+        <div class="ui-g-12 card">
+            <h:form id="importForm">
+                <p:fieldset  legend="#{msg.DirectoryInfoImport}" id="uploaderContainer">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">#{msg.choseFileToUpload}</label>
+                            <p:fileUpload  id="fileUpload" fileUploadListener="#{zkbFileAttachmentController.uploadDataFile}" value="#{zkbFileAttachmentController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                           multiple="false" sizeLimit="10000000" auto="true"  update=":importForm :errorDataListForm" invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"  />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <div style="white-space:pre">#{msg.Description}   1. <a href="#{zkbFileAttachmentController.getTemplateName()}" title="download">#{msg.downloadTemplateFile}</a>        2. #{msg.FileNeedDataOfDirectory}        3. #{msg.UpFileImport}</div>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+
+                <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/asset/fileAttachment/zkbFileAttachment/List?faces-redirect=true" immediate="true" />
+            </h:form>
+        </div>
+
+        <div class="ui-g-12 card">
+            <h:form id="errorDataListForm">
+                <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
+                <p:fieldset  legend="#{msg.ImportFailureData}">
+                    <p:dataTable id="errorDatalist" rendered="#{not empty zkbFileAttachmentController.errorDirectoryList}" value="#{zkbFileAttachmentController.errorDirectoryList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:column headerText="#{msg.EXCELRowNumber}">
+                            <h:outputText value="#{item.get('assetInfoVO').lineNum}" />
+                        </p:column>
+                        <p:column headerText="#{msg.importDirectorySystemId}">
+                            <h:outputText value="#{item.get('assetInfoVO').systemId}" />
+                        </p:column>
+                        <p:column headerText="#{msg.mainDirectory}">
+                            <h:outputText value="#{item.get('assetInfoVO').mainDirectory}" />
+                        </p:column>
+                        <p:column headerText="#{msg.secondDirectory}">
+                            <h:outputText value="#{item.get('assetInfoVO').secondDirectory}" />
+                        </p:column>
+                        <p:column headerText="#{msg.FailureInformation}" >
+                            <h:outputText value="#{item.get('errmsg')}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>
