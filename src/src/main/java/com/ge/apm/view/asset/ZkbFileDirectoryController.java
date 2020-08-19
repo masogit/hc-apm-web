@@ -4,6 +4,8 @@ import com.ge.apm.dao.ZkbFileDirectoryRepository;
 import com.ge.apm.domain.ZkbFileDirectory;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.google.common.base.Strings;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author 503202755 2020/7/30
@@ -83,7 +86,12 @@ public class ZkbFileDirectoryController extends GenericCRUDUUIDController<ZkbFil
      * @return
      */
     public List<ZkbFileDirectory> findMainDirectory(String query) {
-        return zkbFileDirectoryService.findMainDirectory(this.selected.getId());
+        List<ZkbFileDirectory> listZkbFileDirectory = zkbFileDirectoryService.findMainDirectory(this.selected.getId());
+        if(CollectionUtils.isEmpty(listZkbFileDirectory))
+        {
+            return null;
+        }
+        return listZkbFileDirectory.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).collect(Collectors.toList());
     }
 
     @Override
@@ -126,5 +134,13 @@ public class ZkbFileDirectoryController extends GenericCRUDUUIDController<ZkbFil
             this.selected.setZkbFileDirectory(null);
         }
         super.save();
+    }
+
+    public String getActionName() {
+        return actionName;
+    }
+
+    public void setActionName(String actionName) {
+        this.actionName = actionName;
     }
 }
