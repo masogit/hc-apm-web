@@ -8,7 +8,7 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition>
-    <p:dialog id="dialogDirectory" widgetVar="dialogDirectory" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbFileDirectoryController.CRUDActionName}" height="370">
+    <p:dialog id="dialogDirectory" widgetVar="dialogDirectory" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbFileDirectoryController.CRUDActionName}" height="450px" width="350px">
         <h:form id="dialogDirectoryEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{not empty zkbFileDirectoryController.selected}">
                 <h:panelGroup>
@@ -18,7 +18,7 @@
 
                 <h:panelGroup >
                     <label class="label">#{msg.directoryLevel}*</label>
-                    <p:selectOneMenu id="level" value="#{zkbFileDirectoryController.selected.level}"  required="true" requiredMessage="#{msg.directoryLevel} #{msg.ValidationRequire}">
+                    <p:selectOneMenu id="level" disabled="#{zkbFileDirectoryController.actionName!='Create'}" value="#{zkbFileDirectoryController.selected.level}"  required="true" requiredMessage="#{msg.directoryLevel} #{msg.ValidationRequire}">
                         <p:ajax update="parentId" event="change" />
                         <f:selectItems value="#{fieldMsg.getFieldValueList('directoryLevel')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                     </p:selectOneMenu>
