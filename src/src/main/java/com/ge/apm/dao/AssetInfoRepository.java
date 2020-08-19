@@ -232,4 +232,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Modifying
     @Query(value= "UPDATE asset_info SET main_directory = ?1,second_directory = ?2 FROM tenant_info WHERE asset_info.tenant_uid = tenant_info.uid AND tenant_info.TYPE = ?3 AND asset_info.system_id = ?4 ",nativeQuery = true)
     void updateDirecotryInfo(String mainDirectory, String secondDirectory, Integer type,String systemId);
+
+    @Query("select o from AssetInfo o where o.departNum =?1 and o.systemId = ?2")
+    AssetInfo findByDepartNumAndSystemId(String departNum, String departNum1);
 }
