@@ -96,6 +96,7 @@
                 <p:menuitem id="um32" value="#{msg.AssetDocMgmt}" outcome="/portal/asset/fileAttachment/List.xhtml" rendered="#{userContextService.accessContains('knowledge.mgt')}"/>
                 <p:menuitem id="um321" value="#{msg.zkbKnowledgeMgmt}" outcome="/portal/asset/fileAttachment/zkbFileAttachment/List.xhtml" rendered="#{userContextService.accessContains('knowledge.zkbMgt') and userContextService.zkbAdmin}"/>
                 <p:menuitem id="um322" value="#{msg.zkbKnowledgeView}" outcome="/portal/asset/fileAttachment/zkbFileAttachment/ZkbUserList.xhtml" rendered="#{userContextService.accessContains('knowledge.zkbView') and userContextService.zkbUser}"/>
+                <p:menuitem id="um323" value="文档目录管理" outcome="/portal/zkb/fileDirectory/List.xhtml" rendered="#{userContextService.zkbAdmin}"/>
                 <p:menuitem id="um33" value="#{msg.AssetKMMgmt}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um34" value="#{msg.DeviceMgmtForum}" rendered="false" style="color: orange;" outcome="/empty"/>
                 <p:menuitem id="um35" value="#{msg.DeviceApplication}" rendered="false" style="color: orange;" outcome="/empty"/>
@@ -175,13 +176,15 @@
             </p:submenu>
             <p:submenu label="合同管理" icon="settings" rendered="#{userContextService.accessContains('zkbContract')}">
                 <p:menuitem value="合同管理" outcome="/portal/zkb/contract/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.contractMgt')}"/>
-                <p:menuitem value="申请工作台" outcome="/portal/zkb/partOrder/List.xhtml" />
                 <p:menuitem value="课程管理" outcome="/portal/zkb/course/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.courseMgt') and userContextService.zkbAdmin}"/>
             </p:submenu>
             <p:submenu label="#{msg.ZKBBasicInfo}" icon="settings" rendered="#{userContextService.accessContains('zkbBasicInfo')}">
                 <p:menuitem value="#{msg.ZKBAgentContactPersonMgt}" outcome="/portal/zkb/contactPerson/List.xhtml" rendered="#{userContextService.accessContains('zkbBasicInfo.agentContactPersonMgt')}"/>
                 <p:menuitem value="#{msg.ZKBEngineerMgt}" outcome="/portal/zkb/engineer/List.xhtml " rendered="#{userContextService.accessContains('zkbBasicInfo.engineerMgt')}"/>
                 <p:menuitem value="工程师资质查询" url="http://training.gehcservice.com" target="_blank" />
+            </p:submenu>
+            <p:submenu label="维修服务" icon="settings">
+                <p:menuitem value="申请工作台" outcome="/portal/zkb/partOrder/List.xhtml" />
             </p:submenu>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>

@@ -167,14 +167,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrder.setTenantUID(tenantUid);
         AssetInfo assetInfo = assetInfoRepository.findByUid(assetId);
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
-            //备件申请： 如果是放射类那么不需要进行技术支持审批，步骤直接为待区域经理审批
-            if(assetInfo.getAssetGroup() == 1){
-                zkbPartOrder.setStatus("Requested");
-                zkbPartOrder.setCurrentStep("ManagePending");
-            }else{
-                zkbPartOrder.setStatus("Requested");
-                zkbPartOrder.setCurrentStep("TechnicalPending");
-            }
+            zkbPartOrder.setStatus("Requested");
+            zkbPartOrder.setCurrentStep("TechnicalPending");
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
             zkbPartOrder.setStatus("Requested");
             zkbPartOrder.setCurrentStep("TechnicalPending");
@@ -212,13 +206,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         ZkbPartOrderStep zkbPartOrderStep = new ZkbPartOrderStep();
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())) {
-            if (assetInfo.getAssetGroup() == 1) {
-                zkbPartOrderStep.setStepKey("ManagePending");
-                zkbPartOrderStep.setStepName("待经理审批");
-            } else {
-                zkbPartOrderStep.setStepKey("TechnicalPending");
-                zkbPartOrderStep.setStepName("待技术支持审批");
-            }
+            zkbPartOrderStep.setStepKey("TechnicalPending");
+            zkbPartOrderStep.setStepName("待技术支持审批");
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
             zkbPartOrderStep.setStepKey("TechnicalPending");
             zkbPartOrderStep.setStepName("待技术支持审批");
@@ -230,6 +219,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrderStep.setStepKey("ManagePending");
                 zkbPartOrderStep.setStepName("待经理审批");
             }
+        }else if(ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
+            zkbPartOrderStep.setStepKey("TechnicalPending");
+            zkbPartOrderStep.setStepName("待技术支持审批");
         }
         zkbPartOrderStep.setStartTime(new Date());
         zkbPartOrderStep.setOwnerId(userAccount.getUid());
@@ -564,6 +556,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     public void sendMessage(ZkbPartOrder zkbPartOrder) {
+        //如果是备件申请，并且在技术支持审批and放射类设备则不需要发短信
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+            if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep())){
+                AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
+                if(assetInfo != null && assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 1){
+                    return;
+                }
+            }
+        }
         if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep())) {
             HashMap<String, String> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());

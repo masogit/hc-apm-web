@@ -61,6 +61,26 @@ public class ExcelDocumentStreamingWriter implements Closeable {
 
         DEFAULT_CELL_STYLE_DECIMAL = workBook.createCellStyle();
         DEFAULT_CELL_STYLE_DECIMAL.setDataFormat(createHelper.createDataFormat().getFormat("0.00"));
+
+        setDefaultColumnStyles();
+    }
+
+    private void setDefaultColumnStyles() {
+
+        if (null == columnTitles || columnTitles.isEmpty()) {
+            return;
+        }
+
+        for (int index = 0; index < columnTitles.size(); index++) {
+            String columnTitle = columnTitles.get(index);
+            if (columnTitle == null || columnTitle.isEmpty()) {
+                continue;
+            }
+
+            if (columnTitle.toLowerCase().endsWith("date") || columnTitle.endsWith("日期")) {
+                sheet.setDefaultColumnStyle(index, DEFAULT_CELL_STYLE_DATE);
+            }
+        }
     }
 
     public void writeRowData(int row, Map<String, Object> data) {

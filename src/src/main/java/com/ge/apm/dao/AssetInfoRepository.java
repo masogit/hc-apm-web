@@ -211,4 +211,25 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     List<AssetInfo> findBySupplierIdOrMaitananceIdOrManufactureId(Integer supplierId, String maitananceId, String manufactureId);
 
     AssetInfo findFirstByQrCode(String qrCode);
+
+    /**
+     * 根据systemId和用户type类型获取匹配条数
+     * @param type 用户类型
+     * @param systemId 系统ID
+     * @return
+     */
+    @Query(value = "SELECT COUNT(asset.id) FROM asset_info asset LEFT JOIN tenant_info tenant ON asset.tenant_uid = tenant.uid WHERE tenant.TYPE = ?1 AND asset.system_id =?2",nativeQuery = true)
+    Integer findAssetInfoCount(Integer type,String systemId);
+
+    /**
+     * 根据SYSTEM ID更新主目录和子目录信息
+     * @param mainDirectory 主目录名称
+     * @param secondDirectory 子目录名称
+     * @param type 用户类型
+     * @param systemId 系统ID
+     */
+    @Transactional
+    @Modifying
+    @Query(value= "UPDATE asset_info SET main_directory = ?1,second_directory = ?2 FROM tenant_info WHERE asset_info.tenant_uid = tenant_info.uid AND tenant_info.TYPE = ?3 AND asset_info.system_id = ?4 ",nativeQuery = true)
+    void updateDirecotryInfo(String mainDirectory, String secondDirectory, Integer type,String systemId);
 }
