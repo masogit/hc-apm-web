@@ -126,6 +126,15 @@
             <h:form id="zkbPartOrderEditForm" >
                 <p:fieldset id="zkbPartOrderFieldset" legend="额度信息" rendered="#{zkbPartOrderEditController.showPartOrder}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' and zkbPartOrderEditController.assetInfo.assetGroup eq 1}">
+                            <label class="label">设备类型（DI）*</label>
+                            <p:selectOneMenu id="assetTypeDi" value="#{zkbPartOrderEditController.selected.assetTypeDi}" required="true" requiredMessage="#设备类型（DI） #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="CT" itemValue="CT"/>
+                                <f:selectItem itemLabel="XR" itemValue="XR"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
                             <p:selectOneMenu id="region" value="#{zkbPartOrderEditController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}">
@@ -259,6 +268,21 @@
                                       multiple="true"  sizeLimit="100000000"  update="uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                         </h:panelGroup>
                     </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset id="zkbPartOrderOnlineFieldset" legend="在线工程师" rendered="#{(zkbPartOrderEditController.orderType eq 'Parts' or zkbPartOrderEditController.orderType eq 'Probe') and zkbPartOrderEditController.assetInfo.assetGroup eq 2 }" >
+                    <h:panelGroup>
+                        <p:dataTable id="onlineList" value="#{zkbPartOrderEditController.zkbPartOrderUserConfigList}" var="item"
+                                     widgetVar="onlineList"  selection="#{zkbPartOrderEditController.selected.onlineEngine}"
+                                     lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}">
+                            <p:column selectionMode="single" style="width:40px;text-align:center"/>
+                            <p:column headerText="名称">
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+                            <p:column headerText="产品型号">
+                                <h:outputText value="#{item.remark}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGroup>
                 </p:fieldset>
                 <p:fieldset id="zkbPartOrderDetailFieldset" legend="额度明细" rendered="#{zkbPartOrderEditController.showPartOrder and (zkbPartOrderEditController.orderType eq 'Parts' or zkbPartOrderEditController.orderType eq 'Tool')}" >
                     <p:dataTable id="zkbDetailDatalist" value="#{zkbPartOrderEditController.selected.zkbPartOrderItems}" var="item"
