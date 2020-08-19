@@ -23,6 +23,7 @@ import webapp.framework.web.WebUtil;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -154,15 +155,54 @@ public class AssetFileImportBaseService {
         LocalDateTime startTime = LocalDateTime.now();
 
         int row = 0;
+
+        List<Map<String, Object>> importMainOrgMap = new LinkedList<>();
+        List<Map<String, Object>> importNormalOrgMap = new LinkedList<>();
+        StringBuilder departNumName = new StringBuilder();
+
+        if(UserContextService.getCurrentUserAccount().getSiteId() == 46){
+
+            for(Map<String, Object> map : importAssetMap){
+                AssetInfo assetInfo = (AssetInfo)map.get("asset");
+                if(!assetInfo.getDepartNum().isEmpty() && !assetInfo.getSystemId().isEmpty() && assetInfo.getDepartNum().equals(assetInfo.getSystemId())){
+                    importMainOrgMap.add(map);
+                    departNumName.append(assetInfo.getDepartNum()+",");
+                }
+            }
+
+            importAssetMap.removeAll(importMainOrgMap);
+
+            for(Map<String, Object> map : importAssetMap){
+                AssetInfo assetInfo = (AssetInfo)map.get("asset");
+                if(!departNumName.toString().contains(assetInfo.getDepartNum())){
+                    importNormalOrgMap.add(map);
+                }
+            }
+        }else {
+            importNormalOrgMap = importAssetMap;
+            importAssetMap = new LinkedList<>();
+        }
         try {
 
-            for (Map<String, Object> item: importAssetMap) {
+            if(importMainOrgMap.size() > 0){
+
+                for (Map<String, Object> item: importMainOrgMap) {
+                    if (row % 100 == 0) {
+                        logger.info("imported {} rows", row);
+                    }
+
+                    ++row;
+                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                }
+            }
+
+            for (Map<String, Object> item: importNormalOrgMap) {
                 if (row % 100 == 0) {
                     logger.info("imported {} rows", row);
                 }
 
                 ++row;
-                importOneAsset(item, autoGenerateQrcode, orgNamesUriCache);
+                importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
             }
 
         } catch (Exception e) {
@@ -178,7 +218,7 @@ public class AssetFileImportBaseService {
     }
 
     @Transactional
-    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
+    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, List<Map<String, Object>> importAssetMap) {
 
         AssetInfo newAsset = (AssetInfo) item.get("asset");
         Map<String, ExcelDocument.ValueWrapper> rowMap = (Map<String, ExcelDocument.ValueWrapper>) item.get("rowData");
@@ -193,7 +233,12 @@ public class AssetFileImportBaseService {
         }
         //check depart num to avoid duplicate when update
         boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(siteOrg.getUid(), newAsset);
-        if (isDuplicate) {
+
+        AssetInfo mainAssetInfo = assetDao.findByDepartNumAndSystemId(newAsset.getDepartNum(), newAsset.getDepartNum());
+
+        if(null != mainAssetInfo && mainAssetInfo.getDepartNum().equals(newAsset.getDepartNum()) &&  !mainAssetInfo.getSystemId().equals(newAsset.getSystemId())){
+            newAsset.setParentAssetId(mainAssetInfo.getId());
+        }else if (isDuplicate) {
             item.put("status", ImportStatus.Failure);
             AssetRow.addErrMessage(item, "错误: 设备编号重复");
             return;
@@ -408,6 +453,20 @@ public class AssetFileImportBaseService {
 
             mvsUtil.copyToMvsTableIfMvsEquip(newAsset);
 
+        }
+
+        List<Map<String, Object>> importChildMap = new LinkedList<>();
+        if(null != importAssetMap && importAssetMap.size() >0){
+            for(Map<String, Object> map : importAssetMap){
+                AssetInfo assetInfo = (AssetInfo)map.get("asset");
+                if(assetInfo.getDepartNum().equals(newAsset.getDepartNum())){
+                    importChildMap.add(map);
+                }
+            }
+            importAssetMap.removeAll(importChildMap);
+            for (Map<String, Object> map : importChildMap){
+                importOneAsset(map,  autoGenerateQrcode, orgNamesUriCache, importAssetMap );
+            }
         }
 
     }
