@@ -2,6 +2,7 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ZkbPartOrderRepository;
+import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
@@ -38,6 +39,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private UserContextService userContextService;
     private UserAccount currentUser;
     private ZkbPartOrderService zkbPartOrderService;
+    private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
+    private AssetInfoRepository assetInfoRepository;
     private String actionName;
     private String actionItemName;
     private String selectionTenantInfo;
@@ -52,6 +55,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private List<ZkbPartOrderCat> zkbPartOrderCatList ;
     private List<V2_BlobObject> v2_blobObjectList;
     private BlobFileService blobService;
+    private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList =new ArrayList<>();
+    private AssetInfo assetInfo;
 
     @Override
     protected void init() {
@@ -60,6 +65,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService = WebUtil.getBean(ZkbPartOrderService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
@@ -123,6 +130,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }
         selectedWorkFlow = (HashMap<String, String>) event.getObject();
+        assetInfo = assetInfoRepository.findByUid(String.valueOf(selectedWorkFlow.get("assetId")));
+        selected.setProductNumber(assetInfo.getFunctionType());
+
         contractList = zkbPartOrderService.queryContractByAsset(selectionTenantInfo,String.valueOf(selectedWorkFlow.get("assetId")));
         if(contractList.size() == 0){
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "未查询出合同数据！", "");
@@ -174,6 +184,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             if(selectedWorkFlow.get("faultDescription") != null){
                 selected.setFaultDescription(selectedWorkFlow.get("faultDescription").toString());
+            }
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
+                zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending","CS");
             }
         }
         calcRemainQty();
@@ -307,11 +320,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             flag=false;
             errorLog += "额度申请明细不能为空！";
         }
+        if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 2 && selected.getOnlineEngine() == null){
+            flag=false;
+            errorLog += "在线工程师不能为空！";
+        }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-            if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
+            /*if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
                 flag=false;
                 errorLog += "附件不能为空！";
-            }
+            }*/
         }
         if(!flag){
             WebUtil.addErrorMessage(errorLog);
@@ -322,6 +339,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             this.selected.setArtificialType(artificialType);
+        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
+            if(this.selected.getOnlineEngine() != null){
+                this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+            }
         }
         HashMap m = v2_listHashMap.get(0);
         ZkbContract zkbContract = contractList.get(0);
@@ -367,6 +388,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     public List<ZkbPartOrderCat> autoCompleteCat(String query){
         List<ZkbPartOrderCat> res = zkbPartOrderCatList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getCatNo().contains(query)).collect(Collectors.toList());
 
+        return res;
+    }
+
+    public List<ZkbPartOrderUserConfig> autoCompleteUserConfig(String query){
+        List<ZkbPartOrderUserConfig> res = zkbPartOrderUserConfigList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).collect(Collectors.toList());
         return res;
     }
 
@@ -507,6 +533,22 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setShowProblemOrderNumber(boolean showProblemOrderNumber) {
         this.showProblemOrderNumber = showProblemOrderNumber;
+    }
+
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
+    }
+
+    public List<ZkbPartOrderUserConfig> getZkbPartOrderUserConfigList() {
+        return zkbPartOrderUserConfigList;
+    }
+
+    public void setZkbPartOrderUserConfigList(List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList) {
+        this.zkbPartOrderUserConfigList = zkbPartOrderUserConfigList;
     }
 
     @Override

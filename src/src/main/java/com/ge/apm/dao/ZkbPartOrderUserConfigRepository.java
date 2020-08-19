@@ -13,4 +13,9 @@ import java.util.List;
 public interface ZkbPartOrderUserConfigRepository extends GenericRepositoryUUID<ZkbPartOrderUserConfig> {
 
     List<ZkbPartOrderUserConfig> findByConfigType(String configType);
+
+
+    List<ZkbPartOrderUserConfig> findByConfigTypeAndAssetType(String configType,String assetType);
+
+    List<ZkbPartOrderUserConfig> findByConfigTypeAndRegion(String configType,String region);
 }

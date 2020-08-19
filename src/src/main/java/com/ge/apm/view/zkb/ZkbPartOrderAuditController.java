@@ -98,7 +98,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 canEditFlag = true;
             }
         }else{
-            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(selected.getCurrentStep());
+            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = new ArrayList<>();
+            if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
+                zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndRegion(selected.getCurrentStep(),selected.getRegion());
+            }else if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(selected.getCurrentStep())){
+                if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                    if(selected.getAssetInfo() != null && selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup() == 2){
+                        ZkbPartOrderUserConfig zkbPartOrderUserConfig = selected.getOnlineEngine();
+                        zkbPartOrderUserConfigs.add(zkbPartOrderUserConfig);
+                    }else if(selected.getAssetInfo() != null && selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup() == 1){
+                        zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(selected.getCurrentStep(),selected.getAssetTypeDi());
+                    }
+                }
+            }else {
+                zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(selected.getCurrentStep());
+            }
             if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
                 for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
                     if(currentUser.getLoginName().equals(c.getLoginName())){
