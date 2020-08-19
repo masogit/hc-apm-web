@@ -133,11 +133,15 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
                             <label class="label">ZKB工程师姓名*</label>
-                            <p:inputText id="zkbEngineerName" value="#{zkbPartOrderAuditController.selected.zkbEngineerName}" />
+                            <p:inputText id="zkbEngineerName" value="#{zkbPartOrderAuditController.selected.zkbEngineerName}" disabled="true"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial'}">
                             <label class="label">ZKB工程师电话*</label>
-                            <p:inputText id="zkbEngineerPhone" value="#{zkbPartOrderAuditController.selected.zkbEngineerPhone}"/>
+                            <p:inputText id="zkbEngineerPhone" value="#{zkbPartOrderAuditController.selected.zkbEngineerPhone}" disabled="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">在线工程师*</label>
+                            <p:inputText id="onlineEngineer" value="#{zkbPartOrderAuditController.selected.onlineEngine.name}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">订单数量</label>

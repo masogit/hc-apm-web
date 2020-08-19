@@ -1,21 +1,22 @@
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.FileAttachmentOrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.FileAttachmentOrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.UploadedFile;
-import org.springframework.beans.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -23,6 +24,8 @@ import java.util.*;
  */
 @Component
 public class ZkbFileAttachmentService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ZkbFileAttachmentService.class);
 
     public enum ZkbMainDirectory {
         DXR, OEC, CT, ULS, Others
@@ -36,6 +39,43 @@ public class ZkbFileAttachmentService {
     private BlobFileService blobFileService;
     @Autowired
     private FileAttachmentOrgInfoRepository fileAttachmentOrgInfoDao;
+
+    @Autowired
+    private ZkbFileDirectoryRepository zkbFileDirectoryRepository;
+
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
+
+    /**
+     * 导入模板头部行数
+     */
+    public static final int EXCEL_DIRECTORY_HEADER_ROW = 1;
+
+    /**
+     * 最大导入行数
+     */
+    public static final int EXCEL_DIRECTORY_IMPORT_MAX_ROW = 5000;
+
+    /**
+     * 模板数据起始行数
+     */
+    public static final int EXCEL_DIRECTORY_DATA_ROW = 2;
+
+    /**
+     * excel sheet 名称
+     */
+    public static final String SHEET_SERVICE_DIRECTORY = "DIRECTORY LIST";
+
+    /**
+     * 用户类型
+     */
+    public static final Integer userType = 3;
+
+    public enum ImportStatus {
+        New, Exist, Created, Failure, CheckFail
+    }
+
+
 
     public List<TenantInfo> getSourceTenantInfoList(){
 
@@ -233,5 +273,137 @@ public class ZkbFileAttachmentService {
 
         return Boolean.FALSE;
     }
+
+    /**
+     * 根据excel文件 读取文件中的数据
+     * @param doc 文件
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> getDirectoryMapFromTemplate(ExcelDocument doc) throws Exception {
+
+        LocalDateTime startTime = LocalDateTime.now();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (int i = EXCEL_DIRECTORY_DATA_ROW ; i <= doc.getWorkBook().getSheet(SHEET_SERVICE_DIRECTORY).getLastRowNum() + 1 ; i++) {
+            Map< String, Object> rowMap = doc.getDataRowMap(SHEET_SERVICE_DIRECTORY, EXCEL_DIRECTORY_HEADER_ROW, i);
+            Map<String, Object> map = new LinkedHashMap();
+            AssetInfoVO assetInfoVO = new AssetInfoVO();
+            assetInfoVO.setLineNum(i);
+            AssetInfoRow assetInfoRow = new AssetInfoRow(assetInfoVO,rowMap);
+            assetInfoRow.setFieldStringValue(WebUtil.getMessage("mainDirectory"), "setMainDirectory");
+            assetInfoRow.setFieldStringValue(WebUtil.getMessage("secondDirectory"), "setSecondDirectory");
+            assetInfoRow.setFieldStringValue(WebUtil.getMessage("importDirectorySystemId"), "setSystemId");
+            if(assetInfoVO.isNull()){
+                break;
+            }
+            map.put("assetInfoVO", assetInfoVO);
+            map.put("rowData", rowMap);
+            map.put("status", assetInfoVO.getId()==null ? ZkbFileAttachmentService.ImportStatus.New.name() : ZkbFileAttachmentService.ImportStatus.Exist.name());
+            map.put("hashCode", assetInfoVO.hashCode());
+            result.add(map);
+        }
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for getDirectoryMapFromTemplate: {} seconds", duration.getSeconds());
+        return result;
+    }
+
+    /**
+     * 导入数据
+     * @param importDirectoryMapList 目录信息
+     */
+    public void importData(List<Map<String, Object>> importDirectoryMapList) {
+
+        LocalDateTime startTime = LocalDateTime.now();
+        int row = 0;
+        try {
+            for (Map<String, Object> item : importDirectoryMapList) {
+                ++row;
+                if(checkData(item, importDirectoryMapList)) {
+                    AssetInfoVO assetInfoVO = (AssetInfoVO)item.get("assetInfoVO");
+                    this.assetInfoRepository.updateDirecotryInfo(assetInfoVO.getMainDirectory(),assetInfoVO.getSecondDirectory(),ZkbFileAttachmentService.userType,assetInfoVO.getSystemId());
+                }
+
+            }
+        } catch (Exception e) {
+            logger.info("error occurred when importing the {} row", row);
+            throw e;
+        }
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for importData: {} seconds", duration.getSeconds());
+    }
+
+    /**
+     * 检查数据是否合法
+     * 1.做空值检验
+     * 2.验证主目录子目录是否正确
+     * 3.验证是否能根据system id 是否能匹配到信息
+     * @param item
+     * @param importStudentMapList
+     * @return
+     */
+    public boolean checkData(Map<String, Object> item, List<Map<String, Object>> importStudentMapList) {
+
+        boolean isValidateData = true;
+        AssetInfoVO assetInfoVO = (AssetInfoVO)item.get("assetInfoVO");
+        AssetInfoRow.clearErrMessage(item);
+        if(StringUtils.isEmpty(assetInfoVO.getSystemId())){
+            item.put("status", ZkbFileAttachmentService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("ErrorDirectorySystemIdIsEmpty"));
+            isValidateData = false;
+        }
+
+        if(StringUtils.isEmpty(assetInfoVO.getMainDirectory())){
+            item.put("status", ZkbFileAttachmentService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("ErrorDirectoryMainDirectoryIsEmpty"));
+            isValidateData = false;
+        }
+
+        if(StringUtils.isEmpty(assetInfoVO.getSecondDirectory())){
+            item.put("status", ZkbFileAttachmentService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("ErrorDirectorySecondDirectoryIsEmpty"));
+            isValidateData = false;
+        }
+        if(StringUtils.isNotEmpty(assetInfoVO.getMainDirectory())&&StringUtils.isNotEmpty(assetInfoVO.getSecondDirectory()))
+        {
+            Integer count = zkbFileDirectoryRepository.findDirecotryCount(assetInfoVO.getMainDirectory(),assetInfoVO.getSecondDirectory(), ZkbFileDirectoryService.SUB_DIRECTORY_LEVEL_VALUE);
+            if(count==0)
+            {
+                item.put("status", ZkbFileAttachmentService.ImportStatus.Failure);
+                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("ErrorDirectory"));
+                isValidateData = false;
+            }
+        }
+        Integer count = this.assetInfoRepository.findAssetInfoCount(ZkbFileAttachmentService.userType,assetInfoVO.getSystemId());
+        if(count==0)
+        {
+            item.put("status", ZkbFileAttachmentService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("ErrorCountDirectory"));
+            isValidateData = false;
+            return isValidateData;
+        }
+        return isValidateData;
+    }
+
+    /**
+     * 整理错误信息
+     * @param importDirectoryMapList
+     * @return
+     */
+    public List<Map<String, Object>> filterErrorRecords(List<Map<String, Object>> importDirectoryMapList) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map<String, Object> map: importDirectoryMapList) {
+            String importStatus = map.get("status").toString();
+            if (importStatus == null) {
+                continue;
+            }
+            if (ZkbFileAttachmentService.ImportStatus.CheckFail.name().equals(importStatus) || ZkbFileAttachmentService.ImportStatus.Failure.name().equals(importStatus)) {
+                result.add(map);
+            }
+        }
+        return result;
+    }
+
 
 }

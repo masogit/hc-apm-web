@@ -13,6 +13,9 @@
             </div>
 
             <div class="ui-g-12 card">
+<!--                <h:form>-->
+<!--                    <p:commandButton id="importButton" icon="ui-icon-extlink" value="#{msg.DirectoryInfoImport}" title="#{msg.DirectoryInfoImport}" action="#{zkbFileAttachmentController.importAction}"/>-->
+<!--                </h:form>-->
                 <h:form id="zkbFileAttachmentListForm">
                     <p:dataTable id="datalist" value="#{zkbFileAttachmentController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbFileAttachmentController.selected}" disabledSelection="true"
