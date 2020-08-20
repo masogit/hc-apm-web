@@ -143,10 +143,10 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
 
-                        <h:panelGroup>
+                       <!-- <h:panelGroup>
                             <label class="label">订单日期*</label>
                             <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.partOrderDate}" required="true" requiredMessage="#{msg.zkbPartOrder_partOrderDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
 
                         <h:panelGroup>
                             <label class="label">申请人*</label>
@@ -158,24 +158,24 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请时间*</label>
-                            <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.requestDate}" required="true" requiredMessage="#{msg.zkbPartOrder_requestDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.requestDate}" required="true" requiredMessage="#{msg.zkbPartOrder_requestDate} #{msg.ValidationRequire}" showOn="button" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">医院名称*</label>
-                            <p:inputText id="hospitalName" value="#{zkbPartOrderEditController.selected.hospitalName}"  required="true" requiredMessage="#{msg.zkbPartOrder_hospitalName} #{msg.ValidationRequire}"/>
+                            <p:inputText id="hospitalName" value="#{zkbPartOrderEditController.selected.hospitalName}"  required="true" requiredMessage="#{msg.zkbPartOrder_hospitalName} #{msg.ValidationRequire}" disabled="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医院报修人姓名*</label>
-                            <p:inputText id="hospitalRepairer" value="#{zkbPartOrderEditController.selected.hospitalRepairer}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" />
+                            <p:inputText id="hospitalRepairer" value="#{zkbPartOrderEditController.selected.hospitalRepairer}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairer} #{msg.ValidationRequire}" disabled="#{!(empty zkbPartOrderEditController.selected.hospitalRepairer)}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">医院报修人电话*</label>
-                            <p:inputText id="hospitalRepairerPhone" value="#{zkbPartOrderEditController.selected.hospitalRepairerPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairerPhone} #{msg.ValidationRequire}" />
+                            <p:inputText id="hospitalRepairerPhone" value="#{zkbPartOrderEditController.selected.hospitalRepairerPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_hospitalRepairerPhone} #{msg.ValidationRequire}" disabled="#{!(empty zkbPartOrderEditController.selected.hospitalRepairer)}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">产品型号*</label>
-                            <p:inputText id="productNumber" value="#{zkbPartOrderEditController.selected.productNumber}" required="true" requiredMessage="#{msg.zkbPartOrder_productNumber} #{msg.ValidationRequire}" />
+                            <p:inputText id="productNumber" value="#{zkbPartOrderEditController.selected.productNumber}" required="true" requiredMessage="#{msg.zkbPartOrder_productNumber} #{msg.ValidationRequire}" disabled="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">软件版本*</label>
