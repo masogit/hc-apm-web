@@ -407,7 +407,21 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderStepRepository.save(newZkbPartOrderStep);
 
         if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())) {
-            if (!ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
+            if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
+                if("1".equals(zkbPartOrder.getArtificialType())){
+                    if("t".equals(zkbPartOrder.getWhetherDeduct())){
+                        ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+                        subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
+                    }else {
+                        //不扣除名额，那么申请中-1，剩余+1
+                        ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+                        subApplyQty(zkbContract,zkbPartOrder, (0-zkbPartOrder.getQty()));
+                    }
+                }else{
+                    ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+                    subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
+                }
+            }else{
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
             }
