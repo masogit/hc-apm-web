@@ -187,15 +187,23 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
             if(selectedWorkFlow.get("customerName") != null){
                 selected.setHospitalRepairer(selectedWorkFlow.get("customerName").toString());
+            }else {
+                selected.setHospitalRepairer("");
             }
             if(selectedWorkFlow.get("customerTel") != null){
                 selected.setHospitalRepairerPhone(selectedWorkFlow.get("customerTel").toString());
+            }else {
+                selected.setHospitalRepairerPhone("");
             }
             if(selectedWorkFlow.get("hospitalName") != null){
                 selected.setHospitalName(selectedWorkFlow.get("hospitalName").toString());
+            }else {
+                selected.setHospitalName("");
             }
             if(selectedWorkFlow.get("faultDescription") != null){
                 selected.setFaultDescription(selectedWorkFlow.get("faultDescription").toString());
+            }else {
+                selected.setFaultDescription("");
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending","CS");
