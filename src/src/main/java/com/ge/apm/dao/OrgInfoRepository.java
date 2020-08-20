@@ -176,6 +176,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 	@Query(value = "select site_uid from org_info where name=?1 and site_id=?2", nativeQuery = true)
 	String getSiteUidByHospitalName(String hospitalName,Integer siteId);
 
-	@Query(value = "select uid from org_info where name like concat('%',?1,'%') and org_type = 1 and site_id = ?2 limit 50", nativeQuery = true)
+	//only used by apm ib admin, limit result set to 500 institution items
+	@Query(value = "select uid from org_info where name like concat('%',?1,'%') and org_type = 1 and site_id = ?2 limit 500", nativeQuery = true)
 	List<String> findByInstitutionByNameLike(String name, Integer siteId);
 }
