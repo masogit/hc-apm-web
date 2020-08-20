@@ -129,7 +129,11 @@ public class AssetInfo implements ChineseName,Serializable {
     @Size(max = 64)
     @Column(name = "location_name")
     private String locationName;//安装位置
-    
+
+    @Size(max = 64)
+    @Column(name = "location_notes")
+    private String locationNotes;//安装位置备注
+
     @Size(max = 64)
     @Column(name = "nurse_location")
     private String nurseLocation;//护士检查设备位置
@@ -1049,6 +1053,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setLocationName(String locationName) {
         this.locationName = locationName;
+    }
+
+    public String getLocationNotes() {
+        return locationNotes;
+    }
+
+    public void setLocationNotes(String locationNotes) {
+        this.locationNotes = locationNotes;
     }
 
     public String getNurseLocation() {
