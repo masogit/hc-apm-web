@@ -454,71 +454,48 @@ public class UaaService {
 
     //full of the tree for this org
     public TreeNode getOrgTreeBySite(String siteUID){
-        List<OrgInfo> orgList = null;
-        orgList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(siteUID);
-        TreeNode root  = new DefaultTreeNode("root", null, null);
-        
+        List<OrgInfo> orgList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(siteUID);
+        return getOrgTreeNodes(siteUID, orgList);
+    }
+
+    public TreeNode getOrgTreeNodes(String siteUID, List<OrgInfo> orgList) {
+        TreeNode root = new DefaultTreeNode("root", null, null);
+
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
-        for(OrgInfo org: orgList){
+        for (OrgInfo org : orgList) {
             TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setRowKey("org_"+org.getId());
+            node.setRowKey("org_" + org.getId());
             treeMap.put(org.getUid(), node);
         }
-        for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
+        for (Map.Entry<String, TreeNode> nodeItem : treeMap.entrySet()) {
             TreeNode node = nodeItem.getValue();
-            OrgInfo org = (OrgInfo)node.getData();
-            if(org.getParentUID()!=null){
+            OrgInfo org = (OrgInfo) node.getData();
+            if (org.getParentUID() != null) {
                 TreeNode parentNode = treeMap.get(org.getParentUID());
-                if(parentNode!=null){
+                if (parentNode != null) {
                     parentNode.getChildren().add(node);
                 }
             }
         }
-        
-        if(treeMap.get(siteUID)!=null){
+
+        if (treeMap.get(siteUID) != null) {
             root.getChildren().add(treeMap.get(siteUID));
         }
 
-        if(!root.getChildren().isEmpty()){
-            OrgInfo temp = (OrgInfo)root.getChildren().get(0).getData();
+        if (!root.getChildren().isEmpty()) {
+            OrgInfo temp = (OrgInfo) root.getChildren().get(0).getData();
             rootUID = temp.getUid();
         }
         return root;
     }
 
     public TreeNode getOrgTreeBySiteWithoutClinical(String siteUID){
-        List<OrgInfo> orgList = null;
-        orgList = orgInfoDao.getOrgInfosByParentId(siteUID);
-        TreeNode root  = new DefaultTreeNode("root", null, null);
-
-        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
-        for(OrgInfo org: orgList){
-            TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setRowKey("org_"+org.getId());
-            treeMap.put(org.getUid(), node);
-        }
-        for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
-            TreeNode node = nodeItem.getValue();
-            OrgInfo org = (OrgInfo)node.getData();
-            if(org.getParentUID()!=null){
-                TreeNode parentNode = treeMap.get(org.getParentUID());
-                if(parentNode!=null){
-                    parentNode.getChildren().add(node);
-                }
-            }
-        }
-
-        if(treeMap.get(siteUID)!=null){
-            root.getChildren().add(treeMap.get(siteUID));
-        }
-        if(!root.getChildren().isEmpty()){
-            OrgInfo temp = (OrgInfo)root.getChildren().get(0).getData();
-            rootUID = temp.getUid();
-        }
-        return root;
+        List<OrgInfo> orgList =  orgInfoDao.getOrgInfosByParentId(siteUID);
+        return getOrgTreeNodes(siteUID, orgList);
     }
 
     public String rootUID;
+
     public TreeNode getOrgTreeBySiteExceptClinicalDept(String siteUID){
         List<OrgInfo> orgList = null;
         orgList = orgInfoDao.getOrgInfosByParentId(siteUID);
