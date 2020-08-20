@@ -174,6 +174,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("MaintainerTelephone")), "setMaitananceTel", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("InstallationLocationCode")), "setLocationCode", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("InstallationLocation")), "setLocationName", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("InstallationLocationNotes")), "setLocationNotes", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("UseOwner")), "setClinicalOwnerName", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("Remark")), "setComments", true);
 
