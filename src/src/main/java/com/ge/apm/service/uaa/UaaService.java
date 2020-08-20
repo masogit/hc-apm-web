@@ -432,7 +432,7 @@ public class UaaService {
         if (userAccount.getSiteId() == 46) {
             List<OrgInfo> orgListByUser = getOrgListByUser(userAccount.getUid());
             // available to see the all institutions in ib site
-            return orgListByUser.size() == 1 && orgListByUser.get(0).getOrgLevel() == 0;
+            return orgListByUser.size() == 1 && StringUtils.equals(orgListByUser.get(0).getUid(), orgListByUser.get(0).getTenantUID());
         }
         return false;
     }

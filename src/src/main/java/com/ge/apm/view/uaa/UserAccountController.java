@@ -200,13 +200,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
-        
-        rebuildOrgTree();
-
-        TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
-        if (null != selectedOrgNode) {
-            selectedOrgNode.setSelected(true);
-            TreeNodeUtil.expandParentsNodes(selectedOrgNode);
+        if (loginUser.getSiteId() != 46) { // skip building tenant org tree for apm ib user
+            rebuildOrgTree();
+            TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+            if (null != selectedOrgNode) {
+                selectedOrgNode.setSelected(true);
+                TreeNodeUtil.expandParentsNodes(selectedOrgNode);
+            }
         }
         updateRoleList();
     }
