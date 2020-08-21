@@ -386,6 +386,20 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "asset_type_di")
     private String assetTypeDi; //ct xr
 
+    /**
+     * 是否扣除名额
+     * t f
+     */
+    private String whetherDeduct;
+
+    public String getWhetherDeduct() {
+        return whetherDeduct;
+    }
+
+    public void setWhetherDeduct(String whetherDeduct) {
+        this.whetherDeduct = whetherDeduct;
+    }
+
     public String getAssetTypeDi() {
         return assetTypeDi;
     }
