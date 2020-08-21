@@ -3,6 +3,8 @@ package com.ge.apm.dao.mapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import com.ge.apm.domain.Supplier;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -32,5 +34,14 @@ public interface AssetInfoMapper {
 				"</foreach>"+
 			"</script>"})
 	public List<AssetInfo> getAssetMap(@Param("parendAssetIds")List<Integer> parendAssetIds);
+
+	@Select({
+			"<script>" +
+					"select  id,tel  from  supplier spl  where spl.id in " +
+					"<foreach item = 'item' index = 'index' collection = 'suplierIdList' open='(' separator=',' close=')'>" +
+					"#{item}" +
+					"</foreach>"+
+					"</script>"})
+	public List<Supplier> getSupliersBySuplierIds(@Param("suplierIdList")List<Integer> suplierIdList);
 	
 }
