@@ -7,7 +7,6 @@ import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -66,6 +65,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Autowired
     OrgInfoRepository orgInfoRepository;
+
+    @Autowired
+    private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYYMMdd");
 
@@ -387,7 +389,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }else{
             if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())) {
                 newZkbPartOrderStep.setStepKey("ReturnPending");
-                newZkbPartOrderStep.setStepName("已下单");
+                newZkbPartOrderStep.setStepName("待归还");
             }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())) {
                 newZkbPartOrderStep.setStepKey("ClosePending");
                 newZkbPartOrderStep.setStepName("待关单");
@@ -405,7 +407,21 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderStepRepository.save(newZkbPartOrderStep);
 
         if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())) {
-            if (!ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
+            if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
+                if("1".equals(zkbPartOrder.getArtificialType())){
+                    if("t".equals(zkbPartOrder.getWhetherDeduct())){
+                        ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+                        subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
+                    }else {
+                        //不扣除名额，那么申请中-1，剩余+1
+                        ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+                        subApplyQty(zkbContract,zkbPartOrder, (0-zkbPartOrder.getQty()));
+                    }
+                }else{
+                    ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+                    subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
+                }
+            }else{
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
             }
@@ -611,6 +627,62 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     public void setZkbPartOrderRepository(ZkbPartOrderRepository zkbPartOrderRepository) {
         this.zkbPartOrderRepository = zkbPartOrderRepository;
+    }
+
+    public ZkbPartOrderItemRepository getZkbPartOrderItemRepository() {
+        return zkbPartOrderItemRepository;
+    }
+
+    public void setZkbPartOrderItemRepository(ZkbPartOrderItemRepository zkbPartOrderItemRepository) {
+        this.zkbPartOrderItemRepository = zkbPartOrderItemRepository;
+    }
+
+    public ZkbPartOrderStepRepository getZkbPartOrderStepRepository() {
+        return zkbPartOrderStepRepository;
+    }
+
+    public void setZkbPartOrderStepRepository(ZkbPartOrderStepRepository zkbPartOrderStepRepository) {
+        this.zkbPartOrderStepRepository = zkbPartOrderStepRepository;
+    }
+
+    public ZkbPartOrderCatRepository getZkbPartOrderCatRepository() {
+        return zkbPartOrderCatRepository;
+    }
+
+    public void setZkbPartOrderCatRepository(ZkbPartOrderCatRepository zkbPartOrderCatRepository) {
+        this.zkbPartOrderCatRepository = zkbPartOrderCatRepository;
+    }
+
+    public ZkbContractRepository getZkbContractRepository() {
+        return zkbContractRepository;
+    }
+
+    public void setZkbContractRepository(ZkbContractRepository zkbContractRepository) {
+        this.zkbContractRepository = zkbContractRepository;
+    }
+
+    public V2_WorkOrderRepository getV2_workOrderRepository() {
+        return v2_workOrderRepository;
+    }
+
+    public void setV2_workOrderRepository(V2_WorkOrderRepository v2_workOrderRepository) {
+        this.v2_workOrderRepository = v2_workOrderRepository;
+    }
+
+    public AssetInfoRepository getAssetInfoRepository() {
+        return assetInfoRepository;
+    }
+
+    public void setAssetInfoRepository(AssetInfoRepository assetInfoRepository) {
+        this.assetInfoRepository = assetInfoRepository;
+    }
+
+    public ZkbPartOrderUserConfigRepository getZkbPartOrderUserConfigRepository() {
+        return zkbPartOrderUserConfigRepository;
+    }
+
+    public void setZkbPartOrderUserConfigRepository(ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository) {
+        this.zkbPartOrderUserConfigRepository = zkbPartOrderUserConfigRepository;
     }
 }
 

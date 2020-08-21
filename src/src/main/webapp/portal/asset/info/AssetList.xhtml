@@ -103,7 +103,7 @@
                     </h:panelGrid>
                 </h:form>
                 <h:form id="AssetInfoListForm">
-                    <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="false" resizeMode="expand"
+                    <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="false" liveResize="false" resizeMode="expand"
                                  selectionMode="single" scrollable="false" scrollWidth="98%" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" 
                                  rowStyleClass="#{item.warrantyAlertStatus}"
@@ -187,7 +187,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetDeptName'}">
-                                <p:column headerText="#{msg.assetDeptName}"  width="100">
+                                <p:column headerText="#{msg.assetDeptName}">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.assetDeptName}"/><br/>
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetDeptOrg}" appendTo="@(Body)"
@@ -200,7 +200,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'clinicalDeptName'}">
-                                <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" width="100">
+                                <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterClinicalDeptOrg}" appendTo="@(Body)"

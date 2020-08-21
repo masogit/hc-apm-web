@@ -84,6 +84,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             v2_blobObjectList = m.get("v2_blobObjectList") == new ArrayList<>() ? null : (List<V2_BlobObject>)m.get("v2_blobObjectList");
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selectedId);
             fieldRendered();
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+                selected.setRemainQty(zkbContract.getSpareQuota());
+            }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                selected.setRemainQty(zkbContract.getProbeQuota());
+            }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
+                if("1".equals(selected.getArtificialType())){
+                    selected.setRemainQty(zkbContract.getSpareArtificail());
+                }else if("3".equals(selected.getArtificialType())){
+                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
+                        selected.setRemainQty(zkbContract.getSpareArtificail());
+                    }else if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+                        selected.setRemainQty(zkbContract.getGeArtificialSupportTimes());
+                    }
+                }
+            }
 
             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
                 this.selected.setReturnQty(this.selected.getQty());

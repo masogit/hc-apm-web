@@ -82,11 +82,23 @@
                         <p:column headerText="申请人" filterBy="#{item.requestUser}"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.requestUser}"/>
                         </p:column>
-                        <p:column headerText="当前步骤" filterBy="#{item.currentStep}"  filterMatchMode="LIKE">
+                        <p:column headerText="当前步骤" filterBy="#{item.currentStep}"  filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPoSteps',item.currentStep)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoSteps')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
-                        <p:column headerText="状态" filterBy="#{item.status}"  filterMatchMode="LIKE">
+                        <p:column headerText="状态" filterBy="#{item.status}"  filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPoStatus',item.status)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                        <!-- <p:column headerText="申请时间"  filterMatchMode="GTE">
                             <h:outputText value="#{item.requestDate}">
@@ -94,8 +106,8 @@
                             </h:outputText>
                         </p:column>-->
 
-                        <p:column headerText="订单日期"  filterMatchMode="GTE">
-                            <h:outputText value="#{item.partOrderDate}">
+                        <p:column headerText="申请日期"  filterMatchMode="GTE">
+                            <h:outputText value="#{item.requestDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
