@@ -1,6 +1,7 @@
 package com.ge.apm.dao.mapper;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -22,5 +23,14 @@ public interface AssetInfoMapper {
 	
 	@Select("select * from asset_info where id= #{id}")
 	public AssetInfo fetchAssetInfoById(Integer id);
+
+	@Select({
+			"<script>" +
+				"select  asset.id,asset.depart_num,asset.qr_code,asset.name,asset.uid from  asset_info asset  where asset.id in " +
+				"<foreach item = 'item' index = 'index' collection = 'parendAssetIds' open='(' separator=',' close=')'>" +
+				"#{item}" +
+				"</foreach>"+
+			"</script>"})
+	public List<AssetInfo> getAssetMap(@Param("parendAssetIds")List<Integer> parendAssetIds);
 	
 }
