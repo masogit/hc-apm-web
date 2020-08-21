@@ -548,11 +548,18 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'comments')}" >
         <h:panelGroup >
-            <label class="label">#{msg.comments}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['comments'].required? '*':''}</span></label>
+            <label class="label">#{msg.comments}<span style="color:#ff0000">#{assetInfoEditController.customConfig.assetFields['comments'].required? '*':''}</span></label>
             <p:inputTextarea value="#{assetInfoEditController.selected.comments}" required="#{assetInfoEditController.customConfig.assetFields['comments'].required}"
                              requiredMessage="#{msg.comments} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('comments')}"  maxlength="256"/>
         </h:panelGroup>
 
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'locationNotes')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.locationNotes}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['locationNotes'].required? '*':''}</span></label>
+            <p:inputText id="locationNotes" value="#{assetInfoEditController.selected.locationNotes}" required="#{assetInfoEditController.customConfig.assetFields['locationNotes'].required}"
+                         requiredMessage="#{msg.locationNotes} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationNotes')}" />
+        </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetUsage')}" >
         <h:panelGroup>
