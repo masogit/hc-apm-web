@@ -30,7 +30,7 @@ public class BySearchFilterSpecification {
                         Path expression = root.get(names[0]);
                         Class clazz = expression.getJavaType();
                         if(clazz.equals(Set.class)){
-                            SetJoin setJoin = root.joinSet(names[0]);
+                            SetJoin setJoin = root.joinSet(names[0],JoinType.LEFT);
                             expression = setJoin.get(names[1]);
                         }else {
                             for (int i = 1; i < names.length; i++) {
