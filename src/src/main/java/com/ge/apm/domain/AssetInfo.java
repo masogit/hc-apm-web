@@ -597,6 +597,9 @@ public class AssetInfo implements ChineseName,Serializable {
         for(AssetTags tag:assetTags){
             assetTagsView += tag.getTag()+",";
         }
+        if(!"".equals(assetTagsView)){
+            assetTagsView = assetTagsView.substring(0,assetTagsView.length() - 1);
+        }
         return assetTagsView;
     }
 
