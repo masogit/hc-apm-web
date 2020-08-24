@@ -118,8 +118,8 @@
                     <h:outputText value="#{item.creatorName}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.Owner}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.getOwnerName()}"/>
+                <p:column headerText="#{msg.Owner}" sortBy="#{item.ownerName}" filterBy="#{item.ownerName}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.ownerName}"/>
                 </p:column>
 
 
