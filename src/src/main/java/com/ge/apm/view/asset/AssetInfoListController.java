@@ -300,6 +300,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("assetTags.tag", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
 
         if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
@@ -405,6 +406,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.removeFilterOnField("serialNum");
             this.removeFilterOnField("manufacture");
             this.removeFilterOnField("clinicalDeptName");
+            this.removeFilterOnField("assetTags.tag");
         }
     }
 
