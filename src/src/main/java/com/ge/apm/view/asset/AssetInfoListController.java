@@ -461,6 +461,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<OrgInfo> sites = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
         logger.info("load asset list to export");
+
         List<AssetInfo> assetList = getExportList();
 
 //        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
@@ -508,6 +509,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
         List<AssetInfo> resultList;
         if (assetUids.isEmpty()) {
+            //PageRequest pageRequest = new PageRequest(0,100,lastPageSort);
+            //Page<AssetInfo> esultList = dao.findBySearchFilter(searchFilters,pageRequest);
             resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);

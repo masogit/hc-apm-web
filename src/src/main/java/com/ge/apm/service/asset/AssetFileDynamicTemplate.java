@@ -5,9 +5,12 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -25,6 +28,7 @@ import org.apache.poi.xssf.usermodel.*;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.jsf.FacesContextUtils;
 import webapp.framework.context.LocaleHolder;
@@ -32,10 +36,7 @@ import webapp.framework.web.WebUtil;
 
 import javax.faces.context.FacesContext;
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -84,6 +85,11 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     //if cross site is true clinical dept is useless.
     boolean crossSite;
+    @Autowired
+    public AssetTagsMapper assetTagsMapper;
+
+    @Autowired
+    AssetInfoMapper assetInfoMapper;
 
 //    int siteId;
 
@@ -404,9 +410,15 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         writer.writeRowData(EXCEL_ASSET_HEADER_ROW, columnTitles);
 
         int startRow = EXCEL_ASSET_DATA_ROW;
+
+        GetAllElement getAllElement = new GetAllElement(assetList).invoke();
+        Map<String, List<String>> assetMap = getAllElement.getAssetMap();
+        Map parentAssets = getAllElement.getParentAssets();
+        Map supliers = getAllElement.getSupliers();
+
         for (AssetInfo assetInfo: assetList) {
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, supplierDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite,assetMap,parentAssets, supliers);
 
             writer.writeRowData(startRow, rowMap);
 
@@ -602,4 +614,75 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     }
 
+
+    private class GetAllElement {
+        private List<AssetInfo> assetList;
+        private Map<String, List<String>> assetMap;
+        private Map parentAssets;
+        private Map supliers;
+
+        public GetAllElement(List<AssetInfo> assetList) {
+            this.assetList = assetList;
+        }
+
+        public Map<String, List<String>> getAssetMap() {
+            return assetMap;
+        }
+
+        public Map getParentAssets() {
+            return parentAssets;
+        }
+
+        public Map getSupliers() {
+            return supliers;
+        }
+
+        public GetAllElement invoke() {
+            List<String> uids = new ArrayList();
+            Set<Integer> parendAssetIds= new HashSet<Integer>();//父id集合
+            Set<Integer> suplierIds = new HashSet<Integer>();//供应商id集合
+            for (int i = 0; i < assetList.size(); i++) {
+                uids.add(assetList.get(i).getUid());
+                if(null !=assetList.get(i).getParentAssetId()){
+                    parendAssetIds.add(assetList.get(i).getParentAssetId());//获取parentAssetId准备获取parent节点的信息
+                }
+                if(null!= assetList.get(i).getSupplierId()){
+                    suplierIds.add(assetList.get(i).getSupplierId());
+                }
+            }
+            List<HashMap> map = assetTagsMapper.getTagsByAssetMap(uids);
+
+            assetMap = new HashMap<String, List<String>>();
+
+            for (int i = 0; i <map.size() ; i++) {
+                //判断assetMap中有没有当前的key
+                //assetMap.put(map.get(i).get("asset_uid"),map.get(i).get("tag"));
+                List<String> assetTagNow = assetMap.get(map.get(i).get("asset_uid"));//尝试从当前assetMap中获取asset_uid对应的数组
+                if(null==assetTagNow){//如果没有塞过值则放入新值
+                    List<String> assetTags = new ArrayList();
+                    assetTags.add((String) map.get(i).get("tag"));
+                    assetMap.put((String) map.get(i).get("asset_uid"),assetTags);
+                }else{//不为空的情况直接取出来往后面加
+                    List<String> assetTagOld = assetMap.get(map.get(i).get("asset_uid"));
+                    assetTagOld.add((String) map.get(i).get("tag"));
+                    assetMap.put((String) map.get(i).get("asset_uid"),assetTagOld);
+                }
+            }
+            List<Integer> parendAssetIdList = new ArrayList<>(parendAssetIds);
+            List<AssetInfo> parentAssetMap = assetInfoMapper.getAssetMap(parendAssetIdList);
+            List<Integer> suplierIdList = new ArrayList<>(suplierIds);
+            List<Supplier> suplierList = assetInfoMapper.getSupliersBySuplierIds(suplierIdList);
+
+            parentAssets = new HashMap();
+            for (int i = 0; i <parentAssetMap.size() ; i++) {
+                parentAssets.put(parentAssetMap.get(i).getId(),parentAssetMap.get(i));
+            }
+
+            supliers = new HashMap();
+            for (int i = 0; i < suplierList.size(); i++) {
+                supliers.put(suplierList.get(i).getId(),suplierList.get(i).getTel());
+            }
+            return this;
+        }
+    }
 }
