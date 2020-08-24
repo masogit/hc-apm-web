@@ -629,7 +629,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetTags'}">
-                                <p:column headerText="#{msg.assetTags}" sortBy="#{item.assetTags.tag}" filterBy="#{item.assetTags.tag}" filterMatchMode="LIKE">
+                                <p:column headerText="#{msg.assetTags}" filterBy="#{item.assetTags.tag}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetTagsView}"/>
                                 </p:column>
                             </c:if>
