@@ -479,18 +479,6 @@ public class AssetFileImportSupportingService {
         }
     }
 
-//    public String tryFormatQrCodeIfPossible(Map<String, ExcelDocument.ValueWrapper> rowMap, AssetInfo assetInfo) {
-//        String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
-//        if (!StringUtils.isEmpty(inputQrcode) && inputQrcode.length() > 16) {
-//            inputQrcode = inputQrcode.replace("-", "");
-//        }
-//
-//        assetInfo.setQrCode(inputQrcode);
-//
-//        return inputQrcode;
-//    }
-
-
     public SiteOrgWithDeptOrg findSiteOrgInAssetExcelRow(Map<String, ExcelDocument.ValueWrapper> rowMap, Map<String, OrgInfo> orgNamesUriCache) {
         String institution = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("Institution")));
         String hospital = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("Hospital")));
@@ -513,6 +501,40 @@ public class AssetFileImportSupportingService {
         }
 
         return assetInfo.getDepartNum().equals(assetInfo.getSystemId());
+    }
+
+    public boolean isChildAssetForIBTenant(AssetInfo assetInfo, Map<String, AssetInfo> parentAssetsMap) {
+
+        if (StringUtils.isEmpty(assetInfo.getSystemId())) {
+            return false;
+        }
+
+        if (assetInfo.getSystemId().equals(assetInfo.getDepartNum())) {
+            return false;
+        }
+
+        return parentAssetsMap.containsKey(assetInfo.getSystemId());
+    }
+
+    public Map<String, AssetInfo> getParentAssets(List<Map<String, Object>> importAssetMap) {
+        Map<String, AssetInfo> resultMap = new HashMap<>();
+
+        for (Map<String, Object> map : importAssetMap) {
+            AssetInfo assetInfo = (AssetInfo)map.get("asset");
+            if (this.isParentAssetForIBTenant(assetInfo)) {
+                resultMap.put(assetInfo.getSystemId(), assetInfo);
+            }
+        }
+
+        return resultMap;
+    }
+
+    public void setParentAsset(AssetInfo childAsset, Map<String, AssetInfo> parentAssetsMap) {
+
+        AssetInfo parentAsset = parentAssetsMap.get(childAsset.getSystemId());
+        if (null != parentAsset) {
+            childAsset.setParentAssetId(parentAsset.getId());
+        }
     }
 
 }
