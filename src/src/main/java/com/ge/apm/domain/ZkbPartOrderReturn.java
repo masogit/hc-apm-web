@@ -44,11 +44,35 @@ public class ZkbPartOrderReturn implements Serializable {
     @Column(name = "qty")
     private int qty=0;
 
+    @Column(name = "part_serial_number")
+    private String partSerialNumber;
+
+
+    @Column(name = "part_quality_issue")
+    private String partQualityIssue;
+
     /**
      * 备注
      */
     @Column(name = "remark")
     private String remark;
+
+    public String getPartSerialNumber() {
+        return partSerialNumber;
+    }
+
+    public void setPartSerialNumber(String partSerialNumber) {
+        this.partSerialNumber = partSerialNumber;
+    }
+
+
+    public String getPartQualityIssue() {
+        return partQualityIssue;
+    }
+
+    public void setPartQualityIssue(String partQualityIssue) {
+        this.partQualityIssue = partQualityIssue;
+    }
 
     public String getPartOrderId() {
         return partOrderId;
