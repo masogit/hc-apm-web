@@ -399,39 +399,6 @@ public class AssetFileImportSupportingService {
         return true;
     }
 
-//    public void releaseOldQRCodeInUse(OrgInfo selectedOrgToImport, List<Map<String, Object>> importAssetMap) {
-//
-//        importAssetMap.forEach(item -> {
-//            AssetInfo newAsset = (AssetInfo) item.get("asset");
-//
-//            //if site uid not match, ignore update
-//            if (newAsset.getUid() != null) {
-//                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
-//                    return ;
-//                }
-//
-//            }
-//
-//            String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
-//            if (StringUtils.isEmpty(oldQrCode)) return;
-//            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
-//
-//            boolean releaseable = true;
-//            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
-//                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
-//                if (!exists) {
-//                    releaseable = false;
-//                }
-//            }
-//
-//            if (releaseable) {
-//                qrCodeService.releaseQrCode(oldQrCode, selectedOrgToImport.getUid());
-//            }
-//
-//        });
-//
-//    }
-
     /**
      * release qrcode only one asset
      * @param selectedOrgToImport
@@ -534,6 +501,17 @@ public class AssetFileImportSupportingService {
         AssetInfo parentAsset = parentAssetsMap.get(childAsset.getSystemId());
         if (null != parentAsset) {
             childAsset.setParentAssetId(parentAsset.getId());
+        }
+    }
+
+    public void removeParentAssetIfNotExists(AssetInfo assetInfo) {
+        if (null == assetInfo.getParentAssetId()) {
+            return;
+        }
+
+        int count = assetDao.countByAssetIdAndNotDeleted(assetInfo.getParentAssetId().intValue());
+        if (count == 0) {
+            assetInfo.setParentAssetId(null);
         }
     }
 
