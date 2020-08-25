@@ -441,20 +441,6 @@ public class AssetFileImportBaseService {
 
         }
 
-        List<Map<String, Object>> importChildMap = new LinkedList<>();
-        if(null != importAssetMap && importAssetMap.size() >0){
-            for(Map<String, Object> map : importAssetMap){
-                AssetInfo assetInfo = (AssetInfo)map.get("asset");
-                if(assetInfo.getDepartNum().equals(newAsset.getDepartNum())){
-                    importChildMap.add(map);
-                }
-            }
-            importAssetMap.removeAll(importChildMap);
-            for (Map<String, Object> map : importChildMap){
-                importOneAsset(map,  autoGenerateQrcode, orgNamesUriCache, importAssetMap );
-            }
-        }
-
     }
 
     public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
