@@ -92,7 +92,7 @@
                                 </p:scrollPanel>
                             </p:overlayPanel>
                         </h:panelGroup>
-                        <p:inputText id="searchText" value="#{assetInfoListController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
+                        <p:inputText id="searchText" value="#{assetInfoListController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}/#{msg.assetTags}" maxlength="100" style="width: 500px">
                             <p:ajax event="keyup" update=":AssetInfoListForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''} searchButtons " />
                         </p:inputText>
 
