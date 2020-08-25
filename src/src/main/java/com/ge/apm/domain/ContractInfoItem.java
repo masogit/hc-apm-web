@@ -57,7 +57,7 @@ public class ContractInfoItem implements Serializable {
 
     //订购项
     @Column(name = "purchase_item_id", columnDefinition = "CHAR(32)")
-    private String PurchaseItemId;
+    private String purchaseItemId;
 
     
     //申请科室
@@ -161,8 +161,15 @@ public class ContractInfoItem implements Serializable {
     @Basic(optional = true)
     @Column(name = "payment_price")
     private Double paymentPrice;
-    
-    
+
+    //主设备(contractInfoItemID)
+    @Column(name = "parent_id")
+    private String parentId;
+
+    //产地
+    @Column(name = "production_place")
+    private String productionPlace;
+
     //excel行数
     @Transient
     private int lineNum;
@@ -296,11 +303,11 @@ public class ContractInfoItem implements Serializable {
     }
 
     public String getPurchaseItemId() {
-        return PurchaseItemId;
+        return purchaseItemId;
     }
 
-    public void setPurchaseItemId(String PurchaseItemId) {
-        this.PurchaseItemId = PurchaseItemId;
+    public void setPurchaseItemId(String purchaseItemId) {
+        this.purchaseItemId = purchaseItemId;
     }
 
     public ArrivalListItem getArrivalListItem() {
@@ -390,7 +397,22 @@ public class ContractInfoItem implements Serializable {
     public void setPaymentPrice(Double paymentPrice) {
         this.paymentPrice = paymentPrice;
     }
-    
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getProductionPlace() {
+        return productionPlace;
+    }
+
+    public void setProductionPlace(String productionPlace) {
+        this.productionPlace = productionPlace;
+    }
 
     @Override
     public int hashCode() {
