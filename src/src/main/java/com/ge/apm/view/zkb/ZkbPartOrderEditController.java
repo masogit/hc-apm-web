@@ -345,10 +345,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             errorLog += "在线工程师不能为空！";
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-            /*if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
+            if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
                 flag=false;
                 errorLog += "附件不能为空！";
-            }*/
+            }
         }
         if(!flag){
             WebUtil.addErrorMessage(errorLog);
