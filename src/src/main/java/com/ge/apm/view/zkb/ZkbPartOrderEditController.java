@@ -406,7 +406,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat();
     }
     public List<ZkbPartOrderCat> autoCompleteCat(String query){
-        List<ZkbPartOrderCat> res = zkbPartOrderCatList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getCatNo().contains(query)).collect(Collectors.toList());
+        List<ZkbPartOrderCat> res = zkbPartOrderCatList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getCatModel().contains(query)).collect(Collectors.toList());
 
         return res;
     }
