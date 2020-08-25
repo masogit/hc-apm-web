@@ -357,6 +357,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.selected.setOrderType(orderType);
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
+            if(this.selected.getOnlineEngine() != null){
+                this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+            }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             this.selected.setArtificialType(artificialType);
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
