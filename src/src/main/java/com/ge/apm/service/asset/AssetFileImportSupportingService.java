@@ -503,4 +503,16 @@ public class AssetFileImportSupportingService {
         return siteOrgWithDeptOrg;
     }
 
+    public boolean isParentAssetForIBTenant(AssetInfo assetInfo) {
+        if (StringUtils.isEmpty(assetInfo.getDepartNum())) {
+            return false;
+        }
+
+        if (StringUtils.isEmpty(assetInfo.getSystemId())) {
+            return false;
+        }
+
+        return assetInfo.getDepartNum().equals(assetInfo.getSystemId());
+    }
+
 }
