@@ -64,7 +64,7 @@ public class CustomConfigConstant {
                 "salvageValue", "lifecycle", "depreciationMethod", "manufactDate", "purchaseDate", "arriveDate",
                 "installDate", "factoryWarrantyDate", "warrantyDate", "terminateDate", "lastPmDate", "lastQaDate",
                 "lastMeteringDate", "acceptDate", "warrantyMonth","maitanance", "maitananceTel", "qrCode",
-                "locationCode", "locationName", "comments", "assetUsage", "capitalSource",
+                "locationCode", "locationName", "comments", "locationNotes","assetUsage", "capitalSource",
                 "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "status","isPm", "isChecked", "assetValueCategory", "deviceStatus",
                 "warranty", "subjectProject", "proprietaryClass", "assetTags", "UCMID", "createdDate",
@@ -117,6 +117,7 @@ public class CustomConfigConstant {
             allFields.put("status", WebUtil.getMessage("status"));
             allFields.put("deviceStatus", WebUtil.getMessage("deviceStatus"));
             allFields.put("comments", WebUtil.getMessage("comments"));
+            allFields.put("locationNotes", WebUtil.getMessage("locationNotes"));
             allFields.put("assetUsage", WebUtil.getMessage("assetUsage"));
             allFields.put("capitalSource", WebUtil.getMessage("capitalSource"));
             allFields.put("capitalSource2", WebUtil.getMessage("capitalSource2"));
@@ -156,6 +157,7 @@ public class CustomConfigConstant {
             allFields.put("assetLocation", WebUtil.getMessage("assetLocation"));
             allFields.put("UCMID", WebUtil.getMessage("UCMID"));
             allFields.put("assetTags", WebUtil.getMessage("assetTags"));
+            allFields.put("connectToInsite", WebUtil.getMessage("connectToInsite"));
 //        }
         return allFields;
     }
@@ -195,7 +197,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsEditpageStatusFields() {
         return Arrays.asList("functionType", "functionGroup", "assetCode68", "functionGrade", "repairForm",
-                "locationCode", "locationName", "status", "deviceStatus", "isPm", "isChecked", "comments");
+                "locationCode", "locationName", "status", "deviceStatus", "isPm", "isChecked", "comments", "locationNotes");
     }
 
     public static List<String> getAssetsEditpageCatalogFields() {

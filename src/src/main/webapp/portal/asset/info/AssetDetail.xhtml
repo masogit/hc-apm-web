@@ -52,6 +52,16 @@
                                 <c:forEach items="#{assetInfoDetailController.customConfig.assetsDetailpageDetailFields}" var="fieldItem" >
                                     <ui:include src="customViewFields.xhtml"/>
                                 </c:forEach>
+                                <c:if test="#{userContextService.zkbAccount}" >
+                                    <h:panelGroup  >
+                                        <label class="label">#{msg.mainDirectory}</label>
+                                        <p:inputText value="#{assetInfoDetailController.selected.mainDirectory}" readonly="true"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup  >
+                                        <label class="label">#{msg.secondDirectory}</label>
+                                        <p:inputText value="#{assetInfoDetailController.selected.secondDirectory}" readonly="true"/>
+                                    </h:panelGroup>
+                                </c:if>
                             </p:panelGrid>
                         </div>
                     </div>

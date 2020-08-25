@@ -129,7 +129,11 @@ public class AssetInfo implements ChineseName,Serializable {
     @Size(max = 64)
     @Column(name = "location_name")
     private String locationName;//安装位置
-    
+
+    @Size(max = 64)
+    @Column(name = "location_notes")
+    private String locationNotes;//安装位置备注
+
     @Size(max = 64)
     @Column(name = "nurse_location")
     private String nurseLocation;//护士检查设备位置
@@ -587,6 +591,29 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
+
+    public String getAssetTagsView() {
+        String assetTagsView = "";
+        for(AssetTags tag:assetTags){
+            assetTagsView += tag.getTag()+",";
+        }
+        if(!"".equals(assetTagsView)){
+            assetTagsView = assetTagsView.substring(0,assetTagsView.length() - 1);
+        }
+        return assetTagsView;
+    }
+
+    public Set<AssetTags> getAssetTags() {
+        return assetTags;
+    }
+
+    public void setAssetTags(Set<AssetTags> assetTags) {
+        this.assetTags = assetTags;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name="asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private Set<AssetTags> assetTags;
     
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
 		return sharedAssetReqDetailList;
@@ -1049,6 +1076,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setLocationName(String locationName) {
         this.locationName = locationName;
+    }
+
+    public String getLocationNotes() {
+        return locationNotes;
+    }
+
+    public void setLocationNotes(String locationNotes) {
+        this.locationNotes = locationNotes;
     }
 
     public String getNurseLocation() {
