@@ -9,6 +9,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -22,10 +23,7 @@ import webapp.framework.web.WebUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -117,6 +115,8 @@ public class AssetFileImportBaseService {
 
     protected boolean crossSite;
 
+    protected Map<String, AssetInfo> parentAssetsMap = new HashMap<>();
+
 
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport, boolean crossSite) {
         this.selectedOrgToImport = selectedOrgToImport;
@@ -156,37 +156,40 @@ public class AssetFileImportBaseService {
 
         int row = 0;
 
-        List<Map<String, Object>> importMainOrgMap = new LinkedList<>();
-        List<Map<String, Object>> importNormalOrgMap = new LinkedList<>();
-        StringBuilder departNumName = new StringBuilder();
-
-        if(UserContextService.getCurrentUserAccount().getSiteId() == 46){
-
-            for(Map<String, Object> map : importAssetMap){
-                AssetInfo assetInfo = (AssetInfo)map.get("asset");
-                if(!assetInfo.getDepartNum().isEmpty() && !assetInfo.getSystemId().isEmpty() && assetInfo.getDepartNum().equals(assetInfo.getSystemId())){
-                    importMainOrgMap.add(map);
-                    departNumName.append(assetInfo.getDepartNum()+",");
-                }
-            }
-
-            importAssetMap.removeAll(importMainOrgMap);
-
-            for(Map<String, Object> map : importAssetMap){
-                AssetInfo assetInfo = (AssetInfo)map.get("asset");
-                if(!departNumName.toString().contains(assetInfo.getDepartNum())){
-                    importNormalOrgMap.add(map);
-                }
-            }
-        }else {
-            importNormalOrgMap = importAssetMap;
-            importAssetMap = new LinkedList<>();
-        }
         try {
 
-            if(importMainOrgMap.size() > 0){
+            if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
+                List<Map<String, Object>> importParentAssetMap = new LinkedList<>();
+                List<Map<String, Object>> importNormalOrgMap = new LinkedList<>();
+                StringBuilder departNumName = new StringBuilder();
 
-                for (Map<String, Object> item: importMainOrgMap) {
+                //locate parent assets first for later use
+                parentAssetsMap = supportingService.getParentAssets(importAssetMap);
+
+                for (Map<String, Object> item : importAssetMap) {
+                    AssetInfo assetInfo = (AssetInfo)item.get("asset");
+                    if(supportingService.isParentAssetForIBTenant(assetInfo)) {
+                        importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                    }
+                }
+
+                importAssetMap.removeAll(importParentAssetMap);
+
+                for(Map<String, Object> item : importAssetMap){
+                    AssetInfo assetInfo = (AssetInfo)item.get("asset");
+                    if(supportingService.isParentAssetForIBTenant(assetInfo)) {
+                        continue;
+                    }
+
+                    if(supportingService.isChildAssetForIBTenant(assetInfo, parentAssetsMap)) {
+                        supportingService.setParentAsset(assetInfo, parentAssetsMap);
+                    }
+
+                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                }
+
+            } else {
+                for (Map<String, Object> item: importAssetMap) {
                     if (row % 100 == 0) {
                         logger.info("imported {} rows", row);
                     }
@@ -196,20 +199,10 @@ public class AssetFileImportBaseService {
                 }
             }
 
-            for (Map<String, Object> item: importNormalOrgMap) {
-                if (row % 100 == 0) {
-                    logger.info("imported {} rows", row);
-                }
-
-                ++row;
-                importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
-            }
-
         } catch (Exception e) {
             logger.info("error occurred when importing the {} row", row);
             throw e;
         }
-
 
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
