@@ -425,6 +425,8 @@ public class AssetFileImportBaseService {
 
         }
 
+        supportingService.removeParentAssetIfNotExists(newAsset);
+
         //if import status failure, already returned, will not reach here.
         assetDao.save(newAsset);
         assetDepreciationService.saveAssetDerpeciation(newAsset);
