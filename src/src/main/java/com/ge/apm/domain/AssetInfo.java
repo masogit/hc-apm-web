@@ -593,7 +593,7 @@ public class AssetInfo implements ChineseName,Serializable {
     }
 
     public String getAssetTagsView() {
-        assetTagsView = "";
+        String assetTagsView = "";
         for(AssetTags tag:assetTags){
             assetTagsView += tag.getTag()+",";
         }
@@ -602,13 +602,6 @@ public class AssetInfo implements ChineseName,Serializable {
         }
         return assetTagsView;
     }
-
-    public void setAssetTagsView(String assetTagsView) {
-        this.assetTagsView = assetTagsView;
-    }
-
-    @Transient
-    private String assetTagsView;
 
     public Set<AssetTags> getAssetTags() {
         return assetTags;
