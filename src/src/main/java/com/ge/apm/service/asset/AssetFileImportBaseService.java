@@ -159,9 +159,6 @@ public class AssetFileImportBaseService {
         try {
 
             if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
-                List<Map<String, Object>> importParentAssetMap = new LinkedList<>();
-                List<Map<String, Object>> importNormalOrgMap = new LinkedList<>();
-                StringBuilder departNumName = new StringBuilder();
 
                 //locate parent assets first for later use
                 parentAssetsMap = supportingService.getParentAssets(importAssetMap);
@@ -172,8 +169,6 @@ public class AssetFileImportBaseService {
                         importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
                     }
                 }
-
-                importAssetMap.removeAll(importParentAssetMap);
 
                 for(Map<String, Object> item : importAssetMap){
                     AssetInfo assetInfo = (AssetInfo)item.get("asset");
