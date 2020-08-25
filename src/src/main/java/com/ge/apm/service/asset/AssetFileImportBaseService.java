@@ -163,6 +163,7 @@ public class AssetFileImportBaseService {
                 //locate parent assets first for later use
                 parentAssetsMap = supportingService.getParentAssets(importAssetMap);
 
+                //first iteration: import parent asset
                 for (Map<String, Object> item : importAssetMap) {
                     AssetInfo assetInfo = (AssetInfo)item.get("asset");
                     if(supportingService.isParentAssetForIBTenant(assetInfo)) {
@@ -170,6 +171,7 @@ public class AssetFileImportBaseService {
                     }
                 }
 
+                //second iteration: import child asset and other asset
                 for(Map<String, Object> item : importAssetMap){
                     AssetInfo assetInfo = (AssetInfo)item.get("asset");
                     if(supportingService.isParentAssetForIBTenant(assetInfo)) {
@@ -222,11 +224,7 @@ public class AssetFileImportBaseService {
         //check depart num to avoid duplicate when update
         boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(siteOrg.getUid(), newAsset);
 
-        AssetInfo mainAssetInfo = assetDao.findByDepartNumAndSystemId(newAsset.getDepartNum(), newAsset.getDepartNum());
-
-        if(null != mainAssetInfo && mainAssetInfo.getDepartNum().equals(newAsset.getDepartNum()) &&  !mainAssetInfo.getSystemId().equals(newAsset.getSystemId())){
-            newAsset.setParentAssetId(mainAssetInfo.getId());
-        }else if (isDuplicate) {
+        if (isDuplicate) {
             item.put("status", ImportStatus.Failure);
             AssetRow.addErrMessage(item, "错误: 设备编号重复");
             return;
