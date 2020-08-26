@@ -630,7 +630,7 @@ INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('62
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('63                              ', 2, 'LOGIQ 3', '8                               ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('64                              ', 2, 'Logiq 9', '8                               ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('65                              ', 2, 'LOGIQ BOOK XP', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('66                              ', 2, 'LOGIQ P3 ', '8                               ');
+INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('66                              ', 2, 'LOGIQ P3', '8                               ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('67                              ', 2, 'Logiq S7', '8                               ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('68                              ', 2, 'LOGIQ V3/V5', '8                               ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('69                              ', 2, 'Logiq E9', '8                               ');
