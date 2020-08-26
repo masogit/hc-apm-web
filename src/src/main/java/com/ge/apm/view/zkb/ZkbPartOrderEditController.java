@@ -340,9 +340,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             flag=false;
             errorLog += "额度申请明细不能为空！";
         }
-        if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 2 && selected.getOnlineEngine() == null){
-            flag=false;
-            errorLog += "在线工程师不能为空！";
+        if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
+            if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 2 && selected.getOnlineEngine() == null){
+                flag=false;
+                errorLog += "在线工程师不能为空！";
+            }
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
