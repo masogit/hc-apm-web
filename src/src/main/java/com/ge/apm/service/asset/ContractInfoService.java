@@ -95,6 +95,7 @@ public class ContractInfoService {
             contractItem.setContractId(currentContractItem.getContractId());
             contractItem.setItemType(ContractInfoItem.ContractInfoItemType.ArrivalledItem.toString());
             contractItem.setPurchaseItemId(currentContractItem.getId());
+            contractItem.setParentId(currentContractItem.getParentId());
             return contractItem;
         }).collect(Collectors.toList());
         contractItemDao.save(itemList);
@@ -184,6 +185,18 @@ public class ContractInfoService {
     @Transactional
     public void updateContractStatus(String id, String status) {
         int result = contractDao.updateContractStatus(id, status);
+    }
+
+    @Transactional
+    public void removeContractInfoItem(ContractInfoItem item){
+
+        List<ContractInfoItem> tempContractInfoItemList = contractItemDao.findByParentIdAndContractId(item.getId(), item.getContractId());
+        for (ContractInfoItem contractInfoItem : tempContractInfoItemList) {
+            contractInfoItem.setParentId(null);
+            contractItemDao.save(contractInfoItem);
+        }
+
+        contractItemDao.delete(item);
     }
 
 }

@@ -167,6 +167,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrder.setContractId(zkbContract.getId());
         zkbPartOrder.setContractNo(zkbContract.getContractNo());
         zkbPartOrder.setTenantUID(tenantUid);
+        zkbPartOrder.setOnlineEngineer(zkbPartOrder.getOnlineEngine().getId());
         AssetInfo assetInfo = assetInfoRepository.findByUid(assetId);
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
             zkbPartOrder.setStatus("Requested");
@@ -600,7 +601,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      * 发送微信消息
      */
     public void sendWeChatMessages(ZkbPartOrder zkbPartOrder){
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
+        //if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
             if (ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) || ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(zkbPartOrder.getStatus()) ||
                     ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(zkbPartOrder.getStatus())) {
                 String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
@@ -609,7 +610,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 HttpEntity<Map> requestEntity = new HttpEntity<>(header);
                 ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
             }
-        }
+        //}
     }
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
@@ -683,6 +684,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     public void setZkbPartOrderUserConfigRepository(ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository) {
         this.zkbPartOrderUserConfigRepository = zkbPartOrderUserConfigRepository;
+    }
+
+    public ZkbPartOrderReturnRepository getZkbPartOrderReturnRepository() {
+        return zkbPartOrderReturnRepository;
+    }
+
+    public void setZkbPartOrderReturnRepository(ZkbPartOrderReturnRepository zkbPartOrderReturnRepository) {
+        this.zkbPartOrderReturnRepository = zkbPartOrderReturnRepository;
     }
 }
 
