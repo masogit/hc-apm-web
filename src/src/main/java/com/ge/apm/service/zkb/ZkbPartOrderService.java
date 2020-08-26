@@ -167,7 +167,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrder.setContractId(zkbContract.getId());
         zkbPartOrder.setContractNo(zkbContract.getContractNo());
         zkbPartOrder.setTenantUID(tenantUid);
-        zkbPartOrder.setOnlineEngineer(zkbPartOrder.getOnlineEngine().getId());
+        if(zkbPartOrder.getOnlineEngine() != null){
+            zkbPartOrder.setOnlineEngineer(zkbPartOrder.getOnlineEngine().getId());
+        }
         AssetInfo assetInfo = assetInfoRepository.findByUid(assetId);
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
             zkbPartOrder.setStatus("Requested");
