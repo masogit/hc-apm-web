@@ -300,6 +300,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("assetTags.tag", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
 
         if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
@@ -405,6 +406,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.removeFilterOnField("serialNum");
             this.removeFilterOnField("manufacture");
             this.removeFilterOnField("clinicalDeptName");
+            this.removeFilterOnField("assetTags.tag");
         }
     }
 
@@ -461,6 +463,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<OrgInfo> sites = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
         logger.info("load asset list to export");
+
         List<AssetInfo> assetList = getExportList();
 
 //        List<String> exportColumnFields = Arrays.asList(AssetFileDynamicTemplate.columnTitles).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) ||
@@ -508,6 +511,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
         List<AssetInfo> resultList;
         if (assetUids.isEmpty()) {
+            //PageRequest pageRequest = new PageRequest(0,100,lastPageSort);
+            //Page<AssetInfo> esultList = dao.findBySearchFilter(searchFilters,pageRequest);
             resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
         } else {
             resultList = dao.findByUidIn(assetUids, lastPageSort);
