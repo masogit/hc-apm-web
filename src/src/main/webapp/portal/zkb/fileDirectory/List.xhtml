@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.directory}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="zkbFileDirectoryListForm">
+                    <p:dataTable id="datalist" value="#{zkbFileDirectoryController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbFileDirectoryController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="rowSelect" listener="#{zkbFileDirectoryController.prepareEdit}" update="deleteButton editButton"/>
+                        <p:ajax event="filter" listener="#{zkbFileDirectoryController.onFilter}" />
+                        <p:column headerText="#{msg.directoryName}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.mainDirectory}" filterBy="#{item.zkbFileDirectory.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.zkbFileDirectory.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.directoryLevel}" filterBy="#{item.level}"  filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('directoryLevel', item.level)}"/>
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('directoryLevel')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbFileDirectoryController.prepareCreate}" update=":dialogDirectory :dialogDirectoryEditForm" oncomplete="PF('dialogDirectory').show()"/>
+                            <p:commandButton id="editButton" actionListener="#{zkbFileDirectoryController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":dialogDirectory :dialogDirectoryEditForm" oncomplete="PF('dialogDirectory').show()" disabled="#{empty zkbFileDirectoryController.selected.id}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFileDirectoryController.delete}" update=":zkbFileDirectoryListForm" disabled="#{empty zkbFileDirectoryController.selected.id}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
