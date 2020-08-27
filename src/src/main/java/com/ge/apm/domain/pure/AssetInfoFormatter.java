@@ -791,10 +791,8 @@ public class AssetInfoFormatter {
         Integer vendorId = assetInfo.getSupplierId();
         if(vendorId != null){
             //Supplier supplier2= supplierDao.getById(vendorId);
-            Supplier supplier= (Supplier) supliers.get(vendorId);
-            if (null != supplier) {
-                return supplier.getTel();
-            }
+          return  (String) supliers.get(vendorId);
+
         }
 
         return null;
