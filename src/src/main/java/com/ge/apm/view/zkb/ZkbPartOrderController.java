@@ -67,7 +67,11 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             searchFilters = new ArrayList<>();
         }
 
-        if(userContextService.isZkbUser()) {
+        if(this.selectionTenantInfo != null){
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
+        }
+
+        /*if(userContextService.isZkbUser()) {
             if(this.selectionTenantInfo != null){
                 searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
             }
@@ -96,7 +100,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     }
                 }
             }
-        }
+        }*/
 
 
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
@@ -153,6 +157,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         }
     }
 
+
     public String createAction() {
         return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo));
     }
@@ -200,4 +205,5 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     public void setZkbContractPage(Page<ZkbPartOrder> zkbContractPage) {
         this.zkbContractPage = zkbContractPage;
     }
+
 }
