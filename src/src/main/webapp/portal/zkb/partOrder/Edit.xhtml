@@ -327,13 +327,14 @@
                             <label class="label">探头型号</label>
                             <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true"
                                             completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
-                                <p:ajax event="itemSelect" update="valueType qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
+                                <p:ajax event="itemSelect" update="valueTypeGroup qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
                             </p:autoComplete>
                         </h:panelGroup>
 
-                        <h:panelGroup>
+                        <h:panelGroup id="valueTypeGroup">
                             <label class="label">价值类型</label>
                             <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderEditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
+                            <label style="color: red">#{zkbPartOrderEditController.valueTypeTips}</label>
                         </h:panelGroup>
 
                         <h:panelGroup>
