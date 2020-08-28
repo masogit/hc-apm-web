@@ -167,7 +167,7 @@ public class AssetFileImportBaseService {
                 for (Map<String, Object> item : importAssetMap) {
                     AssetInfo assetInfo = (AssetInfo)item.get("asset");
                     if(supportingService.isParentAssetForIBTenant(assetInfo)) {
-                        importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                        importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, true);
                     }
                 }
 
@@ -182,17 +182,18 @@ public class AssetFileImportBaseService {
                         supportingService.setParentAsset(assetInfo, parentAssetsMap);
                     }
 
-                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, true);
                 }
 
             } else {
+                //non ib tenant
                 for (Map<String, Object> item: importAssetMap) {
                     if (row % 100 == 0) {
                         logger.info("imported {} rows", row);
                     }
 
                     ++row;
-                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, false);
                 }
             }
 
@@ -208,7 +209,7 @@ public class AssetFileImportBaseService {
     }
 
     @Transactional
-    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, List<Map<String, Object>> importAssetMap) {
+    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, boolean ibDevice) {
 
         AssetInfo newAsset = (AssetInfo) item.get("asset");
         Map<String, ExcelDocument.ValueWrapper> rowMap = (Map<String, ExcelDocument.ValueWrapper>) item.get("rowData");
@@ -426,6 +427,8 @@ public class AssetFileImportBaseService {
         }
 
         supportingService.removeParentAssetIfNotExists(newAsset);
+
+        supportingService.setIBStatus(newAsset, ibDevice);
 
         //if import status failure, already returned, will not reach here.
         assetDao.save(newAsset);
