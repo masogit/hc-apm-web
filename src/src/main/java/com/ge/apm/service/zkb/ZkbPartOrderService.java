@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -449,8 +450,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     subReturnQty(zkbContract,zkbPartOrder,v);
                 }
             }
-            //归还时发送邮件
-            sendEmail(zkbPartOrder);
         }
     }
 
@@ -598,17 +597,21 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      * 发送邮件
      */
     public void sendEmail(ZkbPartOrder zkbPartOrder){
-        HashMap<String, String> emailWrapperMap = new HashMap<>();
-        emailWrapperMap.put("configType",zkbPartOrder.getCurrentStep());
-        emailWrapperMap.put("systemId", zkbPartOrder.getId());
-        emailWrapperMap.put("url", "?id="+ zkbPartOrder.getId());
-        emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
+        try {
+            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
+            emailWrapperMap.put("systemId", zkbPartOrder.getId());
+            emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
+            emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()));
 
-        String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL);
-        String token = UserContextService.getAccessToken();
-        HttpHeaders header = createHttpHeaders(token);
-        HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
-        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL);
+            String token = UserContextService.getAccessToken();
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void sendMessage(ZkbPartOrder zkbPartOrder) {
@@ -622,16 +625,21 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
         if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep())) {
-            HashMap<String, String> emailWrapperMap = new HashMap<>();
-            emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
-            emailWrapperMap.put("systemId", zkbPartOrder.getId());
-            emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
-            emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
-            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_MESSAGE);
-            String token = UserContextService.getAccessToken();
-            HttpHeaders header = createHttpHeaders(token);
-            HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
-            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            HashMap<String, String> emailWrapperMap = null;
+            try {
+                emailWrapperMap = new HashMap<>();
+                emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
+                emailWrapperMap.put("systemId", zkbPartOrder.getId());
+                emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
+                emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
+                String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_MESSAGE);
+                String token = UserContextService.getAccessToken();
+                HttpHeaders header = createHttpHeaders(token);
+                HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
+                ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -643,11 +651,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
             if (ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) || ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(zkbPartOrder.getStatus()) ||
                     ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(zkbPartOrder.getStatus()) || ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(zkbPartOrder.getStatus())) {
-                String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
-                String token = UserContextService.getAccessToken();
-                HttpHeaders header = createHttpHeaders(token);
-                HttpEntity<Map> requestEntity = new HttpEntity<>(header);
-                ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+                try {
+                    String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
+                    String token = UserContextService.getAccessToken();
+                    HttpHeaders header = createHttpHeaders(token);
+                    HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+                    ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+                } catch (RestClientException e) {
+                    e.printStackTrace();
+                }
             }
         //}
     }
