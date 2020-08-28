@@ -9,6 +9,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -22,10 +23,7 @@ import webapp.framework.web.WebUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -117,6 +115,8 @@ public class AssetFileImportBaseService {
 
     protected boolean crossSite;
 
+    protected Map<String, AssetInfo> parentAssetsMap = new HashMap<>();
+
 
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport, boolean crossSite) {
         this.selectedOrgToImport = selectedOrgToImport;
@@ -156,60 +156,51 @@ public class AssetFileImportBaseService {
 
         int row = 0;
 
-        List<Map<String, Object>> importMainOrgMap = new LinkedList<>();
-        List<Map<String, Object>> importNormalOrgMap = new LinkedList<>();
-        StringBuilder departNumName = new StringBuilder();
-
-        if(UserContextService.getCurrentUserAccount().getSiteId() == 46){
-
-            for(Map<String, Object> map : importAssetMap){
-                AssetInfo assetInfo = (AssetInfo)map.get("asset");
-                if(!assetInfo.getDepartNum().isEmpty() && !assetInfo.getSystemId().isEmpty() && assetInfo.getDepartNum().equals(assetInfo.getSystemId())){
-                    importMainOrgMap.add(map);
-                    departNumName.append(assetInfo.getDepartNum()+",");
-                }
-            }
-
-            importAssetMap.removeAll(importMainOrgMap);
-
-            for(Map<String, Object> map : importAssetMap){
-                AssetInfo assetInfo = (AssetInfo)map.get("asset");
-                if(!departNumName.toString().contains(assetInfo.getDepartNum())){
-                    importNormalOrgMap.add(map);
-                }
-            }
-        }else {
-            importNormalOrgMap = importAssetMap;
-            importAssetMap = new LinkedList<>();
-        }
         try {
 
-            if(importMainOrgMap.size() > 0){
+            if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
 
-                for (Map<String, Object> item: importMainOrgMap) {
+                //locate parent assets first for later use
+                parentAssetsMap = supportingService.getParentAssets(importAssetMap);
+
+                //first iteration: import parent asset
+                for (Map<String, Object> item : importAssetMap) {
+                    AssetInfo assetInfo = (AssetInfo)item.get("asset");
+                    if(supportingService.isParentAssetForIBTenant(assetInfo)) {
+                        importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, true);
+                    }
+                }
+
+                //second iteration: import child asset and other asset
+                for(Map<String, Object> item : importAssetMap){
+                    AssetInfo assetInfo = (AssetInfo)item.get("asset");
+                    if(supportingService.isParentAssetForIBTenant(assetInfo)) {
+                        continue;
+                    }
+
+                    if(supportingService.isChildAssetForIBTenant(assetInfo, parentAssetsMap)) {
+                        supportingService.setParentAsset(assetInfo, parentAssetsMap);
+                    }
+
+                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, true);
+                }
+
+            } else {
+                //non ib tenant
+                for (Map<String, Object> item: importAssetMap) {
                     if (row % 100 == 0) {
                         logger.info("imported {} rows", row);
                     }
 
                     ++row;
-                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, false);
                 }
-            }
-
-            for (Map<String, Object> item: importNormalOrgMap) {
-                if (row % 100 == 0) {
-                    logger.info("imported {} rows", row);
-                }
-
-                ++row;
-                importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
             }
 
         } catch (Exception e) {
             logger.info("error occurred when importing the {} row", row);
             throw e;
         }
-
 
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
@@ -218,7 +209,7 @@ public class AssetFileImportBaseService {
     }
 
     @Transactional
-    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, List<Map<String, Object>> importAssetMap) {
+    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, boolean ibDevice) {
 
         AssetInfo newAsset = (AssetInfo) item.get("asset");
         Map<String, ExcelDocument.ValueWrapper> rowMap = (Map<String, ExcelDocument.ValueWrapper>) item.get("rowData");
@@ -234,11 +225,7 @@ public class AssetFileImportBaseService {
         //check depart num to avoid duplicate when update
         boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(siteOrg.getUid(), newAsset);
 
-        AssetInfo mainAssetInfo = assetDao.findByDepartNumAndSystemId(newAsset.getDepartNum(), newAsset.getDepartNum());
-
-        if(null != mainAssetInfo && mainAssetInfo.getDepartNum().equals(newAsset.getDepartNum()) &&  !mainAssetInfo.getSystemId().equals(newAsset.getSystemId())){
-            newAsset.setParentAssetId(mainAssetInfo.getId());
-        }else if (isDuplicate) {
+        if (isDuplicate) {
             item.put("status", ImportStatus.Failure);
             AssetRow.addErrMessage(item, "错误: 设备编号重复");
             return;
@@ -439,6 +426,10 @@ public class AssetFileImportBaseService {
 
         }
 
+        supportingService.removeParentAssetIfNotExists(newAsset);
+
+        supportingService.setIBStatus(newAsset, ibDevice);
+
         //if import status failure, already returned, will not reach here.
         assetDao.save(newAsset);
         assetDepreciationService.saveAssetDerpeciation(newAsset);
@@ -453,20 +444,6 @@ public class AssetFileImportBaseService {
 
             mvsUtil.copyToMvsTableIfMvsEquip(newAsset);
 
-        }
-
-        List<Map<String, Object>> importChildMap = new LinkedList<>();
-        if(null != importAssetMap && importAssetMap.size() >0){
-            for(Map<String, Object> map : importAssetMap){
-                AssetInfo assetInfo = (AssetInfo)map.get("asset");
-                if(assetInfo.getDepartNum().equals(newAsset.getDepartNum())){
-                    importChildMap.add(map);
-                }
-            }
-            importAssetMap.removeAll(importChildMap);
-            for (Map<String, Object> map : importChildMap){
-                importOneAsset(map,  autoGenerateQrcode, orgNamesUriCache, importAssetMap );
-            }
         }
 
     }
