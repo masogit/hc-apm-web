@@ -7,7 +7,6 @@ import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.orginfo.OrgInfoBuilder;
 import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.orginfo.SiteOrgWithDeptOrg;
-import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -514,13 +513,6 @@ public class AssetFileImportSupportingService {
         if (count == 0) {
             assetInfo.setParentAssetId(null);
         }
-    }
-
-    public void setIBStatus(AssetInfo assetInfo, boolean ibDevice) {
-        if (ibDevice) {
-            assetInfo.setIbStatus(ApmConstant.IB_STATUS_IB_DEVICE_FLAG);
-        }
-
     }
 
 }
