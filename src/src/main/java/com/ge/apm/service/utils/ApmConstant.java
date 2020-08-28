@@ -22,6 +22,6 @@ public interface ApmConstant {
 
     int IB_TENANT_ID = 46;
 
-    int IB_STATUS_IB_DEVICE_FLAG = 1;
+
 
 }
