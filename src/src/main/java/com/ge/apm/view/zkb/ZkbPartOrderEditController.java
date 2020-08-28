@@ -54,6 +54,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private BlobFileService blobService;
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList =new ArrayList<>();
     private AssetInfo assetInfo;
+    private String valueTypeTips = "";
 
     @Override
     protected void init() {
@@ -340,7 +341,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             flag=false;
             errorLog += "额度申请明细不能为空！";
         }
-        if(!ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
+        if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 2 && selected.getOnlineEngine() == null){
                 flag=false;
                 errorLog += "在线工程师不能为空！";
@@ -348,7 +349,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                //flag=false;
+                flag=false;
                 errorLog += "附件不能为空！";
             }
         }
@@ -398,10 +399,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(this.selected.getZkbPartOrderCat() != null){
             if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
                 this.selected.setQty(1);
+                valueTypeTips = "";
             }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
                 this.selected.setQty(2);
+                valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
             }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
                 this.selected.setQty(2);
+                valueTypeTips = "";
             }
         }
         calcRemainQty();
@@ -574,6 +578,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setZkbPartOrderUserConfigList(List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList) {
         this.zkbPartOrderUserConfigList = zkbPartOrderUserConfigList;
+    }
+
+    public String getValueTypeTips() {
+        return valueTypeTips;
+    }
+
+    public void setValueTypeTips(String valueTypeTips) {
+        this.valueTypeTips = valueTypeTips;
     }
 
     @Override
