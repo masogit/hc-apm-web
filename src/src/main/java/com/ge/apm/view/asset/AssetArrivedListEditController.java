@@ -574,6 +574,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
         this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
         this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+        this.selected.setOrigin(selectedContractItem.getProductionPlace());
         String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
         if(StringUtils.isNotEmpty(supplierUid)){
         	Supplier supplier=aiService.getSupplierByUid(supplierUid);
