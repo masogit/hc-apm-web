@@ -669,9 +669,18 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                 }
             }
             List<Integer> parendAssetIdList = new ArrayList<>(parendAssetIds);
-            List<AssetInfo> parentAssetMap = assetInfoMapper.getAssetMap(parendAssetIdList);
+            List<AssetInfo> parentAssetMap = new ArrayList();
+            if(parendAssetIdList.size()==0){
+                logger.info("====================export asset  data parentAssetMap.size is 0 ");
+            }else{
+                parentAssetMap = assetInfoMapper.getAssetMap(parendAssetIdList);
+            }
             List<Integer> suplierIdList = new ArrayList<>(suplierIds);
-            List<Supplier> suplierList = assetInfoMapper.getSupliersBySuplierIds(suplierIdList);
+
+            List<Supplier> suplierList = Collections.emptyList();
+            if (suplierIdList.size() > 0) {
+                suplierList = assetInfoMapper.getSupliersBySuplierIds(suplierIdList);
+            }
 
             parentAssets = new HashMap();
             for (int i = 0; i <parentAssetMap.size() ; i++) {
