@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author : 503189362
@@ -56,6 +57,34 @@ public class ZkbPartOrderReturn implements Serializable {
      */
     @Column(name = "remark")
     private String remark;
+
+    /**
+     * 运单号
+     */
+    @Column(name = "waybill_no")
+    private String waybillNo;
+
+    /**
+     * 归还日期
+     */
+    @Column(name = "return_date")
+    private Date returnDate;
+
+    public String getWaybillNo() {
+        return waybillNo;
+    }
+
+    public void setWaybillNo(String waybillNo) {
+        this.waybillNo = waybillNo;
+    }
+
+    public Date getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
+    }
 
     public String getPartSerialNumber() {
         return partSerialNumber;
