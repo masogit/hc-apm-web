@@ -156,7 +156,7 @@
                             <p:inputText id="remark" value="#{zkbPartOrderAuditController.selected.remark}" disabled="true"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:panelGrid>
+                    <p:panelGrid rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                         <h:panelGroup>
                             <p:dataList id="uploadList" value="#{zkbPartOrderAuditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">附件列表</f:facet>
@@ -262,7 +262,8 @@
                             <label class="label">GE工程师电话*</label>
                             <p:inputText id="geEngineerPhone" value="#{zkbPartOrderAuditController.selected.geEngineerPhone}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_geEngineerPhone} #{msg.ValidationRequire}" />
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.artificialType eq '1'}">
+                        <!--<h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Artificial' and zkbPartOrderAuditController.selected.artificialType eq '1'}">-->
+                        <h:panelGroup rendered="false">
                             <label class="label">是否扣除名额</label>
                             <p:selectOneMenu id="whetherDeduct" value="#{zkbPartOrderAuditController.selected.whetherDeduct}" required="true" requiredMessage="#{msg.zkbPartOrder_whetherDeduct} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -281,10 +282,10 @@
                                  lazy="false" paginator="true" rowKey="#{item.partNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
                                  paginatorTemplate="" rows="20" emptyMessage="#{msg.noRecordFound}" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Tool'}">
                         <p:column headerText="配件号">
-                            <h:outputText value="#{item.partNo}"/>
+                            <p:inputText value="#{item.partNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </p:column>
                         <p:column headerText="配件名称">
-                            <h:outputText value="#{item.partName}"/>
+                            <p:inputText value="#{item.partName}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </p:column>
                         <p:column headerText="配件数量">
                             <h:outputText value="#{item.partQty}"/>
@@ -296,7 +297,7 @@
                             <p:inputNumber value="#{item.price}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" > </p:inputNumber>
                         </p:column>
                         <p:column headerText="备注（说明是否DOA或者Short life）">
-                            <h:outputText value="#{item.remark}"/>
+                            <p:inputText value="#{item.remark}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </p:column>
                     </p:dataTable>
                 </p:fieldset>
@@ -308,15 +309,15 @@
                     </h:panelGroup>
                 </p:fieldset>
                 <p:fieldset id="returnFieldset" legend="归还信息" rendered="#{zkbPartOrderAuditController.showReturn}">
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                        <h:panelGroup>
                             <label class="label">归还类型*</label>
                             <p:selectOneMenu id="returnType" value="#{zkbPartOrderAuditController.selected.returnType}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" >
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{zkbPartOrderAuditController.returnTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                        <h:panelGroup>
                             <label class="label">归还数量*</label>
                             <p:inputText id="returnQty" value="#{zkbPartOrderAuditController.selected.returnQty}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" />
                         </h:panelGroup>
@@ -328,7 +329,7 @@
                             <label class="label">归还日期*</label>
                             <p:calendar timeZone="GMT+8"  id="returnDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.selected.returnDate}" showOn="button" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-                        <h:panelGroup  rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                        <h:panelGroup>
                             <label class="label">新探头SN编号*</label>
                             <p:inputText id="newCatSn" value="#{zkbPartOrderAuditController.selected.newCatSn}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="新探头SN编号 #{msg.ValidationRequire}" />
                         </h:panelGroup>
@@ -345,6 +346,14 @@
 
                         <p:ajax event="rowSelect" update=":zkbPartOrderEditForm:zkbReturnDatalist:editReturnButton :zkbPartOrderEditForm:zkbReturnDatalist:deleteReturnButton"/>
 
+                        <p:column headerText="运单号">
+                            <h:outputText value="#{item.waybillNo}"/>
+                        </p:column>
+                        <p:column headerText="归还日期">
+                            <h:outputText value="#{item.returnDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
                         <p:column headerText="配件号">
                             <h:outputText value="#{item.partNo}"/>
                         </p:column>

@@ -230,7 +230,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     
     public void filterTreeNode(){
-        uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
+        if (uaaService.isIbSiteAdmin(loginUser)) {
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(loginUser.getUid(), treeNodeNameFilter, loginUser.getSiteId());
+            OrgInfo tenant = orgInfoDao.findByUid(loginUser.getTenantUID());
+            siteList.add(tenant);
+            orgTree = uaaService.getOrgTreeNodes(loginUser.getSiteUID(), siteList);
+        } else {
+            uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
+        }
     }
 
     public String getOrgFullNameByUid(String orgUid) {
