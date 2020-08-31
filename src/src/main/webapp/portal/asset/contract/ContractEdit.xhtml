@@ -351,6 +351,12 @@
                             <p:column headerText="#{msg.pattern}">
                                 <h:outputText value="#{item.pattern}"/>
                             </p:column>
+                            <p:column headerText="产地">
+                                <h:outputText value="#{item.productionPlace}"/>
+                            </p:column>
+                            <p:column headerText="主设备名称">
+                                <h:outputText value="#{contractInfoEditController.getParentName(item.parentId)}"/>
+                            </p:column>
                             <p:column width="140" >
                                 <f:facet name="header" >
                                     <h:outputText value="#{msg.operation}" />
@@ -409,7 +415,7 @@
                                     <h:outputText value="#{msg.operation}" />
                                 </f:facet>
                                 <p:link target="_blank" outcome="#{contractInfoEditController.getDetailPageLink(item.assetInfo)}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
-                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item.assetInfo)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}" />
+                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment' and contractInfoEditController.selected.contractType ne 'Parts'}" />
                             </p:column>
 
                             <f:facet name="{Toolbar}" rendered="#{contractInfoEditController.canBeEdit}">
@@ -515,6 +521,17 @@
                         <h:panelGroup>
                             <label class="label">#{msg.pattern}</label>
                             <p:inputText class="bidWinner" value="#{contractInfoEditController.selectedContractItem.pattern}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">产地</label>
+                            <p:inputText class="bidWinner" value="#{contractInfoEditController.selectedContractItem.productionPlace}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">主设备</label>
+                            <p:selectOneMenu id="parentAsset" value="#{contractInfoEditController.selectedContractItem.parentId}" required="false">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+                                <f:selectItems value="#{contractInfoEditController.parentAssetList}" var="item" itemLabel="#{item.contractAssetName}" itemValue="#{item.id}" />
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <!--  <h:panelGroup>
                              <label class="label">#{msg.deliveryDays}</label>

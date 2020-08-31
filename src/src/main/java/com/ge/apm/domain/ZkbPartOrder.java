@@ -390,6 +390,7 @@ public class ZkbPartOrder implements Serializable {
      * 是否扣除名额
      * t f
      */
+    @Column(name = "whether_deduct")
     private String whetherDeduct;
 
     public String getWhetherDeduct() {

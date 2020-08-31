@@ -111,7 +111,7 @@ public class OrgTreeController {
     public void filterTreeNodeByName() {
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         if (uaaService.isIbSiteAdmin(currentUserAccount)) {
-            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid(), treeNodeNameFilter, currentUserAccount.getSiteId());
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(currentUserAccount.getUid(), treeNodeNameFilter, currentUserAccount.getSiteId());
             TreeNode siteTree = buildTree(siteList);
             expandedByOrgType(siteTree, 2);
             siteOrgTree = siteTree;

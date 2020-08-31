@@ -299,10 +299,44 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return "";
                 }
             }
+        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+            if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())){
+                HashMap<String, Integer> returnMap = new HashMap<>();
+                for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
+                    if(returnMap.containsKey(r.getPartNo())){
+                        Integer v = returnMap.get(r.getPartNo());
+                        v += r.getQty();
+                        returnMap.put(r.getPartNo(),v);
+                    }else{
+                        returnMap.put(r.getPartNo(),r.getQty());
+                    }
+                }
+                boolean flag = true;
+                String errorLog = "";
+                for(ZkbPartOrderItem zkbPartOrderItem : selected.getZkbPartOrderItems()){
+                    Integer returnQty = returnMap.get(zkbPartOrderItem.getPartNo());
+                    if(returnQty == null){
+                        flag = false;
+                        errorLog += zkbPartOrderItem.getPartNo() + ",";
+                    }else if(returnQty != zkbPartOrderItem.getPartQty()){
+                        flag = false;
+                        errorLog += zkbPartOrderItem.getPartNo() + ",";
+                    }
+                }
+                if(!flag){
+                    errorLog = errorLog.substring(0,errorLog.length()-1);
+                    WebUtil.addErrorMessage(errorLog+"归还数量不等于申请数量","");
+                    return "";
+                }
+            }
         }
         zkbPartOrderService.normalNext(this.selected,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){
+            //归还时发送邮件
+            zkbPartOrderService.sendEmail(zkbPartOrder);
+        }
         return "List?faces-redirect=true";
     }
 
@@ -345,12 +379,27 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void saveReturn(){
         boolean flag = true;
+        Integer total = 0;
         for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
             if(zkbPartOrderReturn.getPartNo().equals(i.getPartNo())){
-                if(i.getPartQty() < zkbPartOrderReturn.getQty()){
-                    flag = false;
-                }
+                total = i.getPartQty();
+                break;
             }
+        }
+        Integer returnQty = 0;
+        List<ZkbPartOrderReturn> returns = new ArrayList<>();
+        if(StringUtils.isEmpty(zkbPartOrderReturn.getId())){
+            returns = zkbPartOrderReturnRepository.findByPartOrderIdAndPartNo(selected.getId(),zkbPartOrderReturn.getPartNo());
+        }else {
+            returns = zkbPartOrderReturnRepository.findByPartOrderIdAndPartNoAndIdIsNot(selected.getId(),zkbPartOrderReturn.getPartNo(),zkbPartOrderReturn.getId());
+        }
+        if(returns.size() > 0){
+            for(ZkbPartOrderReturn r : returns){
+                returnQty += r.getQty();
+            }
+        }
+        if(total < returnQty + zkbPartOrderReturn.getQty()){
+            flag = false;
         }
         if(!flag){
             WebUtil.addErrorMessage("归还数量不能大于配件数量","");
@@ -362,6 +411,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturnRepository.save(zkbPartOrderReturn);
         zkbPartOrderReturn = null;
         zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId());
+    }
+
+    public void naFlagListener(){
+        zkbPartOrderReturn.setPartSerialNumber("");
     }
 
     public boolean iscanEditFlag() {

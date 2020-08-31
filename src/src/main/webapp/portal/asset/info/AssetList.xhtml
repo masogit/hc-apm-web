@@ -92,7 +92,7 @@
                                 </p:scrollPanel>
                             </p:overlayPanel>
                         </h:panelGroup>
-                        <p:inputText id="searchText" value="#{assetInfoListController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
+                        <p:inputText id="searchText" value="#{assetInfoListController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}/#{msg.assetTags}" maxlength="100" style="width: 500px">
                             <p:ajax event="keyup" update=":AssetInfoListForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''} searchButtons " />
                         </p:inputText>
 
@@ -627,6 +627,11 @@
                             <c:if test="#{columnItem eq 'pmOwnerTel'}">
                                 <p:column headerText="#{msg.pmOwnerTel}" sortBy="#{item.pmOwnerTel}" filterBy="#{item.pmOwnerTel}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.pmOwnerTel}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetTags'}">
+                                <p:column headerText="#{msg.assetTags}" filterBy="#{item.assetTags.tag}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.assetTagsView}"/>
                                 </p:column>
                             </c:if>
                         </c:forEach>

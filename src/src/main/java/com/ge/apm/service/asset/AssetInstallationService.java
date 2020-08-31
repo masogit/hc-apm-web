@@ -187,7 +187,8 @@ public class AssetInstallationService {
                 ContractInfoItem contractItem = contractItemDao.getByArrivalItemId(temp.getId());
                 if (null != contractItem) {
                     contractItem.setAssetUid(temp.getAssetUID());
-                    contractItemDao.save(contractItem);
+                    ContractInfoItem tempContractItem = contractItemDao.save(contractItem);
+                    this.updateAssetParent(tempContractItem, newAsset);
                 }
             } else {
                 //after reject;
@@ -351,6 +352,35 @@ public class AssetInstallationService {
         map.put("template", template);
 
         return wechatSendMsgService.sendArrivalSubmitMsg(token, map);
+    }
+
+    //处理合同中设置了主设备关系的业务逻辑
+    public void updateAssetParent(ContractInfoItem tempContractItem, AssetInfo currentAsset){
+
+        if(StringUtils.isEmpty(tempContractItem.getParentId())){
+            List<ContractInfoItem> tempSourceContractInfoItemList = contractItemDao.findByParentIdAndContractId(tempContractItem.getPurchaseItemId(), tempContractItem.getContractId());
+            for (ContractInfoItem sourceContractInfoItem : tempSourceContractInfoItemList) {
+                List<ContractInfoItem> tempContractInfoItemList = contractItemDao.findByPurchaseItemIdAndContractId(sourceContractInfoItem.getId(), tempContractItem.getContractId());
+                for (ContractInfoItem contractInfoItem : tempContractInfoItemList) {
+                    if(StringUtils.isNotEmpty(contractInfoItem.getAssetUid())){
+                        AssetInfo tempAsset = assetDao.findByUid(contractInfoItem.getAssetUid());
+                        tempAsset.setParentAssetId(currentAsset.getId());
+                        assetDao.save(tempAsset);
+                    }
+                }
+            }
+        }else {
+            List<ContractInfoItem> tempParentContractInfoItemList = contractItemDao.findByPurchaseItemIdAndContractId(tempContractItem.getParentId(), tempContractItem.getContractId());
+            if(!tempParentContractInfoItemList.isEmpty() && tempParentContractInfoItemList.size() == 1){
+                ContractInfoItem tempParentContractInfoItem = tempParentContractInfoItemList.get(0);
+                AssetInfo tempParentAsset = assetDao.findByUid(tempParentContractInfoItem.getAssetUid());
+                if(tempParentAsset != null){
+                    currentAsset.setParentAssetId(tempParentAsset.getId());
+                    assetDao.save(currentAsset);
+                }
+            }
+        }
+
     }
 
 }
