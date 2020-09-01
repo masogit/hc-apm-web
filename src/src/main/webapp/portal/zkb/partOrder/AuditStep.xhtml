@@ -196,29 +196,30 @@
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">探头号</label>
-                            <p:inputText id="catModel" value="#{zkbPartOrderEditController.selected.catNo}" disabled="true" />
+                            <p:inputText id="catModel" value="#{zkbPartOrderAuditController.selected.catNo}" disabled="true" />
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">探头型号</label>
-                            <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" disabled="true"
-                                            completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
+                            <p:autoComplete dropdown="true" value="#{zkbPartOrderAuditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" disabled="true"
+                                            completeMethod="#{zkbPartOrderAuditController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
                             </p:autoComplete>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">价值类型</label>
-                            <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderEditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
+                            <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
+                            <label style="color: red">#{zkbPartOrderAuditController.valueTypeTips}</label>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">旧探头SN号输入框</label>
-                            <p:inputText id="oldCatSn" value="#{zkbPartOrderEditController.selected.oldCatSn}" disabled="true" />
+                            <p:inputText id="oldCatSn" value="#{zkbPartOrderAuditController.selected.oldCatSn}" disabled="true" />
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">数量</label>
-                            <p:inputText id="catNum" value="#{zkbPartOrderEditController.selected.catNum}" disabled="true" />
+                            <p:inputText id="catNum" value="#{zkbPartOrderAuditController.selected.catNum}" disabled="true" />
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>

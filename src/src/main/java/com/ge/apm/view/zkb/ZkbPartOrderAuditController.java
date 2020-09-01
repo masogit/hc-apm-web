@@ -55,6 +55,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     private List<HashMap<String, String>> partNoList = new ArrayList<>();
     private List<I18nMessage> returnTypeList= new ArrayList<>();
+    private String valueTypeTips = "";
 
     @Override
     protected void init() {
@@ -102,6 +103,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
                 this.selected.setReturnQty(this.selected.getQty());
+            }
+
+            if(this.selected.getZkbPartOrderCat() != null){
+                if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    valueTypeTips = "";
+                }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
+                }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    valueTypeTips = "";
+                }
             }
             initReturnList();
         }
@@ -559,6 +570,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setShowBtn(String showBtn) {
         this.showBtn = showBtn;
+    }
+
+    public String getValueTypeTips() {
+        return valueTypeTips;
+    }
+
+    public void setValueTypeTips(String valueTypeTips) {
+        this.valueTypeTips = valueTypeTips;
     }
 
     @Override
