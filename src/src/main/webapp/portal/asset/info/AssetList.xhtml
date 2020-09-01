@@ -102,6 +102,7 @@
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
+                <div style="overflow-x: auto">
                 <h:form id="AssetInfoListForm">
                     <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="false" liveResize="false" resizeMode="expand"
                                  selectionMode="single" scrollable="false" scrollWidth="98%" selection="#{assetInfoListController.selected}"
@@ -111,7 +112,7 @@
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="20,50,100,500">
+                                 rowsPerPageTemplate="20,50,100,500" style="width: 200%">
 
                         <p:ajax  event="rowSelect" listener="#{assetInfoListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>
                         <p:ajax event="filter" listener="#{assetInfoListController.onFilter}" oncomplete="updateSelectAllCheckBox();"/>
@@ -663,6 +664,7 @@
 
                     <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>
                 </h:form>
+                </div>
             </div>
         </div>
 
