@@ -158,7 +158,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请时间*</label>
-                            <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.requestDate}" required="true" requiredMessage="#{msg.zkbPartOrder_requestDate} #{msg.ValidationRequire}" showOn="button" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                            <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderEditController.selected.requestDate}" required="true" requiredMessage="#{msg.zkbPartOrder_requestDate} #{msg.ValidationRequire}" showOn="button" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
 
                         <h:panelGroup>
@@ -177,7 +177,7 @@
                             <label class="label">产品型号*</label>
                             <p:inputText id="productNumber" value="#{zkbPartOrderEditController.selected.productNumber}" required="true" requiredMessage="#{msg.zkbPartOrder_productNumber} #{msg.ValidationRequire}" disabled="true"/>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                             <label class="label">软件版本*</label>
                             <p:inputText id="softwareVersion" value="#{zkbPartOrderEditController.selected.softwareVersion}" required="true" requiredMessage="#{msg.zkbPartOrder_softwareVersion} #{msg.ValidationRequire}" />
                         </h:panelGroup>
