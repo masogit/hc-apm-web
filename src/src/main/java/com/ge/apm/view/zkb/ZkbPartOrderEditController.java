@@ -283,13 +283,20 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(contractList != null && contractList.size() > 0){
             ZkbContract zkbContract = contractList.get(0);
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
-                Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
-                this.selected.setRemainQty(contractCount - this.selected.getQty());
+                /*Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
+                this.selected.setRemainQty(contractCount - this.selected.getQty());*/
+                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                    Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                }else{
+                    Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                }
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
                 this.selected.setRemainQty(contractCount - this.selected.getQty());
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-                if("1".equals(artificialType)){
+                /*if("1".equals(artificialType)){
                     Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
                     this.selected.setRemainQty(contractCount - this.selected.getQty());
                 }else if("3".equals(artificialType)){
@@ -303,7 +310,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }else {
                     Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
                     this.selected.setRemainQty(contractCount - this.selected.getQty());
+                }*/
+                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                    Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                }else{
+                    Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
                 }
+            }else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
+                Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
+                this.selected.setRemainQty(contractCount - this.selected.getQty());
             }
         }
     }
@@ -341,7 +358,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             flag=false;
             errorLog += "额度申请明细不能为空！";
         }
-        if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+        if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && !ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
             if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 2 && selected.getOnlineEngine() == null){
                 flag=false;
                 errorLog += "在线工程师不能为空！";
@@ -382,7 +399,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     public void orderTypeChange(){
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if("2".equals(artificialType)){
-                this.selected.setQty(0);
+                this.selected.setQty(1);
             }else {
                 this.selected.setQty(1);
             }

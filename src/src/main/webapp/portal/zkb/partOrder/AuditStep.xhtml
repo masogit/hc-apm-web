@@ -85,7 +85,7 @@
                             <label class="label">产品型号</label>
                             <p:inputText id="productNumber" value="#{zkbPartOrderAuditController.selected.productNumber}" disabled="true" />
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
                             <label class="label">软件版本</label>
                             <p:inputText id="softwareVersion" value="#{zkbPartOrderAuditController.selected.softwareVersion}" disabled="true" />
                         </h:panelGroup>
@@ -139,10 +139,10 @@
                             <label class="label">ZKB工程师电话*</label>
                             <p:inputText id="zkbEngineerPhone" value="#{zkbPartOrderAuditController.selected.zkbEngineerPhone}" disabled="true"/>
                         </h:panelGroup>
-                        <h:panelGroup>
+                      <!--  <h:panelGroup>
                             <label class="label">在线工程师*</label>
                             <p:inputText id="onlineEngineer" value="#{zkbPartOrderAuditController.selected.onlineEngine.name}" disabled="true" />
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">订单数量</label>
                             <p:inputText id="qty" value="#{zkbPartOrderAuditController.selected.qty}" required="true" readonly="true" requiredMessage="订单数量 #{msg.ValidationRequire}" disabled="true" />
@@ -196,34 +196,39 @@
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">探头号</label>
-                            <p:inputText id="catModel" value="#{zkbPartOrderEditController.selected.catNo}" disabled="true" />
+                            <p:inputText id="catModel" value="#{zkbPartOrderAuditController.selected.catNo}" disabled="true" />
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">探头型号</label>
-                            <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" disabled="true"
-                                            completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
+                            <p:autoComplete dropdown="true" value="#{zkbPartOrderAuditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" disabled="true"
+                                            completeMethod="#{zkbPartOrderAuditController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
                             </p:autoComplete>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">价值类型</label>
-                            <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderEditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
+                            <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
+                            <label style="color: red">#{zkbPartOrderAuditController.valueTypeTips}</label>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">旧探头SN号输入框</label>
-                            <p:inputText id="oldCatSn" value="#{zkbPartOrderEditController.selected.oldCatSn}" disabled="true" />
+                            <p:inputText id="oldCatSn" value="#{zkbPartOrderAuditController.selected.oldCatSn}" disabled="true" />
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">数量</label>
-                            <p:inputText id="catNum" value="#{zkbPartOrderEditController.selected.catNum}" disabled="true" />
+                            <p:inputText id="catNum" value="#{zkbPartOrderAuditController.selected.catNum}" disabled="true" />
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset id="techFieldset" legend="技术支持审批" rendered="#{zkbPartOrderAuditController.showTech}">
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
+                            <label class="label">技术支持审批时间*</label>
+                            <p:calendar timeZone="GMT+8"  id="techAuditDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.techAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">技术支持审批备注</label>
                             <p:inputTextarea id="techRemark" value="#{zkbPartOrderAuditController.selected.techRemark}" rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
@@ -232,7 +237,11 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset id="managementFieldset" legend="区域经理审批" rendered="#{zkbPartOrderAuditController.showManage}">
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
+                            <label class="label">技术支持审批时间*</label>
+                            <p:calendar timeZone="GMT+8"  id="manageAuditDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.manageAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">区域经理审批备注</label>
                             <p:inputTextarea id="manageRemark" value="#{zkbPartOrderAuditController.selected.manageRemark}" rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
@@ -360,6 +369,12 @@
                         <p:column headerText="归还类型">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnType',item.returnType)}"/>
                         </p:column>
+                        <p:column headerText="Part Serial Number" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
+                            <h:outputText value="#{item.partSerialNumber}"/>
+                        </p:column>
+                        <p:column headerText="故障描述" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
+                            <h:outputText value="#{item.partQualityIssue}"/>
+                        </p:column>
                         <p:column headerText="归还数量">
                             <h:outputText value="#{item.qty}"/>
                         </p:column>
@@ -391,7 +406,10 @@
                <p:commandButton validateClient="true" value="审批通过" action="#{zkbPartOrderAuditController.acceptNext}" update=":growl" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.showBtn eq '0') and zkbPartOrderAuditController.canEditFlag}"/>
                 <p:commandButton validateClient="true" value="审批不通过" action="#{zkbPartOrderAuditController.rejectNext}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.showBtn eq '0' and zkbPartOrderAuditController.canEditFlag}"/>
                 <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" />
+
             </h:form>
+           <ui:include src="PartOrderReturn.xhtml"/>
+
             <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
 
                 <h:form id="zkbConfigForm">
@@ -406,10 +424,11 @@
                     <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.orderCancelNext}" oncomplete="PF('zkbConfigDlg').hide()" update=":growl" icon="ui-icon-check" />
                     <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfigDlg').hide()"/>
                 </h:form>
-                <ui:include src="PartOrderReturn.xhtml"/>
 
             </p:dialog>
+
         </div>
+
     </ui:define>
 </ui:composition>
 

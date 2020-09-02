@@ -55,6 +55,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     private List<HashMap<String, String>> partNoList = new ArrayList<>();
     private List<I18nMessage> returnTypeList= new ArrayList<>();
+    private String valueTypeTips = "";
 
     @Override
     protected void init() {
@@ -85,11 +86,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selectedId);
             fieldRendered();
             if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
-                selected.setRemainQty(zkbContract.getSpareQuota());
+                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                    selected.setRemainQty(zkbContract.getSpareQuota());
+                }else{
+                    selected.setRemainQty(zkbContract.getSpareArtificail());
+                }
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                 selected.setRemainQty(zkbContract.getProbeQuota());
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
-                if("1".equals(selected.getArtificialType())){
+                /*if("1".equals(selected.getArtificialType())){
                     selected.setRemainQty(zkbContract.getSpareArtificail());
                 }else if("3".equals(selected.getArtificialType())){
                     if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
@@ -97,11 +102,28 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }else if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
                         selected.setRemainQty(zkbContract.getGeArtificialSupportTimes());
                     }
+                }*/
+                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                    selected.setRemainQty(zkbContract.getGeArtificialSupportTimes());
+                }else{
+                    selected.setRemainQty(zkbContract.getSpareArtificail());
                 }
+            }else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
+                selected.setRemainQty(zkbContract.getSpareQuota());
             }
 
             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
                 this.selected.setReturnQty(this.selected.getQty());
+            }
+
+            if(this.selected.getZkbPartOrderCat() != null){
+                if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    valueTypeTips = "";
+                }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
+                }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    valueTypeTips = "";
+                }
             }
             initReturnList();
         }
@@ -559,6 +581,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setShowBtn(String showBtn) {
         this.showBtn = showBtn;
+    }
+
+    public String getValueTypeTips() {
+        return valueTypeTips;
+    }
+
+    public void setValueTypeTips(String valueTypeTips) {
+        this.valueTypeTips = valueTypeTips;
     }
 
     @Override
