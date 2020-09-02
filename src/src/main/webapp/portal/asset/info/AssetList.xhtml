@@ -193,7 +193,7 @@
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetDeptOrg}" appendTo="@(Body)"
                                                         scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5">
                                             <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" oncomplete="afterLoadRender()"/>
-                                            <p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" oncomplete="afterLoadRender()"/>
                                         </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{item.assetDeptOrg.shortName}"/>
@@ -408,7 +408,7 @@
                                 <p:column headerText="#{msg.hospitalId}" filterBy="#{item.hospitalId}" filterMatchMode="EQ">
                                     <h:outputText value="#{assetInfoListController.getSiteOrgName(item.siteUID)}"/>
                                     <f:facet name="filter">
-                                        <p:inputText id="btnOrg2" readonly="true" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}"/>
+                                        <p:inputText id="btnOrg2" readonly="true" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" widgetVar="varPanelOrg2"/>
                                     </f:facet>
                                 </p:column>
                             </c:if>
@@ -769,7 +769,7 @@
 
         <c:if test="#{assetInfoListController.customedColumns.contains('siteUID')}">
             <h:form id="dataTableFilterByHospital">
-            <p:overlayPanel widgetVar="varPanelOrg2" for="AssetInfoListForm:datalist:btnOrg2" hideEffect="fade" dynamic="false" modal="false" class="dataTableFilterByHospital">
+            <p:overlayPanel widgetVar="varPanelOrg2" hideEffect="fade" dynamic="false" modal="false" class="dataTableFilterByHospital">
                     <p:inputText id="treeNodeNameFilter2" value="#{orgTreeController.treeNodeNameFilter}"/>
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="dataTableFilterByHospital:treeNodeNameFilter2 @this" update="dataTableFilterByHospital:orgTree2" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                     <p:scrollPanel style="height:300px;border: 0" mode="native">
