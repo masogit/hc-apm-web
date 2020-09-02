@@ -584,8 +584,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbContract.setSpareQuota((zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota()) + qty);
                 zkbContractRepository.save(zkbContract);
             }else{
-                zkbContract.setSpareArtificailUse((zkbContract.getSpareQuotaUse() == null ? 0 : zkbContract.getSpareQuotaUse()) - qty);
-                zkbContract.setSpareArtificail((zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota()) + qty);
+                zkbContract.setSpareArtificailUse((zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse()) - qty);
+                zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) + qty);
                 zkbContractRepository.save(zkbContract);
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
