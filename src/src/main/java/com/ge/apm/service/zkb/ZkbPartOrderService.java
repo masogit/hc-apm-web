@@ -306,6 +306,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     public void auditNext(ZkbPartOrder zkbPartOrder,boolean nextFlag,UserAccount userAccount){
         String oldStep = zkbPartOrder.getCurrentStep();
         if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep())){
+            zkbPartOrder.setTechAuditDate(new Date());
             if(nextFlag){
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
@@ -314,6 +315,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
             }
         }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrder.getCurrentStep())){
+            zkbPartOrder.setManageAuditDate(new Date());
             if(nextFlag){
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ManageAccept.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
@@ -365,16 +367,20 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     public void normalNext(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
         String oldStep = zkbPartOrder.getCurrentStep();
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())){
+            zkbPartOrder.setOrderedDate(new Date());
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Ordered.toString());
             zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
         }else{
             if(ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus())){
+                zkbPartOrder.setOrderedDate(new Date());
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Ordered.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString());
             }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(zkbPartOrder.getStatus())){
+                zkbPartOrder.setReturnAuditDate(new Date());
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Returned.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
             }else if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(zkbPartOrder.getStatus())){
+                zkbPartOrder.setClosedDate(new Date());
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
             }
@@ -455,6 +461,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     public void orderCancelNext(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
         String oldStep = zkbPartOrder.getCurrentStep();
+        zkbPartOrder.setOrderedDate(new Date());
         zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.OrderedReject.toString());
         zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
         zkbPartOrderRepository.save(zkbPartOrder);
