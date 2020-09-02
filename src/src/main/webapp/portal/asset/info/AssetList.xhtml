@@ -192,7 +192,7 @@
                                         <h:outputText value="#{msg.assetDeptName}"/><br/>
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterAssetDeptOrg}" appendTo="@(Body)"
                                                         scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5">
-                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" oncomplete="afterLoadRender()"/>
                                             <p:ajax process="@this" listener="#{assetInfoListController.onAssetDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
                                         </p:autoComplete>
                                     </f:facet>
@@ -206,7 +206,7 @@
                                         <p:autoComplete dropdown="true" value="#{assetInfoListController.filterClinicalDeptOrg}" appendTo="@(Body)"
                                                         scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5">
                                             <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" oncomplete="afterLoadRender()" />
-                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate"  oncomplete="afterLoadRender()"/>
                                         </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{item.clinicalDeptOrg.shortName}"/>
@@ -774,7 +774,7 @@
                     <p:commandButton partialSubmit="true" icon="ui-icon-search" process="dataTableFilterByHospital:treeNodeNameFilter2 @this" update="dataTableFilterByHospital:orgTree2" actionListener="#{orgTreeController.filterTreeNodeByName()}" value="检索"/>
                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                             <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                    <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode2}" update=":AssetInfoListForm:datalist :searchForm :dataTableFilterByHospital" oncomplete="PF('varPanelOrg2').hide();"/>
+                                    <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode2}" update=":AssetInfoListForm:datalist :searchForm :dataTableFilterByHospital" oncomplete="PF('varPanelOrg2').hide(); afterLoadRender()"/>
                                     <p:ajax process="@this" event="expand"/>
                                     <p:ajax process="@this" event="collapse"/>
                                     <p:treeNode type="org">
