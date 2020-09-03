@@ -93,8 +93,12 @@
 
         <!-- 护士站 -->
         <!-- <intercept-url pattern="/portal/nurseSite/**" access="hasAnyRole('SuperAdmin','HospitalHead', 'NursingStaff')"/> -->
+        <!--设备调剂-->
+
+
 
         <intercept-url pattern="/**/*.xhtml*" access="isAuthenticated()"/>
+        <!---->
         <access-denied-handler error-page="/accessdeniedzh.xhtml"/>
         <!--
         <port-mappings>
