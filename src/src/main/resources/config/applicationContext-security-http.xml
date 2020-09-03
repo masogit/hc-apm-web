@@ -94,56 +94,6 @@
         <!-- 护士站 -->
         <!-- <intercept-url pattern="/portal/nurseSite/**" access="hasAnyRole('SuperAdmin','HospitalHead', 'NursingStaff')"/> -->
         <!--设备调剂-->
-        <intercept-url pattern="/portal/BorrowAcceptanceV2/List.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--借用受理-->
-        <intercept-url pattern="/portal/ReturnAcceptanceV2/List.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--归还受理-->
-        <intercept-url pattern="/portal/allocationCenter/BatchAllocateAssets.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--设备批量调剂-->
-        <intercept-url pattern="/portal/ReturnAcceptanceV2/ListForQuery**" access="hasAnyRole('zkbDealerSales')"/><!--设备计费情况-->
-        <intercept-url pattern="/portal/allocationCenter/StockOfAssets.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--设备库存情况-->
-        <intercept-url pattern="/portal/SharedAssetType/List.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--调剂设备配置-->
-        <intercept-url pattern="/portal/SharedAssetType/AssetToShare.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--调剂名称设置-->
-        <!--设备档案-->
-        <intercept-url pattern="/portal/asset/info/AssetTerminateEntryList.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--报废资产-->
-        <intercept-url pattern="/portal/asset/contract/ContractList**" access="hasAnyRole('zkbDealerSales')"/><!--合同管理-->
-        <intercept-url pattern="/portal/supplier/List.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--供应商管理-->
-        <intercept-url pattern="/portal/asset/info/AssetList**" access="hasAnyRole('zkbDealerSales')"/><!--基本信息-->
-        <intercept-url pattern="/portal/inventory/inventoryOrder.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--盘点工单-->
-        <!--预防维护-->
-        <intercept-url pattern="/portal/pm/pmOrderListAll.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--保养工作台-->
-        <intercept-url pattern="/portal/electricSafety/measureElectricSafetyMain.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--电器安全数据导入-->
-        <intercept-url pattern="/portal/pm/pmOrderRule/List.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--保养规则-->
-        <intercept-url pattern="/portal/pm/relRuleAsset/List.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--资产规则管理-->
-        <!--计量管理-->
-        <intercept-url pattern="/portal/measuring/measuringTypeConfigList.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--计量类别设置-->
-        <intercept-url pattern="/portal/measuring/measuringResultMain.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--计量信息-->
-        <!--到货安装-->
-        <intercept-url pattern="/portal/asset/arrived/arrivalList.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--到货清单-->
-        <intercept-url pattern="/portal/asset/arrived/arrivalItemsList.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--安装入库-->
-        <!--维修流程-->
-        <intercept-url pattern="/portal/woMgr/workOrderList.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--维修工作台-->
-        <intercept-url pattern="/portal/wo/assetWorkOrder.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--设备维修统计-->
-        <intercept-url pattern="/portal/wo/woExport/woReportMain.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--维修工单报表-->
-        <intercept-url pattern="/portal/schedule/workSchedule.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--排班管理-->
-        <intercept-url pattern="/portal/schedule/userVacationList.xhtml**" access="hasAnyRole('zkbDealerSales')"/><!--休假管理-->
-        <!--知识文档-->
-        <intercept-url pattern="**" access="hasAnyRole('zkbDealerSales')"/><!---->
-        <intercept-url pattern="**" access="hasAnyRole('zkbDealerSales')"/><!---->
-        <intercept-url pattern="**" access="hasAnyRole('zkbDealerSales')"/><!---->
-        <intercept-url pattern="**" access="hasAnyRole('zkbDealerSales')"/><!---->
-        <intercept-url pattern="**" access="hasAnyRole('zkbDealerSales')"/><!---->
-        <intercept-url pattern="**" access="hasAnyRole('zkbDealerSales')"/><!---->
-        <intercept-url pattern="**" access="hasAnyRole('zkbDealerSales')"/><!---->
-
-
-        <!---->
-        <!---->
-        <!---->
-        <!---->
-        <!---->
-        <!---->
-        <!---->
-        <!---->
-        <!---->
-        <!---->
 
 
 
