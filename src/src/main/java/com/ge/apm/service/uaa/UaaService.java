@@ -457,6 +457,10 @@ public class UaaService {
         List<OrgInfo> orgList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(siteUID);
         return getOrgTreeNodes(siteUID, orgList);
     }
+    public TreeNode getOrgTreeBySite46(String siteUID,String retrieval){
+        List<OrgInfo> orgList = orgInfoDao.getOrgTreeBySiteAndparm(siteUID,retrieval);
+        return getOrgTreeNodes(siteUID, orgList);
+    }
 
     public TreeNode getOrgTreeNodes(String siteUID, List<OrgInfo> orgList) {
         TreeNode root = new DefaultTreeNode("root", null, null);
