@@ -289,6 +289,8 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             currentStatus =4;
         }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("4")){
             currentStatus =3;
+        }else if(selectedWorkOrder.getRepairResult().equalsIgnoreCase("5")){
+            currentStatus =1;
         }
     }
     public void selectSubstatus(){
