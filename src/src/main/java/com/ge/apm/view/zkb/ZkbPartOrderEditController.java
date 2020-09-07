@@ -150,9 +150,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(contractList.size() == 0){
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "未查询出合同数据！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
+            return;
         }else if(contractList.size() > 1){
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同超过两条数据，请检查！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
+            return;
         }else if(contractList.size() == 1){
             ZkbContract zkbContract = contractList.get(0);
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
@@ -160,17 +162,20 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于1，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
+                        return;
                     }
                 }else{
                     if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件+人工+保养剩余名额小于等于1，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
+                        return;
                     }
                 }
             } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() <= 1){
-                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同探头数量小于等于1，请检查！", "");
+                if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() <= 0){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同探头数量小于等于0，请检查！", "");
                     FacesContext.getCurrentInstance().addMessage(null, message);
+                    return;
                 }
             } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
                /* if("1".equals(artificialType)){
@@ -195,17 +200,20 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 1){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于1，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
+                        return;
                     }
                 }else{
                     if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于1，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
+                        return;
                     }
                 }
             }else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
                 if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
                     FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于1，请检查！", "");
                     FacesContext.getCurrentInstance().addMessage(null, message);
+                    return;
                 }
             }
 
@@ -392,6 +400,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 //flag=false;
                 //errorLog += "附件不能为空！";
             }
+        }
+        if(selected.getRemainQty() < 0){
+            flag=false;
+            errorLog += "剩余数量不能小于0！";
         }
         if(!flag){
             WebUtil.addErrorMessage(errorLog);
