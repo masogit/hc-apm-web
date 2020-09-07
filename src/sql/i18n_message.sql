@@ -3482,3 +3482,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorDirectorySecondDirectoryIsEmpty', '错误：子目录为空', 'Error: second directory is empty', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorDirectory', '错误：目录信息不存在', 'Error: directory information is not exist', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorCountDirectory', '错误：未找到需要更新的数据', 'Error:needed data has not been find', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'createdBy', '创建人', 'Created By', NULL, '-1');
