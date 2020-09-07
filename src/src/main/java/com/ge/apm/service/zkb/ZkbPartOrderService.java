@@ -680,8 +680,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     public List<ZkbPartOrderCat> queryPartOrderCat(){
-        return zkbPartOrderCatRepository.find();
-        //return zkbPartOrderCatRepository.findByValueTypeIsNot(ZkbPartOrderCat.ValueType.HighValue.toString());
+        //return zkbPartOrderCatRepository.find();
+        return zkbPartOrderCatRepository.findByValueTypeIsNot(ZkbPartOrderCat.ValueType.HighValue.toString());
     }
 
     public ZkbPartOrderRepository getZkbPartOrderRepository() {
