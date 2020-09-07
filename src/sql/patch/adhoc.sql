@@ -436,5 +436,47 @@ INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('10
 INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") VALUES ('/homeHead.xhtml', 'zkbDealerSales', '代理商Sales', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'asset,assetAdjust.batch,assetAdjust.borrowAccept,assetAdjust.config,assetAdjust.cost,assetAdjust.nameConfig,assetAdjust.returnAccept,assetAdjust.stock,asset.batchImportData,asset.create,asset.info,asset.inventory,asset.mgt,asset.scrap,asset.scrapTempMgt,asset.supplierMgt,examineMgt,examineMgt.pcc,examineMgt.pccConfig,examineMgt.ssoImp,install.list,install.store,knowledge.mgt,knowledge.zkbMgt,knowledge.zkbView,link,link,link.CPM,maintain,maintain.assetMgt,maintain.electricDataImport,maintain.reportFormMgt,maintain.reportMgt,maintain.rule,maintain.workbench,measure.categoryConfig,measure.console,measure.info,measure.rule,measure.ruleMgt,measure.templateMgt,nurseSite,nurseSite.config,nurseSite.maintain,nurseSite.optRecord,nurseSite.report,performance.BI,performance.bigScreen,performance.config,performance.deptMgt,performance.import,performance.scan,repair,repair,repair.count,repair.report,repair.reportMgt,repair.vacationMgt,repair.workbench,repair.workSchedule,zkbBasicInfo,zkbBasicInfo.agentContactPersonMgt,zkbBasicInfo.engineerMgt,zkbContract,zkbContract,zkbContract.contractMgt,zkbContract.courseMgt', 'Local Background Operation Management');
 INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") VALUES ('/homeHead.xhtml', 'zkbDealerFE', '代理商FE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'asset,assetAdjust.batch,assetAdjust.borrowAccept,assetAdjust.config,assetAdjust.cost,assetAdjust.nameConfig,assetAdjust.returnAccept,assetAdjust.stock,asset.batchImportData,asset.create,asset.info,asset.inventory,asset.mgt,asset.scrap,asset.scrapTempMgt,asset.supplierMgt,examineMgt,examineMgt.pcc,examineMgt.pccConfig,examineMgt.ssoImp,install.list,install.store,knowledge.mgt,knowledge.zkbMgt,knowledge.zkbView,link,link,link.CPM,maintain,maintain.assetMgt,maintain.electricDataImport,maintain.reportFormMgt,maintain.reportMgt,maintain.rule,maintain.workbench,measure.categoryConfig,measure.console,measure.info,measure.rule,measure.ruleMgt,measure.templateMgt,nurseSite,nurseSite.config,nurseSite.maintain,nurseSite.optRecord,nurseSite.report,performance.BI,performance.bigScreen,performance.config,performance.deptMgt,performance.import,performance.scan,repair,repair,repair.count,repair.report,repair.reportMgt,repair.vacationMgt,repair.workbench,repair.workSchedule,zkbBasicInfo,zkbBasicInfo.agentContactPersonMgt,zkbBasicInfo.engineerMgt,zkbContract,zkbContract,zkbContract.contractMgt,zkbContract.courseMgt', 'Local Background Operation Management');
 
+-- 2020.9.7 物资系统字典更新[资金来源]
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','600','教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','610','科研','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','620','科研+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','630','财政','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','640','财政+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','650','财政+科研','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','660','财政+科研+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','670','自筹','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','680','自筹+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','690','自筹+科研','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','700','自筹+科研+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','710','自筹+财政','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','720','自筹+财政+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','730','自筹+财政+科研','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','740','自筹+财政+科研+教育','',NULL,112);
+--  之前8.19的[资产分类] 未运行
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroup','21','24小时动态监测设备','24-hour Dynamic Monitoring Equipment',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_21','1','24小时动态脑电设备','24-hour Dynamic EEG Equipment',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_21','2','24小时动态睡眠设备','24-hour Dynamic Sleep Equipment',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_21','3','24小时动态心电设备','24-hour Dynamic ECG Equipment',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_21','4','24小时动态血糖设备','24-hour Dynamic Blood Glucose Equipment',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_21','5','24小时动态血压设备','24-hour Ambulatory Blood Pressure Equipment',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_18','9','其他（病理设备）','Other (Pathological Equipment)',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_18','10','染色机','Dyeing Machine',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_11','16','伽马刀','Gamma Knife',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_9','23','呼吸器','Apparatus Respiratorius',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_9','24','体外循环','Extracorporeal CircuIation',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_14','35','快速湿转仪','Rapid Wet Translator',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_14','36','全自动密度梯度制备系统','Automatic Density Gradient Preparation System',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_14','37','全自动核酸提取仪','Automatic Nucleic Acid Extractor',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_8','34','杜瓦罐','Dewar Can',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_8','35','分液器','Liquid Separator',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_8','36','数据系统','Data System',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_8','37','紫外分析仪','Ultraviolet Analyzer',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_8','38','紫外辐照机','Ultraviolet Irradiator',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_8','39','紫外辐照射度计','Ultraviolet Radiation Radiometer',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_8','40','自动旋盖机','Automatic Capping Machine',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_8','41','质谱仪','Mass Spectrometer',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_13','9','原子力显微镜','Atomic Force Microscope',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroup','22','附件','Appendix',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_22','1','附件','Appendix',NULL,112);
 
 
