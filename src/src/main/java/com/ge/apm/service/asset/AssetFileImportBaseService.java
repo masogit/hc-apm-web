@@ -9,6 +9,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -22,9 +23,7 @@ import webapp.framework.web.WebUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -116,6 +115,8 @@ public class AssetFileImportBaseService {
 
     protected boolean crossSite;
 
+    protected Map<String, AssetInfo> parentAssetsMap = new HashMap<>();
+
 
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport, boolean crossSite) {
         this.selectedOrgToImport = selectedOrgToImport;
@@ -154,22 +155,51 @@ public class AssetFileImportBaseService {
         LocalDateTime startTime = LocalDateTime.now();
 
         int row = 0;
+
         try {
 
-            for (Map<String, Object> item: importAssetMap) {
-                if (row % 100 == 0) {
-                    logger.info("imported {} rows", row);
+            if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
+
+                //locate parent assets first for later use
+                parentAssetsMap = supportingService.getParentAssets(importAssetMap);
+
+                //first iteration: import parent asset
+                for (Map<String, Object> item : importAssetMap) {
+                    AssetInfo assetInfo = (AssetInfo)item.get("asset");
+                    if(supportingService.isParentAssetForIBTenant(assetInfo)) {
+                        importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                    }
                 }
 
-                ++row;
-                importOneAsset(item, autoGenerateQrcode, orgNamesUriCache);
+                //second iteration: import child asset and other asset
+                for(Map<String, Object> item : importAssetMap){
+                    AssetInfo assetInfo = (AssetInfo)item.get("asset");
+                    if(supportingService.isParentAssetForIBTenant(assetInfo)) {
+                        continue;
+                    }
+
+                    if(supportingService.isChildAssetForIBTenant(assetInfo, parentAssetsMap)) {
+                        supportingService.setParentAsset(assetInfo, parentAssetsMap);
+                    }
+
+                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                }
+
+            } else {
+                for (Map<String, Object> item: importAssetMap) {
+                    if (row % 100 == 0) {
+                        logger.info("imported {} rows", row);
+                    }
+
+                    ++row;
+                    importOneAsset(item, autoGenerateQrcode, orgNamesUriCache, importAssetMap);
+                }
             }
 
         } catch (Exception e) {
             logger.info("error occurred when importing the {} row", row);
             throw e;
         }
-
 
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
@@ -178,7 +208,7 @@ public class AssetFileImportBaseService {
     }
 
     @Transactional
-    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
+    protected void importOneAsset(Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, List<Map<String, Object>> importAssetMap) {
 
         AssetInfo newAsset = (AssetInfo) item.get("asset");
         Map<String, ExcelDocument.ValueWrapper> rowMap = (Map<String, ExcelDocument.ValueWrapper>) item.get("rowData");
@@ -193,6 +223,7 @@ public class AssetFileImportBaseService {
         }
         //check depart num to avoid duplicate when update
         boolean isDuplicate = supportingService.isAssetDepartNumDuplicate(siteOrg.getUid(), newAsset);
+
         if (isDuplicate) {
             item.put("status", ImportStatus.Failure);
             AssetRow.addErrMessage(item, "错误: 设备编号重复");
@@ -393,6 +424,8 @@ public class AssetFileImportBaseService {
             }
 
         }
+
+        supportingService.removeParentAssetIfNotExists(newAsset);
 
         //if import status failure, already returned, will not reach here.
         assetDao.save(newAsset);

@@ -143,11 +143,17 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "tech_remark")
     private String techRemark;
 
+    @Column(name = "tech_audit_date")
+    private Date techAuditDate;
+
     /**
      * 区域经理审批备注
      */
     @Column(name = "manage_remark")
     private String manageRemark;
+
+    @Column(name = "manage_audit_date")
+    private Date manageAuditDate;
 
     /**
      *
@@ -172,6 +178,9 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "ordered_remark")
     private String orderedRemark;
+
+    @Column(name = "ordered_date")
+    private Date orderedDate;
 
     /**
      * 归还类型
@@ -218,11 +227,17 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "return_remark")
     private String returnRemark;
 
+    @Column(name = "return_audit_date")
+    private Date returnAuditDate;
+
     /**
      * 关单备注
      */
     @Column(name = "closed_remark")
     private String closedRemark;
+
+    @Column(name = "closed_date")
+    private Date closedDate;
 
     @Column(name = "created_by")
     private String createdBy;
@@ -385,6 +400,61 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "asset_type_di")
     private String assetTypeDi; //ct xr
+
+    /**
+     * 是否扣除名额
+     * t f
+     */
+    @Column(name = "whether_deduct")
+    private String whetherDeduct;
+
+    public Date getTechAuditDate() {
+        return techAuditDate;
+    }
+
+    public void setTechAuditDate(Date techAuditDate) {
+        this.techAuditDate = techAuditDate;
+    }
+
+    public Date getManageAuditDate() {
+        return manageAuditDate;
+    }
+
+    public void setManageAuditDate(Date manageAuditDate) {
+        this.manageAuditDate = manageAuditDate;
+    }
+
+    public Date getOrderedDate() {
+        return orderedDate;
+    }
+
+    public void setOrderedDate(Date orderedDate) {
+        this.orderedDate = orderedDate;
+    }
+
+    public Date getReturnAuditDate() {
+        return returnAuditDate;
+    }
+
+    public void setReturnAuditDate(Date returnAuditDate) {
+        this.returnAuditDate = returnAuditDate;
+    }
+
+    public Date getClosedDate() {
+        return closedDate;
+    }
+
+    public void setClosedDate(Date closedDate) {
+        this.closedDate = closedDate;
+    }
+
+    public String getWhetherDeduct() {
+        return whetherDeduct;
+    }
+
+    public void setWhetherDeduct(String whetherDeduct) {
+        this.whetherDeduct = whetherDeduct;
+    }
 
     public String getAssetTypeDi() {
         return assetTypeDi;

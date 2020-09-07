@@ -427,7 +427,16 @@ public class UaaService {
     public List<OrgInfo> getOrgListByUser(String userUid){
         return orgInfoDao.getByUser(userUid);
     }
-    
+
+    public boolean isIbSiteAdmin(UserAccount userAccount) {
+        if (userAccount.getSiteId() == 46) {
+            List<OrgInfo> orgListByUser = getOrgListByUser(userAccount.getUid());
+            // available to see the all institutions in ib site
+            return orgListByUser.size() == 1 && StringUtils.equals(orgListByUser.get(0).getUid(), orgListByUser.get(0).getTenantUID());
+        }
+        return false;
+    }
+
     //get tree for user to access
     public TreeNode getOrgAccessTreeByUser(UserAccount user){
         OrgInfo rootOrg = orgInfoDao.getByUid(user.getSiteUID());
@@ -445,71 +454,48 @@ public class UaaService {
 
     //full of the tree for this org
     public TreeNode getOrgTreeBySite(String siteUID){
-        List<OrgInfo> orgList = null;
-        orgList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(siteUID);
-        TreeNode root  = new DefaultTreeNode("root", null, null);
-        
+        List<OrgInfo> orgList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(siteUID);
+        return getOrgTreeNodes(siteUID, orgList);
+    }
+
+    public TreeNode getOrgTreeNodes(String siteUID, List<OrgInfo> orgList) {
+        TreeNode root = new DefaultTreeNode("root", null, null);
+
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
-        for(OrgInfo org: orgList){
+        for (OrgInfo org : orgList) {
             TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setRowKey("org_"+org.getId());
+            node.setRowKey("org_" + org.getId());
             treeMap.put(org.getUid(), node);
         }
-        for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
+        for (Map.Entry<String, TreeNode> nodeItem : treeMap.entrySet()) {
             TreeNode node = nodeItem.getValue();
-            OrgInfo org = (OrgInfo)node.getData();
-            if(org.getParentUID()!=null){
+            OrgInfo org = (OrgInfo) node.getData();
+            if (org.getParentUID() != null) {
                 TreeNode parentNode = treeMap.get(org.getParentUID());
-                if(parentNode!=null){
+                if (parentNode != null) {
                     parentNode.getChildren().add(node);
                 }
             }
         }
-        
-        if(treeMap.get(siteUID)!=null){
+
+        if (treeMap.get(siteUID) != null) {
             root.getChildren().add(treeMap.get(siteUID));
         }
 
-        if(!root.getChildren().isEmpty()){
-            OrgInfo temp = (OrgInfo)root.getChildren().get(0).getData();
+        if (!root.getChildren().isEmpty()) {
+            OrgInfo temp = (OrgInfo) root.getChildren().get(0).getData();
             rootUID = temp.getUid();
         }
         return root;
     }
 
     public TreeNode getOrgTreeBySiteWithoutClinical(String siteUID){
-        List<OrgInfo> orgList = null;
-        orgList = orgInfoDao.getOrgInfosByParentId(siteUID);
-        TreeNode root  = new DefaultTreeNode("root", null, null);
-
-        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
-        for(OrgInfo org: orgList){
-            TreeNode node = new DefaultTreeNode("org", org, null);
-            node.setRowKey("org_"+org.getId());
-            treeMap.put(org.getUid(), node);
-        }
-        for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
-            TreeNode node = nodeItem.getValue();
-            OrgInfo org = (OrgInfo)node.getData();
-            if(org.getParentUID()!=null){
-                TreeNode parentNode = treeMap.get(org.getParentUID());
-                if(parentNode!=null){
-                    parentNode.getChildren().add(node);
-                }
-            }
-        }
-
-        if(treeMap.get(siteUID)!=null){
-            root.getChildren().add(treeMap.get(siteUID));
-        }
-        if(!root.getChildren().isEmpty()){
-            OrgInfo temp = (OrgInfo)root.getChildren().get(0).getData();
-            rootUID = temp.getUid();
-        }
-        return root;
+        List<OrgInfo> orgList =  orgInfoDao.getOrgInfosByParentId(siteUID);
+        return getOrgTreeNodes(siteUID, orgList);
     }
 
     public String rootUID;
+
     public TreeNode getOrgTreeBySiteExceptClinicalDept(String siteUID){
         List<OrgInfo> orgList = null;
         orgList = orgInfoDao.getOrgInfosByParentId(siteUID);
@@ -755,13 +741,23 @@ public class UaaService {
         return userAccountDao.findById(userId);
     }
 
+    //用户可以显示的医院列表
+    public List<OrgInfo> getUserAccessibleSiteList(String userUid, String name, Integer siteId) {
+        List<String> institutions = orgInfoDao.findByInstitutionByNameLike(name, siteId); //TODO: fetch by user accessible site list
+        //for accessible sites`
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
+        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4)); //非科室
+        return orgInfoDao.findBySearchFilter(orgInfoFilters);
+    }
+
     //用户可以显示的医院列表(不包含科室)
     public List<OrgInfo> getUserAccessibleSiteList(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         //for accessible sites
-        List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(item -> item.getUid()).collect(Collectors.toList());
+        List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toList());
         //for sites of accessible departments
-        Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
+        Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(OrgInfo::getSiteUID).collect(Collectors.toSet());
 
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
@@ -777,9 +773,9 @@ public class UaaService {
     public List<OrgInfo> getUserAccessibleSiteListWithClinicalDept(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         //for accessible sites
-        List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(item -> item.getUid()).collect(Collectors.toList());
+        List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toList());
         //for sites of accessible departments
-        Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
+        Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(OrgInfo::getSiteUID).collect(Collectors.toSet());
 
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));

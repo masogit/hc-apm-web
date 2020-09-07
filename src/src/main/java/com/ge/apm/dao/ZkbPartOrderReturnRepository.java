@@ -15,4 +15,8 @@ public interface ZkbPartOrderReturnRepository extends GenericRepositoryUUID<ZkbP
     List<ZkbPartOrderReturn> findByPartOrderIdAndReturnTypeIsNot(String partOrderId,String returnType);
 
     void deleteByPartOrderId(String partOrderId);
+
+    List<ZkbPartOrderReturn> findByPartOrderIdAndPartNo(String partOrderId,String partNo);
+
+    List<ZkbPartOrderReturn> findByPartOrderIdAndPartNoAndIdIsNot(String partOrderId,String partNo,String id);
 }

@@ -200,13 +200,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
-        
-        rebuildOrgTree();
-
-        TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
-        if (null != selectedOrgNode) {
-            selectedOrgNode.setSelected(true);
-            TreeNodeUtil.expandParentsNodes(selectedOrgNode);
+        if (loginUser.getSiteId() != 46) { // skip building tenant org tree for apm ib user
+            rebuildOrgTree();
+            TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+            if (null != selectedOrgNode) {
+                selectedOrgNode.setSelected(true);
+                TreeNodeUtil.expandParentsNodes(selectedOrgNode);
+            }
         }
         updateRoleList();
     }
@@ -230,7 +230,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     
     public void filterTreeNode(){
-        uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
+        if (uaaService.isIbSiteAdmin(loginUser)) {
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(loginUser.getUid(), treeNodeNameFilter, loginUser.getSiteId());
+            OrgInfo tenant = orgInfoDao.findByUid(loginUser.getTenantUID());
+            siteList.add(tenant);
+            orgTree = uaaService.getOrgTreeNodes(loginUser.getSiteUID(), siteList);
+        } else {
+            uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
+        }
     }
 
     public String getOrgFullNameByUid(String orgUid) {
