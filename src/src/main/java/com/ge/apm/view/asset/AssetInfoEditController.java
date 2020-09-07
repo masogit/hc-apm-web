@@ -248,7 +248,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         supplierList = aimService.getOnlySuplierListBySiteUid(selected.getTenantUID());
         mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
         manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
-
+        //新增时不显示创建人
+        if ("Create".equalsIgnoreCase(actionName)) {
+            if (readableFieldsList.contains("creatorBy")) {
+                readableFieldsList.remove("creatorBy");
+            }
+        }
         initGbTree();
         initOrgTree();
 
@@ -980,7 +985,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
         return autoCompleteService.autoCompleteMaintainer(query, mantainList);
     }
-
+    public String selectCreatedBy(String loginName){
+        UserAccount user = userDao.getByLoginName(loginName);
+        if(user != null){
+            return user.getName();
+        }
+        return null;
+    }
     public List<String> completeAssetName(String prefix) {
         String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
         List<String> names = null;

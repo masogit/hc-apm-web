@@ -2267,7 +2267,7 @@
 
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','ContractImport','合同导入','Contract Import',NULL,	-1	);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','ContractRelatedEquipmentImport','合同相关设备导入','Contract-related Equipment Import',NULL	,	-1	);
-    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','ContractComplete','合同完成','Complete',NULL,	-1	);
+    INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','ContractComplete','验收完成','Complete',NULL,	-1	);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'FrequencyOfMaintenance', '保养次数', 'Frequency of Maintenance', NULL, '-1');
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','ImportContractInformation','导入合同信息','Import Contract Information',NULL,	-1	);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','SiteCannotBeEmpty','所属院区不能为空','Site cannot be empty',NULL,	-1	);
