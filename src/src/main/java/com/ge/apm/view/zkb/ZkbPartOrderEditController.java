@@ -154,6 +154,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }else if(contractList.size() > 1){
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同超过两条数据，请检查！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
+            contractList = new ArrayList<>();
             return;
         }else if(contractList.size() == 1){
             ZkbContract zkbContract = contractList.get(0);
@@ -162,12 +163,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于1，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
+                        contractList = new ArrayList<>();
                         return;
                     }
                 }else{
                     if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件+人工+保养剩余名额小于等于1，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
+                        contractList = new ArrayList<>();
                         return;
                     }
                 }
@@ -175,6 +178,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() <= 0){
                     FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同探头数量小于等于0，请检查！", "");
                     FacesContext.getCurrentInstance().addMessage(null, message);
+                    contractList = new ArrayList<>();
                     return;
                 }
             } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
@@ -200,12 +204,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 1){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于1，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
+                        contractList = new ArrayList<>();
                         return;
                     }
                 }else{
                     if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于1，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
+                        contractList = new ArrayList<>();
                         return;
                     }
                 }
@@ -213,6 +219,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
                     FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于1，请检查！", "");
                     FacesContext.getCurrentInstance().addMessage(null, message);
+                    contractList = new ArrayList<>();
                     return;
                 }
             }
