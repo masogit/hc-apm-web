@@ -6,29 +6,60 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="zkbPartOrderReturnEditDlg" widgetVar="zkbPartOrderReturnEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="额度明细操作"  height="420">
+    <p:dialog id="zkbPartOrderReturnEditDlg" widgetVar="zkbPartOrderReturnEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还明细操作" height="550">
         <h:form id="zkbItemEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                 <h:panelGroup>
+                    <label class="label">运单号*</label>
+                    <p:inputText id="waybillNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.waybillNo}" required="true" requiredMessage="#{msg.zkbPartOrder_waybillNo} #{msg.ValidationRequire}" />
+                </h:panelGroup>
+
+                <h:panelGroup>
                     <label class="label">配件号*</label>
-                    <p:selectOneMenu id="partNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partNo}" >
+                    <p:selectOneMenu id="partNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partNo}" required="true" requiredMessage="配件号不能为空">
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{zkbPartOrderAuditController.partNoList}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">归还类型*</label>
-                    <p:selectOneMenu id="returnType" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnType}" >
+                    <p:selectOneMenu id="returnType" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnType}" required="true" requiredMessage="归还类型不能为空" >
+                        <p:ajax event="change" update="returnTypeGrid" />
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <!--<f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
                         <f:selectItems value="#{zkbPartOrderAuditController.returnTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
+                <h:panelGrid id="returnTypeGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" style="text-align: left">
+                    <h:panelGroup rendered="#{(zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'DOA')}" style="text-align: left">
+                        <label class="label">Part Serial Number</label>
+                        <p:inputText id="partSerialNumber" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partSerialNumber}" style="text-align: left" required="true" requiredMessage="Part Serial Number不能为空"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{(zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'DOA')}" style="text-align: left">
+                        <label class="label">故障描述</label>
+                        <p:selectOneMenu id="partQualityIssue" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partQualityIssue}" style="text-align: left" >
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItem itemLabel="Boot Up Issue" itemValue="Boot Up Issue"/>
+                            <f:selectItem itemLabel="Cosmetic Issue" itemValue="Cosmetic Issue"/>
+                            <f:selectItem itemLabel="Disassembled" itemValue="Disassembled"/>
+                            <f:selectItem itemLabel="Function Does Not Work" itemValue="Function Does Not Work"/>
+                            <f:selectItem itemLabel="Image Quality Issue" itemValue="Image Quality Issue"/>
+                            <f:selectItem itemLabel="Missing/Swapped Component" itemValue="Missing/Swapped Component"/>
+                            <f:selectItem itemLabel="Other" itemValue="Other"/>
+                            <f:selectItem itemLabel="Physical Damage" itemValue="Physical Damage"/>
+                            <f:selectItem itemLabel="Used/Dirty" itemValue="Used/Dirty"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                </h:panelGrid>
                 <h:panelGroup>
                     <label class="label">归还数量*</label>
                     <p:spinner id="courseCount" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.qty}" min="1" max="1000" />
                 </h:panelGroup>
-
+                <h:panelGroup>
+                    <label class="label">归还日期*</label>
+                    <p:calendar timeZone="GMT+8"  mode="inline" id="returnDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
+                </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">备注</label>
                     <p:inputText id="remark" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.remark}"  />

@@ -51,6 +51,8 @@ public class WorkOrderExportPojo {
     private Integer intExtType;
     //工单类型名称
     private String intExtTypeName;
+    //1 完全修复,  2 部分修复, 3 无法修复, 4 需外送修复, 5 误报, 6 重复报修
+    private Integer repairResult;
     //上门维修/送修
     private Integer repairType;
     //上门维修/送修名称
@@ -718,5 +720,13 @@ public class WorkOrderExportPojo {
 
     public void setCloseStepInfo(String closeStepInfo) {
         this.closeStepInfo = closeStepInfo;
+    }
+
+    public Integer getRepairResult() {
+        return repairResult;
+    }
+
+    public void setRepairResult(Integer repairResult) {
+        this.repairResult = repairResult;
     }
 }

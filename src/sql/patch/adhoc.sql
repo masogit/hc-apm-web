@@ -35,301 +35,301 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 -- 2020.08.19 start 供应商系统 楼层数据
 --南部
-insert into asset_location_info values ('n_1','1号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,1);
-insert into asset_location_info values ('n_2','2号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,2);
-insert into asset_location_info values ('n_3','3号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,3);
-insert into asset_location_info values ('n_5','5号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,4);
-insert into asset_location_info values ('n_6','6号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,5);
-insert into asset_location_info values ('n_7','7号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,6);
-insert into asset_location_info values ('n_8','8号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,7);
-insert into asset_location_info values ('n_9','9号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,8);
-insert into asset_location_info values ('n_10','10号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,9);
-insert into asset_location_info values ('n_11','11号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,10);
-insert into asset_location_info values ('n_12','12号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,11);
-insert into asset_location_info values ('n_xmz','新门诊楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,12);
-insert into asset_location_info values ('n_frmz','发热门诊楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,13);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1','1号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2','2号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3','3号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5','5号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_6','6号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7','7号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8','8号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,7);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9','9号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,8);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10','10号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,9);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_11','11号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,10);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_12','12号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,11);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz','新门诊楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,12);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_frmz','发热门诊楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,13);
 
-###1号楼
-insert into asset_location_info values ('n_1_1','1层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_1_2','2层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info values ('n_1_3','3层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info values ('n_1_4','4层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info values ('n_1_5','5层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info values ('n_1_6','6层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info values ('n_1_7','7层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-insert into asset_location_info values ('n_1_8','8层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
-insert into asset_location_info values ('n_1_9','9层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
-insert into asset_location_info values ('n_1_10','10层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,10);
-insert into asset_location_info values ('n_1_11','11层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,11);
-insert into asset_location_info values ('n_1_12','12层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,12);
-insert into asset_location_info values ('n_1_13','13层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,13);
-insert into asset_location_info values ('n_1_14','14层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,14);
-insert into asset_location_info values ('n_1_15','15层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,15);
-insert into asset_location_info values ('n_1_16','16层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,16);
-insert into asset_location_info values ('n_1_17','17层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,17);
-insert into asset_location_info values ('n_1_18','18层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,18);
-insert into asset_location_info values ('n_1_19','19层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,19);
-insert into asset_location_info values ('n_1_20','20层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,20);
-insert into asset_location_info values ('n_1_21','21层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,21);
-
-
-###2号楼
-insert into asset_location_info values ('n_2_1','1层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_2_2','2层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info values ('n_2_3','3层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info values ('n_2_4','4层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info values ('n_2_5','5层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info values ('n_2_6','6层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info values ('n_2_7','7层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-insert into asset_location_info values ('n_2_8','8层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
-insert into asset_location_info values ('n_2_9','9层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
+--1号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_1','1层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_2','2层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_3','3层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_4','4层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_5','5层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_6','6层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_7','7层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_8','8层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_9','9层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_10','10层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,10);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_11','11层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,11);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_12','12层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,12);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_13','13层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,13);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_14','14层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,14);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_15','15层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,15);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_16','16层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,16);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_17','17层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,17);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_18','18层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,18);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_19','19层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,19);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_20','20层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,20);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_21','21层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,21);
 
 
-###3号楼
-insert into asset_location_info values ('n_3_1','1层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_3_2','2层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info values ('n_3_3','3层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info values ('n_3_4','4层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info values ('n_3_5','5层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info values ('n_3_6','6层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info values ('n_3_7','7层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
+--2号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_1','1层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_2','2层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_3','3层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_4','4层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_5','5层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_6','6层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_7','7层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_8','8层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_9','9层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
 
 
-###5号楼
-insert into asset_location_info values ('n_5_1','1层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_5_2','2层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info values ('n_5_3','3层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info values ('n_5_4','4层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info values ('n_5_5','5层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info values ('n_5_6','6层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
+--3号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_1','1层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_2','2层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_3','3层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_4','4层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_5','5层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_6','6层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_7','7层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
 
 
-###6号楼
-insert into asset_location_info values ('n_6_1','1层','n_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_6_2','2层','n_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info values ('n_6_3','3层','n_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
+--5号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_1','1层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_2','2层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_3','3层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_4','4层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_5','5层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_6','6层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
 
 
-###7号楼
-insert into asset_location_info values ('n_7_1','1层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_7_2','2层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info values ('n_7_3','3层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info values ('n_7_4','4层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info values ('n_7_5','5层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info values ('n_7_6','6层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info values ('n_7_7','7层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-insert into asset_location_info values ('n_7_8','8层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
-insert into asset_location_info values ('n_7_9','9层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
-insert into asset_location_info values ('n_7_10','10层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,10);
-insert into asset_location_info values ('n_7_11','11层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,11);
-insert into asset_location_info values ('n_7_12','12层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,12);
-insert into asset_location_info values ('n_7_13','13层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,13);
-insert into asset_location_info values ('n_7_14','14层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,14);
-insert into asset_location_info values ('n_7_15','15层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,15);
+--6号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_6_1','1层','n_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_6_2','2层','n_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_6_3','3层','n_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
 
 
-###8号楼
-insert into asset_location_info values ('n_8_1','1层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_8_2','2层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info values ('n_8_3','3层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info values ('n_8_4','4层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info values ('n_8_5','5层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
+--7号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_1','1层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_2','2层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_3','3层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_4','4层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_5','5层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_6','6层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_7','7层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_8','8层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_9','9层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_10','10层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,10);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_11','11层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,11);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_12','12层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,12);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_13','13层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,13);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_14','14层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,14);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_15','15层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,15);
 
 
-###9号楼
-insert into asset_location_info values ('n_9_1','1层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_9_2','2层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info values ('n_9_3','3层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info values ('n_9_4','4层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info values ('n_9_5','5层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
+--8号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8_1','1层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8_2','2层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8_3','3层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8_4','4层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8_5','5层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
 
 
-###10号楼
-insert into asset_location_info values ('n_10_1','1层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_10_2','2层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info values ('n_10_3','3层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info values ('n_10_4','4层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info values ('n_10_5','5层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info values ('n_10_6','6层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info values ('n_10_7','7层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-insert into asset_location_info values ('n_10_8','8层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
+--9号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9_1','1层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9_2','2层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9_3','3层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9_4','4层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9_5','5层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
 
 
-###11号楼
-insert into asset_location_info values ('n_11_1','1层','n_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_11_2','2层','n_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+--10号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_1','1层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_2','2层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_3','3层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_4','4层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_5','5层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_6','6层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_7','7层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_8','8层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
 
 
-###12号楼
-insert into asset_location_info values ('n_12_1','1层','n_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_12_2','2层','n_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+--11号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_11_1','1层','n_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_11_2','2层','n_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
 
 
-###新门诊楼
-insert into asset_location_info values ('n_xmz_1','1层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_xmz_2','2层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info values ('n_xmz_3','3层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info values ('n_xmz_4','4层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info values ('n_xmz_5','5层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info values ('n_xmz_6','6层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info values ('n_xmz_7','7层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-insert into asset_location_info values ('n_xmz_8','8层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
-insert into asset_location_info values ('n_xmz_9','9层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
-insert into asset_location_info values ('n_xmz_10','10层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,10);
-insert into asset_location_info values ('n_xmz_11','11层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,11);
+--12号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_12_1','1层','n_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_12_2','2层','n_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
 
 
-###发热门诊楼
-insert into asset_location_info values ('n_frmz_1','1层','n_frmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info values ('n_frmz_2','2层','n_frmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+--新门诊楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_1','1层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_2','2层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_3','3层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_4','4层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_5','5层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_6','6层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_7','7层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_8','8层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_9','9层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_10','10层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,10);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_11','11层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,11);
+
+
+--发热门诊楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_frmz_1','1层','n_frmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_frmz_2','2层','n_frmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
 
 
 --北部
-insert into asset_location_info values ('b_1','1号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,1);
-insert into asset_location_info values ('b_2','2号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,2);
-insert into asset_location_info values ('b_3','3号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,3);
-insert into asset_location_info values ('b_5','5号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,4);
-insert into asset_location_info values ('b_6','6号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,5);
-insert into asset_location_info values ('b_7','7号楼',null, (select oi.uid from tenant_info ti,org_infbo oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,6);
-insert into asset_location_info values ('b_8','8号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,7);
-insert into asset_location_info values ('b_9','9号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,8);
-insert into asset_location_info values ('b_10','10号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,9);
-insert into asset_location_info values ('b_11','11号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,10);
-insert into asset_location_info values ('b_12','12号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,11);
-insert into asset_location_info values ('b_tjzx','体检中心',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,12);
-insert into asset_location_info values ('b_yjls','药剂临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,13);
-insert into asset_location_info values ('b_jgls','技工临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,14);
-insert into asset_location_info values ('b_hqls','后勤临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,15);
-insert into asset_location_info values ('b_ls','临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,16);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1','1号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2','2号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3','3号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5','5号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6','6号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_7','7号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_8','8号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,7);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_9','9号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,8);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_10','10号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,9);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_11','11号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,10);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12','12号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,11);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_tjzx','体检中心',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,12);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_yjls','药剂临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,13);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_jgls','技工临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,14);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_hqls','后勤临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,15);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_ls','临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,16);
 
 
-###1号楼
-insert into asset_location_info values ('b_1_-1','-1层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info values ('b_1_1','1层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_1_2','2层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info values ('b_1_3','3层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info values ('b_1_4','4层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-insert into asset_location_info values ('b_1_5','5层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
-insert into asset_location_info values ('b_1_6','6层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
-insert into asset_location_info values ('b_1_7','7层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
-insert into asset_location_info values ('b_1_8','8层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,8);
-insert into asset_location_info values ('b_1_9','9层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,9);
-insert into asset_location_info values ('b_1_10','10层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,10);
-insert into asset_location_info values ('b_1_11','11层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,11);
-insert into asset_location_info values ('b_1_12','12层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,12);
-insert into asset_location_info values ('b_1_13','13层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,13);
-insert into asset_location_info values ('b_1_14','14层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,14);
-insert into asset_location_info values ('b_1_15','15层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,15);
-insert into asset_location_info values ('b_1_16','16层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,16);
+--1号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_-1','-1层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_1','1层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_2','2层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_3','3层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_4','4层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_5','5层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_6','6层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_7','7层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_8','8层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,8);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_9','9层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,9);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_10','10层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,10);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_11','11层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,11);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_12','12层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,12);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_13','13层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,13);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_14','14层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,14);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_15','15层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,15);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_16','16层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,16);
 
 
-###2号楼
-insert into asset_location_info values ('b_2_-1','-1层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info values ('b_2_1','1层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_2_2','2层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info values ('b_2_3','3层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info values ('b_2_4','4层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
+--2号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2_-1','-1层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2_1','1层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2_2','2层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2_3','3层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2_4','4层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
 
 
-###3号楼
-insert into asset_location_info values ('b_3_-1','-1层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info values ('b_3_1','1层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_3_2','2层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info values ('b_3_3','3层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info values ('b_3_4','4层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-insert into asset_location_info values ('b_3_5','5层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
-insert into asset_location_info values ('b_3_6','6层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
-insert into asset_location_info values ('b_3_7','7层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
-insert into asset_location_info values ('b_3_8','8层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,8);
+--3号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_-1','-1层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_1','1层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_2','2层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_3','3层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_4','4层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_5','5层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_6','6层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_7','7层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_8','8层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,8);
 
 
-###5号楼
-insert into asset_location_info values ('b_5_-1','-1层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info values ('b_5_1','1层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_5_2','2层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info values ('b_5_3','3层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info values ('b_5_4','4层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-insert into asset_location_info values ('b_5_5','5层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
-insert into asset_location_info values ('b_5_6','6层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
-insert into asset_location_info values ('b_5_7','7层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
-insert into asset_location_info values ('b_5_8','8层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,8);
-insert into asset_location_info values ('b_5_9','9层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,9);
+--5号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_-1','-1层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_1','1层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_2','2层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_3','3层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_4','4层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_5','5层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_6','6层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_7','7层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_8','8层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,8);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_9','9层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,9);
 
 
-###6号楼
-insert into asset_location_info values ('b_6_-1','-1层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info values ('b_6_1','1层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_6_2','2层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info values ('b_6_3','3层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info values ('b_6_4','4层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-insert into asset_location_info values ('b_6_5','5层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
-insert into asset_location_info values ('b_6_6','6层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
-insert into asset_location_info values ('b_6_7','7层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
+--6号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_-1','-1层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_1','1层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_2','2层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_3','3层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_4','4层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_5','5层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_6','6层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_7','7层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
 
 
-###7号楼
-insert into asset_location_info values ('b_7_1','1层','b_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_7_2','2层','b_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info values ('b_7_3','3层','b_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
+--7号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_7_1','1层','b_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_7_2','2层','b_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_7_3','3层','b_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
 
 
-###8号楼
-insert into asset_location_info values ('b_8_1','1层','b_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+--8号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_8_1','1层','b_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
 
 
-###9号楼
-insert into asset_location_info values ('b_9_-1','-1层','b_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info values ('b_9_1','1层','b_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+--9号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_9_-1','-1层','b_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_9_1','1层','b_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
 
 
-###10号楼
-insert into asset_location_info values ('b_10_1','1层','b_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_10_2','2层','b_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info values ('b_10_3','3层','b_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
+--10号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_10_1','1层','b_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_10_2','2层','b_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_10_3','3层','b_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
 
 
-###11号楼
-insert into asset_location_info values ('b_11_1','1层','b_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_11_2','2层','b_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info values ('b_11_3','3层','b_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
+--11号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_11_1','1层','b_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_11_2','2层','b_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_11_3','3层','b_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
 
 
-###12号楼
-insert into asset_location_info values ('b_12_1','1层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_12_2','2层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info values ('b_12_3','3层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info values ('b_12_4','4层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-insert into asset_location_info values ('b_12_5','5层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
-insert into asset_location_info values ('b_12_6','6层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
+--12号楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_1','1层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_2','2层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_3','3层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_4','4层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_5','5层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_6','6层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
 
 
-###体检中心
-insert into asset_location_info values ('b_tjzx_1','1层','b_tjzx', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+--体检中心
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_tjzx_1','1层','b_tjzx', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
 
 
-###药剂临时楼
-insert into asset_location_info values ('b_yjls_1','1层','b_yjls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_yjls_2','2层','b_yjls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+--药剂临时楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_yjls_1','1层','b_yjls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_yjls_2','2层','b_yjls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
 
 
-###技工临时楼
-insert into asset_location_info values ('b_jgls_1','1层','b_jgls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_jgls_2','2层','b_jgls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+--技工临时楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_jgls_1','1层','b_jgls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_jgls_2','2层','b_jgls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
 
 
 
-###后勤临时楼
-insert into asset_location_info values ('b_hqls_1','1层','b_hqls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info values ('b_hqls_2','2层','b_hqls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
+--后勤临时楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_hqls_1','1层','b_hqls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_hqls_2','2层','b_hqls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
 
 
-###临时楼
-insert into asset_location_info values ('b_ls_1','1层','b_ls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
+--临时楼
+insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_ls_1','1层','b_ls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
 
 -- 2020.08.19 end 供应商系统 楼层数据
 
 
-###初始化目录
+--初始化目录
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('1                               ', 1, 'ULS VENUE', NULL);
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('2                               ', 1, 'CT', NULL);
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('3                               ', 1, 'WIX MAMMO', NULL);
@@ -395,7 +395,7 @@ INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('62
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('63                              ', 2, 'LOGIQ 3', '8                               ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('64                              ', 2, 'Logiq 9', '8                               ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('65                              ', 2, 'LOGIQ BOOK XP', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('66                              ', 2, 'LOGIQ P3 ', '8                               ');
+INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('66                              ', 2, 'LOGIQ P3', '8                               ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('67                              ', 2, 'Logiq S7', '8                               ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('68                              ', 2, 'LOGIQ V3/V5', '8                               ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('69                              ', 2, 'Logiq E9', '8                               ');
@@ -432,5 +432,9 @@ INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('99
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('100                             ', 2, 'IDXA', '11                              ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('101                             ', 2, 'DPX DUO BRAVO', '11                              ');
 INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('102                             ', 2, 'DPX NT', '11                              ');
+-- 2020.09.02 start 智康宝角色
+INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") VALUES ('/homeHead.xhtml', 'zkbDealerSales', '代理商Sales', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'asset,assetAdjust.batch,assetAdjust.borrowAccept,assetAdjust.config,assetAdjust.cost,assetAdjust.nameConfig,assetAdjust.returnAccept,assetAdjust.stock,asset.batchImportData,asset.create,asset.info,asset.inventory,asset.mgt,asset.scrap,asset.scrapTempMgt,asset.supplierMgt,examineMgt,examineMgt.pcc,examineMgt.pccConfig,examineMgt.ssoImp,install.list,install.store,knowledge.mgt,knowledge.zkbMgt,knowledge.zkbView,link,link,link.CPM,maintain,maintain.assetMgt,maintain.electricDataImport,maintain.reportFormMgt,maintain.reportMgt,maintain.rule,maintain.workbench,measure.categoryConfig,measure.console,measure.info,measure.rule,measure.ruleMgt,measure.templateMgt,nurseSite,nurseSite.config,nurseSite.maintain,nurseSite.optRecord,nurseSite.report,performance.BI,performance.bigScreen,performance.config,performance.deptMgt,performance.import,performance.scan,repair,repair,repair.count,repair.report,repair.reportMgt,repair.vacationMgt,repair.workbench,repair.workSchedule,zkbBasicInfo,zkbBasicInfo.agentContactPersonMgt,zkbBasicInfo.engineerMgt,zkbContract,zkbContract,zkbContract.contractMgt,zkbContract.courseMgt', 'Local Background Operation Management');
+INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") VALUES ('/homeHead.xhtml', 'zkbDealerFE', '代理商FE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'asset,assetAdjust.batch,assetAdjust.borrowAccept,assetAdjust.config,assetAdjust.cost,assetAdjust.nameConfig,assetAdjust.returnAccept,assetAdjust.stock,asset.batchImportData,asset.create,asset.info,asset.inventory,asset.mgt,asset.scrap,asset.scrapTempMgt,asset.supplierMgt,examineMgt,examineMgt.pcc,examineMgt.pccConfig,examineMgt.ssoImp,install.list,install.store,knowledge.mgt,knowledge.zkbMgt,knowledge.zkbView,link,link,link.CPM,maintain,maintain.assetMgt,maintain.electricDataImport,maintain.reportFormMgt,maintain.reportMgt,maintain.rule,maintain.workbench,measure.categoryConfig,measure.console,measure.info,measure.rule,measure.ruleMgt,measure.templateMgt,nurseSite,nurseSite.config,nurseSite.maintain,nurseSite.optRecord,nurseSite.report,performance.BI,performance.bigScreen,performance.config,performance.deptMgt,performance.import,performance.scan,repair,repair,repair.count,repair.report,repair.reportMgt,repair.vacationMgt,repair.workbench,repair.workSchedule,zkbBasicInfo,zkbBasicInfo.agentContactPersonMgt,zkbBasicInfo.engineerMgt,zkbContract,zkbContract,zkbContract.contractMgt,zkbContract.courseMgt', 'Local Background Operation Management');
+
 
 
