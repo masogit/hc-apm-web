@@ -158,6 +158,7 @@ public class CustomConfigConstant {
             allFields.put("UCMID", WebUtil.getMessage("UCMID"));
             allFields.put("assetTags", WebUtil.getMessage("assetTags"));
             allFields.put("connectToInsite", WebUtil.getMessage("connectToInsite"));
+            allFields.put("creatorBy", WebUtil.getMessage("creatorUID"));
 //        }
         return allFields;
     }
