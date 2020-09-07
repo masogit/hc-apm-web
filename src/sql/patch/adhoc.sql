@@ -437,21 +437,21 @@ INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_d
 INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") VALUES ('/homeHead.xhtml', 'zkbDealerFE', '代理商FE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'asset,assetAdjust.batch,assetAdjust.borrowAccept,assetAdjust.config,assetAdjust.cost,assetAdjust.nameConfig,assetAdjust.returnAccept,assetAdjust.stock,asset.batchImportData,asset.create,asset.info,asset.inventory,asset.mgt,asset.scrap,asset.scrapTempMgt,asset.supplierMgt,examineMgt,examineMgt.pcc,examineMgt.pccConfig,examineMgt.ssoImp,install.list,install.store,knowledge.mgt,knowledge.zkbMgt,knowledge.zkbView,link,link,link.CPM,maintain,maintain.assetMgt,maintain.electricDataImport,maintain.reportFormMgt,maintain.reportMgt,maintain.rule,maintain.workbench,measure.categoryConfig,measure.console,measure.info,measure.rule,measure.ruleMgt,measure.templateMgt,nurseSite,nurseSite.config,nurseSite.maintain,nurseSite.optRecord,nurseSite.report,performance.BI,performance.bigScreen,performance.config,performance.deptMgt,performance.import,performance.scan,repair,repair,repair.count,repair.report,repair.reportMgt,repair.vacationMgt,repair.workbench,repair.workSchedule,zkbBasicInfo,zkbBasicInfo.agentContactPersonMgt,zkbBasicInfo.engineerMgt,zkbContract,zkbContract,zkbContract.contractMgt,zkbContract.courseMgt', 'Local Background Operation Management');
 
 -- 2020.9.7 物资系统字典更新[资金来源]
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','600','教育','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','610','科研','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','620','科研+教育','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','630','财政','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','640','财政+教育','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','650','财政+科研','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','660','财政+科研+教育','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','670','自筹','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','680','自筹+教育','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','690','自筹+科研','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','700','自筹+科研+教育','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','710','自筹+财政','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','720','自筹+财政+教育','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','730','自筹+财政+科研','',NULL,112);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','740','自筹+财政+科研+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1001','教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1002','科研','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1003','科研+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1004','财政','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1005','财政+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1006','财政+科研','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1007','财政+科研+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1008','自筹','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1009','自筹+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1010','自筹+科研','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1011','自筹+科研+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1012','自筹+财政','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1013','自筹+财政+教育','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1014','自筹+财政+科研','',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('capitalSource','1015','自筹+财政+科研+教育','',NULL,112);
 --  之前8.19的[资产分类] 未运行
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroup','21','24小时动态监测设备','24-hour Dynamic Monitoring Equipment',NULL,112);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_21','1','24小时动态脑电设备','24-hour Dynamic EEG Equipment',NULL,112);
