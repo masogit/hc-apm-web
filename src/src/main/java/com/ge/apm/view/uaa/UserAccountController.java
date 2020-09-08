@@ -138,6 +138,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     TreeNode deleteTreeNode = new DefaultTreeNode("root", null, null);
     boolean deleteDisabled = true;
+    boolean  selectAllButton = false;
+    private OrgInfo orgInfo46 = new OrgInfo();//初始化GE46号节点
+
+    public boolean isDeleteDisabled() {
+        return deleteDisabled;
+    }
+
     public List<String> getUnselectInstitutions() {
         return unselectInstitutions;
     }
@@ -392,8 +399,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         else if(3==type){
             return "院区";
-        }else{
+        }else if(4==type){
             return "科室";
+        }else{
+            return "顶级";
         }
     }
 
@@ -569,6 +578,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         deleteTreeNode = new DefaultTreeNode("root", null, null);
         selectedAccessOrgNodesCopy =new ArrayList<TreeNode>();
         deleteDisabled = true;
+        selectAllButton=false;
+        accessOrgTree = new  DefaultTreeNode("root", null, null);
     }
 
     public OrgInfo getSelectedOrg() {
@@ -1007,7 +1018,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             addMissingChildClinical(accessOrgTree, selectedOrgList);
         }
 
-        userAccountService.updateUserOrg(selected.getUid(), selectedOrgList,treeDeleteUrgOidList,selected.getSiteId(),unselectInstitutions,unselectUidss);
+        userAccountService.updateUserOrg(selected.getUid(), selectedOrgList,treeDeleteUrgOidList,selected.getSiteId(),unselectInstitutions,unselectUidss,selectAllButton,orgInfo46,orgInfoTableData46);
     }
 
 
@@ -1052,21 +1063,20 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     public void onSelectAccessTreeNode46(NodeSelectEvent event) {
         setTreeNodes(event.getTreeNode(), true);
-        updateOrgInfoTable("1");
+        updateOrgInfoTable("1",null);
     }
 
-    private void updateOrgInfoTable(String type) {
+    private void updateOrgInfoTable(String type ,OrgInfo unOrgInfo) {
         //1.先生成对应的关系列表
         Set<OrgInfo> selectedOrgList = new HashSet<>();
         readSelectedOrgTree46(accessOrgTree, selectedOrgList);
         addMissingChildClinical(accessOrgTree, selectedOrgList);
         List<OrgInfo> orginfos  = new ArrayList(selectedOrgList);
-        if("2".equals(type)){
-            orgInfoTableData46 = orginfos;
-            return;
-        }
+        //if("2".equals(type)){
+        //    orgInfoTableData46 = orginfos;
+        //    return;
+        //}
         //2.遍历关系列表与orgInfoTable表。如果发现是属于同一个集团的就把表中的字段删掉然后添加上新生成的关系
-        System.out.println(orgInfoTableData46);
         Set<String> eqInstitutionUids = new HashSet<String>();//存放相等InstitutionUID的集合，以后统一删除与添加
         for (int i = 0; i < orgInfoTableData46.size(); i++) {//遍历当前表格，如果 institution_uid一样则删掉，换上新的institution_uid的数据
             for (int j = 0; j <orginfos.size() ; j++) {
@@ -1083,9 +1093,16 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 it.remove();
             }
         }
-        System.out.println(orgInfoTableData46);
+        Iterator<OrgInfo> it2=orgInfoTableData46.iterator();
+        if("2".equals(type)){
+            while(it2.hasNext()) {
+                OrgInfo orgInfo=it2.next();
+                if(unOrgInfo.getInstitutionUID().equals(orgInfo.getInstitutionUID())) {
+                    it2.remove();
+                }
+            }
+        }
         orgInfoTableData46.addAll(orginfos);
-        System.out.printf(orgInfoTableData46.toString());
     }
 
     public void filterNode(){
@@ -1097,6 +1114,17 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         setSelectedOrgTree(accessOrgTree, orgList);
         TreeNodeUtil.expandTreeNode(accessOrgTree);
         deleteDisabled = false;
+    }
+    //全选按钮 （只保存GE后台运维的uid）(页面上表格也只显示GE后台运维的iD)
+    public void selectAll(){
+        selectAllButton = true;//1.标为全选
+        //2.获取GE后台运维的节点，更新表格，删除按钮置灰
+        //deleteDisabled = true;//删除按钮置灰
+        orgInfoTableData46.clear();
+        OrgInfo orgInfo = (OrgInfo) accessOrgTree.getChildren().get(0).getData();
+        orgInfoTableData46.add(orgInfo);//放入GE后台运维节点
+        orgInfo46 = orgInfo;//全选的时候只记录顶级用户
+
     }
 
     public void onUnselectAccessTreeNode(NodeUnselectEvent event) {
@@ -1118,7 +1146,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
             node = node.getParent();
         }
-        updateOrgInfoTable("2");
+        updateOrgInfoTable("2" , orgInfo);
     }
 
     private void setTreeNodes(TreeNode root, Boolean isSelected) {
@@ -1465,6 +1493,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     //判断租户是否是46号租户 是返回true 否返回false
     public boolean judgeTheUser(){
-        return true;
+        if(selected==null){
+            return false;
+        }
+        if(46==selected.getSiteId()){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

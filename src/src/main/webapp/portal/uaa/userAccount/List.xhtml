@@ -109,7 +109,7 @@
 					<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 				</p:commandButton>
 				<p:commandButton id="roleButton" icon="ui-icon-people" title="#{msg.AssignRole}" actionListener="#{userAccountController.prepareRoleData}"
-					update=":userAccountTab:RoleEditDlg" oncomplete="PF('RoleEditDialog').show()" disabled="#{empty userAccountController.selected}" />
+					update=":userAccountTab:RoleEditDlg2" oncomplete="PF('RoleEditDialog2').show()" disabled="#{empty userAccountController.selected}" />
 				<p:commandButton id="resetPassButton" icon="ui-icon-repeat" title="#{msg.resetPassword}"
 					actionListener="#{userAccountController.resetPassword}" update="datalist :growl" disabled="#{empty userAccountController.selected}">
 					<p:confirm header="#{msg.ResetConformation}" message="#{msg.ResetConformationMsg}" icon="ui-icon-alert" />
@@ -131,14 +131,8 @@
 
 	<ui:include src="Edit.xhtml" />
 	<ui:include src="View.xhtml" />
-	<c:choose>
-		<c:when test="#{userAccountController.judgeTheUser()}">
-			<ui:include src="Role2.xhtml" />
-		</c:when>
-		<c:otherwise>
-			<ui:include src="Role.xhtml" />
-		</c:otherwise>
-	</c:choose>
+	<ui:include src="Role2.xhtml" />
+
 
 </div>
 </html>
