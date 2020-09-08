@@ -53,6 +53,7 @@ public class AssetInfoDetailController {
     private ContractInfoService contractService;
     private ContractInfoItemRepository contractItemDao;
     private AssetTagsMapper assetTagsMapper;
+    private UserAccountRepository userDao;
 
     private Boolean terminate;
     private AssetInfo selected;
@@ -83,6 +84,7 @@ public class AssetInfoDetailController {
         contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
         assetTagsMapper = WebUtil.getBean(AssetTagsMapper.class);
+        userDao = WebUtil.getBean(UserAccountRepository.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
@@ -175,7 +177,13 @@ public class AssetInfoDetailController {
         }
         return "";
     }
-
+    public String selectCreatedBy(String loginName){
+        UserAccount user = userDao.getByLoginName(loginName);
+        if(user != null){
+            return user.getName();
+        }
+        return null;
+    }
     public String getCustomConfigString() {
         return JSONObject.toJSONString(customConfig);
     }

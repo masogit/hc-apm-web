@@ -292,6 +292,7 @@ public class WorkOrderReportProvider {
             "wo.send_step_owner_name as sendStepOwnerName, " +
             "wo.send_step_start_time as sendStepStartTime, " +
             "wo.int_ext_type as intExtType, " +
+            "wo.repair_result as repairResult, " +
             "wo.repair_type as repairType, " +
             "wo.accept_step_owner_name as acceptStepOwnerName, " +
             "wo.accept_step_start_time as acceptStepStartTime, " +

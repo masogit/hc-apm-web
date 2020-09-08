@@ -20,6 +20,8 @@ public interface ApmConstant {
 
     String CHILD_CLINICAL_DEPT_SEPARATOR = "-";
 
+    int IB_TENANT_ID = 46;
+
 
 
 }

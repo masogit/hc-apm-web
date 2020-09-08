@@ -23,7 +23,7 @@ public class ZkbContract implements ChineseName, Serializable {
     }
 
     public enum ContractRegion {
-        North,South,East,NW,SW
+        North,South,East,West
     }
 
     public enum ContractType {
