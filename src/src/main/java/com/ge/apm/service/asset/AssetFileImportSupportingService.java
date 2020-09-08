@@ -399,39 +399,6 @@ public class AssetFileImportSupportingService {
         return true;
     }
 
-//    public void releaseOldQRCodeInUse(OrgInfo selectedOrgToImport, List<Map<String, Object>> importAssetMap) {
-//
-//        importAssetMap.forEach(item -> {
-//            AssetInfo newAsset = (AssetInfo) item.get("asset");
-//
-//            //if site uid not match, ignore update
-//            if (newAsset.getUid() != null) {
-//                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
-//                    return ;
-//                }
-//
-//            }
-//
-//            String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
-//            if (StringUtils.isEmpty(oldQrCode)) return;
-//            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
-//
-//            boolean releaseable = true;
-//            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
-//                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
-//                if (!exists) {
-//                    releaseable = false;
-//                }
-//            }
-//
-//            if (releaseable) {
-//                qrCodeService.releaseQrCode(oldQrCode, selectedOrgToImport.getUid());
-//            }
-//
-//        });
-//
-//    }
-
     /**
      * release qrcode only one asset
      * @param selectedOrgToImport
@@ -479,18 +446,6 @@ public class AssetFileImportSupportingService {
         }
     }
 
-//    public String tryFormatQrCodeIfPossible(Map<String, ExcelDocument.ValueWrapper> rowMap, AssetInfo assetInfo) {
-//        String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
-//        if (!StringUtils.isEmpty(inputQrcode) && inputQrcode.length() > 16) {
-//            inputQrcode = inputQrcode.replace("-", "");
-//        }
-//
-//        assetInfo.setQrCode(inputQrcode);
-//
-//        return inputQrcode;
-//    }
-
-
     public SiteOrgWithDeptOrg findSiteOrgInAssetExcelRow(Map<String, ExcelDocument.ValueWrapper> rowMap, Map<String, OrgInfo> orgNamesUriCache) {
         String institution = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("Institution")));
         String hospital = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("Hospital")));
@@ -501,6 +456,63 @@ public class AssetFileImportSupportingService {
         SiteOrgWithDeptOrg siteOrgWithDeptOrg = orgInfoLocalCacheService.findSiteOrgByFlatternedMap(orgNamesUriCache, institution, hospital, site, clinicalDept, assetDept);
 
         return siteOrgWithDeptOrg;
+    }
+
+    public boolean isParentAssetForIBTenant(AssetInfo assetInfo) {
+        if (StringUtils.isEmpty(assetInfo.getDepartNum())) {
+            return false;
+        }
+
+        if (StringUtils.isEmpty(assetInfo.getSystemId())) {
+            return false;
+        }
+
+        return assetInfo.getDepartNum().equals(assetInfo.getSystemId());
+    }
+
+    public boolean isChildAssetForIBTenant(AssetInfo assetInfo, Map<String, AssetInfo> parentAssetsMap) {
+
+        if (StringUtils.isEmpty(assetInfo.getSystemId())) {
+            return false;
+        }
+
+        if (assetInfo.getSystemId().equals(assetInfo.getDepartNum())) {
+            return false;
+        }
+
+        return parentAssetsMap.containsKey(assetInfo.getSystemId());
+    }
+
+    public Map<String, AssetInfo> getParentAssets(List<Map<String, Object>> importAssetMap) {
+        Map<String, AssetInfo> resultMap = new HashMap<>();
+
+        for (Map<String, Object> map : importAssetMap) {
+            AssetInfo assetInfo = (AssetInfo)map.get("asset");
+            if (this.isParentAssetForIBTenant(assetInfo)) {
+                resultMap.put(assetInfo.getSystemId(), assetInfo);
+            }
+        }
+
+        return resultMap;
+    }
+
+    public void setParentAsset(AssetInfo childAsset, Map<String, AssetInfo> parentAssetsMap) {
+
+        AssetInfo parentAsset = parentAssetsMap.get(childAsset.getSystemId());
+        if (null != parentAsset) {
+            childAsset.setParentAssetId(parentAsset.getId());
+        }
+    }
+
+    public void removeParentAssetIfNotExists(AssetInfo assetInfo) {
+        if (null == assetInfo.getParentAssetId()) {
+            return;
+        }
+
+        int count = assetDao.countByAssetIdAndNotDeleted(assetInfo.getParentAssetId().intValue());
+        if (count == 0) {
+            assetInfo.setParentAssetId(null);
+        }
     }
 
 }
