@@ -28,7 +28,7 @@ public class ZkbPartOrder implements Serializable {
      * Returned：归还  Closed：关单
      */
     public enum PartOrderStatus {
-        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,UnOrdered,UnOrderedReject,Ordered,OrderedReject,Returned,Closed
+        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,Ordered,OrderedReject,Returned,Closed
     }
 
     /**
@@ -146,9 +146,6 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "tech_audit_date")
     private Date techAuditDate;
 
-    @Column(name = "tech_auditer")
-    private String techAuditer;
-
     /**
      * 区域经理审批备注
      */
@@ -157,9 +154,6 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "manage_audit_date")
     private Date manageAuditDate;
-
-    @Column(name = "manage_auditer")
-    private String manageAuditer;
 
     /**
      *
@@ -185,21 +179,8 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "ordered_remark")
     private String orderedRemark;
 
-    @Column(name = "un_order_remark")
-    private String unOrderRemark;
-
-
     @Column(name = "ordered_date")
     private Date orderedDate;
-
-    @Column(name = "un_order_date")
-    private Date unOrderDate;
-
-    @Column(name = "un_order_auditer")
-    private String unOrderAuditer;
-
-    @Column(name = "ordered_auditer")
-    private String orderedAuditer;
 
     /**
      * 归还类型
@@ -249,9 +230,6 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "return_audit_date")
     private Date returnAuditDate;
 
-    @Column(name = "return_auditer")
-    private String returnAuditer;
-
     /**
      * 关单备注
      */
@@ -260,9 +238,6 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "closed_date")
     private Date closedDate;
-
-    @Column(name = "closed_auditer")
-    private String closedAuditer;
 
     @Column(name = "created_by")
     private String createdBy;
@@ -432,70 +407,6 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "whether_deduct")
     private String whetherDeduct;
-
-    public String getTechAuditer() {
-        return techAuditer;
-    }
-
-    public void setTechAuditer(String techAuditer) {
-        this.techAuditer = techAuditer;
-    }
-
-    public String getManageAuditer() {
-        return manageAuditer;
-    }
-
-    public void setManageAuditer(String manageAuditer) {
-        this.manageAuditer = manageAuditer;
-    }
-
-    public String getUnOrderRemark() {
-        return unOrderRemark;
-    }
-
-    public void setUnOrderRemark(String unOrderRemark) {
-        this.unOrderRemark = unOrderRemark;
-    }
-
-    public Date getUnOrderDate() {
-        return unOrderDate;
-    }
-
-    public void setUnOrderDate(Date unOrderDate) {
-        this.unOrderDate = unOrderDate;
-    }
-
-    public String getUnOrderAuditer() {
-        return unOrderAuditer;
-    }
-
-    public void setUnOrderAuditer(String unOrderAuditer) {
-        this.unOrderAuditer = unOrderAuditer;
-    }
-
-    public String getOrderedAuditer() {
-        return orderedAuditer;
-    }
-
-    public void setOrderedAuditer(String orderedAuditer) {
-        this.orderedAuditer = orderedAuditer;
-    }
-
-    public String getReturnAuditer() {
-        return returnAuditer;
-    }
-
-    public void setReturnAuditer(String returnAuditer) {
-        this.returnAuditer = returnAuditer;
-    }
-
-    public String getClosedAuditer() {
-        return closedAuditer;
-    }
-
-    public void setClosedAuditer(String closedAuditer) {
-        this.closedAuditer = closedAuditer;
-    }
 
     public Date getTechAuditDate() {
         return techAuditDate;
