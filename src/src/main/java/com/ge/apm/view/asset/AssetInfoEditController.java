@@ -250,8 +250,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         manuList = aimService.getOnlyManuListBySiteUid(selected.getTenantUID());
         //新增时不显示创建人
         if ("Create".equalsIgnoreCase(actionName)) {
-            if (readableFieldsList.contains("creatorBy")) {
-                readableFieldsList.remove("creatorBy");
+            if (readableFieldsList.contains("createdBy")) {
+                readableFieldsList.remove("createdBy");
             }
         }
         initGbTree();
