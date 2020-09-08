@@ -633,6 +633,11 @@
                                     <h:outputText value="#{item.assetTagsView}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'createdBy'}">
+                                <p:column headerText="#{msg.createdBy}" filterBy="#{item.createdBy}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{assetInfoListController.selectCreatedBy(item.createdBy)}"/>
+                                </p:column>
+                            </c:if>
                         </c:forEach>
 
                         <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
