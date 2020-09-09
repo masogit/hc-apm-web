@@ -356,7 +356,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         if(!nextFlag){
             ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-            subApplyQty(zkbContract,zkbPartOrder,Math.abs(zkbPartOrder.getQty()));
+            subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty());
         }
     }
 
@@ -481,6 +481,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         newZkbPartOrderStep.setTenantUID(zkbPartOrder.getTenantUID());
         newZkbPartOrderStep.setPartOrderId(zkbPartOrder.getId());
         zkbPartOrderStepRepository.save(newZkbPartOrderStep);
+
+        ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+        subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty());
     }
 
     public void subApplyQty(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty){
@@ -584,8 +587,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbContract.setSpareQuota((zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota()) + qty);
                 zkbContractRepository.save(zkbContract);
             }else{
-                zkbContract.setSpareArtificailUse((zkbContract.getSpareQuotaUse() == null ? 0 : zkbContract.getSpareQuotaUse()) - qty);
-                zkbContract.setSpareArtificail((zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota()) + qty);
+                zkbContract.setSpareArtificailUse((zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse()) - qty);
+                zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) + qty);
                 zkbContractRepository.save(zkbContract);
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
@@ -677,8 +680,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     public List<ZkbPartOrderCat> queryPartOrderCat(){
-        return zkbPartOrderCatRepository.find();
-        //return zkbPartOrderCatRepository.findByValueTypeIsNot(ZkbPartOrderCat.ValueType.HighValue.toString());
+        //return zkbPartOrderCatRepository.find();
+        return zkbPartOrderCatRepository.findByValueTypeIsNot(ZkbPartOrderCat.ValueType.HighValue.toString());
     }
 
     public ZkbPartOrderRepository getZkbPartOrderRepository() {

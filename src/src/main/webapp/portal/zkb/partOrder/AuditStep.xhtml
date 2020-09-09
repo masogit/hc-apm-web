@@ -43,6 +43,14 @@
                 <p:fieldset id="zkbPartOrderFieldset" legend="额度信息" >
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 1}">
+                            <label class="label">设备类型（DI）*</label>
+                            <p:selectOneMenu id="assetTypeDi" value="#{zkbPartOrderEditController.selected.assetTypeDi}" required="true" requiredMessage="#设备类型（DI） #{msg.ValidationRequire}" disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="CT" itemValue="CT"/>
+                                <f:selectItem itemLabel="XR" itemValue="XR"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
@@ -239,7 +247,7 @@
                 <p:fieldset id="managementFieldset" legend="区域经理审批" rendered="#{zkbPartOrderAuditController.showManage}">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
-                            <label class="label">技术支持审批时间*</label>
+                            <label class="label">区域经理审批时间*</label>
                             <p:calendar timeZone="GMT+8"  id="manageAuditDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.manageAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
                         <h:panelGroup>
@@ -255,7 +263,7 @@
                             <label class="label">SR#*</label>
                             <p:inputText id="srNo" value="#{zkbPartOrderAuditController.selected.srNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="#{!(zkbPartOrderAuditController.selected.orderType eq 'Tool')}" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
+                        <h:panelGroup>
                             <label class="label">Act#*</label>
                             <p:inputText id="activityNo" value="#{zkbPartOrderAuditController.selected.activityNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_activityNo} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
