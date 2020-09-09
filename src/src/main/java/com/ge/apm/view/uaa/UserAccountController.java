@@ -125,6 +125,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private List<SysRole> roles;
 
+    private boolean isSelect46Account;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<>();
@@ -200,13 +202,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
-        if (loginUser.getSiteId() != 46) { // skip building tenant org tree for apm ib user
+        if (selectedTenant!=null&&selectedTenant.getId()!= 46) { // skip building tenant org tree for apm ib user
             rebuildOrgTree();
             TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
             if (null != selectedOrgNode) {
                 selectedOrgNode.setSelected(true);
                 TreeNodeUtil.expandParentsNodes(selectedOrgNode);
             }
+        }else{
+            orgTree = null;
         }
         updateRoleList();
     }
@@ -230,14 +234,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     
     public void filterTreeNode(){
-        if (uaaService.isIbSiteAdmin(loginUser)) {
+        if (selectedTenant!=null&&selectedTenant.getId()== 46) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(loginUser.getUid(), treeNodeNameFilter, loginUser.getSiteId());
             OrgInfo tenant = orgInfoDao.findByUid(loginUser.getTenantUID());
             siteList.add(tenant);
             orgTree = uaaService.getOrgTreeNodes(loginUser.getSiteUID(), siteList);
-        } else {
             uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
         }
+        uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
     }
 
     public String getOrgFullNameByUid(String orgUid) {
@@ -1251,5 +1255,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
         return tags;
+    }
+
+    public boolean getIsSelect46Account() {
+        if (selectedTenant!=null&&selectedTenant.getId() == 46) {
+            return true;
+        }
+        return false;
     }
 }
