@@ -52,15 +52,17 @@
                             </f:facet>
                             <h:outputText value="#{qrCodeLibCreateController.getHospitalName(item.siteUID)}"/>
                         </p:column>
-
-                        <p:column headerText="#{msg.clinicalDeptName}">
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                                <p:inputText id="clinicalDept"  value="#{qrCodeLibCreateController.fileterDeptOrg.name}"  readonly="true"/>
-                            </f:facet>
-                            <h:outputText value="#{qrCodeLibCreateController.getOrgName(item.orgId)}"/>
-                        </p:column>
-
+                            <p:column headerText="#{msg.clinicalDeptName}">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                    <p:autoComplete dropdown="true" value="#{qrCodeLibCreateController.filterClinicalDeptOrg}" appendTo="@(Body)"
+                                                    scrollHeight="300"  forceSelection="true" completeMethod="#{qrCodeLibCreateController.autoCompleteDeptName}" size="5">
+                                        <p:ajax event="itemSelect" listener="#{qrCodeLibCreateController.onClinicalDeptNameFilterChange}" process="@this"  update=":QrCodeLibListForm:datalist" oncomplete="afterLoadRender()" />
+                                        <p:ajax process="@this" listener="#{qrCodeLibCreateController.onClinicalDeptNameFilterChange}" update=":QrCodeLibListForm:datalist"  oncomplete="afterLoadRender()"/>
+                                    </p:autoComplete>
+                                </f:facet>
+                                <h:outputText value="#{qrCodeLibCreateController.getOrgName(item.orgId)}"/>
+                            </p:column>
                         <p:column headerText="#{msg.name}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
@@ -95,37 +97,63 @@
             </div>
         </div>
 
-        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":QrCodeLibListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;">
-            <p:scrollPanel style="height:300px;border: 0" mode="native">
-                <p:tree class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(empty qrCodeLibCreateController.fileterSiteOrg ? userContextService.loginUser.siteUID : qrCodeLibCreateController.fileterSiteOrg.uid)}"  var="node" selectionMode="single" dynamic="false">
-                    <p:ajax process="@this" event="select"  listener="#{qrCodeLibCreateController.onClinicalDeptFilter}" update=":QrCodeLibListForm:datalist :idVarPanelDeptOrg :idVarPanelSiteOrg" oncomplete="PF('varPanelDeptOrg').hide();"/>
-                    <p:ajax process="@this" event="expand"/>
-                    <p:ajax process="@this" event="collapse"/>
-                    <p:treeNode type="org">
-                        <h:outputText value="#{node.name}"/>
-                    </p:treeNode>
-					<p:treeNode type="hidden" rendered="false"/>
-                </p:tree>
-            </p:scrollPanel>
-        </p:overlayPanel>
-        <p:overlayPanel id="idVarPanelSiteOrg" widgetVar="varPanelSiteOrg" for=":QrCodeLibListForm:datalist:hospitalId" dismissable="true" style="text-align: left;">
-            <p:scrollPanel style="height:300px;border: 0" mode="native">
-                <p:tree class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="false">
-                    <p:ajax process="@this" event="select"  listener="#{qrCodeLibCreateController.onSelectSiteTreeNode}" update=":QrCodeLibListForm:datalist :idVarPanelSiteOrg :idVarPanelDeptOrg" oncomplete="PF('varPanelSiteOrg').hide();"/>
-                    <p:ajax process="@this" event="expand"/>
-                    <p:ajax process="@this" event="collapse"/>
-                    <p:treeNode type="org">
-                        <h:outputText value="#{node.name}"/>
-                    </p:treeNode>
-					<p:treeNode type="hidden" rendered="false"/>
-                </p:tree>
-            </p:scrollPanel>
-        </p:overlayPanel>
     <script>
         afterPageLoad = function () {
             outputMsg();
         };
     </script>
+        <script>
+
+            function afterLoadRender(){
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            }
+
+            $(function () {
+                $(".ui-datatable-tablewrapper").css('width', '100%');
+                $("div table")[1].style.overflowX= "scroll";
+                $("div table")[1].style.width = "auto";
+                $("html")[0].style.overflowX= "hidden";
+            });
+
+            //<![CDATA[
+            afterPageLoad = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                })
+                var isActive = "#{userContextService.isActive()}";
+                if (isActive == '1') {
+                    PF('ActiveDlg').show();
+                }
+            }
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus && this.children[0].children[0].checked;
+                });
+                $("#AssetInfoListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+            //]]>
+        </script>
     </ui:define>
 
 </ui:composition>

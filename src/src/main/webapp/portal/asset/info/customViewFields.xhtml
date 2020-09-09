@@ -533,4 +533,10 @@
             <p:inputText id="locationNotes" value="#{assetInfoDetailController.selected.locationNotes}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'createdBy')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.creatorUID}</label>
+            <p:autoComplete id="createdBy" value="#{assetInfoDetailController.selectCreatedBy(assetInfoDetailController.selected.createdBy)}"  readonly="true"/>
+        </h:panelGroup>
+    </c:if>
 </ui:composition>

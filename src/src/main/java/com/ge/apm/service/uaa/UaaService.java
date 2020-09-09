@@ -432,7 +432,8 @@ public class UaaService {
         if (userAccount.getSiteId() == 46) {
             List<OrgInfo> orgListByUser = getOrgListByUser(userAccount.getUid());
             // available to see the all institutions in ib site
-            return orgListByUser.size() == 1 && StringUtils.equals(orgListByUser.get(0).getUid(), orgListByUser.get(0).getTenantUID());
+            boolean allSite = orgListByUser.size() == 1 && StringUtils.equals(orgListByUser.get(0).getUid(), orgListByUser.get(0).getTenantUID());
+            return allSite || UserContextService.isOnlyLocalITAdmin();
         }
         return false;
     }
@@ -748,6 +749,15 @@ public class UaaService {
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4)); //非科室
+        return orgInfoDao.findBySearchFilter(orgInfoFilters);
+    }
+
+    //用户可以显示的医院列表(包含科室)
+    public List<OrgInfo> getUserAccessibleSiteList1(String userUid, String name, Integer siteId) {
+        List<String> institutions = orgInfoDao.findByInstitutionByNameLike(name, siteId); //TODO: fetch by user accessible site list
+        //for accessible sites`
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 

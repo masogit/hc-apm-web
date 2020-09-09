@@ -350,6 +350,37 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     WebUtil.addErrorMessage(errorLog+"归还数量不等于申请数量","");
                     return "";
                 }
+            }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
+                boolean flag = true;
+                String errorLog = "";
+                for(ZkbPartOrderItem zkbPartOrderItem : selected.getZkbPartOrderItems()){
+                    if(StringUtils.isEmpty(zkbPartOrderItem.getPartNo())){
+                        flag = false;
+                        errorLog += "配件号不能为空,";
+                    }
+                    if(StringUtils.isEmpty(zkbPartOrderItem.getPartName())){
+                        flag = false;
+                        errorLog += "配件名称不能为空,";
+                    }
+                    if(StringUtils.isEmpty(zkbPartOrderItem.getPrice())){
+                        flag = false;
+                        errorLog += "价格不能为空,";
+                    }
+                    ZkbPartOrderItem oldItem = zkbPartOrderService.getZkbPartOrderItemRepository().findById(zkbPartOrderItem.getId());
+                    if(oldItem != null){
+                        if(!oldItem.getPartNo().equals(zkbPartOrderItem.getPartNo()) || !oldItem.getPartName().equals(zkbPartOrderItem.getPartName())){
+                            if(StringUtils.isEmpty(zkbPartOrderItem.getRemark())){
+                                flag = false;
+                                errorLog += "配件号或配件名称修改后备注不能为空,";
+                            }
+                        }
+                    }
+                }
+                if(!flag){
+                    errorLog = errorLog.substring(0,errorLog.length()-1);
+                    WebUtil.addErrorMessage(errorLog,"");
+                    return "";
+                }
             }
         }
         zkbPartOrderService.normalNext(this.selected,currentUser);
