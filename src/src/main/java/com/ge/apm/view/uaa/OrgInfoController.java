@@ -1,32 +1,13 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserOrgInfo;
-import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.orginfo.OrgInfoService;
-import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
@@ -37,6 +18,14 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 @ManagedBean
 @ViewScoped
 public class OrgInfoController extends JpaCRUDController<OrgInfo> {
@@ -44,10 +33,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     OrgInfoRepository dao = null;
     UaaService uaaService;
     private TenantInfo selectedTenant;
-    UserAccount userAccount;
     private AssetInfoRepository assetInfoRepository;
     private OrgInfoService orgInfoService;
-    private OrgInfoTreeService orgInfoTreeService;
     private OrgInfoClinicalDeptService clinicalDeptService;
     private UserOrgInfoRepository userOrgDao;
 
@@ -70,11 +57,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         dao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
-        userAccount = new UserAccount();
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
-        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         clinicalDeptService = WebUtil.getBean(OrgInfoClinicalDeptService.class);
         userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
 
@@ -110,6 +95,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         this.selected = null;
         buildOrdTree();
     }
+
     UserAccountRepository userDao;
 
     public TenantInfo getSelectedTenant() {
@@ -117,7 +103,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public List<UserAccount> findPerson() {
-        List<UserAccount> userList = new ArrayList<UserAccount>();
+        List<UserAccount> userList = new ArrayList<>();
         if (this.selected != null && this.selected.getOrgType() == 4) {//类型是科室
             if (this.selected.getParentOrg() != null) {
                 userList = userDao.findBySiteUID(this.selected.getSiteUID());
@@ -127,7 +113,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void buildOrdTree() {
-
+        if (uaaService.isIbSiteAdmin(loginUser)) {
+            orgTree = null;
+            return;
+        }
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if (UserContextService.isOnlyLocalITAdmin()) {
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
@@ -141,19 +130,20 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         if (null != currentOrgNode) {
             TreeNodeUtil.expandParentsNodes(currentOrgNode);
         }
-        
+
         TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selected);
         if (null != selectedOrgNode) {
             TreeNodeUtil.expandParentsNodes(selectedOrgNode);
         }
-        try {
-//            this.selectedNode = (TreeNode)orgTree.getData();
-            // this.selectedNode.setExpanded(true);
-        } catch (Exception ex) {
-        }
     }
 
     public void filterNode() {
+        if (uaaService.isIbSiteAdmin(loginUser)) {
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList1(loginUser.getUid(), retrieval, loginUser.getSiteId());
+            OrgInfo tenant = dao.findByUid(loginUser.getTenantUID());
+            siteList.add(tenant);
+            orgTree = uaaService.getOrgTreeNodes(loginUser.getSiteUID(), siteList);
+        }
         uaaService.filterTreeNode(orgTree, retrieval, -1, -1);
     }
 
@@ -166,6 +156,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     public TreeNode getOrgTree() {
         return orgTree;
     }
+
     private TreeNode selectedNode;
 
     public TreeNode getSelectedNode() {
@@ -280,20 +271,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         this.selected = org;
     }
 
-//    private boolean exist(List<OrgInfo> orgTypeList) {
-//        for (OrgInfo orgInfo : orgTypeList) {
-//            if (orgInfo.getNameEn() != null) {
-//                
-//            };
-//            
-//            if (orgInfo.getName().equalsIgnoreCase(orgName) && orgNameEn.equalsIgnoreCase(orgInfo.getNameEn())) {
-//                WebUtil.addErrorMessage(orgName + "已经存在");
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
     public boolean checkName() {
 
         OrgInfo orgInfo = dao.findFirstByParentUIDAndShortName(selected.getParentUID(), orgName);
@@ -320,7 +297,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             return false;
         }
         OrgInfo orgInfo = dao
-            .findFirstByTenantUIDAndHospitalUcmid(selected.getTenantUID(), hospitalUcmid);
+                .findFirstByTenantUIDAndHospitalUcmid(selected.getTenantUID(), hospitalUcmid);
         if (orgInfo != null) {
             WebUtil.addErrorMessage(hospitalUcmid + "已经存在");
             return true;
@@ -341,7 +318,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             return;
         }
 
-        boolean isNew = selected.getId() == null ? true : false;
+        boolean isNew = selected.getId() == null;
 
         selected.setShortName(orgName);
         String name = orgInfoService.buildFullPathOrgName(selected);
@@ -356,7 +333,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             if (selected.getOrgType() == 4 && selected.getParentOrg().getOrgType() == 4) {
 
                 List<String> userUids = userOrgDao.findUserUidListByOrgUid(selected.getParentOrg().getUid());
-                for (String userUid: userUids) {
+                for (String userUid : userUids) {
                     UserOrgInfo found = userOrgDao.findFirstByUserUidAndOrgUid(userUid, selected.getUid());
                     if (found == null) {
                         found = new UserOrgInfo();
@@ -369,9 +346,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             }
         } else {
             if (selected.getOrgType() == 4) {
-
-                TreeNode parentClinicalDeptNode = TreeNodeUtil.findNodeFromTree(orgTree, selected);
-                updateClinicalDeptOrgName(parentClinicalDeptNode);
+                updateClinicalDeptOrgName(Objects.requireNonNull(TreeNodeUtil.findNodeFromTree(orgTree, selected)));
             }
 
         }
@@ -385,12 +360,12 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     private void updateClinicalDeptOrgName(TreeNode parentClinicalDeptNode) {
 
-        OrgInfo parentClinicalDeptOrg = (OrgInfo)parentClinicalDeptNode.getData();
+        OrgInfo parentClinicalDeptOrg = (OrgInfo) parentClinicalDeptNode.getData();
         dao.save(parentClinicalDeptOrg);
         assetInfoRepository.updateClinicalName(parentClinicalDeptOrg.getName(), parentClinicalDeptOrg.getUid());
 
         for (TreeNode child : parentClinicalDeptNode.getChildren()) {
-            OrgInfo childClinicalDeptOrg = (OrgInfo)child.getData();
+            OrgInfo childClinicalDeptOrg = (OrgInfo) child.getData();
             childClinicalDeptOrg.setName(parentClinicalDeptOrg.getName() + "-" + childClinicalDeptOrg.getShortName());
             updateClinicalDeptOrgName(child);
         }
@@ -512,12 +487,11 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
         List<OrgInfo> clinicalsDeptOrg = clinicalDeptService.collectChildClinicalDept(selected);
 
-        List<String> clinicalsDeptUids = clinicalsDeptOrg.stream().map(org -> org.getUid()).collect(Collectors.toList());
+        List<String> clinicalsDeptUids = clinicalsDeptOrg.stream().map(OrgInfo::getUid).collect(Collectors.toList());
 
         List<SearchFilter> checkFilters = new ArrayList<>();
 
         //检查是否有用户属于这个组织
-        checkFilters.clear();
         checkFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.IN, clinicalsDeptUids, "1+"));
 
         List<UserAccount> userList = userDao.findBySearchFilter(checkFilters);
@@ -553,16 +527,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgNameEn = selected.getNameEn();
         hospitalUcmid = selected.getHospitalUcmid();
         if (selected != null) {
-            if (selected.getOrgType() == 2) {
-                isShow = true;
-            } else {
-                isShow = false;
-            }
-            if (selected.getOrgType() == 4) {
-                acShow = true;
-            } else {
-                acShow = false;
-            }
+            isShow = selected.getOrgType() == 2;
+            acShow = selected.getOrgType() == 4;
         }
     }
 
@@ -622,15 +588,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public boolean getIsCreateDepartmentDisabled() {
-        return (selected == null) || (selected.getOrgType() == null) || selected.getId() == null || orgInfoService.getClinicalLevel(selected) >=3;
-    }
-
-    public UserAccount getUserAccount() {
-        return userAccount;
-    }
-
-    public void setUserAccount(UserAccount userAccount) {
-        this.userAccount = userAccount;
+        return (selected == null) || (selected.getOrgType() == null) || selected.getId() == null || orgInfoService.getClinicalLevel(selected) >= 3;
     }
 
     public String getOrgName() {

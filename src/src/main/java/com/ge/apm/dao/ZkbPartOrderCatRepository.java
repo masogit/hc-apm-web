@@ -12,4 +12,6 @@ import java.util.List;
  */
 public interface ZkbPartOrderCatRepository extends GenericRepositoryUUID<ZkbPartOrderCat> {
 
+    List<ZkbPartOrderCat> findByValueTypeIsNot(String valueType);
+
 }

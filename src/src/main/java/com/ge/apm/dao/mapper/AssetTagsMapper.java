@@ -5,7 +5,9 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface AssetTagsMapper {
 
@@ -14,6 +16,17 @@ public interface AssetTagsMapper {
 
 	@Select("select distinct tags.tag from asset_tags tags where tags.asset_uid = #{assetUid}")
 	public List<String> getTagsByAsset(String assetUid);
+
+	@Select({
+			"<script>" +
+				"select tags.asset_uid,tags.tag from  asset_tags tags  where tags.asset_uid in " +
+				"<foreach item = 'item' index = 'index' collection = 'uids' open='(' separator=',' close=')'>" +
+				"#{item}" +
+				"</foreach>"+
+			"</script>"})
+	public List<HashMap> getTagsByAssetMap(@Param("uids")List<String> uids);
+
+
 
 	@Delete("delete from asset_tags tags where tags.asset_uid = #{assetUid} and tags.tag = #{tag}")
 	public int removeTag(@Param("assetUid")String assetUid, @Param("tag")String tag);

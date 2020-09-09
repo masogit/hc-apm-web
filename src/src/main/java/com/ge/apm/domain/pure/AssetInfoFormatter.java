@@ -3,6 +3,7 @@ package com.ge.apm.domain.pure;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SupplierRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.service.common.I18nMessageService;
@@ -23,19 +24,21 @@ public class AssetInfoFormatter {
     private AssetInfoRepository assetDao;
     private OrgInfoRepository orgDao;
     private SupplierRepository supplierDao;
+    private UserAccountRepository userDao;
     private int siteId;
 
     public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
                               AssetFileImportBaseService importService,
                               AssetInfoRepository assetDao,
                               OrgInfoRepository orgDao,
-                              SupplierRepository supplierDao) {
+                              SupplierRepository supplierDao ,UserAccountRepository userDao) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
         this.orgDao = orgDao;
         this.supplierDao = supplierDao;
+        this.userDao = userDao;
         this.siteId = UserContextService.getCurrentUserAccount().getSiteId();
     }
 
@@ -573,12 +576,13 @@ public class AssetInfoFormatter {
         return assetInfo.getParentAssetId();
     }
 
-    public String getParentAssetName() {
+    public String getParentAssetName(Map parentAssets) {
         if (assetInfo.getParentAssetId() == null) {
             return null;
         }
 
-        AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
+        //AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
+        AssetInfo parentAsset = (AssetInfo) parentAssets.get(assetInfo.getParentAssetId());
         if (parentAsset == null) return null;
 
         String departNum = parentAsset.getDepartNum() == null ? "" : parentAsset.getDepartNum();
@@ -737,9 +741,10 @@ public class AssetInfoFormatter {
 
     }
 
-    private String joinTags() {
-        List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
-        if (assetTags.isEmpty()) {
+    private String joinTags(Map<String,List<String>> assetMap) {
+        //List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
+        List<String> assetTags = assetMap.get(assetInfo.getUid());
+        if (assetTags==null || assetTags.isEmpty()) {
             return null;
         }
 
@@ -785,19 +790,18 @@ public class AssetInfoFormatter {
         return null;
     }
 
-    public String getVendorTel(){
+    public String getVendorTel(Map supliers){
         Integer vendorId = assetInfo.getSupplierId();
         if(vendorId != null){
-            Supplier supplier= supplierDao.getById(vendorId);
-            if (null != supplier) {
-                return supplier.getTel();
-            }
+            //Supplier supplier2= supplierDao.getById(vendorId);
+          return  (String) supliers.get(vendorId);
+
         }
 
         return null;
     }
 
-    public Map<String, Object> buildExcelColumnKeyValueMap(boolean crossSite) {
+    public Map<String, Object> buildExcelColumnKeyValueMap(boolean crossSite,Map<String,List<String>> assetMap,Map parentAssets,Map supliers) {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -835,8 +839,8 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("deviceName"), this.getDeviceName());
         map.put(WebUtil.getMessage("registrationNo"), this.getRegistrationNo());
         map.put(WebUtil.getMessage("vendor"), this.getVendor());
-        map.put(WebUtil.getMessage("vendorTel"), this.getVendorTel());
-        map.put(WebUtil.getMessage("parentAsset"), this.getParentAssetName());
+        map.put(WebUtil.getMessage("vendorTel"), this.getVendorTel(supliers));
+        map.put(WebUtil.getMessage("parentAsset"), this.getParentAssetName(parentAssets));
 
         map.put(WebUtil.getMessage("functionGroup"), this.getFunctionGroupAsString());
         map.put(WebUtil.getMessage("assetCode68"), this.getAssetCode68AsString());
@@ -891,7 +895,7 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("deviceStatus"), this.getDeviceStatusAsString());
         map.put(WebUtil.getMessage("capitalSource2"), this.getCapitalSource2AsString());
         map.put(WebUtil.getMessage("isWarrantyNotice"), this.getWarrantyAsString());
-        map.put(WebUtil.getMessage("assetTags"), this.joinTags());
+        map.put(WebUtil.getMessage("assetTags"), this.joinTags(assetMap));
         map.put(WebUtil.getMessage("UCMID"), assetInfo.getUCMID());
 
         //fields not used by default
@@ -903,8 +907,17 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("proprietaryClass"), this.getProprietaryClassAsString());
 
         map.put(WebUtil.getMessage("UUID"), this.getUid());
+        map.put(WebUtil.getMessage("createdBy"), this.selectCreatedBy(assetInfo.getCreatedBy()));
 
         return map;
 
     }
+    public String selectCreatedBy(String loginName) {
+        UserAccount user = userDao.getByLoginName(loginName);
+        if(user != null){
+            return user.getName();
+        }
+        return null;
+    }
+
 }

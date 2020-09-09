@@ -45,6 +45,7 @@ public class WorkOrderExportService {
     private static final String I18N_INT_EXT_TYPE = "intExtType";
     private static final String I18N_REPAIR_TYPE = "repairType";
     private static final String I18N_CURRENT_STEP_ = "woSteps";
+    private static final String I18N_REPAIR_RESULT = "repairResult";
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -168,6 +169,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("WorkorderType_xlsx"), workOrderExportPojo.getIntExtType() != null ? FieldValueMessageController.fieldValue(I18N_INT_EXT_TYPE, workOrderExportPojo.getIntExtType().toString()) : "");
             //workOrderMap.put("维修类型", workOrderExportPojo.getRepairTypeName());
             workOrderMap.put(WebUtil.getMessage("RepairType_xlsx"), workOrderExportPojo.getRepairType() != null ? FieldValueMessageController.fieldValue(I18N_REPAIR_TYPE, workOrderExportPojo.getRepairType().toString()) : "");
+            workOrderMap.put(WebUtil.getMessage("RepairResult"), workOrderExportPojo.getRepairResult() != null ? FieldValueMessageController.fieldValue(I18N_REPAIR_RESULT, workOrderExportPojo.getRepairResult().toString()) : "");
             workOrderMap.put(WebUtil.getMessage("Acceptedby_xlsx"), workOrderExportPojo.getAcceptStepOwnerName());
             workOrderMap.put(WebUtil.getMessage("AcceptTime_xlsx"), formatDate(workOrderExportPojo.getAcceptStepStartTime()));
             workOrderMap.put(WebUtil.getMessage("RepairCompleteTime_xlsx"), formatDate(workOrderExportPojo.getWorkStepEndTime()));

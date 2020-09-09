@@ -73,6 +73,8 @@
                         <p:column headerText="#{msg.EquipmentIDHospital}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.departNum}"/>
                         </p:column>
+                <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.functionType}"/>
+                </p:column>
                         <p:column headerText="#{msg.MeasurementGrade2}" sortBy="#{item.ruleLevel}" filterBy="#{item.ruleLevel}" filterMatchMode="EQ">
                             <h:outputText value="#{item.ruleLevel}"/>
                         </p:column>
@@ -118,8 +120,8 @@
                     <h:outputText value="#{item.creatorName}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.Owner}" filterMatchMode="LIKE">
-                    <h:outputText value="#{item.getOwnerName()}"/>
+                <p:column headerText="#{msg.Owner}" sortBy="#{item.ownerName}" filterBy="#{item.ownerName}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.ownerName}"/>
                 </p:column>
 
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<ui:composition>
+    <p:dialog id="dialogDirectory" widgetVar="dialogDirectory" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbFileDirectoryController.CRUDActionName}" height="450px" width="350px">
+        <h:form id="dialogDirectoryEditForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{not empty zkbFileDirectoryController.selected}">
+                <h:panelGroup>
+                    <label class="label">#{msg.directoryName}*</label>
+                    <p:inputText id="name" value="#{zkbFileDirectoryController.selected.name}"  required="true" requiredMessage="#{msg.directoryName} #{msg.ValidationRequire}" />
+                </h:panelGroup>
+
+                <h:panelGroup >
+                    <label class="label">#{msg.directoryLevel}*</label>
+                    <p:selectOneMenu id="level" disabled="#{zkbFileDirectoryController.actionName!='Create'}" value="#{zkbFileDirectoryController.selected.level}"  required="true" requiredMessage="#{msg.directoryLevel} #{msg.ValidationRequire}">
+                        <p:ajax update="parentId" event="change" />
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('directoryLevel')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup ><!--主目录-->
+                    <label class="label">#{msg.mainDirectory}</label>
+                    <p:autoComplete id="parentId" disabled="#{zkbFileDirectoryController.selected.level!=2}"  dropdown="true" value="#{zkbFileDirectoryController.selected.zkbFileDirectory}" scrollHeight="300"
+                                    forceSelection="true" required="true" requiredMessage="#{msg.mainDirectory} #{msg.ValidationRequire}"
+                                    completeMethod="#{zkbFileDirectoryController.findMainDirectory}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="zkbDirectoryConverter">
+                    </p:autoComplete>
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+            <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbFileDirectoryController.save}" oncomplete="PF('dialogDirectory').hide()" update=":growl :zkbFileDirectoryListForm "  style="float:left"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('dialogDirectory').hide()"/>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+
+</html>
