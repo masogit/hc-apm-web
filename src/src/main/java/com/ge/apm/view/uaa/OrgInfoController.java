@@ -139,10 +139,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void filterNode() {
         if (selectedTenant!=null&&selectedTenant.getId()==46) {
-            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList1(loginUser.getUid(), retrieval, loginUser.getSiteId());
-            OrgInfo tenant = dao.findByUid(loginUser.getTenantUID());
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList1(loginUser.getUid(), retrieval, selectedTenant.getId());
+            OrgInfo tenant = dao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
-            orgTree = uaaService.getOrgTreeNodes(loginUser.getSiteUID(), siteList);
+            orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
         }
         uaaService.filterTreeNode(orgTree, retrieval, -1, -1);
     }
