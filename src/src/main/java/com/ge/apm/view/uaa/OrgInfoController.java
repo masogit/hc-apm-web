@@ -113,7 +113,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void buildOrdTree() {
-        if (uaaService.isIbSiteAdmin(loginUser)) {
+        if (selectedTenant!=null&&selectedTenant.getId()==46) {
             orgTree = null;
             return;
         }
@@ -138,7 +138,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void filterNode() {
-        if (uaaService.isIbSiteAdmin(loginUser)) {
+        if (selectedTenant!=null&&selectedTenant.getId()==46) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList1(loginUser.getUid(), retrieval, loginUser.getSiteId());
             OrgInfo tenant = dao.findByUid(loginUser.getTenantUID());
             siteList.add(tenant);

@@ -3,7 +3,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="content">
         <div class="ui-g clearfix">
@@ -26,6 +27,10 @@
                     <p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg==null?msg.AllHospitals:userAccountController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                     <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <c:if test="#{userAccountController.isSelect46Account}">
+                                <p:inputText id = "userAccountTreeNodeFilter1" placeholder="请输入需要查询的集团名称" class="treeNodeNameFilter" value="#{userAccountController.treeNodeNameFilter}"/>
+                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":UserAccountListForm:userAccountTreeNodeFilter1 @this" update=":UserAccountListForm:orgTree" actionListener="#{userAccountController.filterTreeNode()}" value="检索"/>
+                            </c:if>
                             <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userAccountController.orgTree}" selection="#{userAccountController.selectedNode}" var="node" selectionMode="single">
                                 <p:ajax process="@this" event="select" update=":UserAccountListForm" listener="#{userAccountController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                                 <p:ajax process="@this" event="expand"/>

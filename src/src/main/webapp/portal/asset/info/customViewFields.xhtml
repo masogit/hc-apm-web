@@ -527,6 +527,12 @@
                             var="tag" itemLabel="#{tag}" itemValue="#{tag}" forceSelection="false" styleClass="asset-tags"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'locationNotes')}">
+        <h:panelGroup >
+            <label class="label">#{msg.locationNotes}</label>
+            <p:inputText id="locationNotes" value="#{assetInfoDetailController.selected.locationNotes}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'createdBy')}" >
         <h:panelGroup>
             <label class="label">#{msg.creatorUID}</label>
