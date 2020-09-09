@@ -725,7 +725,7 @@ public class UserContextService implements Serializable {
     }
 
     private List<WorkflowConfig> getSiteConfigurations(){
-        UaaService uuaService = WebUtil.getBean(UaaService.class);
+        /*UaaService uuaService = WebUtil.getBean(UaaService.class);
         List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         orgList.add(userAccount.getTenantUID());
         orgList.add(userAccount.getInstitutionUID());
@@ -734,7 +734,14 @@ public class UserContextService implements Serializable {
         WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         List<String> collect = orgList.stream().distinct().collect(Collectors.toList());
         collect.removeIf(Objects::isNull);
-        return wcDao.getBySiteUIDList(collect);
+        return wcDao.getBySiteUIDList(collect);*/
+        List<String> orgList = new ArrayList<String>();
+        orgList.add(userAccount.getTenantUID());
+        orgList.add(userAccount.getInstitutionUID());
+        orgList.add(userAccount.getHospitalUID());
+        orgList.add(userAccount.getSiteUID());
+        WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        return wcDao.getBySiteUIDList1(orgList,userAccount.getUid());
     }
 
     public String isActive(){
