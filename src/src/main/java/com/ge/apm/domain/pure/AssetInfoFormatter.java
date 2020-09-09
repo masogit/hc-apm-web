@@ -3,6 +3,7 @@ package com.ge.apm.domain.pure;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SupplierRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.service.common.I18nMessageService;
@@ -23,19 +24,21 @@ public class AssetInfoFormatter {
     private AssetInfoRepository assetDao;
     private OrgInfoRepository orgDao;
     private SupplierRepository supplierDao;
+    private UserAccountRepository userDao;
     private int siteId;
 
     public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
                               AssetFileImportBaseService importService,
                               AssetInfoRepository assetDao,
                               OrgInfoRepository orgDao,
-                              SupplierRepository supplierDao) {
+                              SupplierRepository supplierDao ,UserAccountRepository userDao) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
         this.orgDao = orgDao;
         this.supplierDao = supplierDao;
+        this.userDao = userDao;
         this.siteId = UserContextService.getCurrentUserAccount().getSiteId();
     }
 
@@ -904,8 +907,17 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("proprietaryClass"), this.getProprietaryClassAsString());
 
         map.put(WebUtil.getMessage("UUID"), this.getUid());
+        map.put(WebUtil.getMessage("createdBy"), this.selectCreatedBy(assetInfo.getCreatedBy()));
 
         return map;
 
     }
+    public String selectCreatedBy(String loginName) {
+        UserAccount user = userDao.getByLoginName(loginName);
+        if(user != null){
+            return user.getName();
+        }
+        return null;
+    }
+
 }

@@ -123,6 +123,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetLifecyleService assetLifecyleService;
 
     private SupplierRepository supplierDao;
+    private UserAccountRepository userDao;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -143,6 +144,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         supplierDao = WebUtil.getBean(SupplierRepository.class);
+        userDao = WebUtil.getBean(UserAccountRepository.class);
 
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         this.filterBySite = false;
@@ -762,6 +764,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
         }*/
 
+    }
+    public String selectCreatedBy(String loginName) {
+        UserAccount user = userDao.getByLoginName(loginName);
+        if(user != null){
+            return user.getName();
+        }
+        return null;
     }
 
     public OrgInfo getSelectSite() {
