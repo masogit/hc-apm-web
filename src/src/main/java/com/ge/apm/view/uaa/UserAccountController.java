@@ -1493,7 +1493,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     //判断租户是否是46号租户 是返回true 否返回false
     public boolean judgeTheUser(){
-        if(selected==null){
+        if(null==selected || null==selected.getSiteId()){
             return false;
         }
         if(46==selected.getSiteId()){
