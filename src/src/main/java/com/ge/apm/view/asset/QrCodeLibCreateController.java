@@ -3,7 +3,11 @@ package com.ge.apm.view.asset;
 import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
+import org.primefaces.event.SelectEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -35,13 +39,17 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
 
     private AssetCreateService acService;
     private UaaService uaaService;
+    private OrgInfoTreeService orgInfoTreeService;
     UserContextService userContextService;
 
     String selectedSiteUid;
 
     private OrgInfo fileterDeptOrg;
     private OrgInfo fileterSiteOrg;
-    
+    //选定科室过滤
+    private String filterClinicalDeptOrg;
+    private List<OrgInfo> clinicalDeptList;
+    private Set<Integer> clinicalDeptOrgUidSet;
     @Override
     protected void init() {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -51,11 +59,19 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
         uaaService = WebUtil.getBean(UaaService.class);
 
         userContextService = WebUtil.getBean(UserContextService.class);
+        orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
 
         this.filterBySite = false;
-
+        loadClinicalDeptList();
     }
-
+    private void loadClinicalDeptList() {
+        clinicalDeptList = uaaService.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        if (null != fileterSiteOrg) {
+            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(fileterSiteOrg.getSiteUID()) || item.getHospitalUID().equals(fileterSiteOrg.getSiteUID())
+                    || item.getInstitutionUID().equals(fileterSiteOrg.getSiteUID()) || item.getTenantUID().equals(fileterSiteOrg.getSiteUID())).collect(Collectors.toList());
+        }
+    }
     @Override
     protected QrCodeLibRepository getDAO() {
         return dao;
@@ -64,7 +80,8 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
     @Override
     protected Page<QrCodeLib> loadData(PageRequest pageRequest) {
         setSearchFilter();
-
+        filterClinicalDeptOrg = null;
+        clinicalDeptOrgUidSet = null;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -94,12 +111,11 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
             this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, fileterSiteOrg.getUid(), "1*2+"));
         }
         
-        if(null != fileterDeptOrg){
-            this.updateSearchFilter(new SearchFilter("orgId", SearchFilter.Operator.EQ, fileterDeptOrg.getId(), "1*"));
-        }else{
+        if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("orgId", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
+        } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "orgId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
-
         if (!this.hasFilterOnField("status")) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
         }
@@ -148,7 +164,45 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
         fileterDeptOrg = null;
 
     }
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
 
+        if (event instanceof SelectEvent) {
+            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
+        }
+
+        if (!Strings.isNullOrEmpty(filterClinicalDeptOrg) && !clinicalDeptList.stream().anyMatch(item -> filterClinicalDeptOrg.equals(item.getName()))) {
+            filterClinicalDeptOrg = null;
+        }
+
+        if (filterClinicalDeptOrg != null) {
+            List<OrgInfo> orgInfosMatchingByName = this.clinicalDeptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
+
+            Set<OrgInfo> matchedList = orgInfoTreeService.collectChildClinicalDeptInExstingList(orgInfosMatchingByName, clinicalDeptList);
+            clinicalDeptOrgUidSet = matchedList.stream().map(OrgInfo::getId).collect(Collectors.toSet());
+        } else {
+            clinicalDeptOrgUidSet = Collections.emptySet();
+        }
+
+    }
+    public List<String> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream()
+                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                        || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
+                .collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+    public String getFilterClinicalDeptOrg() {
+        return filterClinicalDeptOrg;
+    }
+
+    public void setFilterClinicalDeptOrg(String filterClinicalDeptOrg) {
+        this.filterClinicalDeptOrg = filterClinicalDeptOrg;
+    }
     public String getHospitalName(String siteUid) {
         return acService.getSiteName(siteUid);
     }
