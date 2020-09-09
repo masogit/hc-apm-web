@@ -1113,6 +1113,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
         setSelectedOrgTree(accessOrgTree, orgList);
         TreeNodeUtil.expandTreeNode(accessOrgTree);
+        accessOrgTree.getChildren().get(0).setSelectable(false);
         deleteDisabled = false;
     }
     //全选按钮 （只保存GE后台运维的uid）(页面上表格也只显示GE后台运维的iD)
