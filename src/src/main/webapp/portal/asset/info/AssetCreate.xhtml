@@ -131,6 +131,27 @@
                                         <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCatalogFields}" var="fieldItem" >
                                             <ui:include src="customEditFields.xhtml"/>
                                         </c:forEach>
+                                        <c:if test="#{userContextService.zkbAccount}" >
+                                            <h:panelGroup>
+                                                <label class="label">#{msg.mainDirectory}<span style="color:red">*</span></label>
+                                                <p:selectOneMenu id="fileMainDirectory" value="#{assetInfoEditController.selected.mainDirectory}" required="true" requiredMessage="#{msg.mainDirectory} #{msg.ValidationRequire}">
+                                                    <p:ajax update="fileSecondDirectory"/>
+                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                    <c:forEach items="#{assetInfoEditController.findMainDirectory()}" var="v">
+                                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                                    </c:forEach>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <label class="label">#{msg.secondDirectory}<span style="color:red">*</span></label>
+                                                <p:selectOneMenu id="fileSecondDirectory" value="#{assetInfoEditController.selected.secondDirectory}" required="true" requiredMessage="#{msg.secondDirectory} #{msg.ValidationRequire}">
+                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                    <c:forEach items="#{assetInfoEditController.subZkbFileDirectoryList}" var="v">
+                                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                                    </c:forEach>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                        </c:if>
                                     </p:panelGrid>
                             </p:fieldset>
                             <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageDateFields}">
@@ -234,15 +255,20 @@
                 <ui:include src="createSupplier.xhtml" />
             </div>
         </div>
-        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">
+        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 900px;max-height:900px;min-width:800px;min-height:600px">
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
                 <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
                 <span class="ui-icon ui-icon-closethick"></span></a>
                 <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
             </div>
-            <div class="ui-dialog-content ui-widget-content"  style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">
+            <div class="ui-dialog-content ui-widget-content"  style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px;">
 
-                <image id="shwoPicDialogImg" src="" ></image>
+                <image id="shwoPicDialogImg" src="" style="max-height: 900px; max-width: 900px"></image>
+            </div>
+            <div>
+                <p:commandButton id="spin" value="旋转"/>
+                <p:commandButton id="enlarge" value="放大" onclick ="ImageSuofang(true)"/>
+                <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
             </div>
         </div>
         <script id="shwoPicDialog_s" type="text/javascript">$(function () {
@@ -254,11 +280,36 @@
             function showthis(pic) {
                 var s = $('#shwoPicDialogImg')[0]
                 s.src = pic.src;
+                s.style.transform = 'rotate('+ 0 +'deg)';
+                s.width = pic.width * 1.6;
+                s.height = pic.height * 1.6;
                 PF('shwoPicDialog').show();
             }
+
+            //旋转
+            var num = 0;
+            $("#spin").click(function () {
+                num++;
+                // $("#shwoPicDialogImg").style.rotate = num * 90;
+                $("#shwoPicDialogImg")[0].style.transform = 'rotate('+num * 90+'deg)';
+            })
+
+            function ImageSuofang(args) {
+                var imgsrc =  $("#shwoPicDialogImg")[0];
+                if (args) {
+                    if(imgsrc.width * 1.1 > 900 ||imgsrc.height * 1.1>900 ){
+                        return;
+                    }
+                    imgsrc.width = imgsrc.width * 1.1;
+                    imgsrc.height = imgsrc.height * 1.1;
+                }
+                else {
+                    imgsrc.width = imgsrc.width / 1.1;
+                    imgsrc.height = imgsrc.height / 1.1;
+                }
+            }
+
             $(document).ready(function () {
-
-
                 var $audioUlEle = $("#audioUl");
                 var audioList = $("input[id*='audio']");
                 $.each(audioList, function (index) {
@@ -266,8 +317,6 @@
                     var templ = "<li><a href=" + this.value + " class='track " + audioClass + "'>语音" + (index + 1) + "</a></li>";
                     $audioUlEle.append(templ);
                 });
-
-
 
                 // Local copy of jQuery selectors, for performance.
                 var my_jPlayer = $("#jquery_jplayer"),

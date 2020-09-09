@@ -55,6 +55,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     private List<HashMap<String, String>> partNoList = new ArrayList<>();
     private List<I18nMessage> returnTypeList= new ArrayList<>();
+    private String valueTypeTips = "";
 
     @Override
     protected void init() {
@@ -84,9 +85,45 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             v2_blobObjectList = m.get("v2_blobObjectList") == new ArrayList<>() ? null : (List<V2_BlobObject>)m.get("v2_blobObjectList");
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selectedId);
             fieldRendered();
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                    selected.setRemainQty(zkbContract.getSpareQuota());
+                }else{
+                    selected.setRemainQty(zkbContract.getSpareArtificail());
+                }
+            }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                selected.setRemainQty(zkbContract.getProbeQuota());
+            }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
+                /*if("1".equals(selected.getArtificialType())){
+                    selected.setRemainQty(zkbContract.getSpareArtificail());
+                }else if("3".equals(selected.getArtificialType())){
+                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
+                        selected.setRemainQty(zkbContract.getSpareArtificail());
+                    }else if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+                        selected.setRemainQty(zkbContract.getGeArtificialSupportTimes());
+                    }
+                }*/
+                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                    selected.setRemainQty(zkbContract.getGeArtificialSupportTimes());
+                }else{
+                    selected.setRemainQty(zkbContract.getSpareArtificail());
+                }
+            }else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
+                selected.setRemainQty(zkbContract.getSpareQuota());
+            }
 
             if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
                 this.selected.setReturnQty(this.selected.getQty());
+            }
+
+            if(this.selected.getZkbPartOrderCat() != null){
+                if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    valueTypeTips = "";
+                }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
+                }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    valueTypeTips = "";
+                }
             }
             initReturnList();
         }
@@ -98,7 +135,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 canEditFlag = true;
             }
         }else{
-            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(selected.getCurrentStep());
+            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = new ArrayList<>();
+            if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
+                zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndRegion(selected.getCurrentStep(),selected.getRegion());
+            }else if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(selected.getCurrentStep())){
+                if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                    if(selected.getAssetInfo() != null && selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup() == 2){
+                        ZkbPartOrderUserConfig zkbPartOrderUserConfig = selected.getOnlineEngine();
+                        zkbPartOrderUserConfigs.add(zkbPartOrderUserConfig);
+                    }else if(selected.getAssetInfo() != null && selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup() == 1){
+                        zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(selected.getCurrentStep(),selected.getAssetTypeDi());
+                    }
+                }
+            }else {
+                zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(selected.getCurrentStep());
+            }
             if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
                 for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
                     if(currentUser.getLoginName().equals(c.getLoginName())){
@@ -270,15 +321,84 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return "";
                 }
             }
+        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+            if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())){
+                HashMap<String, Integer> returnMap = new HashMap<>();
+                for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
+                    if(returnMap.containsKey(r.getPartNo())){
+                        Integer v = returnMap.get(r.getPartNo());
+                        v += r.getQty();
+                        returnMap.put(r.getPartNo(),v);
+                    }else{
+                        returnMap.put(r.getPartNo(),r.getQty());
+                    }
+                }
+                boolean flag = true;
+                String errorLog = "";
+                for(ZkbPartOrderItem zkbPartOrderItem : selected.getZkbPartOrderItems()){
+                    Integer returnQty = returnMap.get(zkbPartOrderItem.getPartNo());
+                    if(returnQty == null){
+                        flag = false;
+                        errorLog += zkbPartOrderItem.getPartNo() + ",";
+                    }else if(returnQty != zkbPartOrderItem.getPartQty()){
+                        flag = false;
+                        errorLog += zkbPartOrderItem.getPartNo() + ",";
+                    }
+                }
+                if(!flag){
+                    errorLog = errorLog.substring(0,errorLog.length()-1);
+                    WebUtil.addErrorMessage(errorLog+"归还数量不等于申请数量","");
+                    return "";
+                }
+            }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
+                boolean flag = true;
+                String errorLog = "";
+                for(ZkbPartOrderItem zkbPartOrderItem : selected.getZkbPartOrderItems()){
+                    if(StringUtils.isEmpty(zkbPartOrderItem.getPartNo())){
+                        flag = false;
+                        errorLog += "配件号不能为空,";
+                    }
+                    if(StringUtils.isEmpty(zkbPartOrderItem.getPartName())){
+                        flag = false;
+                        errorLog += "配件名称不能为空,";
+                    }
+                    if(StringUtils.isEmpty(zkbPartOrderItem.getPrice())){
+                        flag = false;
+                        errorLog += "价格不能为空,";
+                    }
+                    ZkbPartOrderItem oldItem = zkbPartOrderService.getZkbPartOrderItemRepository().findById(zkbPartOrderItem.getId());
+                    if(oldItem != null){
+                        if(!oldItem.getPartNo().equals(zkbPartOrderItem.getPartNo()) || !oldItem.getPartName().equals(zkbPartOrderItem.getPartName())){
+                            if(StringUtils.isEmpty(zkbPartOrderItem.getRemark())){
+                                flag = false;
+                                errorLog += "配件号或配件名称修改后备注不能为空,";
+                            }
+                        }
+                    }
+                }
+                if(!flag){
+                    errorLog = errorLog.substring(0,errorLog.length()-1);
+                    WebUtil.addErrorMessage(errorLog,"");
+                    return "";
+                }
+            }
         }
         zkbPartOrderService.normalNext(this.selected,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){
+            //归还时发送邮件
+            zkbPartOrderService.sendEmail(zkbPartOrder);
+        }
         return "List?faces-redirect=true";
     }
 
     public String orderCancelNext(){
         zkbPartOrderService.orderCancelNext(this.selected,currentUser);
+        return "List?faces-redirect=true";
+    }
+
+    public String dialogComplete(){
         return "List?faces-redirect=true";
     }
 
@@ -312,12 +432,27 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void saveReturn(){
         boolean flag = true;
+        Integer total = 0;
         for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
             if(zkbPartOrderReturn.getPartNo().equals(i.getPartNo())){
-                if(i.getPartQty() < zkbPartOrderReturn.getQty()){
-                    flag = false;
-                }
+                total = i.getPartQty();
+                break;
             }
+        }
+        Integer returnQty = 0;
+        List<ZkbPartOrderReturn> returns = new ArrayList<>();
+        if(StringUtils.isEmpty(zkbPartOrderReturn.getId())){
+            returns = zkbPartOrderReturnRepository.findByPartOrderIdAndPartNo(selected.getId(),zkbPartOrderReturn.getPartNo());
+        }else {
+            returns = zkbPartOrderReturnRepository.findByPartOrderIdAndPartNoAndIdIsNot(selected.getId(),zkbPartOrderReturn.getPartNo(),zkbPartOrderReturn.getId());
+        }
+        if(returns.size() > 0){
+            for(ZkbPartOrderReturn r : returns){
+                returnQty += r.getQty();
+            }
+        }
+        if(total < returnQty + zkbPartOrderReturn.getQty()){
+            flag = false;
         }
         if(!flag){
             WebUtil.addErrorMessage("归还数量不能大于配件数量","");
@@ -329,6 +464,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturnRepository.save(zkbPartOrderReturn);
         zkbPartOrderReturn = null;
         zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId());
+    }
+
+    public void naFlagListener(){
+        zkbPartOrderReturn.setPartSerialNumber("");
     }
 
     public boolean iscanEditFlag() {
@@ -473,6 +612,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setShowBtn(String showBtn) {
         this.showBtn = showBtn;
+    }
+
+    public String getValueTypeTips() {
+        return valueTypeTips;
+    }
+
+    public void setValueTypeTips(String valueTypeTips) {
+        this.valueTypeTips = valueTypeTips;
     }
 
     @Override

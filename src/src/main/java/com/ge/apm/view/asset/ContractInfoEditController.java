@@ -295,11 +295,11 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         attachements.stream().forEach(item -> {
             item.setBoUuid(selected.getId());
         });
-        allItemList.stream().filter(item -> Strings.isNullOrEmpty(item.getContractId())).forEach(item -> {
+        /*allItemList.stream().filter(item -> Strings.isNullOrEmpty(item.getContractId())).forEach(item -> {
             item.setContractId(selected.getId());
         });
         contractItemDao.save(allItemList);
-        contractItemDao.delete(removedItemList);
+        contractItemDao.delete(removedItemList);*/
         blobService.saveBlobObject(attachements);
 
         removedAttachments.stream().forEach(item -> {
@@ -355,6 +355,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                         newItem.setContractId(selected.getId());
                         newItem.setItemType(ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
                         allItemList.add(newItem);
+                        contractItemDao.save(newItem);
                     }
                 }
             }
@@ -374,6 +375,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 newItem.setContractId(selected.getId());
                 newItem.setItemType(ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
                 allItemList.add(newItem);
+                contractItemDao.save(newItem);
             }
         }
     }
@@ -391,8 +393,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         // ContractInfoItem removeItem = this.contractItemDao.findById(itemId);
         allItemList.remove(item);
         if (!Strings.isNullOrEmpty(item.getId())) {
-            // contractItemDao.delete(item);
-            removedItemList.add(item);
+            contractService.removeContractInfoItem(item);
+            //contractItemDao.delete(item);
+            //removedItemList.add(item);
         }
     }
 
@@ -408,6 +411,11 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public String getSupplierName(String supplierUid) {
         Supplier supplier = supplierDao.findByUid(supplierUid);
         return supplier == null ? null : supplier.getName();
+    }
+
+    public String getParentName(String parentId){
+        ContractInfoItem contractInfoItem = contractItemDao.findOne(parentId);
+        return contractInfoItem == null ? null : contractInfoItem.getContractAssetName();
     }
 
     public String getDetailPageLink(AssetInfo item) {
@@ -443,9 +451,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void savePurchaseItem() {
-        if (!allItemList.contains(selectedContractItem)) {
+        /*if (!allItemList.contains(selectedContractItem)) {
             allItemList.add(selectedContractItem);
-        }
+        }*/
+        contractItemDao.save(selectedContractItem);
     }
 
     public void cancelPurchaseItem() {
@@ -456,6 +465,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         selectedContractItem = new ContractInfoItem();
         selectedContractItem.setId(UUID.randomUUID().toString().replace("-", ""));
         selectedContractItem.setItemType(ContractInfoItem.ContractInfoItemType.Purchase.toString());
+        selectedContractItem.setContractId(selected.getId());
         selectedObjectMap.put("manufacture", null);
         selectedObjectMap.put("applyDept", null);
     }
@@ -467,10 +477,14 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public List<ContractInfoItem> getPurchaseItemsList() {
-        return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType())).collect(Collectors.toList());
+        List<ContractInfoItem> tempContractInfoItemList = new ArrayList<>();
+        tempContractInfoItemList = contractService.getContractItems(selected.getId());
+        return tempContractInfoItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType())).collect(Collectors.toList());
     }
 
     public List<ContractInfoItem> getContractItemsList() {
+        List<ContractInfoItem> tempContractInfoItemList = new ArrayList<>();
+        tempContractInfoItemList = contractService.getContractItems(selected.getId());
         return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())
                 || ContractInfoItem.ContractInfoItemType.ArrivalledItem.toString().equals(item.getItemType())).collect(Collectors.toList());
     }
@@ -541,6 +555,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                         Objects.equals(item, selected.getSiteUID()));
         }
         return canBeEdit;
+    }
+
+    public List<ContractInfoItem> getParentAssetList(){
+        return contractItemDao.findParentByPurchaseAndContractId(selected.getId(), selectedContractItem.getId());
     }
     
 //    public void remomvePaymentInfo(ContractInfoItem item) {

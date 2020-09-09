@@ -34,6 +34,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private String selectionTenantInfo;
     private Page<ZkbPartOrder> zkbContractPage;
     private ZkbPartOrderService zkbPartOrderService;
+    private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = new ArrayList<>();
 
     @Override
     protected void init() {
@@ -44,6 +45,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         currentUser = UserContextService.getCurrentUserAccount();
         if(userContextService.isZkbUser()) {
             this.selectionTenantInfo = currentUser.getTenantUID();
+        }else {
+            zkbPartOrderUserConfigList = zkbPartOrderService.getZkbPartOrderUserConfigRepository().findByLoginName(currentUser.getLoginName());
         }
 
         tenantInfoList = zkbPartOrderService.getSourceTenantInfoList();
@@ -68,8 +71,62 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
         }
 
+        /*if(userContextService.isZkbUser()) {
+            if(this.selectionTenantInfo != null){
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
+            }
+        }else{
+            if(this.selectionTenantInfo != null){
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
+            }
+            if(zkbPartOrderUserConfigList == null || zkbPartOrderUserConfigList.size() == 0){
+                return null;
+            }else{
+                String conditionPath = "";
+                if(searchFilters.size() == 0){
+                    conditionPath = "1+";
+                }else if(searchFilters.size() > 0){
+                    conditionPath = "1*2+";
+                }
+                for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
+                    if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(c.getConfigType())){
+                        if("CS".equals(c.getAssetType())){
+                            searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, c.getId(),conditionPath));
+                        }else {
+                            searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, c.getAssetType(),conditionPath));
+                        }
+                    }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(c.getConfigType())){
+                        searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, c.getRegion(),conditionPath));
+                    }
+                }
+            }
+        }*/
+
+
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
         return zkbContractPage;
+    }
+
+    public boolean isContainOrder(){
+        boolean flag = false;
+        for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
+            if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(c.getConfigType())){
+                flag = true;
+                break;
+            }
+        }
+        return  flag;
+    }
+
+    public boolean isContainManage(){
+        boolean flag = false;
+        for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
+            if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(c.getConfigType())){
+                flag = true;
+                break;
+            }
+        }
+        return flag;
     }
 
     public TenantInfo getTenantInfo(String tenantInfoUID){
@@ -99,6 +156,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             return;
         }
     }
+
 
     public String createAction() {
         return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo));
@@ -147,4 +205,5 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     public void setZkbContractPage(Page<ZkbPartOrder> zkbContractPage) {
         this.zkbContractPage = zkbContractPage;
     }
+
 }
