@@ -137,7 +137,7 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
-                            <p:selectOneMenu id="region" value="#{zkbPartOrderEditController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}">
+                            <p:selectOneMenu id="region" value="#{zkbPartOrderEditController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
@@ -258,7 +258,7 @@
                     <p:panelGrid rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                         <h:panelGroup>
                             <p:dataList id="uploadList" value="#{zkbPartOrderEditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                <f:facet name="header">附件列表</f:facet>
+                                <f:facet name="header">故障图片上传</f:facet>
                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                                 <p:commandButton actionListener="#{zkbPartOrderEditController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>

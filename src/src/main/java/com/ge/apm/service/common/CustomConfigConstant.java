@@ -68,7 +68,7 @@ public class CustomConfigConstant {
                 "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "status","isPm", "isChecked", "assetValueCategory", "deviceStatus",
                 "warranty", "subjectProject", "proprietaryClass", "assetTags", "UCMID", "createdDate",
-                "UUID"
+                "UUID","createdBy"
         );
     }
 
@@ -158,6 +158,7 @@ public class CustomConfigConstant {
             allFields.put("UCMID", WebUtil.getMessage("UCMID"));
             allFields.put("assetTags", WebUtil.getMessage("assetTags"));
             allFields.put("connectToInsite", WebUtil.getMessage("connectToInsite"));
+            allFields.put("createdBy", WebUtil.getMessage("createdBy"));
 //        }
         return allFields;
     }
@@ -181,7 +182,7 @@ public class CustomConfigConstant {
                 "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
-                "lastQaDate", "lastMeteringDate", "warranty");
+                "lastQaDate", "lastMeteringDate", "warranty","createdBy");
     }
 
     public static List<String> getAssetsEditpageBasicFields() {
@@ -206,7 +207,7 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getAssetsEditpageFinicialFields() {
-        return Arrays.asList("purchasePrice", "salvageValue", "lifecycle", "depreciationMethod");
+        return Arrays.asList("purchasePrice", "salvageValue", "lifecycle", "depreciationMethod","createdBy");
     }
 
     public static List<String> getAssetsEditpageDateFields() {
@@ -224,7 +225,7 @@ public class CustomConfigConstant {
                 "functionGrade", "functionGroup", "assetCode68", "capitalSource", "riskGrade", "measureGrade", "emergencyEquipment", "importEquipment",
                 "isPm", "isChecked", "accountingCategory", "measuringItemCategory", "financingNum", "barcode", "registrationNo", "modalityId", "locationCode",
                 "locationName", "functionType", "manufactDate", "purchaseDate", "warrantyDate", "arriveDate", "installDate", "factoryWarrantyDate", "terminateDate",
-                "lastPmDate", "lastQaDate", "lastMeteringDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationMethod");
+                "lastPmDate", "lastQaDate", "lastMeteringDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationMethod","createdBy");
     }
     
     public static List<String> getAssetsMobilepageHeaderFields() {
