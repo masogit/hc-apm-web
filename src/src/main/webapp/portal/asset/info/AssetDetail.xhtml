@@ -313,7 +313,7 @@
 
             </h:panelGroup>
         </div>
-        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 900px;max-height:900px;min-width:800px;min-height:800px">
+        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 900px;max-height:900px;min-width:800px;min-height:600px">
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
                 <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
                     <span class="ui-icon ui-icon-closethick"></span></a>
@@ -357,8 +357,12 @@
 
             function ImageSuofang(args) {
                 var imgsrc =  $("#shwoPicDialogImg")[0];
-                debugger;
                 if (args) {
+
+                    if(imgsrc.width * 1.1 > 900 ||imgsrc.height * 1.1>900 ){
+                        return;
+                    }
+
                     imgsrc.width = imgsrc.width * 1.1;
                     imgsrc.height = imgsrc.height * 1.1;
                 }

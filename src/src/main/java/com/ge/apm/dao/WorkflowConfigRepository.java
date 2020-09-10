@@ -20,6 +20,13 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
     
     @Query(value="select w from WorkflowConfig w where w.siteUID in ?1")
     public List<WorkflowConfig>  getBySiteUIDList(List<String> uidList);
+
+    @Query(value=" select w from WorkflowConfig w where w.siteUID in ?1 or " +
+            " exists(select 1 from OrgInfo orginfo0_ where orginfo0_.orgType<>4 and orginfo0_.uid = w.siteUID and " +
+            " (exists(select 1 from OrgInfo orginfo0_1,UserOrgInfo userorginf1_1 where orginfo0_1.uid=userorginf1_1.orgUid and orginfo0_1.orgType <> 4 " +
+            " and userorginf1_1.userUid = ?2 and (orginfo0_1.uid = orginfo0_.siteUID or orginfo0_1.uid = orginfo0_.institutionUID or orginfo0_1.uid = orginfo0_.tenantUID or orginfo0_1.uid = orginfo0_.hospitalUID)) " +
+            " or exists( select 1 from OrgInfo orginfo0_1,UserOrgInfo userorginf1_1 where orginfo0_1.uid=userorginf1_1.orgUid and orginfo0_1.orgType = 4 and userorginf1_1.userUid = ?2 and orginfo0_1.siteUID = orginfo0_.uid ))) ")
+    public List<WorkflowConfig>  getBySiteUIDList1(List<String> uidList,String uid);
     
     @Query(value="select * from workflow_config w where w.site_UID=:uid order by w.id desc limit 1",nativeQuery = true)
     public WorkflowConfig getBySiteUID(@Param("uid")String site_uid);
