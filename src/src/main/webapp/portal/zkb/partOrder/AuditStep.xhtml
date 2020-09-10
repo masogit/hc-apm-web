@@ -168,7 +168,7 @@
                     <p:panelGrid rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                         <h:panelGroup>
                             <p:dataList id="uploadList" value="#{zkbPartOrderAuditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                <f:facet name="header">附件列表</f:facet>
+                                <f:facet name="header">故障图片上传</f:facet>
                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                             </p:dataList>
 
@@ -308,6 +308,14 @@
                                 <h:panelGroup>
                                     <label class="label">Order#*</label>
                                     <p:inputText value="#{zkbPartOrderAuditController.selected.orderNo}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderExtraPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_orderNo} #{msg.ValidationRequire}" />
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType eq 'HighValue')}">
+                                    <label class="label">是否全新探头</label>
+                                    <p:selectOneMenu id="newCatFlag" value="#{zkbPartOrderAuditController.selected.newCatFlag}"  disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderExtraPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItem itemLabel="是" itemValue="t"/>
+                                        <f:selectItem itemLabel="否" itemValue="f"/>
+                                    </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">备注</label>
