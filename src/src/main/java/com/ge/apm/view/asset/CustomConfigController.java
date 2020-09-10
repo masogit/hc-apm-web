@@ -386,6 +386,13 @@ public class CustomConfigController {
                         ((JSONArray) JSONPath.eval(customConfigObject, "$.mobileMaintainPage.pageWorkOrder.group[type='assetInfo'].assetInfoFields"))
                                 .fluentRemoveAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()).map(Entry::getKey).collect(Collectors.toList())));
                 break;
+            case "ImportantFields":
+                List<String> addImportantFields = new ArrayList();
+                addImportantFields.addAll(customConfigObject.getAssetsImportantFields());
+                addImportantFields.addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsImportantFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                customConfigObject.setAssetsImportantFields(addImportantFields);
+                break;
 
         }
         cancelAddFields();
@@ -632,5 +639,17 @@ public class CustomConfigController {
 
     public void setImportantFieldsCheckedStatus(Map<String, Boolean> importantFieldsCheckedStatus) {
         this.importantFieldsCheckedStatus = importantFieldsCheckedStatus;
+    }
+
+    public void removeAssetsImportantFields(String key) {
+        if (customConfigObject.getAssetsImportantFields().contains(key)) {
+            customConfigObject.setAssetsImportantFields(customConfigObject.getAssetsImportantFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
+        }else {
+            if (assetsImportantFieldsAll.contains(key)) {
+                List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
+                assetsImportantFields.add(key);
+                customConfigObject.setAssetsImportantFields(assetsImportantFields);
+            }
+        }
     }
 }
