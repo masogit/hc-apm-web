@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
@@ -8,14 +9,15 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.constant.UsageStatusConstant;
+import com.ge.apm.service.i18n.I18nService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -66,6 +68,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private SupplierRepository supplierDao;
     private AutoCompleteService autoCompleteService;
     private OrgInfoTreeService orgInfoTreeService;
+    private AssetHistoryService assetHistoryService;
+    private I18nService i18nService;
     private MvsUtil mvsUtil;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private Boolean terminate = false;
@@ -143,6 +147,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private String qr_Code = null;
     private String siteUid = null;
 
+    @Getter
+    private List<JSONObject> changeHistoryList = new ArrayList<>();
+
     /**
      * 目录关系service
      */
@@ -179,6 +186,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetTagsMapper = WebUtil.getBean(AssetTagsMapper.class);
         assetTagsDao = WebUtil.getBean(AssetTagsRepository.class);
         zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
+        assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -228,6 +236,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
             List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
             this.selected.setTags(existingTags);
+
+            changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
+
         }
         if(selected ==null){
             try {
@@ -624,7 +635,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             this.selected.setMvsEquip(1);
         }
 
+        this.saveAssetHistory();
+
         this.save();
+
         if(selected != null && selected.getId() != null && selectedPictures != null){
             acService.createAttachments(selected, selectedPictures);
         }
@@ -1291,5 +1305,16 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public void setSubZkbFileDirectoryList(List<ZkbFileDirectory> subZkbFileDirectoryList) {
         this.subZkbFileDirectoryList = subZkbFileDirectoryList;
+    }
+
+
+    private void saveAssetHistory() {
+
+        AssetInfo oldAsset = dao.findByUid(selected.getUid());
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected, customConfig.getAssetsImportantFields());
+    }
+
+    public int getAssetChangeHistoryCount() {
+        return changeHistoryList.size();
     }
 }

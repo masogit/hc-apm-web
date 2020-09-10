@@ -11,6 +11,7 @@ import com.ge.apm.view.asset.AssetInfoListController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,8 @@ public class CustomConfigObject {
     List<String> assetsMobilepageBasicFields;
     List<String> assetsMobilepageDetailFields;
     List<String> assetsWebMaintainDetailFields;
+
+    List<String> assetsImportantFields;
     
     JSONObject mobilePage;
 
@@ -238,5 +241,15 @@ public class CustomConfigObject {
         this.mobileMaintainPage = mobileMaintainPage;
     }
 
+    public List<String> getAssetsImportantFields() {
+        if (assetsImportantFields == null) {
+            assetsImportantFields = new ArrayList<>();
+        }
+        return assetsImportantFields;
+    }
+
+    public void setAssetsImportantFields(List<String> assetsImportantFields) {
+        this.assetsImportantFields = assetsImportantFields;
+    }
 
 }
