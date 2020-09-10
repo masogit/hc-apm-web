@@ -13,20 +13,20 @@
                 <h:panelGroup id="display">
                     <p:tabView class="ui-g-12" id="tabview"   dynamic="false"   cache="false">
                         <p:tab title="#{msg.AssignRole}" class="ui-g-12" >
-                    <p:panelGrid columns="2" rendered="#{userAccountController.selected != null}">
-                        <p:outputLabel value="#{msg.login_name}"/>
-                        <p:outputLabel value="#{userAccountController.selected.loginName}"/>
-                        <p:outputLabel value="#{msg.userName}"/>
-                        <p:outputLabel value="#{userAccountController.selected.name}"/>
+                            <p:panelGrid columns="2" rendered="#{userAccountController.selected != null}">
+                                <p:outputLabel value="#{msg.login_name}"/>
+                                <p:outputLabel value="#{userAccountController.selected.loginName}"/>
+                                <p:outputLabel value="#{msg.userName}"/>
+                                <p:outputLabel value="#{userAccountController.selected.name}"/>
 
-                        <p:outputLabel value="#{msg.AssignRole}" for="roleNames" />
-                        <p:selectManyCheckbox id="roleNames" value="#{userAccountController.assignedRoles}" layout="pageDirection" valueChangeListener="#{userAccountController.roleChangeListener}">
-                            <p:ajax update=":userAccountTab:UserRoleEditForm:tabview:roleNames"/>
-                            <f:selectItems value="#{userAccountController.roleListVO}" var="roleItem" itemLabel="#{roleItem.roleDesc}" itemValue="#{roleItem.roleDesc}" itemDisabled="#{roleItem.disable}" />
-                            <!--<f:selectItems value="#{userAccountController.allRoles}" />-->
-                        </p:selectManyCheckbox>
+                                <p:outputLabel value="#{msg.AssignRole}" for="roleNames" />
+                                <p:selectManyCheckbox id="roleNames" value="#{userAccountController.assignedRoles}" layout="pageDirection" valueChangeListener="#{userAccountController.roleChangeListener}">
+                                    <p:ajax update=":userAccountTab:UserRoleEditForm:tabview:roleNames"/>
+                                    <f:selectItems value="#{userAccountController.roleListVO}" var="roleItem" itemLabel="#{roleItem.roleDesc}" itemValue="#{roleItem.roleDesc}" itemDisabled="#{roleItem.disable}" />
+                                    <!--<f:selectItems value="#{userAccountController.allRoles}" />-->
+                                </p:selectManyCheckbox>
 
-                    </p:panelGrid>
+                            </p:panelGrid>
                         </p:tab>
                         <p:tab title="#{msg.AccessPermission}" class="ui-g-12" >
                             <p:scrollPanel style="height: 300px; border: 0;" mode="native">
@@ -34,11 +34,11 @@
                                 <p:tree id="orgTree2" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
                                     <p:ajax event="select" listener="#{userAccountController.onSelectAccessTreeNode}" />
                                     <p:ajax event="unselect" listener="#{userAccountController.onUnselectAccessTreeNode}" />
-                    
+
                                     <p:treeNode type="org">
                                         <h:outputText value="#{node.shortName}"/>
                                     </p:treeNode>
-									<p:treeNode type="hidden" rendered="false"/>
+                                    <p:treeNode type="hidden" rendered="false"/>
                                 </p:tree>
                             </p:scrollPanel>
                         </p:tab>
