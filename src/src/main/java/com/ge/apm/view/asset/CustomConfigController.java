@@ -30,6 +30,9 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
@@ -60,6 +63,12 @@ public class CustomConfigController {
 
     private PinYinComparator pinYinComparator;
 
+    private Map<String,Boolean> importantFieldsCheckedStatus = new HashMap();
+
+    @Setter
+    @Getter
+    private List<String> assetsImportantFieldsAll;
+
     @PostConstruct
     protected void init() {
         ccService = WebUtil.getBean(CustomConfigService.class);
@@ -71,6 +80,10 @@ public class CustomConfigController {
         selectedAddFields = new HashMap();
         pinYinComparator = new PinYinComparator();
         loadConfigForSite(selectSite.getUid());
+
+        assetsImportantFieldsAll = CustomConfigConstant.getAssetsImportantFieldsAll();
+
+        initImportantFieldsChecked();
     }
 
     private void loadConfigForSite(String siteUid) {
@@ -528,6 +541,19 @@ public class CustomConfigController {
         }
     }
 
+    private void initImportantFieldsChecked() {
+        List<String> assetsImportantFields = customConfigObject.getAssetsImportantFields();
+
+        for (int i = 0; i < assetsImportantFieldsAll.size(); i++) {
+            String fieldName = assetsImportantFieldsAll.get(i);
+            if(assetsImportantFields.contains(fieldName)){
+                importantFieldsCheckedStatus.put(fieldName,true);
+            }else{
+                importantFieldsCheckedStatus.put(fieldName,false);
+            }
+        }
+    }
+
     //for 10.1 update
 //    public void updateCustomFieldForArrivalRequired() {
 //        com.ge.apm.dao.CustomConfigRepository customConfigDao = WebUtil.getBean(com.ge.apm.dao.CustomConfigRepository.class);
@@ -600,4 +626,11 @@ public class CustomConfigController {
         return addFieldsType;
     }
 
+    public Map<String, Boolean> getImportantFieldsCheckedStatus() {
+        return importantFieldsCheckedStatus;
+    }
+
+    public void setImportantFieldsCheckedStatus(Map<String, Boolean> importantFieldsCheckedStatus) {
+        this.importantFieldsCheckedStatus = importantFieldsCheckedStatus;
+    }
 }
