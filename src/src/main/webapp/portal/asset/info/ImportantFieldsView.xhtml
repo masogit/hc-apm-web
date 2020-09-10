@@ -27,61 +27,55 @@
     <!-- 使用部门 -->
     <p:column headerText="#{msg.assetDeptName}" width="130"
               rendered="#{assetInfoEditController.configShow('assetDeptName')}">
-        <h:outputText value="#{item.assetDeptName}" rendered="#{item.assetDeptName ne 'null'}"/>
+        <h:outputText value="#{item.assetDeptName}" />
     </p:column>
 
     <!-- 所属部门 -->
     <p:column headerText="#{msg.clinicalDeptName}" width="130"
               rendered="#{assetInfoEditController.configShow('clinicalDeptName')}">
-        <h:outputText value="#{item.clinicalDeptName}" rendered="#{item.clinicalDeptName ne 'null'}"/>
-    </p:column>
-
-    <!-- 管理部门 -->
-    <p:column headerText="#{msg.adminDepartmentName}" width="130"
-              rendered="#{assetInfoEditController.configShow('adminDepartmentName')}">
-        <h:outputText value="#{item.adminDepartmentName}" rendered="#{item.adminDepartmentName ne 'null'}"/>
+        <h:outputText value="#{item.clinicalDeptName}" />
     </p:column>
 
     <!-- 使用人 -->
     <p:column headerText="#{msg.clinicalOwnerName}" width="130"
               rendered="#{assetInfoEditController.configShow('clinicalOwnerName')}">
-        <h:outputText value="#{item.clinicalOwnerName}" rendered="#{item.clinicalOwnerName ne 'null'}"/>
+        <h:outputText value="#{item.clinicalOwnerName}" />
     </p:column>
 
     <!-- 安装位置 -->
     <p:column headerText="#{msg.locationName}" width="130"
               rendered="#{assetInfoEditController.configShow('locationName')}">
-        <h:outputText value="#{item.locationName}" rendered="#{item.locationName ne 'null'}"/>
+        <h:outputText value="#{item.locationName}" />
     </p:column>
 
     <!-- 资产状态 -->
     <p:column headerText="#{msg.deviceStatus}" width="130"
               rendered="#{assetInfoEditController.configShow('deviceStatus')}">
-        <h:outputText value="#{item.deviceStatus}" rendered="#{item.deviceStatus ne 'null'}"/>
+        <h:outputText value="#{item.deviceStatus}" />
     </p:column>
 
     <!-- 采购日期 -->
     <p:column headerText="#{msg.purchaseDate}" width="130"
               rendered="#{assetInfoEditController.configShow('purchaseDate')}">
-        <h:outputText value="#{item.purchaseDate}" rendered="#{item.purchaseDate ne 'null'}"/>
+        <h:outputText value="#{item.purchaseDate}" />
     </p:column>
 
     <!-- 采购原值 -->
     <p:column headerText="#{msg.purchasePrice}" width="130"
               rendered="#{assetInfoEditController.configShow('purchasePrice')}">
-        <h:outputText value="#{item.purchasePrice}" rendered="#{item.purchasePrice ne 'null'}"/>
+        <h:outputText value="#{item.purchasePrice}" />
     </p:column>
 
     <!-- 二维码 -->
     <p:column headerText="#{msg.qrCode}" width="130"
               rendered="#{assetInfoEditController.configShow('qrCode')}">
-        <h:outputText value="#{item.qrCode}" rendered="#{item.qrCode ne 'null'}"/>
+        <h:outputText value="#{item.qrCode}" />
     </p:column>
 
     <!-- 启用日期 -->
     <p:column headerText="#{msg.installDate}" width="130"
               rendered="#{assetInfoEditController.configShow('installDate')}">
-        <h:outputText value="#{item.installDate}" rendered="#{item.installDate ne 'null'}"/>
+        <h:outputText value="#{item.installDate}" />
     </p:column>
 
     <!-- 修改人 contains-->
@@ -89,23 +83,10 @@
         <h:outputText value="#{item.createdBy}"/>
     </p:column>
 
-    <!-- 修改人备注信息 -->
-    <p:column headerText="#{msg.Remark}" width="130"
-              rendered="#{assetInfoEditController.configShow('comments')}">
-        <h:outputText value="#{item.comment}"/>
-    </p:column>
-
     <!-- 修改时间 -->
     <p:column headerText="#{msg.modifiedTime}" width="160">
         <h:outputText value="#{item.createdDate}"/>
     </p:column>
-
-    <!-- 附件下载 -->
-    <!--<p:column headerText="#{msg.Attachment}#{msg.download}" width="120">
-        <h:outputText value="#{item.attachment}" style="display: none;"/>
-        <p:link href="#{fileDownloadService.getFileUrl(item.attachment)}"
-                rendered="#{item.attachment ne 'null'}" value="#{msg.Download}"/>
-    </p:column>-->
 
     <!-- 导出文件 -->
     <f:facet name="{Toolbar}">
