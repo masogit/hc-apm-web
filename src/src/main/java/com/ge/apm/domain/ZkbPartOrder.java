@@ -433,6 +433,20 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "whether_deduct")
     private String whetherDeduct;
 
+    /**
+     * 是否全新探头
+     */
+    @Column(name = "new_cat_flag")
+    private String newCatFlag;
+
+    public String getNewCatFlag() {
+        return newCatFlag;
+    }
+
+    public void setNewCatFlag(String newCatFlag) {
+        this.newCatFlag = newCatFlag;
+    }
+
     public String getTechAuditer() {
         return techAuditer;
     }
