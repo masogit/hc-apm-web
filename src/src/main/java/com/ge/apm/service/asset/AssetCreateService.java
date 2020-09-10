@@ -267,7 +267,7 @@ public class AssetCreateService {
         orgList.add(user.getInstitutionUID());
         orgList.add(user.getHospitalUID());
         orgList.add(user.getSiteUID());
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList2(orgList,userUid);
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList1(orgList,userUid);
         return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
     }
     
