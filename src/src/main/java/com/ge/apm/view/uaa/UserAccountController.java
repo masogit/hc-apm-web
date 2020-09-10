@@ -177,6 +177,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.retrieval = retrieval;
     }
 
+    private boolean isSelect46Account;
+
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<>();
@@ -252,13 +255,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedTenant = tenantInfoRepository.findByuid(tenantUid);
 
         deptList = uaaService.getFullOrgListBySiteId(selectedTenant.getId());
-        if (loginUser.getSiteId() != 46) { // skip building tenant org tree for apm ib user
+        if (selectedTenant!=null&&selectedTenant.getId()!= 46) { // skip building tenant org tree for apm ib user
             rebuildOrgTree();
             TreeNode selectedOrgNode = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
             if (null != selectedOrgNode) {
                 selectedOrgNode.setSelected(true);
                 TreeNodeUtil.expandParentsNodes(selectedOrgNode);
             }
+        }else{
+            orgTree = null;
         }
         updateRoleList();
     }
@@ -282,14 +287,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     
     public void filterTreeNode(){
-        if (uaaService.isIbSiteAdmin(loginUser)) {
-            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(loginUser.getUid(), treeNodeNameFilter, loginUser.getSiteId());
-            OrgInfo tenant = orgInfoDao.findByUid(loginUser.getTenantUID());
+        if (selectedTenant!=null&&selectedTenant.getId()== 46) {
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(loginUser.getUid(), treeNodeNameFilter, selectedTenant.getId());
+            OrgInfo tenant = orgInfoDao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
-            orgTree = uaaService.getOrgTreeNodes(loginUser.getSiteUID(), siteList);
-        } else {
-            uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
+            orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
         }
+        uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
     }
 
     public String getOrgFullNameByUid(String orgUid) {
@@ -1492,6 +1496,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         return tags;
     }
+
     //判断租户是否是46号租户 是返回true 否返回false
     public boolean judgeTheUser(){
         if(null==selected || null==selected.getSiteId()){
@@ -1502,5 +1507,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }else{
             return false;
         }
+    }
+
+    public boolean getIsSelect46Account() {
+        if (selectedTenant!=null&&selectedTenant.getId() == 46) {
+            return true;
+        }
+        return false;
     }
 }

@@ -13,7 +13,7 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="zkbPartOrderListForm">
-                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5">
+                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" rendered="#{!userContextService.zkbUser}">
                         <p:outputLabel value="#{msg.TenantInfo}*:"/>
                         <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbPartOrderController.selectionTenantInfo}" disabled="#{userContextService.zkbUser}">
                             <p:ajax listener="#{zkbPartOrderController.tenantInfoSelect}" update="datalist :zkbPartOrderListForm"/>
@@ -33,7 +33,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500" >
 
-                        <p:ajax event="rowSelect" listener="#{zkbPartOrderController.prepareEdit}" update="deleteButton :zkbPartOrderListForm"/>
+                        <p:ajax event="rowSelect" listener="#{zkbPartOrderController.prepareEdit}" update="deleteButton editButton"/>
                         <p:ajax event="filter" listener="#{zkbPartOrderController.onFilter}" />
 
                         <p:column headerText="#{msg.zkbContact_tenant}">
@@ -63,15 +63,21 @@
                             </f:facet>
                         </p:column>
 
-                        <p:column headerText="设备名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.name}"/>
+                        <p:column headerText="设备名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" >
+                            <h:outputText value="#{item.assetInfo.name}" />
                         </p:column>
 
                         <p:column headerText="Sys ID" filterBy="#{item.assetInfo.systemId}"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.systemId}"/>
                         </p:column>
-                        <p:column headerText="设备类型" filterBy="#{item.assetInfo.assetGroup}"  filterMatchMode="LIKE">
+                        <p:column headerText="设备类型" filterBy="#{item.assetInfo.assetGroup}"  filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                         <p:column headerText="派工单号" filterBy="#{item.srNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.srNum}"/>
@@ -116,7 +122,7 @@
 
                         <p:column headerText="申请日期"  filterMatchMode="GTE">
                             <h:outputText value="#{item.requestDate}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
 
