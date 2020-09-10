@@ -17,6 +17,7 @@ import webapp.framework.web.service.UserContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -72,6 +73,9 @@ public class OrgApi {
   @RequestMapping(path = "/allOrg", method = RequestMethod.GET)
   @ResponseBody
   public Object requestAllOrg(HttpServletRequest request) {
+    if(UserContext.getCurrentLoginUser().getSiteId() == 46){
+      throw new UnsupportedOperationException();
+    }
     return orgService.getAllOrg(UserContext.getCurrentLoginUser().getTenantUID());
   }
 
