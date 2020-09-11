@@ -286,9 +286,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 mvsAssetInfo = found;
             }
         }
-
-
     }
+
+    public boolean configShow(String fieldKey) {
+        if (customConfig.getAssetsImportantFields().contains(fieldKey)) {
+            return true;
+        }
+        return false;
+    }
+
     public void returnBack() {
         acService.rejectReturn(createRequest, rejectText);
         this.rejectTextHistory.add(TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText));
