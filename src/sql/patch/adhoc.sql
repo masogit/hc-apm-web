@@ -2655,3 +2655,5 @@ INSERT INTO public.audit_default_file
 (id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, system_file, deleted, expired, file_id, file_type, template, item_id, name, upload_by, upload_time, url)
 VALUES(245, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '',true, false, false, '5f574b11e3a540083cef15f7', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 true, '90', '计量器具管理制度.docx', 'system', '2020-05-20 00:00:00.0', '/hcapmobjecthubservice/api/apm/objectHub/objects/download/5f574b11e3a540083cef15f7');
+
+update asset_info set visible_status = 1 where site_id = 46 and (ib_status < 1 or ib_status is null);
