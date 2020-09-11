@@ -14,67 +14,67 @@
         <h:outputText value="#{empty item.name ? item.assetName : item.name}"/>
     </p:column>
 
-    <!-- 资产编号 rendered="#{assetInfoEditController.configShow('financingNum')}"-->
+    <!-- 资产编号 -->
     <p:column headerText="#{msg.AssetID}" width="125">
         <h:outputText value="#{empty item.financingNum ? '暂无' : item.financingNum}"/>
     </p:column>
 
-    <!-- 设备编号 rendered="#{assetInfoEditController.configShow('financingNum')}"-->
-    <p:column headerText="#{msg.departNum}" width="125" rendered="#{assetInfoEditController.configShow('departNum')}">
+    <!-- 设备编号 -->
+    <p:column headerText="#{msg.departNum}" width="125" rendered="#{currentCustomConfigController.showImportantField('departNum')}">
         <h:outputText value="#{empty item.departNum ? '暂无' : item.departNum}"/>
     </p:column>
 
     <!-- 使用部门 -->
     <p:column headerText="#{msg.assetDeptName}" width="130"
-              rendered="#{assetInfoEditController.configShow('assetDeptName')}">
-        <h:outputText value="#{item.assetDeptName}" />
+              rendered="#{currentCustomConfigController.showImportantField('assetDeptName')}">
+        <h:outputText value="#{item.assetDeptName}"/>
     </p:column>
 
     <!-- 所属部门 -->
     <p:column headerText="#{msg.clinicalDeptName}" width="130"
-              rendered="#{assetInfoEditController.configShow('clinicalDeptName')}">
-        <h:outputText value="#{item.clinicalDeptName}" />
+              rendered="#{currentCustomConfigController.showImportantField('clinicalDeptName')}">
+        <h:outputText value="#{item.clinicalDeptName}"/>
     </p:column>
 
     <!-- 使用人 -->
     <p:column headerText="#{msg.clinicalOwnerName}" width="130"
-              rendered="#{assetInfoEditController.configShow('clinicalOwnerName')}">
+              rendered="#{currentCustomConfigController.showImportantField('clinicalOwnerName')}">
         <h:outputText value="#{item.clinicalOwnerName}" />
     </p:column>
 
     <!-- 安装位置 -->
     <p:column headerText="#{msg.locationName}" width="130"
-              rendered="#{assetInfoEditController.configShow('locationName')}">
+              rendered="#{currentCustomConfigController.showImportantField('locationName')}">
         <h:outputText value="#{item.locationName}" />
     </p:column>
 
     <!-- 资产状态 -->
     <p:column headerText="#{msg.deviceStatus}" width="130"
-              rendered="#{assetInfoEditController.configShow('deviceStatus')}">
+              rendered="#{currentCustomConfigController.showImportantField('deviceStatus')}">
         <h:outputText value="#{item.deviceStatus}" />
     </p:column>
 
     <!-- 采购日期 -->
     <p:column headerText="#{msg.purchaseDate}" width="130"
-              rendered="#{assetInfoEditController.configShow('purchaseDate')}">
+              rendered="#{currentCustomConfigController.showImportantField('purchaseDate')}">
         <h:outputText value="#{item.purchaseDate}" />
     </p:column>
 
     <!-- 采购原值 -->
     <p:column headerText="#{msg.purchasePrice}" width="130"
-              rendered="#{assetInfoEditController.configShow('purchasePrice')}">
+              rendered="#{currentCustomConfigController.showImportantField('purchasePrice')}">
         <h:outputText value="#{item.purchasePrice}" />
     </p:column>
 
     <!-- 二维码 -->
     <p:column headerText="#{msg.qrCode}" width="130"
-              rendered="#{assetInfoEditController.configShow('qrCode')}">
+              rendered="#{currentCustomConfigController.showImportantField('qrCode')}">
         <h:outputText value="#{item.qrCode}" />
     </p:column>
 
     <!-- 启用日期 -->
     <p:column headerText="#{msg.installDate}" width="130"
-              rendered="#{assetInfoEditController.configShow('installDate')}">
+              rendered="#{currentCustomConfigController.showImportantField('installDate')}">
         <h:outputText value="#{item.installDate}" />
     </p:column>
 

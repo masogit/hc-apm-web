@@ -9,7 +9,6 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.constant.UsageStatusConstant;
-import com.ge.apm.service.i18n.I18nService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -69,7 +68,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private AutoCompleteService autoCompleteService;
     private OrgInfoTreeService orgInfoTreeService;
     private AssetHistoryService assetHistoryService;
-    private I18nService i18nService;
     private MvsUtil mvsUtil;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private Boolean terminate = false;
@@ -286,13 +284,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 mvsAssetInfo = found;
             }
         }
-    }
-
-    public boolean configShow(String fieldKey) {
-        if (customConfig.getAssetsImportantFields().contains(fieldKey)) {
-            return true;
-        }
-        return false;
     }
 
     public void returnBack() {
