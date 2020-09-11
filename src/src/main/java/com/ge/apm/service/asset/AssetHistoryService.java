@@ -95,7 +95,8 @@ public class AssetHistoryService {
                     oldColumnValue = ((JSONObject) item).getString("oldColumnValue");
                 }
                 String newColumnValue = ((JSONObject) item).getString("newColumnValue");
-                String columnValue = "新值：" + newColumnValue + " -> 旧值：" + oldColumnValue;
+                //String columnValue = "新值：" + newColumnValue + " -> 旧值：" + oldColumnValue;
+                String columnValue = "旧值:" + oldColumnValue + " -> 新值:" + newColumnValue;
                 jsonObject.put(columnName, columnValue);
 
             });

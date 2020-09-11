@@ -21,7 +21,7 @@
 
     <!-- 设备编号 -->
     <p:column headerText="#{msg.departNum}" width="125" rendered="#{currentCustomConfigController.showImportantField('departNum')}">
-        <h:outputText value="#{empty item.departNum ? '暂无' : item.departNum}"/>
+        <h:outputText value="#{item.departNum}"/>
     </p:column>
 
     <!-- 使用部门 -->
