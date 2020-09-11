@@ -41,6 +41,7 @@ import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
@@ -849,13 +850,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         uaaService.setDefaultScope(selected);
 
         //绑定新建用户和该用户所在层级的以下层级
-        userOrgInfoList=new ArrayList<UserOrgInfo>();
-        accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
-        List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
-        setSelectedOrgTree(accessOrgTree, orgList);
-        prePareForScopeForNewUser(selected,accessOrgTree);
-        userOrgInfoList= userOrgInfoList.stream().filter(item-> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
-        userOrgInfoRepository.save(userOrgInfoList);
+        if(46!=selected.getSiteId()){
+            userOrgInfoList=new ArrayList<UserOrgInfo>();
+            accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
+            List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
+            setSelectedOrgTree(accessOrgTree, orgList);
+            prePareForScopeForNewUser(selected,accessOrgTree);
+            userOrgInfoList= userOrgInfoList.stream().filter(item-> !item.getOrgUid().equalsIgnoreCase(selected.getOrgInfoUID())).collect(Collectors.toList());
+            userOrgInfoRepository.save(userOrgInfoList);
+        }
 
     }
 
@@ -1066,6 +1069,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         setTreeNodes(event.getTreeNode(), true);
     }
     public void onSelectAccessTreeNode46(NodeSelectEvent event) {
+        if(orgInfoTableData46.size()==1 && "GE后台运维".equals(orgInfoTableData46.get(0).getName())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning!", "如要继续操作，请先删除顶级权限！"));
+            return;
+        }
         setTreeNodes(event.getTreeNode(), true);
         updateOrgInfoTable("1",null);
     }
@@ -1133,6 +1140,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void onUnselectAccessTreeNode(NodeUnselectEvent event) {
+
         TreeNode node = event.getTreeNode();
         setTreeNodes(node, false);
         while (node.getParent() != null) {
@@ -1142,6 +1150,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void onUnselectAccessTreeNode46(NodeUnselectEvent event) {
+        if(orgInfoTableData46.size()==1 && "GE后台运维".equals(orgInfoTableData46.get(0).getName())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning!", "如要继续操作，请先删除顶级权限！"));
+            return;
+        }
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
         unselectInstitutions.add(orgInfo.getInstitutionUID());
