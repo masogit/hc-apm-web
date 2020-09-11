@@ -30,6 +30,21 @@ public class I18nMessageService {
         return foundMsg;
     }
 
+    public String getMsgLabelByMsgTypeAndMsgKey(String msgType, String msgKey) {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+
+        I18nMessage foundMsg = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(msgType, msgKey, userAccount.getSiteId());
+        if (foundMsg == null) {
+            foundMsg = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(msgType, msgKey, -1);
+        }
+
+        if (null == foundMsg) {
+            return null;
+        } else {
+            return foundMsg.getValueZh();
+        }
+
+    }
 
     public static List<I18nMessage> getMessageUsingDefaultConfigAsLowestPriority(String msgType, int siteId) {
 

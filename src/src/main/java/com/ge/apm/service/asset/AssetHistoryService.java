@@ -9,8 +9,7 @@ import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.i18n.I18nService;
-import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,7 +17,6 @@ import webapp.framework.web.WebUtil;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -39,10 +37,13 @@ public class AssetHistoryService {
     private AssetHistoryRepository assetHistoryRepository;
 
     @Autowired
+    private AssetInfoRepository dao;
+
+    @Autowired
     private OrgInfoRepository orgDao;
 
     @Autowired
-    private I18nService i18nService;
+    private I18nMessageService i18nMessageService;
 
     /**
      * @return void
@@ -56,7 +57,7 @@ public class AssetHistoryService {
         assetHistoryRepository.save(assetHistory);
     }
 
-    public List<AssetHistory> findByUidOrderByCreatedDateDescAtMostFive(String assetUid) {
+    public List<AssetHistory> findByAssetUid(String assetUid) {
         return assetHistoryRepository.findByUidOrderByCreatedDateDescAtMostFive(assetUid);
     }
 
@@ -64,7 +65,6 @@ public class AssetHistoryService {
         List<AssetHistory> resultList = assetHistoryRepository.findByUidOrderByCreatedDateDescAtMostFive(assetUid);
         return parseFieldsByJson(resultList);
     }
-
     /**
      * @return
      * @throws
@@ -133,8 +133,6 @@ public class AssetHistoryService {
                 }
             }
 
-
-
         } else if (FILED_DEVICE_STATUS.equals(fieldName)){
             Field field = oldAsset.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
@@ -146,14 +144,12 @@ public class AssetHistoryService {
                 return Optional.empty();
             }
 
-            AssetFileImportBaseService baseService = new AssetFileImportBaseService();
             if (null != oldFieldValue) {
-                oldFieldValue = i18nService.findMatchValueByMsgKey((Integer) oldFieldValue, baseService.deviceStatusList);
+                oldFieldValue = i18nMessageService.getMsgLabelByMsgTypeAndMsgKey("deviceStatus", String.valueOf(oldFieldValue));
             }
             if (null != newFieldValue) {
-                newFieldValue = i18nService.findMatchValueByMsgKey((Integer) newFieldValue, baseService.deviceStatusList);
+                newFieldValue = i18nMessageService.getMsgLabelByMsgTypeAndMsgKey("deviceStatus", String.valueOf(newFieldValue));
             }
-
 
         }
 
@@ -258,7 +254,6 @@ public class AssetHistoryService {
         assetHistory.setAssetUid(oldAsset.getUid());
         assetHistory.setAssetName(oldAsset.getName());
         assetHistory.setFinancingNum(oldAsset.getFinancingNum());
-
         assetHistory.setJsonData(jsonData);
         assetHistory.setCreatedDate(new Date());
         assetHistory.setCreatedBy(currentUserAccount.getName());
