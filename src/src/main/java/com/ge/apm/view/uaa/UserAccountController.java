@@ -293,8 +293,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             OrgInfo tenant = orgInfoDao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
             orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
+            uaaService.expendedTreeNode(orgTree, treeNodeNameFilter, -1, -1);
+        }else{
+            uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
         }
-        uaaService.filterTreeNode(orgTree, treeNodeNameFilter, -1, -1);
     }
 
     public String getOrgFullNameByUid(String orgUid) {
