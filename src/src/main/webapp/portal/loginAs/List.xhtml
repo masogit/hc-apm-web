@@ -24,7 +24,7 @@
                         </p:selectOneListbox>
                     </p:overlayPanel>
 
-                    <p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg==null?msg.AllHospitals:userAccountController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg==null?(userAccountController.isSelect46Account?'所有集团':msg.AllHospitals):userAccountController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                     <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
                             <c:if test="#{userAccountController.isSelect46Account}">
