@@ -289,7 +289,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     
     public void filterTreeNode(){
         if (selectedTenant!=null&&selectedTenant.getId()== 46) {
-            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(loginUser.getUid(), treeNodeNameFilter, selectedTenant.getId());
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListWithClinicalDept(loginUser.getUid(), treeNodeNameFilter, selectedTenant.getId());
             OrgInfo tenant = orgInfoDao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
             orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
