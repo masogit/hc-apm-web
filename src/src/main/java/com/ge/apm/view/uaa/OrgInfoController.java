@@ -300,7 +300,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         }
         OrgInfo orgInfo = dao
                 .findFirstByTenantUIDAndHospitalUcmid(selected.getTenantUID(), hospitalUcmid);
-        if (orgInfo != null) {
+        if (orgInfo != null&&!hospitalUcmid.equals(selected.getHospitalUcmid())) {
             WebUtil.addErrorMessage(hospitalUcmid + "已经存在");
             return true;
         }
