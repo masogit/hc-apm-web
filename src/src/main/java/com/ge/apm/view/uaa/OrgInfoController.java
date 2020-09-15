@@ -143,8 +143,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             OrgInfo tenant = dao.findByUid(selectedTenant.getUid());
             siteList.add(tenant);
             orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
+            uaaService.expendedTreeNode(orgTree, retrieval, -1, -1);
+        }else{
+            uaaService.filterTreeNode(orgTree, retrieval, -1, -1);
         }
-        uaaService.filterTreeNode(orgTree, retrieval, -1, -1);
     }
 
     public List<OrgInfo> getHospitalListBySiteId() {
@@ -298,7 +300,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         }
         OrgInfo orgInfo = dao
                 .findFirstByTenantUIDAndHospitalUcmid(selected.getTenantUID(), hospitalUcmid);
-        if (orgInfo != null) {
+        if (orgInfo != null&&!hospitalUcmid.equals(selected.getHospitalUcmid())) {
             WebUtil.addErrorMessage(hospitalUcmid + "已经存在");
             return true;
         }
@@ -352,10 +354,22 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         }
 
         initWorkflowConfig();
-        buildOrdTree();
+        if(selected.getSiteId()==46){
+            buildOrdTree46AfterSave(selected.getInstitutionUID());
+        }else{
+            buildOrdTree();
+        }
         orgName = null;
         orgNameEn = null;
         hospitalUcmid = null;
+    }
+
+    public void buildOrdTree46AfterSave(String institutionUID) {
+        List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListByUid(institutionUID);
+        OrgInfo tenant = dao.findByUid(selectedTenant.getUid());
+        siteList.add(tenant);
+        orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
+        uaaService.expendedTreeNode(orgTree, "all", -1, -1);
     }
 
     private void updateClinicalDeptOrgName(TreeNode parentClinicalDeptNode) {

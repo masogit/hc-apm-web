@@ -1194,7 +1194,39 @@ public class UaaService {
             
             return orgTree;
     }
-    
+
+    public void expendedTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
+        if(filterKeyword==null) filterKeyword = "";
+        boolean isKeywordEmpty = "".equals(filterKeyword);
+
+        ArrayList<TreeNode> nodeList = new ArrayList<>();
+        doExpendedTreeNode(nodeList, node, filterKeyword, maxOrgType, maxOrgLevel);
+        nodeList.forEach(item->{
+            item.setType("org");
+            if(!isKeywordEmpty) item.setExpanded(true); // Auto expand tree nodes
+        });
+    }
+
+    private void doExpendedTreeNode(ArrayList<TreeNode> nodeList, TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        node.getChildren().forEach(item->{
+            doExpendedTreeNode(nodeList, item, filterKeyword, maxOrgType, maxOrgLevel);
+
+            item.setType("hidden");
+            OrgInfo org = (OrgInfo)item.getData();
+            //if(!org.getName().contains(filterKeyword) && !org.getNamePyCode().contains(filterKeyword)) return;
+            if(maxOrgType >=0 && org.getOrgType()>maxOrgType) return;
+            if(maxOrgLevel >=0 && org.getOrgLevel()>maxOrgLevel) return;
+
+            nodeList.add(item);
+            TreeNode pNode = node;
+            while(pNode!=null){
+                nodeList.add(pNode);
+                pNode = pNode.getParent();
+            }
+        });
+    }
+
     public void filterTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
         // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
         if(filterKeyword==null) filterKeyword = "";
@@ -1225,5 +1257,11 @@ public class UaaService {
                 pNode = pNode.getParent();
             }
         });
+    }
+
+    public List<OrgInfo> getUserAccessibleSiteListByUid(String uid) {
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, uid));
+        return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 }
