@@ -807,12 +807,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         Date now = new Date();
         if (object.getId() == null) {
-            object.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
             object.setCreatedDate(now);
-            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             object.setLastModifiedDate(now);
         } else {
-            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
             object.setLastModifiedDate(now);
         }
     }
@@ -1241,7 +1241,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
         this.newSupplier.setSiteUID(loginUser.getSiteUID());
         this.newSupplier.setCreatedDate(new Date());
-        this.newSupplier.setCreatedBy(loginUser.getLoginName());
+        this.newSupplier.setCreatedBy(loginUser.getName());
 
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
