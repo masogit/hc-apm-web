@@ -1,6 +1,5 @@
 package com.ge.apm.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
