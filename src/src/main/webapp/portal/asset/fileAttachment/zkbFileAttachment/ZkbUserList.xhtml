@@ -11,10 +11,47 @@
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{msg.zkbKnowledgeView}"/>
             </div>
-
             <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <p:fieldset legend="#{msg.FilterCondition}">
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.mainDirectory}</label>
+                                <p:inputText id="mainDirectory" value="#{zkbUserFileAttachmentController.mainDirectory}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.secondDirectory}</label>
+                                <p:inputText id="secondDirectory" value="#{zkbUserFileAttachmentController.secondDirectory}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.name}</label>
+                                <p:inputText id="objectName" value="#{zkbUserFileAttachmentController.objectName}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.fileType}</label>
+                                <p:selectOneMenu id="boSubType" value="#{zkbUserFileAttachmentController.boSubType}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbAttachmentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.operationType}</label>
+                                <p:selectOneMenu id="operationType" value="#{zkbUserFileAttachmentController.operationType}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbOperationType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:commandButton value="#{msg.SearchResult}" actionListener="#{zkbUserFileAttachmentController.loadData}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :zkbUserFileAttachmentListForm:datalist">
+                            </p:commandButton>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
                 <h:form id="zkbUserFileAttachmentListForm">
-                    <p:dataTable id="datalist" value="#{zkbUserFileAttachmentController.lazyModel}" var="item" widgetVar="varDataList"
+                    <p:dataTable id="datalist" value="#{zkbUserFileAttachmentController.v2_BlobObjectList}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbUserFileAttachmentController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
@@ -22,52 +59,26 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-
-                        <p:ajax event="filter" listener="#{zkbUserFileAttachmentController.onFilter}" />
-
-                        <p:column headerText="#{msg.mainDirectory}" filterBy="#{item.blobObject.mainDirectory}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.blobObject.mainDirectory}"/>
+                        <p:column headerText="#{msg.mainDirectory}">
+                            <h:outputText value="#{item.mainDirectory}"/>
                         </p:column>
-
-                        <p:column headerText="#{msg.secondDirectory}" filterBy="#{item.blobObject.secondDirectory}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.blobObject.secondDirectory}"/>
+                        <p:column headerText="#{msg.secondDirectory}">
+                            <h:outputText value="#{item.secondDirectory}"/>
                         </p:column>
-
-                        <p:column headerText="#{msg.name}" filterBy="#{item.blobObject.objectName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.blobObject.objectName}"/>
+                        <p:column headerText="#{msg.name}">
+                            <h:outputText value="#{item.objectName}"/>
                         </p:column>
-
-                        <p:column headerText="#{msg.fileType}" filterBy="#{item.blobObject.boSubType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{fieldMsg.fieldValue('zkbAttachmentType', item.blobObject.boSubType)}"/>
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <c:forEach items="#{fieldMsg.getFieldValueList('zkbAttachmentType')}" var="v">
-                                        <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}" />
-                                    </c:forEach>
-                                </p:selectOneMenu>
-                            </f:facet>
+                        <p:column headerText="#{msg.fileType}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbAttachmentType', item.boSubType)}"/>
                         </p:column>
-
-                        <p:column headerText="#{msg.operationType}" filterBy="#{item.blobObject.operationType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{fieldMsg.fieldValue('zkbOperationType', item.blobObject.operationType)}"/>
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <c:forEach items="#{fieldMsg.getFieldValueList('zkbOperationType')}" var="v">
-                                        <f:selectItem itemLabel="#{v.value}" itemValue="#{v.msgKey}" />
-                                    </c:forEach>
-                                </p:selectOneMenu>
-                            </f:facet>
+                        <p:column headerText="#{msg.operationType}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbOperationType', item.operationType)}"/>
                         </p:column>
-
                         <p:column headerText="#{msg.download}" exportable="false">
-                            <p:link href="#{fileDownloadService.getFileUrl(item.blobObject.objectStorageId)}">#{msg.download}</p:link>
+                            <p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}">#{msg.download}</p:link>
                         </p:column>
-
                         <f:facet name="{Toolbar}">
                         </f:facet>
-
                     </p:dataTable>
                 </h:form>
             </div>
