@@ -32,8 +32,7 @@ public class V2_BlobObjectProvider {
                 " bo.ext_link," +
                 " bo.operation_type," +
                 " bo.main_directory," +
-                " bo.second_directory," +
-                " bo.attachments_order" +
+                " bo.second_directory" +
                 " FROM" +
                 " v2_blob_object bo" +
                 " INNER JOIN (SELECT" +
