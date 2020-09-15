@@ -3495,4 +3495,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ModifyRecord','修改记录','Modify record',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SignatureFile','签字文件','Signed document',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','NoRecords','暂无记录','No records',NULL,-1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','AssetImportant','重要字段','Asset List Page',NULL,-1);
 -- 基本信息中重要字段修改留痕操作 end
