@@ -95,7 +95,7 @@ public class SimplePartsWarehouseEditController extends GenericCRUDUUIDControlle
         }
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         Date currentDate = new Date();
-        this.partsWarehouse.setCreatedBy(userAccount.getName());
+        this.partsWarehouse.setCreatedBy(userAccount.getLoginName());
         this.partsWarehouse.setCreatedDate(currentDate);
         this.partsWarehouse.setSiteUid(this.selectedUserOrg.getSiteUID());
         this.partsWarehouse.setHospitalUid(this.selectedUserOrg.getHospitalUID());
