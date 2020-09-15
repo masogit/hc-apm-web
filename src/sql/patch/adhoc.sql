@@ -2655,3 +2655,18 @@ INSERT INTO public.audit_default_file
 (id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, system_file, deleted, expired, file_id, file_type, template, item_id, name, upload_by, upload_time, url)
 VALUES(245, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '',true, false, false, '5f574b11e3a540083cef15f7', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 true, '90', '计量器具管理制度.docx', 'system', '2020-05-20 00:00:00.0', '/hcapmobjecthubservice/api/apm/objectHub/objects/download/5f574b11e3a540083cef15f7');
+
+update asset_info set visible_status = 1 where site_id = 46 and (ib_status < 1 or ib_status is null);
+
+-- 微信自动回复-关注公众号消息
+ALTER TABLE "public"."wechat_subscribe_message"
+  ALTER COLUMN "message" TYPE text COLLATE "pg_catalog"."default" USING "message"::text;
+
+update wechat_subscribe_message set keyword=null,message='感谢关注GEAPM医院资产管理数字化解决方案。点击微工作台，使用APM账号密码登录，享受GE数字化服务新体验。您也可以回复一下数字获得更多信息：
+1.自助注册APM账号
+2.如何登录APM
+3. 如何开通设备连接
+4. APM操作指导
+5. 如何找到密码
+6. 设备报修
+7. GE客服热线',url=null where enabled = true;

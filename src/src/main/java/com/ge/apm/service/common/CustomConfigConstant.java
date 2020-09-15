@@ -239,4 +239,9 @@ public class CustomConfigConstant {
     public static List<String> getAssetsDisabledExportFields() {
         return Arrays.asList("orgPath", "assetLocation");
     }
+
+    public static List<String> getAssetsImportantFieldsAll() {
+        return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
+                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum");
+    }
 }

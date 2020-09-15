@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.google.common.base.Strings;
@@ -1048,5 +1049,15 @@ public class UserContextService implements Serializable {
         }
 
         return Boolean.FALSE;
+    }
+
+    public static boolean isPartsAdmin(){
+        UserAccount userAccount = getCurrentUserAccount();
+        List<String> roleNames = userAccount.getRoleNames();
+        if (roleNames.contains(SimplePartsConstant.PARTS_ADMIN_MANAGER)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -5,7 +5,7 @@
 
 <div>
 	<h:form id="UserAccountListForm">
-		<p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg==null?msg.AllHospitals:userAccountController.selectedOrg.name}" type="button"
+		<p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg==null?(userAccountController.isSelect46Account?msg.AllInstitutions:msg.AllHospitals):userAccountController.selectedOrg.name}" type="button"
 			icon="fa fa-angle-down" iconPos="right" />
 		<p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false" appendTo="@form">
 			<p:scrollPanel style="height:300px;border: 0" mode="native">

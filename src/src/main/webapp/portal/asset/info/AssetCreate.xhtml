@@ -220,6 +220,20 @@
                                     </div>
                                 </c:forEach>
                             </p:fieldset>
+
+                            <p:panel id="modifyRecordList"
+                                     header="#{assetInfoEditController.assetChangeHistoryCount > 0 ? msg.ModifyRecord : msg.NoRecords}"
+                                     toggleable="true"
+                                     toggleSpeed="500" collapsed="true" widgetVar="panel"
+                                     style="margin-bottom:20px"
+                                     rendered="#{assetInfoEditController.assetChangeHistoryCount > 0}">
+                                <p:dataTable id="modifiedRecordList" var="item"
+                                             value="#{assetInfoEditController.changeHistoryList}"
+                                             emptyMessage="#{msg.noRecordFound}" lazy="true">
+                                    <ui:include src="ImportantFieldsView.xhtml"/>
+                                </p:dataTable>
+                            </p:panel>
+
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup id="buttonGroup">
                             <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.applyChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3))}"/>
