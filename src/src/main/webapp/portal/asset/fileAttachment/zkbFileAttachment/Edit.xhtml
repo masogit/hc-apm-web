@@ -78,7 +78,7 @@
                                       multiple="true"  sizeLimit="500000000"  update="zkbUploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                     </h:panelGroup>
 
-                    <h:panelGroup>
+                    <h:panelGroup rendered="false">
                         <label class="label">#{msg.TenantInfo}</label>
                         <p:selectManyMenu value="#{zkbFileAttachmentController.selectedTenantInfoList}" var="t" converter="tenantInfoConverter" required="false" filter="true" filterMatchMode="contains" showCheckbox="true" requiredMessage="#{msg.TenantInfo} #{msg.ValidationRequire}" style="width:50%">
                             <f:selectItems value="#{zkbFileAttachmentController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />

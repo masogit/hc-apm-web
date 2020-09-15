@@ -1,0 +1,204 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.orderHistory}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form>
+                    <p:commandButton id="importButton" icon="ui-icon-extlink" value="#{msg.orderHistoryImport}" title="#{msg.orderHistoryImport}" action="#{zkbOrderHistoryController.importAction}"/>
+                </h:form>
+                <h:form id="searchForm">
+                    <p:fieldset legend="#{msg.FilterCondition}">
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.dataType}</label>
+                                <p:selectOneMenu id="assetGroup" value="#{zkbOrderHistoryController.dataType}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('orderHistoryDataType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.contractBeginningTime}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="startDate" value="#{zkbOrderHistoryController.contractBeginningTime}"
+                                            required="false" requiredMessage="#{msg.contractBeginningTime} #{msg.ValidationRequire}"
+                                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.contractEndingTime}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="endDate" value="#{zkbOrderHistoryController.contractEndingTime}"
+                                            required="false" requiredMessage="#{msg.contractEndingTime} #{msg.ValidationRequire}"
+                                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.region}</label>
+                                <p:inputText id="region" value="#{zkbOrderHistoryController.region}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.agent}</label>
+                                <p:inputText id="agent" value="#{zkbOrderHistoryController.agent}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.contractNo}</label>
+                                <p:inputText id="contractNo" value="#{zkbOrderHistoryController.contractNo}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.contractType}</label>
+                                <p:inputText id="contractType" value="#{zkbOrderHistoryController.contractType}" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+<!--                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
+<!--                                <label class="label">#{msg.Search}</label>-->
+<!--                                <h:panelGroup>-->
+<!--                                    <p:inputText id="searchText" value="#{zkbOrderHistoryController.searchStr}" placeholder="#{msg.region}/#{msg.agent}/#{msg.contractNo}/#{msg.contractType}" maxlength="100" style="width: 500px"/>-->
+<!--                                </h:panelGroup>-->
+<!--                        </p:panelGrid>-->
+                    </p:fieldset>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:commandButton value="#{msg.SearchResult}" actionListener="#{zkbOrderHistoryController.loadData}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :zkbOrderHistoryListForm:datalist">
+                            </p:commandButton>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
+                <h:form id="zkbOrderHistoryListForm">
+                    <p:dataTable id="datalist" value="#{zkbOrderHistoryController.zkbOrderHistoryList}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbOrderHistoryController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="rowSelect" listener="#{zkbOrderHistoryController.prepareEdit}" update="deleteButton"/>
+                        <p:column width="150" headerText="#{msg.dataType}" >
+                            <h:outputText value="#{item.dataType}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.region}" >
+                            <h:outputText value="#{item.region}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.agent}" >
+                            <h:outputText value="#{item.agent}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.contractNo}" >
+                            <h:outputText value="#{item.contractNo}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.contractType}" >
+                            <h:outputText value="#{item.contractType}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.contractBeginningTime}" >
+                            <h:outputText value="#{item.contractBeginningTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.contractEndingTime}" >
+                            <h:outputText value="#{item.contractEndingTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.quantityIb}" >
+                            <h:outputText value="#{item.quantityIb}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.sparePartsQuantity}" >
+                            <h:outputText value="#{item.sparePartsQuantity}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.fw}" >
+                            <h:outputText value="#{item.fw}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.eventDate}" >
+                            <h:outputText value="#{item.eventDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.eventQuarter}" >
+                            <h:outputText value="#{item.eventQuarter}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.systemNo}" >
+                            <h:outputText value="#{item.systemNo}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.faultDescription}" >
+                            <h:outputText value="#{item.faultDescription}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.hospitalName}" >
+                            <h:outputText value="#{item.hospitalName}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.machineType}" >
+                            <h:outputText value="#{item.machineType}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.sparePartsNo}" >
+                            <h:outputText value="#{item.sparePartsNo}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.sparePartsPrice}" >
+                            <h:outputText value="#{item.sparePartsPrice}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.description}" >
+                            <h:outputText value="#{item.description}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.orderNo}" >
+                            <h:outputText value="#{item.orderNo}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.RSESup}" >
+                            <h:outputText value="#{item.RSESup}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.quantity}" >
+                            <h:outputText value="#{item.quantity}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.sr}" >
+                            <h:outputText value="#{item.sr}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.act}" >
+                            <h:outputText value="#{item.act}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.sparePartsLeft}" >
+                            <h:outputText value="#{item.sparePartsLeft}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.sparePartsReturn}" >
+                            <h:outputText value="#{item.sparePartsReturn}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.comment}" >
+                            <h:outputText value="#{item.comment}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.insuranceDescription}" >
+                            <h:outputText value="#{item.insuranceDescription}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.arrangement}" >
+                            <h:outputText value="#{item.arrangement}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.callNo}" >
+                            <h:outputText value="#{item.callNo}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.rowner}" >
+                            <h:outputText value="#{item.rowner}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.status}" >
+                            <h:outputText value="#{item.status}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.owner}" >
+                            <h:outputText value="#{item.owner}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zone}" >
+                            <h:outputText value="#{item.zone}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.source}" >
+                            <h:outputText value="#{item.source}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbOrderHistoryController.exportAll}" icon="ui-icon-arrowthick-1-s">
+                                <p:fileDownload value="#{zkbOrderHistoryController.exportFile}"/>
+                            </p:commandButton>
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbOrderHistoryController.delete}" update=":zkbOrderHistoryListForm" disabled="#{empty zkbOrderHistoryController.selected.id}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
