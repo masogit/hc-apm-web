@@ -3558,3 +3558,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('orderHistoryDataType','LCS','LCS','LCS',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('orderHistoryDataType','US探头','US探头','US探头',NULL,-1);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','FileNeedDataOfOrderHistory','文件中填入要导入的历史订单信息','Fill in the file with the order history information to be imported',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','OrderHistoryUpdateNote','系统ID不为空的时候做更新','Update data when filed of system id is not null',NULL,	-1	);
