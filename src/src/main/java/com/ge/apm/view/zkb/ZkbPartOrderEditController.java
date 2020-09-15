@@ -395,7 +395,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             flag=false;
             errorLog += "合同数据大于一条！";
         }
-        if("Parts".equals(orderType) || "Tool".equals(orderType)){
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
             if((this.selected.getZkbPartOrderItems() ==null || this.selected.getZkbPartOrderItems().size() == 0) ){
                 flag=false;
                 errorLog += "额度申请明细不能为空！";
@@ -410,8 +410,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                //flag=false;
-                //errorLog += "附件不能为空！";
+                flag=false;
+                errorLog += "附件不能为空！";
             }
         }
         if(selected.getRemainQty() < 0){

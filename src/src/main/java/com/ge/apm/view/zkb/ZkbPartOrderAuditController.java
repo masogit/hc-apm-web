@@ -380,7 +380,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return "";
                 }
             }
-        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())){
                 HashMap<String, Integer> returnMap = new HashMap<>();
                 for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
