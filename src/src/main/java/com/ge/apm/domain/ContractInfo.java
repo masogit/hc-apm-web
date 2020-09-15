@@ -44,6 +44,14 @@ public class ContractInfo implements Serializable {
         COMPLETE
     }
 
+    public enum ExtensionStatus {
+        DeliveryPending, AcceptancePending, AcceptanceComplete, ContractInvalid
+    }
+
+    public enum FundingSource {
+        HospitalFunding, ScientificFunding, ProjectFunding, OtherFunding
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -234,6 +242,14 @@ public class ContractInfo implements Serializable {
     @Column(name = "comments")
     @Size(min = 0, max = 256)
     private String comments;
+
+    //经费来源
+    @Column(name = "funding_source")
+    private String fundingSource;
+    //合同状态（扩展只对云南阜外医院）
+    @Column(name = "extension_status")
+    private String extensionStatus;
+
 
     //excel行数
     @Transient
@@ -664,6 +680,22 @@ public class ContractInfo implements Serializable {
 
     public void setExpectArrivalDate(Date expectArrivalDate) {
         this.expectArrivalDate = expectArrivalDate;
+    }
+
+    public String getFundingSource() {
+        return fundingSource;
+    }
+
+    public void setFundingSource(String fundingSource) {
+        this.fundingSource = fundingSource;
+    }
+
+    public String getExtensionStatus() {
+        return extensionStatus;
+    }
+
+    public void setExtensionStatus(String extensionStatus) {
+        this.extensionStatus = extensionStatus;
     }
 
     @Override

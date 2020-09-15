@@ -80,8 +80,6 @@ public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> 
     @Override
     protected Page<QrCodeLib> loadData(PageRequest pageRequest) {
         setSearchFilter();
-        filterClinicalDeptOrg = null;
-        clinicalDeptOrgUidSet = null;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 

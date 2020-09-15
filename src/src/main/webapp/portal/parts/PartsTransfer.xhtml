@@ -1,0 +1,110 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <style>
+            div.ui-panelgrid-cell > label + div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+        </style>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="调拨库存"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="PartsTransferForm">
+                <p:fieldset legend="源仓库/仓位">
+
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">仓库选择</label>
+                            <p:selectOneMenu id="FromSparePartsWarehouse" value="#{simplePartsTransferController.sourcePartsWarehouseId}"
+                                             required="true" requiredMessage="仓库是必须的">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}"/>
+                                <f:selectItems value="#{simplePartsTransferController.sourceWarehouseList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <p:ajax event="itemSelect"
+                                        listener="#{simplePartsTransferController.onSourceWarehouseChange()}"
+                                        process="@this"
+                                        update="@(.warehouseLocatorChanged) @(.partsItemChanged)"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <!--rendered="#{partsConfigReadController.enableWarehouseLocator}"-->
+                        <h:panelGroup >
+                            <label class="label">仓位选择</label>
+                            <p:selectOneMenu id="FromSparePartsLocator" value="#{simplePartsTransferController.sourcePartsWarehouseLocatorId}"
+                                             required="true" requiredMessage="仓位是必须的" class="warehouseLocatorChanged">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{simplePartsTransferController.getSourcePartsWareHouseLocatorList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <p:ajax event="itemSelect"
+                                        listener="#{simplePartsTransferController.onSourceWarehouseLocatorChange()}"
+                                        process="@this"
+                                        update="@(.partsItemChanged)"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">备件列表</label>
+                            <p:selectOneMenu value="#{simplePartsTransferController.sourcePartsItemId}"
+                                             required="true" requiredMessage="备件是必须的" class="partsItemChanged">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{simplePartsTransferController.getSourcePartsItemsInInventoryList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <p:ajax event="itemSelect"
+                                        listener="#{simplePartsTransferController.onPartsItemChange()}"
+                                        process="@this"
+                                        update="@(.partsInventoryNumber)"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">备件数量</label>
+                            <p:inputNumber id="FromSparePartsNumber" value="#{simplePartsTransferController.sourcePartsItemNum}" minValue="0" decimalPlaces="0" required="true" requiredMessage="备件数量是必须的" class="partsInventoryNumber"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+
+
+                <p:fieldset legend="目标仓库/仓位">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">仓库选择</label>
+                            <p:selectOneMenu id="ToSparePartsWarehouse" value="#{simplePartsTransferController.targetPartsWarehouseId}"
+                                             required="true" requiredMessage="仓库是必须的">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{simplePartsTransferController.targetWarehouseList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <p:ajax event="itemSelect"
+                                        listener="#{simplePartsTransferController.onTargetWarehouseChange()}"
+                                        process="@this"
+                                        update="@(.targetWarehouseLocatorChanged)"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{simplePartsConfigReadController.enableWarehouseLocator}">
+                            <label class="label">仓位选择</label>
+                            <p:selectOneMenu id="ToSparePartsLocator" value="#{simplePartsTransferController.targetPartsWarehouseLocatorId}"
+                                             required="false"  class="targetWarehouseLocatorChanged">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{simplePartsTransferController.getTargetPartsWareHouseLocatorList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+
+                    <p:commandButton
+                            actionListener="#{simplePartsTransferController.save()}"
+                            value="#{msg.Confirm}" id="confirmButton" update=":PartsTransferForm"
+                            icon="ui-icon-check" />
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+    <script>
+        function handleToSubmit() {
+            PF('SparePartsAddDialog').hide();
+        }
+    </script>
+
+</ui:composition>

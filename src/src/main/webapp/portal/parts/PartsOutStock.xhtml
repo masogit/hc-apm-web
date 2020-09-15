@@ -1,0 +1,215 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="preRenderView">
+        <f:metadata>
+            <f:event type="preRenderView" listener="#{simplePartsRequestListController.prepareStockOut}" />
+        </f:metadata>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="备件出库"/>
+            </div>
+            <div class="ui-g-12 card">
+                <!-- 备件出库 start -->
+                <p:fieldset legend="备件出库">
+                    <h:form id="searchFormOut">
+                        <h:panelGrid id="searchPanel1" columns="3">
+                            <p:inputText id="searchText1" value="#{simplePartsRequestListController.oneSearchStr}"
+                                         placeholder="申领人"
+                                         maxlength="105" style="width: 360px">
+                                <p:ajax event="keyup"
+                                        update=":sparePartsOutForm searchButtons1 "/>
+                            </p:inputText>
+
+                            <h:panelGroup id='searchButtons1'>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-search"
+                                                 class="btn btn-sm btn-gray"
+                                                 update=":sparePartsOutForm :searchFormOut  "
+                                                 rendered="#{empty simplePartsRequestListController.oneSearchStr}"/>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-close"
+                                                 class="btn btn-sm btn-gray"
+                                                 update=":sparePartsOutForm :searchFormOut "
+                                                 actionListener="#{simplePartsRequestListController.clearSearchCondition()}"
+                                                 rendered="#{not empty simplePartsRequestListController.oneSearchStr}"/>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </h:form>
+                    <h:form id="sparePartsOutForm">
+                        <p:dataTable id="datalist1"
+                                     value="#{simplePartsRequestListController.lazyModel}"
+                                     var="item"
+                                     lazy="true" paginator="true" paginatorPosition="bottom"
+                                     paginatorAlwaysVisible="true"
+                                     selectionMode="single" selection="#{simplePartsRequestListController.selected}"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                     sortBy="#{item.createdDate}"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="20,50,100,500">
+                            <p:ajax event="rowSelect"
+                                    listener="#{simplePartsRequestListController.onRowSelect}"
+                                    update="sparePartsOutStock sparePartsDetailsForm"/>
+                            <p:column headerText="申领人">
+                                <h:outputText value="#{item.createdBy}"/>
+                            </p:column>
+                            <p:column headerText="申领单编号">
+                                <h:outputText value="#{item.requestCode}"/>
+                            </p:column>
+                            <p:column headerText="申领个数">
+                                <h:outputText value="#{item.requestQty}"/>
+                            </p:column>
+                            <p:column headerText="申领总价">
+                                <h:outputText value="#{item.totalPrice}"/>
+                            </p:column>
+                            <p:column headerText="申领时间">
+                                <f:facet name="filter">
+                                    <p:inputText id="filterEndTime1" widgetVar="varFilterEndTime"/>
+                                </f:facet>
+                                <h:outputText value="#{item.createdDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="审批状态">
+                                <h:outputText
+                                        value="#{simplePartsConversionController.partsFormStatus(item.proposerStatus,'approve')}"/>
+                            </p:column>
+                            <p:column headerText="出入库状态">
+                                <h:outputText
+                                        value="#{simplePartsConversionController.partsFormStatus(item.status,'stockOut')}"/>
+                            </p:column>
+
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
+                                                 class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist1"
+                                                fileName="申领单"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:form>
+                </p:fieldset>
+                <!-- 备件出库 end -->
+                <h:panelGroup>
+                    <p:commandButton value="申领单出库" id="sparePartsOutStock"  style="float:right;"
+                                     disabled="#{not simplePartsRequestListController.currentPartsRequestStockApproved()}"
+                                     action="#{simplePartsRequestListController.stockOut()}"/>
+                </h:panelGroup>
+                <!-- 备件明细 start  -->
+                <p:fieldset legend="备件明细" style="width: 100%">
+                    <h:form id="sparePartsDetailsForm">
+                        <p:dataTable id="sparePartsDetailLists"
+                                     value="#{simplePartsRequestListController.partsRequestLineItems}"
+                                     var="item" editable="true"
+                                     widgetVar="varDataList"
+                                     lazy="true" paginator="true" paginatorPosition="bottom"
+                                     paginatorAlwaysVisible="true"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                     sortBy="#{item.createdDate}"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="20,50,100,500">
+                            <p:ajax event="rowEdit" listener="#{simplePartsRequestListController.onRowEdit}"
+                                    update="@this :sparePartsOutForm :sparePartsOutStock"/>
+                            <p:ajax event="rowEditCancel" listener="#{simplePartsRequestListController.onRowCancel}"
+                                    update="@this"/>
+                            <p:column headerText="备件名称">
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+                            <p:column headerText="申领单编号">
+                                <h:outputText value="#{item.requestCode}"/>
+                            </p:column>
+                            <p:column headerText="申领数量">
+                                <h:outputText value="#{item.requestQty}"/>
+                            </p:column>
+                            <p:column headerText="已出库数量">
+                                <h:outputText value="#{item.transactionQty == null ? 0 : item.transactionQty}"/>
+                            </p:column>
+                            <p:column headerText="申领单价">
+                                <h:outputText value="#{item.unitPrice}"/>
+                            </p:column>
+                            <p:column headerText="申领总价">
+                                <h:outputText value="#{item.totalPrice}"/>
+                            </p:column>
+                            <p:column headerText="申领时间">
+                                <f:facet name="filter">
+                                    <p:inputText id="filterEndTime2" widgetVar="varFilterEndTime"/>
+                                </f:facet>
+                                <h:outputText value="#{item.createdDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="仓库选择" exportable="false">
+                                <h:panelGroup>
+                                    <p:selectOneMenu id="sparePartsWarehouse"
+                                                     value="#{item.partsWarehouseId}">
+                                        <p:ajax event="itemSelect"
+                                                listener="#{simplePartsRequestListController.onWarehouseChange(item)}"
+                                                update="sparePartsOutForm sparePartsLocator"/>
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItems
+                                                value="#{simplePartsRequestListController.getStockOutWarehouseList(item)}"
+                                                var="sitem" itemLabel="#{sitem.name}" itemValue="#{sitem.id}"/>
+                                    </p:selectOneMenu>
+                                    <span style="color: red;">*</span>
+                                </h:panelGroup>
+                            </p:column>
+                            <p:column headerText="仓位选择" rendered="#{simplePartsConfigReadController.enableWarehouseLocator}" exportable="false">
+                                <h:panelGroup>
+                                    <p:selectOneMenu id="sparePartsLocator" tabindex="0"
+                                                     value="#{item.partsLocatorId}">
+                                        <p:ajax event="itemSelect"
+                                                listener="#{simplePartsRequestListController.onWarehouseLocatorChange(item)}"
+                                                update="sparePartsOutForm"/>
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItems
+                                                value="#{simplePartsRequestListController.getLocatorListByWarehouse(item)}"
+                                                var="sitem" itemLabel="#{sitem.name}" itemValue="#{sitem.id}"/>
+                                    </p:selectOneMenu>
+                                    <span style="color: red;">*</span>
+                                </h:panelGroup>
+                            </p:column>
+
+                            <p:column headerText="部分出库数量">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{item.notTransactionQty}"
+                                        />
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber id="notTransactionQty" value="#{item.notTransactionQty}" padControl="false"
+                                                       onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
+                                        </p:inputNumber>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="部分出库设定">
+                                <p:rowEditor  rendered="#{simplePartsRequestListController.renderPartsDetails(item.status,simplePartsRequestListController.selected.proposerStatus)}"/>
+                            </p:column>
+
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
+                                                 class="btn btn-sm btn-gray"
+                                                 ajax="false">
+                                    <p:dataExporter type="xls" target="sparePartsDetailLists"
+                                                    fileName="申领单明细"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:form>
+                </p:fieldset>
+                <!-- 备件明细 end -->
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>

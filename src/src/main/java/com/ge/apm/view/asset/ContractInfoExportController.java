@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.ContractExportService;
@@ -80,9 +81,11 @@ public class ContractInfoExportController {
 
         this.selectedItems = null;
 
-        if (null == startDateFilter && null == endDateFilter) {
-            showMsgBox(WebUtil.getMessage("StartTimeEndTimeCantBeEmptyWhile"));
-            return;
+        if(!ContractInfo.ContractType.Equipment.name().equals(contractType)){
+            if (null == startDateFilter && null == endDateFilter) {
+                showMsgBox(WebUtil.getMessage("StartTimeEndTimeCantBeEmptyWhile"));
+                return;
+            }
         }
 
         contractResultList = contractExportService.createContractData(this.selectedOrg, this.contractType, this.startDateFilter, this.endDateFilter);

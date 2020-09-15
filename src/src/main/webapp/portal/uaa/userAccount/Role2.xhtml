@@ -38,7 +38,10 @@
                                         <p:inputText id="retrieval2" value="#{userAccountController.retrieval}">
                                         </p:inputText>
                                         <p:commandButton  icon="ui-icon-location-searching"  validateClient="true"  actionListener="#{userAccountController.filterNode}" update="orgTree2 :growl,userAccountTab:UserRoleEditForm2:tabview2:orgInfoTable2,userAccountTab:UserRoleEditForm2:tabview2:allButton"/>
-                                        <p:commandButton  id="allButton" validateClient="true"    value="所有权限"  actionListener="#{userAccountController.selectAll}" update="userAccountTab:UserRoleEditForm2:tabview2:orgInfoTable2" disabled="#{userAccountController.deleteDisabled}"/>
+                                        <p:commandButton  id="allButton" validateClient="true"    value="租户权限"  actionListener="#{userAccountController.selectAll}" update="userAccountTab:UserRoleEditForm2:tabview2:orgInfoTable2" disabled="#{userAccountController.deleteDisabled}"/>
+                                        <p:messages id="messages" showDetail="true" closable="true">
+                                            <p:autoUpdate />
+                                        </p:messages>
                                         <p:tree id="orgTree2" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
                                             <p:ajax event="select" listener="#{userAccountController.onSelectAccessTreeNode46}" update="userAccountTab:UserRoleEditForm2:tabview2:orgInfoTable2"/>
                                             <p:ajax event="unselect" listener="#{userAccountController.onUnselectAccessTreeNode46}" update="userAccountTab:UserRoleEditForm2:tabview2:orgInfoTable2"/>

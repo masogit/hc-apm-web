@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<ui:composition>
+    <div class="ui-g-12 card">
+        <h:form id="searchFormView">
+            <h:panelGrid id="searchPanel" columns="3">
+                <p:inputText id="searchText" value="#{assetHistoryController.oneSearchStr}"
+                             placeholder="#{msg.ModifiedBy}"
+                             maxlength="100" style="width: 360px">
+                </p:inputText>
+
+                <h:panelGroup id='searchButtons'>
+                    <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray"
+                                     update=":woTab:AssetInfoListFormView :woTab:searchFormView"
+                                     rendered="#{empty assetHistoryController.oneSearchStr}"/>
+                    <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray"
+                                     update=":woTab:AssetInfoListFormView :woTab:searchFormView"
+                                     actionListener="#{assetHistoryController.setOneSearchStr('')}"
+                                     rendered="#{not empty assetHistoryController.oneSearchStr}"/>
+                </h:panelGroup>
+            </h:panelGrid>
+        </h:form>
+        <h:form id="AssetInfoListFormView">
+            <p:dataTable id="datalistView" value="#{assetHistoryController.lazyModel}"
+                         var="item"
+                         widgetVar="varDataListView" resizableColumns="false" liveResize="false"
+                         resizeMode="expand"
+                         scrollable="false" scrollWidth="98%"
+                         selection="#{assetHistoryController.selected}"
+                         lazy="true" paginator="true" paginatorPosition="bottom"
+                         paginatorAlwaysVisible="true"
+                         sortBy="#{item.createdBy}"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="ascending"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                         rowIndexVar="idx"
+                         rows="20" emptyMessage="#{msg.noRecordFound}"
+                         rowsPerPageTemplate="20,50,100,500">
+                <ui:include src="ImportantFieldsView.xhtml"/>
+            </p:dataTable>
+        </h:form>
+    </div>
+</ui:composition>
+</html>
