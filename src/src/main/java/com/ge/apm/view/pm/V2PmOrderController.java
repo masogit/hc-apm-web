@@ -216,6 +216,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String queryAssetUid;
     private ConfigService configService;
 
+    private String plannedCompletionTimeFormat = null;
+
+    public String getPlannedCompletionTimeFormat() {
+        return plannedCompletionTimeFormat;
+    }
+
+    public void setPlannedCompletionTimeFormat(String plannedCompletionTimeFormat) {
+        this.plannedCompletionTimeFormat = plannedCompletionTimeFormat;
+    }
+
     public String getHead() {
         return head;
     }

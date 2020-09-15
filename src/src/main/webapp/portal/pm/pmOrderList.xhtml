@@ -141,7 +141,10 @@
                 <p:column headerText="#{msg.intExtType}">
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                 </p:column>
-                <p:column headerText="#{msg.PlannedCompletionTime}"  sortBy="#{item.planTime}">
+                <p:column headerText="#{msg.PlannedCompletionTime}"  sortBy="#{item.planTime}" filterBy="#{item.planTime}" filterMatchMode="GTE">
+                    <f:facet name="filter">
+                        <p:inputText id="filterPlannedCompletionTime" widgetVar="varFilterPlannedCompletionTime" value="#{v2PmOrderController.plannedCompletionTimeFormat}"/>
+                    </f:facet>
                     <h:outputText value="#{item.planTime}">
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                     </h:outputText>
@@ -417,6 +420,17 @@
 
             </script>
     </p:dialog>
+
+    <p:overlayPanel id="idPanelFilterPlannedCompletionTime" widgetVar="panelFilterPlannedCompletionTime" for="pmTab:pmOrderListForm:datalist:filterPlannedCompletionTime" dismissable="false" >
+        <h:panelGrid columns="2">
+            <p:outputLabel value="#{msg.From}"/>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varPlannedCompletionTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+            <p:outputLabel value="#{msg.To}"/>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  widgetVar="varPlannedCompletionTimeTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+        </h:panelGrid>
+        <p:commandButton onclick="setDateFilter('varDataList', 'varFilterPlannedCompletionTime', 'varPlannedCompletionTimeFrom', 'varPlannedCompletionTimeTo'); PF('panelFilterPlannedCompletionTime').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+        <p:commandButton onclick="PF('panelFilterPlannedCompletionTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+    </p:overlayPanel>
 
     <!--关单对话框-->
     <p:dialog id="closePmDialog" class="closePmDialogClass" widgetVar="closePmDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@this" header="#{msg.CloseDialog}">
