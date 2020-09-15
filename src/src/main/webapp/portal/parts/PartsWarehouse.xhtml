@@ -50,7 +50,7 @@
 
                             <!-- 创建人 -->
                             <p:column headerText="仓库创建人">
-                                <h:outputText value="#{item.createdBy}"/>
+                                <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
 
                             <f:facet name="{Toolbar}">

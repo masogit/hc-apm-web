@@ -1,10 +1,13 @@
 package com.ge.apm.view.simpleparts;
 
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.ultima.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
@@ -26,10 +29,12 @@ public class SimplePartsConversionController {
     private static final long serialVersionUID = -483251039974336475L;
 
     private SimplePartsWarehouseRepository partsWarehouseRepository;
+    private UserAccountRepository userAccountRepository;
 
     @PostConstruct
     protected void init()  {
         partsWarehouseRepository = WebUtil.getBean(SimplePartsWarehouseRepository.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
     }
 
     public String getWareHouseName(String wareHouseId){
@@ -94,6 +99,19 @@ public class SimplePartsConversionController {
         resultList.add(SimplePartsConstant.PARTS_RETURN_FORM_NAME);
 
         return resultList;
+    }
+
+    public String getUserName(String loginName) {
+        if (null == loginName) {
+            return null;
+        }
+
+        UserAccount userAccount = userAccountRepository.getByLoginName(loginName);
+        if (null == userAccount) {
+            return null;
+        }
+
+        return userAccount.getName();
     }
 
 }

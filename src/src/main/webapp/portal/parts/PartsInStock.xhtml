@@ -66,7 +66,7 @@
                                 <h:outputText value="#{item.requestCode}"/>
                             </p:column>
                             <p:column headerText="申购人">
-                                <h:outputText value="#{item.createdBy}"/>
+                                <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
                             <p:column headerText="申购个数">
                                 <h:outputText value="#{item.requestQty}"/>
