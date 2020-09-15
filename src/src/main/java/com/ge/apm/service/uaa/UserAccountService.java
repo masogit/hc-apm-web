@@ -278,9 +278,52 @@ public class UserAccountService {
 	}
 
 	@Transactional
-	public void updateUserOrg(String userUid, Set<OrgInfo> selectedOrgList) {
+	public void updateUserOrg(String userUid, Set<OrgInfo> selectedOrgList,List<String> treeDeleteUrgOidList,int SiteId,List<String> unselectInstitutions,List<String> unselectUidss,boolean selectAllButton,OrgInfo orgInfo46,List<OrgInfo> orgInfoTableData46) {
+		if(46==SiteId){
+			if(selectAllButton){//如果为全选状态
+				userOrgDao.deleteByUserUid(userUid);//清空该用户所有的权限
+				List<UserOrgInfo> userOrgList = new ArrayList();
+				UserOrgInfo userOrg = new UserOrgInfo();
+				userOrg.setOrgType(orgInfo46.getOrgType());
+				userOrg.setOrgUid(orgInfo46.getUid());
+				userOrg.setUserUid(userUid);
+				userOrgList.add(userOrg);
+				userOrgDao.save(userOrgList);
+				return;
+			}else{
+				if(orgInfoTableData46.size()>0){
+					userOrgDao.deleteByUserUid(userUid);
+					List<UserOrgInfo> userOrgList = new ArrayList();
+					for (OrgInfo selectedOrg : orgInfoTableData46) {
+						UserOrgInfo userOrg = new UserOrgInfo();
+						userOrg.setOrgType(selectedOrg.getOrgType());
+						userOrg.setOrgUid(selectedOrg.getUid());
+						userOrg.setUserUid(userUid);
+						userOrgList.add(userOrg);
+					}
+					userOrgDao.save(userOrgList);
+					return;
+				}else{
+					//userOrgDao.deleteByUserUid46(userUid ,treeDeleteUrgOidList);
+					//查询列表中所有的集团id 并删除集团id下的所有
+					Set<String> institutionUIDs = new HashSet<String>();
+					Iterator it = selectedOrgList.iterator();
+					while (it.hasNext()) {
+						OrgInfo str = (OrgInfo) it.next();
+						institutionUIDs.add(str.getInstitutionUID());
+					}
+					List<String> institutionUIDList = new ArrayList<String>(institutionUIDs);
+					institutionUIDList.addAll(unselectInstitutions);
+					userOrgDao.deleteByUserUid46(userUid ,institutionUIDList);
+					if(unselectUidss.size()>0){
+						userOrgDao.deleteByUserUids46(userUid ,unselectUidss);
+					}
+				}
 
-		userOrgDao.deleteByUserUid(userUid);
+			}
+		}else{
+			userOrgDao.deleteByUserUid(userUid);
+		}
 
 		List<UserOrgInfo> userOrgList = new ArrayList();
 		for (OrgInfo selectedOrg : selectedOrgList) {

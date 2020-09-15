@@ -23,6 +23,10 @@ public class ContractInfoItem implements Serializable {
         ExistAsset, Purchase, ArrivalledItem,paymentRecord
     }
 
+    public enum PaymentMode {
+        DirectPayment, AuthorizePayment
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -169,6 +173,10 @@ public class ContractInfoItem implements Serializable {
     //产地
     @Column(name = "production_place")
     private String productionPlace;
+
+    //支付方式
+    @Column(name = "payment_mode")
+    private String paymentMode;
 
     //excel行数
     @Transient
@@ -412,6 +420,14 @@ public class ContractInfoItem implements Serializable {
 
     public void setProductionPlace(String productionPlace) {
         this.productionPlace = productionPlace;
+    }
+
+    public String getPaymentMode() {
+        return paymentMode;
+    }
+
+    public void setPaymentMode(String paymentMode) {
+        this.paymentMode = paymentMode;
     }
 
     @Override

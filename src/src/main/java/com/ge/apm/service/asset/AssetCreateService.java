@@ -16,6 +16,7 @@ import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -254,12 +255,19 @@ public class AssetCreateService {
     }
     
     public Boolean needShowAssetApprovalByUser(String userUid){
-        UserAccount user = userDao.getByUid(userUid);
+        /*UserAccount user = userDao.getByUid(userUid);
         List<String> siteUidList = uuaService.getUserAccessibleSiteList(userUid).stream().filter(item->item.getOrgType()<4).map(OrgInfo::getUid).distinct().collect(Collectors.toList());
         siteUidList.addAll(Arrays.asList(user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID()));
         List<String> collect = siteUidList.stream().distinct().collect(Collectors.toList());
         collect.removeIf(Objects::isNull);
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(collect);
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(collect);*/
+        UserAccount user = userDao.getByUid(userUid);
+        List<String> orgList = new ArrayList<String>();
+        orgList.add(user.getTenantUID());
+        orgList.add(user.getInstitutionUID());
+        orgList.add(user.getHospitalUID());
+        orgList.add(user.getSiteUID());
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList1(orgList,userUid);
         return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
     }
     
