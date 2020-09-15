@@ -21,6 +21,8 @@ public interface ApmConstant {
     String CHILD_CLINICAL_DEPT_SEPARATOR = "-";
 
     int IB_TENANT_ID = 46;
+    public static final String TREASURY_USE = "1";//库房领用
+    public static final String MEDICAL_WORKERS_PURCHASING = "2";//医工采购
 
 
 

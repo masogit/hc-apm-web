@@ -1146,4 +1146,12 @@ public class UserAccount implements ChineseName, Serializable {
 	public void setTags(List<String> tags) {
 		this.tags = tags;
 	}
+
+	public String getClinicalDeptUID() {
+		if (orgType != null && orgType == 4) {
+			return orgInfoUID;
+		} else {
+			return null;
+		}
+	}
 }

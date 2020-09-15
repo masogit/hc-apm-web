@@ -1,0 +1,94 @@
+package com.ge.apm.service.simpleparts;
+
+import com.ge.apm.dao.simpleparts.SimplePartsCategoryRepository;
+import com.ge.apm.dao.simpleparts.SimplePartsItemRepository;
+import com.ge.apm.domain.simpleparts.SimplePartsCategory;
+import com.ge.apm.domain.simpleparts.SimplePartsInventory;
+import com.ge.apm.domain.simpleparts.SimplePartsItem;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.collect.Lists;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional
+public class SimplePartsItemService {
+
+    @Autowired
+    private SimplePartsItemRepository partsItemRepository;
+
+    @Autowired
+    private SimplePartsCategoryRepository partsDao;
+
+    @Autowired
+    private SimplePartsInventoryService partsInventoryService;
+
+    public void save(SimplePartsItem parts) {
+        partsItemRepository.save(parts);
+        List<SimplePartsInventory> list = partsInventoryService.findByPartsItemId(parts.getId());
+        if(list.size() > 0){
+            list.stream().forEach(item -> item.setName(parts.getName()));
+            partsInventoryService.save(list);         
+        }
+    }
+
+
+    public TreeNode buildPartsCategoryTree(String tenantUid) {
+        List<SimplePartsCategory> resultList = partsDao.listPartsCategoryInHierarchy(tenantUid);
+        Map<String, TreeNode> treeNodeMap = new HashMap<>();
+        for (SimplePartsCategory partsGroup : resultList) {
+            TreeNode node = new DefaultTreeNode("partsCategory", partsGroup, null);
+            node.setRowKey(partsGroup.getId());
+            treeNodeMap.put(partsGroup.getId(), node);
+        }
+        TreeNode root = new DefaultTreeNode("root", null, null);
+        for (Map.Entry<String, TreeNode> entry : treeNodeMap.entrySet()) {
+            TreeNode currentNode = entry.getValue();
+            SimplePartsCategory currentData = (SimplePartsCategory) currentNode.getData();
+            if (null == currentData.getParentUid()) {
+                root.getChildren().add(currentNode);
+            } else {
+                TreeNode parentNode = treeNodeMap.get(currentData.getParentUid());
+                if (null != parentNode) {
+                    parentNode.getChildren().add(currentNode);
+                }
+            }
+        }
+        return root;
+    }
+
+    public List<SimplePartsItem> findAll() {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        List<SimplePartsItem> partsItems = partsItemRepository.findByTenantUid(userAccount.getTenantUID());
+        return partsItems;
+    }
+
+    public List<SimplePartsItem> findByIds(Set<String> ids) {
+        return partsItemRepository.findAll(ids);
+    }
+
+    public List<SimplePartsItem> getPartsItemListInInventoryByPartsHouseId(String partsWarehouseId) {
+        List<SimplePartsInventory> partsInventoryList = partsInventoryService.findByWarehouseId(partsWarehouseId);
+        List<SimplePartsItem> list = Lists.newArrayList();
+        if(partsInventoryList.size() > 0){
+            Set<String> uidSet = partsInventoryList.stream().filter(item -> item.getOnhandQty() > 0).map(item -> item.getPartsItemId()).collect(Collectors.toSet());
+            list = this.findByIds(uidSet);
+        }
+
+        return list;
+    }
+    public List<SimplePartsItem> getPartsItemList(String tenantUID) {
+        List<SimplePartsItem> list = partsItemRepository.findByTenantUid(tenantUID);
+        return list != null && list.size() > 0 ? list : Lists.newArrayList();
+    }
+}
