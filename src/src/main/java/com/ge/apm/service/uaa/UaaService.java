@@ -1258,4 +1258,10 @@ public class UaaService {
             }
         });
     }
+
+    public List<OrgInfo> getUserAccessibleSiteListByUid(String uid) {
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, uid));
+        return orgInfoDao.findBySearchFilter(orgInfoFilters);
+    }
 }

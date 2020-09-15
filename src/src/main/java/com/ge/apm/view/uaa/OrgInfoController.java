@@ -354,10 +354,22 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         }
 
         initWorkflowConfig();
-        buildOrdTree();
+        if(selected.getSiteId()==46){
+            buildOrdTree46AfterSave(selected.getInstitutionUID());
+        }else{
+            buildOrdTree();
+        }
         orgName = null;
         orgNameEn = null;
         hospitalUcmid = null;
+    }
+
+    public void buildOrdTree46AfterSave(String institutionUID) {
+        List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListByUid(institutionUID);
+        OrgInfo tenant = dao.findByUid(selectedTenant.getUid());
+        siteList.add(tenant);
+        orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
+        uaaService.expendedTreeNode(orgTree, "all", -1, -1);
     }
 
     private void updateClinicalDeptOrgName(TreeNode parentClinicalDeptNode) {
