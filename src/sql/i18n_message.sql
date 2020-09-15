@@ -3495,7 +3495,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ModifyRecord','修改记录','Modify record',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','SignatureFile','签字文件','Signed document',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','NoRecords','暂无记录','No records',NULL,-1);
-INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('label','AssetImportant','重要字段','Asset List Page',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','AssetImportant','重要字段','Asset List Page',NULL,-1);
 -- 基本信息中重要字段修改留痕操作 end
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('extensionStatus','DeliveryPending','待到货','DeliveryPending',NULL,-1);
@@ -3559,3 +3559,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('orderHistoryDataType','US探头','US探头','US探头',NULL,-1);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','FileNeedDataOfOrderHistory','文件中填入要导入的历史订单信息','Fill in the file with the order history information to be imported',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','OrderHistoryUpdateNote','系统ID不为空的时候做更新','Update data when filed of system id is not null',NULL,	-1	);
+
+--备件申请单业务类型
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('simplePartsRequestType','1','备件申领','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('simplePartsRequestType','2','备件申购','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('simplePartsRequestType','3','备件调拨','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('simplePartsRequestType','4','备件库存盘点','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('simplePartsRequestType','5','备件归还入库','',NULL,-1);

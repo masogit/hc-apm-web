@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.domain.UserAccount;
@@ -200,5 +201,26 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     int deleteUserAccountsByTenantUID(String tenantUid);
     int countUserAccountsByTenantUID(String tenantUid);
+
+    @Query("select u.name from UserAccount u where u.loginName = ?1")
+    String getNameByLoginName(String loginName);
+
+    /**
+     * @param roleList
+     * @return java.util.List<com.ge.apm.domain.UserAccount>
+     * @date 2020/7/14 15:58
+     * 获取角色列表
+     */
+    @Query(value = "select u from UserAccount u where u.id in (select uu.userId from UserRole uu where uu.roleId in (:roleList))")
+    List<UserAccount> getApprovalPersonByRoleId(@Param(value = "roleList") List<Integer> roleList);
+
+    /**
+     * @param userList
+     * @return java.util.List<com.ge.apm.domain.UserAccount>
+     * @date 2020/7/14 15:58
+     * 获取角色列表
+     */
+    @Query(value = "select u from UserAccount u where u.uid in (:userList)")
+    List<UserAccount> getApprovalPersonByUserId(@Param(value = "userList") List<String> userList);
 
 }
