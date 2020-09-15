@@ -807,12 +807,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         Date now = new Date();
         if (object.getId() == null) {
-            object.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
+            object.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
             object.setCreatedDate(now);
-            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
             object.setLastModifiedDate(now);
         } else {
-            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getName());
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
             object.setLastModifiedDate(now);
         }
     }
