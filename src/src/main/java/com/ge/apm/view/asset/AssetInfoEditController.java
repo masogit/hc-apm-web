@@ -300,27 +300,44 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setSerialNum(createRequest.getSerialNum());//制造商序列号
         selected.setFunctionType(createRequest.getModelNum());//设备型号
         selected.setManufactDate(createRequest.getManufactureDate());//出厂日期
+        selected.setDepartNum(createRequest.getDepartNum());//设备编号(院方)
+        selected.setMakerShortName(createRequest.getMakerShortName());//品牌/制造商简称
+        selected.setRegistrationNo(createRequest.getRegistrationNo());//注册证号
         selected.setIsValid(true);
         selected.setStatus(1);
         selected.setDeviceStatus(0);
         selected.setIsDeleted(Boolean.FALSE);
         selected.setName(createRequest.getAssetName());//名称
         selected.setAssetGroup(createRequest.getAssetGroup());//设备分类
-        if (null != createRequest.getOrgId() && createRequest.getOrgId() > 0) {
+        if(null != createRequest.getManufactureId()){
+            Supplier supplier = supplierDao.getById(Integer.valueOf(createRequest.getManufactureId()));
+            if (null != supplier){
+                selected.setManufactureId(supplier.getId().toString());
+                selected.setManufacture(supplier.getName());
+                selectedObjectMap.put("manufacturer", supplier.getUid() == null ? null : supplierDao.findByUid(supplier.getUid()));
+            }
+        }
+        if (null != createRequest.getOrgId()) {
             OrgInfo org = acService.getOrgInfo(createRequest.getOrgId());
-            selected.setClinicalDeptId(createRequest.getOrgId());
-            selected.setClinicalDeptUID(org.getUid());
-            selectedObjectMap.put("clinicalDept", org.getUid() == null ? null : orgDao.findByUid(org.getUid()));
+            if (org != null){
+                selected.setClinicalDeptId(org.getId());
+                selected.setClinicalDeptUID(org.getUid());
+                selectedObjectMap.put("clinicalDept", org.getUid() == null ? null : orgDao.findByUid(org.getUid()));
+            }
         }
         OrgInfo siteOrg = orgDao.findByUid(createRequest.getSiteUID());
-        selectedObjectMap.put("selectedOrg", siteOrg.getSiteUID() == null ? null : orgDao.findByUid(siteOrg.getSiteUID()));//业务单元
+        if(siteOrg !=null){
+            selectedObjectMap.put("selectedOrg", siteOrg.getSiteUID() == null ? null : orgDao.findByUid(siteOrg.getSiteUID()));//业务单元
+        }
         selected.setParentAssetId(createRequest.getParentAssetId());
         selectedObjectMap.put("parentAsset", createRequest.getParentAssetId() == null ? null : dao.findById(createRequest.getParentAssetId()));//主设备
         if (null != createRequest.getUserId()) {
             UserAccount owner = acService.getUserInfo(createRequest.getUserId());
-            selected.setAssetOwnerId(owner.getId());
-            selected.setAssetOwnerName(owner.getName());
-            selected.setAssetOwnerTel(owner.getTelephone());
+            if(owner != null){
+                selected.setAssetOwnerId(owner.getId());
+                selected.setAssetOwnerName(owner.getName());
+                selected.setAssetOwnerTel(owner.getTelephone());
+            }
             selectedObjectMap.put("assetOwner", selected.getAssetOwnerId() == null ? null : userDao.findById(selected.getAssetOwnerId()));//维修负责人
         }
         selected.setHospitalId(siteOrg.getId());

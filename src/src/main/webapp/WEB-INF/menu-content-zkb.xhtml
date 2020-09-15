@@ -153,6 +153,7 @@
             </p:submenu>
             <p:submenu label="维修服务" icon="fa fa-wrench">
                 <p:menuitem value="申请工作台" outcome="/portal/zkb/partOrder/List.xhtml" />
+                <p:menuitem value="历史申请数据" outcome="/portal/zkb/orderHistory/List.xhtml" rendered="#{userContextService.zkbAdmin}"/>
             </p:submenu>
 
             <!--Super admin and GE OP only-->
