@@ -18,7 +18,7 @@
                         <div class="card" style="height:400px;">
                             <h:panelGroup>
                                 <p:inputText id="retrieval" value="#{orgInfoController.retrieval}"/>
-                                <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="#{msg.Search2}"  update="orgTree editPanel :growl"/>
+                                <p:commandButton id = "adminListSearch" icon="ui-icon-location-searching" style="width: 90px;"   actionListener="#{orgInfoController.filterNode()}" value="#{msg.Search2}"  update="orgTree editPanel :growl"/>
                             </h:panelGroup>
                             <p:commandButton id="btnSite" style="max-width:160px;" value="#{orgInfoController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false" appendTo="@form">
@@ -85,7 +85,7 @@
 
                                     <h:panelGroup>
                                         <label class="label">#{msg.name}*</label>
-                                        <p:inputText id="name" value="#{orgInfoController.orgName}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
+                                        <p:inputText id="name" value="#{orgInfoController.orgName}"  required="#{param['editForm:adminListSearch']==null}" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
                                             <p:ajax listener="#{orgInfoController.checkName()}" process="@this"  update=":growl" ></p:ajax></p:inputText>
 
                                     </h:panelGroup>

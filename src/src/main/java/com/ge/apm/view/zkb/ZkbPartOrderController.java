@@ -71,7 +71,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
         }
 
-        /*if(userContextService.isZkbUser()) {
+        if(userContextService.isZkbUser()) {
             if(this.selectionTenantInfo != null){
                 searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
             }
@@ -100,7 +100,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     }
                 }
             }
-        }*/
+        }
 
 
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);

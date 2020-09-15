@@ -179,4 +179,30 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 	//only used by apm ib admin, limit result set to 500 institution items
 	@Query(value = "select uid from org_info where name like concat('%',?1,'%') and org_type = 1 and site_id = ?2 limit 500", nativeQuery = true)
 	List<String> findByInstitutionByNameLike(String name, Integer siteId);
+
+
+	//查询到集团限制500条之内的所有树
+	@Query(value = "with recursive cte_org as (\n" +
+			"    select oi.*\n" +
+			"    from org_info oi\n" +
+			"    where oi.uid in (select uid from org_info where parent_uid= ?1 and name like concat('%',?2,'%') limit 500)\n" +
+			"    union\n" +
+			"    select oi.*\n" +
+			"    from org_info oi\n" +
+			"    join cte_org cte on oi.parent_uid = cte.uid\n" +
+			") select * from cte_org union select * from org_info where uid= ?1", nativeQuery = true)
+	 List<OrgInfo> getOrgTreeBySiteAndparm(String siteUid,String retrieval);
+
+	//
+	@Query(value = "with recursive cte_org as (\n" +
+			"    select oi.uid\n" +
+			"    from org_info oi\n" +
+			"    where oi.uid = ?1 \n" +
+			"    union\n" +
+			"    select oi.uid\n" +
+			"    from org_info oi\n" +
+			"    join cte_org cte on oi.parent_uid = cte.uid\n" +
+			") select * from cte_org", nativeQuery = true)
+	List<String> getOrgInfoUidsByparentUid(String uid);
+
 }

@@ -34,4 +34,32 @@ public interface UserOrgInfoRepository extends GenericRepositoryUUID<UserOrgInfo
     @Query(value = "delete from user_org where user_uid = ?1", nativeQuery = true)
     void deleteByUserUid(String userUid);
 
+    @Transactional
+    @Modifying
+    @Query(value = "delete from user_org where user_uid= ?1 and org_uid in (\n" +
+            "with recursive cte_org as (\n" +
+            "    select oi.uid\n" +
+            "    from org_info oi\n" +
+            "    where oi.institution_uid in (?2)\n" +
+            "    union\n" +
+            "    select oi.uid\n" +
+            "    from org_info oi\n" +
+            "    join cte_org cte on oi.parent_uid = cte.uid\n" +
+            ") select * from cte_org)", nativeQuery = true)
+    void deleteByUserUid46(String userUid,List<String> orgUids);
+
+    @Transactional
+    @Modifying
+    @Query(value = "delete from user_org where user_uid= ?1 and org_uid in (\n" +
+            "with recursive cte_org as (\n" +
+            "    select oi.uid\n" +
+            "    from org_info oi\n" +
+            "    where oi.uid in (?2)\n" +
+            "    union\n" +
+            "    select oi.uid\n" +
+            "    from org_info oi\n" +
+            "    join cte_org cte on oi.parent_uid = cte.uid\n" +
+            ") select * from cte_org)", nativeQuery = true)
+    void deleteByUserUids46(String userUid,List<String> orgUids);
+
 }

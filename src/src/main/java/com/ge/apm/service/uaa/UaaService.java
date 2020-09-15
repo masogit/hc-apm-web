@@ -432,7 +432,8 @@ public class UaaService {
         if (userAccount.getSiteId() == 46) {
             List<OrgInfo> orgListByUser = getOrgListByUser(userAccount.getUid());
             // available to see the all institutions in ib site
-            return orgListByUser.size() == 1 && StringUtils.equals(orgListByUser.get(0).getUid(), orgListByUser.get(0).getTenantUID());
+            boolean allSite = orgListByUser.size() == 1 && StringUtils.equals(orgListByUser.get(0).getUid(), orgListByUser.get(0).getTenantUID());
+            return allSite || UserContextService.isOnlyLocalITAdmin();
         }
         return false;
     }
@@ -455,6 +456,10 @@ public class UaaService {
     //full of the tree for this org
     public TreeNode getOrgTreeBySite(String siteUID){
         List<OrgInfo> orgList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(siteUID);
+        return getOrgTreeNodes(siteUID, orgList);
+    }
+    public TreeNode getOrgTreeBySite46(String siteUID,String retrieval){
+        List<OrgInfo> orgList = orgInfoDao.getOrgTreeBySiteAndparm(siteUID,retrieval);
         return getOrgTreeNodes(siteUID, orgList);
     }
 
@@ -748,6 +753,15 @@ public class UaaService {
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4)); //非科室
+        return orgInfoDao.findBySearchFilter(orgInfoFilters);
+    }
+
+    //用户可以显示的医院列表(包含科室)
+    public List<OrgInfo> getUserAccessibleSiteListWithClinicalDept(String userUid, String name, Integer siteId) {
+        List<String> institutions = orgInfoDao.findByInstitutionByNameLike(name, siteId); //TODO: fetch by user accessible site list
+        //for accessible sites`
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 
@@ -1180,7 +1194,39 @@ public class UaaService {
             
             return orgTree;
     }
-    
+
+    public void expendedTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
+        if(filterKeyword==null) filterKeyword = "";
+        boolean isKeywordEmpty = "".equals(filterKeyword);
+
+        ArrayList<TreeNode> nodeList = new ArrayList<>();
+        doExpendedTreeNode(nodeList, node, filterKeyword, maxOrgType, maxOrgLevel);
+        nodeList.forEach(item->{
+            item.setType("org");
+            if(!isKeywordEmpty) item.setExpanded(true); // Auto expand tree nodes
+        });
+    }
+
+    private void doExpendedTreeNode(ArrayList<TreeNode> nodeList, TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        node.getChildren().forEach(item->{
+            doExpendedTreeNode(nodeList, item, filterKeyword, maxOrgType, maxOrgLevel);
+
+            item.setType("hidden");
+            OrgInfo org = (OrgInfo)item.getData();
+            //if(!org.getName().contains(filterKeyword) && !org.getNamePyCode().contains(filterKeyword)) return;
+            if(maxOrgType >=0 && org.getOrgType()>maxOrgType) return;
+            if(maxOrgLevel >=0 && org.getOrgLevel()>maxOrgLevel) return;
+
+            nodeList.add(item);
+            TreeNode pNode = node;
+            while(pNode!=null){
+                nodeList.add(pNode);
+                pNode = pNode.getParent();
+            }
+        });
+    }
+
     public void filterTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
         // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
         if(filterKeyword==null) filterKeyword = "";
@@ -1211,5 +1257,11 @@ public class UaaService {
                 pNode = pNode.getParent();
             }
         });
+    }
+
+    public List<OrgInfo> getUserAccessibleSiteListByUid(String uid) {
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, uid));
+        return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 }

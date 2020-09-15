@@ -137,7 +137,7 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
-                            <p:selectOneMenu id="region" value="#{zkbPartOrderEditController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}">
+                            <p:selectOneMenu id="region" value="#{zkbPartOrderEditController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
@@ -187,7 +187,7 @@
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
-                            <label class="label">订单标注</label>
+                            <label class="label">订单标注*</label>
                             <p:selectOneMenu id="orderAnnotation" value="#{zkbPartOrderEditController.selected.orderAnnotation}" required="true" requiredMessage="#{msg.zkbPartOrder_orderAnnotation} #{msg.ValidationRequire}">
                                 <p:ajax update="problemOrderNumberGrid" listener="#{zkbPartOrderEditController.orderAnnotationChange}"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -200,12 +200,12 @@
                         </h:panelGroup>
                         <h:panelGrid id="problemOrderNumberGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                             <h:panelGroup id="problemOrderNumberGroup" rendered="#{!(zkbPartOrderEditController.showProblemOrderNumber)}" style="text-align: left">
-                                <label class="label">发生问题的order number</label>
+                                <label class="label">发生问题的order number*</label>
                                 <p:inputText id="problemOrderNumber" value="#{zkbPartOrderEditController.selected.problemOrderNumber}"  required="true" requiredMessage="#{msg.zkbPartOrder_problemOrderNumber} #{msg.ValidationRequire}"  />
                             </h:panelGroup>
                         </h:panelGrid>
                         <h:panelGroup>
-                            <label class="label">是否为紧急订单</label>
+                            <label class="label">是否为紧急订单*</label>
                             <p:selectOneMenu id="urgentOrder" value="#{zkbPartOrderEditController.selected.urgentOrder}" required="true" requiredMessage="#{msg.zkbPartOrder_urgentOrder} #{msg.ValidationRequire}">
                                 <p:ajax event="change" update="urgencyReasonsGrid" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -215,8 +215,8 @@
                         </h:panelGroup>
                         <h:panelGrid id="urgencyReasonsGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" >
                             <h:panelGroup id="urgencyReasonsGroup" rendered="#{(zkbPartOrderEditController.selected.urgentOrder eq 't')}" style="text-align: left">
-                                <label class="label">订单紧急的原因</label>
-                                <p:selectOneMenu id="urgencyReasons" value="#{zkbPartOrderEditController.selected.urgencyReasons}"  >
+                                <label class="label">订单紧急的原因*</label>
+                                <p:selectOneMenu id="urgencyReasons" value="#{zkbPartOrderEditController.selected.urgencyReasons}" required="true" requiredMessage="#{msg.zkbPartOrder_urgencyReasons} #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbUrgentReasonType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
@@ -258,7 +258,7 @@
                     <p:panelGrid rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                         <h:panelGroup>
                             <p:dataList id="uploadList" value="#{zkbPartOrderEditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                <f:facet name="header">附件列表</f:facet>
+                                <f:facet name="header">故障图片上传</f:facet>
                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                                 <p:commandButton actionListener="#{zkbPartOrderEditController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
@@ -291,10 +291,19 @@
                                  paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}" >
 
                         <p:ajax event="rowSelect" update=":zkbPartOrderEditForm:zkbDetailDatalist:editDetailButton :zkbPartOrderEditForm:zkbDetailDatalist:deleteDetailButton"/>
-
-                        <p:column headerText="配件号">
-                            <h:outputText value="#{item.partNo}"/>
-                        </p:column>
+                        <c:choose>
+                            <c:when test="#{zkbPartOrderEditController.orderType eq 'Parts'}">
+                                <p:column headerText="配件号">
+                                    <h:outputText value="#{item.partNo}"/>
+                                </p:column>
+                            </c:when>
+                            <c:when test="#{zkbPartOrderEditController.orderType eq 'Tool'}">
+                                <p:column headerText="工具号">
+                                    <h:outputText value="#{item.partNo}"/>
+                                </p:column>
+                            </c:when>
+                        </c:choose>
+                       
                         <p:column headerText="配件名称">
                             <h:outputText value="#{item.partName}"/>
                         </p:column>
