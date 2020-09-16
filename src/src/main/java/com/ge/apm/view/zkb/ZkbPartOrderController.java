@@ -94,7 +94,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             if(StringUtils.isEmpty(queryStatus)){
                 searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ReturnPending.toString()));
             }else if(!"all".equals(queryStatus)){
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, queryStatus));
+                searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
             }
         }else{
             if(this.selectionTenantInfo != null){
@@ -135,13 +135,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     if(StringUtils.isEmpty(queryStatus)){
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString()));
                     }else if(!"all".equals(queryStatus)){
-                        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, queryStatus));
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if(StringUtils.isEmpty(queryStatus)){
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString()));
                     }else if(!"all".equals(queryStatus)){
-                        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, queryStatus));
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if(StringUtils.isEmpty(queryStatus)){
