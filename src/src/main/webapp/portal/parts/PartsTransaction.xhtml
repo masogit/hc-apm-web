@@ -114,7 +114,7 @@
                             </p:column>
 
                             <p:column headerText="出库人">
-                                <h:outputText value="#{item.createdBy}"/>
+                                <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
                         </c:if>
                         <c:if test="#{simplePartsTransactionController.queryIndex == 0}">
@@ -131,7 +131,7 @@
                             </p:column>
 
                             <p:column headerText="入库人">
-                                <h:outputText value="#{item.createdBy}"/>
+                                <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
                         </c:if>
                         <p:column headerText="院区" sortBy="#{item.siteUID}">

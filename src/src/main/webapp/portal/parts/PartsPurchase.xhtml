@@ -61,7 +61,7 @@
                                     listener="#{simplePartsRequestListController.onRowSelect}"
                                     update="editButton sparePartsDetailsForm"/>
                             <p:column headerText="申购人">
-                                <h:outputText value="#{item.createdBy}"/>
+                                <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
                             <p:column headerText="申购编号">
                                 <h:outputText value="#{item.requestCode}"/>
@@ -375,7 +375,7 @@
                                     <label class="label">备件申购人</label>
                                     <p:inputText id="viewSparePartsRequestPerson" name="viewSparePartsRequestPerson"
                                                  readonly="true"
-                                                 value="#{simplePartsRequestEditController.selected.createdBy}"/>
+                                                 value="#{simplePartsConversionController.getUserName(simplePartsRequestEditController.selected.createdBy)}"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup>

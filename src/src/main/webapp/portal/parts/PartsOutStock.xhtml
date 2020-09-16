@@ -59,7 +59,7 @@
                                     listener="#{simplePartsRequestListController.onRowSelect}"
                                     update="sparePartsOutStock sparePartsDetailsForm"/>
                             <p:column headerText="申领人">
-                                <h:outputText value="#{item.createdBy}"/>
+                                <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
                             <p:column headerText="申领单编号">
                                 <h:outputText value="#{item.requestCode}"/>

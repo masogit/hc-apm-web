@@ -141,7 +141,7 @@ public class SimplePartsRequestEditController extends GenericCRUDUUIDController<
 
         //record timestamp
         partsRequestLineItem.setCreatedDate(new Date());
-        partsRequestLineItem.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
+        partsRequestLineItem.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
 
         partsRequestLineItem.setPartsItem(selectedPartsItem);
 
@@ -162,7 +162,7 @@ public class SimplePartsRequestEditController extends GenericCRUDUUIDController<
         }
 
         newLineItem.setTotalPrice(new BigDecimal(df.format(SimplePartsRequest.calculateTotalPrice(newLineItem.getRequestQty(), newLineItem.getUnitPrice()))));
-        newLineItem.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
+        newLineItem.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
 
         this.lineItems.add(newLineItem);
 
@@ -228,7 +228,7 @@ public class SimplePartsRequestEditController extends GenericCRUDUUIDController<
             selected.setTotalPrice(getTotalPrice());
             selected.setRequestQty(getTotalCount());
             selected.setCreatedDate(new Date());
-            selected.setCreatedBy(UserContextService.getCurrentUserAccount().getName());
+            selected.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
             // 保存单据总计
             if (isEditPartsRequest()) {
                 selected.setProposerStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_ING);

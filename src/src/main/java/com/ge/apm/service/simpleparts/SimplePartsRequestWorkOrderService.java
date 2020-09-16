@@ -144,11 +144,11 @@ public class SimplePartsRequestWorkOrderService {
             // 未入库
             partsRequestLineItem.setStatus(SimplePartsConstant.PARTS_NOT_TRANSACTIONED);
             if(userAccount != null){
-                partsRequestLineItem.setCreatedBy(userAccount.getName());
+                partsRequestLineItem.setCreatedBy(userAccount.getLoginName());
 
                 SimplePartsRequestLineItemService.addCurrentOrgInfo(partsRequestLineItem, userAccount);
 
-                partsRequest.setCreatedBy(userAccount.getName());
+                partsRequest.setCreatedBy(userAccount.getLoginName());
                 SimplePartsRequestService.addCurrentOrgInfo(partsRequest, userAccount);
             }
 
@@ -308,11 +308,11 @@ public class SimplePartsRequestWorkOrderService {
             // 未出库
             partsRequestLineItem.setStatus(SimplePartsConstant.PARTS_NOT_TRANSACTIONED);
             if(userAccount != null){
-                partsRequestLineItem.setCreatedBy(userAccount.getName());
+                partsRequestLineItem.setCreatedBy(userAccount.getLoginName());
 
                 SimplePartsRequestLineItemService.addCurrentOrgInfo(partsRequestLineItem, userAccount);
 
-                partsRequest.setCreatedBy(userAccount.getName());
+                partsRequest.setCreatedBy(userAccount.getLoginName());
 
                 SimplePartsRequestService.addCurrentOrgInfo(partsRequest, userAccount);
             }
