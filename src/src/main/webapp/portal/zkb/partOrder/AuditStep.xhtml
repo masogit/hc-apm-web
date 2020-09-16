@@ -98,8 +98,8 @@
                             <p:inputText id="softwareVersion" value="#{zkbPartOrderAuditController.selected.softwareVersion}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">故障描述</label>
-                            <p:inputText id="faultDescription" value="#{zkbPartOrderAuditController.selected.faultDescription}" disabled="true" />
+                            <label class="label">故障描述*</label>
+                            <p:inputTextarea id="faultDescription"  value="#{zkbPartOrderEditController.selected.faultDescription}" maxlength="255" disabled="true"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
                             <label class="label">订单标注</label>
