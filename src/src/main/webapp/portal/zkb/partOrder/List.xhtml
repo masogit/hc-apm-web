@@ -26,18 +26,13 @@
 
                     <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
                         <p:commandButton value="待办"  process="@this" update="datalist buttonSet" disabled="#{empty zkbPartOrderController.queryStatus}" rendered="true" action="List.xhtml?faces-redirect=true" />
-                        <p:commandButton value="已申请"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'Requested'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=Requested" />
-                        <p:commandButton value="技术支持审批通过"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'TechnicalAccept'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=TechnicalAccept" />
-                        <p:commandButton value="技术支持审批拒绝"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'TechnicalReject'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=TechnicalReject" />
-                        <p:commandButton value="经理审批通过"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ManageAccept'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=ManageAccept" />
-                        <p:commandButton value="经理审批拒绝"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ManageReject'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=ManageReject" />
-                        <p:commandButton value="已下单"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'UnOrdered'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=UnOrdered" />
-                        <p:commandButton value="400开单拒绝"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'UnOrderReject'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=UnOrderReject" />
-                        <p:commandButton value="已下单"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'Ordered'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=Ordered" />
-                        <p:commandButton value="400下单拒绝"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'OrderedReject'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=OrderedReject" />
-                        <p:commandButton value="已归还"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'Returned'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=Returned" />
-                        <p:commandButton value="已关单"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'Closed'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=Closed" />
-                        <p:commandButton value="已取消"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'Cleaned'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=Cleaned" />
+                        <p:commandButton value="待技术支持审批"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'TechnicalPending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=TechnicalPending" />
+                        <p:commandButton value="待经理审批"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ManagePending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=ManagePending" />
+                        <p:commandButton value="待开单"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'OrderPending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=OrderPending" />
+                        <p:commandButton value="已开单"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'OrderExtraPending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=OrderExtraPending" />
+                        <p:commandButton value="待归还"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ReturnPending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=ReturnPending" />
+                        <p:commandButton value="待关单"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ClosePending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=ClosePending" />
+                        <p:commandButton value="完成"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'Complete'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="List.xhtml?faces-redirect=true&amp;queryStatus=Complete" />
                         <p:commandButton value="全部"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'all'}" rendered="true" action="List.xhtml?faces-redirect=true&amp;queryStatus=all" />
 
                     </h:panelGrid>
@@ -113,7 +108,7 @@
                         <p:column headerText="审批人" filterBy="#{item.onlineEngine.name}"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.onlineEngine.name}"/>
                         </p:column>
-                        <p:column headerText="当前步骤" filterBy="#{item.currentStep}"  filterMatchMode="EQ">
+                        <p:column headerText="当前步骤" filterBy="#{item.currentStep}"  filterMatchMode="EQ" rendered="#{!zkbPartOrderController.showStatusBtn}">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPoSteps',item.currentStep)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
