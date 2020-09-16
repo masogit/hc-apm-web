@@ -32,7 +32,7 @@
                 </h:panelGroup>
                 <h:panelGrid id="returnTypeGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" style="text-align: left">
                     <h:panelGroup rendered="#{(zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'DOA')}" style="text-align: left">
-                        <label class="label">Part Serial Number</label>
+                        <label class="label">Part Serial Number*</label>
                         <p:inputText id="partSerialNumber" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partSerialNumber}" style="text-align: left" required="true" requiredMessage="Part Serial Number不能为空"/>
                     </h:panelGroup>
 
