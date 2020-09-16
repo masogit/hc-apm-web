@@ -1,0 +1,462 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="preRenderView">
+        <f:metadata>
+            <f:event type="preRenderView" listener="#{simplePartsRequestListController.preparePartsPurchase}" />
+        </f:metadata>
+    </ui:define>
+
+    <ui:define name="content">
+        <style>
+            div.ui-panelgrid-cell > label + div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+        </style>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="备件申购"/>
+            </div>
+            <div class="ui-g-12 card">
+                <p:fieldset legend="申购单列表">
+                    <h:form id="searchFormSPInfo">
+                        <h:panelGrid id="searchPanel" columns="3">
+                            <p:inputText id="searchText" value="#{simplePartsRequestListController.oneSearchStr}"
+                                         placeholder="申购人/申购单编号"
+                                         maxlength="105" style="width: 360px">
+                                <p:ajax event="keyup"
+                                        update=":sparePartsClaimForm searchButtons "/>
+                            </p:inputText>
+
+                            <h:panelGroup id='searchButtons'>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-search"
+                                                 class="btn btn-sm btn-gray"
+                                                 update=":sparePartsClaimForm :searchFormSPInfo"
+                                                 rendered="#{empty simplePartsRequestListController.oneSearchStr}"/>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-close"
+                                                 class="btn btn-sm btn-gray"
+                                                 update=":sparePartsClaimForm :searchFormSPInfo"
+                                                 actionListener="#{simplePartsRequestListController.clearSearchCondition()}"
+                                                 rendered="#{not empty simplePartsRequestListController.oneSearchStr}"/>
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </h:form>
+                    <h:form id="sparePartsClaimForm">
+                        <p:dataTable id="datalist" value="#{simplePartsRequestListController.lazyModel}"
+                                     var="item" lazy="true" paginator="true" paginatorPosition="bottom"
+                                     paginatorAlwaysVisible="true"
+                                     selectionMode="single" selection="#{simplePartsRequestListController.selected}"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                     sortBy="#{item.createdDate}"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="5,20,50,100,500">
+                            <p:ajax event="rowSelect"
+                                    listener="#{simplePartsRequestListController.onRowSelect}"
+                                    update="editButton sparePartsDetailsForm"/>
+                            <p:column headerText="申购人">
+                                <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
+                            </p:column>
+                            <p:column headerText="申购编号">
+                                <h:outputText value="#{item.requestCode}"/>
+                            </p:column>
+                            <p:column headerText="仓库">
+                                <h:outputText value="#{simplePartsConversionController.getWareHouseName(item.partsWarehouseId)}"/>
+                            </p:column>
+                            <p:column headerText="工单号">
+                                <h:outputText value="#{item.maintenanceWorkOrderNumber}"/>
+                            </p:column>
+                            <p:column headerText="申购数量">
+                                <h:outputText value="#{item.requestQty}"/>
+                            </p:column>
+                            <p:column headerText="申购总价">
+                                <h:outputText value="#{item.totalPrice}"/>
+                            </p:column>
+                            <p:column headerText="申购时间">
+                                <f:facet name="filter">
+                                    <p:inputText id="filterEndTime" widgetVar="varFilterEndTime"/>
+                                </f:facet>
+                                <h:outputText value="#{item.createdDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="入库状态">
+                                <h:outputText value="#{simplePartsConversionController.partsFormStatus(item.status,'stockIn')}"/>
+                            </p:column>
+                            <p:column headerText="审批状态">
+                                <h:outputText
+                                        value="#{simplePartsConversionController.partsFormStatus(item.proposerStatus,'approve')}"/>
+                            </p:column>
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
+                                                 title="#{msg.Create}"
+                                                 actionListener="#{simplePartsRequestEditController.createPartsPurchase()}"
+                                                 oncomplete="PF('SparePartsPurchaseDialog').show()"
+                                                 update="SparePartsTotalForm"
+                                                 action="#"/>
+                                <p:commandButton id="editButton" class="btn btn-sm btn-gray" icon="ui-icon-edit"
+                                                 title="#{msg.Edit}"
+                                                 disabled="#{not simplePartsRequestListController.isCurrentPartsRequestEditable()}"
+                                                 oncomplete="PF('EditPartsPurchaseFormDialog').show()"
+                                                 actionListener="#{simplePartsRequestListController.editPartsRequest()}"
+                                                 update="SparePartsDetailEditForm SparePartsEditForm"/>
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
+                                                 class="btn btn-sm btn-gray"
+                                                 ajax="false">
+                                    <p:dataExporter type="xls" target="datalist"
+                                                    fileName="备件申购单"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:form>
+                </p:fieldset>
+                <p:fieldset legend="备件明细">
+                    <h:form id="sparePartsDetailsForm">
+                        <p:dataTable id="sparePartsDetailLists"
+                                     value="#{simplePartsRequestListController.partsRequestLineItems}"
+                                     var="item"
+                                     widgetVar="varDataList"
+                                     lazy="true" paginator="true" paginatorPosition="bottom"
+                                     paginatorAlwaysVisible="true"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                     sortBy="#{item.createdDate}"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="5,20,50,100,500">
+
+                            <p:column headerText="备件名称">
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+                            <p:column headerText="申购单编号">
+                                <h:outputText value="#{item.requestCode}"/>
+                            </p:column>
+                            <p:column headerText="申购个数">
+                                <h:outputText value="#{item.requestQty}"/>
+                            </p:column>
+                            <p:column headerText="申购单价">
+                                <h:outputText value="#{item.unitPrice}"/>
+                            </p:column>
+                            <p:column headerText="申购总价">
+                                <h:outputText value="#{item.totalPrice}"/>
+                            </p:column>
+                            <p:column headerText="申购时间">
+                                <f:facet name="filter">
+                                    <p:inputText id="filterEndTime2" widgetVar="varFilterEndTime"/>
+                                </f:facet>
+                                <h:outputText value="#{item.createdDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="入库状态" id="stockStatus">
+                                <h:outputText value="#{simplePartsConversionController.partsFormStatus(item.status,'stockIn')}"/>
+                            </p:column>
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download"
+                                                 class="btn btn-sm btn-gray"
+                                                 ajax="false">
+                                    <p:dataExporter type="xls" target="sparePartsDetailLists"
+                                                    fileName="申购单明细"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:form>
+                </p:fieldset>
+            </div>
+            <!-- 弹框显示 -->
+            <p:dialog id="SparePartsPurchaseDialog" widgetVar="SparePartsPurchaseDialog" modal="true" width="1200"
+                      height="600"
+                      resizable="true" draggable="true" appendTo="@this" header="申购单">
+                <p:fieldset legend="备件申购单信息">
+                    <h:form id="SparePartsTotalForm">
+                        <h:panelGroup id="SparePartsTotalSum">
+                            <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                         rendered="true">
+                                <h:panelGroup>
+                                    <label class="label">申购单编号</label>
+                                    <p:inputText id="sparePartsFromNum" name="sparePartsFromNum" readonly="true"
+                                                 value="#{simplePartsRequestEditController.selected.requestCode}"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">备件总数量</label>
+                                    <p:inputText id="sparePartsSumNumber" name="sparePartsSumNumber" readonly="true"
+                                                 value="#{simplePartsRequestEditController.getTotalCount()}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">备件总价格</label>
+                                    <p:inputText id="sparePartsTotalPrice" name="sparePartsTotalPrice" readonly="true"
+                                                 value="#{simplePartsRequestEditController.getTotalPrice()}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">备件申购人</label>
+                                    <p:inputText id="sparePartsRequestPerson" name="sparePartsRequestPerson"
+                                                 readonly="true"
+                                                 value="#{currentUserAccountController.currentUserAccount.name}"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">申购日期</label>
+                                    <p:inputText id="sparePartsRequestDate" name="sparePartsRequestDate"
+                                                 readonly="true"
+                                                 value="#{currentUserAccountController.currentDateTime}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                    </p:inputText>
+                                </h:panelGroup>
+                            </p:panelGrid>
+
+                        </h:panelGroup>
+                    </h:form>
+                </p:fieldset>
+                <p:fieldset legend="备件明细">
+                    <h:form id="sparePartsRequestForm">
+                        <h:panelGroup rendered="#{simplePartsConfigReadController.enableWarehouseSelectionInRequest}">
+                            <label class="label">备件仓库<span style="color: red;">*</span></label>
+                            <p:selectOneMenu value="#{simplePartsRequestEditController.selected.partsWarehouseId}" required="true" requiredMessage="仓库是必须的">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems
+                                        value="#{simplePartsRequestEditController.getWarehouseListInRequest()}"
+                                        var="sitem" itemLabel="#{sitem.name}" itemValue="#{sitem.id}"/>
+                                <p:ajax event="itemSelect" process="@this"
+                                        listener="#{simplePartsRequestEditController.onWarehouseChange}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <br/>
+                        <p:dataTable id="sparePartsDataList" value="#{simplePartsRequestEditController.lineItemsWithOptionalActionRow}"
+                                     var="item" widgetVar="varDataList" lazy="false" paginator="false" rows="1000"
+                                     rowIndexVar="rowIndex"
+                                     emptyMessage="#{msg.noRecordFound}">
+
+                            <p:column headerText="备件名称">
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+
+                            <p:column headerText="申购数量">
+                                <h:outputText value="#{item.requestQty eq 0 ? '' : item.requestQty}"/>
+                            </p:column>
+
+                            <p:column headerText="备件单价">
+                                <h:outputText value="#{item.unitPrice}"/>
+                            </p:column>
+
+                            <p:column headerText="备件总价">
+                                <h:outputText value="#{item.totalPrice}"/>
+                            </p:column>
+
+                            <p:column headerText="#{msg.Actions}">
+                                <p:commandButton validateClient="true"
+                                                 actionListener="#{simplePartsRequestEditController.deleteCurrentPartsLineItem(item)}"
+                                                 value="#{msg.Delete}" rendered="#{not simplePartsRequestEditController.isLastEmptyRowInCreate(rowIndex)}"
+                                                 update=":sparePartsRequestForm:sparePartsDataList :SparePartsTotalForm:sparePartsSumNumber :SparePartsTotalForm:sparePartsTotalPrice :sparePartsRequestForm:saveButton">
+                                </p:commandButton>
+                                <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;"
+                                                 title="#{msg.Create}"  action="#{simplePartsRequestEditController.initPartsRequestLineItem()}"
+                                                 update="@(.selectedPartsDialog) :selectedPartsForm"
+                                                 oncomplete="PF('selectedPartsDialog').show()"
+                                                 rendered="#{simplePartsRequestEditController.isLastEmptyRowInCreate(rowIndex)}"/>
+                            </p:column>
+                        </p:dataTable>
+                        <br/>
+                        <br/>
+                        <p:commandButton validateClient="true"
+                                         action="#{simplePartsRequestEditController.savePartsRequest()}"
+                                         value="#{msg.save}并提交" id="saveButton" disabled="#{not simplePartsRequestEditController.requestSubmitable}"
+                                         icon="ui-icon-check" oncomplete="PF('SparePartsAddDialog').hide()"
+                                         update=":sparePartsRequestForm:sparePartsDataList :selectedPartsForm :SparePartsTotalForm:sparePartsSumNumber :SparePartsTotalForm:sparePartsTotalPrice"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                         validateClient="true"
+                                         onclick="PF('SparePartsAddDialog').hide()"
+                                         update=":sparePartsRequestForm:sparePartsDataList :selectedPartsForm :SparePartsTotalForm:sparePartsSumNumber :SparePartsTotalForm:sparePartsTotalPrice"
+                                         action="#{simplePartsRequestEditController.removeLineItem()}"/>
+                    </h:form>
+                </p:fieldset>
+            </p:dialog>
+
+            <p:dialog id="selectedPartsDialog" widgetVar="selectedPartsDialog" modal="true" width="1200"
+                      height="300"
+                      resizable="true" draggable="true" appendTo="@this" header="选择申购备件">
+                <p:fieldset legend="申购备件">
+                    <h:form id="selectedPartsForm">
+                        <h:panelGroup>
+                            <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                         rendered="true">
+                                <h:panelGroup>
+                                    <label class="label">备件名称 <span style="color: red;">*</span></label>
+                                    <p:autoComplete id="sparePartName" dropdown="true" inputStyle="width: 160px"
+                                                    value="#{simplePartsRequestEditController.newLineItem.partsItem}"
+                                                    readonly="false" forceSelection="true" required="true" requiredMessage="备件选择 #{msg.ValidationRequire}"
+                                                    completeMethod="#{simplePartsConfigReadController.getAllPartsItemList()}"
+                                                    var="item" itemLabel="#{item.name}"
+                                                    itemValue="#{item}"
+                                                    converter="simplePartsItemConverter">
+                                        <p:ajax event="itemSelect"
+                                                listener="#{simplePartsRequestEditController.onPartsItemChange}"
+                                                update="unitPrice partsModel specification supplier"/>
+                                    </p:autoComplete>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">申购数量 <span style="color: red;">*</span></label>
+                                    <p:inputText id="requestQty" name="requestQty" placeholder="申购数量" required="true"
+                                                 requiredMessage="请输入申购数量"  onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+                                                 value="#{simplePartsRequestEditController.newLineItem.requestQty}">
+                                    <p:ajax event="blur" update="confirmButton"/>
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">备件单价 <span style="color: red;">*</span></label>
+                                    <p:inputText id="unitPrice" name="unitPrice" placeholder="备件单价" required="true"
+                                                 requiredMessage="请填写申购价格"
+                                                 value="#{simplePartsRequestEditController.newLineItem.unitPrice}">
+                                        <p:ajax event="blur" update="confirmButton"/>
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">备件规格</label>
+                                    <p:inputText id="partsModel" name="partsModel" placeholder="备件型号" readonly="true"
+                                                 value="#{simplePartsRequestEditController.newLineItem.partsItem.specification}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">备件类型</label>
+                                    <p:inputText id="specification" name="specification" placeholder="备件类型"
+                                                 readonly="true"
+                                                 value="#{simplePartsRequestEditController.newLineItem.partsItem.categoryName}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">备件供应商</label>
+                                    <p:inputText id="supplier" name="supplier" placeholder="备件供应商" readonly="true"
+                                                 value="#{simplePartsRequestEditController.newLineItem.partsItem.supplier}"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <p:commandButton
+                                    actionListener="#{simplePartsRequestEditController.addSelectedPartsToRequest()}"
+                                    value="#{msg.Confirm}" id="confirmButton" disabled="#{not simplePartsRequestEditController.selectedPartsInputValid}"
+                                    update=":sparePartsRequestForm:sparePartsDataList :selectedPartsForm :SparePartsTotalForm:sparePartsSumNumber :SparePartsTotalForm:sparePartsTotalPrice :sparePartsRequestForm:saveButton"
+                                    icon="ui-icon-check" onclick="PF('selectedPartsDialog').hide()"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                             onclick="PF('selectedPartsDialog').hide()"
+                                             update=":selectedPartsForm  :sparePartsRequestForm:saveButton"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:fieldset>
+            </p:dialog>
+
+            <!-- 备件信息修改 -->
+            <p:dialog id="EditPartsPurchaseFormDialog" widgetVar="EditPartsPurchaseFormDialog" modal="true" width="1200"
+                      height="600"
+                      resizable="true" draggable="true" appendTo="@this" header="修改申购单">
+                <p:fieldset legend="申购单信息">
+                    <h:form id="SparePartsEditForm">
+                        <h:panelGroup id="EditForm">
+                            <p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                         rendered="true">
+                                <h:panelGroup>
+                                    <label class="label">申购单编号</label>
+                                    <p:inputText id="viewSparePartsFromNum" name="viewSparePartsFromNum" readonly="true"
+                                                 value="#{simplePartsRequestEditController.selected.requestCode}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">备件总数量</label>
+                                    <p:inputText id="viewSparePartsSumNumber" name="sparePartsSumNumber" readonly="true"
+                                                 value="#{simplePartsRequestEditController.getTotalCount()}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">备件总价格</label>
+                                    <p:inputText id="viewSparePartsTotalPrice" name="viewSparePartsTotalPrice"
+                                                 readonly="true"
+                                                 value="#{simplePartsRequestEditController.getTotalPrice()}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">备件申购人</label>
+                                    <p:inputText id="viewSparePartsRequestPerson" name="viewSparePartsRequestPerson"
+                                                 readonly="true"
+                                                 value="#{simplePartsConversionController.getUserName(simplePartsRequestEditController.selected.createdBy)}"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">申购日期</label>
+                                    <p:inputText id="viewSparePartsRequestDate" name="viewSparePartsRequestDate"
+                                                 readonly="true"
+                                                 value="#{simplePartsRequestEditController.selected.createdDate}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                    </p:inputText>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </h:panelGroup>
+                    </h:form>
+                </p:fieldset>
+                <p:fieldset legend="备件详情修改">
+                    <h:form id="SparePartsDetailEditForm">
+                        <p:growl id="msgs" showDetail="true"/>
+                        <h:panelGroup rendered="#{simplePartsConfigReadController.enableWarehouseSelectionInRequest}">
+                            <label class="label">备件仓库<span style="color: red;">*</span></label>
+                            <p:selectOneMenu value="#{simplePartsRequestEditController.selected.partsWarehouseId}" required="true" requiredMessage="仓库是必须的">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems
+                                        value="#{simplePartsRequestEditController.getWarehouseListInRequest()}"
+                                        var="sitem" itemLabel="#{sitem.name}" itemValue="#{sitem.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <br/>
+                        <p:dataTable id="DetailEditForm" var="item"
+                                     value="#{simplePartsRequestEditController.lineItemsWithOptionalActionRow}"
+                                     editable="true" style="margin-bottom:20px;">
+
+                            <p:ajax event="rowEdit" listener="#{simplePartsRequestEditController.onRowEdit}"
+                                    update=":SparePartsDetailEditForm:DetailEditForm SparePartsEditForm :sparePartsClaimForm:datalist :sparePartsDetailsForm:sparePartsDetailLists"/>
+
+                            <p:ajax event="rowEditCancel" listener="#{simplePartsRequestEditController.onRowCancel}"
+                                    update=":SparePartsDetailEditForm:DetailEditForm :sparePartsDetailsForm:sparePartsDetailLists"/>
+
+                            <p:column headerText="备件名称">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{item.name}"/></f:facet>
+                                    <f:facet name="input"><p:inputText id="name" value="#{item.name}" readonly="true"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column headerText="备件申请数量">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{item.getRequestQtyAsObject()}" /></f:facet>
+                                    <f:facet name="input"><p:inputNumber id="partsRequestQty" required="true"
+                                                 requiredMessage="备件申请数量不能为空" padControl="false"   value="#{item.requestQty}"
+                                                onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column headerText="备件单价">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{item.unitPrice}"/></f:facet>
+                                    <f:facet name="input"><p:inputNumber id="partsUnitPrice" required="true"
+                                                                       requiredMessage="备件申请价格不能为空"
+                                                                       value="#{item.unitPrice}"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column headerText="操作" style="width:60px">
+                                <p:rowEditor/>
+                            </p:column>
+                        </p:dataTable>
+                        <p:commandButton
+                                validateClient="true"
+                                action="#{simplePartsRequestEditController.savePartsRequest()}"
+                                value="再次提交"
+                                update=":SparePartsDetailEditForm:DetailEditForm SparePartsEditForm :sparePartsClaimForm:datalist :sparePartsDetailsForm:sparePartsDetailLists"
+                                icon="ui-icon-check" oncomplete="PF('EditPartsPurchaseFormDialog').hide()"/>
+                    </h:form>
+                </p:fieldset>
+            </p:dialog>
+        </div>
+    </ui:define>
+    <script>
+        function handleToSubmit() {
+            PF('SparePartsAddDialog').hide();
+        }
+    </script>
+
+</ui:composition>

@@ -2670,3 +2670,6 @@ update wechat_subscribe_message set keyword=null,message='感谢关注GEAPM医�
 5. 如何找到密码
 6. 设备报修
 7. GE客服热线',url=null where enabled = true;
+
+
+INSERT INTO public.sys_role (id,home_page,name,role_desc,menus,role_desc_en) VALUES (17,null,'SparePartsAdmin','备件管理员','simple-parts','Spare Parts Admin');

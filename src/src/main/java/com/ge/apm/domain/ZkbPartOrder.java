@@ -149,6 +149,9 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "tech_auditer")
     private String techAuditer;
 
+    @Column(name = "tech_auditer_uid")
+    private String techAuditerUid;
+
     /**
      * 区域经理审批备注
      */
@@ -160,6 +163,8 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "manage_auditer")
     private String manageAuditer;
+    @Column(name = "manage_auditer_uid")
+    private String manageAuditerUid;
 
     /**
      *
@@ -200,6 +205,12 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "ordered_auditer")
     private String orderedAuditer;
+
+    @Column(name = "un_order_auditer_uid")
+    private String unOrderAuditerUid;
+
+    @Column(name = "ordered_auditer_uid")
+    private String orderedAuditerUid;
 
     /**
      * 归还类型
@@ -252,6 +263,9 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "return_auditer")
     private String returnAuditer;
 
+    @Column(name = "return_auditer_uid")
+    private String returnAuditerUid;
+
     /**
      * 关单备注
      */
@@ -263,6 +277,9 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "closed_auditer")
     private String closedAuditer;
+
+    @Column(name = "closed_auditer_uid")
+    private String closedAuditerUid;
 
     @Column(name = "created_by")
     private String createdBy;
@@ -438,6 +455,54 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "new_cat_flag")
     private String newCatFlag;
+
+    public String getTechAuditerUid() {
+        return techAuditerUid;
+    }
+
+    public void setTechAuditerUid(String techAuditerUid) {
+        this.techAuditerUid = techAuditerUid;
+    }
+
+    public String getManageAuditerUid() {
+        return manageAuditerUid;
+    }
+
+    public void setManageAuditerUid(String manageAuditerUid) {
+        this.manageAuditerUid = manageAuditerUid;
+    }
+
+    public String getUnOrderAuditerUid() {
+        return unOrderAuditerUid;
+    }
+
+    public void setUnOrderAuditerUid(String unOrderAuditerUid) {
+        this.unOrderAuditerUid = unOrderAuditerUid;
+    }
+
+    public String getOrderedAuditerUid() {
+        return orderedAuditerUid;
+    }
+
+    public void setOrderedAuditerUid(String orderedAuditerUid) {
+        this.orderedAuditerUid = orderedAuditerUid;
+    }
+
+    public String getReturnAuditerUid() {
+        return returnAuditerUid;
+    }
+
+    public void setReturnAuditerUid(String returnAuditerUid) {
+        this.returnAuditerUid = returnAuditerUid;
+    }
+
+    public String getClosedAuditerUid() {
+        return closedAuditerUid;
+    }
+
+    public void setClosedAuditerUid(String closedAuditerUid) {
+        this.closedAuditerUid = closedAuditerUid;
+    }
 
     public String getNewCatFlag() {
         return newCatFlag;
