@@ -412,10 +412,14 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void deleteSelectedOrg() {
         if (canDelete()) {
-
-
+            int tenantId = selected.getSiteId();
+            String institutionUID = selected.getInstitutionUID();
             super.delete();
-            buildOrdTree();
+            if(tenantId==46){
+                buildOrdTree46AfterSave(institutionUID);
+            }else{
+                buildOrdTree();
+            }
         }
     }
 
