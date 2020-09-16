@@ -101,7 +101,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
             }
             if(zkbPartOrderUserConfigList == null || zkbPartOrderUserConfigList.size() == 0){
-                return null;
+                //return null;
             }else{
                 ZkbPartOrderUserConfig zkbPartOrderUserConfig = zkbPartOrderUserConfigList.get(0);
                 if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
