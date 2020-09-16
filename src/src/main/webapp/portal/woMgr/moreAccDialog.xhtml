@@ -9,18 +9,18 @@
     <p:dialog id="moreAccDialogDlg" class="moreAccDialogDlg" widgetVar="moreAccDialogDlg" modal="true" width="1250"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.accessory}">
         <h:form id="moreAccDialogForm" >
             <h:panelGroup id="display42" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
-                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{!workOrderMgrController.isEnableIntegrationWithWorkOrder()}">
                     <h:panelGroup>
                         <label class="label">#{msg.PartName}*</label>
-                        <p:inputText id="parts" value="#{workOrderMgrController.itemDetail.parts}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                        <p:inputText id="parts1" value="#{workOrderMgrController.itemDetail.parts}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.PartQuantity}*</label>
-                        <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity" value="#{workOrderMgrController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}"/>
+                        <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity1" value="#{workOrderMgrController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
-                        <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}" >
+                        <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPrice1"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}" >
                             <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)" >
                         </p:ajax>
 
@@ -55,11 +55,11 @@
                    </h:panelGroup>-->
                     <h:panelGroup>
                         <label class="label">#{msg.InvoiceProvider}</label>
-                        <p:autoComplete id="vendor" dropdown="true" value="#{workOrderMgrController.selectedObjectMap['supplier']}" scrollHeight="300" forceSelection="true"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
+                        <p:autoComplete id="vendor1" dropdown="true" value="#{workOrderMgrController.selectedObjectMap['supplier']}" scrollHeight="300" forceSelection="true"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
                             <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange()}"/>
                             <p:ajax listener="#{workOrderMgrController.onSupplierChange()}" />
                         </p:autoComplete>
-                        <p:commandButton id="createSupplierButton" icon="ui-icon-plus" action="#{workOrderMgrController.prepareCreateSupplier}" title="#{msg.Create}" process="@this"  update="@(.SupplierEditDlgCls)" oncomplete="PF('SupplierEditDialog').show()"/>
+                        <p:commandButton id="createSupplierButton1" icon="ui-icon-plus" action="#{workOrderMgrController.prepareCreateSupplier}" title="#{msg.Create}" process="@this"  update="@(.SupplierEditDlgCls)" oncomplete="PF('SupplierEditDialog').show()"/>
 
                     </h:panelGroup>
                    <!-- <h:panelGroup>
@@ -70,6 +70,147 @@
                         </p:autoComplete>
                         <p:commandButton id="createSupplierButton" icon="ui-icon-plus" action="#{assetInfoEditController.prepareCreateSupplier}" title="#{msg.Create}" process="@this"  oncomplete="PF('SupplierEditDialog').show()"/>
                     </h:panelGroup>-->
+                    <h:panelGroup>
+                        <label class="label">#{msg.contractNo}</label>
+                        <p:inputText value="#{workOrderMgrController.itemDetail.contractNum}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.ContractPriceRMB}</label>
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="closedPrice1" class="contractPrice"  value="#{workOrderMgrController.itemDetail.closedPrice}">
+
+                            <p:ajax listener="#{workOrderMgrController.closePrcieUpdate()}">
+                            </p:ajax>
+                        </p:inputNumber>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.ApplyTime}</label>
+                        <p:calendar disabled="#{workOrderMgrController.nochange}" timeZone="GMT+8" label="#{msg.ApplyTime}" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.itemDetail.applyTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.EstimatedArrivalTime}</label>
+                        <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.qualityexpirdate}</label>
+                        <p:calendar timeZone="GMT+8" label="#{msg.equiptaketime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.itemDetail.warrantyDate}" showOn="button"
+                                    readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.assetsDashboardclm2}</label>
+                        <p:inputText value="#{workOrderMgrController.itemDetail.serialNum}"/>
+                    </h:panelGroup>
+                    <p:column headerText="#{msg.arrival}">
+                        <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.arrived}" onLabel="#{msg.Arrived}" offLabel="#{msg.NonArrived}">
+                            <p:ajax listener="#{workOrderMgrController.arrivalTimeSet}" event="change"></p:ajax>
+                        </p:selectBooleanButton>
+                        <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.closed}" onLabel="#{msg.Closed2}" offLabel="#{msg.Opened}">
+                            <p:ajax listener="#{workOrderMgrController.orderSet}" event="change"></p:ajax>
+                        </p:selectBooleanButton>
+                    </p:column>
+                    <h:panelGroup>
+                        <label class="label">#{msg.Remark}</label>
+                        <p:inputTextarea id="area1" value="#{workOrderMgrController.itemDetail.comment}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+        <!-- ==================================================================启用集成工单时==============================================-->
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workOrderMgrController.isEnableIntegrationWithWorkOrder()}">
+                    <h:panelGroup>
+                        <label class="label">#{msg.PartType}</label>
+                        <p:selectOneMenu value="#{workOrderMgrController.itemDetail.partsType}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                            <p:ajax event="itemSelect"  update="moreAccDialogForm" listener="#{workOrderMgrController.changeStatus()}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup id="sparePartsName" rendered="#{workOrderMgrController.statusFlag==1}">
+                        <label class="label">#{msg.PartName}*</label>
+                        <p:autoComplete id="sparePartName" dropdown="true"
+                                        value="#{workOrderMgrController.partsItem}"
+                                        readonly="false"
+                                        forceSelection="true"
+                                        completeMethod="#{workOrderMgrController.autosparePartName()}"
+                                        var="item" itemLabel="#{item.name}"
+                                        itemValue="#{item}"
+                                        converter="simplePartsItemConverter">
+                            <p:ajax event="itemSelect"
+                                    listener="#{workOrderMgrController.onSparePartsValueChange}"
+                                    update="moreAccDialogForm"/>
+                        </p:autoComplete>
+
+                    </h:panelGroup>
+                    <h:panelGroup  rendered="#{workOrderMgrController.statusFlag==3}">
+                        <label class="label">#{msg.PartName}*</label>
+                        <p:inputText id="partsOther" value="#{workOrderMgrController.itemDetail.parts}"  requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{workOrderMgrController.statusFlag==2}">
+                        <label class="label">#{msg.PartName}*</label>
+                        <p:autoComplete id="parts" dropdown="true"
+                                        value="#{workOrderMgrController.partsItem}"
+                                        readonly="false" forceSelection="true"
+                                        completeMethod="#{workOrderMgrController.initSparePartsMaster()}"
+                                        var="item" itemLabel="#{item.name}"
+                                        itemValue="#{item}"
+                                        converter="simplePartsItemConverter">
+                            <p:ajax event="itemSelect"
+                                    listener="#{workOrderMgrController.onSparePartsMasterValueChange}"
+                                    update="moreAccDialogForm"/>
+                        </p:autoComplete>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.PartQuantity}*</label>
+                        <p:inputNumber  decimalPlaces="0"  id="apartsQuantity" value="#{workOrderMgrController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup id="remainingStock" rendered="#{workOrderMgrController.statusFlag==1}">
+                        <label class="label">所剩库存</label>
+                        <p:inputText id="remainingStock2" name="remainingStock" placeholder="剩余库存"
+                                     readonly="true"
+                                     value="#{workOrderMgrController.itemDetail.currentQuantity}"/>
+                    </h:panelGroup>
+                    <h:panelGroup id="EstimatedUnitPriceRMB">
+                        <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
+                        <p:inputNumber disabled="#{workOrderMgrController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{workOrderMgrController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}" >
+                            <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)" >
+                            </p:ajax>
+
+                        </p:inputNumber>
+                    </h:panelGroup>
+                    <h:panelGroup id="invoiceNum">
+                        <label class="label">#{msg.invoiceNum}</label>
+                        <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.InvoicingTime}</label>
+                        <p:calendar timeZone="GMT+8" label="#{msg.EstimatedArrivalTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.itemDetail.invoiceTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+
+                    <!--<h:panelGroup>
+                       <label class="label">#{msg.vendor}<span style="color:red">#{workOrderMgrController.customConfig.assetFields['vendor'].required? '*':''}</span></label>
+
+                       <p:autoComplete id="vendor" dropdown="true" value="#{workOrderMgrController.selectedObjectMap['supplier']}" scrollHeight="300"
+                                       forceSelection="true"  required="#{workOrderMgrController.customConfig.assetFields['vendor'].required}"  requiredMessage="#{msg.vendor} #{msg.ValidationRequire}"
+                                       completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputVendor">
+                           <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange('supplier')}" update="@(.vendorChange)"/>
+                           <p:ajax listener="#{workOrderMgrController.onSupplierChange('supplier')}" />
+                       </p:autoComplete>
+                       <p:commandButton id="createSupplierButton1" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{workOrderMgrController.prepareCreateSupplier}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+                   </h:panelGroup>-->
+                    <h:panelGroup>
+                        <label class="label">#{msg.InvoiceProvider}</label>
+                        <p:autoComplete id="vendor" dropdown="true" value="#{workOrderMgrController.selectedObjectMap['supplier']}" scrollHeight="300" forceSelection="true"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
+                            <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange()}"/>
+                            <p:ajax listener="#{workOrderMgrController.onSupplierChange()}" />
+                        </p:autoComplete>
+                        <p:commandButton id="createSupplierButton" icon="ui-icon-plus" action="#{workOrderMgrController.prepareCreateSupplier}" title="#{msg.Create}" process="@this"  update="@(.SupplierEditDlgCls)" oncomplete="PF('SupplierEditDialog').show()"/>
+
+                    </h:panelGroup>
+                    <!-- <h:panelGroup>
+                         <label class="label">供应商&#45;&#45;</label>
+                         <p:autoComplete id="vendor" dropdown="true" value="#{workOrderMgrController.supplierName}" scrollHeight="300" forceSelection="false"   requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{workOrderMgrController.autoCompleteSupplier}" var="t" itemLabel="#{t}" itemValue="#{t}">
+                             <p:ajax event="itemSelect" listener="#{workOrderMgrController.onSupplierChange()}"/>
+                             <p:ajax listener="#{workOrderMgrController.onSupplierChange()}" />
+                         </p:autoComplete>
+                         <p:commandButton id="createSupplierButton" icon="ui-icon-plus" action="#{assetInfoEditController.prepareCreateSupplier}" title="#{msg.Create}" process="@this"  oncomplete="PF('SupplierEditDialog').show()"/>
+                     </h:panelGroup>-->
                     <h:panelGroup>
                         <label class="label">#{msg.contractNo}</label>
                         <p:inputText value="#{workOrderMgrController.itemDetail.contractNum}"/>

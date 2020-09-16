@@ -205,4 +205,20 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 			") select * from cte_org", nativeQuery = true)
 	List<String> getOrgInfoUidsByparentUid(String uid);
 
+	@Query(value="with recursive cte_org_info as (select sag.* from org_info sag where tenant_uid = ?1 and sag.org_type = 0 union" +
+			" select sag.* from org_info sag inner join cte_org_info cte on sag.parent_uid = cte.uid and sag.org_type !=4) select  * from cte_org_info",nativeQuery=true)
+	List<OrgInfo> getOrgHierarchyExceptClinicalDeptForTenant(String tenantUid);
+
+	@Query("select o.name from OrgInfo o where o.uid=?1")
+	String findNameByUID(String uid);
+
+	@Query(value = "with RECURSIVE cte as (select a.parent_uid,cast(a.name as varchar(500)) from org_info a where a.uid= ?1 " +
+			"union all select k.parent_uid,cast(k.name||' '||c.name as varchar(500)) as name " +
+			"from cte  c inner join org_info k on c.parent_uid = k.uid)select name from cte where  parent_uid is null", nativeQuery = true)
+	String listOrgInfoNamePathInHierarchy(String uid);
+
+	@Query(value = "with RECURSIVE cte as (select a.parent_uid,cast(a.name as varchar(500)) from org_info a where a.uid= ?1 " +
+			"union all select k.parent_uid,cast(k.name||'/'||c.name as varchar(500)) as name " +
+			"from cte  c inner join org_info k on c.parent_uid = k.uid)select name from cte where  parent_uid is null", nativeQuery = true)
+	String listOrgInfoNamePathInHierarchyWithSlash(String uid);
 }

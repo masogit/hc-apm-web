@@ -53,6 +53,15 @@ public class WechatSendMsgService extends MicroServiceInvoker {
         return response.getStatusCode().equals(HttpStatus.OK);
     }
 
+    public Boolean sendWxMsg(Map<String, Object> map){
+        WechatPushModel model = new WechatPushModel();
+        model.setMessage(JSON.toJSONString(map));
+        HttpEntity<WechatPushModel> requestEntity = new HttpEntity<WechatPushModel>(model,createHttpHeaders(null));
+        String gatewayURL = getGatewayURL(GatewayURL.SEND_WECHAT_MSG);
+        ResponseEntity<String> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, String.class);
+        return response.getStatusCode().equals(HttpStatus.OK);
+    }
+
 }
 
 class WechatPushModel implements Serializable{

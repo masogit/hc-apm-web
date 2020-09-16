@@ -93,6 +93,50 @@ public class QrCodeLib implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    @Column(name = "depart_num")
+    private String departNum;
+
+    @Column(name = "manufacture_id")
+    private String manufactureId;
+
+    @Column(name = "make_short_name")
+    private String makerShortName;
+
+    @Column(name = "registration_no")
+    private String registrationNo;
+
+    public String getDepartNum() {
+        return departNum;
+    }
+
+    public void setDepartNum(String departNum) {
+        this.departNum = departNum;
+    }
+
+    public String getManufactureId() {
+        return manufactureId;
+    }
+
+    public void setManufactureId(String manufactureId) {
+        this.manufactureId = manufactureId;
+    }
+
+    public String getMakerShortName() {
+        return makerShortName;
+    }
+
+    public void setMakerShortName(String makerShortName) {
+        this.makerShortName = makerShortName;
+    }
+
+    public String getRegistrationNo() {
+        return registrationNo;
+    }
+
+    public void setRegistrationNo(String registrationNo) {
+        this.registrationNo = registrationNo;
+    }
+
     public String getTenantUID() {
         return tenantUID;
     }
