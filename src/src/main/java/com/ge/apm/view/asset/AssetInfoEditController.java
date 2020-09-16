@@ -648,8 +648,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-
-        this.saveAssetHistory();
+        if(!isStatus){
+            this.saveAssetHistory();
+        }
 
         this.save();
 
@@ -673,7 +674,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         saveOrUpdateAssetTags();
         if(isStatus){
-            return "/portal/asset/createAsset/RequestsList.xhtml";
+            return "/portal/asset/createAsset/RequestsList?faces-redirect=true";
         }
         if (resultStatus) {
             return getListPageLink();
@@ -711,7 +712,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public String getListPageLink() {
         if(isStatus){
-            return "/portal/asset/createAsset/RequestsList.xhtml";
+            return "/portal/asset/createAsset/RequestsList?faces-redirect=true";
         }
         if (!selected.getIsValid() || 4 == selected.getStatus()) {
             return "AssetTerminateEntryList?faces-redirect=true";
