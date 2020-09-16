@@ -62,12 +62,12 @@
                                     listener="#{simplePartsRequestListController.onRowSelect}"
                                     update="editButton sparePartsDetailsForm"/>
                             <p:column headerText="申领人">
-                                <h:outputText value="#{item.createdBy}"/>
+                                <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
                             </p:column>
                             <p:column headerText="申领单编号">
                                 <h:outputText value="#{item.requestCode}"/>
                             </p:column>
-                            <p:column headerText="仓库">
+                            <p:column headerText="仓库" rendered="#{simplePartsConfigReadController.enableWarehouseSelectionInRequest}">
                                 <h:outputText value="#{simplePartsConversionController.getWareHouseName(item.partsWarehouseId)}"/>
                             </p:column>
                             <p:column headerText="工单号">
@@ -369,7 +369,7 @@
                                     <label class="label">备件申领人</label>
                                     <p:inputText id="viewSparePartsRequestPerson" name="viewSparePartsRequestPerson"
                                                  readonly="true"
-                                                 value="#{simplePartsRequestEditController.selected.createdBy}"/>
+                                                 value="#{simplePartsConversionController.getUserName(simplePartsRequestEditController.selected.createdBy)}"/>
                                 </h:panelGroup>
 
                                 <h:panelGroup>

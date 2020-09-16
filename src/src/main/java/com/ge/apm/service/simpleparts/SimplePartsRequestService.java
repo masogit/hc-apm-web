@@ -186,7 +186,7 @@ public class SimplePartsRequestService {
             partsTransaction.setRequestCode(item.getRequestCode());
             partsTransaction.setPartsRequestId(partsRequest.getId());
             partsTransaction.setPartsRequestLineItemId(item.getId());
-            partsTransaction.setCreatedBy(currentUserAccount.getName());
+            partsTransaction.setCreatedBy(currentUserAccount.getLoginName());
             partsTransaction.setCreatedDate(createDate);
             partsTransaction.setTransactionQty(item.getRequestQty() - item.getTransactionQty());
             partsTransaction.setPartsItemId(item.getPartsItemId());
@@ -282,7 +282,7 @@ public class SimplePartsRequestService {
             partsTransaction.setRequestCode(item.getRequestCode());
             partsTransaction.setPartsRequestId(partsRequest.getId());
             partsTransaction.setPartsRequestLineItemId(item.getId());
-            partsTransaction.setCreatedBy(currentUserAccount.getName());
+            partsTransaction.setCreatedBy(currentUserAccount.getLoginName());
             partsTransaction.setCreatedDate(new Date());
             partsTransaction.setTransactionQty(item.getRequestQty() - item.getTransactionQty());
             partsTransaction.setPartsItemId(item.getPartsItemId());
@@ -329,7 +329,7 @@ public class SimplePartsRequestService {
         partsRequestLineItemList.stream().forEach(item -> {
             item.setPartsRequestId(partsRequest.getId());
             item.setRequestCode(partsRequest.getRequestCode());
-            item.setCreatedBy(currentUserAccount.getName());
+            item.setCreatedBy(currentUserAccount.getLoginName());
 
             SimplePartsRequestLineItemService.addCurrentOrgInfo(item);
 
@@ -348,7 +348,7 @@ public class SimplePartsRequestService {
         partsRequest.setStatus(SimplePartsConstant.PARTS_NOT_TRANSACTIONED);
 
         // 未审批
-        partsRequest.setCreatedBy(currentUserAccount.getName());
+        partsRequest.setCreatedBy(currentUserAccount.getLoginName());
         partsRequest.setCreatedDate(new Date());
 
         partsRequest.setProposerId(currentUserAccount.getId());
@@ -365,7 +365,7 @@ public class SimplePartsRequestService {
             item.setRequestCode(partsRequest.getRequestCode());
             item.setProposerDate(new Date());
 
-            item.setCreatedBy(currentUserAccount.getName());
+            item.setCreatedBy(currentUserAccount.getLoginName());
             item.setCreatedDate(new Date());
 
             SimplePartsRequestLineItemService.addCurrentOrgInfo(item);
