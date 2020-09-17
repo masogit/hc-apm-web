@@ -52,6 +52,10 @@ public class OrderHistoryProvider {
             {
                 sb.append(" and contract_type like '%"+value.toString()+"%'");
             }
+            if("tenantUid".equals(tempColumn))
+            {
+                sb.append("and tenant_uid='"+value.toString()+"'");
+            }
             if("searchStrFilter".equals(tempColumn))
             {
                 sb.append(" and (region like '%"+value+"%'");
