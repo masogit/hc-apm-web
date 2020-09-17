@@ -923,6 +923,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void prepareEdit() {
         super.prepareEdit();
         selectedUserOrg = orgInfoDao.getByUid(selected.getOrgInfoUID());
+        filterTreeNodeByUid();
     }
 
     public OrgInfo getSelectedUserOrg() {
@@ -942,6 +943,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if(46==selected.getSiteId()){
             //查询权限结合 给表格填充数据。
             orgInfoTableData46 = orgList;//给表格数据赋值。
+            accessOrgTree = new  DefaultTreeNode("root", null, null);
 
         }else{
             accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
@@ -1528,5 +1530,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             return true;
         }
         return false;
+    }
+
+    public void filterTreeNodeByUid(){
+        if (selectedTenant!=null&&selectedTenant.getId()== 46&&selectedUserOrg!=null&& !StringUtils.isEmpty(selectedUserOrg.getInstitutionUID())) {
+            List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListByUid(selectedUserOrg.getInstitutionUID());
+            OrgInfo tenant = orgInfoDao.findByUid(selectedTenant.getUid());
+            siteList.add(tenant);
+            orgTree = uaaService.getOrgTreeNodes(selectedTenant.getUid(), siteList);
+            uaaService.expendedTreeNode(orgTree, "ALL", -1, -1);
+        }
     }
 }

@@ -1,0 +1,146 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="备件出入库记录"/>
+            </div>
+
+            <div class="ui-g-12 card">
+
+                <h:form id="SparePartsInventoryListForm">
+
+                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                        <p:commandButton value="出库记录" process="@this" update="datalist buttonSet searchText"
+                                         actionListener="#{simplePartsTransactionController.searchList(1)}" rendered="true"
+                                         disabled="#{simplePartsTransactionController.queryIndex == 1}"/>
+                        <p:commandButton value="入库记录" process="@this" update="datalist buttonSet searchText"
+                                         actionListener="#{simplePartsTransactionController.searchList(0)}" rendered="true"
+                                         disabled="#{simplePartsTransactionController.queryIndex == 0}"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid id="buttonSearchList" columns="12" cellpadding="5">
+                        <p:inputText id="searchText" value="#{simplePartsTransactionController.oneSearchStr}"
+                                     placeholder="备件名称/申请单编"
+                                     maxlength="105" style="width: 360px">
+                            <p:ajax event="keyup"
+                                    update=":SparePartsInventoryListForm:datalist searchButtons"/>
+                        </p:inputText>
+
+                        <h:panelGroup id='searchButtons'>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search"
+                                             class="btn btn-sm btn-gray"
+                                             update=":SparePartsInventoryListForm:datalist"
+                                             rendered="#{empty simplePartsTransactionController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close"
+                                             class="btn btn-sm btn-gray"
+                                             update=":SparePartsInventoryListForm:datalist"
+                                             actionListener="#{simplePartsTransactionController.searchTextList(simplePartsTransactionController.queryIndex)}"
+                                             rendered="#{not empty simplePartsTransactionController.oneSearchStr}"/>
+                        </h:panelGroup>
+
+                    </h:panelGrid>
+
+                    <p:dataTable id="datalist" value="#{simplePartsTransactionController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{simplePartsTransactionController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}  #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="filter" listener="#{simplePartsTransactionController.onFilter}"/>
+                        <p:ajax event="page" oncomplete="rc2();"/>
+                        <p:column headerText="备件名称" sortBy="#{item.name}" filterBy="#{item.name}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+
+                        <p:column headerText="申请单编号" sortBy="#{item.requestCode}"
+                                  filterBy="#{item.requestCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.requestCode}"/>
+                        </p:column>
+
+                        <p:column headerText="申请单类型" sortBy="#{item.requestType}"
+                                  filterBy="#{item.requestType}" filterMatchMode="EQ">
+
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}"
+                                                  noSelectionOption="true"/>
+                                    <f:selectItems value="#{simplePartsTransactionController.getRequestTypeList()}" var="item"
+                                                   itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+
+                            <h:outputText value="#{simplePartsTransactionController.switchRequestType(item.requestType)}"/>
+                        </p:column>
+
+                        <p:column headerText="供应商" sortBy="#{item.sourcSupplier}" filterBy="#{item.sourcSupplier}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.sourcSupplier}"/>
+                        </p:column>
+
+                        <p:column headerText="出入库数量" sortBy="#{item.transactionQty}">
+                            <h:outputText value="#{item.transactionQty}"/>
+                        </p:column>
+
+                        <p:column headerText="备件单价" sortBy="#{item.unitPrice}">
+                            <h:outputText value="#{item.unitPrice}"/>
+                        </p:column>
+
+                        <p:column headerText="备件总价" sortBy="#{item.totalPrice}">
+                            <h:outputText value="#{item.totalPrice}"/>
+                        </p:column>
+
+                        <c:if test="#{simplePartsTransactionController.queryIndex == 1}">
+                            <p:column headerText="出库仓库">
+                                <h:outputText
+                                        value="#{simplePartsTransactionController.getWarehouse(item.partsWarehouseId)}"/>
+                            </p:column>
+                            <p:column headerText="出库仓位">
+                                <h:outputText
+                                        value="#{simplePartsTransactionController.getLocator(item.partsLocatorId)}"/>
+                            </p:column>
+                            <p:column headerText="出库时间" sortBy="#{item.createdDate}">
+                                <h:outputText value="#{item.createdDate}"/>
+                            </p:column>
+
+                            <p:column headerText="出库人">
+                                <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
+                            </p:column>
+                        </c:if>
+                        <c:if test="#{simplePartsTransactionController.queryIndex == 0}">
+                            <p:column headerText="入库仓库">
+                                <h:outputText
+                                        value="#{simplePartsTransactionController.getWarehouse(item.partsWarehouseId)}"/>
+                            </p:column>
+                            <p:column headerText="入库仓位">
+                                <h:outputText
+                                        value="#{simplePartsTransactionController.getLocator(item.partsLocatorId)}"/>
+                            </p:column>
+                            <p:column headerText="入库时间" sortBy="#{item.createdDate}">
+                                <h:outputText value="#{item.createdDate}"/>
+                            </p:column>
+
+                            <p:column headerText="入库人">
+                                <h:outputText value="#{simplePartsConversionController.getUserName(item.createdBy)}"/>
+                            </p:column>
+                        </c:if>
+                        <p:column headerText="院区" sortBy="#{item.siteUID}">
+                            <h:outputText value="#{simplePartsTransactionController.switchSiteName(item.siteUID)}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <p:remoteCommand name="rc2" update=":SparePartsInventoryListForm:datalist"/>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
