@@ -1,0 +1,160 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <style>
+            div.ui-panelgrid-cell > label + div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+        </style>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="备件信息"/>
+            </div>
+            <div class="ui-g-12 card">
+                    <h:form id="basicListForm">
+                        <p:dataTable id="datalist" value="#{simplePartsItemController.partsItemList}"
+                                     var="item"
+                                     widgetVar="varDataList"
+                                     lazy="true" paginator="true" paginatorPosition="bottom"
+                                     paginatorAlwaysVisible="true"
+                                     selectionMode="single" selection="#{simplePartsItemController.selected}"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                     sortBy="#{item.createdDate}"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="20,50,100,500">
+
+                            <p:ajax event="rowSelect" listener="#{simplePartsItemController.onSelectPartsItem()}" update="createButton editButton deleteButton"/>
+                            <p:ajax event="filter" listener="#{simplePartsItemController.onFilter}" oncomplete="rc();"/>
+
+
+                            <p:column headerText="#{msg.PartsName}" >
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.PartsSupplier}" >
+                                <h:outputText value="#{item.supplier}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.PartsSpecification}" >
+                                <h:outputText value="#{item.specification}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.PartsModel}" >
+                                <h:outputText value="#{item.model}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.PartsBrand}" >
+                                <h:outputText value="#{item.brand}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.PartsUnit}" >
+                                <h:outputText value="#{item.unit}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.PartsCategory}" >
+                                <h:outputText value="#{item.categoryName}"/>
+                            </p:column>
+
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" update=":basicEditDialog" actionListener="#{simplePartsItemController.prepareCreate}" oncomplete="PF('basicEditDialog').show()"/>
+                                <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{simplePartsItemController.prepareEdit}" update=" @(.basicDlgCls)" oncomplete="PF('basicEditDialog').show()" disabled="#{empty simplePartsItemController.selected}"/>
+                                <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{simplePartsItemController.delete}" update="datalist" disabled="#{empty simplePartsItemController.selected}">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                                </p:commandButton>
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-file-download" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:dataExporter type="xls" target="datalist" fileName="备件申领单"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:form>
+            </div>
+
+            <p:dialog id="basicEditDialog" widgetVar="basicEditDialog" modal="true" width="1200" class="basicDlgCls"
+                      height="600"
+                      resizable="true" draggable="true" appendTo="@this" header="备件信息">
+                <h:form id="basicEditForm">
+                    <p:fieldset legend="备件信息">
+
+                                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                             rendered="true">
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.PartsName}</label>
+                                        <p:inputText id="sparePartsName" name="sparePartsName" readonly="false"
+                                                     style="width: 220px;"
+                                                     value="#{simplePartsItemController.selected.name}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.PartsSupplier}</label>
+                                        <p:inputText id="sparePartsSupplier" name="sparePartsSupplier" readonly="false"
+                                                     value="#{simplePartsItemController.selected.supplier}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.PartsSpecification}</label>
+                                        <p:inputText id="sparePartsSpecification" name="sparePartsSpecification" readonly="false"
+                                                     value="#{simplePartsItemController.selected.specification}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.PartsModel}</label>
+                                        <p:inputText id="sparePartsModel" name="sparePartsModel" readonly="false"
+                                                     value="#{simplePartsItemController.selected.model}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.PartsBrand}</label>
+                                        <p:inputText id="sparePartsBrand" name="sparePartsBrand" readonly="false"
+                                                     value="#{simplePartsItemController.selected.brand}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.PartsUnit}</label>
+                                        <p:inputText id="sparePartsUnit" name="sparePartsUnit"
+                                                     readonly="false"
+                                                     value="#{simplePartsItemController.selected.unit}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.PartsCategory}</label>
+                                        <p:inputText value="#{simplePartsItemController.getSelectedPartsCategoryName()}" required="false"
+                                                     requiredMessage="#{msg.authGroup} #{msg.ValidationRequire}"
+                                                     readonly="true" class="partsCategoryName" />
+                                        <p:commandButton id="btnPartsCategory" process="@this" icon="fa fa-angle-down"
+                                                         class="btn btn-sm popupIconButton" />
+                                        <p:overlayPanel widgetVar="varPanelBasicTree" for="btnPartsCategory" hideEffect="fade" dynamic="false"
+                                                        style="width:300px" modal="false">
+                                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                                <p:tree id="basicTree" style="width:98%;border:0;"
+                                                        value="#{simplePartsItemController.currentPartsCategoryTree}" var="node" selectionMode="single">
+                                                    <p:ajax process="@this" event="select" update="@(.partsCategoryName)"
+                                                            listener="#{simplePartsItemController.onSelectPartsCategoryTreeNode}"
+                                                            oncomplete="PF('varPanelBasicTree').hide();"/>
+                                                    <p:ajax process="@this" event="expand"/>
+                                                    <p:ajax process="@this" event="collapse"/>
+
+                                                    <p:treeNode type="partsCategory">
+                                                        <h:outputText value="#{node.name}"/>
+                                                    </p:treeNode>
+                                                </p:tree>
+                                            </p:scrollPanel>
+                                        </p:overlayPanel>
+
+                                    </h:panelGroup>
+
+                                </p:panelGrid>
+
+                    </p:fieldset>
+
+                    <h:panelGroup >
+                        <p:commandButton
+                                actionListener="#{simplePartsItemController.savePartsItem()}"
+                                value="#{msg.save}"
+                                update=":basicListForm:datalist"
+                                icon="ui-icon-check" oncomplete="PF('basicEditDialog').hide();"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
+                                         onclick="PF('basicEditDialog').hide()" />
+                    </h:panelGroup>
+                </h:form>
+            </p:dialog>
+        </div>
+    </ui:define>
+</ui:composition>

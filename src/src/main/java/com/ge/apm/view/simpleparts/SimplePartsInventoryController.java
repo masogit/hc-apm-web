@@ -1,0 +1,166 @@
+package com.ge.apm.view.simpleparts;
+
+import com.ge.apm.dao.simpleparts.SimplePartsInventoryRepository;
+import com.ge.apm.dao.simpleparts.SimplePartsWarehouseLocatorRepository;
+import com.ge.apm.domain.simpleparts.SimplePartsInventory;
+import com.ge.apm.domain.simpleparts.SimplePartsWareHouseLocator;
+import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.simpleparts.SimplePartsConfigService;
+import com.ge.apm.service.simpleparts.SimplePartsInventoryService;
+import com.ge.apm.service.simpleparts.SimplePartsWarehouseService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * @author csh
+ * @version 1.0
+ * @date 2020/6/17
+ * @descript 备件总库存Controller
+ * @package com.ge.apm.view.spareparts
+ */
+@ManagedBean
+@ViewScoped
+@SuppressWarnings("all")
+public class SimplePartsInventoryController extends GenericCRUDUUIDController<SimplePartsInventory> {
+    private static final long serialVersionUID = 3721577362709407159L;
+
+    private SimplePartsInventoryService partsInventoryService;
+    private SimplePartsInventoryRepository partsInventoryRepository;
+    private SimplePartsWarehouseService partsWarehouseService;
+    private SimplePartsWarehouseLocatorRepository partsWarehouseLocatorRepository;
+    private ConfigService workflowConfigService;
+    private UaaService uuaService;
+    private SimplePartsConfigService partsConfigService;
+
+    /**
+     * @author csh
+     * @createTime 2020/6/11 15:00
+     * @description 搜索字符串
+     */
+    @Setter
+    @Getter
+    private String oneSearchStr;
+
+    @Override
+    protected void init() {
+        partsInventoryRepository = WebUtil.getBean(SimplePartsInventoryRepository.class);
+        partsInventoryService = WebUtil.getBean(SimplePartsInventoryService.class);
+        partsWarehouseService = WebUtil.getBean(SimplePartsWarehouseService.class);
+        uuaService = WebUtil.getBean(UaaService.class);
+        partsWarehouseLocatorRepository = WebUtil.getBean(SimplePartsWarehouseLocatorRepository.class);
+        workflowConfigService = WebUtil.getBean(ConfigService.class);
+        partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
+    }
+
+    /**
+     * @param uid
+     * @param type
+     * @return void
+     * @date 2020/7/22 15:17
+     * 根据uid查询仓库名称
+     */
+    public SimplePartsWarehouse findWarehouseNameById(String id, String type) {
+        SimplePartsWarehouse partsWarehouse = partsWarehouseService.findWarehouseNameById(id);
+        return partsWarehouse;
+    }
+
+    /**
+     * @param id
+     * @return com.ge.apm.domain.simpleparts.PartsWareHouseLocator
+     * @date 2020/7/28 11:26
+     * 根据仓位的id查询
+     */
+    public SimplePartsWareHouseLocator findById(String id) {
+        SimplePartsWareHouseLocator partsWareHouseLocator = partsWarehouseLocatorRepository.findById(id);
+        return partsWareHouseLocator;
+    }
+
+    public String findLocatorName(String id) {
+        if (SimplePartsConstant.VIRTUAL_LOCATOR_ID.equals(id)) {
+            return SimplePartsConstant.VIRTUAL_LOCATOR_NAME;
+        }
+        SimplePartsWareHouseLocator partsWareHouseLocator = partsWarehouseLocatorRepository.findById(id);
+        return partsWareHouseLocator.getName();
+    }
+
+    @Override
+    protected GenericRepositoryUUID<SimplePartsInventory> getDAO() {
+        return partsInventoryRepository;
+    }
+
+    @Override
+    protected Page<SimplePartsInventory> loadData(PageRequest pageRequest) {
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+
+        searchFilters = new ArrayList<SearchFilter>();
+        setUserSearchFilters();
+
+        List<String> orgUidList = uuaService.getOrgListByUser(currentUserAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
+        Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+        return res;
+    }
+
+    @Override
+    public void setSiteFilter() {
+        if (filterBySite) {
+            if (this.searchFilters == null) {
+                this.searchFilters = new ArrayList<SearchFilter>();
+            }
+        }
+    }
+
+    private void setUserSearchFilters() {
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+        }
+    }
+
+    public void searchStr() {
+        this.searchFilters.clear();
+    }
+
+    private PageRequest addRequiredSortById(PageRequest pageRequest) {
+        Iterator<Sort.Order> orders = pageRequest.getSort().iterator();
+        boolean exists = false;
+        while (orders.hasNext()) {
+            if ("id".equals(orders.next().getProperty())) {
+                exists = true;
+                break;
+            }
+        }
+        if (exists) {
+            return pageRequest;
+        } else {
+            Sort sortWithId = new Sort(Sort.Direction.ASC, "id");
+            pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortWithId));
+        }
+        return pageRequest;
+    }
+
+
+}

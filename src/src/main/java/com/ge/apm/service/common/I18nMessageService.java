@@ -124,4 +124,15 @@ public class I18nMessageService {
 
         return msg;
     }
+
+    public List<I18nMessage> getByMsgType(String msgType) {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+
+        List<I18nMessage> foundMsgList = i18nMessageDao.getByMsgTypeAndSiteId(msgType, userAccount.getSiteId());
+        if (foundMsgList.size() == 0) {
+            foundMsgList = i18nMessageDao.getByMsgTypeAndSiteId(msgType, -1);
+        }
+
+        return foundMsgList;
+    }
 }

@@ -3,6 +3,7 @@ package com.ge.apm.service.uaa;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -1263,5 +1264,47 @@ public class UaaService {
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, uid));
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
+    }
+
+    //获取该用户下的所有组织树
+    public TreeNode buildEnableOrgTree (String userUid,String orgUid,OrgInfo orgInfo){
+        List<OrgInfo> enableList = new ArrayList<>();
+        if (null != orgInfo && 4 == orgInfo.getOrgType()) {
+            //enableList = orgInfoDao.getByUser(userUid);
+            enableList = collectChildOrgs(orgInfoDao.getByUid(orgUid), enableList);
+        }else{
+            enableList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(orgUid);
+        }
+        TreeNode orgTree = buildEnableTree(enableList);
+        return orgTree;
+    }
+
+    public List<OrgInfo> collectChildOrgs(OrgInfo info, List<OrgInfo> clinicalOrgSet) {
+        if (4 == info.getOrgType().intValue()) {
+            //System.out.println("keshi----->" +info.getName());
+            clinicalOrgSet.add(info);
+        }
+        List<OrgInfo> resultList = orgInfoDao.findByParentUID(info.getUid());
+        if(resultList !=null&& !resultList.isEmpty()) {
+            for (OrgInfo orgInfo : resultList) {
+                collectChildOrgs(orgInfo, clinicalOrgSet);
+            }
+        }
+        return clinicalOrgSet;
+    }
+
+    private TreeNode buildEnableTree(List<OrgInfo> orgList) {
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+        for (OrgInfo org : orgList) {
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+        return rootNode;
     }
 }

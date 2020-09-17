@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+
+    <!-- 编辑备件仓库 -->
+    <p:dialog id="partsWarehouseEditDialog" widgetVar="partsWarehouseEditDialog" modal="true" resizable="true"
+              draggable="true" appendTo="@(body)" header="编辑备件仓库">
+        <h:form id="partsWarehouseEditForm">
+            <h:panelGroup id="display">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">仓库所属</label>
+                        <p:inputText id="editSelectedUserOrgName" class="editSelectedUserOrgName"
+                                     value="#{orgInfoPathController.getOrgFullPathByOrgInfo(simplePartsWarehouseEditController.selectedUserOrg)}"
+                                     readonly="true" required="true" size="50"/>
+                        <p:commandButton id="btnOrgUser" process="@this" icon="fa fa-angle-down"
+                                         style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                        <p:overlayPanel id="panelOrgUser" my="right top" widgetVar="varPanelOrgUser"
+                                        for="btnOrgUser" hideEffect="fade" dynamic="false"
+                                        class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                            <p:inputText id="treeNodeNameFilter2" class="treeNodeNameFilter"
+                                         value="#{simplePartsWarehouseEditController.treeNodeNameFilter}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search"
+                                             process="@(.treeNodeNameFilter) @this"
+                                             update="@(.orgTree) @(.treeNodeNameFilter)"
+                                             actionListener="#{simplePartsWarehouseEditController.filterTreeNode()}"
+                                             value="#{msg.Search2}"/>
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="orgTree4User" class="orgTree" style="width:98%;border:0;"
+                                        value="#{simplePartsWarehouseEditController.enableOrgTree}"
+                                        selection="#{simplePartsWarehouseEditController.selectedNode}" var="node"
+                                        selectionMode="single">
+                                    <p:ajax process="@this" event="select" update="@(.editSelectedUserOrgName)"
+                                            listener="#{simplePartsWarehouseEditController.onSelectOrgForUser}"
+                                            oncomplete="PF('varPanelOrgUser').hide();"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node.shortName}"/>
+                                    </p:treeNode>
+                                    <p:treeNode type="hidden" rendered="false"/>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                             style="min-width: 500px;">
+                    <h:panelGroup>
+                        <label class="label">仓库名称 <span style="color: red;">*</span></label>
+                        <p:inputText id="warehouseName"
+                                     value="#{simplePartsWarehouseEditController.partsWarehouse.name}"
+                                     required="true"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <p:outputLabel for="partsWarehouseStatusEditSelect" value="仓库状态:" />
+                        <p:selectOneRadio id="partsWarehouseStatusEditSelect" value="#{simplePartsWarehouseEditController.partsWarehouse.status}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                            <f:selectItem itemLabel="启用" itemValue="1" />
+                            <f:selectItem itemLabel="禁用" itemValue="0" />
+                        </p:selectOneRadio>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <br/>
+                <p:commandButton validateClient="true"
+                                 action="#{simplePartsWarehouseEditController.saveWarehouse()}"
+                                 value="#{msg.Save}"
+                                 icon="ui-icon-check"
+                                 oncomplete="handleSubmit(args, 'partsWarehouseEditDialog');"/>
+
+                <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel"
+                                 onclick="PF('partsWarehouseEditDialog').hide()"
+                                 update=":basicListForm"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+</html>
