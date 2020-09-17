@@ -139,8 +139,10 @@ public class SimplePartsRequestLineItemService extends MicroServiceInvoker {
         Optional<SimplePartsInventory> partsInventoryOptional = partsInventoryRepository.findByWarehouseIdAndLocatorIdAndPartsItemId(partsRequestLineItem.getPartsWarehouseId(), partsRequestLineItem.getPartsLocatorId(), partsRequestLineItem.getPartsItemId());
         if (partsInventoryOptional.isPresent()) {
             partsInventory = partsInventoryOptional.get();
+
             // 更新
-            int sumNum = partsInventory.getOnhandQty() + partsRequestLineItem.getNotTransactionQty();
+            int sumNum = partsRequest.getType() == 1 ?
+                    partsInventory.getOnhandQty() - partsRequestLineItem.getNotTransactionQty() : partsInventory.getOnhandQty() + partsRequestLineItem.getNotTransactionQty();
             partsInventory.setOnhandQty(sumNum);
         } else {
             // 新增
