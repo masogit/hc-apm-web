@@ -74,6 +74,9 @@ public class SimplePartsRequestWorkOrderService {
     @Autowired
     private SimplePartsWarehouseUserRepository partsWarehouseUserRepository;
 
+    @Autowired
+    private SimplePartsConfigService partsConfigService;
+
     /**
      * 生成申购单
      * @param accessoryList
@@ -370,10 +373,12 @@ public class SimplePartsRequestWorkOrderService {
         if (null == assetInfo) {
             return Optional.empty();
         }
-
-        Optional<SimplePartsWarehouse> partsWarehouseOptional = partsWarehouseService.findDefaultWarehouseByAssetInfoForCurrentUser(assetInfo);
-
-        return partsWarehouseOptional;
+        boolean enableWarehouseSelectionInRequest = partsConfigService.isEnableWarehouseSelectionInRequest();
+        if(enableWarehouseSelectionInRequest){
+            Optional<SimplePartsWarehouse> partsWarehouseOptional = partsWarehouseService.findDefaultWarehouseByAssetInfoForCurrentUser(assetInfo);
+            return partsWarehouseOptional;
+        }
+        return Optional.empty();
     }
     public Optional<SimplePartsWarehouse> getPartsWarehouseByWorkOrderId(String workOrderId){
 
@@ -386,10 +391,12 @@ public class SimplePartsRequestWorkOrderService {
         if (null == assetInfo) {
             return Optional.empty();
         }
-
-        Optional<SimplePartsWarehouse> partsWarehouseOptional = partsWarehouseService.findDefaultWarehouseByAssetInfoForCurrentUser(assetInfo);
-
-        return partsWarehouseOptional;
+        boolean enableWarehouseSelectionInRequest = partsConfigService.isEnableWarehouseSelectionInRequest();
+        if(enableWarehouseSelectionInRequest){
+            Optional<SimplePartsWarehouse> partsWarehouseOptional = partsWarehouseService.findDefaultWarehouseByAssetInfoForCurrentUser(assetInfo);
+            return partsWarehouseOptional;
+        }
+        return Optional.empty();
     }
 
     private boolean isWorkOrderValidPartsRequest(List<V2_WorkOrder_Detail> accessoryList) {

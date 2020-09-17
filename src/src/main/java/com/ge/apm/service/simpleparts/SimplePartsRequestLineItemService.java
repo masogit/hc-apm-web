@@ -108,9 +108,7 @@ public class SimplePartsRequestLineItemService extends MicroServiceInvoker {
      * @param partsRequestLineItem
      */
     @Transactional
-    public void stockInOrOutParts(SimplePartsRequestLineItem partsRequestLineItem) {
-
-        SimplePartsRequest partsRequest = partsRequestRepository.findById(partsRequestLineItem.getPartsRequestId());
+    public void stockInOrOutParts(SimplePartsRequestLineItem partsRequestLineItem,SimplePartsRequest partsRequest) {
 
         //处理交易记录
         SimplePartsTransaction partsTransaction = new SimplePartsTransaction();
@@ -139,10 +137,15 @@ public class SimplePartsRequestLineItemService extends MicroServiceInvoker {
         Optional<SimplePartsInventory> partsInventoryOptional = partsInventoryRepository.findByWarehouseIdAndLocatorIdAndPartsItemId(partsRequestLineItem.getPartsWarehouseId(), partsRequestLineItem.getPartsLocatorId(), partsRequestLineItem.getPartsItemId());
         if (partsInventoryOptional.isPresent()) {
             partsInventory = partsInventoryOptional.get();
+
             // 更新
-            int sumNum = partsInventory.getOnhandQty() + partsRequestLineItem.getNotTransactionQty();
+            int sumNum = partsRequest.getType() == 1 ?
+                    partsInventory.getOnhandQty() - partsRequestLineItem.getNotTransactionQty() : partsInventory.getOnhandQty() + partsRequestLineItem.getNotTransactionQty();
             partsInventory.setOnhandQty(sumNum);
-        } else {
+            if(partsRequest.getType() == 1 && sumNum == 0){
+                partsInventoryRepository.deleteByWarehouseIdAndLocatorIdAndPartsItemId(partsRequestLineItem.getPartsWarehouseId(), partsRequestLineItem.getPartsLocatorId(), partsRequestLineItem.getPartsItemId());
+            }
+        } else{
             // 新增
             partsInventory = new SimplePartsInventory();
             partsInventory.setPartsItemId(partsRequestLineItem.getPartsItemId());

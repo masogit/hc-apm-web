@@ -1,12 +1,15 @@
 package com.ge.apm.service.zkb;
 
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbOrderHistoryRepository;
 import com.ge.apm.dao.mapper.ZkbOrderHistoryMapper;
 import com.ge.apm.domain.OrderHistoryVO;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.ZkbOrderHistory;
 import com.ge.apm.service.asset.AssetInfoRow;
 import com.ge.apm.service.asset.OrderHistoryInfoRow;
 import com.ge.apm.service.utils.ExcelDocument;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,12 @@ public class ZkbOrderHistoryService {
 
     @Autowired
     private ZkbOrderHistoryRepository zkbOrderHistoryRepository;
+
+    /**
+     * 租户信息repository
+     */
+    @Autowired
+    private TenantInfoRepository tenantInfoRepository;
 
     /**
      * 导入模板头部行数
@@ -72,6 +81,11 @@ public class ZkbOrderHistoryService {
     public static final String DIRECOTORY_PATH="/portal/zkb/orderHistory/";
 
     /**
+     *智康宝租户type
+     */
+    public static final Integer zkbTenantType = 3;
+
+    /**
      * 历史数据查询mapper
      */
     @Autowired
@@ -97,42 +111,42 @@ public class ZkbOrderHistoryService {
             OrderHistoryVO orderHistoryVO = new OrderHistoryVO();
             orderHistoryVO.setLineNum(i);
             OrderHistoryInfoRow orderHistoryInfoRow = new OrderHistoryInfoRow(orderHistoryVO,rowMap);
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("systemId"), "setId");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("dataType"), "setDataType");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("region"), "setRegion");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("agent"), "setAgent");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("contractNo"), "setContractNo");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("contractType"), "setContractType");
-            orderHistoryInfoRow.setFieldDateValue(WebUtil.getMessage("contractBeginningTime"), "setContractBeginningTime");
-            orderHistoryInfoRow.setFieldDateValue(WebUtil.getMessage("contractEndingTime"), "setContractEndingTime");
-            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("quantityIb"), "setQuantityIb");
-            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("sparePartsQuantity"), "setSparePartsQuantity");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("fw"), "setFw");
-            orderHistoryInfoRow.setFieldDateValue(WebUtil.getMessage("eventDate"), "setEventDate");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("eventQuarter"), "setEventQuarter");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("systemNo"), "setSystemNo");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("faultDescription"), "setFaultDescription");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("hospitalName"), "setHospitalName");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("machineType"), "setMachineType");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("sparePartsNo"), "setSparePartsNo");
-            orderHistoryInfoRow.setFieldDoubleValue(WebUtil.getMessage("sparePartsPrice"), "setSparePartsPrice");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("description"), "setDescription");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("orderNo"), "setOrderNo");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("RSESup"), "setRSESup");
-            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("quantity"), "setQuantity");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("sr"), "setSr");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("act"), "setAct");
-            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("sparePartsLeft"), "setSparePartsLeft");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("sparePartsReturn"), "setSparePartsReturn");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("comment"), "setComment");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("insuranceDescription"), "setInsuranceDescription");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("arrangement"), "setArrangement");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("callNo"), "setCallNo");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("rowner"), "setRowner");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("status"), "setStatus");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("owner"), "setOwner");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zone"), "setZone");
-            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("source"), "setSource");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_systemId"), "setId");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_dataType"), "setDataType");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_region"), "setRegion");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_agent"), "setAgent");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_contractNo"), "setContractNo");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_contractType"), "setContractType");
+            orderHistoryInfoRow.setFieldDateValue(WebUtil.getMessage("zkbHistory_contractBeginningTime"), "setContractBeginningTime");
+            orderHistoryInfoRow.setFieldDateValue(WebUtil.getMessage("zkbHistory_contractEndingTime"), "setContractEndingTime");
+            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("zkbHistory_quantityIb"), "setQuantityIb");
+            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("zkbHistory_sparePartsQuantity"), "setSparePartsQuantity");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_fw"), "setFw");
+            orderHistoryInfoRow.setFieldDateValue(WebUtil.getMessage("zkbHistory_eventDate"), "setEventDate");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_eventQuarter"), "setEventQuarter");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_systemNo"), "setSystemNo");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_faultDescription"), "setFaultDescription");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_hospitalName"), "setHospitalName");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_machineType"), "setMachineType");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_sparePartsNo"), "setSparePartsNo");
+            orderHistoryInfoRow.setFieldDoubleValue(WebUtil.getMessage("zkbHistory_sparePartsPrice"), "setSparePartsPrice");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_description"), "setDescription");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_orderNo"), "setOrderNo");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_RSESup"), "setRSESup");
+            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("zkbHistory_quantity"), "setQuantity");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_sr"), "setSr");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_act"), "setAct");
+            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("zkbHistory_sparePartsLeft"), "setSparePartsLeft");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_sparePartsReturn"), "setSparePartsReturn");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_comment"), "setComment");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_insuranceDescription"), "setInsuranceDescription");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_arrangement"), "setArrangement");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_callNo"), "setCallNo");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_rowner"), "setRowner");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_status"), "setStatus");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_owner"), "setOwner");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_zone"), "setZone");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_source"), "setSource");
             orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("Delete"),"setDelete");
             if(orderHistoryVO.isNull()){
                 break;
@@ -202,19 +216,43 @@ public class ZkbOrderHistoryService {
         boolean isValidateData = true;
         OrderHistoryVO orderHistoryVO = (OrderHistoryVO)item.get("orderHistoryVO");
         AssetInfoRow.clearErrMessage(item);
-        if(orderHistoryVO.getDataType()==null){
+        if(StringUtils.isBlank(orderHistoryVO.getDataType())){
             item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
-            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("ErrorDataTypeIsEmpty"));
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorDataTypeIsEmpty"));
             isValidateData = false;
         }
-        if(StringUtils.isNotEmpty(orderHistoryVO.getId())){
+        if(StringUtils.isNotBlank(orderHistoryVO.getId())){
               ZkbOrderHistory zkbOrderHistory = this.zkbOrderHistoryRepository.findById(orderHistoryVO.getId());
               if(zkbOrderHistory==null)
               {
                 item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
-                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("ErrorSystemId"));
+                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorSystemId"));
                 isValidateData = false;
               }
+        }
+        //代理商字段是否为空
+        boolean isEmptyOfAgent = false;
+        if(StringUtils.isBlank(orderHistoryVO.getAgent()))
+        {
+            item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorDataAgentIsEmpty"));
+            isValidateData = false;
+            //代理商字段为空
+            isEmptyOfAgent = true;
+        }
+        if(!isEmptyOfAgent)
+        {
+            List<TenantInfo> tenantInfoList = this.tenantInfoRepository.findByNameAndType(orderHistoryVO.getAgent(),ZkbOrderHistoryService.zkbTenantType);
+            if(CollectionUtils.isNotEmpty(tenantInfoList))
+            {
+                String tenantUid = tenantInfoList.get(0).getUid();
+                orderHistoryVO.setTenantUid(tenantUid);
+            }else
+                {
+                    item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+                    AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorAgent"));
+                    isValidateData = false;
+                }
         }
         return isValidateData;
     }
@@ -250,7 +288,15 @@ public class ZkbOrderHistoryService {
      * @param contractType 合同类型
      * @return
      */
-    public List<ZkbOrderHistory> loadZkbOrderHistoryData(String dataType,Date contractBeginningTime,Date contractEndingTime,String region,String agent,String contractNo,String contractType,String searchStr){
+    public List<ZkbOrderHistory> loadZkbOrderHistoryData(String dataType,
+                                                         Date contractBeginningTime,
+                                                         Date contractEndingTime,
+                                                         String region,
+                                                         String agent,
+                                                         String contractNo,
+                                                         String contractType,
+                                                         String searchStr,
+                                                         String tenantUid){
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         if(dataType!=null)
         {
@@ -292,6 +338,11 @@ public class ZkbOrderHistoryService {
             SearchFilter searchStrFilter = new SearchFilter("contractType", SearchFilter.Operator.LIKE, contractType);
             searchFilters.add(searchStrFilter);
         }
+        if(tenantUid!=null)
+        {
+            SearchFilter searchStrFilter = new SearchFilter("tenantUid", SearchFilter.Operator.EQ, tenantUid);
+            searchFilters.add(searchStrFilter);
+        }
         return zkbOrderHistoryMapper.loadZkbOrderHistory(searchFilters);
     }
 
@@ -300,42 +351,42 @@ public class ZkbOrderHistoryService {
         List<Map<String, Object>> orderHistoryMapList = new ArrayList<>();
         for (ZkbOrderHistory orderHistory : zkbOrderHistoryList) {
             Map<String, Object> orderHistoryMap = new HashMap<>();
-            orderHistoryMap.put(WebUtil.getMessage("systemId"),orderHistory.getId());
-            orderHistoryMap.put(WebUtil.getMessage("dataType"),orderHistory.getDataType());
-            orderHistoryMap.put(WebUtil.getMessage("region"),orderHistory.getRegion());
-            orderHistoryMap.put(WebUtil.getMessage("agent"),orderHistory.getAgent());
-            orderHistoryMap.put(WebUtil.getMessage("contractNo"),orderHistory.getContractNo());
-            orderHistoryMap.put(WebUtil.getMessage("contractType"),orderHistory.getContractType());
-            orderHistoryMap.put(WebUtil.getMessage("contractBeginningTime"),orderHistory.getContractBeginningTime());
-            orderHistoryMap.put(WebUtil.getMessage("contractEndingTime"),orderHistory.getContractEndingTime());
-            orderHistoryMap.put(WebUtil.getMessage("quantityIb"),orderHistory.getQuantityIb());
-            orderHistoryMap.put(WebUtil.getMessage("sparePartsQuantity"),orderHistory.getSparePartsQuantity());
-            orderHistoryMap.put(WebUtil.getMessage("fw"),orderHistory.getFw());
-            orderHistoryMap.put(WebUtil.getMessage("eventDate"),orderHistory.getEventDate());
-            orderHistoryMap.put(WebUtil.getMessage("eventQuarter"),orderHistory.getEventQuarter());
-            orderHistoryMap.put(WebUtil.getMessage("systemNo"),orderHistory.getSystemNo());
-            orderHistoryMap.put(WebUtil.getMessage("faultDescription"),orderHistory.getFaultDescription());
-            orderHistoryMap.put(WebUtil.getMessage("hospitalName"),orderHistory.getHospitalName());
-            orderHistoryMap.put(WebUtil.getMessage("machineType"),orderHistory.getMachineType());
-            orderHistoryMap.put(WebUtil.getMessage("sparePartsNo"),orderHistory.getSparePartsNo());
-            orderHistoryMap.put(WebUtil.getMessage("sparePartsPrice"),orderHistory.getSparePartsPrice());
-            orderHistoryMap.put(WebUtil.getMessage("description"),orderHistory.getDescription());
-            orderHistoryMap.put(WebUtil.getMessage("orderNo"),orderHistory.getOrderNo());
-            orderHistoryMap.put(WebUtil.getMessage("RSESup"),orderHistory.getRSESup());
-            orderHistoryMap.put(WebUtil.getMessage("quantity"),orderHistory.getQuantity());
-            orderHistoryMap.put(WebUtil.getMessage("sr"),orderHistory.getSr());
-            orderHistoryMap.put(WebUtil.getMessage("act"),orderHistory.getAct());
-            orderHistoryMap.put(WebUtil.getMessage("sparePartsLeft"),orderHistory.getSparePartsLeft());
-            orderHistoryMap.put(WebUtil.getMessage("sparePartsReturn"),orderHistory.getSparePartsReturn());
-            orderHistoryMap.put(WebUtil.getMessage("comment"),orderHistory.getComment());
-            orderHistoryMap.put(WebUtil.getMessage("insuranceDescription"),orderHistory.getInsuranceDescription());
-            orderHistoryMap.put(WebUtil.getMessage("arrangement"),orderHistory.getArrangement());
-            orderHistoryMap.put(WebUtil.getMessage("callNo"),orderHistory.getCallNo());
-            orderHistoryMap.put(WebUtil.getMessage("rowner"),orderHistory.getRowner());
-            orderHistoryMap.put(WebUtil.getMessage("status"),orderHistory.getStatus());
-            orderHistoryMap.put(WebUtil.getMessage("owner"),orderHistory.getOwner());
-            orderHistoryMap.put(WebUtil.getMessage("zone"),orderHistory.getZone());
-            orderHistoryMap.put(WebUtil.getMessage("source"),orderHistory.getSource());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_systemId"),orderHistory.getId());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_dataType"),orderHistory.getDataType());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_region"),orderHistory.getRegion());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_agent"),orderHistory.getAgent());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_contractNo"),orderHistory.getContractNo());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_contractType"),orderHistory.getContractType());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_contractBeginningTime"),orderHistory.getContractBeginningTime());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_contractEndingTime"),orderHistory.getContractEndingTime());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_quantityIb"),orderHistory.getQuantityIb());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sparePartsQuantity"),orderHistory.getSparePartsQuantity());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_fw"),orderHistory.getFw());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_eventDate"),orderHistory.getEventDate());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_eventQuarter"),orderHistory.getEventQuarter());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_systemNo"),orderHistory.getSystemNo());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_faultDescription"),orderHistory.getFaultDescription());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_hospitalName"),orderHistory.getHospitalName());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_machineType"),orderHistory.getMachineType());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sparePartsNo"),orderHistory.getSparePartsNo());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sparePartsPrice"),orderHistory.getSparePartsPrice());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_description"),orderHistory.getDescription());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_orderNo"),orderHistory.getOrderNo());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_RSESup"),orderHistory.getRSESup());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_quantity"),orderHistory.getQuantity());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sr"),orderHistory.getSr());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_act"),orderHistory.getAct());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sparePartsLeft"),orderHistory.getSparePartsLeft());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sparePartsReturn"),orderHistory.getSparePartsReturn());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_comment"),orderHistory.getComment());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_insuranceDescription"),orderHistory.getInsuranceDescription());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_arrangement"),orderHistory.getArrangement());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_callNo"),orderHistory.getCallNo());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_rowner"),orderHistory.getRowner());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_status"),orderHistory.getStatus());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_owner"),orderHistory.getOwner());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_zone"),orderHistory.getZone());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_source"),orderHistory.getSource());
             orderHistoryMapList.add(orderHistoryMap);
         }
         return orderHistoryMapList;

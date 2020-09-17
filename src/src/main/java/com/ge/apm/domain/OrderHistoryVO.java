@@ -93,8 +93,8 @@ public class OrderHistoryVO extends ZkbOrderHistory {
         stringBuffer=stringBuffer.append(this.getRowner() != null ? this.getRowner().toString() : "");
         stringBuffer=stringBuffer.append(this.getStatus() != null ? this.getStatus().toString() : "");
         stringBuffer=stringBuffer.append(this.getOwner() != null ? this.getOwner().toString() : "");
-        stringBuffer=stringBuffer.append(this.getZone() != null ? this.getStatus().toString() : "");
-        stringBuffer=stringBuffer.append(this.getSource() != null ? this.getOwner().toString() : "");
+        stringBuffer=stringBuffer.append(this.getZone() != null ? this.getZone().toString() : "");
+        stringBuffer=stringBuffer.append(this.getSource() != null ? this.getSource().toString() : "");
         return stringBuffer.toString().hashCode();
     }
 
