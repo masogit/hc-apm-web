@@ -1,10 +1,7 @@
 package com.ge.apm.view.simpleparts;
 
 import com.ge.apm.dao.*;
-import com.ge.apm.dao.simpleparts.SimplePartsRequestLineItemRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsWarehouseLocatorRepository;
-import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
+import com.ge.apm.dao.simpleparts.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.*;
 import com.ge.apm.service.constant.ApprovalConstant;
@@ -65,7 +62,7 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
     private UserAccountRepository userAccountRepository;
     private SimplePartsConfigService partsConfigService;
     private SimplePartsRequestEditController partsRequestEditController;
-
+    private SimplePartsInventoryRepository simplePartsInventoryRepository;
     @Getter
     @Setter
     private String oneSearchStr;
@@ -99,7 +96,7 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
         partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
         partsRequestLineItemRepository = WebUtil.getBean(SimplePartsRequestLineItemRepository.class);
         partsRequestEditController = WebUtil.getBean(SimplePartsRequestEditController.class);
-
+        simplePartsInventoryRepository = WebUtil.getBean(SimplePartsInventoryRepository.class);
     }
 
     @Override
@@ -439,6 +436,8 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
             }
             WebUtil.addWarnMessage("须指定仓位");
             return;
+        }else{
+            partsRequestLineItem.setPartsLocatorId(SimplePartsConstant.VIRTUAL_LOCATOR_ID);
         }
 
         if (partsRequestLineItem.getNotTransactionQty() == null || partsRequestLineItem.getNotTransactionQty() == 0){
@@ -448,7 +447,27 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
         }
 
         if(query.getRequestQty() - query.getTransactionQty() >= partsRequestLineItem.getNotTransactionQty()){
-            partsRequestLineItemService.stockInOrOutParts(partsRequestLineItem);
+            SimplePartsRequest partsRequest = partsRequestRepository.findById(partsRequestLineItem.getPartsRequestId());
+            if(partsRequest.getType() == 1){
+                Optional<SimplePartsInventory> partsInventoryOptional = simplePartsInventoryRepository.findByWarehouseIdAndLocatorIdAndPartsItemId(partsRequestLineItem.getPartsWarehouseId(), partsRequestLineItem.getPartsLocatorId(), partsRequestLineItem.getPartsItemId());
+                if (partsInventoryOptional.isPresent()) {
+
+                    SimplePartsInventory partsInventory = partsInventoryOptional.get();
+                    // 更新
+                    int sumNum = partsInventory.getOnhandQty() - partsRequestLineItem.getNotTransactionQty() ;
+                    // 更新 总的库存
+                    if (sumNum < 0) {
+                        partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
+                        WebUtil.addWarnMessage("备件库存不足");
+                        return;
+                    }
+                }else{
+                    WebUtil.addWarnMessage("备件库存不足");
+                    return;
+                }
+            }
+            //备件出入库
+            partsRequestLineItemService.stockInOrOutParts(partsRequestLineItem,partsRequest);
         }else{
             partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
             WebUtil.addWarnMessage("当前申购单明细入库数量不能大于初始需入库的数量");

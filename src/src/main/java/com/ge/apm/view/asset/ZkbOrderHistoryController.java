@@ -1,10 +1,14 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbOrderHistoryRepository;
+import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbOrderHistory;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbOrderHistoryService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -39,6 +43,11 @@ public class ZkbOrderHistoryController extends GenericCRUDUUIDController<ZkbOrde
      * 智康宝历史订单service
      */
     private ZkbOrderHistoryService zkbOrderHistoryService;
+
+    /**
+     * 租户信息repository
+     */
+    private TenantInfoRepository tenantInfoRepository;
 
     /**
      * 智康宝历史订单dao
@@ -100,11 +109,48 @@ public class ZkbOrderHistoryController extends GenericCRUDUUIDController<ZkbOrde
      */
     private String contractType;
 
+    /**
+     * 租户列表信息
+     */
+    private List<TenantInfo> tenantInfoList;
+
+    /**
+     * 租户UID
+     */
+    private String tenantUid;
+
+    /**
+     * 判断用户admin service
+     */
+    private UserContextService userContextService;
+
+    /**
+     * 当前登录用户信息service
+     */
+    private UserAccount currentUser;
+
+
+
     @Override
     protected void init() {
         super.init();
         zkbOrderHistoryService = WebUtil.getBean(ZkbOrderHistoryService.class);
         zkbOrderHistoryRepository = WebUtil.getBean(ZkbOrderHistoryRepository.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        this.tenantInfoList=this.tenantInfoRepository.findByType(ZkbOrderHistoryService.zkbTenantType);
+        if(!userContextService.isZkbAdmin())
+        {
+            String tenantUID = currentUser.getTenantUID();
+            if(StringUtils.isNotEmpty(tenantUID))
+            {
+                this.tenantUid=tenantUID;
+            }else
+                {
+                    this.tenantUid="-";
+                }
+        }
         loadData();
 
     }
@@ -160,7 +206,8 @@ public class ZkbOrderHistoryController extends GenericCRUDUUIDController<ZkbOrde
                 this.agent,
                 this.contractNo,
                 this.contractType,
-                this.searchStr);
+                this.searchStr,
+                this.tenantUid);
     }
 
     /**
@@ -302,5 +349,21 @@ public class ZkbOrderHistoryController extends GenericCRUDUUIDController<ZkbOrde
 
     public void setContractType(String contractType) {
         this.contractType = contractType;
+    }
+
+    public List<TenantInfo> getTenantInfoList() {
+        return tenantInfoList;
+    }
+
+    public void setTenantInfoList(List<TenantInfo> tenantInfoList) {
+        this.tenantInfoList = tenantInfoList;
+    }
+
+    public String getTenantUid() {
+        return tenantUid;
+    }
+
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
     }
 }
