@@ -80,4 +80,22 @@ public interface SimplePartsInventoryRepository extends GenericRepositoryUUID<Si
 
     @Query(value = "select COALESCE(sum(onhand_qty), 0) from simple_parts_inventory where parts_warehouse_id in ?1 and parts_locator_id = 'VIRTUAL_LOCATOR'", nativeQuery = true)
     int countOfVirtualLocators(List<String> partsWarehouseIds);
+
+    /**
+     * @param tenantUid
+     * @return java.util.List<com.ge.apm.domain.SimplePartsInventory>
+     * @date 2020/7/21 18:41
+     * 根据租户id查询虚拟仓库的备件
+     */
+    @Query(value = "select * from simple_parts_inventory where tenant_uid = ?1 and parts_locator_id = 'VIRTUAL_LOCATOR'", nativeQuery = true)
+    List<SimplePartsInventory> findIsVirtualLoctorByTenantUid(String tenantUid);
+
+    /**
+     * @param tenantUid
+     * @return java.util.List<com.ge.apm.domain.SimplePartsInventory>
+     * @date 2020/7/21 18:41
+     * 根据租户id查询非虚拟仓库的备件
+     */
+    @Query(value = "select * from simple_parts_inventory where tenant_uid = ?1 and parts_locator_id != 'VIRTUAL_LOCATOR'", nativeQuery = true)
+    List<SimplePartsInventory> findNotIsVirtualLoctorByTenantUid(String tenantUid);
 }
