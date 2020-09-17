@@ -944,6 +944,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             //查询权限结合 给表格填充数据。
             orgInfoTableData46 = orgList;//给表格数据赋值。
             accessOrgTree = new  DefaultTreeNode("root", null, null);
+            retrieval=null;
 
         }else{
             accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
