@@ -177,7 +177,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     public String queryListByStatus(String status){
         queryStatus = status;
         System.out.println(status);
-        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus+"&tenantUID="+selectionTenantInfo;
+        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public boolean isContainOrder(){
@@ -232,12 +232,15 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
 
     public String createAction() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo));
+        return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo)+"&queryStatus="+queryStatus);
     }
     public String editAction() {
-        return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId()));
-}
+        return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus);
+    }
 
+    public String backList(){
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
+    }
 
     public UserAccount getCurrentUser() {
         return currentUser;
