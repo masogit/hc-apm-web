@@ -150,6 +150,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
      */
     private ZkbFileDirectoryService zkbFileDirectoryService;
 
+    //设备状态
+    @Getter
+    List<I18nMessage> assetStatusList = Collections.emptyList();
+
     // TreeNodeName Filter
     private String treeNodeNameFilter;
     public String getTreeNodeNameFilter() {
@@ -273,6 +277,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         initOrgTree();
 
         updateClinicalDeptOnSiteChange();
+        updateAssetStatusList();
 
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
@@ -290,6 +295,23 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 mvsAssetInfo = found;
             }
         }
+    }
+
+    //判断待报废按钮是否禁用
+    public Boolean hasScrappedAuthority() {
+        return acService.hasScrappedAuthority();
+    }
+
+    //重新获取资产状态枚举
+    public void updateAssetStatusList() {
+        assetStatusList = i18nDao.getByMsgTypeAndSiteId("assetStatus", ApmConstant.DEFAULT_SITE_ID);
+        assetStatusList.stream().forEach(status ->{
+            if(status.getMsgKey().equals("4")){
+                status.setEditable(hasScrappedAuthority());
+            }else{
+                status.setEditable(true);
+            }
+        });
     }
 
     public void returnBack() {
