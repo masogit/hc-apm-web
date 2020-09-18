@@ -55,6 +55,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList =new ArrayList<>();
     private AssetInfo assetInfo;
     private String valueTypeTips = "";
+    private String queryStatus;
 
     @Override
     protected void init() {
@@ -69,6 +70,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         String encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         selectionTenantInfo = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectionTenantInfo");
+        queryStatus = UrlEncryptController.getValueFromMap(encodeStr, "queryStatus") == null ? "" : (String) UrlEncryptController.getValueFromMap(encodeStr, "queryStatus");
         queryWorkFlow = new V2_WorkOrder();
         queryWorkFlow.setAssetInfo(new AssetInfo());
         queryWorkFlow.setServiceRequest(new V2_ServiceRequest());
@@ -515,6 +517,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }else{
             return false;
         }
+    }
+
+    public String backList(){
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public String getActionName() {
