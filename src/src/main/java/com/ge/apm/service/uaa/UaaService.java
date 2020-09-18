@@ -973,8 +973,10 @@ public class UaaService {
             orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
             orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
             List<OrgInfo> list = orgInfoDao.findBySearchFilter(orgInfoFilters);
-            OrgInfo tenant = orgInfoDao.findByUid(tenantUid);
-            list.add(tenant);
+            if(list!=null&&list.size()>0){
+                OrgInfo tenant = orgInfoDao.findByUid(tenantUid);
+                list.add(tenant);
+            }
             return list;
         }else{
             List<String> institutions = new ArrayList<String>();
