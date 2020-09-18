@@ -971,6 +971,7 @@ public class UaaService {
         if(flag){
             List<String> institutions = orgInfoDao.findByInstitutionByNameLike(treeNodeNameFilter, 46);
             orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
+            orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
             List<OrgInfo> list = orgInfoDao.findBySearchFilter(orgInfoFilters);
             OrgInfo tenant = orgInfoDao.findByUid(tenantUid);
             list.add(tenant);
