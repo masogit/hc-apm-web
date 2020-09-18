@@ -248,6 +248,9 @@ public class WorkflowConfig implements Serializable {
     }
 
     public boolean getEnableScrappedControl() {
+        if(null == enableScrappedControl){
+            return false;
+        }
         return enableScrappedControl;
     }
 
