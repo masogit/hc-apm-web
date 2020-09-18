@@ -24,6 +24,9 @@ public interface ApmConstant {
     public static final String TREASURY_USE = "1";//库房领用
     public static final String MEDICAL_WORKERS_PURCHASING = "2";//医工采购
 
-
+    //自定义角色类型
+    static final int CUSTOME_ROLE_TYPE = 1;
+    //默认site_id
+    static final int DEFAULT_SITE_ID = -1;
 
 }
