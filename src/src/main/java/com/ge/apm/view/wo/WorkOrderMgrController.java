@@ -1787,8 +1787,11 @@ public void test1(){
         if(this.isEnableIntegrationWithWorkOrder()){
             for (int i = 0; i < approvedDetails.size(); i++) {
                 V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
+                LOGGER.info("selectedMap.get(v2_workOrder_detail.getId())------->"+selectedMap.get(v2_workOrder_detail.getId()));
                 if (selectedMap.get(v2_workOrder_detail.getId())) {
+                    LOGGER.info("v2_workOrder_detail.getPartsItemId()------>"+v2_workOrder_detail.getPartsItemId());
                     if(v2_workOrder_detail.getPartsItemId() !=null){
+                        LOGGER.info("v2_workOrder_detail.getApproved()------>"+v2_workOrder_detail.getApproved());
                         if (!v2_workOrder_detail.getApproved()) {
                             approvedDetailsNew.add(v2_workOrder_detail);
                         }
