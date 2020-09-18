@@ -12,10 +12,7 @@ import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.MvsUtil;
-import com.ge.apm.service.utils.PinYinComparator;
-import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.service.utils.*;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -152,6 +149,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
      * 目录关系service
      */
     private ZkbFileDirectoryService zkbFileDirectoryService;
+
+    // TreeNodeName Filter
+    private String treeNodeNameFilter;
+    public String getTreeNodeNameFilter() {
+        return treeNodeNameFilter;
+    }
+    public void setTreeNodeNameFilter(String treeNodeNameFilter) {
+        this.treeNodeNameFilter = treeNodeNameFilter;
+    }
 
     @Override
     protected void init() {
@@ -408,6 +414,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public void initOrgTree() {
+        if(getIsSelect46Account()){
+            return;
+        }
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
         OrgInfo rootOrg = new OrgInfo();
@@ -1330,5 +1339,38 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public int getAssetChangeHistoryCount() {
         return changeHistoryList.size();
+    }
+
+    public boolean getIsSelect46Account() {
+        if (UserContextService.getCurrentUserAccount().getSiteId()==46&&UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
+            return true;
+        }
+        return false;
+    }
+    private TreeNode buildTree(List<OrgInfo> orgList,int siteId) {
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("org", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        rootNode.setSelectable(false);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+        for (OrgInfo org : orgList) {
+            rootNode.setSelectable(true);
+            rootNode.setRowKey("org_"+org.getId());
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+        return rootNode;
+    }
+    public void filterTreeNode(){
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
+        TreeNode treeNode = buildTree(orgList,loginUser.getSiteId());
     }
 }
