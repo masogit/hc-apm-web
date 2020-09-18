@@ -14,22 +14,48 @@
 
             <div class="ui-g-12 card">
                 <h:form id="customConfigForm">
-                    <h:panelGroup >
-                        <p:commandButton id="btnOrg" value="#{customConfigController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                        <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
-                            <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                    <p:ajax process="@this" event="select" listener="#{customConfigController.onSelectSiteTreeNode}" update="customConfigForm" oncomplete="PF('varPanelOrg').hide();"/>
-                                    <p:ajax process="@this" event="expand"/>
-                                    <p:ajax process="@this" event="collapse"/>
-                                    <p:treeNode type="org">
-                                        <h:outputText value="#{node.name}"/>
-                                    </p:treeNode>
-                                    <p:treeNode type="hidden" rendered="false"/>
-                                </p:tree>
-                            </p:scrollPanel>
-                        </p:overlayPanel>
-                    </h:panelGroup>
+                    <c:choose>
+                        <c:when test="#{orgTreeController.judgeTheUser()}">
+                            <h:panelGroup >
+                                <!-- <p:commandButton id="btnOrg" value="#{customConfigController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right" />-->
+                                <h:outputText value="查询集团名称:"  style="font-weight:bold; padding: 10px"/>
+                                <p:inputText id="retrieval" value="#{orgTreeController.retrieval}" style="width:150px;"/>
+                                <p:commandButton id="retrieval2"  icon="fa fa-angle-down" title="查询"   validateClient="true"  actionListener="#{orgTreeController.filterNode()}" value="#{customConfigController.selectSite.name}"  update="orgTree :growl" iconPos="right"/>
+                                <p:overlayPanel widgetVar="varPanelOrg" for="retrieval2" hideEffect="fade" dynamic="false" modal="false">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native" >
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTreePage}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                            <p:ajax process="@this" event="select" listener="#{customConfigController.onSelectSiteTreeNode}" update="customConfigForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node.name}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="hidden" rendered="false"/>
+                                        </p:tree>
+                                    </p:scrollPanel>
+
+                                </p:overlayPanel>
+                            </h:panelGroup>
+                        </c:when>
+                        <c:otherwise>
+                             <h:panelGroup >
+                               <p:commandButton id="btnOrg" value="#{customConfigController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                               <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                   <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                       <p:tree id="orgTree2" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                           <p:ajax process="@this" event="select" listener="#{customConfigController.onSelectSiteTreeNode}" update="customConfigForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                           <p:ajax process="@this" event="expand"/>
+                                           <p:ajax process="@this" event="collapse"/>
+                                           <p:treeNode type="org">
+                                               <h:outputText value="#{node.name}"/>
+                                           </p:treeNode>
+                                           <p:treeNode type="hidden" rendered="false"/>
+                                       </p:tree>
+                                   </p:scrollPanel>
+                               </p:overlayPanel>
+                           </h:panelGroup>
+                        </c:otherwise>
+                    </c:choose>
                     <h:panelGroup >
                         <h:outputText id="configInfo" value="#{msg.CreatedAfterSaving}" rendered="#{empty customConfigController.customConfig}" style="font-weight:bold; padding: 10px"/>
                         <h:outputText value="#{msg.Creator}:" rendered="#{not empty customConfigController.customConfig}" style="font-weight:bold; padding: 10px"/>
