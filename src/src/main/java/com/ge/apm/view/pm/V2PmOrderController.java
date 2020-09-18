@@ -223,6 +223,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String queryAssetUid;
     private ConfigService configService;
 
+    private String plannedCompletionTimeFormat = null;
+    private String actualCompletionTimeFormat = null;
+
+    public String getActualCompletionTimeFormat() {
+        return actualCompletionTimeFormat;
+    }
+
+    public void setActualCompletionTimeFormat(String actualCompletionTimeFormat) {
+        this.actualCompletionTimeFormat = actualCompletionTimeFormat;
+    }
+
+    public String getPlannedCompletionTimeFormat() {
+        return plannedCompletionTimeFormat;
+    }
+
+    public void setPlannedCompletionTimeFormat(String plannedCompletionTimeFormat) {
+        this.plannedCompletionTimeFormat = plannedCompletionTimeFormat;
+    }
+
     public String getHead() {
         return head;
     }
@@ -1753,6 +1772,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
            //最后一个审批通过的时候 生成相应单子
            List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
            List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
+           LOGGER.info("保养工单approvedDetailsNew.size"+approvedDetailsNew.size());
            if (!approvedDetailsNew.isEmpty()) {
                for (int i = 0; i < approvedDetailsNew.size(); i++) {
                    V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
@@ -1762,10 +1782,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                        accessorySparePartsBuyList.add(v2_workOrder_detail);
                    }
                }
+               LOGGER.info("保养工单生成申领单是否又符合要求的accessorySparePartsRequestList.size"+accessorySparePartsRequestList.size());
                if (!accessorySparePartsRequestList.isEmpty()) {
                    LOGGER.info("保养工单生成申领单start!!!!");
                    partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER);//生成申领单
                }
+               LOGGER.info("保养工单生成申购单是否又符合要求的accessorySparePartsBuyList.size"+accessorySparePartsBuyList.size());
                if (!accessorySparePartsBuyList.isEmpty()) {
                    LOGGER.info("保养工单生成申购单start!!!!");
                    partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER);//生成申购单
