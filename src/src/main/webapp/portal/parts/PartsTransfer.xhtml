@@ -82,7 +82,7 @@
                                         update="@(.targetWarehouseLocatorChanged)"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{simplePartsConfigReadController.enableWarehouseLocator}">
+                        <h:panelGroup>
                             <label class="label">仓位选择</label>
                             <p:selectOneMenu id="ToSparePartsLocator" value="#{simplePartsTransferController.targetPartsWarehouseLocatorId}"
                                              required="false"  class="targetWarehouseLocatorChanged">

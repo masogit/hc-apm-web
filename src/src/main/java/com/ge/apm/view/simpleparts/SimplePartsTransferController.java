@@ -160,14 +160,10 @@ public class SimplePartsTransferController extends GenericCRUDUUIDController<Sim
             return Collections.EMPTY_LIST;
         }
 
-        boolean isEnableWarehouseLocator = partsConfigReadController.isEnableWarehouseLocator();
-        List<SimplePartsWareHouseLocator> targetPartsWareHouseLocatorList = Lists.newArrayList();
-        if (isEnableWarehouseLocator) {
-            targetPartsWareHouseLocatorList = partsWarehouseLocatorRepository.findByPartsWarehouseId(targetPartsWarehouseId);
-        }else{
-            targetPartsWareHouseLocatorList.add(SimplePartsWareHouseLocator.VIRTUAL_LOCATOR);
-        }
+        List<SimplePartsWareHouseLocator> targetPartsWareHouseLocatorList = partsWarehouseLocatorRepository.findByPartsWarehouseId(targetPartsWarehouseId);
+        targetPartsWareHouseLocatorList.add(SimplePartsWareHouseLocator.VIRTUAL_LOCATOR);
         return targetPartsWareHouseLocatorList;
+
     }
 
     public void save(){
@@ -179,8 +175,8 @@ public class SimplePartsTransferController extends GenericCRUDUUIDController<Sim
         }else if (sourcePartsItemNum==0){
             WebUtil.addErrorMessage("保存失败，备件数量至少为1个");
             return;
-        }else if(sourcePartsWarehouseId.equals(targetPartsWarehouseId)){
-            WebUtil.addErrorMessage("源仓库与目标仓库不能相同");
+        }else if(sourcePartsWarehouseId.equals(targetPartsWarehouseId) && sourcePartsWarehouseLocatorId.equals(targetPartsWarehouseLocatorId)){
+            WebUtil.addErrorMessage("源仓库与目标仓库相同时，仓位不能相同");
             return;
         }else if(isWareHouseLocatorOpen == true && (null == targetPartsWarehouseLocatorId || targetPartsWarehouseLocatorId.isEmpty()) ){
             WebUtil.addErrorMessage("仓位已开启，请选择仓位");
