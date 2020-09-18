@@ -158,6 +158,18 @@ public class TenantInfo implements Serializable {
     @Column(name = "have_ib_device")
     private Boolean haveIbDevice;
 
+
+    @Column(name = "two_factor_valid")
+    private Boolean twoFactorValid;          //登录是否2次验证开关
+
+    public Boolean getTwoFactorValid() {
+        return twoFactorValid;
+    }
+
+    public void setTwoFactorValid(Boolean twoFactorValid) {
+        this.twoFactorValid = twoFactorValid;
+    }
+
     public Integer getInternationalVersion() {
         return internationalVersion;
     }
