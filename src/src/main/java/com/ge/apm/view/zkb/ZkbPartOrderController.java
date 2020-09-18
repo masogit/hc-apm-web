@@ -48,8 +48,12 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         queryStatus =WebUtil.getRequestParameter("queryStatus");
+        selectionTenantInfo =WebUtil.getRequestParameter("tenantUID");
         if(StringUtils.isEmpty(queryStatus)){
             queryStatus = "";
+        }
+        if(StringUtils.isEmpty(selectionTenantInfo)){
+            selectionTenantInfo = "";
         }
         if(userContextService.isZkbUser()) {
             this.selectionTenantInfo = currentUser.getTenantUID();
@@ -83,12 +87,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             searchFilters = new ArrayList<>();
         }
 
-        if(this.selectionTenantInfo != null){
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
-        }
 
         if(userContextService.isZkbUser()) {
-            if(this.selectionTenantInfo != null){
+            if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
                 searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
             }
             if(StringUtils.isEmpty(queryStatus)){
@@ -97,9 +98,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
             }
         }else{
-            if(this.selectionTenantInfo != null){
+            if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
                 searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
             }
+
             if(zkbPartOrderUserConfigList == null || zkbPartOrderUserConfigList.size() == 0){
                 //return null;
             }else{
@@ -160,9 +162,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         return zkbContractPage;
     }
 
-    public void queryListByStatus(String status){
+    public String queryListByStatus(String status){
         queryStatus = status;
         System.out.println(status);
+        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus+"&tenantUID="+selectionTenantInfo;
     }
 
     public boolean isContainOrder(){
