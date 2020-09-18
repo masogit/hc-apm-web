@@ -16,6 +16,7 @@ import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -87,6 +88,8 @@ public class AssetFileImportController {
 //    private Map<String, OrgInfo> orgNamesUriCache;
 
     private boolean crossSite;
+
+    private String treeNodeNameFilter;
 
     @PostConstruct
     protected void init() {
@@ -284,6 +287,9 @@ public class AssetFileImportController {
 //    }
 
     public void initOrgTree() {
+        if(getIsSelect46Account()){
+            return;
+        }
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
@@ -489,5 +495,47 @@ public class AssetFileImportController {
 
     public void setActiveTabIndex(int activeTabIndex) {
         this.activeTabIndex = activeTabIndex;
+    }
+
+    public boolean getIsSelect46Account() {
+        if (UserContextService.getCurrentUserAccount().getSiteId()==46&&UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
+            return true;
+        }
+        return false;
+    }
+
+    public String getTreeNodeNameFilter() {
+        return treeNodeNameFilter;
+    }
+
+    public void setTreeNodeNameFilter(String treeNodeNameFilter) {
+        this.treeNodeNameFilter = treeNodeNameFilter;
+    }
+
+    private TreeNode buildTree(List<OrgInfo> orgList,int siteId) {
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("org", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        rootNode.setSelectable(false);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+        for (OrgInfo org : orgList) {
+            rootNode.setSelectable(true);
+            rootNode.setRowKey("org_"+org.getId());
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+        return rootNode;
+    }
+    public void filterTreeNode(){
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
+        buildTree(orgList,loginUser.getSiteId());
     }
 }
