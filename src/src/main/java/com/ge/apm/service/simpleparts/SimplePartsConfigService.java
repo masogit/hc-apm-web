@@ -36,7 +36,7 @@ public class SimplePartsConfigService {
             return false;
         }
 
-        return partsConfigOptional.get().isEnableWarehouseSelectionInRequest();
+        return partsConfigOptional.get().isEnableWarehouseSelectionInRequest() != null ? partsConfigOptional.get().isEnableWarehouseSelectionInRequest() : false;
     }
 
     public boolean isEnableIntegrationWithWorkOrder() {

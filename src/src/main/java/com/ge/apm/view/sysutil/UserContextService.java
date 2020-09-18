@@ -855,6 +855,16 @@ public class UserContextService implements Serializable {
         }
         return false;
     }
+    public boolean isPartnerAccount46() {
+        UserAccount user = getLoginUser();
+        if (null == user.getSiteId()) {
+            return false;
+        }
+        if (ApmConstant.IB_TENANT_ID == user.getSiteId()) {
+            return true;
+        }
+        return false;
+    }
 
     public boolean isZkbAccount() {
         TenantInfo tenantInfo = getTenantInfo();

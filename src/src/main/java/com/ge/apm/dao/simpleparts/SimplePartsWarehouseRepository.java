@@ -28,7 +28,7 @@ public interface SimplePartsWarehouseRepository extends GenericRepositoryUUID<Si
     @Query(value = "select u.* from simple_parts_warehouse u where u.id = ?1 ", nativeQuery = true)
     SimplePartsWarehouse getById(String id);
 
-    @Query(value = "select * from simple_parts_warehouse where tenant_uid = ?1  order by created_date desc", nativeQuery = true)
+    @Query(value = "select * from simple_parts_warehouse where tenant_uid = ?1  and status =1 order by created_date desc", nativeQuery = true)
     List<SimplePartsWarehouse> findAllWarehouseList(String tenantUid);
 
     @Query(value = "select * from simple_parts_warehouse where tenant_uid = ?1 and status = 1 order by created_date desc", nativeQuery = true)
