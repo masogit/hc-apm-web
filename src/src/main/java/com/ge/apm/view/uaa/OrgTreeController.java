@@ -48,14 +48,14 @@ public class OrgTreeController {
     // TreeNodeName Filter
     private String treeNodeNameFilter;
     private String retrieval;
-    private int siteId = -1;
+    private String tenantUid="";
 
-    public int getSiteId() {
-        return siteId;
+    public String getTenantUid() {
+        return tenantUid;
     }
 
-    public void setSiteId(int siteId) {
-        this.siteId = siteId;
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
     }
 
     public String getRetrieval() {
@@ -76,7 +76,7 @@ public class OrgTreeController {
 
     @PostConstruct
     protected void init() {
-        siteId = UserContextService.getCurrentUserAccount().getSiteId();//获取用户siteId用于区分用户是否是46号租户
+        tenantUid = UserContextService.getCurrentUserAccount().getTenantUID();//获取用户siteId用于区分用户是否是46号租户
         siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
     }
 
@@ -183,7 +183,7 @@ public class OrgTreeController {
     }
     //判断租户是否是46号租户 是返回true 否返回false
     public boolean judgeTheUser(){
-        if(46==siteId){
+        if(siteUID.equals(tenantUid)){
             return true;
         }else{
             return false;
