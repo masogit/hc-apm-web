@@ -1808,9 +1808,11 @@ public void test1(){
                         }
                     }
                     if (!accessorySparePartsRequestList.isEmpty()) {
+                        LOGGER.info("维修工单生成申领单start!!!!");
                         partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER);//生成申领单
                     }
                     if (!accessorySparePartsBuyList.isEmpty()) {
+                        LOGGER.info("维修工单生成申购单start!!!!");
                         partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER);//生成申购单
                     }
                 }

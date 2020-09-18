@@ -195,13 +195,16 @@
             <p:inputText id="selectedUserOrgName" value="#{assetInfoEditController.selectedObjectMap['selectedOrg']}" readonly="true" class="SiteUIDChange"/>
             <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{not empty assetInfoEditController.selected.id or !assetInfoEditController.needEdit('siteUID')}"/>
             <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                <c:if test="#{assetInfoEditController.isSelect46Account}">
+                    <p:inputText id="assetEditTreeNodeNameFilter" class="treeNodeNameFilter" value="#{assetInfoEditController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":tab:AssetInfoEditForm:assetEditTreeNodeNameFilter @this" update=":tab:AssetInfoEditForm:orgTree" actionListener="#{assetInfoEditController.filterTreeNode()}" value="#{msg.Search2}"/>
+                </c:if>
                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.orgTree}" var="node" selectionMode="single">
                         <p:ajax process="@this" event="select" update="@(.SiteUIDChange) :tab:AssetInfoEditForm:buttonGroup"
                                 listener="#{assetInfoEditController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                         <p:ajax process="@this" event="expand"/>
                         <p:ajax process="@this" event="collapse"/>
-
                         <p:treeNode type="org">
                             <h:outputText value="#{node}"/>
                         </p:treeNode>
