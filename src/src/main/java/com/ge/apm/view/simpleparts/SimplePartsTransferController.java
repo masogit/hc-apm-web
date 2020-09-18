@@ -160,14 +160,10 @@ public class SimplePartsTransferController extends GenericCRUDUUIDController<Sim
             return Collections.EMPTY_LIST;
         }
 
-        boolean isEnableWarehouseLocator = partsConfigReadController.isEnableWarehouseLocator();
-        List<SimplePartsWareHouseLocator> targetPartsWareHouseLocatorList = Lists.newArrayList();
-        if (isEnableWarehouseLocator) {
-            targetPartsWareHouseLocatorList = partsWarehouseLocatorRepository.findByPartsWarehouseId(targetPartsWarehouseId);
-        }else{
-            targetPartsWareHouseLocatorList.add(SimplePartsWareHouseLocator.VIRTUAL_LOCATOR);
-        }
+        List<SimplePartsWareHouseLocator> targetPartsWareHouseLocatorList = partsWarehouseLocatorRepository.findByPartsWarehouseId(targetPartsWarehouseId);
+        targetPartsWareHouseLocatorList.add(SimplePartsWareHouseLocator.VIRTUAL_LOCATOR);
         return targetPartsWareHouseLocatorList;
+
     }
 
     public void save(){
