@@ -197,6 +197,7 @@ public class SimplePartsRequestWorkOrderService {
         }
         //发送微信通知
         this.sendWxMsg(partsRequest);
+        log.info("工单生成申购单end!!!!");
     }
 
     public void sendWxMsg(SimplePartsRequest partsRequest){
@@ -359,6 +360,7 @@ public class SimplePartsRequestWorkOrderService {
 
         //发送微信通知
         this.sendWxMsg(partsRequest);
+        log.info("工单生成申领单end!!!!!");
     }
 
 

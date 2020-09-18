@@ -1763,9 +1763,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                    }
                }
                if (!accessorySparePartsRequestList.isEmpty()) {
+                   LOGGER.info("保养工单生成申领单start!!!!");
                    partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER);//生成申领单
                }
                if (!accessorySparePartsBuyList.isEmpty()) {
+                   LOGGER.info("保养工单生成申购单start!!!!");
                    partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER);//生成申购单
                }
            }
