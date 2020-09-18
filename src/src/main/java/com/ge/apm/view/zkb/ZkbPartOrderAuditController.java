@@ -382,7 +382,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())){
-                HashMap<String, Integer> returnMap = new HashMap<>();
+                /*HashMap<String, Integer> returnMap = new HashMap<>();
                 for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
                     if(returnMap.containsKey(r.getPartNo())){
                         Integer v = returnMap.get(r.getPartNo());
@@ -408,7 +408,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     errorLog = errorLog.substring(0,errorLog.length()-1);
                     WebUtil.addErrorMessage(errorLog+"归还数量不等于申请数量","");
                     return "";
-                }
+                }*/
             }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
                 boolean flag = true;
                 String errorLog = "";
@@ -442,7 +442,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }
-        zkbPartOrderService.normalNext(this.selected,currentUser);
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
+            List<ZkbPartOrderReturn> currentZkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderIdAndDataStatus(selected.getId(),ZkbPartOrderReturn.DataStatusEnum.New.toString());
+            if(currentZkbPartOrderReturns ==null || currentZkbPartOrderReturns.size() ==0){
+                WebUtil.addErrorMessage("请填写归还数据","");
+                return "";
+            }
+            zkbPartOrderService.batchesReturnNext(selected,currentZkbPartOrderReturns,currentUser);
+        }else {
+            zkbPartOrderService.normalNext(this.selected,currentUser);
+        }
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){

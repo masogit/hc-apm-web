@@ -119,7 +119,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             WebUtil.addErrorMessage("查询有误，请输入条件","");
             return;
         }
-        v2_listHashMap = zkbPartOrderService.getQueryWorkFlowList(queryWorkFlow);
+        v2_listHashMap = zkbPartOrderService.getQueryWorkFlowList(queryWorkFlow,selectionTenantInfo);
         contractList = new ArrayList<>();
     }
 
