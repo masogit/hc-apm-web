@@ -1078,7 +1078,7 @@ public class UserContextService implements Serializable {
         AssetCreateService acService = WebUtil.getBean(AssetCreateService.class);
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         CustomRoleRepository customeRoleDao = WebUtil.getBean(CustomRoleRepository.class);
-        if(acService.hasScrappedAuthority()){
+        if(acService.needScrappedControl()){
             List<UserRole> userRoleList = userRoleDao.findByUserIdAndRoleType(UserContextService.getCurrentUserAccount().getId(), ApmConstant.CUSTOME_ROLE_TYPE);
             for (UserRole userRole : userRoleList) {
                 String menus = customeRoleDao.findById(userRole.getRoleId()).getMenus();
