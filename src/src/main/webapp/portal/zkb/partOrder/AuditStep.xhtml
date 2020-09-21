@@ -168,15 +168,15 @@
                             <p:inputTextarea id="remark" value="#{zkbPartOrderAuditController.selected.remark}" disabled="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">产品型号</label>
+                            <label class="label">产品型号*</label>
                             <p:inputText id="productNumber" value="#{zkbPartOrderAuditController.selected.productNumber}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
-                            <label class="label">软件版本</label>
+                            <label class="label">软件版本*</label>
                             <p:inputText id="softwareVersion" value="#{zkbPartOrderAuditController.selected.softwareVersion}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">故障描述</label>
+                            <label class="label">故障描述*</label>
                             <p:inputTextarea id="faultDescription" value="#{zkbPartOrderAuditController.selected.faultDescription}" disabled="true" />
                         </h:panelGroup>
                     </p:panelGrid>
@@ -488,10 +488,35 @@
                         <h:panelGroup>
                             <label class="label">归还类型*</label>
                             <p:selectOneMenu id="returnType" value="#{zkbPartOrderAuditController.selected.returnType}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" >
+                                <p:ajax event="change" update="partSerialNumberGroup partQualityIssueGroup" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{zkbPartOrderAuditController.returnTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        <h:panelGroup id="partSerialNumberGroup" style="text-align: left">
+                            <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA')}" style="text-align: left">
+                                <label class="label">Part Serial Number*</label>
+                                <p:inputText id="partSerialNumber" value="#{zkbPartOrderAuditController.selected.partSerialNumber}" style="text-align: left" required="true" requiredMessage="Part Serial Number不能为空"/>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                        <h:panelGroup id="partQualityIssueGroup" style="text-align: left">
+                            <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA')}" style="text-align: left">
+                                <label class="label">故障描述*</label>
+                                <p:selectOneMenu id="partQualityIssue" value="#{zkbPartOrderAuditController.selected.partQualityIssue}" style="text-align: left" >
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItem itemLabel="Boot Up Issue" itemValue="Boot Up Issue"/>
+                                    <f:selectItem itemLabel="Cosmetic Issue" itemValue="Cosmetic Issue"/>
+                                    <f:selectItem itemLabel="Disassembled" itemValue="Disassembled"/>
+                                    <f:selectItem itemLabel="Function Does Not Work" itemValue="Function Does Not Work"/>
+                                    <f:selectItem itemLabel="Image Quality Issue" itemValue="Image Quality Issue"/>
+                                    <f:selectItem itemLabel="Missing/Swapped Component" itemValue="Missing/Swapped Component"/>
+                                    <f:selectItem itemLabel="Other" itemValue="Other"/>
+                                    <f:selectItem itemLabel="Physical Damage" itemValue="Physical Damage"/>
+                                    <f:selectItem itemLabel="Used/Dirty" itemValue="Used/Dirty"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">归还数量*</label>
                             <p:inputText id="returnQty" value="#{zkbPartOrderAuditController.selected.returnQty}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" />
