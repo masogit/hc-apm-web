@@ -1798,7 +1798,6 @@ public void test1(){
                 //最后一个审批通过的时候 生成相应单子
                 List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
                 List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
-                LOGGER.info("维修工单approvedDetailsNew.size"+approvedDetailsNew.size());
                 if (!approvedDetailsNew.isEmpty()) {
                     for (int i = 0; i < approvedDetailsNew.size(); i++) {
                         V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
@@ -1808,12 +1807,10 @@ public void test1(){
                             accessorySparePartsBuyList.add(v2_workOrder_detail);
                         }
                     }
-                    LOGGER.info("维修工单生成申领单是否又符合要求的accessorySparePartsRequestList.size"+accessorySparePartsRequestList.size());
                     if (!accessorySparePartsRequestList.isEmpty()) {
                         LOGGER.info("维修工单生成申领单start!!!!");
                         partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER);//生成申领单
                     }
-                    LOGGER.info("维修工单生成申购单是否又符合要求的accessorySparePartsBuyList.size"+accessorySparePartsBuyList.size());
                     if (!accessorySparePartsBuyList.isEmpty()) {
                         LOGGER.info("维修工单生成申购单start!!!!");
                         partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER);//生成申购单

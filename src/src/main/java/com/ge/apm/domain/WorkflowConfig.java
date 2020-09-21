@@ -217,6 +217,8 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "swap_center_config")
     private String swapCenterConfig;
 
+    @Column(name = "enable_scrapped_control")
+    private Boolean enableScrappedControl;
     /***
      *
      * 备件审核人排列，保养、维修、计量都适用
@@ -243,6 +245,17 @@ public class WorkflowConfig implements Serializable {
 
     public void setClinicalDeptHeadWeight(Integer clinicalDeptHeadWeight) {
         this.clinicalDeptHeadWeight = clinicalDeptHeadWeight;
+    }
+
+    public boolean getEnableScrappedControl() {
+        if(null == enableScrappedControl){
+            return false;
+        }
+        return enableScrappedControl;
+    }
+
+    public void setEnableScrappedControl(boolean enableScrappedControl) {
+        this.enableScrappedControl = enableScrappedControl;
     }
 
     public Integer getAssetDeptHeadWeight() {
