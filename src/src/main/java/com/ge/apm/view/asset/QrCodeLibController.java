@@ -87,6 +87,9 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 //            tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
 //        }
 //        onSiteChange();
+        //系统配置二维码管理初始化页面没有医院下拉修复
+        tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
+        onTenantFilterChange();
 
     }
 
