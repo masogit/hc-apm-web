@@ -76,7 +76,7 @@
 						</h:panelGroup>
 						<h:panelGroup>
 							<label class="label">#{msg.nurseSiteAssetScrapped}</label>
-							<p:selectManyCheckbox value="#{customRoleController.mapAuthCard['asset']}" layout="responsive" columns="4">
+							<p:selectManyCheckbox value="#{customRoleController.mapAuthCard['assetScrapped']}" layout="responsive" columns="4">
 								<f:selectItems value="#{fieldMsg.getFieldValueList('assetScrapped')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 							</p:selectManyCheckbox>
 						</h:panelGroup>
