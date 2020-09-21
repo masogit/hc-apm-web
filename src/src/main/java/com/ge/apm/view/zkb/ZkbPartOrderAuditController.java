@@ -366,14 +366,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.sendMessage(zkbPartOrder);
         zkbPartOrderService.sendEmail(zkbPartOrder);
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
-        return "List?faces-redirect=true";
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public String rejectNext(){
         zkbPartOrderService.auditNext(this.selected,false,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
-        return "List?faces-redirect=true";
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public String normalNext(){
