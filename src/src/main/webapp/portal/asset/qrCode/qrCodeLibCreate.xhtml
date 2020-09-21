@@ -4,7 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
 <ui:composition>
     <p:dialog id="qrCodeLibCreateDlg" widgetVar="qrCodeLibCreateDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.QRCodeCreate}">
@@ -12,7 +13,7 @@
         <h:panelGroup id="display">
         	<h:panelGroup id ="tenant" >
             <h:outputLabel for="siteIdSelect" value="#{msg.TenantInfo} ： "  />
-            <p:selectOneMenu id="siteIdSelect" value="#{qrCodeLibController.tenantUID}" required="true" requiredMessage="#{msg.SiteCannotBeEmpty}">
+            <p:selectOneMenu id="siteIdSelect" value="#{qrCodeLibController.tenantUID}" required="true" requiredMessage="#{msg.SiteCannotBeEmpty}" filter="true" filterMatchMode="startsWith" effect="fade" >
                 <p:ajax  listener="#{qrCodeLibController.onSiteChange}" update="hospitalIdSelect" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{qrCodeLibController.tenantList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
@@ -20,7 +21,7 @@
             <br/>
             <br/>
             <h:outputLabel for="hospitalIdSelect" value="#{msg.Hospital} ： " />
-            <p:selectOneMenu id="hospitalIdSelect" value="#{qrCodeLibController.siteUID}" required="true" requiredMessage="#{msg.HospitalCannotBeEmpty}" >
+            <p:selectOneMenu id="hospitalIdSelect" value="#{qrCodeLibController.siteUID}" required="true" requiredMessage="#{msg.HospitalCannotBeEmpty}" filter="true" filterMatchMode="startsWith" effect="fade">
                 <p:ajax  listener="#{qrCodeLibController.onSiteUIDChange}" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
