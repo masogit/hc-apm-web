@@ -429,6 +429,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         flag = false;
                         errorLog += "价格不能为空,";
                     }
+                    if(StringUtils.isEmpty(zkbPartOrderItem.getOrderNo())){
+                        flag = false;
+                        errorLog += "Order#不能为空,";
+                    }
                     ZkbPartOrderItem oldItem = zkbPartOrderService.getZkbPartOrderItemRepository().findById(zkbPartOrderItem.getId());
                     if(oldItem != null){
                         if(!oldItem.getPartNo().equals(zkbPartOrderItem.getPartNo()) || !oldItem.getPartName().equals(zkbPartOrderItem.getPartName())){
