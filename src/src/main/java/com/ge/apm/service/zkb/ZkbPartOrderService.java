@@ -6,6 +6,7 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -91,8 +92,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
 
-    public List<HashMap<String, String>> getQueryWorkFlowList(V2_WorkOrder v2_workOrder,String tenantUID){
-        List<HashMap<String, String>> v2_listHashMap = new ArrayList<>();
+    public List<HashMap<String, Object>> getQueryWorkFlowList(V2_WorkOrder v2_workOrder,String tenantUID){
+        List<HashMap<String, Object>> v2_listHashMap = new ArrayList<>();
         List<SearchFilter> assetFilters = new ArrayList<>();
         //assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 1));
         //assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
@@ -110,7 +111,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         Page page = v2_workOrderRepository.findBySearchFilter(assetFilters, pageable);
         List<V2_WorkOrder> v2_workOrderList = page.getContent();
         for(V2_WorkOrder v : v2_workOrderList){
-            HashMap<String, String> m = new HashMap<>();
+            HashMap<String, Object> m = new HashMap<>();
             m.put("name",v.getAssetInfo().getName());
             m.put("systemId",v.getAssetInfo().getSystemId());
             m.put("srNum",v.getServiceRequest().getSrNum());
@@ -119,6 +120,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             m.put("customerName",v.getServiceRequest().getCustomerName());
             m.put("customerTel",v.getServiceRequest().getCustomerTel());
             m.put("faultDescription",v.getServiceRequest().getRequestReason());
+            m.put("requestTime",v.getServiceRequest().getRequestTime());
             String siteUid = v.getAssetInfo().getSiteUID();
             if(StringUtils.isNotEmpty(siteUid)){
                 OrgInfo orgInfo = orgInfoRepository.getByUid(siteUid);
@@ -134,13 +136,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Autowired
     ZkbContractAssetRepository zkbContractAssetRepository;
 
-    public List<ZkbContract> queryContractByAsset(String tenUId,String assetId){
+    public List<ZkbContract> queryContractByAsset(String tenUId,String assetId,Date requestTime){
         List<String> strings = zkbContractAssetRepository.findDistinctContractId(assetId);
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("id", SearchFilter.Operator.IN,strings));
         filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenUId));
-        filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, new Date()));
-        filters.add(new SearchFilter("endDate", SearchFilter.Operator.GTE,new Date()));
+        filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, requestTime));
+        filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(requestTime, 1)));
        /* if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
             filters.add(new SearchFilter("spareQuota", SearchFilter.Operator.GT,1));
         } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
@@ -266,7 +268,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             V2_WorkOrder v = v2_workOrderRepository.findById(zkbPartOrder.getWorkOrderId());
             map.put("V2_WorkOrder",v);
             if(v != null){
-                HashMap<String, String> m = new HashMap<>();
+                HashMap<String, Object> m = new HashMap<>();
                 m.put("name",v.getAssetInfo().getName());
                 m.put("systemId",v.getAssetInfo().getSystemId());
                 m.put("srNum",v.getServiceRequest().getSrNum());
@@ -275,6 +277,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 m.put("id",v.getId());
                 m.put("assetId",v.getAssetInfo().getUid());
                 m.put("faultDescription",v.getServiceRequest().getRequestReason());
+                m.put("requestTime",v.getServiceRequest().getRequestTime());
                 String siteUid = v.getAssetInfo().getSiteUID();
                 if(StringUtils.isNotEmpty(siteUid)){
                     OrgInfo orgInfo = orgInfoRepository.getByUid(siteUid);
