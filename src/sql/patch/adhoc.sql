@@ -12,6 +12,15 @@ INSERT INTO public.sys_role (id,home_page,name,role_desc,menus,role_desc_en) VAL
 
 
 -- 2020.09.21 质控更新 start
+delete from audit_config;
+delete from audit_summary;
+delete from audit_module;
+delete from audit_group;
+delete from audit_link;
+delete from audit_item;
+delete from audit_file;
+
+
 update audit_default_item set owner = '请填写模块负责人' where owner is null or owner = '';
 update audit_item set owner = '请填写模块负责人' where owner is null or owner = '';
 
