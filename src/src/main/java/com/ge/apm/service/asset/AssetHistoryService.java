@@ -9,6 +9,7 @@ import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import webapp.framework.web.WebUtil;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author csh
@@ -45,6 +48,9 @@ public class AssetHistoryService {
     @Autowired
     private I18nMessageService i18nMessageService;
 
+    @Autowired
+    private CustomConfigService ccService;
+
     /**
      * @return void
      * @throws
@@ -63,6 +69,19 @@ public class AssetHistoryService {
 
     public List<JSONObject> getAssetChangeHistoryByJSON(String assetUid) {
         List<AssetHistory> resultList = assetHistoryRepository.findByUidOrderByCreatedDateDescAtMostFive(assetUid);
+        CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        resultList = resultList.stream().filter(assetHistory -> {
+            List<AssetHistory.AssetHistoryInfo> assetHistoryInfos = JSONArray.parseArray(assetHistory.getJsonData(), AssetHistory.AssetHistoryInfo.class);
+            assetHistoryInfos = assetHistoryInfos.stream().filter(assetHistoryInfo -> customConfig.getAssetsImportantFields().contains(assetHistoryInfo.getColumnName())).collect(Collectors.toList());
+            assetHistory.setJsonData(JSONArray.toJSONString(assetHistoryInfos));
+            return assetHistoryInfos.size() > 0;
+        }).collect(Collectors.toList());
+
+        /*ListIterator<AssetHistory> assetHistoryList = resultList.listIterator();
+        while(assetHistoryList.hasNext()){
+            AssetHistory assetHistory = assetHistoryList.next();
+            assetHistory
+        }*/
         return parseFieldsByJson(resultList);
     }
     /**
@@ -252,9 +271,9 @@ public class AssetHistoryService {
         String jsonData = JSONArray.toJSONString(resultList);
 
         AssetHistory assetHistory = new AssetHistory();
-        assetHistory.setAssetUid(oldAsset.getUid());
-        assetHistory.setAssetName(oldAsset.getName());
-        assetHistory.setFinancingNum(oldAsset.getFinancingNum());
+        assetHistory.setAssetUid(newAsset.getUid());
+        assetHistory.setAssetName(newAsset.getName());
+        assetHistory.setFinancingNum(newAsset.getFinancingNum());
         assetHistory.setJsonData(jsonData);
         assetHistory.setCreatedDate(new Date());
         assetHistory.setCreatedBy(currentUserAccount.getName());

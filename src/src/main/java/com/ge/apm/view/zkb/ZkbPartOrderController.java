@@ -121,7 +121,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }else if("all".equals(queryStatus)){
                             if(searchFilters.size() > 0) {
                                 searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion(),"1*2+3*"));
-                                searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(),"1*2+3*"));
+                                searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"1*2+3*"));
                                 searchFilters.add(new SearchFilter("techAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
                             }else{
                                 searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1+2*"));
@@ -177,7 +177,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     public String queryListByStatus(String status){
         queryStatus = status;
         System.out.println(status);
-        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus+"&tenantUID="+selectionTenantInfo;
+        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public boolean isContainOrder(){
@@ -232,12 +232,15 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
 
     public String createAction() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo));
+        return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo)+"&queryStatus="+queryStatus);
     }
     public String editAction() {
-        return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId()));
-}
+        return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus);
+    }
 
+    public String backList(){
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
+    }
 
     public UserAccount getCurrentUser() {
         return currentUser;

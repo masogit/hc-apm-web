@@ -1086,8 +1086,11 @@ public class UserContextService implements Serializable {
                     return true;
                 }
             }
+            return false;
+        }else{
+            return true;
         }
-        return false;
+
     }
 
 }
