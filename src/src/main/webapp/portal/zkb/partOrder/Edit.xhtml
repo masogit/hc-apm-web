@@ -295,7 +295,7 @@
                         </p:dataTable>
                     </h:panelGroup>
                 </p:fieldset>
-                <p:fieldset id="zkbPartOrderDetailFieldset" legend="额度明细" rendered="#{zkbPartOrderEditController.showPartOrder and (zkbPartOrderEditController.orderType eq 'Parts' or zkbPartOrderEditController.orderType eq 'Tool')}" >
+                <p:fieldset id="zkbPartOrderDetailFieldset" legend="额度明细*" rendered="#{zkbPartOrderEditController.showPartOrder and (zkbPartOrderEditController.orderType eq 'Parts' or zkbPartOrderEditController.orderType eq 'Tool')}" >
                     <p:dataTable id="zkbDetailDatalist" value="#{zkbPartOrderEditController.selected.zkbPartOrderItems}" var="item"
                                  widgetVar="zkbContractCourseDatalist" selectionMode="single" selection="#{zkbPartOrderEditController.zkbPartOrderItem}"
                                  lazy="false" paginator="true" rowKey="#{item.partNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
@@ -339,13 +339,13 @@
                 <p:fieldset id="zkbPartOrderProbeFieldset" legend="探头明细" rendered="#{zkbPartOrderEditController.showPartOrder and zkbPartOrderEditController.orderType eq 'Probe'}" >
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <label class="label">探头号</label>
-                            <p:inputText id="catModel" value="#{zkbPartOrderEditController.selected.catNo}" />
+                            <label class="label">探头号*</label>
+                            <p:inputText id="catModel" value="#{zkbPartOrderEditController.selected.catNo}" required="true" requiredMessage="探头号 #{msg.ValidationRequire}" />
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">探头型号</label>
-                            <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true"
+                            <label class="label">探头型号*</label>
+                            <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="探头型号 #{msg.ValidationRequire}"
                                             completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
                                 <p:ajax event="itemSelect" update="valueTypeGroup qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
                             </p:autoComplete>
@@ -358,19 +358,19 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">旧探头SN号输入框</label>
-                            <p:inputText id="oldCatSn" value="#{zkbPartOrderEditController.selected.oldCatSn}" />
+                            <label class="label">旧探头SN号输入框*</label>
+                            <p:inputText id="oldCatSn" value="#{zkbPartOrderEditController.selected.oldCatSn}" requiredMessage="旧探头SN号输入框 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">数量</label>
+                            <label class="label">数量*</label>
                             <p:inputText id="catNum" value="#{zkbPartOrderEditController.selected.catNum}" disabled="true" />
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Submit}" action="#{zkbPartOrderEditController.saveEntity}" update=":growl" icon="ui-icon-check" />
-                <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" />
+                <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbPartOrderEditController.backList}" />
             </h:form>
             <ui:include src="PartOrderItem.xhtml"/>
         </div>
