@@ -210,4 +210,277 @@ update audit_group set interpretation = '举证说明：贵重设备的培训记
 update audit_group set interpretation = '可以利用APM资产云管家管理维护保养，提供相应的保养和维修报告，使用科室可以利用护士助手进行日常检查。另外对科室的设备分布情况要有明细。' where version = '6.10.7.2.B.1';
 update audit_group set interpretation = '该条设备装备管理部门是主管部门，提供对安全检查的调研表和巡检表' where version = '6.10.7.2.B.2';
 update audit_group set interpretation = '每一年要比前一年做的更好，制度任何一点改变都需要写到总章程里，拔一个高度，但是不要矫枉过正，把握改进的度。' where version = '6.10.7.2.A.1';
+
+
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(91, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 1, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(92, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 2, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(93, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 3, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(94, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 4, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(95, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 5, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(96, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 6, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(97, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 7, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(98, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 8, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(99, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 9, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(100, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 10, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(101, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 11, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(102, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 12, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(103, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 13, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(104, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 14, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(105, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 15, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(106, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 16, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(107, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 17, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(108, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 18, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(109, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 19, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(110, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 20, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(111, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 21, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(112, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 22, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(113, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 23, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(114, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 24, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(115, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 25, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(116, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 26, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(117, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 27, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(118, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 28, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(119, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 29, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(120, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 30, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(121, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 31, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(122, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 32, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(123, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 33, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(124, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 34, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(125, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 35, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(126, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 36, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(127, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 37, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(128, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 38, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(129, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 39, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(130, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 40, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(131, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 41, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(132, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 42, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(133, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 43, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(134, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 44, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(135, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 45, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(136, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 46, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(137, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 47, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(138, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 48, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(139, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 49, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(140, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 50, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(141, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 51, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(142, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 52, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(143, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 53, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(144, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 54, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(145, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 55, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(146, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 56, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(147, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 57, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(148, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 58, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(149, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 59, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(150, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 60, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(151, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 61, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(152, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 62, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(153, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 63, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(154, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 64, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(155, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 65, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(156, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 66, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(157, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 67, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(158, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 68, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(159, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 69, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(160, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 70, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(161, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 71, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(162, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 72, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(163, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 73, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(164, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 74, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(165, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 75, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(166, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 76, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(167, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 77, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(168, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 78, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(169, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 79, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(170, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 80, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(171, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 81, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(172, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 82, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(173, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 83, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(174, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 84, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(175, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 85, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(176, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 86, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(177, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 87, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(178, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 88, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(179, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 89, '自查文件', 2, '请填写模块负责人', true, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(180, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 90, '自查文件', 2, '请填写模块负责人', true, false);
+
 -- 2020.09.21 质控更新 end
