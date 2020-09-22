@@ -104,7 +104,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
             if(zkbPartOrderUserConfigList == null || zkbPartOrderUserConfigList.size() == 0){
                 //return null;
-            }else{
+            }else if(zkbPartOrderUserConfigList.size() == 1){
+                //region 用户只有一种角色
                 ZkbPartOrderUserConfig zkbPartOrderUserConfig = zkbPartOrderUserConfigList.get(0);
                 if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if("CS".equals(zkbPartOrderUserConfig.getAssetType())){
@@ -146,10 +147,22 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if(StringUtils.isEmpty(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString()));
-                    }else if(!"all".equals(queryStatus)){
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
+                    if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrderUserConfig.getOrderType())){
+                        if(StringUtils.isEmpty(queryStatus)){
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString()));
+                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Probe.toString()));
+                        }else if(!"all".equals(queryStatus)){
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
+                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, ZkbPartOrder.OrderType.Probe.toString()));
+                        }
+                    }else{
+                        if(StringUtils.isEmpty(queryStatus)){
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString()));
+                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.NE, ZkbPartOrder.OrderType.Probe.toString()));
+                        }else if(!"all".equals(queryStatus)){
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
+                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.NE, ZkbPartOrder.OrderType.Probe.toString()));
+                        }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if(StringUtils.isEmpty(queryStatus)){
@@ -170,6 +183,33 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }
 
                         /*searchFilters.add(new SearchFilter("closedAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1+"));*/
+                    }
+                }
+                //endregion
+            }else if(zkbPartOrderUserConfigList.size() == 2){
+                //判断是否为肖雨的角色
+                boolean is4ooRole = true;
+                for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
+                    if(StringUtils.isEmpty(c.getConfigType())){
+                        is4ooRole = false;
+                    }
+                    if(!c.getConfigType().contains("Order")){
+                        is4ooRole = false;
+                    }
+                }
+                if(is4ooRole) {
+                    if (StringUtils.isEmpty(queryStatus)) {
+                        if(searchFilters.size() > 0){
+                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.NE, ZkbPartOrder.OrderType.Probe.toString(),"1*2+3*"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString(),"1*2+3*"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString(),"1*2+"));
+                        }else{
+                            searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.NE, ZkbPartOrder.OrderType.Probe.toString(),"1+2*"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString(),"1+2*"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString(),"1+"));
+                        }
+                    }else if(!"all".equals(queryStatus)){
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
                     }
                 }
             }

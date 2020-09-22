@@ -91,6 +91,17 @@ public class ZkbPartOrderUserConfig implements Serializable {
     @Column(name = "tenant_uid")
     private String tenantUID;
 
+    @Column(name = "order_type")
+    private String orderType;
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+
     public String getSubConfigType() {
         return subConfigType;
     }
