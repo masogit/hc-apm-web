@@ -142,18 +142,18 @@
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                 </p:column>
                 <p:column headerText="#{msg.PlannedCompletionTime}"  sortBy="#{item.planTime}" filterBy="#{item.planTime}" filterMatchMode="GTE">
-                    <f:facet name="filter">
+                   <!-- <f:facet name="filter">
                         <p:inputText id="filterPlannedCompletionTime" widgetVar="varFilterPlannedCompletionTime" value="#{v2PmOrderController.plannedCompletionTimeFormat}"/>
-                    </f:facet>
+                    </f:facet>-->
                     <h:outputText value="#{item.planTime}">
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd"/>
                     </h:outputText>
                 </p:column>
 
                 <p:column headerText="#{msg.ActualCompletionTime}"  sortBy="#{item.endTime}" filterBy="#{item.endTime}" filterMatchMode="GTE"  rendered="#{v2PmOrderController.queryIndex==7}">
-                    <f:facet name="filter">
+                    <!--<f:facet name="filter">
                         <p:inputText id="filterActualCompletionTime" widgetVar="varFilterActualCompletionTime" value="#{v2PmOrderController.actualCompletionTimeFormat}"/>
-                    </f:facet>
+                    </f:facet>-->
                     <h:outputText value="#{item.endTime}">
                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                     </h:outputText>
