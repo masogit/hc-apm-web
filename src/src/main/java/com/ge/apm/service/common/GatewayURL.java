@@ -68,6 +68,8 @@ public enum GatewayURL {
     //supplier Api
     SUPPLIER_WX_CODE_IMAGE("/hcapmgateway/api/apm/weChat/wxaCodeImage"),
     SUPPLIER_WX_QRCODE_IMAGE("/hcapmgateway/api/apm/weChat/qrCodeImage"),
+    MSM_SEND_CODE("/hcapmgateway/api/apm/login/valid/sendSmsCode/{phone}"),
+    MSM_GET_CODE("/hcapmgateway/api/apm/login/valid/getSmsCode/{phone}"),
 
     //备件增删
     ACCESSADD("/hcapmassetservice/api/apm/asset/workOrderDetails/{assetUid}"),
@@ -92,7 +94,6 @@ public enum GatewayURL {
     PART_ORDER_SEND_RETURN_EMAIL("/hcapmreportservice/api/apm/report/partOrder/sendHtmlForReturn"),
     PART_ORDER_SEND_MESSAGE("/hcapmreportservice/api/apm/report/partOrder/sendMessage"),
     PART_ORDER_SEND_WECHAT_MESSAGE("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatMessages");
-
     private final String url;
 
     GatewayURL(String url) {

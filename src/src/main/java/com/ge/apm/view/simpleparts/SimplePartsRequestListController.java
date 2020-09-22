@@ -411,14 +411,8 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
     }
 
     public void onRowEdit(RowEditEvent event) {
-        SimplePartsRequestLineItem partsRequestLineItem = (SimplePartsRequestLineItem) event.getObject();
-
+        SimplePartsRequestLineItem partsRequestLineItem = (SimplePartsRequestLineItem ) event.getObject();
         SimplePartsRequestLineItem query = partsRequestLineItemRepository.findById(partsRequestLineItem.getId());
-
-        if(partsRequestLineItem.getStatus() == SimplePartsConstant.PARTS_TRANSACTIONED){
-            WebUtil.addWarnMessage("备件申购单明细已入库");
-            return;
-        }
 
         if(StringUtils.isEmpty(partsRequestLineItem.getPartsWarehouseId())){
             if(partsRequestLineItem.getNotTransactionQty() == null){
@@ -429,7 +423,6 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
         }
 
         boolean enableWarehouseLocator = partsConfigService.isEnableWarehouseLocator();
-
         if(enableWarehouseLocator && StringUtils.isEmpty(partsRequestLineItem.getPartsLocatorId())){
             if(partsRequestLineItem.getNotTransactionQty() == null){
                 partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
@@ -440,43 +433,56 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
             partsRequestLineItem.setPartsLocatorId(SimplePartsConstant.VIRTUAL_LOCATOR_ID);
         }
 
-        if (partsRequestLineItem.getNotTransactionQty() == null || partsRequestLineItem.getNotTransactionQty() == 0){
-            partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
-            WebUtil.addWarnMessage("备件申购单明细入库数量请填写有意义数值");
-            return;
-        }
+        SimplePartsRequest partsRequest = partsRequestRepository.findById(partsRequestLineItem.getPartsRequestId());
+        if(partsRequest.getType() == 1){
+            if (partsRequestLineItem.getNotTransactionQty() == null || partsRequestLineItem.getNotTransactionQty() == 0){
+                partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
+                WebUtil.addWarnMessage("备件申购单明细出库数量请填写有意义数值");
+                return;
+            }
 
-        if(query.getRequestQty() - query.getTransactionQty() >= partsRequestLineItem.getNotTransactionQty()){
-            SimplePartsRequest partsRequest = partsRequestRepository.findById(partsRequestLineItem.getPartsRequestId());
-            if(partsRequest.getType() == 1){
-                Optional<SimplePartsInventory> partsInventoryOptional = simplePartsInventoryRepository.findByWarehouseIdAndLocatorIdAndPartsItemId(partsRequestLineItem.getPartsWarehouseId(), partsRequestLineItem.getPartsLocatorId(), partsRequestLineItem.getPartsItemId());
-                if (partsInventoryOptional.isPresent()) {
+            Optional<SimplePartsInventory> partsInventoryOptional = simplePartsInventoryRepository.findByWarehouseIdAndLocatorIdAndPartsItemId(partsRequestLineItem.getPartsWarehouseId(), partsRequestLineItem.getPartsLocatorId(), partsRequestLineItem.getPartsItemId());
+            if (partsInventoryOptional.isPresent()) {
 
-                    SimplePartsInventory partsInventory = partsInventoryOptional.get();
-                    // 更新
-                    int sumNum = partsInventory.getOnhandQty() - partsRequestLineItem.getNotTransactionQty() ;
-                    // 更新 总的库存
-                    if (sumNum < 0) {
-                        partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
-                        WebUtil.addWarnMessage("备件库存不足");
-                        return;
-                    }
-                }else{
+                SimplePartsInventory partsInventory = partsInventoryOptional.get();
+                // 更新
+                int sumNum = partsInventory.getOnhandQty() - partsRequestLineItem.getNotTransactionQty() ;
+                // 更新 总的库存
+                if (sumNum < 0) {
+                    partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
                     WebUtil.addWarnMessage("备件库存不足");
                     return;
                 }
+            }else{
+                WebUtil.addWarnMessage("备件库存不足");
+                return;
             }
+        }else{
+            if (partsRequestLineItem.getNotTransactionQty() == null || partsRequestLineItem.getNotTransactionQty() == 0){
+                partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
+                WebUtil.addWarnMessage("备件申购单明细入库数量请填写有意义数值");
+                return;
+            }
+        }
+
+        if(query.getRequestQty() - query.getTransactionQty() >= partsRequestLineItem.getNotTransactionQty()){
             //备件出入库
-            partsRequestLineItemService.stockInOrOutParts(partsRequestLineItem,partsRequest);
+            try {
+                partsRequestLineItemService.stockInOrOutParts(partsRequestLineItem);
+            }catch (SimplePartsInventoryNotEnoughException e){
+                logger.error("仓库库存不足或故障!",e);
+                WebUtil.addWarnMessage("仓库库存不足或故障");
+                return;
+            }
         }else{
             partsRequestLineItem.setNotTransactionQty(query.getRequestQty() - query.getTransactionQty());
-            WebUtil.addWarnMessage("当前申购单明细入库数量不能大于初始需入库的数量");
+            partsRequestLineItem.setTransactionQty(query.getTransactionQty());
+            WebUtil.addWarnMessage("当前申购单明细入库/出库数量不能大于初始需入库/出库的数量");
             return;
         }
     }
 
     public void onRowCancel(RowEditEvent event) {
-
     }
 
     public boolean renderPartsDetails(Integer status, Integer proposerStatus) {
