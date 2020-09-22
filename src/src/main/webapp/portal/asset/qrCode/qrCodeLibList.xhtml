@@ -30,7 +30,6 @@
 
                         <p:ajax event="rowSelect" update="viewButton"/>
                         <p:ajax event="filter" listener="#{qrCodeLibController.onFilter}" />
-                        <!--<c:if test="#{orgTreeController.judgeTheUser()}">-->
                         <p:column headerText="#{msg.TenantInfo}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="EQ" >
                             <f:facet name="filter">
                                 <p:selectOneMenu value="#{qrCodeLibController.tenantUIDFilter}" autoWidth="false" style="max-width: 150px;" disabled="#{qrCodeLibController.isChooseTenant()}"  filter="true" filterMatchMode="startsWith" effect="fade">
@@ -41,18 +40,46 @@
                             </f:facet>
                             <h:outputText value="#{qrCodeLibController.getTenantName(item.tenantUID)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.Hospital}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
-                            <f:facet name="filter">
 
-                                <p:selectOneMenu id="hospitalIdSelect_list" value="#{qrCodeLibController.siteUIDFilter}" onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" filter="true" filterMatchMode="startsWith" effect="fade">
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                					<f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
-                                    <!-- <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/> -->
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{qrCodeLibController.getHospitalName(item.siteUID)}"/>
-                        </p:column>
+                        <c:choose>
+                            <c:when test="#{!qrCodeLibController.hospitalOn}">
+                                <p:column id="hospitalid" headerText="#{msg.Hospital}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu id="hospitalIdSelect_list" value="#{qrCodeLibController.siteUIDFilter}" onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" filter="true" filterMatchMode="startsWith" effect="fade">
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{qrCodeLibController.getHospitalName(item.siteUID)}"/>
+                                </p:column>
+                            </c:when>
+                            <c:otherwise>
+                                <p:column headerText="#{msg.Hospital}" style="word-wrap: break-word;" exportable="false">
+                                   <f:facet name="header">
+                                       <h:outputText value="#{msg.Hospital}"/><br/>
+                                       <p:overlayPanel widgetVar="varPanelSiteFilter" for="filterOrg" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
+                                           <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                               <c:if test="#{orgTreeController.judgeTheUser()}">
+                                                   <p:inputText id="retrieval" value="#{orgTreeController.retrieval}" style="width:150px;"/>
+                                                   <p:commandButton id="retrieval3" partialSubmit="true"  process=":qrCodeLibListForm:datalist:retrieval @this" icon="ui-icon-search"   validateClient="true"  actionListener="#{orgTreeController.filterNode()}" value="#{msg.Search}"  update="orgTree :growl" iconPos="right"/>
+                                               </c:if>
+                                               <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userContextService.hasRole('ITAdmin')?orgTreeController.tenantOrgTree:orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
+                                                   <p:ajax process="@this" event="select" listener="#{qrCodeLibController.onSiteFilterChange}" update=":qrCodeLibListForm:datalist" oncomplete="PF('varPanelSiteFilter').hide();"/>
+                                                   <p:ajax process="@this" event="expand"/>
+                                                   <p:ajax process="@this" event="collapse"/>
+                                                   <p:treeNode type="org">
+                                                       <h:outputText value="#{node.name}"/>
+                                                   </p:treeNode>
+                                                   <p:treeNode type="hidden" rendered="false"/>
+                                               </p:tree>
+                                           </p:scrollPanel>
+                                       </p:overlayPanel>
+                                       <p:inputText id="filterOrg"  value="#{qrCodeLibController.siteUIDFilter==null?'':qrCodeLibController.getHospitalName(qrCodeLibController.siteUIDFilter)}"  readonly="true"/>
+                                   </f:facet>
+                                   <h:outputText value="#{qrCodeLibController.getHospitalName(item.siteUID)}"/>
+                               </p:column>
+                            </c:otherwise>
+                        </c:choose>
                         <p:column headerText="#{msg.QRCode}" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
