@@ -79,4 +79,14 @@ public interface UserAccountMapper {
 
 	@Select("select distinct tags.tag from user_tags tags inner join user_account u on tags.id = u.id where u.tenant_uid = #{tenantUid}")
 	public List<String> getTagsByTenant(String tenantUid);
+
+	@Select({
+			"<script>" +
+					"select  *  from  user_account userAccount  where userAccount.tenant_uid = #{tenantUid} and userAccount.name in " +
+					"<foreach item = 'item' index = 'index' collection = 'nameLists' open='(' separator=',' close=')'>" +
+					"#{item}" +
+					"</foreach>"+
+					"</script>"})
+	public List<UserAccount> getUserAccountByNameAndTenantUid(@Param("nameLists")List<String> nameLists, @Param("tenantUid")String tenantUid);
+
 }

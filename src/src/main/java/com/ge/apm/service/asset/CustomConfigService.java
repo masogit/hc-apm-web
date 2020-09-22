@@ -147,7 +147,12 @@ public class CustomConfigService {
 
     public List<String> getLocalizedExportableAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
         List<String> exportFields = getExportAssetFieldsByRoles(config, userRoles);
-
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        boolean zkbAccountBoolean = userContextService.isZkbAccount();
+        if (!zkbAccountBoolean){
+            exportFields.remove("mainDirectory");
+            exportFields.remove("secondDirectory");
+        }
         removeDisabledExportFields(exportFields);
 
         orderByExportFields(exportFields);
