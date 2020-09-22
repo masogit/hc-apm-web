@@ -308,9 +308,11 @@ public class AssetCreateService {
                     }
                 }
             }
+            return false;
+        }else{
+            return true;
         }
         // anyMatch(userRole -> customeRoleDao.findById(userRole.getRoleId()).getWebAuthorities().contains(""))
-        return false;
     }
 
     public List<I18nMessage> getAssetStatusList(){
