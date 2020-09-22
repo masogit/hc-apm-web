@@ -12,6 +12,7 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MvsUtil;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
@@ -94,6 +95,9 @@ public class AssetFileImportBaseService {
 
     @Autowired
     protected AssetFileImportSupportingService supportingService;
+
+    @Autowired
+    private ZkbFileDirectoryService zkbFileDirectoryService;
 
     @Autowired
     protected AssetDepreciationService assetDepreciationService;
@@ -493,7 +497,24 @@ public class AssetFileImportBaseService {
                 AssetRow.addErrMessage(item, "错误: 设备编号是必须的");
                 continue;
             }
-
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            boolean zkbAccountBoolean = userContextService.isZkbAccount();
+            if(zkbAccountBoolean){
+                List<ZkbFileDirectory> mainDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,newAsset.getMainDirectory());
+                if (mainDirectoryList.isEmpty()) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 主目录名字不存在");
+                    continue;
+                }
+                List<ZkbFileDirectory> secondDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.SUB_DIRECTORY_LEVEL_VALUE,newAsset.getSecondDirectory());
+                if (secondDirectoryList.isEmpty()) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 子目录名字不存在");
+                    continue;
+                }
+            }
             //check clinical dept
             String clinicalDeptName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(clinicalDeptName)) {
