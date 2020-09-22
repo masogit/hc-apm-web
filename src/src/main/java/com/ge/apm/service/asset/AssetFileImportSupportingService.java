@@ -82,6 +82,29 @@ public class AssetFileImportSupportingService {
     }
 
     @Transactional
+    public Supplier importSupplierIfNeeded(OrgInfo selectedOrgToImport, String name) {
+
+        Supplier supplier;
+        supplier = supplierDao.findByTenantUIDAndName(selectedOrgToImport.getTenantUID(), name);
+
+        //only create new supplier
+        if (null == supplier) {
+            //TenantInfo tenantInfo = tenantInfoDao.findByuid(selectedOrgToImport.getTenantUID());
+            supplier = new Supplier();
+            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
+            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+            supplier.setName(name);
+            supplier.setCreatedDate(new Date());
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
+
+    }
+
+    @Transactional
     public OrgInfo findOrgOnly(OrgInfo selectedOrgToImport, String name) {
 
         boolean isShortName = isShortName(name);

@@ -906,8 +906,10 @@ public class AssetInfoFormatter {
         map.put(WebUtil.getMessage("warrantyMonth"), assetInfo.getWarrantyMonth());
         map.put(WebUtil.getMessage("proprietaryClass"), this.getProprietaryClassAsString());
 
-        map.put(WebUtil.getMessage("UUID"), this.getUid());
         map.put(WebUtil.getMessage("createdBy"), this.selectCreatedBy(assetInfo.getCreatedBy()));
+        map.put(WebUtil.getMessage("mainDirectory"), assetInfo.getMainDirectory());
+        map.put(WebUtil.getMessage("secondDirectory"), assetInfo.getSecondDirectory());
+        map.put(WebUtil.getMessage("UUID"), this.getUid());
 
         return map;
 
