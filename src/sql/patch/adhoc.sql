@@ -1,671 +1,495 @@
--- 2020.08.05 start 质控更新
-update audit_default_summary set except_progress = 20 where level = 'A';
-update audit_summary set except_progress = 20 where level = 'A';
--- 2020.08.05 end 质控更新
-
-
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('134', 'H48681AS', 'C4-8-DCurvedArray', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('1', 'H48681MJ', 'eM6C新型电子矩阵曲面容积探头', '高值EM', 'HighValue', '800,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('6', 'H45001KC', 'i13Lvintra-operationprobe术中探头', '线阵', 'SpecialValue', '505,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('7', 'H45511NW', 'I8Lintra-operationprobe术中探头', '线阵', 'SpecialValue', '500,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('8', 'H45282ML', 'M12Lultra-wideband6-13MHzlinearAMAprobe;M12L6-13MHz超宽频带线阵AMA二维面阵探头', '面阵', 'SpecialValue', '500,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('9', 'H45001KB', 'i8Lvintra-operationprobe;i8Lv5.0-8.0MHz术中探头', '线阵', 'SpecialValue', '490,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('12', 'H45202ER', 'ERB双平面探头', '腔内', 'SpecialValue', '450,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('13', 'H40612LC', 'ERB7Bi-PlaneEndocavityProbe;ERB7双平面经阴道/经直肠探头', '腔内', 'SpecialValue', '450,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('14', 'H45511NT', '"KW011I13LINTRAOP.PROBE术中探头;"', '线阵', 'SpecialValue', '450,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('20', 'H48651DB', 'RNA5-94DMicroconvexPediatricprobe;RNA5-9宽带3.3-9.1MHz微凸容积探头', '3D/4D', 'SpecialValue', '400,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('23', 'H45021YE', 'ICEcord-RS（AcuNav）;ICEcord-RS探头(BT10需要用ICE，须订part5573905+H45041E+H45021YR+H45041GH)', '腔内', 'SpecialValue', '360,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('25', 'H48651NA', 'RIC6-126-12MHz4DENDOCAVITYPROBE', '3D/4D', 'SpecialValue', '360,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('27', 'H48651MS', 'RIC5-9-D', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('28', 'H40452LG', 'ML6-15-D', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('29', 'H40482LB', 'C3-10-D', '凸阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('30', 'H46422LN', 'C2-7VN-D', '凸阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('31', 'H40472LW', 'C1-6VN-D', '凸阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('2', 'H45581BJ', '6VT-DTEE经食道心脏容积探头', '高值TEE', 'HighValue', '660,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('3', 'H45001JJ', '8.0MHzmulti-planeTEEforpediatric;8.0MHz多平面经食道探头', '高值TEE', 'HighValue', '620,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('4', 'H45521DY', '9TTEEProbe;9T小儿食道探头', '高值TEE', 'HighValue', '600,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('5', 'H45001YE', '8TPED.TEEPROBE;', '高值TEE', 'HighValue', '600,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('10', 'H4001BT', '4V-D心脏相控阵电子矩阵探头', '高值V探头', 'HighValue', '480,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('11', 'H45531YM', '9T-RSPedTEEprobe;9T-RS小儿经食道食道探头', '高值TEE', 'HighValue', '470,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('15', 'H45551ZD', '6TC', '高值TEE', 'HighValue', '422,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('16', 'H45521DX', '6T-OR', '高值TEE', 'HighValue', '422,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('17', 'H45551BG', '6T-OR_REV;', '高值TEE', 'HighValue', '422,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('18', 'H45531MZ', '6T-RSAdultTEEprobe;6T-RS成人用多平面食道探头(6T-RS可以用于所有版本的Vividi/Vividq/VividS5/VividS6)（被H45551ZE取代）', '高值TEE', 'HighValue', '422,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('19', 'H45011AA', '6Tvmulti-planeTEEprobeforadult;成人用多平面食道探头', '高值TEE', 'HighValue', '420,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('21', 'H4900PC', '3VRealTime4DVolumePhasedArrayProbe;3V矩阵四维容积探头', '高值V探头', 'HighValue', '400,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('22', 'H4001BJ', '3V-DMatrix4DVolumePhasedArrayProbe;3V-D矩阵四维容积探头', '高值V探头', 'HighValue', '400,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('24', 'H48671ZG', 'RM6C4DAMAAbdominalprobe', '3D/4D', 'HighValue', '360,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('26', 'H45551ZE', '6Tc-RSprobe（requiesH48602LB/H45551NM）', '高值TEE', 'HighValue', '360,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('32', 'H40472LY', 'C2-9VN-D', '凸阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('33', 'H45302LA', 'S4-10-D', '相控阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('34', 'H46332LW', 'C2-6B-D', '凸阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('35', 'H40412LW', 'BE9C', '腔内', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('36', 'H47072LY', 'T739', '线阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('37', 'H48681MG', 'RAB6-D', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('38', 'H40402LW', 'i12L-RSLineararraytransducer‘hockeystick’', '线阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('39', 'H40402LW', 'i12L-RSWidebandLinear hockeystick arrayProbe;i12L-RS宽频线阵探头,用于肌骨扫查、血管及术中超声', '线阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('40', 'H45551NH', 'M5S-D', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('41', 'H48651MZ', 'PA6-8-D;PA6-8-D', '相控阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('42', 'H40472LT', 'C1-6-D', '凸阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('43', 'H4830KN', '6.5MHzECLAendocavity;6.5MHzECLA腔内探头', '腔内', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('44', 'H48691LP', 'RAB6-RS', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('45', 'H48651MP', 'RAB4-8-D', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('46', 'H40452LF', 'BE9CS', '腔内', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('47', 'H40212LB', '739L5-10MHzLinear/SteeredLinearProbe;739L5-10MHz宽带线阵探头', '线阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('48', 'H40212LF', 'I739', '线阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('49', 'H44901AE', 'M5SC-D,CARDIACPROBE', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('50', 'H40212LM', 'T7395-10MHzT-TypeIntraoperativeprobe;T7395-10MHzT-型术中探头', '线阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('51', 'H46701J', '"PA6-8PMHzbroadbandphasedarrayprobe;PA6-8PMHz相控阵探头Multi-frequency6-8MHzsectortransducerforabdomen,cardiologyandpediatric applications.FOV:89degrees.Footprint13x19.5mm."', '相控阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('52', 'H41482LS', 'I739-RSLCLinearLongcableVETprobe;I739-RS线阵长线术中探头动物探头', '线阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('53', 'H40402LJ', 'I739-RSWidebandLinearSurgicalProbe;I739-RS宽带线阵术中探头用于术中。适用于LOGIQBOOK，LOGIQE', '线阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('54', 'H40412LP', 'T739-RSPROBE(EXP)术中探头', '线阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('55', 'H40452LY', 'ML6-15', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('56', 'H48681WR', 'RAB2-6-RS', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('57', 'H44801G', '4D3C-L', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('58', 'H40462LM', 'ML6-15-RS', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('59', 'H40462LN', 'C2-9-D', '凸阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('60', 'H48661EF', 'RIC5-9W-RS;', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('61', 'H48651MR', 'RSP6-16-D', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('62', 'H40452LH', 'M4S-RS;', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('63', 'H40412LD', 'M12L', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('64', 'H48651MN', 'RAB2-5-D', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('65', 'H48621Z', 'RAB4-8LMHzRealTime4Dbroadbandcurvedarrayprobe,Abd,OB/GYN;RAB4-8LMHz实时四维凸阵腹部,妇产科探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('66', 'H46701AB', 'RSP6-16MHzReaTime4Dbroadbandlineararrayprobe;RSP6-16MHz实时四维线阵探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('67', 'H48651MY', 'RNA5-9-D', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('68', 'H40432LM', 'M6C-D', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('69', 'H46701NA', 'RAB2-5-RSBT12TYPE_DOM;onlyforcustomersinJapan.218ABBZX00049000', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('70', 'H45021L', 'RAB4-8-RS;', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('71', 'H4908SN', 'S4-10', '相控阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('72', 'H40412LR', 'M12L-Hlineararrayprobe;M12L宽带5.0-13.0MHz面阵线阵探头', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('73', 'H45011SZ', 'M3S', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('74', 'H4000PA', 'M4SMatrixPhasedProbe;M4S矩阵探头', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('75', 'H40412LC', 'M7C', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('76', 'H40412LS', 'M7C-HAMAcurvedarrayprobe,Abd,OB/GYN;M7C探头宽频带3-8MHz凸型面阵探头', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('77', 'H44801GB', '4D10L', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('78', 'H48621X', 'RAB2-5LMHzRealTime4Dbroadbandcurvedarrayprobe,Abd,OB/GYN;RAB2-5LMHz实时四维腹部,妇产科探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('79', 'H46701M', 'RAB2-5MHzRealTime4Dbroadbandcurvedarrayprobe,Abd,OB/GYN;RAB2-5MHz实时四维凸阵腹部,妇产科探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('80', 'H46701N', 'RAB4-8PMHzRealTime4Dbroadbandcurvedarrayprobe,Abd,OB/GYN;RAB4-8PMHz实时四维凸阵腹部,妇产科探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('81', 'H46701R', 'RIC5-9MHzRealTime4Dbroadbandendocavityprobe;RIC5-9MHz实时四维腔内探头(支持所有BT)', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('82', 'H48651DA', 'RIC5-9HMHzRealTime4Dbroadbandendocavityprobe;RIC5-9MHz实时四维腔内探头(BT04-BT07)', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('83', 'H48661HJ', 'RIC5-9WMHzRealTime4Dbroadbandendocavityprobe;RIC5-9WMHz实时四维腔内探头(BT08)', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('84', 'H48681AR', 'RM14LAMAlinearprobe容积探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('85', 'H46701S', 'RRE6-10MHzReaTime4Dbroadbandendorectal150°trans./135°longprobe;RRE6-10MHz实时四维双平面腔内探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('86', 'H48651NC', 'RSM5-14AMAlinearprobe容积探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('87', 'H46701P', 'RSP6-12MHzReaTime4Dbroadbandlineararrayprobe;RSP6-12MHz实时四维线阵探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('88', 'H46701W', 'RSP5-12RT-4DLAPROBE线阵4D探头;', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('89', 'H44801GY', '4D16L', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('90', 'H44801GZ', '4D8C', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('91', 'H44801GA', '4DE7C', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('92', 'H48681XX', 'RAB6-DVolumeAbdominalProbe', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('93', 'H48671WS', 'RRE5-10-DEndocavityprobe;RRE5-10-D经腔容积探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('94', 'H48651N', 'RRE6-10-DVolumeEndocavityprobe;RRE6-10-D经腔容积探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('95', 'H40442LN', 'M4S-D', '面阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('96', 'H46701RA', 'RIC5-9-RSEndocavityprobe;RIC5-9-RS四维经腔探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('97', 'H45021LA', 'RNA5-9-RSMicroconvexarrayprobe;RNA5-9-RS四维微凸矩阵探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('98', 'H46701AC', 'RSP6-16-RSLineararrayprobe;RSP6-16-RS四维线阵探头', '3D/4D', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('108', 'H4012L', 'I12L', '线阵', 'SpecialValue', '300,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('99', 'H48312AH', 'L10-22-RSLinearTransducer', '线阵', 'NormalValue', '250,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('100', 'H4830JX', '5.0MHzFPAphasedarrayprobe;5.0MHz相控阵探头(19mm)', '相控阵', 'NormalValue', '205,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('101', 'H40452LL', 'L8-18I-D', '线阵', 'NormalValue', '200,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('102', 'H40462LK', '3CRF-D', '凸阵', 'NormalValue', '200,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('103', 'H44901AB', '12S-RS', '相控阵', 'NormalValue', '200,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('104', 'H40442LP', '3CRF', '凸阵', 'NormalValue', '200,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('105', 'H40452LZ', 'L8-18i-SCHockeyStickLinearTransducer用于儿科、外周血管、小器官、MSK、麻醉、介入', '线阵', 'NormalValue', '200,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('106', 'H48062AB', 'L4-12t-RS', '线阵', 'NormalValue', '200,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('107', 'H4913SD', 'S1-5-D', '相控阵', 'NormalValue', '200,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('109', 'H4908SC', 'S1-5', '相控阵', 'NormalValue', '200,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('110', 'H40462LF', 'L8-18i-RS', '线阵', 'NormalValue', '190,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('111', 'H40462LA', 'C1-5-RS;', '凸阵', 'NormalValue', '180,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('112', 'H46701C', 'SP10-16MHzbroadbandlineararrayprobe,smallparts;SP10-16MHz线阵小器官、外周血管探头', '线阵', 'NormalValue', '180,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('113', 'H4830JZ', '10.0MHzFLALineararrayprobe;10.0MHz线阵探头', '线阵', 'NormalValue', '180,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('114', 'H40212LA', '546L3-7MHzLinear/SteeredProbe;546L3-7MHz高频线阵探头', '线阵', 'NormalValue', '180,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('115', 'H40212LG', 'L7645-9.5MHzLinear/SteeredProbe;L7645-9.5MHz宽带高频线阵探头', '线阵', 'NormalValue', '180,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('116', 'H44801HR', 'E8CS', '腔内', 'NormalValue', '170,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('117', 'H40412LE', 'E8C', '腔内', 'NormalValue', '170,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('118', 'H47072LS', 'E8CS', '腔内', 'NormalValue', '170,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('119', 'H4830KJ', '5.0MHzFLAlineararrayprobe;5.0MHz线阵探头', '线阵', 'NormalValue', '170,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('120', 'H40402LN', 'E8C-RS', '腔内', 'NormalValue', '160,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('121', 'H45001AE', '10MHzFPAphasedarrayprobe;10MHz相控阵探头', '相控阵', 'NormalValue', '160,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('122', 'H40442LK', 'IC5-9-D', '腔内', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('123', 'H40452LE', 'C1-5-D', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('124', 'H40442LM', '9L-D', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('125', 'H40432LN', '11L-D', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('126', 'H40402LY', '12L-RS', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('127', 'H46422LM', 'C2-7-D', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('128', 'H4915IO', 'L3-9i-D', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('129', 'H45041DL', '3Sc-RS', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('130', 'H45021RR', '6S-DLP', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('131', 'H48681AZ', '3Sp-D', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('132', 'H48062AC', 'L6-12-RSLinearArrayprobe线阵探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('133', 'H4904PC', '4C', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('135', 'H45021RT', '12S-DLPPHASEARRAYPEDIA', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('136', 'H45021RP', '6S-RS', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('137', 'H40422LL', 'IC5-9Hbroadbandendocavityprobe;IC5-9HMHz腔内探头（BT04-08）', '腔内', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('138', 'H4001BC', '4C-DCurvedarrayprobe;4C-D矩阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('139', 'H46222LE', '3SP', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('140', 'H41252CF', 'C363.5MHzConvexprobe(2.5-5.5);C363.5MHz宽带凸阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('141', 'H46701AA', '4C-ACurvedarrayprobeabd&Ob/Gyn;4C-A宽带1.5-4.6MHz凸阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('142', 'H40402LS', '8C-RS', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('143', 'H40412LJ', '8C', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('144', 'H40412LY', '11L', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('145', 'H46701V', 'PA2-5PMHzbroadbandphasedarrayprobe;PA2-5PMHz相控阵探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('146', 'H40452LM', '4C-SCPROBE凸阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('147', 'H46701T', 'AB2-7MHzbroadbandcurvedarrayprobe,abd&Ob/Gyn;AB2-7MHz凸阵探头妇产科，腹部', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('148', 'H46342LA', '10C-D', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('149', 'H48651MW', 'AB2-7-D2-7MHzCurvedarrayprobe;AB2-7-D2-7MHz矩阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('150', 'H40452LB', '12L-SCPROBE线阵探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('151', 'H48651MT', 'SP10-16-DLineararrayprobe;SP10-16-D线阵探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('152', 'H48661LG', '3S-DPhasedArrayProbe;3S-D相控阵探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('153', 'H40412LT', '9L', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('154', 'H40212LH', 'LA396-13MHzLinear/SteeredLinearProbe;LA396-13MHz超宽频高分辨线阵探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('155', 'H4901PC', '10S', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('156', 'H40422LA', '5S', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('157', 'H46022LT', 'LT7.5MHzLinearprobe(5.2-9.5)IntraopreativeT-Type;LT7.5MHz线阵T型术中探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('158', 'H46701F', 'IC5-9ENDOCAVITYPROBE腔内探头（BT04-08）', '腔内', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('233', 'H4830JS', '2.5MHzFPAphasedarrayprobe;2.5MHz相控阵探头', '相控阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('159', 'H46022MT', 'MTZ6.5MHzMicroconvexEndocavityprobe(4.5-9.0);MTZ6.5MHz宽带微凸经阴道/经直肠探头', '腔内', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('160', 'H44901AD', 'AB2-7RS;', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('161', 'H46701D', 'AB2-5GLMHzbroadbandcurvedarrayprobe,abd&Ob/Gyn;AB2-5MHz凸阵探头妇产科，腹部', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('162', 'H46701U', 'AC2-5MHzbroadbandcurvedarrayprobe,abd&Ob/Gyn;AC2-5MHz凸阵探头妇产科，腹部', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('163', 'H45021RS', '6S-DLFPAComfortScanProbe;6SFPA相控阵探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('164', 'H45202FM', '6.5MHZENDOPROBE', '腔内', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('165', 'H41252ME', 'E726.5MHzConvexprobe(4.3-9.0)TR/TV;E726.5MHz宽带凸阵经阴道/经直肠探头', '腔内', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('166', 'H40462LL', 'E8CS-SCEndocavitaryMicro-convexArrayTransducer', '腔内', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('167', 'H48862LZ', '10C-SCprobe', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('168', 'H4061CB', '3.5MHZCONVEXPROBE', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('169', 'H4830KL', '3.5MHzConvexProbe;3.5MHz凸阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('170', 'H4901PE', '3.5C', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('171', 'H40412LK', '3.5CS', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('172', 'H40412LB', '3C', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('173', 'H47032LH', '4C', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('174', 'H40412LA', '5C', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('175', 'H47072LT', '5CS', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('176', 'H41762LM', '8C', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('177', 'H41002LB', 'C313.5MHzMicroconvexprobe(2.8-4.2)Cardiac;C313.5MHz宽带微凸心脏探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('178', 'H40212LD', 'C364', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('179', 'H41002LA', 'C555.0MHzConvexprobe(3.5-7.5);C555.0MHz宽带凸阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('180', 'H40602LL', 'C5513.7-7.5MHzConvexprobe;C5513.7-7.5MHz宽带凸阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('181', 'H40772LC', 'C603.5MHz凸阵探头;', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('182', 'H40602LM', 'C7214-9MHzNeonatalProbe;C7214-9MHz小凸阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('183', 'H46022CA', 'CAE5.0MHzConvexprobe(3.5-7.0);CAE5.0MHz宽带凸阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('184', 'H46122CB', 'CBF3.5MHzConvexprobe(2.5-5.0);CBF3.5MHz宽带凸阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('185', 'H45222CS', 'CS2.5-5.0MHzBiopsyProbe;CS2.5-5.0MHz微凸探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('186', 'H45202CZ', 'CZB6.5MHzNeonatalM/CProbe;CZB6.5MHz小凸阵探头', '凸阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('187', 'H40412LG', '10L', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('188', 'H45202LM', '10LB', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('189', 'H47072LW', '11L', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('190', 'H40412LH', '12L', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('191', 'H41762LL', '12L', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('192', 'H40412LF', '7L', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('193', 'H40772LD', 'C146.0MHz线阵探头;', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('194', 'H45262LF', 'L393.5MHzLinearprobe(2.8-4.2);L393.5MHz线阵探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('195', 'H40772LE', 'L7007.5MHz线阵探头;', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('196', 'H41252HP', 'L767.5MHzLinearprobe(5.2-9.5);L767.5MHz线阵探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('197', 'H45282LA', 'LA39PROBE', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('198', 'H46022LB', 'LB3.5MHzLinearProbe;LB3.5MHz线阵探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('199', 'H40602LP', 'LDBiopsyProbe;LD线阵穿刺探头(使用于腹部)', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('200', 'H46022LE', 'LE5.0MHzLinearprobe(3.7-7.4);LE5.0MHz线阵探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('201', 'H46122LH', 'LH7.5MHzLinearprobe(5.0-8.0);LH7.5MHz线阵探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('202', 'H46022LI', 'LI7.5MHzLinearprobe(5.2-9.5)IntraoperativeI-Type;LI7.5MHz线阵I型术中探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('203', 'H45202LP', 'LINEARPROBLE7.5MHZ59MM', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('204', 'H46701A', 'SP4-10MHzbroadbandlineararrayprobe,smallparts;SP4-10MHz线阵小器官、外周血管探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('205', 'H46701B', 'SP6-12MHzbroadbandlineararrayprobe,smallparts;SP6-12MHz线阵小器官、外周血管探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('206', 'H4830JW', '3.5MHzFPAphasedarrayprobe;3.5MHz相控阵探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('207', 'H4901PB', '4S', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('208', 'H4901RA', '5Sphasedarrayprobe(old);5S相控阵心脏探头(旧)', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('209', 'H4901RA', '5Sphasedarrayprobe(old);5S相控阵心脏探头(旧)', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('210', 'H46222LF', '5SP', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('211', 'H40422LB', '7S', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('212', 'H40422LB', '7Sphasedarrayprobe;7S相控阵小儿探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('213', 'H46701G', 'PA2-5MHzbroadbandphasedarrayprobe;PA2-5MHz相控阵探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('214', 'H46701H', 'PA4-7MHzbroadbandphasedarrayprobe;PA4-7MHz相控阵探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('215', 'H45202WG', 'S2202.0-2.5MHzSectorProbe;S2202.0-2.5MHz相控阵扇扫探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('216', 'H40602LR', 'S2202.5MHzSectorProbe;S2202.5MHz相控阵扇扫探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('217', 'H40212LJ', 'S2222-4MHzTransCranialSectorProbe;S2222-4MHz相控阵扇扫探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('218', 'H40212LK', 'S3172-5MHzSectorprobe;S3172-5MHz相控阵扇扫探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('219', 'H44901AC', 'IC5-9W-RSEndocavityprobe;IC5-9W-RS经腔探头', '腔内', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('220', 'H48661NJ', 'SP10-16-RSLineararrayprobe;SP10-16-RS线阵探头', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('221', 'H4000PF', '10S-RSSectorprobe;10S-RS相阵探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('222', 'H4000PC', '5S-RSSectorprobe;5S-RS相阵探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('223', 'H4000PE', '7S-RSSectorprobe;7S-RS相阵探头', '相控阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('224', 'H40402LL', 'L10-22-RSLinearTransducer', '线阵', 'NormalValue', '150,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('225', 'H40442LL', '9L-RS', '线阵', 'NormalValue', '130,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('226', 'H4000SR', '4C-RS', '凸阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('227', 'H4000PD', '3S-RSPhasedarraytransducer', '相控阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('228', 'H4000PD', '3S-RSSectorProbe;3S-RS宽带相控阵探头,用于心脏、腹部、外伤及颈颅扫查', '相控阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('229', 'H4001DB', '8L', '线阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('230', 'H40452LD', '3S-SCPhasedArrayTransducer', '相控阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('231', 'H4830KM', '5.0MHzCLAcurvedarrayprobe;5.0MHz凸阵探头', '凸阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('232', 'H40212LC', 'C358', '凸阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('234', 'H41752LW', '3S', '相控阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('235', 'H4701SZ', '3S', '相控阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('236', 'H4830JY', '5.0MHzFPAphasedarrayprobe;5.0MHz相控阵探头(14mm)', '相控阵', 'NormalValue', '120,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('237', 'H40602LN', 'E7214-9MHzTV/TRProbe;E7214-9MHz经阴道/经直肠探头', '腔内', 'NormalValue', '100,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('238', 'H40462LG', 'E8CS-RCPROBE腔内探头', '腔内', 'NormalValue', '100,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('239', 'H40462LH', 'C2-5-RCPROBE腹部探头', '凸阵', 'NormalValue', '90,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('240', 'H40462LJ', 'L6-12-RCPROBE小器官探头', '线阵', 'NormalValue', '90,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('241', 'H40402LT', '8L-RSWidebandLinearProbe;8L-RS宽带线阵探头,用于外周血管、小器官', '线阵', 'NormalValue', '85,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('242', 'H45202WB', '3CBMulti-frequencyconvexprobe(2.0MHz-5.0MHz);3CB宽带多频凸阵探头', '凸阵', 'NormalValue', '85,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('243', 'H40452LA', '3S-RCPhasedArrayProbe;3S-RC相控阵探头', '相控阵', 'NormalValue', '75,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('244', 'H48102LH', 'E6C-RCMicroConvexProbe,Endocavity;E6C-RC微凸经腔探头', '腔内', 'NormalValue', '70,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('245', 'H48102LG', 'E7C-RCMicroConvexProbe,Endocavity;E7C-RC微凸经腔探头', '腔内', 'NormalValue', '70,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('246', 'H48102LJ', '7.5L-RCLinearProbe;7.5L-RC线阵探头', '线阵', 'NormalValue', '70,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('247', 'H48102LF', '6.5C-RCMicroConvexProbe,Pediatric;6.5C-RC小儿微凸阵探头', '凸阵', 'NormalValue', '50,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('248', 'H48102LE', '4C-RCConvexProbe;4C-RC凸阵探头', '凸阵', 'NormalValue', '50,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('249', 'H48102LK', '7L-RCLinearProbe;7L-RC线阵探头', '线阵', 'NormalValue', '50,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('250', 'H45202PA', 'PA51PROBEADAPTOR', '相控阵', 'NormalValue', '50,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('251', 'H48102LD', '3.8C-RCConvexProbe;3.8C-RC凸阵探头', '凸阵', 'NormalValue', '45,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('252', 'H4830KP', '2.0MHzTranscranialPWProbe;2.0MHz经颅多普勒检查', '相控阵', 'NormalValue', '20,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('253', 'H45202DB', 'CWD22.0MHzST-CWDProbe;CWD22.0MHz连续波多普勒探头', '相控阵', 'NormalValue', '20,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('254', 'H45202DE', 'CWD55.0MHzST-CWDProbe;CWD55.0MHz连续波多普勒探头', '相控阵', 'NormalValue', '20,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('255', 'H46701L', 'PCW4.0MHzPencilCW-Probe;', '相控阵', 'NormalValue', '20,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('256', 'H46701K', 'SCW2.0MHzPencilCW-Probe;', '相控阵', 'NormalValue', '20,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('257', 'H4830JE', 'P2D', '线阵', 'NormalValue', '15,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('258', 'H4830JG', 'P6D', '线阵', 'NormalValue', '15,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('259', 'H45021C', 'P2D-RSCWDPencilProbe;P2D-RS笔式探头', '线阵', 'NormalValue', '15,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('260', 'H45541CP', 'P6D-RSCWDPencilProbe;P6D-RS笔式探头', '线阵', 'NormalValue', '15,000');
-INSERT INTO zkb_part_order_cat (id,cat_no,cat_model,cat_type,value_type,price) VALUES ('261', 'H45551CA', 'P2D-RSPedofftransducer', '线阵', 'NormalValue', '12,000');
-
-
-
--- 2020.08.19 start 供应商系统 楼层数据
---南部
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1','1号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2','2号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3','3号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5','5号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_6','6号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7','7号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8','8号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,7);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9','9号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,8);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10','10号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,9);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_11','11号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,10);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_12','12号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,11);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz','新门诊楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,12);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_frmz','发热门诊楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'main',null,13);
-
---1号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_1','1层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_2','2层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_3','3层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_4','4层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_5','5层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_6','6层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_7','7层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_8','8层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_9','9层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_10','10层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,10);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_11','11层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,11);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_12','12层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,12);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_13','13层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,13);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_14','14层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,14);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_15','15层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,15);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_16','16层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,16);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_17','17层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,17);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_18','18层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,18);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_19','19层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,19);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_20','20层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,20);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_1_21','21层','n_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,21);
-
-
---2号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_1','1层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_2','2层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_3','3层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_4','4层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_5','5层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_6','6层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_7','7层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_8','8层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_2_9','9层','n_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
-
-
---3号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_1','1层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_2','2层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_3','3层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_4','4层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_5','5层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_6','6层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_3_7','7层','n_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-
-
---5号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_1','1层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_2','2层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_3','3层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_4','4层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_5','5层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_5_6','6层','n_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-
-
---6号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_6_1','1层','n_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_6_2','2层','n_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_6_3','3层','n_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-
-
---7号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_1','1层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_2','2层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_3','3层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_4','4层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_5','5层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_6','6层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_7','7层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_8','8层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_9','9层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_10','10层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,10);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_11','11层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,11);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_12','12层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,12);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_13','13层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,13);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_14','14层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,14);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_7_15','15层','n_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,15);
-
-
---8号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8_1','1层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8_2','2层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8_3','3层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8_4','4层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_8_5','5层','n_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-
-
---9号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9_1','1层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9_2','2层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9_3','3层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9_4','4层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_9_5','5层','n_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-
-
---10号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_1','1层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_2','2层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_3','3层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_4','4层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_5','5层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_6','6层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_7','7层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_10_8','8层','n_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
-
-
---11号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_11_1','1层','n_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_11_2','2层','n_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-
-
---12号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_12_1','1层','n_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_12_2','2层','n_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-
-
---新门诊楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_1','1层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_2','2层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_3','3层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_4','4层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_5','5层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_6','6层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_7','7层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,7);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_8','8层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,8);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_9','9层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,9);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_10','10层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,10);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_xmz_11','11层','n_xmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,11);
-
-
---发热门诊楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_frmz_1','1层','n_frmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('n_frmz_2','2层','n_frmz', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='南部院区'),'sub',null,2);
-
-
---北部
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1','1号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2','2号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3','3号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5','5号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6','6号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_7','7号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_8','8号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,7);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_9','9号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,8);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_10','10号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,9);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_11','11号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,10);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12','12号楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,11);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_tjzx','体检中心',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,12);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_yjls','药剂临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,13);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_jgls','技工临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,14);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_hqls','后勤临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,15);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_ls','临时楼',null, (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'main',null,16);
-
-
---1号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_-1','-1层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_1','1层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_2','2层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_3','3层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_4','4层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_5','5层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_6','6层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_7','7层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_8','8层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,8);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_9','9层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,9);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_10','10层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,10);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_11','11层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,11);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_12','12层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,12);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_13','13层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,13);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_14','14层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,14);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_15','15层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,15);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_1_16','16层','b_1', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,16);
-
-
---2号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2_-1','-1层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2_1','1层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2_2','2层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2_3','3层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_2_4','4层','b_2', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-
-
---3号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_-1','-1层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_1','1层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_2','2层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_3','3层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_4','4层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_5','5层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_6','6层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_7','7层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_3_8','8层','b_3', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,8);
-
-
---5号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_-1','-1层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_1','1层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_2','2层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_3','3层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_4','4层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_5','5层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_6','6层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_7','7层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_8','8层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,8);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_5_9','9层','b_5', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,9);
-
-
---6号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_-1','-1层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_1','1层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_2','2层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_3','3层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_4','4层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_5','5层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_6','6层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_6_7','7层','b_6', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,7);
-
-
---7号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_7_1','1层','b_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_7_2','2层','b_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_7_3','3层','b_7', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-
-
---8号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_8_1','1层','b_8', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-
-
---9号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_9_-1','-1层','b_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,-1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_9_1','1层','b_9', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-
-
---10号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_10_1','1层','b_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_10_2','2层','b_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_10_3','3层','b_10', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-
-
---11号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_11_1','1层','b_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_11_2','2层','b_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_11_3','3层','b_11', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-
-
---12号楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_1','1层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_2','2层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_3','3层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,3);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_4','4层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,4);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_5','5层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,5);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_12_6','6层','b_12', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,6);
-
-
---体检中心
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_tjzx_1','1层','b_tjzx', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-
-
---药剂临时楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_yjls_1','1层','b_yjls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_yjls_2','2层','b_yjls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-
-
---技工临时楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_jgls_1','1层','b_jgls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_jgls_2','2层','b_jgls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-
-
-
---后勤临时楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_hqls_1','1层','b_hqls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_hqls_2','2层','b_hqls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,2);
-
-
---临时楼
-insert into asset_location_info("id", "name", "parent", "site_uid", "type", "remark", "index") values ('b_ls_1','1层','b_ls', (select oi.uid from tenant_info ti,org_info oi where ti.uid=oi.tenant_uid and ti.name = '上海交通大学医学院附属第九人民医院' and oi.org_type=3 and oi.name='北部院区'),'sub',null,1);
-
--- 2020.08.19 end 供应商系统 楼层数据
-
-
---初始化目录
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('1                               ', 1, 'ULS VENUE', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('2                               ', 1, 'CT', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('3                               ', 1, 'WIX MAMMO', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('4                               ', 1, 'ULS Vivid', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('5                               ', 1, 'WIX SURGEY', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('6                               ', 1, 'WIX RF', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('7                               ', 1, 'ULS BMD', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('8                               ', 1, 'ULS Logiq', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('9                               ', 1, 'ULS Voluson', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('10                              ', 1, 'WIX DXR', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('11                              ', 1, 'WIX BMD', NULL);
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('12                              ', 2, 'VENUE 40', '1                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('13                              ', 2, 'HISPEED', '2                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('14                              ', 2, 'CT385', '2                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('15                              ', 2, 'ACT ACTS', '2                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('16                              ', 2, 'BRIGHTSPEED', '2                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('17                              ', 2, 'CT315 325', '2                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('18                              ', 2, 'SENO DS', '3                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('19                              ', 2, 'SENO 2000D', '3                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('20                              ', 2, 'CRYSTAL', '3                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('21                              ', 2, 'SENO PRISTINA', '3                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('22                              ', 2, 'ALPHA RT', '3                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('23                              ', 2, 'SENO ESSENTIAL', '3                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('24                              ', 2, 'VIVID S5/S6', '4                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('25                              ', 2, 'Vivid E80 E90 E95', '4                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('26                              ', 2, 'Vivid E7 E9', '4                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('27                              ', 2, 'Vivid 7', '4                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('28                              ', 2, 'VIVID E', '4                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('29                              ', 2, 'Vivid I/Q', '4                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('30                              ', 2, 'Vivid S60 S70', '4                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('31                              ', 2, 'VIVIDT 8', '4                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('32                              ', 2, 'OEC ONE', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('33                              ', 2, 'OEC9800', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('34                              ', 2, 'OEC7900', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('35                              ', 2, 'OEC7500', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('36                              ', 2, 'OEC ONE CFD', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('37                              ', 2, 'OEC850', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('38                              ', 2, 'OEC715 785 865', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('39                              ', 2, 'OEC ONE II', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('40                              ', 2, 'OEC7700', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('41                              ', 2, 'OEC MINIVIEW', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('42                              ', 2, 'OEC9900', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('43                              ', 2, 'OEC ELITE', '5                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('44                              ', 2, 'RXI', '6                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('45                              ', 2, 'PS800', '6                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('46                              ', 2, 'R500', '6                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('47                              ', 2, 'PT800', '6                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('48                              ', 2, 'ACHILLES EXPII', '7                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('49                              ', 2, 'ACHILLES EXP', '7                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('50                              ', 2, 'Logiq F', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('51                              ', 2, 'Logiq C', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('52                              ', 2, 'LOGIQ S6', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('53                              ', 2, 'Logiq P6', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('54                              ', 2, 'Logiq V1 V2', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('55                              ', 2, 'Logiq E', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('56                              ', 2, 'Logiq P5', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('57                              ', 2, 'Logiq P7 P9', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('58                              ', 2, 'Venue50', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('59                              ', 2, 'Logiq 7', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('60                              ', 2, 'Logiq S8', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('61                              ', 2, 'Logiq 5', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('62                              ', 2, 'Logiq E8', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('63                              ', 2, 'LOGIQ 3', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('64                              ', 2, 'Logiq 9', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('65                              ', 2, 'LOGIQ BOOK XP', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('66                              ', 2, 'LOGIQ P3 ', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('67                              ', 2, 'Logiq S7', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('68                              ', 2, 'LOGIQ V3/V5', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('69                              ', 2, 'Logiq E9', '8                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('70                              ', 2, 'Voluson 730', '9                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('71                              ', 2, 'VOLUSON I/E', '9                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('72                              ', 2, 'Voluson S6/S8', '9                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('73                              ', 2, 'Voluson E6 E8 E10', '9                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('74                              ', 2, 'VOLUSON S10', '9                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('75                              ', 2, 'Voluson P6 P8', '9                               ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('76                              ', 2, 'XR575', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('77                              ', 2, 'XR6000', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('78                              ', 2, 'DR-F', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('79                              ', 2, 'D6000-3', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('80                              ', 2, 'XRD-2X', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('81                              ', 2, 'D6000-2', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('82                              ', 2, 'XR656G3', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('83                              ', 2, 'XR650', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('84                              ', 2, 'D8000', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('85                              ', 2, 'XR316', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('86                              ', 2, 'XR118', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('87                              ', 2, 'XRD', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('88                              ', 2, 'AMX4PLUS', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('89                              ', 2, 'XR648', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('90                              ', 2, 'XR642', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('91                              ', 2, 'XR646HD', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('92                              ', 2, 'XR646', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('93                              ', 2, 'XR220', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('94                              ', 2, 'XR656', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('95                              ', 2, 'XR515', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('96                              ', 2, 'XR240', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('97                              ', 2, 'XR656G2', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('98                              ', 2, 'D6000-1', '10                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('99                              ', 2, 'PRODIGY', '11                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('100                             ', 2, 'IDXA', '11                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('101                             ', 2, 'DPX DUO BRAVO', '11                              ');
-INSERT INTO "zkb_file_directory"("id", "level", "name", "parent_id") VALUES ('102                             ', 2, 'DPX NT', '11                              ');
-
-
+update asset_info set visible_status = 1 where site_id = 46 and (ib_status < 1 or ib_status is null);
+
+-- 微信自动回复-关注公众号消息
+ALTER TABLE "public"."wechat_subscribe_message"
+  ALTER COLUMN "message" TYPE text COLLATE "pg_catalog"."default" USING "message"::text;
+
+update wechat_subscribe_message set keyword=null,message='感谢关注GEAPM医院资产管理数字化解决方案。点击微工作台，使用APM账号密码登录，享受GE数字化服务新体验。您也可以回复一下数字获得更多信息：'||chr(10)||'1.自助注册APM账号'||chr(10)||'2.如何登录APM'||chr(10)||'3. 如何开通设备连接'||chr(10)||'4. APM操作指导'||chr(10)||'5. 如何找到密码'||chr(10)||'6. 设备报修'||chr(10)||'7. GE客服热线',url=null where enabled = true;
+
+
+INSERT INTO public.sys_role (id,home_page,name,role_desc,menus,role_desc_en) VALUES (17,null,'SparePartsAdmin','备件管理员','simple-parts','Spare Parts Admin');
+
+
+
+-- 2020.09.21 质控更新 start
+delete from audit_config;
+delete from audit_summary;
+delete from audit_module;
+delete from audit_group;
+delete from audit_link;
+delete from audit_item;
+delete from audit_file;
+
+
+update audit_default_item set owner = '请填写模块负责人' where owner is null or owner = '';
+update audit_item set owner = '请填写模块负责人' where owner is null or owner = '';
+
+
+update audit_default_item set system_item = true;
+update audit_item set system_item = true where id < 91;
+
+
+update audit_default_group set interpretation = '要成立专门的医疗设备和医用耗材管理委员会，明确委员会的工作职责，人员组成，要形成会议记录；委员会一般由医疗行政管理、医学工程、临床医学及护理、医院感染管理部门、医保、信息等专业人员组成，（如果委员会人员或者职责有调整，提供调整内容)，举证说明委员会的工作职责以及执行情况，比如2年内的重要设备购置预算领导意见和签字，购置设备的数据统计表；购置设备的汇总表；年度设备清单,购置手术器械汇总表，大购置论证会签到记录等' where version = '6.10.1.1.C.1';
+update audit_default_group set interpretation = '根据医院实际情况配备合理的人员数量，根据设备生命周期管理的关键环节来分配关键岗位，一般分为行政/专技两种人员，制定岗位职责制度' where version = '6.10.1.1.C.2';
+update audit_default_group set interpretation = '围绕着医疗装备的全生命周期，制定设备的管理制度，以及人员岗位制度等，详见模板。江苏版需要医院配备合理的维修人员与场地，对于有害作业需要有安全防护，在相关制度中要体现出来，在现场的维修场地也要注意设置防护措施。' where version = '6.10.1.1.C.3';
+update audit_default_group set interpretation = '这里的主管部门（江苏版为医学装备管理部门）院外的涉及到若干个相关机构，如卫计委，质控中心（业务专家组成），市场监管局（特种设备管理），药监所等；医院内部主要包括党委会、院委会、人事处（考核）、设备耗材管理委员会；行政部（或院办，主要是红头文件或者市级下发各种文件，限于设备有关）等，可举证以上相关的主管部门对于设备相关工作和人员的检查和反馈，不局限于某个部门。' where version = '6.10.1.1.B.1';
+update audit_default_group set interpretation = '举证说明，比如可以将市级的五年规划与院方的五年规划相结合，把其中和设备有关的预算项目进行举证，并详细说明有关的项目调整原因，是为了更好的配合临床需求。也可以举证说明过去2-3年中的设备发展规划中的改进亮点，从大的方向中证明医学装备规划在不断改进。' where version = '6.10.1.1.A.1';
+update audit_default_group set interpretation = '该条可以先举证近年来的设备发展计划是什么，然后在其中挑选重要设备的采购论证和相关记录' where version = '6.10.1.2.C.1';
+update audit_default_group set interpretation = '首先要制定详细的医学装备每个环节的制度与流程，（包括但不限于本条目的环节）每个环节的制度请参考模板，然后举证是如何执行的，关键信息要有，比如：维修工单记录，总的资产账目等。该环节可以用APM 资产云管家中的档案、维修、计量、报废等功能来进行相关工作的执行。' where version = '6.10.1.2.C.2';
+update audit_default_group set interpretation = '临床使用部门要指定专门的设备管理人员，并提供与人员对应的设备使用培训和考核成绩记录。' where version = '6.10.1.2.C.3';
+update audit_default_group set interpretation = '该处的主管部门主要是指与设备相关的上级行政组织，相关的医学装备近年来的监察记录都可以举例。' where version = '6.10.1.2.B.1';
+update audit_default_group set interpretation = '主要是针对设备的配置规划和实行的过程进行改进，比如年度规划中的中期采购改进等。该处也可以向院务处或者财务处收集相关举证材料。' where version = '6.10.1.2.A.1';
+update audit_default_group set interpretation = '50万的门槛可能会因地方政策要求而有所调整，该条主要是采购环节的论证，首先要制定相关制度，然后举例贵重医疗设备的可行性论证、申请过程的记录等' where version = '6.10.2.1.C.1';
+update audit_default_group set interpretation = '国家和地方都有相关的分类方式，一般地方的分类要求比国家的68码要求更细，APM account中的设备档案分类综合了多方要求，完全可以建立充分的设备电子账目。' where version = '6.10.2.1.C.2';
+update audit_default_group set interpretation = '大型设备的档案建立一般要求更高，证明文件比较齐全，比如CT、MR等，可以准备相应的招标文件、评标报告、投标书、验收报告、使用手册、注册证、培训记录、维修记录等相关文件。江苏省还要求严格实行甲乙类设备的配置证管理制度，因此要根据最新的甲乙类分类，保留相关设备的配置证文件。' where version = '6.10.2.1.C.3';
+update audit_default_group set interpretation = '大型医用设备的评价方式目前还不完全统一，需要结合使用科室制定可量化的评价指标，具体指标可以参照模板。' where version = '6.10.2.1.C.4';
+update audit_default_group set interpretation = '具体可以利用APM 资产云管家等系统的截图或表单导出来举证，如总设备台账、不同时间的设备验收清单、合同执行情况，多少台在正常使用中、多少台在维修中、多少台考虑报废、设备的维修工单记录、维修费用等' where version = '6.10.2.1.B.1';
+update audit_default_group set interpretation = '该处的主管部门主要是指与设备相关的上级行政组织，比如市级监管部门的审计结果或者院办/财务等与设备相关的审计报告，提供给医学装备委员会' where version = '6.10.2.1.B.2';
+update audit_default_group set interpretation = '要根据B中主管部门提供的审计报告中，对提出的问题进一步改进' where version = '6.10.2.1.A.1';
+update audit_default_group set interpretation = '一定要有医疗器械临床使用安全事件监测与报告制度，尤其对于与设备相关的不良事件足够重视，拿出不良事件的上报记录。而且要有举措鼓励不良事件的上报。江苏版中额外要求：遵从安全操作使用流程，加强对装备警报提示系统的管理。 可以利用厂商对于大型设备的远程设备预警功能来管理，并且加强使用人员的操作安全的培训和考核。' where version = '6.10.3.1.C.1';
+update audit_default_group set interpretation = '要有明确的计量设备管理制度和计量设备清单，并及时记录与跟进相关设备/耗材厂商的召回动作，即使在当前没有发生相关的质量安全事件，也要用文件说明当前未发生表示在密切监督设备的质量保障环节。' where version = '6.10.3.1.C.2';
+update audit_default_group set interpretation = '对条款里提到的设备分类要制定相应的使用安全事件检测与报告制度，详见模板' where version = '6.10.3.1.C.3';
+update audit_default_group set interpretation = '利用员工手册提醒员工注意自身安全，培训制度要通知到使用科室，让使用人员都知晓安全要求；另外设备管理人员也要掌握相应内容；' where version = '6.10.3.1.C.4';
+update audit_default_group set interpretation = '可提供使用部门的大型设备日常维护自查表，医学装备部门要提供各个科室的使用安全总情况的考核表，' where version = '6.10.3.1.B.1';
+update audit_default_group set interpretation = '该处的主管部门主要是指与设备相关的上级行政组织，比如省级质控中心提供过去检查的成绩，市场监督管理局检查的结果等' where version = '6.10.3.1.B.2';
+update audit_default_group set interpretation = '医学装备管理部门要总结近年来设备使用安全与风险的总体情况，形式可以包括文档报告，相关表单等，在过去的使用安全问题中发现改进措施并执行。' where version = '6.10.3.1.A.1';
+update audit_default_group set interpretation = '江苏版将6.10.3.2与6.10.3.3整合为一个款项，但是核心要求不变。该条主要提供核医学科装备、高压氧舱、放射类设备等的检验机构报告' where version = '6.10.3.2.C.1';
+update audit_default_group set interpretation = '需要提供机房放射警示标签的照片' where version = '6.10.3.2.C.2';
+update audit_default_group set interpretation = '要有设备使用人员对于放射与放疗类设备的安全培训制度，提供培训记录' where version = '6.10.3.2.C.3';
+update audit_default_group set interpretation = '提供放射与放疗类机房环境的检查记录' where version = '6.10.3.2.B.1';
+update audit_default_group set interpretation = '同6.10.3.2.C.1，主要通过第三方检验机构来监测安全情况' where version = '6.10.3.2.B.2';
+update audit_default_group set interpretation = '主要是根据监管制度的不断完善来持续改进机房安全的管理' where version = '6.10.3.2.A.1';
+update audit_default_group set interpretation = '需要准备特种装备的设备明细（包括分布位置），并且提供第三方检查机构提供的监测报告和合格证明。' where version = '6.10.3.3.C.1';
+update audit_default_group set interpretation = '提供特殊装备操作人员的上岗证，培训记录等。' where version = '6.10.3.3.C.2';
+update audit_default_group set interpretation = '提供医学装备部门对于特种装备的定期检查记录，可以利用APM 资产云管家进行周期性检查管理' where version = '6.10.3.3.B.1';
+update audit_default_group set interpretation = '举证说明医学装备部门对于特殊装备的检查记录，并且形成阶段性总结' where version = '6.10.3.3.B.2';
+update audit_default_group set interpretation = '要举证在近年来对于特种装备质量安全的治理案例，说明在不断改进中。' where version = '6.10.3.3.A.1';
+update audit_default_group set interpretation = '江苏版是3.3；制定放射和诊断影像类设备的管理制度' where version = '6.10.3.4.C.1';
+update audit_default_group set interpretation = '可以用各个厂商的维修报告来举证，另外可提供使用科室的日常自查表' where version = '6.10.3.4.C.2';
+update audit_default_group set interpretation = '要先准备医院的放射类设备名称一览表，然后提供放射装置、放射工作场所、环境检测情况报告；年度放射诊疗频次表；介入放射学年度实施总人次数表；改进整改措施；特种设备使用登记证（包括检验报告）；计量测试技术研究院华东计量测试中心检定证书（压力表检定装置、锅炉）；液氧塔自查表；压力表减压器电接点表分部记录表；射线装置与同位素基本情况；' where version = '6.10.3.4.C.3';
+update audit_default_group set interpretation = '医学装备部门可以提供模板，然后由使用科室提供自查记录；' where version = '6.10.3.4.B.1';
+update audit_default_group set interpretation = '此处的主管部门指医学装备管理部门，要定期对放射和诊断性影像设备做预防性维护检查，提供（也可以由厂商提供相关服务）定期保养报告、计量或者质控报告等；' where version = '6.10.3.4.B.2';
+update audit_default_group set interpretation = '需要做年度总结，对于关键使用指标要不断提出改进措施，详见模板。' where version = '6.10.3.4.A.1';
+update audit_default_group set interpretation = '江苏版本是3.4；计量必须做台账/强检计量设备必须100%检测；非强检设备逐年增加，指定强检周期时间并落实；账目和强检数量不一致时，要注意查看是否是强检范围不够准确，另外要注意有些设备可能已经报废了；有部分科研设备也必须强检；' where version = '6.10.3.5.C.1';
+update audit_default_group set interpretation = '统一设置计量设备清单，清单上所列计量设备必须进行检测；有两年内计量设备清单、定期检测记录和计量不合格设备的维修记录等相关资料' where version = '6.10.3.5.C.2';
+update audit_default_group set interpretation = '现场查的时候一定看贴的有效期，原始检测报告都要保留记录，标志显示检测时间与登记记录一致。' where version = '6.10.3.5.C.3';
+update audit_default_group set interpretation = '要有相关管理人员的培训和考核记录' where version = '6.10.3.5.C.4';
+update audit_default_group set interpretation = '可以通过APM 护士助手来辅助使用科室对于计量设备定期自查，自行设置检查项和检查周期。' where version = '6.10.3.5.B.1';
+update audit_default_group set interpretation = '可以通过APM 对计量设备定期巡检，自行设置检查项和检查周期。' where version = '6.10.3.5.B.2';
+update audit_default_group set interpretation = '在允许的范围内，合理增加非强检的目录和品规' where version = '6.10.3.5.A.1';
+update audit_default_group set interpretation = '江苏版把该条删了。现场抽查，所以要提前做好计量器具的合格标志检查。' where version = '6.10.3.5.A.2';
+update audit_default_group set interpretation = '制定医疗仪器设备使用人员操作培训、考核制度与程序；提供培训会签到表、培训ppt（多放几种类型），测卷，考核结果汇总（不一定是成绩，也可以是签到记录）；' where version = '6.10.4.1.C.1';
+update audit_default_group set interpretation = '技术支持可以用设备保养维护、维修记录等来体现；业务指导和咨询服务可以用设备培训记录表来体现；' where version = '6.10.4.1.C.2';
+update audit_default_group set interpretation = '江苏把该条合并到C.1了。提供意外情况处理的培训PPT，另外要举证说明意外情况处理记录，如除颤仪意外情况处理方案表，呼吸机意外情况处理表，监护仪意外情况处理表，' where version = '6.10.4.1.C.3';
+update audit_default_group set interpretation = '江苏版要求操作手册由装备管理部门管理和存档。主要部门尤其是急救设备需要有挂机本，需要涵盖简易操作手册，状态标识牌，检查维护的记录，医学转杯科也需要管理和存档相应资料，尤其是要准备呼吸机、除颤仪等急救类设备的。' where version = '6.10.4.1.C.4';
+update audit_default_group set interpretation = '要提供医疗设备培训记录表（比如呼吸机，除颤仪、心电图机等），以及科室培训考核评分表' where version = '6.10.4.1.C.5';
+update audit_default_group set interpretation = '要提供近来年科室培训情况与效果反馈表，以及使用科室内部的自查表（应知应会）' where version = '6.10.4.1.B.1';
+update audit_default_group set interpretation = '对今年来设备使用培训情况进行总结，该处的主管部门指资产设备处，要体现培训了哪些内容，考核了哪些内容，哪些考核不够，应该再怎么处理。' where version = '6.10.4.1.B.2';
+update audit_default_group set interpretation = '要对近年来整体的设备培训情况有详细分析，最好和日常的设备使用状况、维修状况、以及临床效益分析结合在一起，并且要提出实施有效的措施形成PDCA改进闭环。' where version = '6.10.4.1.A.1';
+update audit_default_group set interpretation = '可以将所有的医学装备管理相关制度都整理在一起，另外要把全院设备按照科室配置、设备规划进行整理。江苏版还要求有临床使用记录，所以还要提供临床日常登记记录（开关机）' where version = '6.10.5.1.C.1';
+update audit_default_group set interpretation = '首先要有医疗设备维修管理制度，然后可以利用 APM 保养、计量、维修等功能统一来管理相关设备，并且用护士助手来履行日常使用部门的保养和登记记录。' where version = '6.10.5.1.C.2';
+update audit_default_group set interpretation = '江苏版多一条C.4: 应用信息化技术实施医学装备全流程的管理，有医学装备论证、决策、购置、验收、培训、使用、保养、维修、应用分析和更新、处置等相关工作的全程记录，信息真实、完整、准确。
+
+对于医学装备的保障，指的是要充分保障设备的临床使用，一旦发生故障要能修，因此要把近年来所有的维修记录全部提供出来。对于江苏版的要求，可以利用APM来展示医学装备管理的验收、培训、使用、保养、维修、应用分析和更新、处置等相关工作。' where version = '6.10.5.1.C.3';
+update audit_default_group set interpretation = '要举例说明对设备故障维修的分析情况，尤其是大型设备比如MRI/CT/DSA/MI设备，和急救类设备比如心电、监护仪等。里面要说明维修的总数量、故障原因、故障降低措施，或者设备规划' where version = '6.10.5.1.B.1';
+update audit_default_group set interpretation = '可以整理安全和风险防控排查情况的总结，包括现在各环节存在的问题：设备质量、使用规范、监管力度等，并提出相应的整改措施，包括验收质量把关、加强培训、及时巡检等；' where version = '6.10.5.1.B.2';
+update audit_default_group set interpretation = '江苏版要求“持续改进有成效，全院医学装备实现全生命周期信息化管理且管理规范，满足临床使用需求。”具体用数字或者信息化手段分析在哪些管理的KPI上有所改进，比如，做关于降低大型设备平均故障次数的分析，也可以做采购报修的原因分析，或者单次维修的原因分析等，' where version = '6.10.5.1.A.1';
+update audit_default_group set interpretation = '使用科室要有仪器设备使用记录本，医学装备部门制定急救设备应急预案；15min之内必须要有好设备调过来，这个是必考项，应急储备设备列表，必须有；临床科室要求必须掌握发生急救设备故障处理流程表；' where version = '6.10.5.2.C.1';
+update audit_default_group set interpretation = '若一旦故障停机，要及时张贴停用标识，不够用的情况下，要有调配机制，举证说明，比如呼吸机/心电监护等借用记录，' where version = '6.10.5.2.C.2';
+update audit_default_group set interpretation = '江苏版要求应用信息化技术来进行实时监管。
+可借鉴APM 资产云管家的调剂中心来完成，保证设备调配的实时性，一旦设备发生故障停机时，要第一时间张贴仪器损坏表或者撤回，保证投入临床使用的100%完好率。' where version = '6.10.5.2.B.1';
+update audit_default_group set interpretation = '要有急救类、生命支持类装备完好率不同阶段的结果汇总，并提供不断改进完好率措施的举证，比如应急演练、各类设备的保养表、定期巡查清单、设备清点单等' where version = '6.10.5.2.A.1';
+update audit_default_group set interpretation = '江苏版将6.10.5.3.C.1和6.10.5.3.C.2合二为一了，改为“有医学装备日常管理工作和意外应急管理等相关制度，建立应急管理程序，装备故障时有紧急替代流程。优先保障急救类、生命支持类装备的应急调配”。要制定医疗设备应急替代制度，提供应急储备设备列表，医疗设备应急替代工作流程。' where version = '6.10.5.3.C.1';
+update audit_default_group set interpretation = '江苏版将6.10.5.3.C.1和6.10.5.3.C.2合二为一了，取消了6.10.5.3.C.2。要制定医疗设备应急替代制度，提供应急储备设备列表，医疗设备应急替代工作流程。' where version = '6.10.5.3.C.2';
+update audit_default_group set interpretation = '对医务人员定期培训和考核医疗装备应急预案。' where version = '6.10.5.3.C.3';
+update audit_default_group set interpretation = '要定期（建议每半年一次）举办医学装备应急演练，并提供应急设备日常调用情况的记录。' where version = '6.10.5.3.B.1';
+update audit_default_group set interpretation = '对于应急演练要有分析与反馈，在设备调用方面要提供调用结果分析，不断改进应急储备库。' where version = '6.10.5.3.A.1';
+update audit_default_group set interpretation = '制定关于医用耗材方面的制度，详见模板。' where version = '6.10.6.1.C.1';
+update audit_default_group set interpretation = '江苏版多了一句要求：有高值医用耗材临床应用遴选、采购、储存、使用、监测、评价、监督等管理的程序，并有记录。 集中举证某类医疗耗材的入库、出库、手术使用登记、手术相关使用记录、知情同意书等，有一个完整的追溯和监督记录。' where version = '6.10.6.1.C.2';
+update audit_default_group set interpretation = '要保留高值耗材的供应商营业执照、经营许可证、医疗器械注册证；第二类医疗器械经营备案凭证，供应商的授权书；植入性医疗器械使用登记表；要分2步：1，使用范围证明；2，使用范围相关记录' where version = '6.10.6.1.C.3';
+update audit_default_group set interpretation = '制定医疗器械不良事件监测报告管理办法，包括医疗安全不良事件上报流程、可疑医疗器械不良事件报告表模板等；提供上报实例，在医用耗材管理委员会以外，如果院方举办或参与过医疗耗材不良事件的汇报分析和整改，请一并提供，从而证明院方对于耗材不良事件的重视程度。' where version = '6.10.6.1.C.4';
+update audit_default_group set interpretation = '提供不同科室的高值耗材自查表，并附有科室负责人签名。' where version = '6.10.6.1.B.1';
+update audit_default_group set interpretation = '提供院方定期巡查的整改建议，若有，请提供院方审计科对于医用耗材的采购使用分析，说明为何要购入该类医用耗材，是否符合耗材管理制度药材。' where version = '6.10.6.1.B.2';
+update audit_default_group set interpretation = '江苏版将“百元医疗收入(不含药品收入)中消耗的卫生材料降到20元以下”删掉了。材占比是医院考核KPI之一，可向院务处或者财务处收集院方的材占比分析报告。' where version = '6.10.6.1.A.1';
+update audit_default_group set interpretation = '江苏版把6.10.7.1与6.10.7.2合并了，核心内容保留，更加简洁。
+主要针对医学装备处的行政管理和技术人员进行培训，准备相关学分证明、相关技能培训证书等' where version = '6.10.7.1.C.1';
+update audit_default_group set interpretation = '对大型设备举证说明，包括使用情况，设备计划、维修年度总结、报废小结等，来说明医学装备处对于发展规划的落实情况。' where version = '6.10.7.1.C.2';
+update audit_default_group set interpretation = '举证说明安全管理的工作内容和整改反馈，详见模板' where version = '6.10.7.1.B.1';
+update audit_default_group set interpretation = '可以借助APM资产云管家按周期进行设备巡查，定期总结使用安全情况。' where version = '6.10.7.1.B.2';
+update audit_default_group set interpretation = '要定期对使用科室的使用满意度调查，帮助医学装备管理部门规范设备的规划和管理，加强使用科室的培训和支持制度，持续改进使用满意度。' where version = '6.10.7.1.A.1';
+update audit_default_group set interpretation = '江苏版把6.10.7.1与6.10.7.2合并了，核心内容保留，更加简洁。首先要有非常健全的设备全周期管理制度，包括使用科室对于医疗设备的管理制度。' where version = '6.10.7.2.C.1';
+update audit_default_group set interpretation = '要提供详细的应急程序制度，包括应急替代制度、应急物资管理制度等。对于医学装备的日常管理可以用大型医疗设备的采购记录来举证。' where version = '6.10.7.2.C.2';
+update audit_default_group set interpretation = '举证说明：贵重设备的培训记录，以及使用人员的上岗证。' where version = '6.10.7.2.C.3';
+update audit_default_group set interpretation = '可以利用APM资产云管家管理维护保养，提供相应的保养和维修报告，使用科室可以利用护士助手进行日常检查。另外对科室的设备分布情况要有明细。' where version = '6.10.7.2.B.1';
+update audit_default_group set interpretation = '该条设备装备管理部门是主管部门，提供对安全检查的调研表和巡检表' where version = '6.10.7.2.B.2';
+update audit_default_group set interpretation = '每一年要比前一年做的更好，制度任何一点改变都需要写到总章程里，拔一个高度，但是不要矫枉过正，把握改进的度。' where version = '6.10.7.2.A.1';
+
+
+update audit_group set interpretation = '要成立专门的医疗设备和医用耗材管理委员会，明确委员会的工作职责，人员组成，要形成会议记录；委员会一般由医疗行政管理、医学工程、临床医学及护理、医院感染管理部门、医保、信息等专业人员组成，（如果委员会人员或者职责有调整，提供调整内容)，举证说明委员会的工作职责以及执行情况，比如2年内的重要设备购置预算领导意见和签字，购置设备的数据统计表；购置设备的汇总表；年度设备清单,购置手术器械汇总表，大购置论证会签到记录等' where version = '6.10.1.1.C.1';
+update audit_group set interpretation = '根据医院实际情况配备合理的人员数量，根据设备生命周期管理的关键环节来分配关键岗位，一般分为行政/专技两种人员，制定岗位职责制度' where version = '6.10.1.1.C.2';
+update audit_group set interpretation = '围绕着医疗装备的全生命周期，制定设备的管理制度，以及人员岗位制度等，详见模板。江苏版需要医院配备合理的维修人员与场地，对于有害作业需要有安全防护，在相关制度中要体现出来，在现场的维修场地也要注意设置防护措施。' where version = '6.10.1.1.C.3';
+update audit_group set interpretation = '这里的主管部门（江苏版为医学装备管理部门）院外的涉及到若干个相关机构，如卫计委，质控中心（业务专家组成），市场监管局（特种设备管理），药监所等；医院内部主要包括党委会、院委会、人事处（考核）、设备耗材管理委员会；行政部（或院办，主要是红头文件或者市级下发各种文件，限于设备有关）等，可举证以上相关的主管部门对于设备相关工作和人员的检查和反馈，不局限于某个部门。' where version = '6.10.1.1.B.1';
+update audit_group set interpretation = '举证说明，比如可以将市级的五年规划与院方的五年规划相结合，把其中和设备有关的预算项目进行举证，并详细说明有关的项目调整原因，是为了更好的配合临床需求。也可以举证说明过去2-3年中的设备发展规划中的改进亮点，从大的方向中证明医学装备规划在不断改进。' where version = '6.10.1.1.A.1';
+update audit_group set interpretation = '该条可以先举证近年来的设备发展计划是什么，然后在其中挑选重要设备的采购论证和相关记录' where version = '6.10.1.2.C.1';
+update audit_group set interpretation = '首先要制定详细的医学装备每个环节的制度与流程，（包括但不限于本条目的环节）每个环节的制度请参考模板，然后举证是如何执行的，关键信息要有，比如：维修工单记录，总的资产账目等。该环节可以用APM 资产云管家中的档案、维修、计量、报废等功能来进行相关工作的执行。' where version = '6.10.1.2.C.2';
+update audit_group set interpretation = '临床使用部门要指定专门的设备管理人员，并提供与人员对应的设备使用培训和考核成绩记录。' where version = '6.10.1.2.C.3';
+update audit_group set interpretation = '该处的主管部门主要是指与设备相关的上级行政组织，相关的医学装备近年来的监察记录都可以举例。' where version = '6.10.1.2.B.1';
+update audit_group set interpretation = '主要是针对设备的配置规划和实行的过程进行改进，比如年度规划中的中期采购改进等。该处也可以向院务处或者财务处收集相关举证材料。' where version = '6.10.1.2.A.1';
+update audit_group set interpretation = '50万的门槛可能会因地方政策要求而有所调整，该条主要是采购环节的论证，首先要制定相关制度，然后举例贵重医疗设备的可行性论证、申请过程的记录等' where version = '6.10.2.1.C.1';
+update audit_group set interpretation = '国家和地方都有相关的分类方式，一般地方的分类要求比国家的68码要求更细，APM account中的设备档案分类综合了多方要求，完全可以建立充分的设备电子账目。' where version = '6.10.2.1.C.2';
+update audit_group set interpretation = '大型设备的档案建立一般要求更高，证明文件比较齐全，比如CT、MR等，可以准备相应的招标文件、评标报告、投标书、验收报告、使用手册、注册证、培训记录、维修记录等相关文件。江苏省还要求严格实行甲乙类设备的配置证管理制度，因此要根据最新的甲乙类分类，保留相关设备的配置证文件。' where version = '6.10.2.1.C.3';
+update audit_group set interpretation = '大型医用设备的评价方式目前还不完全统一，需要结合使用科室制定可量化的评价指标，具体指标可以参照模板。' where version = '6.10.2.1.C.4';
+update audit_group set interpretation = '具体可以利用APM 资产云管家等系统的截图或表单导出来举证，如总设备台账、不同时间的设备验收清单、合同执行情况，多少台在正常使用中、多少台在维修中、多少台考虑报废、设备的维修工单记录、维修费用等' where version = '6.10.2.1.B.1';
+update audit_group set interpretation = '该处的主管部门主要是指与设备相关的上级行政组织，比如市级监管部门的审计结果或者院办/财务等与设备相关的审计报告，提供给医学装备委员会' where version = '6.10.2.1.B.2';
+update audit_group set interpretation = '要根据B中主管部门提供的审计报告中，对提出的问题进一步改进' where version = '6.10.2.1.A.1';
+update audit_group set interpretation = '一定要有医疗器械临床使用安全事件监测与报告制度，尤其对于与设备相关的不良事件足够重视，拿出不良事件的上报记录。而且要有举措鼓励不良事件的上报。江苏版中额外要求：遵从安全操作使用流程，加强对装备警报提示系统的管理。 可以利用厂商对于大型设备的远程设备预警功能来管理，并且加强使用人员的操作安全的培训和考核。' where version = '6.10.3.1.C.1';
+update audit_group set interpretation = '要有明确的计量设备管理制度和计量设备清单，并及时记录与跟进相关设备/耗材厂商的召回动作，即使在当前没有发生相关的质量安全事件，也要用文件说明当前未发生表示在密切监督设备的质量保障环节。' where version = '6.10.3.1.C.2';
+update audit_group set interpretation = '对条款里提到的设备分类要制定相应的使用安全事件检测与报告制度，详见模板' where version = '6.10.3.1.C.3';
+update audit_group set interpretation = '利用员工手册提醒员工注意自身安全，培训制度要通知到使用科室，让使用人员都知晓安全要求；另外设备管理人员也要掌握相应内容；' where version = '6.10.3.1.C.4';
+update audit_group set interpretation = '可提供使用部门的大型设备日常维护自查表，医学装备部门要提供各个科室的使用安全总情况的考核表，' where version = '6.10.3.1.B.1';
+update audit_group set interpretation = '该处的主管部门主要是指与设备相关的上级行政组织，比如省级质控中心提供过去检查的成绩，市场监督管理局检查的结果等' where version = '6.10.3.1.B.2';
+update audit_group set interpretation = '医学装备管理部门要总结近年来设备使用安全与风险的总体情况，形式可以包括文档报告，相关表单等，在过去的使用安全问题中发现改进措施并执行。' where version = '6.10.3.1.A.1';
+update audit_group set interpretation = '江苏版将6.10.3.2与6.10.3.3整合为一个款项，但是核心要求不变。该条主要提供核医学科装备、高压氧舱、放射类设备等的检验机构报告' where version = '6.10.3.2.C.1';
+update audit_group set interpretation = '需要提供机房放射警示标签的照片' where version = '6.10.3.2.C.2';
+update audit_group set interpretation = '要有设备使用人员对于放射与放疗类设备的安全培训制度，提供培训记录' where version = '6.10.3.2.C.3';
+update audit_group set interpretation = '提供放射与放疗类机房环境的检查记录' where version = '6.10.3.2.B.1';
+update audit_group set interpretation = '同6.10.3.2.C.1，主要通过第三方检验机构来监测安全情况' where version = '6.10.3.2.B.2';
+update audit_group set interpretation = '主要是根据监管制度的不断完善来持续改进机房安全的管理' where version = '6.10.3.2.A.1';
+update audit_group set interpretation = '需要准备特种装备的设备明细（包括分布位置），并且提供第三方检查机构提供的监测报告和合格证明。' where version = '6.10.3.3.C.1';
+update audit_group set interpretation = '提供特殊装备操作人员的上岗证，培训记录等。' where version = '6.10.3.3.C.2';
+update audit_group set interpretation = '提供医学装备部门对于特种装备的定期检查记录，可以利用APM 资产云管家进行周期性检查管理' where version = '6.10.3.3.B.1';
+update audit_group set interpretation = '举证说明医学装备部门对于特殊装备的检查记录，并且形成阶段性总结' where version = '6.10.3.3.B.2';
+update audit_group set interpretation = '要举证在近年来对于特种装备质量安全的治理案例，说明在不断改进中。' where version = '6.10.3.3.A.1';
+update audit_group set interpretation = '江苏版是3.3；制定放射和诊断影像类设备的管理制度' where version = '6.10.3.4.C.1';
+update audit_group set interpretation = '可以用各个厂商的维修报告来举证，另外可提供使用科室的日常自查表' where version = '6.10.3.4.C.2';
+update audit_group set interpretation = '要先准备医院的放射类设备名称一览表，然后提供放射装置、放射工作场所、环境检测情况报告；年度放射诊疗频次表；介入放射学年度实施总人次数表；改进整改措施；特种设备使用登记证（包括检验报告）；计量测试技术研究院华东计量测试中心检定证书（压力表检定装置、锅炉）；液氧塔自查表；压力表减压器电接点表分部记录表；射线装置与同位素基本情况；' where version = '6.10.3.4.C.3';
+update audit_group set interpretation = '医学装备部门可以提供模板，然后由使用科室提供自查记录；' where version = '6.10.3.4.B.1';
+update audit_group set interpretation = '此处的主管部门指医学装备管理部门，要定期对放射和诊断性影像设备做预防性维护检查，提供（也可以由厂商提供相关服务）定期保养报告、计量或者质控报告等；' where version = '6.10.3.4.B.2';
+update audit_group set interpretation = '需要做年度总结，对于关键使用指标要不断提出改进措施，详见模板。' where version = '6.10.3.4.A.1';
+update audit_group set interpretation = '江苏版本是3.4；计量必须做台账/强检计量设备必须100%检测；非强检设备逐年增加，指定强检周期时间并落实；账目和强检数量不一致时，要注意查看是否是强检范围不够准确，另外要注意有些设备可能已经报废了；有部分科研设备也必须强检；' where version = '6.10.3.5.C.1';
+update audit_group set interpretation = '统一设置计量设备清单，清单上所列计量设备必须进行检测；有两年内计量设备清单、定期检测记录和计量不合格设备的维修记录等相关资料' where version = '6.10.3.5.C.2';
+update audit_group set interpretation = '现场查的时候一定看贴的有效期，原始检测报告都要保留记录，标志显示检测时间与登记记录一致。' where version = '6.10.3.5.C.3';
+update audit_group set interpretation = '要有相关管理人员的培训和考核记录' where version = '6.10.3.5.C.4';
+update audit_group set interpretation = '可以通过APM 护士助手来辅助使用科室对于计量设备定期自查，自行设置检查项和检查周期。' where version = '6.10.3.5.B.1';
+update audit_group set interpretation = '可以通过APM 对计量设备定期巡检，自行设置检查项和检查周期。' where version = '6.10.3.5.B.2';
+update audit_group set interpretation = '在允许的范围内，合理增加非强检的目录和品规' where version = '6.10.3.5.A.1';
+update audit_group set interpretation = '江苏版把该条删了。现场抽查，所以要提前做好计量器具的合格标志检查。' where version = '6.10.3.5.A.2';
+update audit_group set interpretation = '制定医疗仪器设备使用人员操作培训、考核制度与程序；提供培训会签到表、培训ppt（多放几种类型），测卷，考核结果汇总（不一定是成绩，也可以是签到记录）；' where version = '6.10.4.1.C.1';
+update audit_group set interpretation = '技术支持可以用设备保养维护、维修记录等来体现；业务指导和咨询服务可以用设备培训记录表来体现；' where version = '6.10.4.1.C.2';
+update audit_group set interpretation = '江苏把该条合并到C.1了。提供意外情况处理的培训PPT，另外要举证说明意外情况处理记录，如除颤仪意外情况处理方案表，呼吸机意外情况处理表，监护仪意外情况处理表，' where version = '6.10.4.1.C.3';
+update audit_group set interpretation = '江苏版要求操作手册由装备管理部门管理和存档。主要部门尤其是急救设备需要有挂机本，需要涵盖简易操作手册，状态标识牌，检查维护的记录，医学转杯科也需要管理和存档相应资料，尤其是要准备呼吸机、除颤仪等急救类设备的。' where version = '6.10.4.1.C.4';
+update audit_group set interpretation = '要提供医疗设备培训记录表（比如呼吸机，除颤仪、心电图机等），以及科室培训考核评分表' where version = '6.10.4.1.C.5';
+update audit_group set interpretation = '要提供近来年科室培训情况与效果反馈表，以及使用科室内部的自查表（应知应会）' where version = '6.10.4.1.B.1';
+update audit_group set interpretation = '对今年来设备使用培训情况进行总结，该处的主管部门指资产设备处，要体现培训了哪些内容，考核了哪些内容，哪些考核不够，应该再怎么处理。' where version = '6.10.4.1.B.2';
+update audit_group set interpretation = '要对近年来整体的设备培训情况有详细分析，最好和日常的设备使用状况、维修状况、以及临床效益分析结合在一起，并且要提出实施有效的措施形成PDCA改进闭环。' where version = '6.10.4.1.A.1';
+update audit_group set interpretation = '可以将所有的医学装备管理相关制度都整理在一起，另外要把全院设备按照科室配置、设备规划进行整理。江苏版还要求有临床使用记录，所以还要提供临床日常登记记录（开关机）' where version = '6.10.5.1.C.1';
+update audit_group set interpretation = '首先要有医疗设备维修管理制度，然后可以利用 APM 保养、计量、维修等功能统一来管理相关设备，并且用护士助手来履行日常使用部门的保养和登记记录。' where version = '6.10.5.1.C.2';
+update audit_group set interpretation = '江苏版多一条C.4: 应用信息化技术实施医学装备全流程的管理，有医学装备论证、决策、购置、验收、培训、使用、保养、维修、应用分析和更新、处置等相关工作的全程记录，信息真实、完整、准确。
+
+对于医学装备的保障，指的是要充分保障设备的临床使用，一旦发生故障要能修，因此要把近年来所有的维修记录全部提供出来。对于江苏版的要求，可以利用APM来展示医学装备管理的验收、培训、使用、保养、维修、应用分析和更新、处置等相关工作。' where version = '6.10.5.1.C.3';
+update audit_group set interpretation = '要举例说明对设备故障维修的分析情况，尤其是大型设备比如MRI/CT/DSA/MI设备，和急救类设备比如心电、监护仪等。里面要说明维修的总数量、故障原因、故障降低措施，或者设备规划' where version = '6.10.5.1.B.1';
+update audit_group set interpretation = '可以整理安全和风险防控排查情况的总结，包括现在各环节存在的问题：设备质量、使用规范、监管力度等，并提出相应的整改措施，包括验收质量把关、加强培训、及时巡检等；' where version = '6.10.5.1.B.2';
+update audit_group set interpretation = '江苏版要求“持续改进有成效，全院医学装备实现全生命周期信息化管理且管理规范，满足临床使用需求。”具体用数字或者信息化手段分析在哪些管理的KPI上有所改进，比如，做关于降低大型设备平均故障次数的分析，也可以做采购报修的原因分析，或者单次维修的原因分析等，' where version = '6.10.5.1.A.1';
+update audit_group set interpretation = '使用科室要有仪器设备使用记录本，医学装备部门制定急救设备应急预案；15min之内必须要有好设备调过来，这个是必考项，应急储备设备列表，必须有；临床科室要求必须掌握发生急救设备故障处理流程表；' where version = '6.10.5.2.C.1';
+update audit_group set interpretation = '若一旦故障停机，要及时张贴停用标识，不够用的情况下，要有调配机制，举证说明，比如呼吸机/心电监护等借用记录，' where version = '6.10.5.2.C.2';
+update audit_group set interpretation = '江苏版要求应用信息化技术来进行实时监管。
+可借鉴APM 资产云管家的调剂中心来完成，保证设备调配的实时性，一旦设备发生故障停机时，要第一时间张贴仪器损坏表或者撤回，保证投入临床使用的100%完好率。' where version = '6.10.5.2.B.1';
+update audit_group set interpretation = '要有急救类、生命支持类装备完好率不同阶段的结果汇总，并提供不断改进完好率措施的举证，比如应急演练、各类设备的保养表、定期巡查清单、设备清点单等' where version = '6.10.5.2.A.1';
+update audit_group set interpretation = '江苏版将6.10.5.3.C.1和6.10.5.3.C.2合二为一了，改为“有医学装备日常管理工作和意外应急管理等相关制度，建立应急管理程序，装备故障时有紧急替代流程。优先保障急救类、生命支持类装备的应急调配”。要制定医疗设备应急替代制度，提供应急储备设备列表，医疗设备应急替代工作流程。' where version = '6.10.5.3.C.1';
+update audit_group set interpretation = '江苏版将6.10.5.3.C.1和6.10.5.3.C.2合二为一了，取消了6.10.5.3.C.2。要制定医疗设备应急替代制度，提供应急储备设备列表，医疗设备应急替代工作流程。' where version = '6.10.5.3.C.2';
+update audit_group set interpretation = '对医务人员定期培训和考核医疗装备应急预案。' where version = '6.10.5.3.C.3';
+update audit_group set interpretation = '要定期（建议每半年一次）举办医学装备应急演练，并提供应急设备日常调用情况的记录。' where version = '6.10.5.3.B.1';
+update audit_group set interpretation = '对于应急演练要有分析与反馈，在设备调用方面要提供调用结果分析，不断改进应急储备库。' where version = '6.10.5.3.A.1';
+update audit_group set interpretation = '制定关于医用耗材方面的制度，详见模板。' where version = '6.10.6.1.C.1';
+update audit_group set interpretation = '江苏版多了一句要求：有高值医用耗材临床应用遴选、采购、储存、使用、监测、评价、监督等管理的程序，并有记录。 集中举证某类医疗耗材的入库、出库、手术使用登记、手术相关使用记录、知情同意书等，有一个完整的追溯和监督记录。' where version = '6.10.6.1.C.2';
+update audit_group set interpretation = '要保留高值耗材的供应商营业执照、经营许可证、医疗器械注册证；第二类医疗器械经营备案凭证，供应商的授权书；植入性医疗器械使用登记表；要分2步：1，使用范围证明；2，使用范围相关记录' where version = '6.10.6.1.C.3';
+update audit_group set interpretation = '制定医疗器械不良事件监测报告管理办法，包括医疗安全不良事件上报流程、可疑医疗器械不良事件报告表模板等；提供上报实例，在医用耗材管理委员会以外，如果院方举办或参与过医疗耗材不良事件的汇报分析和整改，请一并提供，从而证明院方对于耗材不良事件的重视程度。' where version = '6.10.6.1.C.4';
+update audit_group set interpretation = '提供不同科室的高值耗材自查表，并附有科室负责人签名。' where version = '6.10.6.1.B.1';
+update audit_group set interpretation = '提供院方定期巡查的整改建议，若有，请提供院方审计科对于医用耗材的采购使用分析，说明为何要购入该类医用耗材，是否符合耗材管理制度药材。' where version = '6.10.6.1.B.2';
+update audit_group set interpretation = '江苏版将“百元医疗收入(不含药品收入)中消耗的卫生材料降到20元以下”删掉了。材占比是医院考核KPI之一，可向院务处或者财务处收集院方的材占比分析报告。' where version = '6.10.6.1.A.1';
+update audit_group set interpretation = '江苏版把6.10.7.1与6.10.7.2合并了，核心内容保留，更加简洁。
+主要针对医学装备处的行政管理和技术人员进行培训，准备相关学分证明、相关技能培训证书等' where version = '6.10.7.1.C.1';
+update audit_group set interpretation = '对大型设备举证说明，包括使用情况，设备计划、维修年度总结、报废小结等，来说明医学装备处对于发展规划的落实情况。' where version = '6.10.7.1.C.2';
+update audit_group set interpretation = '举证说明安全管理的工作内容和整改反馈，详见模板' where version = '6.10.7.1.B.1';
+update audit_group set interpretation = '可以借助APM资产云管家按周期进行设备巡查，定期总结使用安全情况。' where version = '6.10.7.1.B.2';
+update audit_group set interpretation = '要定期对使用科室的使用满意度调查，帮助医学装备管理部门规范设备的规划和管理，加强使用科室的培训和支持制度，持续改进使用满意度。' where version = '6.10.7.1.A.1';
+update audit_group set interpretation = '江苏版把6.10.7.1与6.10.7.2合并了，核心内容保留，更加简洁。首先要有非常健全的设备全周期管理制度，包括使用科室对于医疗设备的管理制度。' where version = '6.10.7.2.C.1';
+update audit_group set interpretation = '要提供详细的应急程序制度，包括应急替代制度、应急物资管理制度等。对于医学装备的日常管理可以用大型医疗设备的采购记录来举证。' where version = '6.10.7.2.C.2';
+update audit_group set interpretation = '举证说明：贵重设备的培训记录，以及使用人员的上岗证。' where version = '6.10.7.2.C.3';
+update audit_group set interpretation = '可以利用APM资产云管家管理维护保养，提供相应的保养和维修报告，使用科室可以利用护士助手进行日常检查。另外对科室的设备分布情况要有明细。' where version = '6.10.7.2.B.1';
+update audit_group set interpretation = '该条设备装备管理部门是主管部门，提供对安全检查的调研表和巡检表' where version = '6.10.7.2.B.2';
+update audit_group set interpretation = '每一年要比前一年做的更好，制度任何一点改变都需要写到总章程里，拔一个高度，但是不要矫枉过正，把握改进的度。' where version = '6.10.7.2.A.1';
+
+
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(91, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 1, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(92, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 2, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(93, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 3, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(94, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 4, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(95, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 5, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(96, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 6, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(97, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 7, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(98, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 8, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(99, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 9, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(100, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 10, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(101, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 11, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(102, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 12, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(103, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 13, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(104, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 14, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(105, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 15, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(106, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 16, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(107, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 17, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(108, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 18, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(109, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 19, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(110, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 20, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(111, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 21, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(112, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 22, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(113, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 23, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(114, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 24, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(115, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 25, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(116, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 26, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(117, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 27, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(118, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 28, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(119, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 29, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(120, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 30, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(121, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 31, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(122, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 32, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(123, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 33, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(124, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 34, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(125, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 35, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(126, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 36, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(127, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 37, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(128, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 38, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(129, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 39, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(130, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 40, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(131, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 41, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(132, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 42, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(133, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 43, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(134, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 44, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(135, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 45, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(136, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 46, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(137, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 47, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(138, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 48, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(139, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 49, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(140, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 50, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(141, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 51, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(142, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 52, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(143, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 53, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(144, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 54, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(145, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 55, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(146, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 56, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(147, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 57, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(148, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 58, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(149, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 59, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(150, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 60, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(151, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 61, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(152, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 62, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(153, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 63, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(154, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 64, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(155, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 65, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(156, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 66, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(157, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 67, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(158, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 68, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(159, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 69, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(160, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 70, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(161, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 71, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(162, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 72, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(163, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 73, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(164, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 74, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(165, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 75, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(166, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 76, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(167, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 77, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(168, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 78, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(169, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 79, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(170, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 80, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(171, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 81, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(172, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 82, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(173, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 83, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(174, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 84, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(175, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 85, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(176, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 86, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(177, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 87, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(178, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 88, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(179, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 89, '自查文件', 2, '请填写模块负责人', false, false);
+INSERT INTO public.audit_default_item
+(id, created_by, created_date, hospital_uid, institution_uid, last_modified_by, last_modified_date, site_uid, tenant_uid, completed, group_id, name, order_num, owner, system_item, deleted)
+VALUES(180, 'system', '2020-05-20 00:00:00.0', '', '', 'system', '2020-05-20 00:00:00.0', '', '', false, 90, '自查文件', 2, '请填写模块负责人', false, false);
+
+-- 2020.09.21 质控更新 end

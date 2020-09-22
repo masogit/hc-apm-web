@@ -37,7 +37,7 @@ public class OrgTreeController {
     private TreeNode siteOrgTree;
     private TreeNode selectedOrgNode;
 
-    private TreeNode tenantOrgTree;
+    private TreeNode tenantOrgTreePage;
     private TreeNode selectedTenantOrgNode;
 
     private TreeNode selectedDeptOrgNode;
@@ -47,10 +47,47 @@ public class OrgTreeController {
 
     // TreeNodeName Filter
     private String treeNodeNameFilter;
+    private String retrieval;
+    private String tenantUid="";
+    int siteId;
+
+    public int getTenantId() {
+        return siteId;
+    }
+
+    public void setTenantId(int siteId) {
+        this.siteId = siteId;
+    }
+
+    public String getTenantUid() {
+        return tenantUid;
+    }
+
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
+    }
+
+    public String getRetrieval() {
+        return retrieval;
+    }
+
+    public void setRetrieval(String retrieval) {
+        this.retrieval = retrieval;
+    }
+
+    public TreeNode getTenantOrgTreePage() {
+        return tenantOrgTreePage;
+    }
+
+    public void setTenantOrgTreePage(TreeNode tenantOrgTreePage) {
+        this.tenantOrgTreePage = tenantOrgTreePage;
+    }
 
     @PostConstruct
     protected void init() {
+        tenantUid = UserContextService.getCurrentUserAccount().getTenantUID();//获取用户siteId用于区分用户是否是46号租户
         siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
+        siteId = UserContextService.getCurrentUserAccount().getSiteId();
     }
 
     public OrgInfo getOrgInfoByUID(String uid) {
@@ -65,7 +102,20 @@ public class OrgTreeController {
         TreeNode rootNode = new DefaultTreeNode("org", null, null);
         rootNode.getChildren().add(new DefaultTreeNode("org", rootOrg, null));
         List<OrgInfo> siteList = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID())
-                .stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+                                        .stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+
+        TreeNode siteTree = buildTree(siteList);
+        expandedByOrgType(siteTree, 2);
+        rootNode.getChildren().addAll(siteTree.getChildren());
+        return rootNode;
+    }
+    public TreeNode createTenantOrgTree46() {
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        rootNode.getChildren().add(new DefaultTreeNode("org", rootOrg, null));
+        List<OrgInfo> siteList = orgDao.getOrgTreeBySiteAndparm(siteUID,retrieval==null?"":retrieval).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
         TreeNode siteTree = buildTree(siteList);
         expandedByOrgType(siteTree, 2);
         rootNode.getChildren().addAll(siteTree.getChildren());
@@ -132,10 +182,26 @@ public class OrgTreeController {
     }
 
     public TreeNode getTenantOrgTree() {
-        if (null == tenantOrgTree) {
-            tenantOrgTree = createTenantOrgTree();
+        if (null == tenantOrgTreePage) {
+            if(judgeTheUser()){
+                tenantOrgTreePage = createTenantOrgTree46();
+            }else{
+                tenantOrgTreePage = createTenantOrgTree();
+            }
         }
-        return tenantOrgTree;
+        return tenantOrgTreePage;
+    }
+
+    public void filterNode(){
+        tenantOrgTreePage = createTenantOrgTree46();
+    }
+    //判断租户是否是46号租户 是返回true 否返回false
+    public boolean judgeTheUser(){
+        if(siteUID.equals(tenantUid) && 46==siteId){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public List<OrgInfo> getClinicalDeptListBySite(String siteUID) {

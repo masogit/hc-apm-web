@@ -574,6 +574,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
         this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
         this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+        this.selected.setOrigin(selectedContractItem.getProductionPlace());
         String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
         if(StringUtils.isNotEmpty(supplierUid)){
         	Supplier supplier=aiService.getSupplierByUid(supplierUid);
@@ -581,6 +582,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             	this.selected.setVendor(supplier.getName());
                 this.selected.setSupplierId(supplier.getId());
                 this.supplier=supplier;
+
+                this.supplierUserList = supplierService.getApprovedUserList(selected.getSupplierId());
             }
         }
         selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:composition>
+
+        <p:dialog id="RoleEditDlg2" widgetVar="RoleEditDialog2" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.AssignRole}">
+            <h:form id="UserRoleEditForm2">
+                <h:panelGroup id="display2">
+                    <p:tabView class="ui-g-12" id="tabview2"   dynamic="false"   cache="false">
+                        <p:tab title="#{msg.AssignRole}" class="ui-g-12" >
+                    <p:panelGrid columns="2" rendered="#{userAccountController.selected != null}">
+                        <p:outputLabel value="#{msg.login_name}"/>
+                        <p:outputLabel value="#{userAccountController.selected.loginName}"/>
+                        <p:outputLabel value="#{msg.userName}"/>
+                        <p:outputLabel value="#{userAccountController.selected.name}"/>
+
+                        <p:outputLabel value="#{msg.AssignRole}" for="roleNames2" />
+                        <p:selectManyCheckbox id="roleNames2" value="#{userAccountController.assignedRoles}" layout="pageDirection" valueChangeListener="#{userAccountController.roleChangeListener}">
+                            <p:ajax update=":userAccountTab:UserRoleEditForm2:tabview2:roleNames2"/>
+                            <f:selectItems value="#{userAccountController.roleListVO}" var="roleItem" itemLabel="#{roleItem.roleDesc}" itemValue="#{roleItem.roleDesc}" itemDisabled="#{roleItem.disable}" />
+                            <!--<f:selectItems value="#{userAccountController.allRoles}" />-->
+                        </p:selectManyCheckbox>
+
+                    </p:panelGrid>
+                        </p:tab>
+
+                        <c:choose>
+                            <c:when test="#{userAccountController.judgeTheUser()}">
+                                <!--新逻辑-->
+                                <p:tab title="#{msg.AccessPermission}" class="ui-g-12" >
+                                    <p:scrollPanel style="height: 300px; border: 0;" mode="native">
+                                        <p:inputText id="retrieval2" value="#{userAccountController.retrieval}">
+                                        </p:inputText>
+                                        <p:commandButton  icon="ui-icon-location-searching"  validateClient="true"  actionListener="#{userAccountController.filterNode}" update="orgTree2 :growl,userAccountTab:UserRoleEditForm2:tabview2:orgInfoTable2,userAccountTab:UserRoleEditForm2:tabview2:allButton"/>
+                                        <p:commandButton  id="allButton" validateClient="true"    value="租户权限"  actionListener="#{userAccountController.selectAll}" update="userAccountTab:UserRoleEditForm2:tabview2:orgInfoTable2" disabled="#{userAccountController.deleteDisabled}"/>
+                                        <p:messages id="messages" showDetail="true" closable="true">
+                                            <p:autoUpdate />
+                                        </p:messages>
+                                        <p:tree id="orgTree2" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
+                                            <p:ajax event="select" listener="#{userAccountController.onSelectAccessTreeNode46}" update="userAccountTab:UserRoleEditForm2:tabview2:orgInfoTable2"/>
+                                            <p:ajax event="unselect" listener="#{userAccountController.onUnselectAccessTreeNode46}" update="userAccountTab:UserRoleEditForm2:tabview2:orgInfoTable2"/>
+
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node.shortName}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="hidden" rendered="false"/>
+                                        </p:tree>
+                                    </p:scrollPanel>
+
+                                    <p:scrollPanel style="height: 300px; border: 0;" mode="native">
+                                        <p:dataTable id="orgInfoTable2" var="orgInfo" value="#{userAccountController.orgInfoTableData46}" scrollRows="20" scrollable="true" liveScroll="true" scrollHeight="250">
+                                            <p:column headerText="级别" footerText="级别">
+                                                <h:outputText value="#{userAccountController.Escape(orgInfo.orgType)}" />
+                                            </p:column>
+                                            <p:column headerText="名称" footerText="名称">
+                                                <h:outputText value="#{orgInfo.name}" />
+                                            </p:column>
+                                            <p:column headerText="操作" footerText="操作">
+                                                <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}"  actionListener="#{userAccountController.deleteOrgInfoTable(orgInfo.uid)}"
+                                                                 update="userAccountTab:UserRoleEditForm2:tabview2:orgTree2,userAccountTab:UserRoleEditForm2:tabview2:orgInfoTable2" disabled="#{userAccountController.deleteDisabled}">
+                                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+                                                </p:commandButton>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </p:scrollPanel>
+
+                                </p:tab>
+                            </c:when>
+                            <c:otherwise>
+                                <!--老逻辑-->
+                                <p:tab title="#{msg.AccessPermission}" class="ui-g-12" >
+                                    <p:scrollPanel style="height: 300px; border: 0;" mode="native">
+
+                                        <p:tree id="orgTree3" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="false"  cache="false" selectionMode="checkbox" highlight="true">
+                                            <p:ajax event="select" listener="#{userAccountController.onSelectAccessTreeNode}" />
+                                            <p:ajax event="unselect" listener="#{userAccountController.onUnselectAccessTreeNode}" />
+
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node.shortName}"/>
+                                            </p:treeNode>
+                                            <p:treeNode type="hidden" rendered="false"/>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:tab>
+                            </c:otherwise>
+                        </c:choose>
+                    </p:tabView>
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{userAccountController.saveRoles}" value="#{msg.Save}" update="display2,:userAccountTab, :userAccountTab:UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'RoleEditDialog2');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" onclick="PF('RoleEditDialog2').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

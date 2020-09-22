@@ -1,0 +1,164 @@
+package com.ge.apm.domain;
+
+
+import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ *
+ * @author 505389829
+ */
+@Entity
+@Table(name = "multi_level_approval")
+@Data
+public class MultiLevelApproval implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
+    @Column(name = "id")
+    private String id;
+
+    /**
+     * 业务单号
+     */
+    @Column(name = "business_number")
+    private String businessNumber;
+    /**
+     * 审批单号
+     */
+    @Column(name = "approva_number")
+    private String approvalNumber;
+    /**
+     * 业务UID
+     */
+    @Column(name = "business_uid")
+    private String businessUid;
+    /**
+     * 业务类型
+     */
+    @Column(name = "business_type")
+    private int businessType;
+    /**
+     * 是否正在审批
+     */
+    @Column(name = "approval_ing")
+    private boolean approvalIng;
+    /**
+     * 审批类型 1角色审批 2用户审批
+     */
+    @Column(name = "approval_type")
+    private Integer approvalType;
+    /**
+     * 审批UID
+     */
+    @Column(name = "approval_uid")
+    private String approvalUid;
+    /**
+     * 审批流状态:0待审批 1审批中 2审批通过 3审批不同意
+     */
+    @Column(name = "approval_status")
+    private Integer approvalStatus;
+    /**
+     * 审批节点状态0待审批  2审批通过 3审批不同意
+     */
+    @Column(name = "approval_node_status")
+    private Integer approvalNodeStatus;
+    /**
+     * 审批级别
+     */
+    @Column(name = "approval_level")
+    private Integer approvalLevel;
+    /**
+     * 当前所在审批级别
+     */
+    @Column(name = "approval_level_now")
+    private Integer approvalLevelNow;
+    /**
+     * 审批流ID
+     */
+    @Column(name = "workflow_config_approve_uid")
+    private String workflowConfigApproveUid;
+    /**
+     * 审批意见
+     */
+    @Column(name = "approval_opinion")
+    private String approvalOpinion;
+
+    /**
+     * 发起审批UID
+     */
+    @Column(name = "initiate_approver_uid")
+    private String initiateApproverUid;
+    /**
+     * 实际审批人UID
+     */
+    @Column(name = "actual_approver_uid")
+    private String actualApproverUid;
+    /**
+     * 实际审批人
+     */
+    @Column(name = "actual_approver_name")
+    private String actualApproverName;
+    /**
+     * 实际审批人时间
+     */
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "actual_approver_date")
+    private Date actualApproverDate;
+
+    /**
+     * 创建日期
+     */
+    @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    /**
+     * 创建人
+     */
+    @CreatedBy
+    @Column(name = "created_by", columnDefinition = "VARCHAR(60)")
+    private String createdBy;
+
+    /**
+     * 租户
+     */
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUID;
+
+    /**
+     * 集团
+     */
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+    private String institutionUID;
+
+    /**
+     * 医院
+     */
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+
+    /**
+     * 院区
+     */
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUID;
+
+    public boolean getApprovalIng() {
+        return approvalIng;
+    }
+
+    public void setApprovalIng(boolean approvalIng) {
+        this.approvalIng = approvalIng;
+    }
+}
