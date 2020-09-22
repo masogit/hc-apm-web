@@ -296,7 +296,28 @@ public class UserAccount implements ChineseName, Serializable {
 	@Transient
 	private boolean isGeSSO=false;
 
+	public String getUserTagsView(){
+		String userTagsView = "";
+		for(UserTags tag:userTags){
+			userTagsView += tag.getTag()+",";
+		}
+		if(!"".equals(userTagsView)){
+			userTagsView = userTagsView.substring(0,userTagsView.length() - 1);
+		}
+		return userTagsView;
+	}
 
+	public Set<UserTags> getUserTags() {
+		return userTags;
+	}
+
+	public void setUserTags(Set<UserTags> userTags) {
+		this.userTags = userTags;
+	}
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name="user_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+	private Set<UserTags> userTags;
 
 	@PrePersist
 	public void initializeUid() {
@@ -1124,5 +1145,13 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setTags(List<String> tags) {
 		this.tags = tags;
+	}
+
+	public String getClinicalDeptUID() {
+		if (orgType != null && orgType == 4) {
+			return orgInfoUID;
+		} else {
+			return null;
+		}
 	}
 }

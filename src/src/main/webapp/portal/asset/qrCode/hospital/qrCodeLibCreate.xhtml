@@ -4,7 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:composition>
         <p:dialog id="qrCodeLibCreateDlg" widgetVar="qrCodeLibCreateDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.QRCodeCreate}">
@@ -32,6 +33,10 @@
                         <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
                         <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false" class="ui-selectonemenu-panel">
                             <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <c:if test="#{orgTreeController.judgeTheUser()}">
+                                    <p:inputText id="retrieval" value="#{orgTreeController.retrieval}" style="width:150px;"/>
+                                    <p:commandButton id="retrieval3" partialSubmit="true"  process=":qrCodeLibCreateForm:retrieval @this" icon="ui-icon-search"   validateClient="true"  actionListener="#{orgTreeController.filterNode()}" value="#{msg.Search}"  update="orgTree :growl" iconPos="right"/>
+                                </c:if>
                                 <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userContextService.hasRole('ITAdmin')?orgTreeController.tenantOrgTree:orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
                                     <p:ajax process="@this" event="select" oncomplete="PF('varPanelOrg').hide();" listener="#{qrCodeLibController.onHospitalChange}" update=":qrCodeLibCreateForm:hospitalIdSelect"/>
                                     <p:ajax process="@this" event="expand"/>

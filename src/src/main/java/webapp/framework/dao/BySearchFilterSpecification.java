@@ -9,6 +9,7 @@ import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -27,11 +28,18 @@ public class BySearchFilterSpecification {
                         // nested path translate, eg, task's "user.name" to Task.user.name
                         String[] names = StringUtils.split(filter.fieldName, ".");
                         Path expression = root.get(names[0]);
-                        for (int i = 1; i < names.length; i++) {
-                            if (i == 1 && expression instanceof PluralAttributePath) {
-                                expression = root.join(names[0]);
+                        Class clazz = expression.getJavaType();
+                        if(clazz.equals(Set.class)){
+                            SetJoin setJoin = root.joinSet(names[0],JoinType.LEFT);
+                            query.distinct(true);
+                            expression = setJoin.get(names[1]);
+                        }else {
+                            for (int i = 1; i < names.length; i++) {
+                                if (i == 1 && expression instanceof PluralAttributePath) {
+                                    expression = root.join(names[0]);
+                                }
+                                expression = expression.get(names[i]);
                             }
-                            expression = expression.get(names[i]);
                         }
 
                         // logic operator

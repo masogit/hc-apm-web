@@ -591,6 +591,29 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
+
+    public String getAssetTagsView() {
+        String assetTagsView = "";
+        for(AssetTags tag:assetTags){
+            assetTagsView += tag.getTag()+",";
+        }
+        if(!"".equals(assetTagsView)){
+            assetTagsView = assetTagsView.substring(0,assetTagsView.length() - 1);
+        }
+        return assetTagsView;
+    }
+
+    public Set<AssetTags> getAssetTags() {
+        return assetTags;
+    }
+
+    public void setAssetTags(Set<AssetTags> assetTags) {
+        this.assetTags = assetTags;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name="asset_uid", referencedColumnName = "uid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private Set<AssetTags> assetTags;
     
     public Set<SharedAssetReqDetail> getSharedAssetReqDetailList() {
 		return sharedAssetReqDetailList;

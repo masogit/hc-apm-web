@@ -1,21 +1,8 @@
 package com.ge.apm.view.asset;
 
 import com.baomidou.mybatisplus.toolkit.StringUtils;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.ContractInfoItemRepository;
-import com.ge.apm.dao.ContractInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.ContractInfo;
-import com.ge.apm.domain.ContractInfoItem;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.BlobFileService;
@@ -67,6 +54,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private SupplierRepository supplierDao = null;
     private OrgInfoRepository orgDao = null;
     private UserAccountRepository userDao = null;
+    private TenantInfoRepository tenantInfoDao;
     private UaaService uaaService;
     private AssetInfoMgrService aimService;
     private BlobFileService blobService;
@@ -105,6 +93,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -295,11 +284,11 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         attachements.stream().forEach(item -> {
             item.setBoUuid(selected.getId());
         });
-        allItemList.stream().filter(item -> Strings.isNullOrEmpty(item.getContractId())).forEach(item -> {
+        /*allItemList.stream().filter(item -> Strings.isNullOrEmpty(item.getContractId())).forEach(item -> {
             item.setContractId(selected.getId());
         });
         contractItemDao.save(allItemList);
-        contractItemDao.delete(removedItemList);
+        contractItemDao.delete(removedItemList);*/
         blobService.saveBlobObject(attachements);
 
         removedAttachments.stream().forEach(item -> {
@@ -355,6 +344,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                         newItem.setContractId(selected.getId());
                         newItem.setItemType(ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
                         allItemList.add(newItem);
+                        contractItemDao.save(newItem);
                     }
                 }
             }
@@ -374,6 +364,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 newItem.setContractId(selected.getId());
                 newItem.setItemType(ContractInfoItem.ContractInfoItemType.ExistAsset.toString());
                 allItemList.add(newItem);
+                contractItemDao.save(newItem);
             }
         }
     }
@@ -391,8 +382,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         // ContractInfoItem removeItem = this.contractItemDao.findById(itemId);
         allItemList.remove(item);
         if (!Strings.isNullOrEmpty(item.getId())) {
-            // contractItemDao.delete(item);
-            removedItemList.add(item);
+            contractService.removeContractInfoItem(item);
+            //contractItemDao.delete(item);
+            //removedItemList.add(item);
         }
     }
 
@@ -408,6 +400,11 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public String getSupplierName(String supplierUid) {
         Supplier supplier = supplierDao.findByUid(supplierUid);
         return supplier == null ? null : supplier.getName();
+    }
+
+    public String getParentName(String parentId){
+        ContractInfoItem contractInfoItem = contractItemDao.findOne(parentId);
+        return contractInfoItem == null ? null : contractInfoItem.getContractAssetName();
     }
 
     public String getDetailPageLink(AssetInfo item) {
@@ -443,9 +440,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void savePurchaseItem() {
-        if (!allItemList.contains(selectedContractItem)) {
+        /*if (!allItemList.contains(selectedContractItem)) {
             allItemList.add(selectedContractItem);
-        }
+        }*/
+        contractItemDao.save(selectedContractItem);
     }
 
     public void cancelPurchaseItem() {
@@ -456,6 +454,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         selectedContractItem = new ContractInfoItem();
         selectedContractItem.setId(UUID.randomUUID().toString().replace("-", ""));
         selectedContractItem.setItemType(ContractInfoItem.ContractInfoItemType.Purchase.toString());
+        selectedContractItem.setContractId(selected.getId());
         selectedObjectMap.put("manufacture", null);
         selectedObjectMap.put("applyDept", null);
     }
@@ -467,12 +466,23 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public List<ContractInfoItem> getPurchaseItemsList() {
-        return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType())).collect(Collectors.toList());
+        List<ContractInfoItem> tempContractInfoItemList = new ArrayList<>();
+        tempContractInfoItemList = contractService.getContractItems(selected.getId());
+        return tempContractInfoItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType())).collect(Collectors.toList());
     }
 
     public List<ContractInfoItem> getContractItemsList() {
-        return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())
-                || ContractInfoItem.ContractInfoItemType.ArrivalledItem.toString().equals(item.getItemType())).collect(Collectors.toList());
+        List<ContractInfoItem> tempContractInfoItemList = new ArrayList<>();
+        tempContractInfoItemList = contractService.getContractItems(selected.getId());
+        return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())).collect(Collectors.toList());
+        /*return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())
+                || ContractInfoItem.ContractInfoItemType.ArrivalledItem.toString().equals(item.getItemType())).collect(Collectors.toList());*/
+    }
+
+    public List<ContractInfoItem> getContractArrivalItemsList() {
+        List<ContractInfoItem> tempContractInfoItemList = new ArrayList<>();
+        tempContractInfoItemList = contractService.getContractItems(selected.getId());
+        return allItemList.stream().filter(item -> ContractInfoItem.ContractInfoItemType.ArrivalledItem.toString().equals(item.getItemType())).collect(Collectors.toList());
     }
 
     public List<Tuple2<AssetInfo, V2_WorkOrder_Detail>> getPartsItemsList() {
@@ -531,6 +541,8 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         if (!allItemList.contains(paymentInfo)) {
             allItemList.add(paymentInfo);
         }
+
+        contractItemDao.save(paymentInfo);
     }
 
     public Boolean getCanBeEdit() {
@@ -541,6 +553,18 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                         Objects.equals(item, selected.getSiteUID()));
         }
         return canBeEdit;
+    }
+
+    public List<ContractInfoItem> getParentAssetList(){
+        return contractItemDao.findParentByPurchaseAndContractId(selected.getId(), selectedContractItem.getId());
+    }
+
+    public Boolean isYunNanFuWai(){
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(UserContextService.getCurrentUserAccount().getTenantUID());
+        if("云南省阜外心血管病医院".equals(tenantInfo.getName().trim())){
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
     
 //    public void remomvePaymentInfo(ContractInfoItem item) {

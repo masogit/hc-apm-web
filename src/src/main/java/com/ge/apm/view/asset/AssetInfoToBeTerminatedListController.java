@@ -65,6 +65,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
     private I18nMessageRepository i18nDao;
+    private AssetInfoParentAssetService parentAssetService;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -160,6 +161,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         exportToBeTerminatedAppraisalService = WebUtil.getBean(ExportToBeTerminatedAppraisalService.class);
         uuaService = WebUtil.getBean(UaaService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
+        parentAssetService = WebUtil.getBean(AssetInfoParentAssetService.class);
+
         this.filterBySite = false;
         this.selectedMap = new HashMap<>();
         this.selectedObject = new HashMap<>();
@@ -848,5 +851,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     public void setAssetTemplateFile(StreamedContent assetTemplateFile) {
         this.assetTemplateFile = assetTemplateFile;
+    }
+
+    public String getParentAssetNameByAssetId(int assetId) {
+        return parentAssetService.getParentAssetNameByAssetId(assetId);
     }
 }

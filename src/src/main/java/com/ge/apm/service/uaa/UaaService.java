@@ -3,6 +3,7 @@ package com.ge.apm.service.uaa;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +12,8 @@ import org.hibernate.Hibernate;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -432,7 +435,8 @@ public class UaaService {
         if (userAccount.getSiteId() == 46) {
             List<OrgInfo> orgListByUser = getOrgListByUser(userAccount.getUid());
             // available to see the all institutions in ib site
-            return orgListByUser.size() == 1 && StringUtils.equals(orgListByUser.get(0).getUid(), orgListByUser.get(0).getTenantUID());
+            boolean allSite = orgListByUser.size() == 1 && StringUtils.equals(orgListByUser.get(0).getUid(), orgListByUser.get(0).getTenantUID());
+            return allSite || UserContextService.isOnlyLocalITAdmin();
         }
         return false;
     }
@@ -455,6 +459,10 @@ public class UaaService {
     //full of the tree for this org
     public TreeNode getOrgTreeBySite(String siteUID){
         List<OrgInfo> orgList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(siteUID);
+        return getOrgTreeNodes(siteUID, orgList);
+    }
+    public TreeNode getOrgTreeBySite46(String siteUID,String retrieval){
+        List<OrgInfo> orgList = orgInfoDao.getOrgTreeBySiteAndparm(siteUID,retrieval);
         return getOrgTreeNodes(siteUID, orgList);
     }
 
@@ -751,6 +759,15 @@ public class UaaService {
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 
+    //用户可以显示的医院列表(包含科室)
+    public List<OrgInfo> getUserAccessibleSiteListWithClinicalDept(String userUid, String name, Integer siteId) {
+        List<String> institutions = orgInfoDao.findByInstitutionByNameLike(name, siteId); //TODO: fetch by user accessible site list
+        //for accessible sites`
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
+        return orgInfoDao.findBySearchFilter(orgInfoFilters);
+    }
+
     //用户可以显示的医院列表(不包含科室)
     public List<OrgInfo> getUserAccessibleSiteList(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
@@ -769,9 +786,35 @@ public class UaaService {
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 
+    //用户可以显示的医院列表(不包含科室)
+    /*public List<OrgInfo> getUserAccessibleSiteListByFilter(String userUid,String treeNodeNameFilter,String parentOrgId) {
+        List<OrgInfo> accessList = getOrgListByUser(userUid);
+        //for accessible sites
+        List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toList());
+        //for sites of accessible departments
+        Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(OrgInfo::getSiteUID).collect(Collectors.toSet());
+
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
+        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4)); //非科室
+        orgInfoFilters.add(new SearchFilter("name",SearchFilter.Operator.LIKE,treeNodeNameFilter));
+        Pageable pageable = new PageRequest(0,500);
+
+        return orgInfoDao.findBySearchFilter(orgInfoFilters,pageable).getContent();
+    }*/
+
     //用户可以显示的医院列表(包含科室)
     public List<OrgInfo> getUserAccessibleSiteListWithClinicalDept(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
+        for (OrgInfo orgInfo : accessList){
+            if(orgInfo.getTenantUID().equals(orgInfo.getSiteUID())&&orgInfo.getSiteId()==46){
+                return new ArrayList<OrgInfo>();
+            }
+        }
         //for accessible sites
         List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toList());
         //for sites of accessible departments
@@ -907,6 +950,74 @@ public class UaaService {
 
         return rootNode;
     }
+
+    public List<OrgInfo> getOrgTreeByParentIdWithSelectedChildren(String parentOrgId, String userUid,String treeNodeNameFilter,int siteId) {
+        //List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListByFilter(userUid,treeNodeNameFilter,parentOrgId);
+        List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListByFilterAll(userUid,treeNodeNameFilter,parentOrgId);
+        return orgInfoSelectableList;
+    }
+
+    public List<OrgInfo> getUserAccessibleSiteListByFilterAll(String userUid,String treeNodeNameFilter,String parentOrgId) {
+        List<OrgInfo> accessList = getOrgListByUser(userUid);
+        boolean flag = false;
+        String tenantUid = null;
+        for (OrgInfo orgInfo : accessList){
+            if(orgInfo.getTenantUID().equals(orgInfo.getSiteUID())&&orgInfo.getSiteId()==46){
+                tenantUid = orgInfo.getTenantUID();
+                flag = true;
+            }
+        }
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        if(flag){
+            List<String> institutions = orgInfoDao.findByInstitutionByNameLike(treeNodeNameFilter, 46);
+            orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
+            orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
+            List<OrgInfo> list = orgInfoDao.findBySearchFilter(orgInfoFilters);
+            if(list!=null&&list.size()>0){
+                OrgInfo tenant = orgInfoDao.findByUid(tenantUid);
+                list.add(tenant);
+            }
+            return list;
+        }else{
+            List<String> institutions = new ArrayList<String>();
+            for (OrgInfo orgInfo : accessList){
+                institutions.add(orgInfo.getInstitutionUID());
+            }
+            orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, institutions));
+            orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4)); //非科室
+            if(!StringUtils.isEmpty(treeNodeNameFilter)){
+                orgInfoFilters.add(new SearchFilter("name",SearchFilter.Operator.LIKE,treeNodeNameFilter,"1*2+"));
+                orgInfoFilters.add(new SearchFilter("orgType",SearchFilter.Operator.EQ,1,"1*2+"));
+            }
+            List<OrgInfo> listAll = orgInfoDao.findBySearchFilter(orgInfoFilters);
+            //for accessible sites
+            Set<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(OrgInfo::getUid).collect(Collectors.toSet());
+            //for sites of accessible departments
+            Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(OrgInfo::getSiteUID).collect(Collectors.toSet());
+
+            List<OrgInfo> list = new ArrayList<>();
+            if(orgUidSet1!=null&&orgUidSet1.size()>0){
+                for (OrgInfo tmp:listAll) {
+                    for (String uid:orgUidSet1) {
+                        if(uid.equals(tmp.getInstitutionUID())||uid.equals(tmp.getHospitalUID())||uid.equals(tmp.getSiteUID())||uid.equals(tmp.getTenantUID())){
+                            if(!list.contains(tmp))list.add(tmp);
+                        }
+                    }
+                }
+            }
+            if(orgUidSet2!=null&&orgUidSet2.size()>0) {
+                for (OrgInfo tmp : listAll) {
+                    for (String uid : orgUidSet2) {
+                        if (uid.equals(tmp.getUid())) {
+                            if(!list.contains(tmp))list.add(tmp);
+                        }
+                    }
+                }
+            }
+
+            return list;
+        }
+    }
     
     public TreeNode getOrgTreeByParentIdWithSelectedChildren(String parentOrgId) {
 
@@ -958,6 +1069,41 @@ public class UaaService {
 
         return rootNode;
     }
+
+    /*public TreeNode buildOrgTreeByParentIdWithSelectedChildren(List<OrgInfo> orgInfoFullList) {
+
+        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
+        TreeNode rootNode = null;
+        for(OrgInfo org: orgInfoFullList) {
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(true);
+            node.setRowKey("org_" + org.getId());
+            treeMap.put(org.getUid(), node);
+        }
+
+        for(OrgInfo org: orgInfoFullList) {
+            OrgInfo current = org;
+            while (current.getParentUID() != null) {
+                TreeNode currentNode = treeMap.get(current.getUid());
+                TreeNode parentNode = treeMap.get(current.getParentUID());
+                if (parentNode == null) break;
+
+                parentNode.getChildren().add(currentNode);
+                current = (OrgInfo) parentNode.getData();
+
+            }
+
+            if (rootNode == null) {
+                if (current.getParentUID() == null) {
+                    rootNode = treeMap.get(current.getUid());
+                } else if (treeMap.get(current.getParentUID()) == null) {
+                    rootNode = treeMap.get(current.getUid());
+                }
+            }
+        }
+
+        return rootNode;
+    }*/
 
     public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelected(String parentOrgId, String userUid) {
 
@@ -1180,7 +1326,39 @@ public class UaaService {
             
             return orgTree;
     }
-    
+
+    public void expendedTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
+        if(filterKeyword==null) filterKeyword = "";
+        boolean isKeywordEmpty = "".equals(filterKeyword);
+
+        ArrayList<TreeNode> nodeList = new ArrayList<>();
+        doExpendedTreeNode(nodeList, node, filterKeyword, maxOrgType, maxOrgLevel);
+        nodeList.forEach(item->{
+            item.setType("org");
+            if(!isKeywordEmpty) item.setExpanded(true); // Auto expand tree nodes
+        });
+    }
+
+    private void doExpendedTreeNode(ArrayList<TreeNode> nodeList, TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
+        node.getChildren().forEach(item->{
+            doExpendedTreeNode(nodeList, item, filterKeyword, maxOrgType, maxOrgLevel);
+
+            item.setType("hidden");
+            OrgInfo org = (OrgInfo)item.getData();
+            //if(!org.getName().contains(filterKeyword) && !org.getNamePyCode().contains(filterKeyword)) return;
+            if(maxOrgType >=0 && org.getOrgType()>maxOrgType) return;
+            if(maxOrgLevel >=0 && org.getOrgLevel()>maxOrgLevel) return;
+
+            nodeList.add(item);
+            TreeNode pNode = node;
+            while(pNode!=null){
+                nodeList.add(pNode);
+                pNode = pNode.getParent();
+            }
+        });
+    }
+
     public void filterTreeNode(TreeNode node, String filterKeyword, int maxOrgType, int maxOrgLevel){
         // filter tree node by setting node type to "hidden" for invisible nodes and  "org" for visible nodes
         if(filterKeyword==null) filterKeyword = "";
@@ -1211,5 +1389,53 @@ public class UaaService {
                 pNode = pNode.getParent();
             }
         });
+    }
+
+    public List<OrgInfo> getUserAccessibleSiteListByUid(String uid) {
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, uid));
+        return orgInfoDao.findBySearchFilter(orgInfoFilters);
+    }
+
+    //获取该用户下的所有组织树
+    public TreeNode buildEnableOrgTree (String userUid,String orgUid,OrgInfo orgInfo){
+        List<OrgInfo> enableList = new ArrayList<>();
+        if (null != orgInfo && 4 == orgInfo.getOrgType()) {
+            //enableList = orgInfoDao.getByUser(userUid);
+            enableList = collectChildOrgs(orgInfoDao.getByUid(orgUid), enableList);
+        }else{
+            enableList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(orgUid);
+        }
+        TreeNode orgTree = buildEnableTree(enableList);
+        return orgTree;
+    }
+
+    public List<OrgInfo> collectChildOrgs(OrgInfo info, List<OrgInfo> clinicalOrgSet) {
+        if (4 == info.getOrgType().intValue()) {
+            //System.out.println("keshi----->" +info.getName());
+            clinicalOrgSet.add(info);
+        }
+        List<OrgInfo> resultList = orgInfoDao.findByParentUID(info.getUid());
+        if(resultList !=null&& !resultList.isEmpty()) {
+            for (OrgInfo orgInfo : resultList) {
+                collectChildOrgs(orgInfo, clinicalOrgSet);
+            }
+        }
+        return clinicalOrgSet;
+    }
+
+    private TreeNode buildEnableTree(List<OrgInfo> orgList) {
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+        for (OrgInfo org : orgList) {
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+        return rootNode;
     }
 }

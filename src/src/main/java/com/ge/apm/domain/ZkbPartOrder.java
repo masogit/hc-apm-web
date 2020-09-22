@@ -28,7 +28,7 @@ public class ZkbPartOrder implements Serializable {
      * Returned：归还  Closed：关单
      */
     public enum PartOrderStatus {
-        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,Ordered,OrderedReject,Returned,Closed
+        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,UnOrdered,UnOrderedReject,Ordered,OrderedReject,Returned,Closed
     }
 
     /**
@@ -143,11 +143,28 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "tech_remark")
     private String techRemark;
 
+    @Column(name = "tech_audit_date")
+    private Date techAuditDate;
+
+    @Column(name = "tech_auditer")
+    private String techAuditer;
+
+    @Column(name = "tech_auditer_uid")
+    private String techAuditerUid;
+
     /**
      * 区域经理审批备注
      */
     @Column(name = "manage_remark")
     private String manageRemark;
+
+    @Column(name = "manage_audit_date")
+    private Date manageAuditDate;
+
+    @Column(name = "manage_auditer")
+    private String manageAuditer;
+    @Column(name = "manage_auditer_uid")
+    private String manageAuditerUid;
 
     /**
      *
@@ -172,6 +189,28 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "ordered_remark")
     private String orderedRemark;
+
+    @Column(name = "un_order_remark")
+    private String unOrderRemark;
+
+
+    @Column(name = "ordered_date")
+    private Date orderedDate;
+
+    @Column(name = "un_order_date")
+    private Date unOrderDate;
+
+    @Column(name = "un_order_auditer")
+    private String unOrderAuditer;
+
+    @Column(name = "ordered_auditer")
+    private String orderedAuditer;
+
+    @Column(name = "un_order_auditer_uid")
+    private String unOrderAuditerUid;
+
+    @Column(name = "ordered_auditer_uid")
+    private String orderedAuditerUid;
 
     /**
      * 归还类型
@@ -212,17 +251,42 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "return_date")
     private Date returnDate;
 
+    @Column(name = "part_serial_number")
+    private String partSerialNumber;
+
+
+    @Column(name = "part_quality_issue")
+    private String partQualityIssue;
+
     /**
      * 归还备注
      */
     @Column(name = "return_remark")
     private String returnRemark;
 
+    @Column(name = "return_audit_date")
+    private Date returnAuditDate;
+
+    @Column(name = "return_auditer")
+    private String returnAuditer;
+
+    @Column(name = "return_auditer_uid")
+    private String returnAuditerUid;
+
     /**
      * 关单备注
      */
     @Column(name = "closed_remark")
     private String closedRemark;
+
+    @Column(name = "closed_date")
+    private Date closedDate;
+
+    @Column(name = "closed_auditer")
+    private String closedAuditer;
+
+    @Column(name = "closed_auditer_uid")
+    private String closedAuditerUid;
 
     @Column(name = "created_by")
     private String createdBy;
@@ -390,7 +454,190 @@ public class ZkbPartOrder implements Serializable {
      * 是否扣除名额
      * t f
      */
+    @Column(name = "whether_deduct")
     private String whetherDeduct;
+
+    /**
+     * 是否全新探头
+     */
+    @Column(name = "new_cat_flag")
+    private String newCatFlag;
+
+    public String getPartSerialNumber() {
+        return partSerialNumber;
+    }
+
+    public void setPartSerialNumber(String partSerialNumber) {
+        this.partSerialNumber = partSerialNumber;
+    }
+
+    public String getPartQualityIssue() {
+        return partQualityIssue;
+    }
+
+    public void setPartQualityIssue(String partQualityIssue) {
+        this.partQualityIssue = partQualityIssue;
+    }
+
+    public String getTechAuditerUid() {
+        return techAuditerUid;
+    }
+
+    public void setTechAuditerUid(String techAuditerUid) {
+        this.techAuditerUid = techAuditerUid;
+    }
+
+    public String getManageAuditerUid() {
+        return manageAuditerUid;
+    }
+
+    public void setManageAuditerUid(String manageAuditerUid) {
+        this.manageAuditerUid = manageAuditerUid;
+    }
+
+    public String getUnOrderAuditerUid() {
+        return unOrderAuditerUid;
+    }
+
+    public void setUnOrderAuditerUid(String unOrderAuditerUid) {
+        this.unOrderAuditerUid = unOrderAuditerUid;
+    }
+
+    public String getOrderedAuditerUid() {
+        return orderedAuditerUid;
+    }
+
+    public void setOrderedAuditerUid(String orderedAuditerUid) {
+        this.orderedAuditerUid = orderedAuditerUid;
+    }
+
+    public String getReturnAuditerUid() {
+        return returnAuditerUid;
+    }
+
+    public void setReturnAuditerUid(String returnAuditerUid) {
+        this.returnAuditerUid = returnAuditerUid;
+    }
+
+    public String getClosedAuditerUid() {
+        return closedAuditerUid;
+    }
+
+    public void setClosedAuditerUid(String closedAuditerUid) {
+        this.closedAuditerUid = closedAuditerUid;
+    }
+
+    public String getNewCatFlag() {
+        return newCatFlag;
+    }
+
+    public void setNewCatFlag(String newCatFlag) {
+        this.newCatFlag = newCatFlag;
+    }
+
+    public String getTechAuditer() {
+        return techAuditer;
+    }
+
+    public void setTechAuditer(String techAuditer) {
+        this.techAuditer = techAuditer;
+    }
+
+    public String getManageAuditer() {
+        return manageAuditer;
+    }
+
+    public void setManageAuditer(String manageAuditer) {
+        this.manageAuditer = manageAuditer;
+    }
+
+    public String getUnOrderRemark() {
+        return unOrderRemark;
+    }
+
+    public void setUnOrderRemark(String unOrderRemark) {
+        this.unOrderRemark = unOrderRemark;
+    }
+
+    public Date getUnOrderDate() {
+        return unOrderDate;
+    }
+
+    public void setUnOrderDate(Date unOrderDate) {
+        this.unOrderDate = unOrderDate;
+    }
+
+    public String getUnOrderAuditer() {
+        return unOrderAuditer;
+    }
+
+    public void setUnOrderAuditer(String unOrderAuditer) {
+        this.unOrderAuditer = unOrderAuditer;
+    }
+
+    public String getOrderedAuditer() {
+        return orderedAuditer;
+    }
+
+    public void setOrderedAuditer(String orderedAuditer) {
+        this.orderedAuditer = orderedAuditer;
+    }
+
+    public String getReturnAuditer() {
+        return returnAuditer;
+    }
+
+    public void setReturnAuditer(String returnAuditer) {
+        this.returnAuditer = returnAuditer;
+    }
+
+    public String getClosedAuditer() {
+        return closedAuditer;
+    }
+
+    public void setClosedAuditer(String closedAuditer) {
+        this.closedAuditer = closedAuditer;
+    }
+
+    public Date getTechAuditDate() {
+        return techAuditDate;
+    }
+
+    public void setTechAuditDate(Date techAuditDate) {
+        this.techAuditDate = techAuditDate;
+    }
+
+    public Date getManageAuditDate() {
+        return manageAuditDate;
+    }
+
+    public void setManageAuditDate(Date manageAuditDate) {
+        this.manageAuditDate = manageAuditDate;
+    }
+
+    public Date getOrderedDate() {
+        return orderedDate;
+    }
+
+    public void setOrderedDate(Date orderedDate) {
+        this.orderedDate = orderedDate;
+    }
+
+    public Date getReturnAuditDate() {
+        return returnAuditDate;
+    }
+
+    public void setReturnAuditDate(Date returnAuditDate) {
+        this.returnAuditDate = returnAuditDate;
+    }
+
+    public Date getClosedDate() {
+        return closedDate;
+    }
+
+    public void setClosedDate(Date closedDate) {
+        this.closedDate = closedDate;
+    }
 
     public String getWhetherDeduct() {
         return whetherDeduct;

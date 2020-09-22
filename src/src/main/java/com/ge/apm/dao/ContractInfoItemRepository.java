@@ -6,6 +6,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ContractInfoItem;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 import java.util.List;
@@ -25,4 +26,11 @@ public interface ContractInfoItemRepository extends GenericRepositoryUUID<Contra
    List<ContractInfoItem> getByAssetUidAndContractType(String assetUid);
 
    List<ContractInfoItem> findByContractIdAndAssetUid(String contractId, String assetUid);
+
+   @Query("select cii from ContractInfoItem cii where cii.contractId = ?1 and cii.id <> ?2 and cii.itemType = 'Purchase' and cii.contractAssetQuantity = 1 and cii.parentId is null")
+   List<ContractInfoItem> findParentByPurchaseAndContractId(String contractId, String id);
+
+   List<ContractInfoItem>  findByParentIdAndContractId(String parentId, String contractId);
+
+   List<ContractInfoItem> findByPurchaseItemIdAndContractId(String purchaseItemId, String contractId);
 }

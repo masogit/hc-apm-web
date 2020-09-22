@@ -10,6 +10,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.asset.CustomConfigService;
@@ -19,15 +20,15 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import javaslang.Tuple2;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
@@ -53,6 +54,8 @@ public class AssetInfoDetailController {
     private ContractInfoService contractService;
     private ContractInfoItemRepository contractItemDao;
     private AssetTagsMapper assetTagsMapper;
+    private UserAccountRepository userDao;
+    private AssetHistoryService assetHistoryService;
 
     private Boolean terminate;
     private AssetInfo selected;
@@ -69,6 +72,9 @@ public class AssetInfoDetailController {
     
     private List<AssetLifecycleEvent> assetEvents;
 
+    @Getter
+    private List<JSONObject> changeHistoryList = Collections.emptyList();
+
     @PostConstruct
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -83,6 +89,8 @@ public class AssetInfoDetailController {
         contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
         assetTagsMapper = WebUtil.getBean(AssetTagsMapper.class);
+        userDao = WebUtil.getBean(UserAccountRepository.class);
+        assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
@@ -113,6 +121,8 @@ public class AssetInfoDetailController {
 
         List<String> existingTags = assetTagsMapper.getTagsByAsset(this.selected.getUid());
         this.selected.setTags(existingTags);
+
+        changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {
@@ -175,7 +185,13 @@ public class AssetInfoDetailController {
         }
         return "";
     }
-
+    public String selectCreatedBy(String loginName){
+        UserAccount user = userDao.getByLoginName(loginName);
+        if(user != null){
+            return user.getName();
+        }
+        return null;
+    }
     public String getCustomConfigString() {
         return JSONObject.toJSONString(customConfig);
     }
@@ -266,6 +282,10 @@ public class AssetInfoDetailController {
 
     public String getMaintanceType() {
         return maintanceType;
+    }
+
+    public int getAssetChangeHistoryCount() {
+        return changeHistoryList.size();
     }
     
 }

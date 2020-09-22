@@ -91,6 +91,7 @@ public enum GatewayURL {
     BATCH_FILE_UPLOAD("/hcapmreportservice/api/apm/batchFile/upload"),
 
     PART_ORDER_SEND_EMAIL("/hcapmreportservice/api/apm/report/partOrder/sendHtmlForPartOrder"),
+    PART_ORDER_SEND_RETURN_EMAIL("/hcapmreportservice/api/apm/report/partOrder/sendHtmlForReturn"),
     PART_ORDER_SEND_MESSAGE("/hcapmreportservice/api/apm/report/partOrder/sendMessage"),
     PART_ORDER_SEND_WECHAT_MESSAGE("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatMessages");
     private final String url;
