@@ -159,7 +159,7 @@ public class TenantInfo implements Serializable {
     private Boolean haveIbDevice;
 
 
-    @Column(name = "two_factor_valid")
+    @Column(name = "two_factor_valid",columnDefinition="bool default false")
     private Boolean twoFactorValid;          //登录是否2次验证开关
 
     public Boolean getTwoFactorValid() {
