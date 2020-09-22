@@ -9,6 +9,7 @@ import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.simpleparts.SimplePartsWarehouseUserService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Getter;
@@ -100,9 +101,10 @@ public class SimplePartsWarehouseUserController extends GenericCRUDUUIDControlle
             }
             SysRole role = roleDao.getByName(SimplePartsConstant.PARTS_ADMIN_MANAGER);
             if (role != null) {
+                UserAccount userAccount = UserContextService.getCurrentUserAccount();
                 Set set = Sets.newHashSet();
                 set.add(role.getId());
-                Set<Integer> userIds = userRoleRepository.findUserIdByRoleIds(set);
+                Set<Integer> userIds = userRoleRepository.findUserIdByRoleIds(userAccount.getTenantUID(),set);
                 if (userIds != null && userIds.size() > 0) {
                     userAccountList = userDao.getByIds(userIds);
                 }

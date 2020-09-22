@@ -42,11 +42,11 @@ public class SimplePartsConfig implements Serializable {
         this.enableWarehouseLocator = enableWarehouseLocator;
     }
 
-    public boolean isEnableWarehouseSelectionInRequest() {
+    public Boolean isEnableWarehouseSelectionInRequest() {
         return enableWarehouseSelectionInRequest;
     }
 
-    public void setEnableWarehouseSelectionInRequest(boolean enableWarehouseSelectionInRequest) {
+    public void setEnableWarehouseSelectionInRequest(Boolean enableWarehouseSelectionInRequest) {
         this.enableWarehouseSelectionInRequest = enableWarehouseSelectionInRequest;
     }
 

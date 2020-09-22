@@ -16,6 +16,10 @@ import java.util.Date;
 public class ZkbPartOrderReturn implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    public enum DataStatusEnum{
+        New,Old
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -69,6 +73,21 @@ public class ZkbPartOrderReturn implements Serializable {
      */
     @Column(name = "return_date")
     private Date returnDate;
+
+    /**
+     * new 可以修改，删改
+     * old 不能操作，
+     */
+    @Column(name = "data_satus")
+    private String dataStatus= "New";
+
+    public String getDataStatus() {
+        return dataStatus;
+    }
+
+    public void setDataStatus(String dataStatus) {
+        this.dataStatus = dataStatus;
+    }
 
     public String getWaybillNo() {
         return waybillNo;

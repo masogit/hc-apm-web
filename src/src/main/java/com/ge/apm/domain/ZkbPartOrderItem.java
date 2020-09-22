@@ -58,6 +58,17 @@ public class ZkbPartOrderItem implements Serializable {
     @Column(name = "price")
     private String price;
 
+    @Column(name = "order_no")
+    private String orderNo;
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
     public String getPrice() {
         return price;
     }

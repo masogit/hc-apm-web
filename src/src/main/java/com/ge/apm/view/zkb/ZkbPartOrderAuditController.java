@@ -59,6 +59,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<I18nMessage> returnTypeList= new ArrayList<>();
     private String valueTypeTips = "";
     private String showOrderedFieldsetText = "";
+    private String queryStatus;
+
 
     @Override
     protected void init() {
@@ -74,6 +76,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         String encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+        queryStatus = UrlEncryptController.getValueFromMap(encodeStr, "queryStatus") == null ? "" : (String) UrlEncryptController.getValueFromMap(encodeStr, "queryStatus");
+
         if(StringUtils.isNotEmpty(selectedId)){
             HashMap m = zkbPartOrderService.queryEditInfo(selectedId);
             this.selected = m.get("zkbPartOrder") ==null ? new ZkbPartOrder() : (ZkbPartOrder)m.get("zkbPartOrder");
@@ -362,14 +366,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.sendMessage(zkbPartOrder);
         zkbPartOrderService.sendEmail(zkbPartOrder);
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
-        return "List?faces-redirect=true";
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public String rejectNext(){
         zkbPartOrderService.auditNext(this.selected,false,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
-        return "List?faces-redirect=true";
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public String normalNext(){
@@ -382,7 +386,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())){
-                HashMap<String, Integer> returnMap = new HashMap<>();
+                /*HashMap<String, Integer> returnMap = new HashMap<>();
                 for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
                     if(returnMap.containsKey(r.getPartNo())){
                         Integer v = returnMap.get(r.getPartNo());
@@ -408,7 +412,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     errorLog = errorLog.substring(0,errorLog.length()-1);
                     WebUtil.addErrorMessage(errorLog+"归还数量不等于申请数量","");
                     return "";
-                }
+                }*/
             }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
                 boolean flag = true;
                 String errorLog = "";
@@ -424,6 +428,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     if(StringUtils.isEmpty(zkbPartOrderItem.getPrice())){
                         flag = false;
                         errorLog += "价格不能为空,";
+                    }
+                    if(StringUtils.isEmpty(zkbPartOrderItem.getOrderNo())){
+                        flag = false;
+                        errorLog += "Order#不能为空,";
                     }
                     ZkbPartOrderItem oldItem = zkbPartOrderService.getZkbPartOrderItemRepository().findById(zkbPartOrderItem.getId());
                     if(oldItem != null){
@@ -442,23 +450,32 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }
-        zkbPartOrderService.normalNext(this.selected,currentUser);
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
+            List<ZkbPartOrderReturn> currentZkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderIdAndDataStatus(selected.getId(),ZkbPartOrderReturn.DataStatusEnum.New.toString());
+            if(currentZkbPartOrderReturns ==null || currentZkbPartOrderReturns.size() ==0){
+                WebUtil.addErrorMessage("请填写归还数据","");
+                return "";
+            }
+            zkbPartOrderService.batchesReturnNext(selected,currentZkbPartOrderReturns,currentUser);
+        }else {
+            zkbPartOrderService.normalNext(this.selected,currentUser);
+        }
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){
             //归还时发送邮件
             zkbPartOrderService.sendEmail(zkbPartOrder);
         }
-        return "List?faces-redirect=true";
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public String orderCancelNext(){
         zkbPartOrderService.orderCancelNext(this.selected,currentUser);
-        return "List?faces-redirect=true";
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public String dialogComplete(){
-        return "List?faces-redirect=true";
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public void prepareReturnCreate(){
@@ -523,6 +540,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturnRepository.save(zkbPartOrderReturn);
         zkbPartOrderReturn = null;
         zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId());
+    }
+
+    public String backList(){
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public void naFlagListener(){

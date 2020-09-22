@@ -36,7 +36,7 @@ public interface SimplePartsCategoryRepository extends JpaRepository<SimpleParts
 
     SimplePartsCategory findById(String id);
 
-    SimplePartsCategory findPartsCategoryByNameAndParentUid(String name, String parentUid);
+    SimplePartsCategory findPartsCategoryByNameAndParentUidAndTenantUid(String name, String parentUid, String tenantUid);
 
     @Query(value = "with RECURSIVE cte as (select a.parent_uid,cast(a.name as varchar(500)) " +
             "from simple_parts_category a where a.id=?1 " +

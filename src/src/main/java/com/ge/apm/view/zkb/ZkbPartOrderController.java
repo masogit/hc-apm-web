@@ -48,8 +48,12 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         queryStatus =WebUtil.getRequestParameter("queryStatus");
+        selectionTenantInfo =WebUtil.getRequestParameter("tenantUID");
         if(StringUtils.isEmpty(queryStatus)){
             queryStatus = "";
+        }
+        if(StringUtils.isEmpty(selectionTenantInfo)){
+            selectionTenantInfo = "";
         }
         if(userContextService.isZkbUser()) {
             this.selectionTenantInfo = currentUser.getTenantUID();
@@ -83,23 +87,21 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             searchFilters = new ArrayList<>();
         }
 
-        if(this.selectionTenantInfo != null){
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
-        }
 
         if(userContextService.isZkbUser()) {
-            if(this.selectionTenantInfo != null){
+            if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
                 searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
             }
             if(StringUtils.isEmpty(queryStatus)){
                 searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ReturnPending.toString()));
             }else if(!"all".equals(queryStatus)){
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, queryStatus));
+                searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
             }
         }else{
-            if(this.selectionTenantInfo != null){
+            if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
                 searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
             }
+
             if(zkbPartOrderUserConfigList == null || zkbPartOrderUserConfigList.size() == 0){
                 //return null;
             }else{
@@ -117,9 +119,15 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType()));
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
                         }else if("all".equals(queryStatus)){
-                            searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1+2*"));
-                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"1+2*"));
-                            searchFilters.add(new SearchFilter("techAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1+"));
+                            if(searchFilters.size() > 0) {
+                                searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion(),"1*2+3*"));
+                                searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"1*2+3*"));
+                                searchFilters.add(new SearchFilter("techAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
+                            }else{
+                                searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1+2*"));
+                                searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"1+2*"));
+                                searchFilters.add(new SearchFilter("techAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1+"));
+                            }
                         }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
@@ -127,21 +135,27 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion()));
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString()));
                     }else if("all".equals(queryStatus)){
-                        searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion(),"1+2*"));
-                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(),"1+2*"));
-                        searchFilters.add(new SearchFilter("manageAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1+"));
+                        if(searchFilters.size() > 0) {
+                            searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion(),"1*2+3*"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(),"1*2+3*"));
+                            searchFilters.add(new SearchFilter("manageAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
+                        }else {
+                            searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion(), "1+2*"));
+                            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.ManagePending.toString(), "1+2*"));
+                            searchFilters.add(new SearchFilter("manageAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(), "1+"));
+                        }
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if(StringUtils.isEmpty(queryStatus)){
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderPending.toString()));
                     }else if(!"all".equals(queryStatus)){
-                        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, queryStatus));
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if(StringUtils.isEmpty(queryStatus)){
                         searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString()));
                     }else if(!"all".equals(queryStatus)){
-                        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, queryStatus));
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
                     }
                 }else if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if(StringUtils.isEmpty(queryStatus)){
@@ -160,9 +174,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         return zkbContractPage;
     }
 
-    public void queryListByStatus(String status){
+    public String queryListByStatus(String status){
         queryStatus = status;
         System.out.println(status);
+        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public boolean isContainOrder(){
@@ -217,12 +232,15 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
 
     public String createAction() {
-        return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo));
+        return UrlEncryptController.encodeUrlParam("Edit?action=Create&selectionTenantInfo=".concat(selectionTenantInfo)+"&queryStatus="+queryStatus);
     }
     public String editAction() {
-        return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId()));
-}
+        return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus);
+    }
 
+    public String backList(){
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
+    }
 
     public UserAccount getCurrentUser() {
         return currentUser;

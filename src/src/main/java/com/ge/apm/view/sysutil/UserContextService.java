@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
@@ -855,6 +856,16 @@ public class UserContextService implements Serializable {
         }
         return false;
     }
+    public boolean isPartnerAccount46() {
+        UserAccount user = getLoginUser();
+        if (null == user.getSiteId()) {
+            return false;
+        }
+        if (ApmConstant.IB_TENANT_ID == user.getSiteId()) {
+            return true;
+        }
+        return false;
+    }
 
     public boolean isZkbAccount() {
         TenantInfo tenantInfo = getTenantInfo();
@@ -1060,4 +1071,26 @@ public class UserContextService implements Serializable {
             return false;
         }
     }
+
+    //判断是否有报废资产菜单权限
+    public boolean hasScrappedMenuAuthority() {
+
+        AssetCreateService acService = WebUtil.getBean(AssetCreateService.class);
+        UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
+        CustomRoleRepository customeRoleDao = WebUtil.getBean(CustomRoleRepository.class);
+        if(acService.needScrappedControl()){
+            List<UserRole> userRoleList = userRoleDao.findByUserIdAndRoleType(UserContextService.getCurrentUserAccount().getId(), ApmConstant.CUSTOME_ROLE_TYPE);
+            for (UserRole userRole : userRoleList) {
+                String menus = customeRoleDao.findById(userRole.getRoleId()).getMenus();
+                if(null != menus && menus.contains("AssetScrapped")){
+                    return true;
+                }
+            }
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
 }

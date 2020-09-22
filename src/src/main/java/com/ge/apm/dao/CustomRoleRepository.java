@@ -16,4 +16,6 @@ public interface CustomRoleRepository extends GenericRepository<CustomRole> {
     @Query(value = "select * from custom_role where id in (select role_id from user_role where role_type = 1 and user_id = ?1)",nativeQuery = true)
     List<CustomRole> findCustomRolesByUserId(Integer userId);
 
+    CustomRole findById(int id);
+
 }

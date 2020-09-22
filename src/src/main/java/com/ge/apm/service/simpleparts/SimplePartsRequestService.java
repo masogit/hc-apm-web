@@ -214,7 +214,7 @@ public class SimplePartsRequestService {
             if (partsInventoryOptional.isPresent()) {
                 partsInventory = partsInventoryOptional.get();
                 // 更新
-                int sumNum = partsInventory.getOnhandQty() + item.getRequestQty();
+                int sumNum = partsInventory.getOnhandQty() + (item.getRequestQty() - item.getTransactionQty());
                 partsInventory.setOnhandQty(sumNum);
             } else {
                 // 新增
@@ -223,7 +223,7 @@ public class SimplePartsRequestService {
                 partsInventory.setPartsLocatorId(item.getPartsLocatorId());
                 partsInventory.setPartsWarehouseId(item.getPartsWarehouseId());
                 partsInventory.setName(item.getName());
-                partsInventory.setOnhandQty(item.getRequestQty());
+                partsInventory.setOnhandQty(item.getRequestQty() - item.getTransactionQty());
 
                 SimplePartsInventoryService.addCurrentOrgInfo(partsInventory);
 
@@ -264,7 +264,7 @@ public class SimplePartsRequestService {
             }
 
             SimplePartsInventory partsInventory = partsInventoryOptional.get();
-            int newInventoryNum = partsInventory.getOnhandQty() - item.getRequestQty();
+            int newInventoryNum = partsInventory.getOnhandQty() - (item.getRequestQty() - item.getTransactionQty());
 
             if (newInventoryNum < 0) {
                 throw new SimplePartsInventoryNotEnoughException("no inventory");
@@ -273,7 +273,7 @@ public class SimplePartsRequestService {
             if (newInventoryNum == 0) {
                 partsInventoryRepository.deleteByWarehouseIdAndLocatorIdAndPartsItemId(item.getPartsWarehouseId(), item.getPartsLocatorId(), item.getPartsItemId());
             } else {
-                partsInventory.setOnhandQty(partsInventory.getOnhandQty() - item.getRequestQty());
+                partsInventory.setOnhandQty(partsInventory.getOnhandQty() -  (item.getRequestQty() - item.getTransactionQty()));
                 partsInventoryRepository.save(partsInventory);
             }
 

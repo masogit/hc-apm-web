@@ -238,6 +238,12 @@ public class ZkbOrderHistory {
     @Column(name = "source")
     private String source;
 
+    /**
+     *tenant_info表里uid
+     */
+    @Column(name = "tenant_uid")
+    private String tenantUid;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -549,5 +555,13 @@ public class ZkbOrderHistory {
 
     public void setDataType(String dataType) {
         this.dataType = dataType;
+    }
+
+    public String getTenantUid() {
+        return tenantUid;
+    }
+
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
     }
 }

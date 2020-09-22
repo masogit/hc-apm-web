@@ -122,7 +122,7 @@ public class SimplePartsCategoryController extends GenericCRUDController<SimpleP
             return;
         }
         selected.setTenantUid(tenantUid);
-        SimplePartsCategory partsCategory = partsCategoryDao.findPartsCategoryByNameAndParentUid(selected.getName(), selected.getParentUid());
+        SimplePartsCategory partsCategory = partsCategoryDao.findPartsCategoryByNameAndParentUidAndTenantUid(selected.getName(), selected.getParentUid(), selected.getTenantUid());
         String parentEncoded = "";
         if (selected.getParentUid() != null) {
             parentEncoded = partsCategoryDao.findById(selected.getParentUid()).getEncoded().trim();
@@ -143,7 +143,7 @@ public class SimplePartsCategoryController extends GenericCRUDController<SimpleP
     }
 
     public boolean checkName() {
-        SimplePartsCategory partsGroup = partsCategoryDao.findPartsCategoryByNameAndParentUid(selected.getName(), selected.getParentUid());
+        SimplePartsCategory partsGroup = partsCategoryDao.findPartsCategoryByNameAndParentUidAndTenantUid(selected.getName(), selected.getParentUid(), selected.getTenantUid());
         if (partsGroup != null) {
             WebUtil.addErrorMessage(selected.getName() + "已经存在");
             return true;
