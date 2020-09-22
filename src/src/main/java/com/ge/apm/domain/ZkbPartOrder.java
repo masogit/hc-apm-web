@@ -251,6 +251,13 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "return_date")
     private Date returnDate;
 
+    @Column(name = "part_serial_number")
+    private String partSerialNumber;
+
+
+    @Column(name = "part_quality_issue")
+    private String partQualityIssue;
+
     /**
      * 归还备注
      */
@@ -455,6 +462,22 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "new_cat_flag")
     private String newCatFlag;
+
+    public String getPartSerialNumber() {
+        return partSerialNumber;
+    }
+
+    public void setPartSerialNumber(String partSerialNumber) {
+        this.partSerialNumber = partSerialNumber;
+    }
+
+    public String getPartQualityIssue() {
+        return partQualityIssue;
+    }
+
+    public void setPartQualityIssue(String partQualityIssue) {
+        this.partQualityIssue = partQualityIssue;
+    }
 
     public String getTechAuditerUid() {
         return techAuditerUid;

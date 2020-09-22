@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
  */
 @Transactional
 @Service
-public class SimplePartsRequestLineItemService extends MicroServiceInvoker {
+public class SimplePartsRequestLineItemService {
 
     @Autowired
     private SimplePartsRequestLineItemRepository partsRequestLineItemRepository;
@@ -50,6 +51,9 @@ public class SimplePartsRequestLineItemService extends MicroServiceInvoker {
 
     @Autowired
     private SimplePartsRequestRepository partsRequestRepository;
+
+    @Autowired
+    EntityManager entityManager;
 
     /**
      * @return void
@@ -108,7 +112,7 @@ public class SimplePartsRequestLineItemService extends MicroServiceInvoker {
      * @param partsRequestLineItem
      */
     @Transactional
-    public void stockInOrOutParts(SimplePartsRequestLineItem partsRequestLineItem) {
+    public synchronized void stockInOrOutParts(SimplePartsRequestLineItem partsRequestLineItem) throws SimplePartsInventoryNotEnoughException {
 
         SimplePartsRequest partsRequest = partsRequestRepository.findById(partsRequestLineItem.getPartsRequestId());
 
@@ -137,39 +141,57 @@ public class SimplePartsRequestLineItemService extends MicroServiceInvoker {
         // 处理库存,将数据拷贝到总库存中
         SimplePartsInventory partsInventory;
         Optional<SimplePartsInventory> partsInventoryOptional = partsInventoryRepository.findByWarehouseIdAndLocatorIdAndPartsItemId(partsRequestLineItem.getPartsWarehouseId(), partsRequestLineItem.getPartsLocatorId(), partsRequestLineItem.getPartsItemId());
-        if (partsInventoryOptional.isPresent()) {
-            partsInventory = partsInventoryOptional.get();
-            // 更新
-            int sumNum = partsInventory.getOnhandQty() + partsRequestLineItem.getNotTransactionQty();
-            partsInventory.setOnhandQty(sumNum);
-        } else {
-            // 新增
-            partsInventory = new SimplePartsInventory();
-            partsInventory.setPartsItemId(partsRequestLineItem.getPartsItemId());
-            partsInventory.setPartsLocatorId(partsRequestLineItem.getPartsLocatorId());
-            partsInventory.setPartsWarehouseId(partsRequestLineItem.getPartsWarehouseId());
-            partsInventory.setName(partsRequestLineItem.getName());
-            partsInventory.setOnhandQty(partsRequestLineItem.getNotTransactionQty());
 
-            partsInventoryService.addCurrentOrgInfo(partsInventory);
+        if(partsRequest.getType() == 1){
+            if (partsInventoryOptional.isPresent()) {
+                partsInventory = partsInventoryOptional.get();
+                // 更新
+                int sumNum = partsInventory.getOnhandQty() - partsRequestLineItem.getNotTransactionQty();
+                if( sumNum < 0){
+                    // 库存不足
+                    throw new SimplePartsInventoryNotEnoughException("no inventory");
+                }
 
+                if(sumNum == 0){
+                    partsInventoryRepository.deleteByWarehouseIdAndLocatorIdAndPartsItemId(partsRequestLineItem.getPartsWarehouseId(), partsRequestLineItem.getPartsLocatorId(), partsRequestLineItem.getPartsItemId());
+                    entityManager.detach(partsInventory);
+                }else{
+                    partsInventory.setOnhandQty(sumNum);
+                    partsInventoryRepository.save(partsInventory);
+                }
+            } else{
+                // 库存不足
+                throw new SimplePartsInventoryNotEnoughException("no inventory");
+            }
+        }else{
+            if (partsInventoryOptional.isPresent()) {
+                partsInventory = partsInventoryOptional.get();
+                // 更新
+                int sumNum = partsInventory.getOnhandQty() + partsRequestLineItem.getNotTransactionQty();
+                partsInventory.setOnhandQty(sumNum);
+            } else{
+                // 新增
+                partsInventory = new SimplePartsInventory();
+                partsInventory.setPartsItemId(partsRequestLineItem.getPartsItemId());
+                partsInventory.setPartsLocatorId(partsRequestLineItem.getPartsLocatorId());
+                partsInventory.setPartsWarehouseId(partsRequestLineItem.getPartsWarehouseId());
+                partsInventory.setName(partsRequestLineItem.getName());
+                partsInventory.setOnhandQty(partsRequestLineItem.getNotTransactionQty());
+                partsInventoryService.addCurrentOrgInfo(partsInventory);
+            }
+            partsInventoryRepository.save(partsInventory);
         }
-
-        partsInventoryRepository.save(partsInventory);
 
         //处理备件明细
         if(String.valueOf(partsRequestLineItem.getRequestQty()).equals(String.valueOf(partsRequestLineItem.getTransactionQty() + partsRequestLineItem.getNotTransactionQty()))){
             partsRequestLineItem.setStatus(1);
         }
         partsRequestLineItem.setTransactionQty(partsRequestLineItem.getTransactionQty() + partsRequestLineItem.getNotTransactionQty());
-        partsRequestLineItemRepository.save(partsRequestLineItem);
-
         partsRequestLineItem.setNotTransactionQty(partsRequestLineItem.getRequestQty() - partsRequestLineItem.getTransactionQty());
-
+        partsRequestLineItemRepository.save(partsRequestLineItem);
 
         //处理申请单状态
         List<SimplePartsRequestLineItem> partsRequestLineItems = partsRequestLineItemRepository.findByRequestCode(partsRequest.getRequestCode());
-
         partsRequestLineItems = partsRequestLineItems.stream().filter(item -> item.getStatus() != SimplePartsConstant.PARTS_TRANSACTIONED).collect(Collectors.toList());
         if(partsRequestLineItems.size() == 0){
             partsRequest.setStatus(SimplePartsConstant.PARTS_TRANSACTIONED);

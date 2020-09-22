@@ -26,6 +26,10 @@
                                         <p:inputText id="selectedUserOrgName" value="#{assetFileImportController.getSelectedOrgName()}" readonly="true" />
                                         <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{assetFileImportController.file != null}"/>
                                         <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                            <c:if test="#{assetFileImportController.isSelect46Account}">
+                                                <p:inputText id="assetImportTreeNodeNameFilter" class="treeNodeNameFilter" value="#{assetFileImportController.treeNodeNameFilter}"/>
+                                                <p:commandButton partialSubmit="true" icon="ui-icon-search" process="importForm:assetImportTreeNodeNameFilter @this" update="importForm:orgTree" actionListener="#{assetFileImportController.filterTreeNode()}" value="#{msg.Search2}"/>
+                                            </c:if>
                                             <p:scrollPanel style="height:300px;border: 0" mode="native">
                                                 <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetFileImportController.orgTree}" selection="#{assetFileImportController.selectedNode}" var="node" selectionMode="single">
                                                     <p:ajax process="@this" event="select" update="@form" listener="#{assetFileImportController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
