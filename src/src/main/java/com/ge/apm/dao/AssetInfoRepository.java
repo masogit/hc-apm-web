@@ -239,4 +239,5 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value="select count(*) from asset_info where id=?1 and is_deleted = false",nativeQuery=true)
     public int countByAssetIdAndNotDeleted(int assetId);
 
+    List<AssetInfo> findAllByDepartNumIn(List<String> departsNums);
 }

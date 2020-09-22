@@ -24,7 +24,10 @@ import webapp.framework.web.WebUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -152,6 +155,18 @@ public class AssetFileImportBaseService {
             item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
         });
 
+    }
+
+    @Transactional
+    public void importSupplierData(List<Map<String, Object>> importOrgMap){
+
+        importOrgMap.stream().forEach(item ->{
+            AssetInfo newAssetInfo = (AssetInfo) item.get("asset");
+            Supplier supplier =  supplierDao.findByTenantUIDAndName(selectedOrgToImport.getTenantUID(), newAssetInfo.getVendor());
+            if(null == supplier){
+                supportingService.importSupplierIfNeeded(selectedOrgToImport, newAssetInfo.getVendor());
+            }
+        });
     }
 
     @Transactional
