@@ -142,7 +142,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         filters.add(new SearchFilter("id", SearchFilter.Operator.IN,strings));
         filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenUId));
         filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, requestTime));
-        filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(requestTime, 1)));
+        filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(requestTime, -1)));
        /* if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
             filters.add(new SearchFilter("spareQuota", SearchFilter.Operator.GT,1));
         } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
