@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.pm.V2_PmOrderService;
@@ -67,6 +68,8 @@ public class AssetCreateService {
     BlobObjectRepository blobDao;
     @Autowired
     private UaaService uuaService;
+    @Autowired
+    ConfigService configService;
     
     @Autowired
     private AssetDepreciationService assetDepreciationService;
@@ -285,17 +288,9 @@ public class AssetCreateService {
         return userDao.getByWeChatId(wechatId);
     }
 
-    public Boolean needScrappedControl(){
-        String siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
-        OrgInfo siteOrg = orgDao.getByUid(siteUID);
-        List<String> siteUidList = Arrays.asList(siteOrg.getTenantUID(),siteOrg.getInstitutionUID(),siteOrg.getHospitalUID(),siteOrg.getSiteUID());
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
-        return wcList.stream().anyMatch(item-> item.getEnableScrappedControl());
-    }
-
-    //判断待报废按钮是否禁用
-    public Boolean hasScrappedAuthority() {
-        if(needScrappedControl()){
+    //判断待报废按钮是否禁用false
+    public boolean hasScrappedAuthority() {
+        if(configService.needScrappedControl()){
             List<UserRole> userRoleList = userRoleDao.findByUserIdAndRoleType(UserContextService.getCurrentUserAccount().getId(), ApmConstant.CUSTOME_ROLE_TYPE);
             for (UserRole userRole : userRoleList) {
                 String webAuthorities = customeRoleDao.findById(userRole.getRoleId()).getWebAuthorities();

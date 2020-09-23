@@ -175,4 +175,15 @@ public class ConfigService {
         workflowConfig = configDao.findFirstBySiteUID(currentUserAccount.getTenantUID());
         return Optional.ofNullable(workflowConfig);
     }
+
+    //是否待报废权限控制
+    public boolean needScrappedControl(){
+
+        Optional<WorkflowConfig> optWorkflowConfig = findInheritableWorkflowConfigByCurrentUser();
+        if(optWorkflowConfig.isPresent()){
+            WorkflowConfig workflowConfig = optWorkflowConfig.get();
+            return workflowConfig.getEnableScrappedControl();
+        }
+        return false;
+    }
 }

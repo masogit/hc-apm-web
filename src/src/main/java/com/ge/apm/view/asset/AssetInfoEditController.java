@@ -299,7 +299,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     //判断待报废按钮是否禁用
-    public Boolean hasScrappedAuthority() {
+    public boolean hasScrappedAuthority() {
         return acService.hasScrappedAuthority();
     }
 
