@@ -5,7 +5,10 @@
  */
 package com.ge.apm.service.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.core.io.ByteArrayResource;
@@ -14,6 +17,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
+import webapp.framework.web.WebUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -244,4 +249,66 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         logger.info("File uploaded");
     }
 
+    /**
+     * 发送短信验证码
+     * @param telephone
+     */
+    public Boolean sendMsMCode(String telephone){
+
+        String gatewayURL = getGatewayURL(GatewayURL.MSM_SEND_CODE);
+        String url = gatewayURL.replace("{phone}",telephone);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        logger.info("url for sendMsMCode: " + url);
+        ResponseEntity<String> response = template.exchange(url, HttpMethod.GET, requestEntity, String.class);
+        logger.info("sendMsMCode,telphone={},response={}",telephone, JSON.toJSONString(response));
+
+        String body = response.getBody();
+        logger.info("getMsMCode,telephone={},response body ={}",telephone, body);
+        JSONObject result = JSON.parseObject(body);
+        Boolean isSuccess = result.getBoolean("data");
+        return isSuccess;
+    }
+    /**
+     * 发送短信验证码
+     * @param telephone
+     */
+    public Map getMsMCode(String telephone){
+
+        String gatewayURL = getGatewayURL(GatewayURL.MSM_GET_CODE);
+        String url = gatewayURL.replace("{phone}",telephone);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        logger.info("url for getMsMCode: " + url);
+        ResponseEntity<String> response = template.exchange(url, HttpMethod.GET, requestEntity, String.class);
+        logger.info("getMsMCode,telephone={},response={}",telephone, JSON.toJSONString(response));
+
+        String body = response.getBody();
+        logger.info("getMsMCode,telephone={},response body ={}",telephone, body);
+        JSONObject result = JSON.parseObject(body);
+        String data = result.getString("data");
+        if(StringUtils.isEmpty(data)){
+            return null;
+        }else {
+            JSONObject cache = JSON.parseObject(data);
+            logger.info("get sms code , cache:{}", cache.toJSONString());
+            Date createdTime = cache.getDate("createdAt");
+            String phone = cache.getString("phone");
+            String code = cache.getString("code");
+
+            Map<String,String> map = new HashMap<String,String>();
+            map.put("phone", phone);
+            map.put("code", code);
+            long temp_sen = (System.currentTimeMillis() - createdTime.getTime())/1000;
+            long temp_send =(10 * 60) - temp_sen;
+            if(temp_send != 0){
+                map.put("expire", String.valueOf(temp_send/60l));
+            }else{
+                map.put("expire", String.valueOf(1));
+            }
+            return map;
+        }
+    }
 }

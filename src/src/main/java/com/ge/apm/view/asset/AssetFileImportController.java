@@ -56,6 +56,7 @@ public class AssetFileImportController {
     private List<Map<String, Object>> importAssetMap;
 
     private AssetFileImportStreamingService streamingService;
+    private AssetFileImportUseCacheService importUseCacheService;
 
     private OrgInfoLocalCacheService orgInfoLocalCacheService;
 
@@ -99,6 +100,7 @@ public class AssetFileImportController {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
+        importUseCacheService = WebUtil.getBean(AssetFileImportUseCacheService.class);
 
         initOrgTree();
 
@@ -159,7 +161,7 @@ public class AssetFileImportController {
 
             logger.info("found asset record count: {}", importAssetMap.size());
 
-            if(importAssetMap.size() > 5000){
+            if(importAssetMap.size() > 15000){
                 WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
                 return;
             }
@@ -191,7 +193,12 @@ public class AssetFileImportController {
             }
 
             Map<String, OrgInfo> orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
-            streamingService.importAssetData(importAssetMap, autoGenerateQrcode, orgNamesUriCache);
+
+            AssetFileImportCacheService assetFileImportCacheService = WebUtil.getBean(AssetFileImportCacheService.class);
+            AssetFileImportCache assetFileImportCache = new AssetFileImportCache(importAssetMap, selectedOrg, assetFileImportCacheService);
+
+            //streamingService.importAssetData(importAssetMap, autoGenerateQrcode, orgNamesUriCache);
+            importUseCacheService.importAssetData(selectedOrg, importAssetMap, autoGenerateQrcode, orgNamesUriCache, assetFileImportCache);
             isImported = true;
 
             filterErrorRecords();

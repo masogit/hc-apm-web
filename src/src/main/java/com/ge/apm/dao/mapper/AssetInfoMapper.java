@@ -43,5 +43,14 @@ public interface AssetInfoMapper {
 					"</foreach>"+
 					"</script>"})
 	public List<Supplier> getSupliersBySuplierIds(@Param("suplierIdList")List<Integer> suplierIdList);
-	
+
+	@Select({
+			"<script>" +
+					"select  *  from  supplier spl  where spl.tenant_uid = #{tenantUid} and spl.name in " +
+					"<foreach item = 'item' index = 'index' collection = 'assetSuppliers' open='(' separator=',' close=')'>" +
+					"#{item}" +
+					"</foreach>"+
+					"</script>"})
+	public List<Supplier> getSupliersBySuplierNamesAndTenantUID(@Param("assetSuppliers")List<String> assetSuppliers, @Param("tenantUid")String tenantUid);
+
 }

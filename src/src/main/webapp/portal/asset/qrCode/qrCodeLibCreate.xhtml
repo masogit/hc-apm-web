@@ -14,25 +14,64 @@
         	<h:panelGroup id ="tenant" >
             <h:outputLabel for="siteIdSelect" value="#{msg.TenantInfo} ： "  />
             <p:selectOneMenu id="siteIdSelect" value="#{qrCodeLibController.tenantUID}" required="true" requiredMessage="#{msg.SiteCannotBeEmpty}" filter="true" filterMatchMode="startsWith" effect="fade" >
-                <p:ajax  listener="#{qrCodeLibController.onSiteChange}" update="hospitalIdSelect" />
+                <p:ajax  listener="#{qrCodeLibController.onSiteChange}" update="qrCodeLibCreateForm" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{qrCodeLibController.tenantList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
             </p:selectOneMenu>
             <br/>
             <br/>
-            <h:outputLabel for="hospitalIdSelect" value="#{msg.Hospital} ： " />
-            <p:selectOneMenu id="hospitalIdSelect" value="#{qrCodeLibController.siteUID}" required="true" requiredMessage="#{msg.HospitalCannotBeEmpty}" filter="true" filterMatchMode="startsWith" effect="fade">
-                <p:ajax  listener="#{qrCodeLibController.onSiteUIDChange}" />
-                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
-            </p:selectOneMenu>
-            <br/>
-            <br/>
+            <h:panelGroup id ="tenantOld">
+
+            <c:choose>
+                <c:when test="#{!qrCodeLibController.hospitalOn}">
+                    <h:outputLabel for="hospitalIdSelect" value="#{msg.Hospital} ： " />
+                    <p:selectOneMenu id="hospitalIdSelect" value="#{qrCodeLibController.siteUID}" required="true" requiredMessage="#{msg.HospitalCannotBeEmpty}" filter="true" filterMatchMode="startsWith" effect="fade">
+                        <p:ajax  listener="#{qrCodeLibController.onSiteUIDChange}" />
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
+                    </p:selectOneMenu>
+                    <br/>
+                    <br/>
+                    <h:outputLabel for="hospitalIdSelect" value="#{msg.QRCodeQuantity} ： " />
+                    <p:inputNumber id="qrCodeNum" decimalPlaces="0" minValue="1" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="#{msg.QuantityCannotBeEmpty}"/>
+                    <br/>
+                    <br/>
+                </c:when>
+                <c:otherwise>
+                    <h:panelGroup>
+                            <h:outputLabel for="hospitalIdSelectNew" value="#{msg.Hospital} ： " />
+                            <p:inputText id="hospitalIdSelectNew" value="#{qrCodeLibController.selectedOrg.name}" readonly="true" required="true" requiredMessage="#{msg.HospitalCannotBeEmpty}"/>
+                            <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false" class="ui-selectonemenu-panel">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <c:if test="#{orgTreeController.judgeTheUser()}">
+                                        <p:inputText id="retrieval" value="#{orgTreeController.retrieval}" style="width:150px;"/>
+                                        <p:commandButton id="retrieval3" partialSubmit="true"  process=":qrCodeLibCreateForm:retrieval @this" icon="ui-icon-search"   validateClient="true"  actionListener="#{orgTreeController.filterNode()}" value="#{msg.Search}"  update="orgTree :growl" iconPos="right"/>
+                                    </c:if>
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userContextService.hasRole('ITAdmin')?orgTreeController.tenantOrgTree:orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
+                                        <p:ajax process="@this" event="select" oncomplete="PF('varPanelOrg').hide();" listener="#{qrCodeLibController.onHospitalChange}" update=":qrCodeLibCreateForm:hospitalIdSelectNew"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        <br/>
+                        <br/>
+                        <h:outputLabel for="hospitalIdSelectNew" value="#{msg.QRCodeQuantity} ： " />
+                        <p:inputNumber id="qrCodeNumNew" decimalPlaces="0" minValue="1" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="#{msg.QuantityCannotBeEmpty}"/>
+                        <br/>
+                        <br/>
+                    </h:panelGroup>
+                </c:otherwise>
+            </c:choose>
+
             </h:panelGroup>
-            <h:outputLabel for="hospitalIdSelect" value="#{msg.QRCodeQuantity} ： " />
-            <p:inputNumber id="qrCodeNum" decimalPlaces="0" minValue="1" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="#{msg.QuantityCannotBeEmpty}"/>
-            <br/>
-            <br/>
+            </h:panelGroup>
+
+
             <p:commandButton value="#{msg.ConfirmCreate}" icon="ui-icon-extlink" validateClient="true" actionListener="#{qrCodeLibController.createQrCode}" update=":qrCodeLibListForm:datalist :growl" oncomplete="handleSubmit(args, 'qrCodeLibCreateDialog');"/>
             <br/>
         </h:panelGroup>

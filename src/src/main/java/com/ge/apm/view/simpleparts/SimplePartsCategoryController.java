@@ -8,6 +8,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.simpleparts.SimplePartsCategoryService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.GenericRepository;
@@ -127,14 +128,14 @@ public class SimplePartsCategoryController extends GenericCRUDController<SimpleP
         if (selected.getParentUid() != null) {
             parentEncoded = partsCategoryDao.findById(selected.getParentUid()).getEncoded().trim();
         }
-        if (partsCategory == null && selected.getEncoded().contains(parentEncoded) && selected.getEncoded().length()> parentEncoded.length()+1 && partsCategoryDao.findEncodedById(selected.getEncoded()) == null) {
+        if (partsCategory == null && selected.getEncoded().contains(parentEncoded) && selected.getEncoded().length()> parentEncoded.length()+1 && StringUtils.isEmpty(partsCategoryDao.findEncodedById(selected.getEncoded(), selected.getTenantUid()))) {
             partsCategory = selected;
             partsCategory.setId(null);
             partsCategoryDao.save(partsCategory);
             isCreate = false;
             createTopLevelNode = false;
             WebUtil.addSuccessMessage("保存成功!");
-        } else if (partsCategoryDao.findEncodedById(selected.getEncoded()) != null) {
+        } else if (StringUtils.isNotEmpty(partsCategoryDao.findEncodedById(selected.getEncoded(), selected.getTenantUid()))) {
             WebUtil.addErrorMessage(selected.getEncoded() + "编码已存在");
         } else if(selected.getEncoded().length()== parentEncoded.length()+ 1 || !selected.getEncoded().contains(parentEncoded)){
             WebUtil.addErrorMessage(selected.getEncoded() + "编码格式不正确，请补全生成后编码");
