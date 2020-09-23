@@ -479,7 +479,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                     subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
                 }
-            }else if(!ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+            }else {
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
             }
