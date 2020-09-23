@@ -9,6 +9,8 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.UserCommonService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -31,7 +33,7 @@ import webapp.framework.web.mvc.GenericCRUDController;
 @ManagedBean
 @ViewScoped
 public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
-
+    private static final Logger logger = LoggerFactory.getLogger(QrCodeLibController.class);
     QrCodeLibRepository dao = null;
     TenantInfoRepository tenantInfoDao = null;
     OrgInfoRepository orgInfoDao = null;
@@ -202,10 +204,12 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
         if (tenantUID != null) {
             TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUID);
             UserAccount userAccount = UserContextService.getCurrentUserAccount();
-            if(46==userAccount.getSiteId() && userAccount.getSiteUID().equals(userAccount.getTenantUID()) && 46==tenantInfo.getId()){
+            if((46==userAccount.getSiteId() && userAccount.getSiteUID().equals(userAccount.getTenantUID())) || 46==tenantInfo.getId()){
+                logger.info("===========================================QrCodeLibController.onSiteChange 46号租户不加载医院下拉列表");
                 hospitalOn = true;
             }else{
                 hospitalFileterList = orgInfoDao.getByTenantUID(tenantUID).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+                logger.info("===========================================QrCodeLibController.onSiteChange 非46号租户正常加载医院下拉选");
                 hospitalOn = false;
             }
         }
@@ -241,10 +245,12 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
         } else {
             TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUIDFilter);
             UserAccount userAccount = UserContextService.getCurrentUserAccount();
-            if(46==userAccount.getSiteId() && userAccount.getSiteUID().equals(userAccount.getTenantUID()) && 46==tenantInfo.getId()){
+            if((46==userAccount.getSiteId() && userAccount.getSiteUID().equals(userAccount.getTenantUID())) || 46==tenantInfo.getId()){
+                logger.info("===========================================QrCodeLibController.onTenantFilterChange 46号租户不加载医院下拉列表");
                 hospitalOn = true;
             }else{
                 hospitalFileterList = orgInfoDao.getByTenantUID(tenantUIDFilter).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+                logger.info("============================================QrCodeLibController.onTenantFilterChange 非46号租户正常加载医院下拉选");
                 hospitalOn = false;
             }
         }
