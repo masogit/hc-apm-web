@@ -1076,22 +1076,21 @@ public class UserContextService implements Serializable {
     //判断是否有报废资产菜单权限
     public boolean hasScrappedMenuAuthority() {
 
-        ConfigService cfgService = WebUtil.getBean(ConfigService.class);
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         CustomRoleRepository customeRoleDao = WebUtil.getBean(CustomRoleRepository.class);
-        if(cfgService.needScrappedControl()){
-            List<UserRole> userRoleList = userRoleDao.findByUserIdAndRoleType(UserContextService.getCurrentUserAccount().getId(), ApmConstant.CUSTOME_ROLE_TYPE);
-            for (UserRole userRole : userRoleList) {
-                String menus = customeRoleDao.findById(userRole.getRoleId()).getMenus();
-                if(null != menus && menus.contains("AssetScrapped")){
-                    return true;
-                }
+        List<UserRole> userRoleList = userRoleDao.findByUserIdAndRoleType(UserContextService.getCurrentUserAccount().getId(), ApmConstant.CUSTOME_ROLE_TYPE);
+        for (UserRole userRole : userRoleList) {
+            String menus = customeRoleDao.findById(userRole.getRoleId()).getMenus();
+            if(null != menus && menus.contains("AssetScrapped")){
+                return true;
             }
-            return false;
-        }else{
-            return true;
         }
+        return false;
+    }
 
+    public boolean needScrappedControl(){
+        ConfigService cfgService = WebUtil.getBean(ConfigService.class);
+        return cfgService.needScrappedControl();
     }
 
 }
