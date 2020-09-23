@@ -20,6 +20,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,8 +44,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private String selectionTenantInfo;
     private AssetInfo queryAsset;
     private V2_WorkOrder queryWorkFlow;
-    private HashMap<String, String> selectedWorkFlow;
-    private List<HashMap<String, String>> v2_listHashMap;
+    private HashMap<String, Object> selectedWorkFlow;
+    private List<HashMap<String, Object>> v2_listHashMap;
     private List<ZkbContract> contractList;
     private ZkbPartOrderItem zkbPartOrderItem;
     private String orderType;
@@ -92,7 +93,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 contractList = new ArrayList<>();
                 contractList.add(c);
             }
-            HashMap<String, String> mm = m.get("v2") == null ? null : (HashMap<String, String>)m.get("v2");
+            HashMap<String, Object> mm = m.get("v2") == null ? null : (HashMap<String, Object>)m.get("v2");
             v2_listHashMap = new ArrayList<>();
             if(mm != null){
                 v2_listHashMap.add(mm);
@@ -132,7 +133,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             FacesContext.getCurrentInstance().addMessage(null, message);
             return;
         }
-        selectedWorkFlow = (HashMap<String, String>) event.getObject();
+        selectedWorkFlow = (HashMap<String, Object>) event.getObject();
         assetInfo = assetInfoRepository.findByUid(String.valueOf(selectedWorkFlow.get("assetId")));
         selected.setProductNumber(assetInfo.getFunctionType());
 
@@ -150,7 +151,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         }
 
-        contractList = zkbPartOrderService.queryContractByAsset(selectionTenantInfo,String.valueOf(selectedWorkFlow.get("assetId")));
+        contractList = zkbPartOrderService.queryContractByAsset(selectionTenantInfo,String.valueOf(selectedWorkFlow.get("assetId")),(Date)selectedWorkFlow.get("requestTime"));
         if(contractList.size() == 0){
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "未查询出合同数据！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -555,19 +556,19 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.queryWorkFlow = queryWorkFlow;
     }
 
-    public HashMap<String, String> getSelectedWorkFlow() {
+    public HashMap<String, Object> getSelectedWorkFlow() {
         return selectedWorkFlow;
     }
 
-    public void setSelectedWorkFlow(HashMap<String, String> selectedWorkFlow) {
+    public void setSelectedWorkFlow(HashMap<String, Object> selectedWorkFlow) {
         this.selectedWorkFlow = selectedWorkFlow;
     }
 
-    public List<HashMap<String, String>> getV2_listHashMap() {
+    public List<HashMap<String, Object>> getV2_listHashMap() {
         return v2_listHashMap;
     }
 
-    public void setV2_listHashMap(List<HashMap<String, String>> v2_listHashMap) {
+    public void setV2_listHashMap(List<HashMap<String, Object>> v2_listHashMap) {
         this.v2_listHashMap = v2_listHashMap;
     }
 

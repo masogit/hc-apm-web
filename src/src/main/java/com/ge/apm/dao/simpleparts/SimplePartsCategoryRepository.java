@@ -54,8 +54,8 @@ public interface SimplePartsCategoryRepository extends JpaRepository<SimpleParts
             "inner join cte_auth_group cte on sag.parent_uid = cte.id) select  * from cte_auth_group", nativeQuery = true)
     List<SimplePartsCategory> findChildByParentUid(String id);
 
-    @Query(value = "select sys.encoded from simple_parts_category sys where sys.encoded=?1", nativeQuery = true)
-    String findEncodedById(String id);
+    @Query(value = "select sys.encoded from simple_parts_category sys where sys.encoded=?1 and sys.tenant_uid = ?2", nativeQuery = true)
+    String findEncodedById(String id, String tenantUid);
 
     @Query(value = "select * from simple_parts_category cat where cat.encoded=?1", nativeQuery = true)
     SimplePartsCategory findByEncoded(String encoded);

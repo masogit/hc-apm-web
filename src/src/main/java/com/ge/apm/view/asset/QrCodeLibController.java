@@ -7,6 +7,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.UserCommonService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -60,6 +61,15 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
     private UserCommonService userCommonService;
     
     private UaaService uaaService;
+    boolean hospitalOn =false;
+
+    public boolean isHospitalOn() {
+        return hospitalOn;
+    }
+
+    public void setHospitalOn(boolean hospitalOn) {
+        this.hospitalOn = hospitalOn;
+    }
 
     @Override
     protected void init() {
@@ -87,9 +97,11 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 //            tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
 //        }
 //        onSiteChange();
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
         //系统配置二维码管理初始化页面没有医院下拉修复
         tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
         onTenantFilterChange();
+
 
     }
 
@@ -188,7 +200,14 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 
     public void onSiteChange() {
         if (tenantUID != null) {
-            hospitalFileterList = orgInfoDao.getByTenantUID(tenantUID).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+            TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUID);
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            if(46==userAccount.getSiteId() && userAccount.getSiteUID().equals(userAccount.getTenantUID()) && 46==tenantInfo.getId()){
+                hospitalOn = true;
+            }else{
+                hospitalFileterList = orgInfoDao.getByTenantUID(tenantUID).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+                hospitalOn = false;
+            }
         }
     }
 
@@ -220,7 +239,14 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
             hospitalFileterList.clear();
             siteUIDFilter = null;
         } else {
-            hospitalFileterList = orgInfoDao.getByTenantUID(tenantUIDFilter).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+            TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUIDFilter);
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            if(46==userAccount.getSiteId() && userAccount.getSiteUID().equals(userAccount.getTenantUID()) && 46==tenantInfo.getId()){
+                hospitalOn = true;
+            }else{
+                hospitalFileterList = orgInfoDao.getByTenantUID(tenantUIDFilter).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+                hospitalOn = false;
+            }
         }
     }
 

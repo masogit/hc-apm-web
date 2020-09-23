@@ -160,6 +160,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(selected.getCurrentStep(),selected.getAssetTypeDi());
                     }
                 }
+            }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
+                if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                    zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndOrderType(selected.getCurrentStep(),selected.getOrderType());
+                }else{
+                    zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndOrderTypeNull(selected.getCurrentStep());
+                }
             }else {
                 zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(selected.getCurrentStep());
             }

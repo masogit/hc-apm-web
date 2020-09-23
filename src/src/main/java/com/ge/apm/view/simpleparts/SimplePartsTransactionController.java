@@ -7,11 +7,14 @@ import com.ge.apm.dao.simpleparts.SimplePartsTransactionRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsWarehouseLocatorRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.simpleparts.SimplePartsTransaction;
 import com.ge.apm.domain.simpleparts.SimplePartsWareHouseLocator;
 import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author 503189828
@@ -41,7 +45,7 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
     private UserAccountRepository userDao;
     private I18nMessageRepository i18nDao;
     private I18nMessageService i18nMessageService;
-
+    private UaaService uaaService;
     private long queryIndex = SimplePartsConstant.TRANSACTION_TYPE_IN_STOCK;
 
     @Getter
@@ -68,6 +72,7 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
         userDao = WebUtil.getBean(UserAccountRepository.class);
         i18nDao= WebUtil.getBean(I18nMessageRepository.class);
         i18nMessageService = WebUtil.getBean(I18nMessageService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
     }
 
     @Override
@@ -76,6 +81,13 @@ public class SimplePartsTransactionController extends GenericCRUDUUIDController<
             searchFilters = new ArrayList();
         }
         searchFilters.removeIf(e->e.fieldName.equals("siteId"));
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        List<String> orgUidList = uaaService.getOrgListByUser(currentUserAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         setUserSearchFilters();
 
         //入库 or 出库
