@@ -22,7 +22,7 @@
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/portal/loginAs/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um49" value="#{msg.UserAdmin}" outcome="/portal/uaa/userAccount/ListMain.xhtml" rendered="#{userContextService.hasNotAnyRole('SuperAdmin') and userContextService.accessContains('config.user')}"/>
                 <p:menuitem id="um504" value="#{msg.CustomConfiguration}" outcome="/portal/asset/customConfig/CustomConfig.xhtml" rendered="#{userContextService.accessContains('config.custom')}"/>
-                <!--<p:menuitem id="um495" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/qrCodeLibList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>-->
+                <p:menuitem id="um495" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/qrCodeLibList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{userContextService.hasNotAnyRole('SuperAdmin') and userContextService.accessContains('config.qrCode')}"/>
             </p:submenu>
             <p:submenu id="um4000" label="#{msg.APMPlatformManagement}" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}">
