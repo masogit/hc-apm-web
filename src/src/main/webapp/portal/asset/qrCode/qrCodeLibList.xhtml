@@ -63,7 +63,7 @@
                                                    <p:inputText id="retrieval" value="#{orgTreeController.retrieval}" style="width:150px;"/>
                                                    <p:commandButton id="retrieval3" partialSubmit="true"  process=":qrCodeLibListForm:datalist:retrieval @this" icon="ui-icon-search"   validateClient="true"  actionListener="#{orgTreeController.filterNode()}" value="#{msg.Search}"  update="orgTree :growl" iconPos="right"/>
                                                </c:if>
-                                               <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userContextService.hasRole('ITAdmin')?orgTreeController.tenantOrgTree:orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
+                                               <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}"  var="node" selectionMode="single" dynamic="true">
                                                    <p:ajax process="@this" event="select" listener="#{qrCodeLibController.onSiteFilterChange}" update=":qrCodeLibListForm:datalist" oncomplete="PF('varPanelSiteFilter').hide();"/>
                                                    <p:ajax process="@this" event="expand"/>
                                                    <p:ajax process="@this" event="collapse"/>
