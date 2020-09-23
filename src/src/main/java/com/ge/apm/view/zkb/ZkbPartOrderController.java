@@ -131,6 +131,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             }
                         }
                     }
+
                 }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     if(StringUtils.isEmpty(queryStatus)){
                         searchFilters.add(new SearchFilter("region", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getRegion()));
