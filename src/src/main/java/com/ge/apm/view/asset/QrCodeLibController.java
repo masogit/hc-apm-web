@@ -231,8 +231,8 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
                 tenantOrgTreePage = createTenantOrgTree46();
                 hospitalOn = true;
             }else{
+                logger.info("============================================QrCodeLibController.onTenantFilterChange 非46号租户正常加载医院下拉选 tenantInfoId={}",tenantInfo.getId());
                 hospitalFileterList = orgInfoDao.getByTenantUID(tenantUID).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
-                logger.info("===========================================QrCodeLibController.onSiteChange 非46号租户正常加载医院下拉选");
                 hospitalOn = false;
             }
         }
@@ -273,8 +273,8 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
                 tenantOrgTreePage = createTenantOrgTree46();
                 hospitalOn = true;
             }else{
+                logger.info("============================================QrCodeLibController.onTenantFilterChange 非46号租户正常加载医院下拉选 tenantInfoId={}",tenantInfo.getId());
                 hospitalFileterList = orgInfoDao.getByTenantUID(tenantUIDFilter).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
-                logger.info("============================================QrCodeLibController.onTenantFilterChange 非46号租户正常加载医院下拉选");
                 hospitalOn = false;
             }
         }
@@ -288,6 +288,7 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
         TreeNode rootNode = new DefaultTreeNode("org", null, null);
         rootNode.getChildren().add(new DefaultTreeNode("org", rootOrg, null));
+        logger.info("============================trnantUid={}   tenantUIDFilter={}     retrieval={}",tenantUID,tenantUIDFilter,retrieval);
         List<OrgInfo> siteList = orgDao.getOrgTreeBySiteAndparm(tenantUID==null?tenantUIDFilter:tenantUID,retrieval==null?"":retrieval).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
         TreeNode siteTree = buildTree(siteList);
         expandedByOrgType(siteTree, 2);
