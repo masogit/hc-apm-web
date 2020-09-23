@@ -10,8 +10,10 @@ update wechat_subscribe_message set keyword=null,message='感谢关注GEAPM医�
 INSERT INTO public.sys_role (id,home_page,name,role_desc,menus,role_desc_en) VALUES (17,null,'SparePartsAdmin','备件管理员','simple-parts','Spare Parts Admin');
 
 
-
 --400探头开单
 INSERT INTO zkb_part_order_user_config("id", "config_type", "email", "name", "phone", "region", "remark", "sso", "tenant_uid", "login_name", "asset_type", "sub_config_type", "order_type") VALUES ('id20081908_2', 'OrderExtraPending', 'yu.xiao@ge.com', '肖雨', '18911860839', '', NULL, '', NULL, 'ZKB.XY', NULL, NULL, NULL);
+INSERT INTO zkb_part_order_user_config("id", "config_type", "email", "name", "phone", "region", "remark", "sso", "tenant_uid", "login_name", "asset_type", "sub_config_type", "order_type") VALUES ('ty2020092355', 'OrderExtraPending', 'ying.tian@ge.com', 'zkb-4001', '18516585569', '', NULL, '', NULL, 'zkb-4001', NULL, NULL, NULL);
+
 --400探头下单更改
 update zkb_part_order_user_config set order_type = 'Probe' where login_name = 'ZKB.PHP';
+update zkb_part_order_user_config set order_type = 'Probe' where login_name = 'zkb-4002';
