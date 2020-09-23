@@ -10,10 +10,13 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.view.asset.QrCodeLibController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -29,7 +32,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class OrgTreeController {
-
+    private static final Logger logger = LoggerFactory.getLogger(OrgTreeController.class);
     UaaService uaaService = WebUtil.getBean(UaaService.class);
     private OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
 
