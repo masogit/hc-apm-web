@@ -159,8 +159,6 @@ public class CustomConfigConstant {
             allFields.put("assetTags", WebUtil.getMessage("assetTags"));
             allFields.put("connectToInsite", WebUtil.getMessage("connectToInsite"));
             allFields.put("createdBy", WebUtil.getMessage("createdBy"));
-            allFields.put("mainDirectory", WebUtil.getMessage("mainDirectory"));
-            allFields.put("secondDirectory", WebUtil.getMessage("secondDirectory"));
             allFields.put("geDeviceType", WebUtil.getMessage("geDeviceType"));
 //        }
         return allFields;
