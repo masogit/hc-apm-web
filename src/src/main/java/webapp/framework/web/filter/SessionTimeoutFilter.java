@@ -11,11 +11,15 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+import webapp.framework.web.service.LoginService;
 
 @WebFilter(filterName = "SessionTimeoutFilter", urlPatterns = "/*")
 public class SessionTimeoutFilter implements Filter {
-
+    private static final Logger logger = LoggerFactory.getLogger(SessionTimeoutFilter.class);
     private static final String loginPage = "login.xhtml";
     private static final String reloginPage = "login.xhtml";
     private static final String phoneValidPage = "phoneValid.xhtml";
@@ -43,6 +47,7 @@ public class SessionTimeoutFilter implements Filter {
         
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        logger.info("doFilter,url={}",httpServletRequest.getRequestURI());
         if (isSessionControlRequired(httpServletRequest)) {
             if(isAJAXRequest(httpServletRequest)){
                 if(isNotLogin(httpServletRequest)){
@@ -57,10 +62,10 @@ public class SessionTimeoutFilter implements Filter {
                     httpServletResponse.sendRedirect(String.format(redirectURL, httpServletRequest.getContextPath()));
                     return;
                 }
-//                if(isNotPhoneLogin(httpServletRequest)){
-//                    httpServletResponse.sendRedirect(String.format(redirectPhoneValidURL, httpServletRequest.getContextPath()));
-//                    return;
-//                }
+                if(isNotPhoneLogin(httpServletRequest)){
+                    httpServletResponse.sendRedirect(String.format(redirectPhoneValidURL, httpServletRequest.getContextPath()));
+                    return;
+                }
 
             }
         }

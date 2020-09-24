@@ -27,6 +27,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.B64Code;
 import org.primefaces.context.RequestContext;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -35,7 +36,7 @@ import webapp.framework.web.service.LoginService;
 @ManagedBean
 @RequestScoped
 public class LoginController extends LoginService {
-
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(LoginController.class);
     public static final int ACTIVATION_ROLE = 10;
 
 	private Boolean isSuccess;
@@ -160,11 +161,12 @@ public class LoginController extends LoginService {
             WebUtil.redirectTo("/resetPassword2.xhtml");
         } else {
             String str = userContextService.getUserDefaultHomePage();
-//            boolean factorValidLogin = isPhoneValidLogin(user);
-//            if(factorValidLogin){
-//                str = "phoneValid.xhtml";
-//            }
-//            skipTelephoneValidlogin();
+            boolean factorValidLogin = isPhoneValidLogin(user);
+             if(factorValidLogin){
+                str = "phoneValid.xhtml";
+            }
+            logger.info("getUserDefaultHomePage,str={},isPhoneValidLogin={}",str,factorValidLogin);
+            skipTelephoneValidlogin();
             //System.out.println(str);
             WebUtil.redirectTo(str);
         }
