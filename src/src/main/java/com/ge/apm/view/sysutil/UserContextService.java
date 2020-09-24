@@ -187,6 +187,14 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    /**
+     * 判断当前登录是否科室级用户
+     * @return boolean
+     */
+    public static boolean isDeparmentUser() {
+        return  null == getCurrentUserAccount().getOrgType() ? false : 4 == getCurrentUserAccount().getOrgType();
+    }
+
     //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {
         return !hasAnyRole(roleList);
@@ -339,6 +347,13 @@ public class UserContextService implements Serializable {
 
             UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
             userAccount = dao.getByLoginName(userName);
+        }
+
+        if(userAccount != null){
+            OrgInfo orgInfo = WebUtil.getBean(OrgInfoRepository.class).getByUid(userAccount.getOrgInfoUID());
+            if(orgInfo != null){
+                userAccount.setOrgType(orgInfo.getOrgType());
+            }
         }
 /*
         else {
