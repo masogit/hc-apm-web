@@ -127,6 +127,8 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("RegistrationNumber")), "setRegistrationNo", true);
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("Vendor")), "setVendor", true);
 
+                assetRow.setFieldIntegerValue(trimMsgKey(WebUtil.getMessage("geDeviceType")), "setGeDeviceType");
+
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("medicalInstrumentClassification")), "setFunctionGroup", assetFunctionTypes, map, null);
                 if (asset.getFunctionGroup() != null) {
                     List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(String.valueOf(asset.getFunctionGroup()), siteId);

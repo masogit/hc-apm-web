@@ -68,7 +68,7 @@ public class CustomConfigConstant {
                 "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "status","isPm", "isChecked", "assetValueCategory", "deviceStatus",
                 "warranty", "subjectProject", "proprietaryClass", "assetTags", "UCMID", "createdDate",
-                "createdBy","mainDirectory","secondDirectory","UUID"
+                "createdBy","mainDirectory","secondDirectory","geDeviceType","UUID"
         );
     }
 
@@ -161,6 +161,7 @@ public class CustomConfigConstant {
             allFields.put("createdBy", WebUtil.getMessage("createdBy"));
             allFields.put("mainDirectory", WebUtil.getMessage("mainDirectory"));
             allFields.put("secondDirectory", WebUtil.getMessage("secondDirectory"));
+            allFields.put("geDeviceType", WebUtil.getMessage("geDeviceType"));
 //        }
         return allFields;
     }

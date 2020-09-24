@@ -363,6 +363,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
     public void applyCellDropdownIfPossible(List<String> exportFields, String currentField) {
 
+        if(null == currentField){
+            return;
+        }
         String normalizedName = getRangeName(currentField);
         Name name = workBook.getXSSFWorkbook().getName(normalizedName);
         String formulaList;
