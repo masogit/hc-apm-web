@@ -161,15 +161,10 @@ public class LoginController extends LoginService {
         } else {
             String str = userContextService.getUserDefaultHomePage();
             boolean factorValidLogin = isPhoneValidLogin(user);
-            if(factorValidLogin){
-                Logger.getLogger(LoginController.class.getName()).info("redirect to  phoneValid.xhtml");
-                WebUtil.redirectTo("/phoneValid.xhtml");
-
-            }else{
-                Logger.getLogger(LoginController.class.getName()).info("redirect to,"+str);
+            if(!factorValidLogin){
                 skipTelephoneValidlogin();
-                WebUtil.redirectTo(str);
             }
+            WebUtil.redirectTo(str);
         }
     }
     private void skipTelephoneValidlogin() {
