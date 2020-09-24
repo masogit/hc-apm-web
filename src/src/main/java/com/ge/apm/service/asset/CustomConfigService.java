@@ -153,6 +153,10 @@ public class CustomConfigService {
             exportFields.remove("mainDirectory");
             exportFields.remove("secondDirectory");
         }
+
+        if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
+            exportFields.add("geDeviceType");
+        }
         removeDisabledExportFields(exportFields);
 
         orderByExportFields(exportFields);
