@@ -37,6 +37,7 @@
         <intercept-url pattern="/portal/sr/opsreport/reportList.xhtml**"
                        access="hasAnyRole('SuperAdmin','GeOp','SiteAdmin')"/>
 
+        <intercept-url pattern="/phoneValid.xhtml" access="isAuthenticated()"/>
         <intercept-url pattern="/home.xhtml" access="isAuthenticated()"/>
         <intercept-url pattern="/api/**" access="isAuthenticated()"/>
         <intercept-url pattern="/sysadmin/**" access="hasRole('SuperAdmin')"/>
