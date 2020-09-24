@@ -187,8 +187,10 @@ public class OrgTreeController {
     public TreeNode getTenantOrgTree() {
         if (null == tenantOrgTreePage) {
             if(judgeTheUser()){
+                logger.info("===============================================TrgTreeController.getTenantOrgTree 优化逻辑");
                 tenantOrgTreePage = createTenantOrgTree46();
             }else{
+                logger.info("===============================================TrgTreeController.getTenantOrgTree 原始逻辑");
                 tenantOrgTreePage = createTenantOrgTree();
             }
         }
@@ -200,7 +202,8 @@ public class OrgTreeController {
     }
     //判断租户是否是46号租户 是返回true 否返回false
     public boolean judgeTheUser(){
-        if(siteUID.equals(tenantUid) && 46==siteId){
+        logger.info("=================================OrgTreeController.judgeTheUser parameter siteUID={},tenantUID={},siteId={}",siteUID,tenantUid,siteId);
+        if(siteUID.equals(tenantUid) || 46==siteId){
             return true;
         }else{
             return false;
