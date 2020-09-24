@@ -17,6 +17,7 @@ import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -144,7 +145,7 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("createdBy", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+//            this.updateSearchFilter(new SearchFilter("createdBy", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("requestCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
 

@@ -11,33 +11,14 @@
         <p:dialog id="qrCodeLibCreateDlg" widgetVar="qrCodeLibCreateDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.QRCodeCreate}">
             <h:form id="qrCodeLibCreateForm">
                 <h:panelGroup id="display">
-<!--                    <h:panelGroup id ="tenant">
-                                    <h:outputLabel for="siteIdSelect" value="租户 ： "  />
-                                    <p:selectOneMenu id="siteIdSelect" value="#{qrCodeLibController.tenantUID}" required="true" requiredMessage="租户院区不能为空">
-                                        <p:ajax  listener="#{qrCodeLibController.onSiteChange}" update="hospitalIdSelect" />
-                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                        <f:selectItems value="#{qrCodeLibController.tenantList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                    </p:selectOneMenu> 
-
-                        <h:outputLabel for="hospitalIdSelect" value="医院 ： " />
-                        <p:selectOneMenu id="hospitalIdSelect" value="#{qrCodeLibController.siteUID}" required="true" requiredMessage="医院不能为空" >
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
-                        </p:selectOneMenu>
-                        <br/>
-                        <br/>
-                    </h:panelGroup>-->
-
                     <h:panelGroup >
                         <p:inputText id="hospitalIdSelect" value="#{qrCodeLibController.selectedOrg.name}" readonly="true" required="true" requiredMessage="#{msg.HospitalCannotBeEmpty}"/>
                         <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
                         <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false" class="ui-selectonemenu-panel">
                             <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                <c:if test="#{orgTreeController.judgeTheUser()}">
-                                    <p:inputText id="retrieval" value="#{orgTreeController.retrieval}" style="width:150px;"/>
-                                    <p:commandButton id="retrieval3" partialSubmit="true"  process=":qrCodeLibCreateForm:retrieval @this" icon="ui-icon-search"   validateClient="true"  actionListener="#{orgTreeController.filterNode()}" value="#{msg.Search}"  update="orgTree :growl" iconPos="right"/>
-                                </c:if>
-                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userContextService.hasRole('ITAdmin')?orgTreeController.tenantOrgTree:orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
+                                <p:inputText id="retrieval" value="#{qrCodeLibController.retrieval}" style="width:150px;"/>
+                                <p:commandButton id="retrieval3" partialSubmit="true"  process=":qrCodeLibCreateForm:retrieval @this" icon="ui-icon-search"   validateClient="true"  actionListener="#{qrCodeLibController.filterNode()}" value="#{msg.Search}"  update="orgTree :growl" iconPos="right"/>
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{qrCodeLibController.tenantOrgTreePage}"  var="node" selectionMode="single" dynamic="true">
                                     <p:ajax process="@this" event="select" oncomplete="PF('varPanelOrg').hide();" listener="#{qrCodeLibController.onHospitalChange}" update=":qrCodeLibCreateForm:hospitalIdSelect"/>
                                     <p:ajax process="@this" event="expand"/>
                                     <p:ajax process="@this" event="collapse"/>
