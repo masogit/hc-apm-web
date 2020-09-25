@@ -118,11 +118,13 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         if (assetSheet == null) {
             assetSheet = workBook.createSheet(SHEET_ASSET);
         }
+        assetSheet.setDisplayGridlines(true);
 
         orgSheet = workBook.getSheet(SHEET_ORG);
         if (orgSheet == null) {
             orgSheet = workBook.createSheet(SHEET_ORG);
         }
+        orgSheet.setDisplayGridlines(true);
 
         dynamicListSheet = workBook.getSheet(SHEET_DYNAMIC_LIST_NAME);
         if (dynamicListSheet == null) {
