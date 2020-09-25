@@ -160,12 +160,10 @@ public class LoginController extends LoginService {
             WebUtil.redirectTo("/resetPassword2.xhtml");
         } else {
             String str = userContextService.getUserDefaultHomePage();
-//            boolean factorValidLogin = isPhoneValidLogin(user);
-//            if(factorValidLogin){
-//                str = "phoneValid.xhtml";
-//            }
-//            skipTelephoneValidlogin();
-            //System.out.println(str);
+            boolean factorValidLogin = isPhoneValidLogin(user);
+            if(!factorValidLogin){
+                skipTelephoneValidlogin();
+            }
             WebUtil.redirectTo(str);
         }
     }
