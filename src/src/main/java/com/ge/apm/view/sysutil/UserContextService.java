@@ -637,7 +637,7 @@ public class UserContextService implements Serializable {
     private boolean isPhoneValidLogin() {
         TenantInfoRepository tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tenantInfo = tenantInfoDao.findByuid(userAccount.getTenantUID());
-        return tenantInfo.getTwoFactorValid();
+        return tenantInfo.getTwoFactorValid()==null?false:tenantInfo.getTwoFactorValid();
     }
     public static String getAccessToken() {
         return getAccessToken(null);
