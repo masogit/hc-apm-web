@@ -38,6 +38,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = new ArrayList<>();
     private String queryStatus = "";
     private boolean showStatusBtn = true;
+    private boolean vacationBtn = false;
     private String isVacation;
 
 
@@ -69,6 +70,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 }
                 if(zkbPartOrderUserConfigList.size() == 2){
                     isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? "f" : zkbPartOrderUserConfig.getIsVacation();
+                    vacationBtn = true;
                 }
             }
         }
@@ -363,5 +365,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setIsVacation(String isVacation) {
         this.isVacation = isVacation;
+    }
+
+    public boolean isVacationBtn() {
+        return vacationBtn;
+    }
+
+    public void setVacationBtn(boolean vacationBtn) {
+        this.vacationBtn = vacationBtn;
     }
 }
