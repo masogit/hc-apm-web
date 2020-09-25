@@ -39,13 +39,33 @@
                             <h:outputText value="#{item.sso}"/>
                         </p:column>
                         <p:column headerText="区域" filterBy="#{item.region}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.region}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractRegion', item.region)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                         <p:column headerText="类型" filterBy="#{item.configType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.configType}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbPoSteps', item.configType)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoSteps')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                         <p:column headerText="资产类型" filterBy="#{item.assetType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetType}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="CS" itemValue="CS"/>
+                                    <f:selectItem itemLabel="CT" itemValue="CT"/>
+                                    <f:selectItem itemLabel="XR" itemValue="XR"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                         <p:column headerText="subConfigType" filterBy="#{item.subConfigType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.subConfigType}"/>
