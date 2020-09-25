@@ -362,37 +362,93 @@ public class OrgInfoService {
 
     public ExcelDocument exportOrg() throws IOException {
         UserAccount user = UserContextService.getCurrentUserAccount();
-
-        List<OrgInfo> orgInfoList = orgDao.getByTenantUID(user.getTenantUID());
-
-        Map<String, OrgInfo> orgInfoMap = new HashMap<>();
-
-        orgInfoList.stream().forEach(orgInfo -> { orgInfoMap.put(orgInfo.getUid(), orgInfo); });
-
-
         List<Map<String, Object>> resultList = new ArrayList<>();
-
-
-        exportOrgByParent(user.getTenantUID(), orgInfoList, orgInfoMap, resultList);
-
         InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Org_Template.xlsx");
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
         String[] columnKeys = doc.getKeyRow(0, 1);
         int startRow = 2;
+        if(46==user.getSiteId()){
+            //1.获取对应住户下的所有集团
+            List<OrgInfo> orginfoInstitutionlist = orgDao.getHospitalByTenantUIDAndType(user.getTenantUID());
+            OrgInfo parent = orgDao.getOrgInfoByUid(user.getTenantUID());
+            getPagingData1(orginfoInstitutionlist,5, parent,columnKeys,startRow,doc);
+        }else{
+            List<OrgInfo> orgInfoList = orgDao.getByTenantUID(user.getTenantUID());
 
-        //remove fake data row in template
-        doc.clearRow(startRow);
+            Map<String, OrgInfo> orgInfoMap = new HashMap<>();
 
-        for (Map<String, Object> map: resultList) {
+            orgInfoList.stream().forEach(orgInfo -> { orgInfoMap.put(orgInfo.getUid(), orgInfo); });
 
-            doc.writeRowData(0, columnKeys, startRow, map);
+            exportOrgByParent(user.getTenantUID(), orgInfoList, orgInfoMap, resultList);
 
-            ++startRow;
-
+            //remove fake data row in template
+            doc.clearRow(startRow);
+            for (Map<String, Object> map: resultList) {
+                doc.writeRowData(0, columnKeys, startRow, map);
+                ++startRow;
+            }
         }
-
         return doc;
 
+
+    }
+
+    private void getPagingData1( List<OrgInfo> orginfoInstitutionlist,int pageSize,OrgInfo parent,String[] columnKeys,int startRow,ExcelDocument doc) {
+        List<String> uids = new ArrayList();
+
+        for (int i = 0; i <orginfoInstitutionlist.size() ; i++) {
+            uids.add(orginfoInstitutionlist.get(i).getUid());//每次循环收集要查询的uid,到与pageSize一样大小的时候统一执行。
+            if(uids.size()%pageSize==0){//如果到了分页的次数就统一执行一次
+                List<Map<String, Object>> resultList2 = new ArrayList<>();
+                //2.通过集团信息向下递归出所有的子集 orginfoInstitutionlist.uid
+                List<OrgInfo> orgHospitalChildrenlist = orgDao.getHospitalChildrenByUids(uids);
+                //查询出顶级目录为了能让集团变为顶级的儿子
+                orgHospitalChildrenlist.add(parent);
+                Map<String, OrgInfo> orgInfoMap2 = new HashMap<>();
+                orgHospitalChildrenlist.stream().forEach(orgInfo -> {
+                    orgInfoMap2.put(orgInfo.getUid(), orgInfo);
+                });
+                exportOrgByParent(parent.getUid(), orgHospitalChildrenlist, orgInfoMap2, resultList2);
+                uids = new ArrayList();//为下次查询清空uids
+                for (Map<String, Object> map: resultList2) {
+                    doc.writeRowData(0, columnKeys, startRow, map);
+                    ++startRow;
+                }
+            }
+            if((i+1)==orginfoInstitutionlist.size() && orginfoInstitutionlist.size()%pageSize!=0){//如果遍历到了最后一次则把剩下的执行完毕。
+                List<Map<String, Object>> resultList2 = new ArrayList<>();
+                //2.通过集团信息向下递归出所有的子集 orginfoInstitutionlist.uid
+                List<OrgInfo> orgHospitalChildrenlist = orgDao.getHospitalChildrenByUids(uids);
+                //查询出顶级目录为了能让集团变为顶级的儿子
+                orgHospitalChildrenlist.add(parent);
+                Map<String, OrgInfo> orgInfoMap2 = new HashMap<>();
+                orgHospitalChildrenlist.stream().forEach(orgInfo -> {
+                    orgInfoMap2.put(orgInfo.getUid(), orgInfo);
+                });
+                exportOrgByParent(parent.getUid(), orgHospitalChildrenlist, orgInfoMap2, resultList2);
+                uids = new ArrayList();//为下次查询清空uids
+                for (Map<String, Object> map: resultList2) {
+                    doc.writeRowData(0, columnKeys, startRow, map);
+                    ++startRow;
+                }
+            }
+        }
+    }
+
+    private List<String> getPagingData(List<Map<String, Object>> resultList, List<OrgInfo> orginfoInstitutionlist, List<String> uids, int i,OrgInfo parent) {
+        List<Map<String, Object>> resultList2 = new ArrayList<>();
+        //2.通过集团信息向下递归出所有的子集 orginfoInstitutionlist.uid
+        List<OrgInfo> orgHospitalChildrenlist = orgDao.getHospitalChildrenByUids(uids);
+        //查询出顶级目录为了能让集团变为顶级的儿子
+        orgHospitalChildrenlist.add(parent);
+        Map<String, OrgInfo> orgInfoMap2 = new HashMap<>();
+        orgHospitalChildrenlist.stream().forEach(orgInfo -> {
+            orgInfoMap2.put(orgInfo.getUid(), orgInfo);
+        });
+        exportOrgByParent(parent.getUid(), orgHospitalChildrenlist, orgInfoMap2, resultList2);
+        resultList.addAll(resultList2);
+        uids = new ArrayList();//为下次查询清空uids
+        return uids;
     }
 
     private void exportOrgByParent(String parentUid, final List<OrgInfo> orgInfoList, final Map<String, OrgInfo> orgInfoMap, final List<Map<String, Object>> resultList ) {
@@ -499,6 +555,10 @@ public class OrgInfoService {
         List<OrgInfo> orgInfos = orgInfoMapper.listParentClinicalDeptsWithSelectedClinicalDept(currentOrg.getUid());
 
         return orgInfos.size();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Math.ceil(Double.valueOf(2000)/Double.valueOf(500)));
     }
 
 }
