@@ -221,4 +221,25 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 			"union all select k.parent_uid,cast(k.name||'/'||c.name as varchar(500)) as name " +
 			"from cte  c inner join org_info k on c.parent_uid = k.uid)select name from cte where  parent_uid is null", nativeQuery = true)
 	String listOrgInfoNamePathInHierarchyWithSlash(String uid);
+
+    //根据tenant_uid找出所有的集团
+	@Query(value = "select * from org_info where parent_uid=?1", nativeQuery = true)
+	public List<OrgInfo> getHospitalByTenantUIDAndType(String tenantUID);
+
+	@Query(value = "select * from org_info where uid=?1", nativeQuery = true)
+	public OrgInfo getOrgInfoByUid(String tenantUID);
+
+	//根据UID向下递归出所有的子集
+	@Query(value = "with recursive cte_org as (" +
+			"    select oi.*" +
+			"    from org_info oi" +
+			"    where oi.uid in (?1)" +
+			"    union" +
+			"    select oi.*" +
+			"    from org_info oi" +
+			"    join cte_org cte on oi.parent_uid = cte.uid" +
+			") select * from cte_org", nativeQuery = true)
+	public List<OrgInfo> getHospitalChildrenByUids(List<String> uids);
+
+
 }
