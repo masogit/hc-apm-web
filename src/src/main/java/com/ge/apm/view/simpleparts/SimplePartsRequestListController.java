@@ -472,7 +472,7 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
             try {
                 partsRequestLineItemService.stockInOrOutParts(partsRequestLineItem);
                 List<SimplePartsRequestLineItem> partsRequestLineItemTemps = partsRequestLineItemRepository.findByRequestCode(partsRequest.getRequestCode());
-                partsRequestLineItemTemps = partsRequestLineItemTemps.stream().filter(item -> item.getStatus() != PartsConstant.PARTS_TRANSACTIONED).collect(Collectors.toList());
+                partsRequestLineItemTemps = partsRequestLineItemTemps.stream().filter(item -> item.getStatus() != SimplePartsConstant.PARTS_TRANSACTIONED).collect(Collectors.toList());
                 if(partsRequestLineItemTemps.size() == 0){
                     RequestContext.getCurrentInstance().execute("window.location.reload()");
                 }
