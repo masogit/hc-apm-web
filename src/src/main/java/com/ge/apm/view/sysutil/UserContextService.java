@@ -187,6 +187,14 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    /**
+     * 判断当前登录是否科室级用户
+     * @return boolean
+     */
+    public static boolean isDeparmentUser() {
+        return  null == getCurrentUserAccount().getOrgType() ? false : 4 == getCurrentUserAccount().getOrgType();
+    }
+
     //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {
         return !hasAnyRole(roleList);
@@ -339,6 +347,13 @@ public class UserContextService implements Serializable {
 
             UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
             userAccount = dao.getByLoginName(userName);
+        }
+
+        if(userAccount != null){
+            OrgInfo orgInfo = WebUtil.getBean(OrgInfoRepository.class).getByUid(userAccount.getOrgInfoUID());
+            if(orgInfo != null){
+                userAccount.setOrgType(orgInfo.getOrgType());
+            }
         }
 /*
         else {
@@ -606,6 +621,9 @@ public class UserContextService implements Serializable {
         if (userAccount == null) {
             return "/login.xhtml";
         } else {
+            if(isPhoneValidLogin()){
+                return "/home.xhtml";
+            }
             if(isPartnerAccount())
                 return "/admin/uaa/siteInfo/List.xhtml";
 
@@ -616,7 +634,11 @@ public class UserContextService implements Serializable {
             return uaaService.getUserDefaultHomePage(userAccount);
         }
     }
-
+    private boolean isPhoneValidLogin() {
+        TenantInfoRepository tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(userAccount.getTenantUID());
+        return tenantInfo.getTwoFactorValid()==null?false:tenantInfo.getTwoFactorValid();
+    }
     public static String getAccessToken() {
         return getAccessToken(null);
     }

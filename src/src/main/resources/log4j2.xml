@@ -7,13 +7,13 @@
   </appenders>
 
   <loggers>
-    <root additivity="false" level="info">
+    <root additivity="false" level="DEBUG">
       <appender-ref ref="Console"/>
     </root>
     <logger name="com.demo" additivity="false" level="${log4j.level}">
       <appender-ref ref="Console"/>
     </logger>
-    <logger name="com.ge.apm.view" additivity="false" level="info">
+    <logger name="com.ge.apm" additivity="false" level="DEBUG">
       <appender-ref ref="Console"/>
     </logger>
     <logger name="com.demo.dao" additivity="false" level="warn">

@@ -43,6 +43,7 @@ public class SessionTimeoutFilter implements Filter {
         
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        System.out.println("doFilter request URI = " + httpServletRequest.getRequestURI());
         if (isSessionControlRequired(httpServletRequest)) {
             if(isAJAXRequest(httpServletRequest)){
                 if(isNotLogin(httpServletRequest)){
