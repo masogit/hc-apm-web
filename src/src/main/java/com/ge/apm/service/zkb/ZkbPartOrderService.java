@@ -97,7 +97,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         List<HashMap<String, Object>> v2_listHashMap = new ArrayList<>();
         List<SearchFilter> assetFilters = new ArrayList<>();
         //assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 1));
-        //assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
+        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
 
         if(v2_workOrder.getServiceRequest() != null && StringUtils.isNotEmpty(v2_workOrder.getServiceRequest().getSrNum())){
             assetFilters.add(new SearchFilter("serviceRequest.srNum", SearchFilter.Operator.EQ, v2_workOrder.getServiceRequest().getSrNum()));
