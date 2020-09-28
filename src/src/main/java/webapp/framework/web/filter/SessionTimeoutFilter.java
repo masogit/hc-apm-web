@@ -86,9 +86,14 @@ public class SessionTimeoutFilter implements Filter {
         return (httpServletRequest.getSession().getAttribute("SPRING_SECURITY_CONTEXT")==null);
     }
     private boolean isNotPhoneLogin(HttpServletRequest httpServletRequest) {
-        if(httpServletRequest.getSession()==null) return true;
-
-        return (httpServletRequest.getSession().getAttribute("PHONE_SMSCODE_VALID")==null);
+        //if(httpServletRequest.getSession()==null) return true;
+        HttpSession session = httpServletRequest.getSession();
+        if(session==null){
+            return false;
+        }else{
+            boolean phone_smscode_valid = session.getAttribute("PHONE_SMSCODE_VALID") == null;
+            return phone_smscode_valid;
+        }
     }
 
 
