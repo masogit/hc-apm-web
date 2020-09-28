@@ -622,7 +622,7 @@ public class UserContextService implements Serializable {
             return "/login.xhtml";
         } else {
             if(isPhoneValidLogin()){
-                return "/admin/phoneValid.xhtml";
+                return "/empty.xhtml";
             }
             if(isPartnerAccount())
                 return "/admin/uaa/siteInfo/List.xhtml";
