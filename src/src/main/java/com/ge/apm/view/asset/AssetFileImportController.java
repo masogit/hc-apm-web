@@ -198,7 +198,7 @@ public class AssetFileImportController {
             AssetFileImportCache assetFileImportCache = new AssetFileImportCache(importAssetMap, selectedOrg, assetFileImportCacheService);
 
             //streamingService.importAssetData(importAssetMap, autoGenerateQrcode, orgNamesUriCache);
-            importUseCacheService.importAssetData(selectedOrg, importAssetMap, autoGenerateQrcode, orgNamesUriCache, assetFileImportCache);
+            importUseCacheService.importAssetData(crossSite, selectedOrg, importAssetMap, autoGenerateQrcode, orgNamesUriCache, assetFileImportCache);
             isImported = true;
 
             filterErrorRecords();
