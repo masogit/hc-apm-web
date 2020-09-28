@@ -100,7 +100,45 @@
 </h:head>
 
 <h:body styleClass="login-body">
-   this is test payge!!!
+    <h:form>
+        <p:growl id="growl"/>
+        <p:focus/>
+        <p:graphicImage name="images/ge_logo.svg" library="ultima-layout" class="logo_image"/>
+        <div class="card login-panel ui-fluid">
+            <div class="ui-g">
+                <div class="ui-g-12" style="padding: 0px; margin: 0px;">
+                    <center>
+                        <label style="color: white;"><h1>GE APM</h1></label>
+                    </center>
+                </div>
+                <div class="ui-g-12" style="padding: 0px; margin: 0px;">
+                    <div class="ui-g-8">
+                        <p:inputText id="j_mobile" required="true" value="#{loginTelValidController.telephone}" requiredMessage="#{msg.telephone}: #{msg.ValidationRequire}" placeholder="手机号"/>
+                    </div>
+                </div>
+                <div class="ui-g-12" style="padding: 0px; margin: 0px;">
+                    <div class="ui-g-8">
+                        <p:inputText id="j_msmcode" requiredMessage="#{msg.msmcode}: #{msg.ValidationRequire}" placeholder="验证码"/>
+                    </div>
+                    <div class="ui-g-4" >
+                        <p:commandButton onclick="handleUpdateFormValue();"
+                                         onerror="handleLoginError(xhr, status);"
+                                         onsuccess="handleSuccess(data, status, xhr)"
+                                         styleClass="secondary"
+                                         validateClient="true"
+                                         actionListener="#{loginTelValidController.sendMsMCode()}"
+                                         value="获取验证码"
+                                         update="growl" oncomplete="handleComplete();" style="font-size:10px;margin-bottom: 0px"/>
+                    </div>
+                </div>
+                <div class="ui-g-12" style="margin-bottom: 0px;">
+                    <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginTelValidController.doLogin()}" value="#{msg.login}" update="growl" oncomplete="handleComplete();"/>
+                </div>
+            </div>
+        </div>
+
+    </h:form>
+
 </h:body>
 
 </html>
