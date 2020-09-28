@@ -18,7 +18,7 @@ public class SessionTimeoutFilter implements Filter {
 
     private static final String loginPage = "login.xhtml";
     private static final String reloginPage = "login.xhtml";
-    private static final String phoneValidPage = "valid/phoneValid.xhtml";
+    private static final String phoneValidPage = "admin/phoneValid.xhtml";
     private static final String redirectURL ="%s/" + loginPage + "?session_expired=1";
     private static final String redirectXML = "<?xml version='1.0' encoding='UTF-8'?>" 
                 + "<partial-response>" 
