@@ -162,6 +162,7 @@ public class LoginController extends LoginService {
             String str = userContextService.getUserDefaultHomePage();
             boolean factorValidLogin = isPhoneValidLogin(user);
             if(!factorValidLogin){
+
                 skipTelephoneValidlogin();
             }
             WebUtil.redirectTo(str);

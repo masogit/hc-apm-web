@@ -37,7 +37,6 @@ public class LoginTelValidController {
     @PostConstruct
     private void init() {
         msUtil = WebUtil.getBean(MicroServiceUtil.class);
-
         userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.processAfterLogin();
         UserAccount user = userContextService.getLoginUser();
@@ -47,24 +46,28 @@ public class LoginTelValidController {
 
     public void sendMsMCode(){
         logger.info("发送短信验证码");
-        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
-        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+        try{
+            ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+            HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
 
-        String mobile = request.getParameter("j_mobile");
-        Map<String,String> map = msUtil.getMsMCode(mobile);
-        if(map==null){
-            Boolean isSuccess = msUtil.sendMsMCode(mobile);
-            if(isSuccess){
-                WebUtil.addSuccessMessage("验证码已发送,请查收短信");
+            String mobile = request.getParameter("j_mobile");
+            Map<String,String> map = msUtil.getMsMCode(mobile);
+            if(map==null){
+                Boolean isSuccess = msUtil.sendMsMCode(mobile);
+                if(isSuccess){
+                    WebUtil.addSuccessMessage("验证码已发送,请查收短信");
+                }else {
+                    WebUtil.addErrorMessage("验证码发送失败,请稍后重试");
+                }
+
             }else {
-                WebUtil.addErrorMessage("验证码发送失败,请稍后重试");
+                String expire = map.get("expire");
+                WebUtil.addSuccessMessage("验证码已发送,请查收短信."+expire+"分钟后可以重新发送");
             }
-
-        }else {
-            String expire = map.get("expire");
-            WebUtil.addSuccessMessage("验证码已发送,请查收短信."+expire+"分钟后可以重新发送");
+        }catch (Exception e){
+            e.printStackTrace();
+            WebUtil.addErrorMessage("ss验证码发送失败,请稍后重试");
         }
-
     }
     public void doLogin(){
 

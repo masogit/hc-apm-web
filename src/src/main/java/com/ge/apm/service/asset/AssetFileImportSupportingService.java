@@ -472,7 +472,7 @@ public class AssetFileImportSupportingService {
     public SiteOrgWithDeptOrg findSiteOrgInAssetExcelRow(Map<String, ExcelDocument.ValueWrapper> rowMap, Map<String, OrgInfo> orgNamesUriCache) {
         String institution = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("Institution")));
         String hospital = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("Hospital")));
-        String site = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("Site")));
+        String site = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("hospitalId")));
         String clinicalDept = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("clinicalDeptId")));
         String assetDept = ExcelDocument.getCellStringValue(rowMap.get(WebUtil.getMessage("assetDeptId")));
 
