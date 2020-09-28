@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:insert name="preRenderView"/>
+<h:head>
+    <f:facet name="first">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#{guestPreferences.themeColors[guestPreferences.theme]}" />
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>
+    </f:facet>
+    <ui:include src="../commonHead.xhtml"/>
+    <title>GE APM</title>
+    <link rel="stylesheet" type="text/css" href="#{request.contextPath}/resources/css/shell2.css" />
+    <h:outputScript name="js/layout.js" library="ultima-layout"/>
+    <h:outputScript name="js/ripple.js" library="ultima-layout"/>
+    <h:outputScript name="js/swipe.js" library="ultima-layout"/>
+    <h:outputScript name="js/primefaces-locale_zh.js"/>
+
+    <h:outputStylesheet name="css/main3.css"/>
+    <h:outputScript name="js/main.js"/>
+    <ui:insert name="head"/>
+    <style type="text/css">
+        html{
+            background-color: transparent;
+            margin:0px;
+            height: 100%;
+        }
+        .login-body {
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            background-image: url("#{resource['ultima-layout:images/login/login.jpg']}");
+            background-repeat: no-repeat;
+            background-position: top right;
+            background-attachment: fixed;
+        }
+        .login-panel{
+            min-height: 200px!important;
+            float: left;
+            position: absolute;
+            top: 18%;
+            left: 50%;
+            width: 350px;
+            margin-top:0px;
+            padding-bottom: 0px;
+            padding-top: 20px!important;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .logo_image{
+            z-index: 10000;
+            float: left;
+            top:5%;
+            position: absolute;
+        }
+        .ui-g-12> .ui-widget, .fa{
+            color: white;
+        }
+        .ui-g-8> .ui-widget, .fa{
+            color: white;
+        }
+        .card{
+            margin-left: -175px!important;
+            margin-right: 0px!important;
+        }
+        .bottom-ctner{
+            width:98%;
+            position: absolute;
+            z-index: 3;
+            bottom: 12px;
+            left: 0;
+            color: #fff;
+        }
+        .top-ctner{
+            display:none;
+            width:100%;
+            position: absolute;
+            z-index: 4;
+            left: 0;
+            padding-top: 14px;
+            color: #735C0F;
+            background-color: #FFFBDD;
+            font-size: 16px;
+        }
+        .ui-growl > .ui-growl-item-container {
+            background-color: #5180ce!important;
+        }
+        #ajaxStatus{
+            padding:0px;
+            background-color:#121212;
+        }
+    </style>
+</h:head>
+
+<h:body styleClass="login-body">
+   this is test payge!!!
+</h:body>
+
+</html>

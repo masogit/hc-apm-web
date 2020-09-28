@@ -17,7 +17,7 @@
     <http pattern="/login.faces*" security="none"/>
     <http pattern="/error/*" security="none"/>
     <http pattern="/about.html" security="none"/>
-    <http pattern="/valid/phoneValid.xhtml" security="none"/>
+    <http pattern="/admin/phoneValid.xhtml" security="none"/>
 
     <beans:bean name="logoutHandler" class="com.ge.apm.view.sysutil.LogoutHandler"
                 p:logoutSuccessUrl="/login.xhtml"/>
