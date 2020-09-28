@@ -148,9 +148,6 @@ public class CustomConfigService {
     public List<String> getLocalizedExportableAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
         List<String> exportFields = getExportAssetFieldsByRoles(config, userRoles);
 
-        if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
-            exportFields.add("geDeviceType");
-        }
         removeDisabledExportFields(exportFields);
 
         orderByExportFields(exportFields);
@@ -164,6 +161,9 @@ public class CustomConfigService {
         if (zkbAccountBoolean){
             localizedExportFields.add(WebUtil.getMessage("mainDirectory"));
             localizedExportFields.add(WebUtil.getMessage("secondDirectory"));
+        }
+        if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
+            localizedExportFields.add(WebUtil.getMessage("geDeviceType"));
         }
         localizedExportFields.add("UUID");
 
