@@ -18,7 +18,7 @@ public class SessionTimeoutFilter implements Filter {
 
     private static final String loginPage = "login.xhtml";
     private static final String reloginPage = "login.xhtml";
-    private static final String phoneValidPage = "phoneValid.xhtml";
+    private static final String phoneValidPage = "portal/login/phoneValid.xhtml";
     private static final String redirectURL ="%s/" + loginPage + "?session_expired=1";
     private static final String redirectXML = "<?xml version='1.0' encoding='UTF-8'?>" 
                 + "<partial-response>" 
@@ -58,10 +58,11 @@ public class SessionTimeoutFilter implements Filter {
                     httpServletResponse.sendRedirect(String.format(redirectURL, httpServletRequest.getContextPath()));
                     return;
                 }
-//                if(isNotPhoneLogin(httpServletRequest)){
-//                    httpServletResponse.sendRedirect(String.format(redirectPhoneValidURL, httpServletRequest.getContextPath()));
-//                    return;
-//                }
+                if(isNotPhoneLogin(httpServletRequest)){
+                    System.out.println("isNotPhoneLogin true" );
+                    httpServletResponse.sendRedirect(String.format(redirectPhoneValidURL, httpServletRequest.getContextPath()));
+                    return;
+                }
 
             }
         }
