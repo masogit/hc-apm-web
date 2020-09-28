@@ -621,9 +621,9 @@ public class UserContextService implements Serializable {
         if (userAccount == null) {
             return "/login.xhtml";
         } else {
-            if(isPhoneValidLogin()){
-                return "/portal/login/phoneValid.xhtml";
-            }
+//            if(isPhoneValidLogin()){
+//                return "/portal/login/phoneValid.xhtml";
+//            }
             if(isPartnerAccount())
                 return "/admin/uaa/siteInfo/List.xhtml";
 

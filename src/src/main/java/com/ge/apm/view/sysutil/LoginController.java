@@ -163,6 +163,8 @@ public class LoginController extends LoginService {
             boolean factorValidLogin = isPhoneValidLogin(user);
             if(!factorValidLogin){
                 skipTelephoneValidlogin();
+            }else {
+               str = "/portal/login/phoneValid.xhtml";
             }
             WebUtil.redirectTo(str);
         }
