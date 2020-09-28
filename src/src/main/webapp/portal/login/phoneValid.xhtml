@@ -118,7 +118,7 @@
                 </div>
                 <div class="ui-g-12" style="padding: 0px; margin: 0px;">
                     <div class="ui-g-8">
-                        <p:inputText id="j_msmcode" requiredMessage="#{msg.msmcode}: #{msg.ValidationRequire}" placeholder="验证码"/>
+                        <p:inputText id="j_msmcode" value="#{loginTelValidController.msmcode}" requiredMessage="#{msg.msmcode}: #{msg.ValidationRequire}" placeholder="验证码"/>
                     </div>
                     <div class="ui-g-4" >
                         <p:commandButton onclick="handleUpdateFormValue();"
