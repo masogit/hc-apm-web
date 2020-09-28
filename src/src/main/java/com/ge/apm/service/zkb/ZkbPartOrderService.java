@@ -18,6 +18,7 @@ import org.springframework.web.client.RestClientException;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -96,7 +97,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         List<HashMap<String, Object>> v2_listHashMap = new ArrayList<>();
         List<SearchFilter> assetFilters = new ArrayList<>();
         //assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 1));
-        //assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
+        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
 
         if(v2_workOrder.getServiceRequest() != null && StringUtils.isNotEmpty(v2_workOrder.getServiceRequest().getSrNum())){
             assetFilters.add(new SearchFilter("serviceRequest.srNum", SearchFilter.Operator.EQ, v2_workOrder.getServiceRequest().getSrNum()));
@@ -814,8 +815,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return zkbPartOrderItems;
     }
 
-    public List<ZkbPartOrderCat> queryPartOrderCat(){
-        return zkbPartOrderCatRepository.find();
+    public List<ZkbPartOrderCat> queryPartOrderCat(Date contractDate){
+        return zkbPartOrderCatRepository.queryByDate(contractDate,contractDate);
         //return zkbPartOrderCatRepository.findByValueTypeIsNot(ZkbPartOrderCat.ValueType.HighValue.toString());
     }
 
