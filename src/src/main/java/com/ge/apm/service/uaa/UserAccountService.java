@@ -343,6 +343,7 @@ public class UserAccountService {
 
     @Transactional
     public void deleteUserAccount(UserAccount userAccount){
+		userOrgDao.deleteByUserUid(userAccount.getUid());
         userRoleRepository.deleteByUserAccount(userAccount.getId());
         userAccountRepository.delete(userAccount);
     }
