@@ -1,9 +1,11 @@
 package com.ge.apm.domain;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author : 503189362
@@ -45,6 +47,44 @@ public class ZkbPartOrderCat implements Serializable {
 
     @Column(name = "price")
     private String price;
+
+    @Column(name = "is_vaild")
+    private String isVaild = "Y"; // Y  N
+
+
+    @Temporal(TemporalType.DATE)//生成yyyy-MM-dd类型的日期
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "start_date")
+    private Date startDate;
+
+    @Temporal(TemporalType.DATE)//生成yyyy-MM-dd类型的日期
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "end_date")
+    private Date endDate;
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getIsVaild() {
+        return isVaild;
+    }
+
+    public void setIsVaild(String isVaild) {
+        this.isVaild = isVaild;
+    }
 
     public String getId() {
         return id;
