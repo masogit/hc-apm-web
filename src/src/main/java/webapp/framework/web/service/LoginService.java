@@ -341,6 +341,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
                     sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
             }
             catch(Exception ex){
+                ex.printStackTrace();
             }
 
             // below : do the same thing as in
