@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.slf4j.Logger;
@@ -470,6 +471,11 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
             //备件出入库
             try {
                 partsRequestLineItemService.stockInOrOutParts(partsRequestLineItem);
+                List<SimplePartsRequestLineItem> partsRequestLineItemTemps = partsRequestLineItemRepository.findByRequestCode(partsRequest.getRequestCode());
+                partsRequestLineItemTemps = partsRequestLineItemTemps.stream().filter(item -> item.getStatus() != SimplePartsConstant.PARTS_TRANSACTIONED).collect(Collectors.toList());
+                if(partsRequestLineItemTemps.size() == 0){
+                    RequestContext.getCurrentInstance().execute("window.location.reload()");
+                }
             }catch (SimplePartsInventoryNotEnoughException e){
                 logger.error("仓库库存不足或故障!",e);
                 WebUtil.addWarnMessage("仓库库存不足或故障");
