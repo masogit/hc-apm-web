@@ -51,6 +51,7 @@ public class LoginTelValidController {
             HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
 
             String mobile = request.getParameter("j_mobile");
+            logger.info("sendMsMCode,mobile={}",mobile);
             Map<String,String> map = msUtil.getMsMCode(mobile);
             if(map==null){
                 Boolean isSuccess = msUtil.sendMsMCode(mobile);
@@ -79,6 +80,7 @@ public class LoginTelValidController {
         String mobile = request.getParameter("j_mobile");
         //String passwordPlain = request.getParameter("j_password");
         String msmCode = request.getParameter("j_msmcode");
+        logger.info("phone login: mobile={},mdmCode={}",mobile,msmCode);
         if(StringUtils.isEmpty(mobile)){
             WebUtil.addErrorMessage("手机号不能为空");
             return;
