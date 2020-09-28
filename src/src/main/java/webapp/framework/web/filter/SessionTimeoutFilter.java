@@ -59,6 +59,7 @@ public class SessionTimeoutFilter implements Filter {
                     return;
                 }
                 if(isNotPhoneLogin(httpServletRequest)){
+                    System.out.println("isNotPhoneLogin true" );
                     httpServletResponse.sendRedirect(String.format(redirectPhoneValidURL, httpServletRequest.getContextPath()));
                     return;
                 }
