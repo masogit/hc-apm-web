@@ -66,7 +66,7 @@ public class LoginTelValidController {
             }
         }catch (Exception e){
             e.printStackTrace();
-            WebUtil.addErrorMessage("ss验证码发送失败,请稍后重试");
+            WebUtil.addErrorMessage("验证码发送失败,请稍后重试");
         }
     }
     public void doLogin(){
