@@ -1,233 +1,144 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<f:view xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:h="http://xmlns.jcp.org/jsf/html"
-        xmlns:f="http://xmlns.jcp.org/jsf/core"
-        xmlns:p="http://primefaces.org/ui"
-        xmlns:ui="http://java.sun.com/jsf/facelets"
-        contentType="text/html"
-        encoding="UTF-8"
-        transient="true">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
 
-    <html>
-    <h:head>
-        <f:facet name="first">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-            <meta name="apple-mobile-web-app-capable" content="yes" />
-        </f:facet>
-        <ui:include src="../commonHead.xhtml"/>
-        <ui:include src="../authorization2.xhtml"/>
-        <!--<ui:include src="authorization.xhtml"/>-->
-        <title>GE APM</title>
-        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/resources/css/shell2.css" />
+<ui:insert name="preRenderView"/>
+<h:head>
+    <f:facet name="first">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#{guestPreferences.themeColors[guestPreferences.theme]}" />
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>
+    </f:facet>
+    <ui:include src="../../commonHead.xhtml"/>
+    <title>GE APM</title>
+    <link rel="stylesheet" type="text/css" href="#{request.contextPath}/resources/css/shell2.css" />
+    <h:outputScript name="js/layout.js" library="ultima-layout"/>
+    <h:outputScript name="js/ripple.js" library="ultima-layout"/>
+    <h:outputScript name="js/swipe.js" library="ultima-layout"/>
+    <h:outputScript name="js/primefaces-locale_zh.js"/>
 
-        <h:outputStylesheet name="css/main2.css" />
-        <h:outputScript name="js/ripple.js" library="ultima-layout" />
-        <h:outputScript name="js/layout.js" library="ultima-layout" />
-        <script type="text/javascript" src="../resources/js/main.js"></script>
-        <f:metadata>
-            <f:viewParam name="session_expired" value="#{loginController.sessionExpired}" />
-        </f:metadata>
-        <script type="text/javascript">
-            window.onload = function(){
-                var token = "#{userContextService.getSystemInMaintainConfig()}";
-                var now = new Date();
-                var startDate = new Date();
-                startDate.setFullYear(2020, 04, 25);
-                startDate.setHours(0, 0, 0);
-                var endDate = new Date();
-                endDate.setFullYear(2020, 04, 31);
-                endDate.setHours(23, 59, 59);
-                if (now >= startDate &amp;&amp; now &lt;= endDate) {
-                    document.getElementById("updateNotice").style.display="inline";
-                }
-            }
-        </script>
-        <style type="text/css">
-            html{
-                background-color: transparent;
-                margin:0px;
-                height: 100%;
-            }
-            .login-body {
-                -webkit-background-size: cover;
-                -moz-background-size: cover;
-                -o-background-size: cover;
-                background-size: cover;
-                background-image: url("#{resource['ultima-layout:images/login/login.jpg']}");
-                background-repeat: no-repeat;
-                background-position: top right;
-                background-attachment: fixed;
-            }
-            .login-panel{
-                min-height: 200px!important;
-                float: left;
-                position: absolute;
-                top: 18%;
-                left: 50%;
-                width: 350px;
-                margin-top:0px;
-                padding-bottom: 0px;
-                padding-top: 20px!important;
-                background-color: rgba(0, 0, 0, 0.7);
-            }
-            .logo_image{
-                z-index: 10000;
-                float: left;
-                top:5%;
-                position: absolute;
-            }
-            .ui-g-12> .ui-widget, .fa{
-                color: white;
-            }
-            .ui-g-8> .ui-widget, .fa{
-                color: white;
-            }
-            .card{
-                margin-left: -175px!important;
-                margin-right: 0px!important;
-            }
-            .bottom-ctner{
-                width:98%;
-                position: absolute;
-                z-index: 3;
-                bottom: 12px;
-                left: 0;
-                color: #fff;
-            }
-            .top-ctner{
-                display:none;
-                width:100%;
-                position: absolute;
-                z-index: 4;
-                left: 0;
-                padding-top: 14px;
-                color: #735C0F;
-                background-color: #FFFBDD;
-                font-size: 16px;
-            }
-            .ui-growl > .ui-growl-item-container {
-                background-color: #5180ce!important;
-            }
-            #ajaxStatus{
-                padding:0px;
-                background-color:#121212;
-            }
-        </style>
-        <script type="text/javascript" src="../resources/bower_components/lscache/lscache.js"></script>
-        <h:outputScript>
+    <h:outputStylesheet name="css/main3.css"/>
+    <h:outputScript name="js/main.js"/>
+    <ui:insert name="head"/>
+    <style type="text/css">
+        html{
+            background-color: transparent;
+            margin:0px;
+            height: 100%;
+        }
+        .login-body {
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            background-image: url("#{resource['ultima-layout:images/login/login.jpg']}");
+            background-repeat: no-repeat;
+            background-position: top right;
+            background-attachment: fixed;
+        }
+        .login-panel{
+            min-height: 200px!important;
+            float: left;
+            position: absolute;
+            top: 18%;
+            left: 50%;
+            width: 350px;
+            margin-top:0px;
+            padding-bottom: 0px;
+            padding-top: 20px!important;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .logo_image{
+            z-index: 10000;
+            float: left;
+            top:5%;
+            position: absolute;
+        }
+        .ui-g-12> .ui-widget, .fa{
+            color: white;
+        }
+        .ui-g-8> .ui-widget, .fa{
+            color: white;
+        }
+        .card{
+            margin-left: -175px!important;
+            margin-right: 0px!important;
+        }
+        .bottom-ctner{
+            width:98%;
+            position: absolute;
+            z-index: 3;
+            bottom: 12px;
+            left: 0;
+            color: #fff;
+        }
+        .top-ctner{
+            display:none;
+            width:100%;
+            position: absolute;
+            z-index: 4;
+            left: 0;
+            padding-top: 14px;
+            color: #735C0F;
+            background-color: #FFFBDD;
+            font-size: 16px;
+        }
+        .ui-growl > .ui-growl-item-container {
+            background-color: #5180ce!important;
+        }
+        #ajaxStatus{
+            padding:0px;
+            background-color:#121212;
+        }
+    </style>
+</h:head>
 
-            var __encode =_0xb483=["ge","ge"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(window);var __Ox4402c=["\x76\x61\x6C\x75\x65","\x6A\x5F\x70\x61\x73\x73\x77\x6F\x72\x64","\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64"];function handleUpdateFormValue(){var _0x2864x2=document[__Ox4402c[0x2]](__Ox4402c[0x1])[__Ox4402c[0x0]];document[__Ox4402c[0x2]](__Ox4402c[0x1])[__Ox4402c[0x0]]= encryptAES(_0x2864x2)}
-            var __encode =_0xb483=["ge","ge"];(function(_0xd642x1){_0xd642x1[_0xb483[0]]= _0xb483[1]})(window);var __Ox44034=["\x76\x61\x6C\x75\x65","\x70\x61\x73\x73\x77\x6F\x72\x64\x31","\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64","\x70\x61\x73\x73\x77\x6F\x72\x64\x32"];function updatePwd_r(){var _0xfca9x2=document[__Ox44034[0x2]](__Ox44034[0x1])[__Ox44034[0x0]];var _0xfca9x3=document[__Ox44034[0x2]](__Ox44034[0x3])[__Ox44034[0x0]];document[__Ox44034[0x2]](__Ox44034[0x1])[__Ox44034[0x0]]= encryptAES(_0xfca9x2);document[__Ox44034[0x2]](__Ox44034[0x3])[__Ox44034[0x0]]= encryptAES(_0xfca9x3)}
-
-            function handleComplete() {
-                console.info("handleComplete");
-                document.getElementById("j_msmcode").value = "";
-                document.getElementById("j_msmcode").html = "";
-
-            }
-            // clear local storage when logged out
-            var match = location.search.match(/uid=(\d+)/);
-            if(match) {
-                lscache.setBucket(+match[1]);
-                // only removes cache entries for this logged out user
-                lscache.flush();
-            }
-
-            function handleLoginError(xhr, status, exception) {
-                console.info("handleLoginError");
-                if(xhr.status===401){
-                    PF("dlgLoginError").show();
-                }
-
-                if(xhr.status===403){
-                    PF("dlgAccountLocked").show();
-                }
-            }
-
-            function handleSuccess(data, status, xhr) {
-                console.info("handleSuccess");
-                if(xhr.status===205){
-                    document.getElementById("hiddenPwd").value = document.getElementById("j_msmcode").value;
-                    document.getElementById("hiddenUname").value = document.getElementById("j_mobile").value;
-
-                    PF("dlgResetPassword").show();
-                }
-            }
-
-        </h:outputScript>
-    </h:head>
-
-    <h:body styleClass="login-body">
-        <div id="updateNotice" class="top-ctner">
-            <table align="center"><tr><td>APM 定于北京时间5月30日中午12点至5月31日晚间24点进行系统日常维护，维护期间系统PC端与手机端将无法访问，请提前做好相关准备通知工作&nbsp;</td></tr></table>
-        </div>
-        <h:outputStylesheet name="css/ripple.css" library="ultima-layout" />
-        <h:outputStylesheet name="css/layout-#{guestPreferences.theme}.css" library="ultima-layout" />
-
-        <h:form prependId="false">
-
-            <p:focus/>
-            <p:graphicImage name="images/ge_logo.svg" library="ultima-layout" class="logo_image"/>
-            <div class="card login-panel ui-fluid">
-                <div class="ui-g">
-                    <div class="ui-g-12" style="padding: 0px; margin: 0px;">
-                        <center>
-                            <label style="color: white;"><h1>GE APM</h1></label>
-                        </center>
-                    </div>
-                    <div class="ui-g-12" style="padding: 0px; margin: 0px;">
-                        <div class="ui-g-8">
-                            <p:inputText id="j_mobile" required="true" value="#{loginTelValidController.telephone}" requiredMessage="#{msg.telephone}: #{msg.ValidationRequire}" placeholder="手机号"/>
-                        </div>
-                    </div>
-                    <div class="ui-g-12" style="padding: 0px; margin: 0px;">
-                        <div class="ui-g-8">
-                            <p:inputText id="j_msmcode" requiredMessage="#{msg.msmcode}: #{msg.ValidationRequire}" placeholder="验证码"/>
-                        </div>
-                        <div class="ui-g-4" >
-                            <p:commandButton onclick="handleUpdateFormValue();"
-                                             onerror="handleLoginError(xhr, status);"
-                                             onsuccess="handleSuccess(data, status, xhr)"
-                                             styleClass="secondary"
-                                             validateClient="true"
-                                             actionListener="#{loginTelValidController.sendMsMCode()}"
-                                             value="获取验证码"
-                                             update="growl" oncomplete="handleComplete();" style="font-size:10px;margin-bottom: 0px"/>
-                        </div>
-                    </div>
-                    <div class="ui-g-12" style="margin-bottom: 0px;">
-                        <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginTelValidController.doLogin()}" value="#{msg.login}" update="growl" oncomplete="handleComplete();"/>
+<h:body styleClass="login-body">
+    <h:form>
+        <p:growl id="growl"/>
+        <p:focus/>
+        <p:graphicImage name="images/ge_logo.svg" library="ultima-layout" class="logo_image"/>
+        <div class="card login-panel ui-fluid">
+            <div class="ui-g">
+                <div class="ui-g-12" style="padding: 0px; margin: 0px;">
+                    <center>
+                        <label style="color: white;"><h1>GE APM</h1></label>
+                    </center>
+                </div>
+                <div class="ui-g-12" style="padding: 0px; margin: 0px;">
+                    <div class="ui-g-8">
+                        <p:inputText id="j_mobile" required="true" value="#{loginTelValidController.telephone}" requiredMessage="#{msg.telephone}: #{msg.ValidationRequire}" placeholder="手机号"/>
                     </div>
                 </div>
+                <div class="ui-g-12" style="padding: 0px; margin: 0px;">
+                    <div class="ui-g-8">
+                        <p:inputText id="j_msmcode" requiredMessage="#{msg.msmcode}: #{msg.ValidationRequire}" placeholder="验证码"/>
+                    </div>
+                    <div class="ui-g-4" >
+                        <p:commandButton onclick="handleUpdateFormValue();"
+                                         onerror="handleLoginError(xhr, status);"
+                                         onsuccess="handleSuccess(data, status, xhr)"
+                                         styleClass="secondary"
+                                         validateClient="true"
+                                         actionListener="#{loginTelValidController.sendMsMCode()}"
+                                         value="获取验证码"
+                                         update="growl" oncomplete="handleComplete();" style="font-size:10px;margin-bottom: 0px"/>
+                    </div>
+                </div>
+                <div class="ui-g-12" style="margin-bottom: 0px;">
+                    <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginTelValidController.doLogin()}" value="#{msg.login}" update="growl" oncomplete="handleComplete();"/>
+                </div>
             </div>
-
-        </h:form>
-        <p:ajaxStatus onstart="PF('statusDialog').show()" oncomplete="PF('statusDialog').hide()" />
-        <p:dialog id="ajaxStatus" widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false" style="border:0">
-            <p:graphicImage name="/img/ajaxloader2.gif"  height="60" width="60"  />
-        </p:dialog>
-        <p:growl id="growl"/>
-
-        <p:dialog modal="true" widgetVar="dlgLoginError" header="登录失败" appendTo="@(body)">
-            <i class="ui-icon ui-icon-error"></i>&nbsp;&nbsp;
-            <h:outputText value="用户名或密码错误。请重新输入用户名和密码！"/>
-            <br/><br/>
-            <p:commandButton value="#{msg.Confirm}" onclick="PF('dlgLoginError').hide()"/>
-        </p:dialog>
-
-        <p:dialog modal="true" widgetVar="dlgAccountLocked" header="登录失败" appendTo="@(body)">
-            <i class="ui-icon ui-icon-error"></i>&nbsp;&nbsp;
-            <h:outputText value="帐号被锁定，请24小时后再试！"/>
-            <br/><br/>
-            <p:commandButton value="#{msg.Confirm}" type="button" onclick="PF('dlgAccountLocked').hide()"/>
-        </p:dialog>
-
-        <div id="bottom_container" class="bottom-ctner">
-            <table align="right"><tr><td>ICP证号: 沪ICP备05002432号</td></tr></table>
         </div>
-    </h:body>
-    </html>
-</f:view>
+
+    </h:form>
+
+</h:body>
+
+</html>
