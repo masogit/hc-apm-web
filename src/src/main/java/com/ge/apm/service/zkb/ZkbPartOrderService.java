@@ -18,6 +18,7 @@ import org.springframework.web.client.RestClientException;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -814,8 +815,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return zkbPartOrderItems;
     }
 
-    public List<ZkbPartOrderCat> queryPartOrderCat(){
-        return zkbPartOrderCatRepository.find();
+    public List<ZkbPartOrderCat> queryPartOrderCat(Date contractDate){
+        return zkbPartOrderCatRepository.queryByDate(contractDate,contractDate);
         //return zkbPartOrderCatRepository.findByValueTypeIsNot(ZkbPartOrderCat.ValueType.HighValue.toString());
     }
 

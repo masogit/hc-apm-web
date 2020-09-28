@@ -99,8 +99,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 v2_listHashMap.add(mm);
             }
             v2_blobObjectList = m.get("v2_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_blobObjectList");
+            initZknPartCat(c.getStartDate());
         }
-        initZknPartCat();
+
     }
 
     public void getQueryWorkFlowList(){
@@ -253,6 +254,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending","CS");
             }
             selected.setRegion(zkbContract.getRegion());
+            initZknPartCat(zkbContract.getStartDate());
         }
         calcRemainQty();
 
@@ -479,8 +481,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         calcRemainQty();
     }
 
-    public void initZknPartCat(){
-        zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat();
+    public void initZknPartCat(Date contractDate){
+        zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat(contractDate);
     }
     public List<ZkbPartOrderCat> autoCompleteCat(String query){
         List<ZkbPartOrderCat> res = zkbPartOrderCatList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getCatModel().contains(query)).collect(Collectors.toList());
