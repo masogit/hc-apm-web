@@ -25,6 +25,7 @@ public class LoginTelValidController {
     private UserContextService userContextService;
     private MicroServiceUtil msUtil;
     private String telephone;
+    private String msmcode;
 
     public String getTelephone() {
         return telephone;
@@ -32,6 +33,14 @@ public class LoginTelValidController {
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    public String getMsmcode() {
+        return msmcode;
+    }
+
+    public void setMsmcode(String msmcode) {
+        this.msmcode = msmcode;
     }
 
     @PostConstruct
@@ -43,17 +52,16 @@ public class LoginTelValidController {
 
         telephone = user.getTelephone();
     }
-
     public void sendMsMCode(){
         logger.info("发送短信验证码");
         try{
             ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
             HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
 
-            String mobile = request.getParameter("j_mobile");
-            Map<String,String> map = msUtil.getMsMCode(mobile);
+            logger.info("sendMsMCode,telephone={}",telephone);
+            Map<String,String> map = msUtil.getMsMCode(telephone);
             if(map==null){
-                Boolean isSuccess = msUtil.sendMsMCode(mobile);
+                Boolean isSuccess = msUtil.sendMsMCode(telephone);
                 if(isSuccess){
                     WebUtil.addSuccessMessage("验证码已发送,请查收短信");
                 }else {
@@ -66,7 +74,7 @@ public class LoginTelValidController {
             }
         }catch (Exception e){
             e.printStackTrace();
-            WebUtil.addErrorMessage("ss验证码发送失败,请稍后重试");
+            WebUtil.addErrorMessage("验证码发送失败,请稍后重试");
         }
     }
     public void doLogin(){
@@ -76,25 +84,23 @@ public class LoginTelValidController {
         HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
         HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
 
-        String mobile = request.getParameter("j_mobile");
-        //String passwordPlain = request.getParameter("j_password");
-        String msmCode = request.getParameter("j_msmcode");
-        if(StringUtils.isEmpty(mobile)){
+        logger.info("phone login: telephone={},mdmCode={}",telephone,msmcode);
+        if(StringUtils.isEmpty(telephone)){
             WebUtil.addErrorMessage("手机号不能为空");
             return;
         }
-        if(StringUtils.isEmpty(msmCode)){
+        if(StringUtils.isEmpty(msmcode)){
             WebUtil.addErrorMessage("验证码不能为空");
             return;
         }
-        Map<String,String> map = msUtil.getMsMCode(mobile);
+        Map<String,String> map = msUtil.getMsMCode(telephone);
         if(map == null){
             WebUtil.addErrorMessage("验证码已经过期,请重新发送");
             return;
         }
         String phone = map.get("phone");
         String code = map.get("code");
-        if(phone.equals(mobile) && msmCode.equals(code)){
+        if(phone.equals(phone) && msmcode.equals(code)){
             doTelephoneValidlogin(request, response);
             // called after user logined.
             String str = userContextService.getUserDefaultHomePage();
