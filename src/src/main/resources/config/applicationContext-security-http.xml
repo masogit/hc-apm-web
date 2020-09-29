@@ -38,7 +38,6 @@
                        access="hasAnyRole('SuperAdmin','GeOp','SiteAdmin')"/>
 
         <intercept-url pattern="/home.xhtml" access="isAuthenticated()"/>
-        <intercept-url pattern="/admin/phoneValid.xhtml" access="isAuthenticated()"/>
         <intercept-url pattern="/api/**" access="isAuthenticated()"/>
         <intercept-url pattern="/sysadmin/**" access="hasRole('SuperAdmin')"/>
         <intercept-url pattern="/admin/**" access="hasAnyRole('SuperAdmin','SiteAdmin')"/>
