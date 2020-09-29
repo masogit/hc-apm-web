@@ -161,20 +161,13 @@ public class LoginController extends LoginService {
         } else {
             String str = userContextService.getUserDefaultHomePage();
             boolean factorValidLogin = isPhoneValidLogin(user);
-            if(!factorValidLogin){
-                skipTelephoneValidlogin();
-            }else {
+            if(factorValidLogin){
                str = "/portal/login/phoneValid.xhtml";
             }
             WebUtil.redirectTo(str);
         }
     }
-    private void skipTelephoneValidlogin() {
-        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
-        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
-        HttpSession session = request.getSession();
-        session.setAttribute("PHONE_SMSCODE_VALID",true);
-    }
+
     @Transactional
     public void saveSession(UserAccount user,String userAgent){
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
