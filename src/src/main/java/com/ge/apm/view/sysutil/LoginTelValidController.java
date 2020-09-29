@@ -52,7 +52,6 @@ public class LoginTelValidController {
 
         telephone = user.getTelephone();
     }
-
     public void sendMsMCode(){
         logger.info("发送短信验证码");
         try{
