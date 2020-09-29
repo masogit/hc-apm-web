@@ -56,12 +56,12 @@ public class SessionTimeoutFilter implements Filter {
                     httpServletResponse.flushBuffer();
                     return;
                 }
-                boolean notPhoneLogin = isNotPhoneLogin(httpServletRequest);
-                if(notPhoneLogin){
-                    httpServletResponse.getWriter().print(String.format(redirectPhoneValidXML, httpServletRequest.getContextPath()));
-                    httpServletResponse.flushBuffer();
-                    return;
-                }
+//                boolean notPhoneLogin = isNotPhoneLogin(httpServletRequest);
+//                if(notPhoneLogin){
+//                    httpServletResponse.getWriter().print(String.format(redirectPhoneValidXML, httpServletRequest.getContextPath()));
+//                    httpServletResponse.flushBuffer();
+//                    return;
+//                }
             }
             else{
                 // Non-Ajax Request
