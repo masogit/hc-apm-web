@@ -52,7 +52,6 @@ public class LoginTelValidController {
 
         telephone = user.getTelephone();
     }
-
     public void sendMsMCode(){
         logger.info("发送短信验证码");
         try{
@@ -101,7 +100,7 @@ public class LoginTelValidController {
         }
         String phone = map.get("phone");
         String code = map.get("code");
-        if(phone.equals(msmcode) && msmcode.equals(code)){
+        if(phone.equals(phone) && msmcode.equals(code)){
             doTelephoneValidlogin(request, response);
             // called after user logined.
             String str = userContextService.getUserDefaultHomePage();
