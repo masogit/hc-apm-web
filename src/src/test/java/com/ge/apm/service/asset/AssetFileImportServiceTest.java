@@ -96,7 +96,7 @@ public class AssetFileImportServiceTest {
         List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(assetDoc, null);
 
         service.importOrgData(orgMap);
-        service.importAssetData(assetMap, false, null);
+        //service.importAssetData(assetMap, false, null);
         long endTime = System.currentTimeMillis();
         logger.info("finish to import excel");
 
@@ -127,7 +127,7 @@ public class AssetFileImportServiceTest {
         List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc, null);
 
         service.importOrgData(orgMap);
-        service.importAssetData(assetMap, false, null);
+        //service.importAssetData(assetMap, false, null);
 
         long endTime = System.currentTimeMillis();
         logger.info("finish to import excel");
@@ -232,7 +232,7 @@ public class AssetFileImportServiceTest {
         List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc, null);
 
         service.importOrgData(orgMap);
-        service.importAssetData(assetMap, false, null);
+        //service.importAssetData(assetMap, false, null);
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
@@ -252,7 +252,7 @@ public class AssetFileImportServiceTest {
         assetMap = service.getAssetMapFromTemplate(excelDoc, null);
 
         service.importOrgData(orgMap);
-        service.importAssetData(assetMap, false, null);
+        //service.importAssetData(assetMap, false, null);
 
         assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         assetInfo = assetInfoList.get(0);

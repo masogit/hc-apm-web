@@ -35,6 +35,11 @@
                                 <ui:include src="./menu-content-partner.xhtml"/>
                             </ui:fragment>
                         </c:when>
+                        <c:when test="${userContextService.partnerAccount46}">
+                            <ui:fragment>
+                                <ui:include src="./menu-content-46.xhtml"/>
+                            </ui:fragment>
+                        </c:when>
                         <c:otherwise>
                             <ui:fragment>
                                 <ui:include src="./menu-content.xhtml"/>

@@ -145,6 +145,18 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
     
     @Column(name = "mvs_price")
 	private Double mvsPrice;
+
+    @Column(name = "parts_item_id")
+    private String partsItemId;
+
+    /**
+     * 当前备件库存
+     */
+    @Transient
+    private Integer currentQuantity;
+
+    @Column(name = "created_by")
+    private String createdBy;
     
 //    @Transient
     @JoinColumn(name = "wo_id", referencedColumnName = "id", insertable = false, updatable = false)
@@ -159,6 +171,30 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
     
     @Transient
     private OrgInfo siteOrg;
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getPartsItemId() {
+        return partsItemId;
+    }
+
+    public void setPartsItemId(String partsItemId) {
+        this.partsItemId = partsItemId;
+    }
+
+    public Integer getCurrentQuantity() {
+        return currentQuantity;
+    }
+
+    public void setCurrentQuantity(Integer currentQuantity) {
+        this.currentQuantity = currentQuantity;
+    }
 
     public String getInvoiceNum() {
         return invoiceNum;

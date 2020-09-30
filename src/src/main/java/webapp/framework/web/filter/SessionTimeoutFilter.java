@@ -18,12 +18,18 @@ public class SessionTimeoutFilter implements Filter {
 
     private static final String loginPage = "login.xhtml";
     private static final String reloginPage = "login.xhtml";
+    private static final String phoneValidPage = "portal/login/phoneValid.xhtml";
     private static final String redirectURL ="%s/" + loginPage + "?session_expired=1";
     private static final String redirectXML = "<?xml version='1.0' encoding='UTF-8'?>" 
                 + "<partial-response>" 
                 + "<redirect url=\"%s/" + loginPage + "?session_expired=1\"/>" 
                 + "</partial-response>";
-    
+
+    private static final String redirectPhoneValidURL ="%s/" + phoneValidPage + "?session_expired=1";
+    private static final String redirectPhoneValidXML = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<partial-response>"
+            + "<redirect url=\"%s/" + phoneValidPage + "?session_expired=1\"/>"
+            + "</partial-response>";
     private static final String resources = "javax.faces.resource";
     private static final String sso_login = "api/a1sso";
 
@@ -41,10 +47,18 @@ public class SessionTimeoutFilter implements Filter {
         
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        //System.out.println("doFilter request URI = " + httpServletRequest.getRequestURI());
         if (isSessionControlRequired(httpServletRequest)) {
             if(isAJAXRequest(httpServletRequest)){
-                if(isNotLogin(httpServletRequest)){
+                boolean notLogin = isNotLogin(httpServletRequest);
+                if(notLogin){
                     httpServletResponse.getWriter().print(String.format(redirectXML, httpServletRequest.getContextPath()));
+                    httpServletResponse.flushBuffer();
+                    return;
+                }
+                boolean notPhoneLogin = isNotPhoneLogin(httpServletRequest);
+                if(notPhoneLogin){
+                    httpServletResponse.getWriter().print(String.format(redirectPhoneValidXML, httpServletRequest.getContextPath()));
                     httpServletResponse.flushBuffer();
                     return;
                 }
@@ -76,6 +90,12 @@ public class SessionTimeoutFilter implements Filter {
 
         return (httpServletRequest.getSession().getAttribute("SPRING_SECURITY_CONTEXT")==null);
     }
+    private boolean isNotPhoneLogin(HttpServletRequest httpServletRequest) {
+        if(httpServletRequest.getSession()==null) return true;
+
+        return (httpServletRequest.getSession().getAttribute("PHONE_SMSCODE_VALID")==null);
+    }
+
 
     private boolean isRequestedSessionInvalid(HttpServletRequest httpServletRequest) {
         String reqID = httpServletRequest.getRequestedSessionId();

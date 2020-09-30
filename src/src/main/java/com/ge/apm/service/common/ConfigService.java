@@ -10,8 +10,12 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.WorkflowConfig;
 import java.util.List;
+import java.util.Optional;
+
+import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -143,5 +147,43 @@ public class ConfigService {
     public boolean isInsulateTenant(String tenantUid){
         TenantInfo tenant = tenantDao.findByuid(tenantUid);
         return tenant.getInsulate()!=null && tenant.getInsulate();
+    }
+
+    public Optional<WorkflowConfig> findInheritableWorkflowConfigByCurrentUser() {
+
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+
+        WorkflowConfig workflowConfig = configDao.findFirstBySiteUID(currentUserAccount.getSiteUID());
+        if (isInsulateTenant(currentUserAccount.getTenantUID())) {
+            return Optional.ofNullable(workflowConfig);
+        }
+
+        if (null != workflowConfig) {
+            return Optional.of(workflowConfig);
+        }
+
+        workflowConfig = configDao.findFirstBySiteUID(currentUserAccount.getHospitalUID());
+        if (null != workflowConfig) {
+            return Optional.of(workflowConfig);
+        }
+
+        workflowConfig = configDao.findFirstBySiteUID(currentUserAccount.getInstitutionUID());
+        if (null != workflowConfig) {
+            return Optional.of(workflowConfig);
+        }
+
+        workflowConfig = configDao.findFirstBySiteUID(currentUserAccount.getTenantUID());
+        return Optional.ofNullable(workflowConfig);
+    }
+
+    //是否待报废权限控制
+    public boolean needScrappedControl(){
+
+        Optional<WorkflowConfig> optWorkflowConfig = findInheritableWorkflowConfigByCurrentUser();
+        if(optWorkflowConfig.isPresent()){
+            WorkflowConfig workflowConfig = optWorkflowConfig.get();
+            return workflowConfig.getEnableScrappedControl();
+        }
+        return false;
     }
 }

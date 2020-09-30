@@ -220,12 +220,26 @@
                                     </div>
                                 </c:forEach>
                             </p:fieldset>
+
+                            <p:panel id="modifyRecordList"
+                                     header="#{assetInfoEditController.assetChangeHistoryCount > 0 ? msg.ModifyRecord : msg.NoRecords}"
+                                     toggleable="true"
+                                     toggleSpeed="500" collapsed="true" widgetVar="panel"
+                                     style="margin-bottom:20px"
+                                     rendered="#{assetInfoEditController.assetChangeHistoryCount > 0}">
+                                <p:dataTable id="modifiedRecordList" var="item"
+                                             value="#{assetInfoEditController.changeHistoryList}"
+                                             emptyMessage="#{msg.noRecordFound}" lazy="true">
+                                    <ui:include src="ImportantFieldsView.xhtml"/>
+                                </p:dataTable>
+                            </p:panel>
+
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup id="buttonGroup">
                             <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.applyChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3))}"/>
                             <p:commandButton value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval()}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3)}"/>
                             <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
-                            <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus()}" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
+                            <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and assetInfoEditController.hasScrappedAuthority()}" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
                             <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus()}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
                              </h:panelGroup>
                             </p:panelGrid>

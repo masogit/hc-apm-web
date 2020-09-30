@@ -30,6 +30,21 @@ public class I18nMessageService {
         return foundMsg;
     }
 
+    public String getMsgLabelByMsgTypeAndMsgKey(String msgType, String msgKey) {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+
+        I18nMessage foundMsg = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(msgType, msgKey, userAccount.getSiteId());
+        if (foundMsg == null) {
+            foundMsg = i18nMessageDao.getByMsgTypeAndMsgKeyAndSiteId(msgType, msgKey, -1);
+        }
+
+        if (null == foundMsg) {
+            return null;
+        } else {
+            return foundMsg.getValueZh();
+        }
+
+    }
 
     public static List<I18nMessage> getMessageUsingDefaultConfigAsLowestPriority(String msgType, int siteId) {
 
@@ -108,5 +123,16 @@ public class I18nMessageService {
         msg = rootCache.get(propertyKey);
 
         return msg;
+    }
+
+    public List<I18nMessage> getByMsgType(String msgType) {
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+
+        List<I18nMessage> foundMsgList = i18nMessageDao.getByMsgTypeAndSiteId(msgType, userAccount.getSiteId());
+        if (foundMsgList.size() == 0) {
+            foundMsgList = i18nMessageDao.getByMsgTypeAndSiteId(msgType, -1);
+        }
+
+        return foundMsgList;
     }
 }

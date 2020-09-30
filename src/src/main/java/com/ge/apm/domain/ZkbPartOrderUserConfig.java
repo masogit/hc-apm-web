@@ -91,6 +91,28 @@ public class ZkbPartOrderUserConfig implements Serializable {
     @Column(name = "tenant_uid")
     private String tenantUID;
 
+    @Column(name = "order_type")
+    private String orderType;
+
+    @Column(name = "is_vacation")
+    private String isVacation = "f";// 是否修改 t f
+
+    public String getIsVacation() {
+        return isVacation;
+    }
+
+    public void setIsVacation(String isVacation) {
+        this.isVacation = isVacation;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+
     public String getSubConfigType() {
         return subConfigType;
     }

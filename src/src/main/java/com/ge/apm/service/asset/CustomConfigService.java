@@ -156,6 +156,15 @@ public class CustomConfigService {
                 .map(item -> CustomConfigConstant.getAllFields().get(item)).collect(Collectors.toList());
 
         //uuid is required to export, but not in custom config fields, so include it here.
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        boolean zkbAccountBoolean = userContextService.isZkbAccount();
+        if (zkbAccountBoolean){
+            localizedExportFields.add(WebUtil.getMessage("mainDirectory"));
+            localizedExportFields.add(WebUtil.getMessage("secondDirectory"));
+        }
+        if(UserContextService.getCurrentUserAccount().getSiteId() == ApmConstant.IB_TENANT_ID){
+            localizedExportFields.add(WebUtil.getMessage("geDeviceType"));
+        }
         localizedExportFields.add("UUID");
 
         return localizedExportFields;

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
 <div>
 	<h:form id="UserAccountListForm">
-		<p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg==null?msg.AllHospitals:userAccountController.selectedOrg.name}" type="button"
+		<p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg==null?(userAccountController.isSelect46Account?msg.AllInstitutions:msg.AllHospitals):userAccountController.selectedOrg.name}" type="button"
 			icon="fa fa-angle-down" iconPos="right" />
 		<p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false" appendTo="@form">
 			<p:scrollPanel style="height:300px;border: 0" mode="native">
-                            <p:inputText class="treeNodeNameFilter" value="#{userAccountController.treeNodeNameFilter}"/>
-                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process="@(.treeNodeNameFilter) @this" update="@(.orgTree) @(.treeNodeNameFilter)" actionListener="#{userAccountController.filterTreeNode()}" value="检索"/>
+                            <p:inputText id = "listFormtreeNodeNameFilter1" class="treeNodeNameFilter" value="#{userAccountController.treeNodeNameFilter}"/>
+                            <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":userAccountTab:UserAccountListForm:listFormtreeNodeNameFilter1 @this" update=":userAccountTab:UserAccountListForm:orgTree" actionListener="#{userAccountController.filterTreeNode()}" value="检索"/>
 				<p:tree id="orgTree" class="orgTree" style="width:98%;border:0;" value="#{userAccountController.orgTree}" selection="#{userAccountController.selectedNode}"
 					var="node" selectionMode="single">
 					<p:ajax process="@this" event="select" update=":userAccountTab:UserAccountListForm" listener="#{userAccountController.onSelectTreeNode}"
@@ -109,7 +109,7 @@
 					<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
 				</p:commandButton>
 				<p:commandButton id="roleButton" icon="ui-icon-people" title="#{msg.AssignRole}" actionListener="#{userAccountController.prepareRoleData}"
-					update=":userAccountTab:RoleEditDlg" oncomplete="PF('RoleEditDialog').show()" disabled="#{empty userAccountController.selected}" />
+					update=":userAccountTab:RoleEditDlg2" oncomplete="PF('RoleEditDialog2').show()" disabled="#{empty userAccountController.selected}" />
 				<p:commandButton id="resetPassButton" icon="ui-icon-repeat" title="#{msg.resetPassword}"
 					actionListener="#{userAccountController.resetPassword}" update="datalist :growl" disabled="#{empty userAccountController.selected}">
 					<p:confirm header="#{msg.ResetConformation}" message="#{msg.ResetConformationMsg}" icon="ui-icon-alert" />
@@ -131,7 +131,8 @@
 
 	<ui:include src="Edit.xhtml" />
 	<ui:include src="View.xhtml" />
-	<ui:include src="Role.xhtml" />
+	<ui:include src="Role2.xhtml" />
+
 
 </div>
 </html>

@@ -22,4 +22,19 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
     public List<TenantInfo> findAllByTestStatusIsNullOrTestStatusNotOrderByName(int testStatus);
 
     public Optional<TenantInfo> findFirstByName(String name);
+
+    /**
+     * 根据租户名称和类型查找数据
+     * @param name 租户名称
+     * @param type 租户类型
+     * @return 返回租户列表
+     */
+    List<TenantInfo> findByNameAndType(String name,Integer type);
+
+    /**
+     * 根据类型查找数据
+     * @param type 租户类型
+     * @return 返回租户列表
+     */
+    List<TenantInfo> findByType(Integer type);
 }
