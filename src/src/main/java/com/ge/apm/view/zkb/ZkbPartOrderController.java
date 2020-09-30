@@ -228,6 +228,16 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         return zkbContractPage;
     }
 
+    public String techAuditField(ZkbPartOrder zkbPartOrder){
+        if(StringUtils.isNotEmpty(zkbPartOrder.getTechAuditer())){
+            return zkbPartOrder.getTechAuditer();
+        }else if(StringUtils.isNotEmpty(zkbPartOrder.getOnlineEngineer())){
+            return zkbPartOrder.getOnlineEngine().getName();
+        }else{
+            return zkbPartOrder.getAssetTypeDi();
+        }
+    }
+
     public String queryListByStatus(String status){
         queryStatus = status;
         System.out.println(status);
