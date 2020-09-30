@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.ge.apm.web.cboard.CBoardController;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.B64Code;
@@ -158,11 +160,21 @@ public class LoginController extends LoginService {
             WebUtil.redirectTo("/resetPassword2.xhtml");
         } else {
             String str = userContextService.getUserDefaultHomePage();
-            //System.out.println(str);
+            boolean factorValidLogin = isPhoneValidLogin(user);
+            if(!factorValidLogin){
+                skipTelephoneValidlogin();
+            }else {
+                str = "/portal/login/phoneValid.xhtml";
+            }
             WebUtil.redirectTo(str);
         }
     }
-
+    private void skipTelephoneValidlogin() {
+        ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+        HttpSession session = request.getSession();
+        session.setAttribute("PHONE_SMSCODE_VALID",true);
+    }
     @Transactional
     public void saveSession(UserAccount user,String userAgent){
         ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();

@@ -7,7 +7,13 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.utils.TreeNodeUtil;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -30,7 +36,8 @@ import webapp.framework.web.mvc.GenericCRUDController;
 @ManagedBean
 @ViewScoped
 public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
-
+    private static final Logger logger = LoggerFactory.getLogger(QrCodeLibController.class);
+    private OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
     QrCodeLibRepository dao = null;
     TenantInfoRepository tenantInfoDao = null;
     OrgInfoRepository orgInfoDao = null;
@@ -60,6 +67,33 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
     private UserCommonService userCommonService;
     
     private UaaService uaaService;
+    boolean hospitalOn =false;
+    private String retrieval;
+    private TreeNode tenantOrgTreePage;
+
+    public TreeNode getTenantOrgTreePage() {
+        return tenantOrgTreePage;
+    }
+
+    public void setTenantOrgTreePage(TreeNode tenantOrgTreePage) {
+        this.tenantOrgTreePage = tenantOrgTreePage;
+    }
+
+    public String getRetrieval() {
+        return retrieval;
+    }
+
+    public void setRetrieval(String retrieval) {
+        this.retrieval = retrieval;
+    }
+
+    public boolean isHospitalOn() {
+        return hospitalOn;
+    }
+
+    public void setHospitalOn(boolean hospitalOn) {
+        this.hospitalOn = hospitalOn;
+    }
 
     @Override
     protected void init() {
@@ -87,6 +121,11 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 //            tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
 //        }
 //        onSiteChange();
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        //系统配置二维码管理初始化页面没有医院下拉修复
+        tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
+        onTenantFilterChange();
+
 
     }
 
@@ -185,7 +224,17 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 
     public void onSiteChange() {
         if (tenantUID != null) {
-            hospitalFileterList = orgInfoDao.getByTenantUID(tenantUID).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+            TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUID);
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            if(46==tenantInfo.getId()){
+                logger.info("===========================================QrCodeLibController.onSiteChange 46号租户不加载医院下拉列表");
+                tenantOrgTreePage = createTenantOrgTree46();
+                hospitalOn = true;
+            }else{
+                logger.info("============================================QrCodeLibController.onTenantFilterChange 非46号租户正常加载医院下拉选 tenantInfoId={}",tenantInfo.getId());
+                hospitalFileterList = orgInfoDao.getByTenantUID(tenantUID).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+                hospitalOn = false;
+            }
         }
     }
 
@@ -217,8 +266,61 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
             hospitalFileterList.clear();
             siteUIDFilter = null;
         } else {
-            hospitalFileterList = orgInfoDao.getByTenantUID(tenantUIDFilter).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+            TenantInfo tenantInfo = tenantInfoDao.findByuid(tenantUIDFilter);
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            if(46==tenantInfo.getId()){
+                logger.info("===========================================QrCodeLibController.onTenantFilterChange 46号租户不加载医院下拉列表");
+                tenantOrgTreePage = createTenantOrgTree46();
+                hospitalOn = true;
+            }else{
+                logger.info("============================================QrCodeLibController.onTenantFilterChange 非46号租户正常加载医院下拉选 tenantInfoId={}",tenantInfo.getId());
+                hospitalFileterList = orgInfoDao.getByTenantUID(tenantUIDFilter).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+                hospitalOn = false;
+            }
         }
+    }
+    public void filterNode(){
+        tenantOrgTreePage = createTenantOrgTree46();
+    }
+    public TreeNode createTenantOrgTree46() {
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        rootNode.getChildren().add(new DefaultTreeNode("org", rootOrg, null));
+        logger.info("============================trnantUid={}   tenantUIDFilter={}     retrieval={}",tenantUID,tenantUIDFilter,retrieval);
+        List<OrgInfo> siteList = orgDao.getOrgTreeBySiteAndparm(tenantUID==null?tenantUIDFilter:tenantUID,retrieval==null?"":retrieval).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+        TreeNode siteTree = buildTree(siteList);
+        expandedByOrgType(siteTree, 2);
+        rootNode.getChildren().addAll(siteTree.getChildren());
+        return rootNode;
+    }
+    private TreeNode buildTree(List<OrgInfo> orgList) {
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        Map<String, TreeNode> treeMap = orgList.stream().collect(Collectors.toMap(OrgInfo::getUid, item -> new DefaultTreeNode("org", item, null)));
+        for (OrgInfo org : orgList) {
+            if (treeMap.containsKey(org.getParentUID())) {
+                treeMap.get(org.getParentUID()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        rootNode.setExpanded(true);
+        return rootNode;
+    }
+    private void expandedByOrgType(TreeNode tree, Integer type) {
+        if (tree.getData() != null) {
+            OrgInfo node = (OrgInfo) tree.getData();
+            if (node.getOrgType() > type) {
+                return;
+            }
+        }
+        tree.setExpanded(true);
+        for (TreeNode child : tree.getChildren()) {
+            expandedByOrgType(child, type);
+        }
+
     }
 
     public void exportQrCode() throws Exception {

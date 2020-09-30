@@ -20,6 +20,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,8 +44,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private String selectionTenantInfo;
     private AssetInfo queryAsset;
     private V2_WorkOrder queryWorkFlow;
-    private HashMap<String, String> selectedWorkFlow;
-    private List<HashMap<String, String>> v2_listHashMap;
+    private HashMap<String, Object> selectedWorkFlow;
+    private List<HashMap<String, Object>> v2_listHashMap;
     private List<ZkbContract> contractList;
     private ZkbPartOrderItem zkbPartOrderItem;
     private String orderType;
@@ -55,6 +56,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList =new ArrayList<>();
     private AssetInfo assetInfo;
     private String valueTypeTips = "";
+    private String queryStatus;
 
     @Override
     protected void init() {
@@ -69,12 +71,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         String encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         selectionTenantInfo = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectionTenantInfo");
+        queryStatus = UrlEncryptController.getValueFromMap(encodeStr, "queryStatus") == null ? "" : (String) UrlEncryptController.getValueFromMap(encodeStr, "queryStatus");
         queryWorkFlow = new V2_WorkOrder();
         queryWorkFlow.setAssetInfo(new AssetInfo());
         queryWorkFlow.setServiceRequest(new V2_ServiceRequest());
         if("Create".equals(actionName)){
             this.selected = new ZkbPartOrder();
             selected.setRequestDate(new Date());
+            selected.setRequestUser(currentUser.getName());
+            selected.setRequestPhone(currentUser.getTelephone());
             v2_blobObjectList = new ArrayList<>();
         }else{
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
@@ -88,14 +93,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 contractList = new ArrayList<>();
                 contractList.add(c);
             }
-            HashMap<String, String> mm = m.get("v2") == null ? null : (HashMap<String, String>)m.get("v2");
+            HashMap<String, Object> mm = m.get("v2") == null ? null : (HashMap<String, Object>)m.get("v2");
             v2_listHashMap = new ArrayList<>();
             if(mm != null){
                 v2_listHashMap.add(mm);
             }
             v2_blobObjectList = m.get("v2_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_blobObjectList");
+            initZknPartCat(c.getStartDate());
         }
-        initZknPartCat();
+
     }
 
     public void getQueryWorkFlowList(){
@@ -117,7 +123,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             WebUtil.addErrorMessage("查询有误，请输入条件","");
             return;
         }
-        v2_listHashMap = zkbPartOrderService.getQueryWorkFlowList(queryWorkFlow);
+        v2_listHashMap = zkbPartOrderService.getQueryWorkFlowList(queryWorkFlow,selectionTenantInfo);
         contractList = new ArrayList<>();
     }
 
@@ -128,7 +134,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             FacesContext.getCurrentInstance().addMessage(null, message);
             return;
         }
-        selectedWorkFlow = (HashMap<String, String>) event.getObject();
+        selectedWorkFlow = (HashMap<String, Object>) event.getObject();
         assetInfo = assetInfoRepository.findByUid(String.valueOf(selectedWorkFlow.get("assetId")));
         selected.setProductNumber(assetInfo.getFunctionType());
 
@@ -146,7 +152,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         }
 
-        contractList = zkbPartOrderService.queryContractByAsset(selectionTenantInfo,String.valueOf(selectedWorkFlow.get("assetId")));
+        contractList = zkbPartOrderService.queryContractByAsset(selectionTenantInfo,String.valueOf(selectedWorkFlow.get("assetId")),(Date)selectedWorkFlow.get("requestTime"));
         if(contractList.size() == 0){
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "未查询出合同数据！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -247,6 +253,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending","CS");
             }
+            selected.setRegion(zkbContract.getRegion());
+            initZknPartCat(zkbContract.getStartDate());
         }
         calcRemainQty();
 
@@ -392,10 +400,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             flag=false;
             errorLog += "合同数据大于一条！";
         }
-        if((this.selected.getZkbPartOrderItems() ==null || this.selected.getZkbPartOrderItems().size() == 0) && "Parts".equals(orderType)){
-            flag=false;
-            errorLog += "额度申请明细不能为空！";
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
+            if((this.selected.getZkbPartOrderItems() ==null || this.selected.getZkbPartOrderItems().size() == 0) ){
+                flag=false;
+                errorLog += "额度申请明细不能为空！";
+            }
         }
+
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && !ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
             if(assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 2 && selected.getOnlineEngine() == null){
                 flag=false;
@@ -405,7 +416,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
                 //flag=false;
-                //errorLog += "附件不能为空！";
+                errorLog += "附件不能为空！";
             }
         }
         if(selected.getRemainQty() < 0){
@@ -460,7 +471,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 this.selected.setQty(1);
                 valueTypeTips = "";
             }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                this.selected.setQty(2);
+                this.selected.setQty(0);
                 valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
             }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
                 this.selected.setQty(2);
@@ -470,8 +481,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         calcRemainQty();
     }
 
-    public void initZknPartCat(){
-        zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat();
+    public void initZknPartCat(Date contractDate){
+        zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat(contractDate);
     }
     public List<ZkbPartOrderCat> autoCompleteCat(String query){
         List<ZkbPartOrderCat> res = zkbPartOrderCatList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getCatModel().contains(query)).collect(Collectors.toList());
@@ -511,6 +522,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public String backList(){
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
+    }
+
     public String getActionName() {
         return actionName;
     }
@@ -543,19 +558,19 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.queryWorkFlow = queryWorkFlow;
     }
 
-    public HashMap<String, String> getSelectedWorkFlow() {
+    public HashMap<String, Object> getSelectedWorkFlow() {
         return selectedWorkFlow;
     }
 
-    public void setSelectedWorkFlow(HashMap<String, String> selectedWorkFlow) {
+    public void setSelectedWorkFlow(HashMap<String, Object> selectedWorkFlow) {
         this.selectedWorkFlow = selectedWorkFlow;
     }
 
-    public List<HashMap<String, String>> getV2_listHashMap() {
+    public List<HashMap<String, Object>> getV2_listHashMap() {
         return v2_listHashMap;
     }
 
-    public void setV2_listHashMap(List<HashMap<String, String>> v2_listHashMap) {
+    public void setV2_listHashMap(List<HashMap<String, Object>> v2_listHashMap) {
         this.v2_listHashMap = v2_listHashMap;
     }
 

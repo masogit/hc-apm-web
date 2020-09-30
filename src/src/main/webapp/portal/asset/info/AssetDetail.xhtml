@@ -308,6 +308,17 @@
                 </p:tabView>
             </h:form>
 
+            <p:panel id="modifyRecordList"
+                     header="#{msg.ModifyRecord}"
+                     toggleable="true"
+                     toggleSpeed="500" collapsed="#{assetInfoDetailController.assetChangeHistoryCount > 0 ? false : true}" widgetVar="panel"
+                     style="margin-bottom:20px;">
+                <p:dataTable var="item" value="#{assetInfoDetailController.changeHistoryList}"
+                             emptyMessage="#{msg.noRecordFound}" lazy="true">
+                    <ui:include src="ImportantFieldsView.xhtml"/>
+                </p:dataTable>
+            </p:panel>
+
             <h:panelGroup >
                 <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
 

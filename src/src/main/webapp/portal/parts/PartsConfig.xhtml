@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="备件库存配置"/>
+            </div>
+            <div class="ui-g-12 card ">
+                <h:form id="basic">
+                    <p:fieldset legend="备件配置">
+
+                        <h:panelGrid columns="6" style="margin-bottom:10px" cellpadding="20">
+                            <p:selectBooleanCheckbox value="#{simplePartsConfigController.selected.enableWarehouseLocator}" itemLabel="启用仓位" />
+
+<!--                            <p:selectBooleanCheckbox value="#{simplePartsConfigController.selected.enableWarehouseSelectionInRequest}" itemLabel="申领和申购时是否选择仓库" />-->
+
+                            <p:selectBooleanCheckbox value="#{simplePartsConfigController.selected.enableIntegrationWithWorkOrder}" itemLabel="是否集成工单" />
+
+<!--                            <p:selectBooleanCheckbox value="#{partsConfigController.selected.enableIntegrationWithMultiLevelAuditing}" itemLabel="是否集成多级审核" />-->
+
+                        </h:panelGrid>
+                    </p:fieldset>
+
+                    <p:commandButton value="保存" actionListener="#{simplePartsConfigController.save()}" update="basic" icon="pi pi-check"/>
+                </h:form>
+
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

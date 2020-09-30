@@ -272,7 +272,8 @@
                     <h:panelGroup>
                         <label class="label">#{msg.deviceStatus}*</label>
                         <p:selectOneMenu value="#{workOrderMgrController.assetStatus}" >
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <!--<f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
+                            <f:selectItems value="#{assetInfoEditController.assetStatusList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" itemDisabled="#{!item.editable}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup >

@@ -12,6 +12,7 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MvsUtil;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
@@ -23,7 +24,10 @@ import webapp.framework.web.WebUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -46,6 +50,7 @@ public class AssetFileImportBaseService {
         New, Exist, Created, Failure, CheckFail
     }
 
+    protected AssetCreateService assetCreateService = WebUtil.getBean(AssetCreateService.class);
     protected Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
     protected String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
     public List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
@@ -60,7 +65,8 @@ public class AssetFileImportBaseService {
     public List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
     public List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
     public List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
-    public List<I18nMessage> assetStatusList = FieldValueMessageController.getFieldValueList("assetStatus", siteId);
+    //public List<I18nMessage> assetStatusList = FieldValueMessageController.getFieldValueList("assetStatus", siteId);
+    public List<I18nMessage> assetStatusList = assetCreateService.getAssetStatusList();
     public List<I18nMessage> assetValueCategoryList = FieldValueMessageController.getFieldValueList("assetValueCategory", siteId);
     public List<I18nMessage> capitalSource2List = FieldValueMessageController.getFieldValueList("capitalSource2", siteId);
     public List<I18nMessage> deviceStatusList = FieldValueMessageController.getFieldValueList("deviceStatus", siteId);
@@ -92,6 +98,9 @@ public class AssetFileImportBaseService {
 
     @Autowired
     protected AssetFileImportSupportingService supportingService;
+
+    @Autowired
+    private ZkbFileDirectoryService zkbFileDirectoryService;
 
     @Autowired
     protected AssetDepreciationService assetDepreciationService;
@@ -146,6 +155,18 @@ public class AssetFileImportBaseService {
             item.put("status", orgInfo == null ? ImportStatus.Created : ImportStatus.Exist);
         });
 
+    }
+
+    @Transactional
+    public void importSupplierData(List<Map<String, Object>> importOrgMap){
+
+        importOrgMap.stream().forEach(item ->{
+            AssetInfo newAssetInfo = (AssetInfo) item.get("asset");
+            Supplier supplier =  supplierDao.findByTenantUIDAndName(selectedOrgToImport.getTenantUID(), newAssetInfo.getVendor());
+            if(null == supplier){
+                supportingService.importSupplierIfNeeded(selectedOrgToImport, newAssetInfo.getVendor());
+            }
+        });
     }
 
     @Transactional
@@ -491,7 +512,38 @@ public class AssetFileImportBaseService {
                 AssetRow.addErrMessage(item, "错误: 设备编号是必须的");
                 continue;
             }
-
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            boolean zkbAccountBoolean = userContextService.isZkbAccount();
+            if(zkbAccountBoolean){
+                if(StringUtils.isEmpty(newAsset.getMainDirectory())){
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 主目录名字不能为空");
+                    continue;
+                }else {
+                    List<ZkbFileDirectory> mainDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,newAsset.getMainDirectory());
+                    if (mainDirectoryList.isEmpty()) {
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 主目录名字没有找到! "+newAsset.getMainDirectory());
+                        continue;
+                    }
+                }
+               if(StringUtils.isEmpty(newAsset.getSecondDirectory())){
+                   item.put("status", ImportStatus.CheckFail);
+                   result.add(Boolean.FALSE);
+                   AssetRow.addErrMessage(item, "错误: 子目录名字不能为空");
+                   continue;
+               }else {
+                   List<ZkbFileDirectory> secondDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.SUB_DIRECTORY_LEVEL_VALUE,newAsset.getSecondDirectory());
+                   if (secondDirectoryList.isEmpty()) {
+                       item.put("status", ImportStatus.CheckFail);
+                       result.add(Boolean.FALSE);
+                       AssetRow.addErrMessage(item, "错误: 子目录名字找不到! "+newAsset.getSecondDirectory());
+                       continue;
+                   }
+               }
+            }
             //check clinical dept
             String clinicalDeptName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(clinicalDeptName)) {

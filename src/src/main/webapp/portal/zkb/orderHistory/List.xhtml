@@ -1,0 +1,208 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.zkbHistory_orderHistory}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form rendered="#{userContextService.zkbAdmin}">
+                    <p:commandButton id="importButton" icon="ui-icon-extlink" value="#{msg.zkbHistory_orderHistoryImport}" title="#{msg.zkbHistory_orderHistoryImport}" action="#{zkbOrderHistoryController.importAction}"/>
+                </h:form>
+                <h:form id="searchForm">
+                    <p:fieldset legend="#{msg.FilterCondition}">
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup rendered="#{userContextService.zkbAdmin}" >
+                                <label class="label">#{msg.zkbHistory_agent}</label>
+                                <p:selectOneMenu id="agent" value="#{zkbOrderHistoryController.tenantUid}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{zkbPartOrderController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbHistory_dataType}</label>
+                                <p:selectOneMenu id="assetGroup" value="#{zkbOrderHistoryController.dataType}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('orderHistoryDataType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbHistory_contractBeginningTime}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="startDate" value="#{zkbOrderHistoryController.contractBeginningTime}"
+                                            required="false" requiredMessage="#{msg.contractBeginningTime} #{msg.ValidationRequire}"
+                                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbHistory_contractEndingTime}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="endDate" value="#{zkbOrderHistoryController.contractEndingTime}"
+                                            required="false" requiredMessage="#{msg.contractEndingTime} #{msg.ValidationRequire}"
+                                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbHistory_region}</label>
+                                <p:inputText id="region" value="#{zkbOrderHistoryController.region}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbHistory_contractNo}</label>
+                                <p:inputText id="contractNo" value="#{zkbOrderHistoryController.contractNo}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbHistory_contractType}</label>
+                                <p:inputText id="contractType" value="#{zkbOrderHistoryController.contractType}" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+<!--                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
+<!--                                <label class="label">#{msg.Search}</label>-->
+<!--                                <h:panelGroup>-->
+<!--                                    <p:inputText id="searchText" value="#{zkbOrderHistoryController.searchStr}" placeholder="#{msg.region}/#{msg.agent}/#{msg.contractNo}/#{msg.contractType}" maxlength="100" style="width: 500px"/>-->
+<!--                                </h:panelGroup>-->
+<!--                        </p:panelGrid>-->
+                    </p:fieldset>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:commandButton value="#{msg.SearchResult}" actionListener="#{zkbOrderHistoryController.loadData}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :zkbOrderHistoryListForm:datalist">
+                            </p:commandButton>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
+                <h:form id="zkbOrderHistoryListForm">
+                    <p:dataTable id="datalist" value="#{zkbOrderHistoryController.zkbOrderHistoryList}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbOrderHistoryController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+<!--                        <p:ajax event="rowSelect" listener="#{zkbOrderHistoryController.prepareEdit}" update="deleteButton"/>-->
+                        <p:column width="150" headerText="#{msg.zkbHistory_dataType}" >
+                            <h:outputText value="#{item.dataType}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_region}" >
+                            <h:outputText value="#{item.region}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_agent}" >
+                            <h:outputText value="#{item.agent}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_contractNo}" >
+                            <h:outputText value="#{item.contractNo}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_contractType}" >
+                            <h:outputText value="#{item.contractType}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_contractBeginningTime}" >
+                            <h:outputText value="#{item.contractBeginningTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_contractEndingTime}" >
+                            <h:outputText value="#{item.contractEndingTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_quantityIb}" >
+                            <h:outputText value="#{item.quantityIb}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_sparePartsQuantity}" >
+                            <h:outputText value="#{item.sparePartsQuantity}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_fw}" >
+                            <h:outputText value="#{item.fw}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_eventDate}" >
+                            <h:outputText value="#{item.eventDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_eventQuarter}" >
+                            <h:outputText value="#{item.eventQuarter}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_systemNo}" >
+                            <h:outputText value="#{item.systemNo}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_faultDescription}" >
+                            <h:outputText value="#{item.faultDescription}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_hospitalName}" >
+                            <h:outputText value="#{item.hospitalName}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_machineType}" >
+                            <h:outputText value="#{item.machineType}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_sparePartsNo}" >
+                            <h:outputText value="#{item.sparePartsNo}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_sparePartsPrice}" >
+                            <h:outputText value="#{item.sparePartsPrice}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_description}" >
+                            <h:outputText value="#{item.description}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_orderNo}" >
+                            <h:outputText value="#{item.orderNo}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_RSESup}" >
+                            <h:outputText value="#{item.RSESup}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_quantity}" >
+                            <h:outputText value="#{item.quantity}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_sr}" >
+                            <h:outputText value="#{item.sr}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_act}" >
+                            <h:outputText value="#{item.act}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_sparePartsLeft}" >
+                            <h:outputText value="#{item.sparePartsLeft}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_sparePartsReturn}" >
+                            <h:outputText value="#{item.sparePartsReturn}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_comment}" >
+                            <h:outputText value="#{item.comment}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_insuranceDescription}" >
+                            <h:outputText value="#{item.insuranceDescription}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_arrangement}" >
+                            <h:outputText value="#{item.arrangement}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_callNo}" >
+                            <h:outputText value="#{item.callNo}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_rowner}" >
+                            <h:outputText value="#{item.rowner}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_status}" >
+                            <h:outputText value="#{item.status}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_owner}" >
+                            <h:outputText value="#{item.owner}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_zone}" >
+                            <h:outputText value="#{item.zone}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_source}" >
+                            <h:outputText value="#{item.source}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbOrderHistoryController.exportAll}" icon="ui-icon-arrowthick-1-s">
+                                <p:fileDownload value="#{zkbOrderHistoryController.exportFile}"/>
+                            </p:commandButton>
+<!--                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbOrderHistoryController.delete}" update=":zkbOrderHistoryListForm" disabled="#{empty zkbOrderHistoryController.selected.id}">-->
+<!--                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
+<!--                            </p:commandButton>-->
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

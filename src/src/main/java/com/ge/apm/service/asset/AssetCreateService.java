@@ -5,17 +5,23 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,6 +33,12 @@ import java.util.stream.Collectors;
 @Component
 public class AssetCreateService {
 
+    @Autowired
+    CustomRoleRepository customeRoleDao;
+    @Autowired
+    UserRoleRepository userRoleDao;
+    @Autowired
+    I18nMessageRepository i18nDao;
     @Autowired
     private TenantInfoRepository tenantDao;
     @Autowired
@@ -56,6 +68,8 @@ public class AssetCreateService {
     BlobObjectRepository blobDao;
     @Autowired
     private UaaService uuaService;
+    @Autowired
+    ConfigService configService;
     
     @Autowired
     private AssetDepreciationService assetDepreciationService;
@@ -254,12 +268,19 @@ public class AssetCreateService {
     }
     
     public Boolean needShowAssetApprovalByUser(String userUid){
-        UserAccount user = userDao.getByUid(userUid);
+        /*UserAccount user = userDao.getByUid(userUid);
         List<String> siteUidList = uuaService.getUserAccessibleSiteList(userUid).stream().filter(item->item.getOrgType()<4).map(OrgInfo::getUid).distinct().collect(Collectors.toList());
         siteUidList.addAll(Arrays.asList(user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID()));
         List<String> collect = siteUidList.stream().distinct().collect(Collectors.toList());
         collect.removeIf(Objects::isNull);
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(collect);
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(collect);*/
+        UserAccount user = userDao.getByUid(userUid);
+        List<String> orgList = new ArrayList<String>();
+        orgList.add(user.getTenantUID());
+        orgList.add(user.getInstitutionUID());
+        orgList.add(user.getHospitalUID());
+        orgList.add(user.getSiteUID());
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList1(orgList,userUid);
         return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
     }
     
@@ -267,4 +288,39 @@ public class AssetCreateService {
         return userDao.getByWeChatId(wechatId);
     }
 
+    //判断待报废按钮是否禁用false
+    public boolean hasScrappedAuthority() {
+        if(configService.needScrappedControl()){
+            List<UserRole> userRoleList = userRoleDao.findByUserIdAndRoleType(UserContextService.getCurrentUserAccount().getId(), ApmConstant.CUSTOME_ROLE_TYPE);
+            for (UserRole userRole : userRoleList) {
+                String webAuthorities = customeRoleDao.findById(userRole.getRoleId()).getWebAuthorities();
+                if(null != webAuthorities){
+                    JSONArray authJSONArr= JSONArray.parseArray(webAuthorities);
+                    for (int i = 0; i < authJSONArr.size(); i++) {
+                        JSONObject ob = authJSONArr.getJSONObject(i);
+                        if("nurseSiteAssetScrapped".equals(ob.get("k")) && (Boolean) ob.get("a"))
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }else{
+            return true;
+        }
+        // anyMatch(userRole -> customeRoleDao.findById(userRole.getRoleId()).getWebAuthorities().contains(""))
+    }
+
+    public List<I18nMessage> getAssetStatusList(){
+        List<I18nMessage> assetStatusList = i18nDao.getByMsgTypeAndSiteId("assetStatus", ApmConstant.DEFAULT_SITE_ID);
+        if(assetStatusList.size() >0 ){
+            Iterator<I18nMessage> ite = assetStatusList.iterator();
+            while(ite.hasNext()){
+                I18nMessage next = ite.next();
+                if( next.getMsgKey().equals("4") && !hasScrappedAuthority()){
+                    ite.remove();
+                }
+            }
+        }
+        return assetStatusList;
+    }
 }

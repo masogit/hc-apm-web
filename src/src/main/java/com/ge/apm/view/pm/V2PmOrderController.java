@@ -10,24 +10,32 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.domain.pure.SimplePartsItemValue;
+import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.simpleparts.SimplePartsInventoryService;
+import com.ge.apm.service.simpleparts.SimplePartsItemService;
+import com.ge.apm.service.simpleparts.SimplePartsRequestService;
+import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
 import com.ge.apm.service.pm.PmFileExportTemplate;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.view.wo.WorkOrderMgrController;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
@@ -59,7 +67,6 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
-import javax.persistence.criteria.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -216,6 +223,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String queryAssetUid;
     private ConfigService configService;
 
+    private String plannedCompletionTimeFormat = null;
+    private String actualCompletionTimeFormat = null;
+
+    public String getActualCompletionTimeFormat() {
+        return actualCompletionTimeFormat;
+    }
+
+    public void setActualCompletionTimeFormat(String actualCompletionTimeFormat) {
+        this.actualCompletionTimeFormat = actualCompletionTimeFormat;
+    }
+
+    public String getPlannedCompletionTimeFormat() {
+        return plannedCompletionTimeFormat;
+    }
+
+    public void setPlannedCompletionTimeFormat(String plannedCompletionTimeFormat) {
+        this.plannedCompletionTimeFormat = plannedCompletionTimeFormat;
+    }
+
     public String getHead() {
         return head;
     }
@@ -225,9 +251,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     @Getter @Setter
     private StreamedContent excelFile;
-
+    @Getter
+    @Setter
+    private SimplePartsItem partsItem;
+    @Getter
+    @Setter
+    private Integer currentQuantity;
+    @Getter
+    @Setter
+    private int statusFlag;
+    private SimplePartsRequestService partsRequestService;
+    private SimplePartsInventoryService partsInventoryService;
+    private SimplePartsItemService partsItemService;
     private BlobObjectRepository blobObjectRepository;
-
+    private SimplePartsRequestWorkOrderService partsRequestWorkOrderService;
     public boolean downloadButton(){
         if(queryIndex==10){
             return false;
@@ -438,7 +475,51 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             cancelInt = "1";
         }
     }
+    public void changeStatus() {
+        partsItem = null;
+        currentQuantity = 0;
+        itemDetail.setParts(null);
+        itemDetail.setPartsPrice(null);
+        itemDetail.setPartsPrice(null);
+        if (itemDetail != null) {
+            String partsType = itemDetail.getPartsType();
+            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+                return;
+            }
+            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+                return;
+            }
+        }
+        statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
+    }
+    public List<SimplePartsItem> autosparePartName() {
+        List<SimplePartsItem> all = partsInventoryService.findAll();
+        return all;
+    }
+    public List<SimplePartsItem> initSparePartsMaster() {
+        List<SimplePartsItem> partsItemList = partsItemService.findAll();
+        return partsItemList;
+    }
+    public void onSparePartsMasterValueChange(SelectEvent event) {
+        SimplePartsItem partsItem = (SimplePartsItem) event.getObject();
+        if (partsItem == null) return;
+        itemDetail.setParts(partsItem.getName());
+        itemDetail.setPartsItemId(partsItem.getId());
+    }
+    public void onSparePartsValueChange(SelectEvent event) {
+        Object object = event.getObject();
 
+        if (null != object) {
+            partsItem = (SimplePartsItem) object;
+            itemDetail.setParts(partsItem.getName());
+            SimplePartsItemValue partsItemValue = partsRequestService.getInventoryNumAndAvgPriceByPartsItem(partsItem.getId(),null).get();
+            itemDetail.setPartsPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
+            itemDetail.setCurrentQuantity(partsItemValue.getInStockNum());
+            itemDetail.setPartsItemId(partsItem.getId());
+        }
+    }
     public void cancelPMorder() {
         pmOrderService.invokePmOerCancel(cancelReason, selected, cancelInt);
     }
@@ -1177,6 +1258,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         configService = WebUtil.getBean(ConfigService.class);
         v2_workOrderDetailRepository = WebUtil.getBean(V2_WorkOrderDetailRepository.class);
+        partsRequestService = WebUtil.getBean(SimplePartsRequestService.class);
+        partsInventoryService = WebUtil.getBean(SimplePartsInventoryService.class);
+        partsItemService = WebUtil.getBean(SimplePartsItemService.class);
+        partsRequestWorkOrderService = WebUtil.getBean(SimplePartsRequestWorkOrderService.class);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         this.selectedMap = new HashMap();
         pmReportService = WebUtil.getBean(PmReportService.class);
@@ -1665,6 +1750,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void approvePMorder() {
+        List<V2_WorkOrder_Detail> approvedDetailsNew = new ArrayList<>();
        if (selectedPmOrder != null) {
             if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey
                     (item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
@@ -1672,6 +1758,38 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
                 return;
             }
+           for (int i = 0; i < approvedDetails.size(); i++) {
+               V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
+               if (selectedMap.get(v2_workOrder_detail.getId())) {
+                   if (v2_workOrder_detail.getPartsItemId() != null){
+                       if (!v2_workOrder_detail.getApproved()) {
+                           approvedDetailsNew.add(v2_workOrder_detail);
+                       }
+                       v2_workOrder_detail.setApproved(true);
+                   }
+               }
+           }
+           //最后一个审批通过的时候 生成相应单子
+           List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
+           List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
+           if (!approvedDetailsNew.isEmpty()) {
+               for (int i = 0; i < approvedDetailsNew.size(); i++) {
+                   V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
+                   if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
+                       accessorySparePartsRequestList.add(v2_workOrder_detail);
+                   } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
+                       accessorySparePartsBuyList.add(v2_workOrder_detail);
+                   }
+               }
+               if (!accessorySparePartsRequestList.isEmpty()) {
+                   LOGGER.info("保养工单生成申领单start!!!!");
+                   partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER);//生成申领单
+               }
+               if (!accessorySparePartsBuyList.isEmpty()) {
+                   LOGGER.info("保养工单生成申购单start!!!!");
+                   partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER);//生成申购单
+               }
+           }
             approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(true));
             approvedDetails.forEach(item -> {
                 item.setCreatedDate(null);

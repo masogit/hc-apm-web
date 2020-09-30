@@ -538,6 +538,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         dao.deleteBySiteUID(selected.getSiteUID());
         super.save();
 		selectedUserOrg = null; //orgInfoRepository.getByUid(user.getOrgInfoUID());
+        selected = null;
     }
 
     public void setSwapCenter(){

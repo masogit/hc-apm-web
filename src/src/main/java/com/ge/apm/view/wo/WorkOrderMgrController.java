@@ -9,9 +9,15 @@ import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.domain.pure.SimplePartsItemValue;
+import com.ge.apm.domain.simpleparts.SimplePartsInventory;
+import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.constant.AssetConstant;
+import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.simpleparts.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -170,6 +176,23 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private CustomConfigService ccService;
     private CustomConfig customConfig;
     private TenantInfo tenantInfo;
+    @Getter
+    @Setter
+    private int statusFlag;
+    @Getter
+    @Setter
+    private SimplePartsItem partsItem;
+    @Getter
+    @Setter
+    private SimplePartsInventory partsInventory;
+    @Getter
+    @Setter
+    private Integer currentQuantity;
+    private SimplePartsRequestService partsRequestService;
+    private SimplePartsInventoryService partsInventoryService;
+    private SimplePartsItemService partsItemService;
+    private SimplePartsRequestWorkOrderService partsRequestWorkOrderService;
+    private SimplePartsConfigService partsConfigService;
     @Override
     protected void init() {
         try {
@@ -199,6 +222,11 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
             orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
             autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+            partsRequestService = WebUtil.getBean(SimplePartsRequestService.class);
+            partsInventoryService = WebUtil.getBean(SimplePartsInventoryService.class);
+            partsItemService = WebUtil.getBean(SimplePartsItemService.class);
+            partsRequestWorkOrderService = WebUtil.getBean(SimplePartsRequestWorkOrderService.class);
+            partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -278,7 +306,54 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
 //        res.sort(new PinYinComparatorByName());
         return res;
     }
+    public void changeStatus() {
+        partsItem = null;
+        partsInventory = null;
+        currentQuantity = 0;
+        itemDetail.setParts(null);
+        itemDetail.setPartsPrice(null);
+        if (itemDetail != null) {
+            String partsType = itemDetail.getPartsType();
+            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+                return;
+            }
+            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+                return;
+            }
+        }
+        statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
+    }
+    public void onSparePartsValueChange(SelectEvent event) {
+        Object object = event.getObject();
 
+        if (null != object) {
+            partsItem = (SimplePartsItem) object;
+            itemDetail.setParts(partsItem.getName());
+            SimplePartsItemValue partsItemValue = partsRequestService.getInventoryNumAndAvgPriceByPartsItem(partsItem.getId(),null).get();
+            itemDetail.setPartsPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
+            itemDetail.setCurrentQuantity(partsItemValue.getInStockNum());
+            itemDetail.setPartsItemId(partsItem.getId());
+        }
+    }
+    public void onSparePartsMasterValueChange(SelectEvent event) {
+        SimplePartsItem partsItem = (SimplePartsItem) event.getObject();
+        if (partsItem == null) return;
+        itemDetail.setParts(partsItem.getName());
+        itemDetail.setPartsItemId(partsItem.getId());
+    }
+    public List<SimplePartsItem> autosparePartName() {
+        List<SimplePartsItem> all = partsInventoryService.findAll();
+        return all;
+    }
+    public List<SimplePartsItem> initSparePartsMaster() {
+        List<SimplePartsItem> partsItemList = partsItemService.findAll();
+        return partsItemList;
+    }
+    public boolean isEnableIntegrationWithWorkOrder() {
+       return partsConfigService.isEnableIntegrationWithWorkOrder();
+    }
     public void repairResultSet(){
         if(selectedWorkOrder.getRepairResult().equalsIgnoreCase ("1")){
             currentStatus =1;
@@ -1422,6 +1497,7 @@ public void test1(){
         itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
     }
     public void prepareEditAccDetail(String itemId) {
+        statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
         Object eval;
         if ("new".equals(itemId)) {
             selectedObjectMap = new HashMap();
@@ -1552,13 +1628,26 @@ public void test1(){
     }
     //保存一个备件
     public void saveItem(){
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         if (!accessoryList.contains(itemDetail)) {
             //合同价格"默认等于"预估单价
-            if(itemDetail.getClosedPrice()==null) {
+            if(itemDetail.getPartsPrice() != null && itemDetail.getPartsPrice() < 0.01) {
+                WebUtil.addErrorMessage("预估单价不能小于0.01元");
+                return;
+            }
+            if (itemDetail.getClosedPrice() == null) {
                 itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+            }
+            if(itemDetail.getApartsQuantity() !=null && itemDetail.getApartsQuantity() <= 0){
+                WebUtil.addErrorMessage("备件数量不能小于0");
+                return;
             }
             itemDetail.setArrivedGood(false);
             itemDetail.setArrivedGoodReturn(false);
+            itemDetail.setSiteUID(currentUserAccount.getSiteUID());
+            itemDetail.setTenantUID(currentUserAccount.getTenantUID());
+            itemDetail.setInstitutionUID(currentUserAccount.getInstitutionUID());
+            itemDetail.setHospitalUID(currentUserAccount.getHospitalUID());
             accessoryList.add(itemDetail);
         }
         //调用微服务来存附件
@@ -1687,11 +1776,49 @@ public void test1(){
     }
 
     public void approveWorkOrder() {
+        List<V2_WorkOrder_Detail> approvedDetailsNew = new ArrayList<>();
         if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
             WebUtil.addErrorMessage(WebUtil.getMessage(WebUtil.getMessage("ApprovalFallureReasonRequired")));
             RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
             return;
         }
+        if(this.isEnableIntegrationWithWorkOrder()){
+            for (int i = 0; i < approvedDetails.size(); i++) {
+                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
+                if (selectedMap.get(v2_workOrder_detail.getId())) {
+                    if(v2_workOrder_detail.getPartsItemId() !=null){
+                        if (!v2_workOrder_detail.getApproved()) {
+                            approvedDetailsNew.add(v2_workOrder_detail);
+                        }
+                        v2_workOrder_detail.setApproved(true);
+                    }
+                }
+            }
+            if (selectedApproverUid ==null) {
+                //最后一个审批通过的时候 生成相应单子
+                List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
+                List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
+                if (!approvedDetailsNew.isEmpty()) {
+                    for (int i = 0; i < approvedDetailsNew.size(); i++) {
+                        V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
+                        if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
+                            accessorySparePartsRequestList.add(v2_workOrder_detail);
+                        } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
+                            accessorySparePartsBuyList.add(v2_workOrder_detail);
+                        }
+                    }
+                    if (!accessorySparePartsRequestList.isEmpty()) {
+                        LOGGER.info("维修工单生成申领单start!!!!");
+                        partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER);//生成申领单
+                    }
+                    if (!accessorySparePartsBuyList.isEmpty()) {
+                        LOGGER.info("维修工单生成申购单start!!!!");
+                        partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER);//生成申购单
+                    }
+                }
+            }
+        }
+
         approvedDetails.stream().filter(item -> selectedMap.get(item.getId())).forEach(item -> item.setApproved(true));
         approvedDetails.forEach(item -> {
             item.setCreatedDate(null);

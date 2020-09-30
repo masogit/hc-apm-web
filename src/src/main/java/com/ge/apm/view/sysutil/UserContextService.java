@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AssetCreateService;
+import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.google.common.base.Strings;
@@ -184,6 +187,14 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    /**
+     * 判断当前登录是否科室级用户
+     * @return boolean
+     */
+    public static boolean isDeparmentUser() {
+        return  null == getCurrentUserAccount().getOrgType() ? false : 4 == getCurrentUserAccount().getOrgType();
+    }
+
     //add MVSAdmin,MVSFE
     public boolean hasNotAnyRole(String roleList) {
         return !hasAnyRole(roleList);
@@ -336,6 +347,13 @@ public class UserContextService implements Serializable {
 
             UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
             userAccount = dao.getByLoginName(userName);
+        }
+
+        if(userAccount != null){
+            OrgInfo orgInfo = WebUtil.getBean(OrgInfoRepository.class).getByUid(userAccount.getOrgInfoUID());
+            if(orgInfo != null){
+                userAccount.setOrgType(orgInfo.getOrgType());
+            }
         }
 /*
         else {
@@ -613,7 +631,6 @@ public class UserContextService implements Serializable {
             return uaaService.getUserDefaultHomePage(userAccount);
         }
     }
-
     public static String getAccessToken() {
         return getAccessToken(null);
     }
@@ -725,7 +742,7 @@ public class UserContextService implements Serializable {
     }
 
     private List<WorkflowConfig> getSiteConfigurations(){
-        UaaService uuaService = WebUtil.getBean(UaaService.class);
+        /*UaaService uuaService = WebUtil.getBean(UaaService.class);
         List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         orgList.add(userAccount.getTenantUID());
         orgList.add(userAccount.getInstitutionUID());
@@ -734,7 +751,14 @@ public class UserContextService implements Serializable {
         WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         List<String> collect = orgList.stream().distinct().collect(Collectors.toList());
         collect.removeIf(Objects::isNull);
-        return wcDao.getBySiteUIDList(collect);
+        return wcDao.getBySiteUIDList(collect);*/
+        List<String> orgList = new ArrayList<String>();
+        orgList.add(userAccount.getTenantUID());
+        orgList.add(userAccount.getInstitutionUID());
+        orgList.add(userAccount.getHospitalUID());
+        orgList.add(userAccount.getSiteUID());
+        WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        return wcDao.getBySiteUIDList1(orgList,userAccount.getUid());
     }
 
     public String isActive(){
@@ -843,6 +867,16 @@ public class UserContextService implements Serializable {
             return false;
         }
         if (ApmConstant.USER_ACCOUNT_TYPE_PARTNER == user.getType() && user.getIsSuperAdmin()) {
+            return true;
+        }
+        return false;
+    }
+    public boolean isPartnerAccount46() {
+        UserAccount user = getLoginUser();
+        if (null == user.getSiteId()) {
+            return false;
+        }
+        if (ApmConstant.IB_TENANT_ID == user.getSiteId()) {
             return true;
         }
         return false;
@@ -1042,4 +1076,35 @@ public class UserContextService implements Serializable {
 
         return Boolean.FALSE;
     }
+
+    public static boolean isPartsAdmin(){
+        UserAccount userAccount = getCurrentUserAccount();
+        List<String> roleNames = userAccount.getRoleNames();
+        if (roleNames.contains(SimplePartsConstant.PARTS_ADMIN_MANAGER)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //判断是否有报废资产菜单权限
+    public boolean hasScrappedMenuAuthority() {
+
+        UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
+        CustomRoleRepository customeRoleDao = WebUtil.getBean(CustomRoleRepository.class);
+        List<UserRole> userRoleList = userRoleDao.findByUserIdAndRoleType(UserContextService.getCurrentUserAccount().getId(), ApmConstant.CUSTOME_ROLE_TYPE);
+        for (UserRole userRole : userRoleList) {
+            String menus = customeRoleDao.findById(userRole.getRoleId()).getMenus();
+            if(null != menus && menus.contains("AssetScrapped")){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean needScrappedControl(){
+        ConfigService cfgService = WebUtil.getBean(ConfigService.class);
+        return cfgService.needScrappedControl();
+    }
+
 }

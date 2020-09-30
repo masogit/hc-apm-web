@@ -155,7 +155,10 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
             return false;
         }
     }
-
+    protected boolean isPhoneValidLogin(UserAccount user) {
+        TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
+        return tenantInfo.getTwoFactorValid()==null?false:tenantInfo.getTwoFactorValid();
+    }
     public String requestPost(String url, String body) {
         CloseableHttpClient httpclient = null;
         HttpPost httppost = null;
@@ -338,6 +341,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
                     sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
             }
             catch(Exception ex){
+                ex.printStackTrace();
             }
 
             // below : do the same thing as in
