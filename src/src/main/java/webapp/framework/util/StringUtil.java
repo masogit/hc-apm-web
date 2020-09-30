@@ -2,6 +2,8 @@ package webapp.framework.util;
 
 import java.util.Date;
 import java.util.Random;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 public class StringUtil {
@@ -46,4 +48,17 @@ public class StringUtil {
         }
         return input;
     }
+
+    /**
+     * 手机号码前三后四脱敏
+     * @param mobile
+     * @return
+     */
+    public static String mobileEncrypt(String mobile) {
+        if (StringUtils.isEmpty(mobile) || (mobile.length() != 11)) {
+            return mobile;
+        }
+        return mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+    }
+
 }
