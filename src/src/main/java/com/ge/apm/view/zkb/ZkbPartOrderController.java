@@ -191,6 +191,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }*/
 
                         /*searchFilters.add(new SearchFilter("closedAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1+"));*/
+                    }else{
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
+
                     }
                 }
                 //endregion
