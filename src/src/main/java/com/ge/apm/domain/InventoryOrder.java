@@ -208,7 +208,7 @@ public class InventoryOrder implements Serializable {
     }
 
     public String getName() {
-        if (this.planStartTime != null && this.planStartTime != null) {
+        if (this.planStartTime != null) {
             this.name = new SimpleDateFormat("yyyy-MM-dd").format(this.planStartTime) + " 至 " + new SimpleDateFormat("yyyy-MM-dd").format(this.planEndTime);
         }
         this.name += this.isFinished ? " 已完成" : " 进行中";
