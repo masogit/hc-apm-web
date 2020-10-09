@@ -188,21 +188,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public void onTransfer(TransferEvent event) {
-//        for (Object item : event.getItems()) {
-//            AssetInfo assetInfo = (AssetInfo)item;
-//            if (event.isAdd()) {
-//                if (!assets.getTarget().contains(assetInfo)) {
-//                    assets.getTarget().add(assetInfo);
-//                }
-//
-//            } else {
-//                assets.getTarget().remove(assetInfo);
-//            }
-//        }
+
     }
 
     public void onTabChange(TabChangeEvent event) {
-        if (!"选择资产属性".equals(event.getTab().getTitle())) {
+        if ("选择资产".equals(event.getTab().getTitle())) {
             return;
         }
 
