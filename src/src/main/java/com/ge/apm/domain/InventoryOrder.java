@@ -40,7 +40,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class InventoryOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -210,7 +209,7 @@ public class InventoryOrder implements Serializable {
 
     public String getName() {
         if (this.planStartTime != null && this.planStartTime != null) {
-            this.name = dateFormat.format(this.planStartTime) + " 至 " + dateFormat.format(this.planEndTime);
+            this.name = new SimpleDateFormat("yyyy-MM-dd").format(this.planStartTime) + " 至 " + new SimpleDateFormat("yyyy-MM-dd").format(this.planEndTime);
         }
         this.name += this.isFinished ? " 已完成" : " 进行中";
         return this.name;
