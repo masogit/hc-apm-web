@@ -30,6 +30,7 @@ public class AssetInfoBulkEditService {
     @Transactional
     public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
 
+        updateSiteForAssetItself(assets, targetAsset);
         commitCorrectiveMaintenanceBulkEdit(assets, targetAsset);
         commitPreventativeMaintenanceBulkEdit(assets, targetAsset);
         commitQrCode(assets, targetAsset);
@@ -43,6 +44,22 @@ public class AssetInfoBulkEditService {
             if (selectedColumns.contains("assetGroup")) {
                 item.setAssetGroup(targetAsset.getAssetGroup());
             }
+        }
+
+        assetInfoDao.save(assets);
+    }
+
+    private void updateSiteForAssetItself(List<AssetInfo> assets, AssetInfo targetAsset) {
+
+        for (AssetInfo item: assets) {
+            item.setSiteUID(targetAsset.getSiteOrg().getSiteUID());
+            item.setHospitalUID(targetAsset.getSiteOrg().getHospitalUID());
+            item.setInstitutionUID(targetAsset.getSiteOrg().getInstitutionUID());
+            item.setTenantUID(targetAsset.getSiteOrg().getTenantUID());
+
+            item.setClinicalDeptId(targetAsset.getClinicalDeptOrg().getId());
+            item.setClinicalDeptUID(targetAsset.getClinicalDeptOrg().getUid());
+            item.setClinicalDeptName(targetAsset.getClinicalDeptOrg().getName());
         }
 
         assetInfoDao.save(assets);
