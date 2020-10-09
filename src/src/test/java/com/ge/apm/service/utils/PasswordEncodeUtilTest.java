@@ -9,18 +9,18 @@ public class PasswordEncodeUtilTest {
     @Test
     public void decrypt() {
 
-        String password = "test";
-        String encrypted = PasswordEncodeUtil.encrypt(password);
+        String mima = "test";
+        String encrypted = PasswordEncodeUtil.encrypt(mima);
         String decrypted = PasswordEncodeUtil.decrypt(encrypted);
 
-        assertEquals(password, decrypted);
+        assertEquals(mima, decrypted);
     }
 
     @Test
     public void encrypt() {
 
-        String password = "JY2019@e";
-        String encrypted = PasswordEncodeUtil.encrypt(password);
+        String mima = "JY2019@e";
+        String encrypted = PasswordEncodeUtil.encrypt(mima);
         System.out.println(encrypted.length());
 
 
