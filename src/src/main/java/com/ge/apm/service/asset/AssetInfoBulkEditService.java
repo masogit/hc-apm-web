@@ -1,9 +1,6 @@
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.ServiceRequestRepository;
-import com.ge.apm.dao.V2_PmOrderRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,57 +16,37 @@ public class AssetInfoBulkEditService {
     private AssetInfoRepository assetInfoDao;
 
     @Autowired
+    private QrCodeLibRepository qrCodeLibDao;
+
+    @Autowired
     private ServiceRequestRepository serviceRequestDao;
 
     @Autowired
     private V2_WorkOrderRepository workOrderDao;
 
     @Autowired
-    private V2_PmOrderService pmOrderService;
-
-    @Autowired
     private V2_PmOrderRepository pmOrderDao;
+
+    @Transactional
+    public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
+
+        commitCorrectiveMaintenanceBulkEdit(assets, targetAsset);
+        commitPreventativeMaintenanceBulkEdit(assets, targetAsset);
+        commitQrCode(assets, targetAsset);
+    }
 
     @Transactional
     public void commitBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
 
-        commitBulkEditForAssetRelated(assets, targetAsset, selectedColumns);
-
-        commitBulkEditForAssetItself(assets, targetAsset, selectedColumns);
-    }
-
-    public void commitBulkEditForAssetRelated(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
-
-        if (selectedColumns.contains("hospitalId")) {
-            commitCorrectiveMaintenanceBulkEdit(assets, targetAsset);
-            commitPreventativeMaintenanceBulkEdit(assets, targetAsset);
-        }
-    }
-
-    private void commitBulkEditForAssetItself(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
-
         for (AssetInfo item: assets) {
 
-            if (selectedColumns.contains("hospitalId")) {
-                item.setSiteUID(targetAsset.getSiteOrg().getSiteUID());
-                item.setHospitalUID(targetAsset.getSiteOrg().getHospitalUID());
-                item.setInstitutionUID(targetAsset.getSiteOrg().getInstitutionUID());
-                item.setTenantUID(targetAsset.getSiteOrg().getTenantUID());
-            }
-            if (selectedColumns.contains("clinicalDeptName")) {
-                item.setClinicalDeptId(targetAsset.getClinicalDeptOrg().getId());
-                item.setClinicalDeptUID(targetAsset.getClinicalDeptOrg().getUid());
-                item.setClinicalDeptName(targetAsset.getClinicalDeptOrg().getName());
-            }
             if (selectedColumns.contains("assetGroup")) {
                 item.setAssetGroup(targetAsset.getAssetGroup());
             }
         }
 
         assetInfoDao.save(assets);
-
     }
-
 
     /**
      * 维修 (step 没有site uid)
@@ -120,6 +97,26 @@ public class AssetInfoBulkEditService {
             }
 
             pmOrderDao.save(pmOrders);
+        }
+
+    }
+
+    private void commitQrCode(List<AssetInfo> assets, AssetInfo targetAsset) {
+
+        for (AssetInfo assetInfo: assets) {
+            if (null == assetInfo.getQrCode()) {
+                continue;
+            }
+
+            OrgInfo targetSite = targetAsset.getSiteOrg();
+
+            QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(assetInfo.getQrCode(), assetInfo.getSiteUID());
+            qrCodeLib.setSiteUID(targetSite.getSiteUID());
+            qrCodeLib.setHospitalUID(targetSite.getHospitalUID());
+            qrCodeLib.setInstitutionUID(targetSite.getInstitutionUID());
+            qrCodeLib.setTenantUID(targetSite.getTenantUID());
+
+            qrCodeLibDao.save(qrCodeLib);
         }
 
     }
