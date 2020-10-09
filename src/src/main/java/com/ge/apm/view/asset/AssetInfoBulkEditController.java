@@ -87,11 +87,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private void initCandidateKeyLabels() {
         KeyLabel keyLabel;
 
-        keyLabel = new KeyLabel("hospitalId", WebUtil.getMessage("hospitalId"));
-        candidateColumns.add(keyLabel);
-
-        keyLabel = new KeyLabel("clinicalDeptName", WebUtil.getMessage("clinicalDeptName"));
-        candidateColumns.add(keyLabel);
+//        keyLabel = new KeyLabel("hospitalId", WebUtil.getMessage("hospitalId"));
+//        candidateColumns.add(keyLabel);
+//
+//        keyLabel = new KeyLabel("clinicalDeptName", WebUtil.getMessage("clinicalDeptName"));
+//        candidateColumns.add(keyLabel);
 
         keyLabel = new KeyLabel("assetGroup", WebUtil.getMessage("assetGroup"));
         candidateColumns.add(keyLabel);
@@ -311,6 +311,24 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         return false;
     }
 
+    public void commitBulkEditSite() {
+
+        if (!checkIsValidInput()) {
+            return;
+        }
+
+        //commit changes after validated
+        List<AssetInfo> selectedAssets = assets.getTarget();
+
+        assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
+
+        assets.setSource(new ArrayList<>());
+        assets.setTarget(new ArrayList<>());
+
+        WebUtil.addSuccessMessage("批量修改资产院区成功!");
+
+    }
+
     public void commitBulkEdit() {
 
         if (!checkIsValidInput()) {
@@ -354,6 +372,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
 
         return true;
+    }
+
+    public boolean disableBulkEditSiteButton() {
+        if (assets.getTarget().size() == 0) {
+            return true;
+        }
+
+        return false;
     }
 
     public boolean disableBulkEditButton() {

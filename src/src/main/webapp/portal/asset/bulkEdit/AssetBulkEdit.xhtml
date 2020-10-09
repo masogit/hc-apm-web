@@ -77,7 +77,7 @@
                                         filterMatchMode="contains" converter="assetInfoConverter" class="pickList">
                                 <f:facet name="sourceCaption">待选设备</f:facet>
                                 <f:facet name="targetCaption">已选设备</f:facet>
-                                <p:ajax event="transfer" listener="#{assetInfoBulkEditController.onTransfer}" update="commitBulkEditBtn"/>
+                                <p:ajax event="transfer" listener="#{assetInfoBulkEditController.onTransfer}" update="btnBulkEditSite btnBulkEdit"/>
                                 <p:column style="width:20%;">
                                     <h:outputText value="#{asset.name}" />
                                 </p:column>
@@ -85,25 +85,19 @@
 
                         </p:tab>
 
-                        <p:tab title="选择资产属性">
-                            <p:fieldset legend="候选资产属性列表">
-                                <p:selectManyCheckbox id="grid" value="#{assetInfoBulkEditController.selectedColumns}" layout="grid" columns="4">
-                                    <p:ajax update="changeList commitBulkEditBtn"/>
-                                    <f:selectItems value="#{assetInfoBulkEditController.candidateColumns}" var="item" itemLabel="#{item.label}" itemValue="#{item.key}" />
-                                </p:selectManyCheckbox>
-                            </p:fieldset>
-                            <p:fieldset legend="已选资产属性列表">
-                                <p:panelGrid  id="changeList" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <p:tab title="变更资产所属院区">
+                            <p:fieldset>
+                                <p:panelGrid  id="changeSite" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
-                                    <h:panelGroup rendered="#{assetInfoBulkEditController.displayControl('hospitalId')}">
+                                    <h:panelGroup>
                                         <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label>
-                                        <p:inputText id="selectedUserOrgName" value="#{assetInfoBulkEditController.selected.siteOrg}" readonly="true" class="SiteUIDChange"/>
+                                        <p:inputText id="selectedUserOrgName" value="#{assetInfoBulkEditController.selected.siteOrg}" readonly="true" class="clsNewSiteName"/>
                                         <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" />
                                         <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
 
                                             <p:scrollPanel style="height:300px;border: 0" mode="native">
                                                 <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{tenantOrgTreeController.tenantOrgTree}" var="node" selectionMode="single">
-                                                    <p:ajax process="@this" event="select" update="@(.SiteUIDChange) "
+                                                    <p:ajax process="@this" event="select" update="@(.clsBtnChangeSite) @(.clsNewSiteName)"
                                                             listener="#{assetInfoBulkEditController.onSelectTreeNodeAsNewValue}" oncomplete="PF('varPanelOrg').hide();"/>
                                                     <p:ajax process="@this" event="expand"/>
                                                     <p:ajax process="@this" event="collapse"/>
@@ -115,13 +109,32 @@
                                         </p:overlayPanel>
                                     </h:panelGroup>
 
-                                    <h:panelGroup rendered="#{assetInfoBulkEditController.displayControl('clinicalDeptName')}">
+                                    <h:panelGroup>
                                         <label class="label">#{msg.clinicalDeptName}<span style="color:red">*</span></label>
                                         <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoBulkEditController.selected.clinicalDeptOrg}"
                                                         scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
                                                         var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
+                                            <p:ajax update="@(.clsBtnChangeSite) " />
                                         </p:autoComplete>
                                     </h:panelGroup>
+
+                                </p:panelGrid>
+
+                            </p:fieldset>
+
+                            <p:commandButton id="btnBulkEditSite" value="确认批量修改院区" actionListener="#{assetInfoBulkEditController.commitBulkEditSite}"
+                                             disabled="#{assetInfoBulkEditController.disableBulkEditSiteButton()}" update="@form" class="clsBtnChangeSite"/>
+                        </p:tab>
+
+                        <p:tab title="变更资产其他属性" rendered="false">
+                            <p:fieldset legend="候选资产属性列表">
+                                <p:selectManyCheckbox id="grid" value="#{assetInfoBulkEditController.selectedColumns}" layout="grid" columns="4">
+                                    <p:ajax update="changeList btnBulkEdit"/>
+                                    <f:selectItems value="#{assetInfoBulkEditController.candidateColumns}" var="item" itemLabel="#{item.label}" itemValue="#{item.key}" />
+                                </p:selectManyCheckbox>
+                            </p:fieldset>
+                            <p:fieldset legend="已选资产属性列表">
+                                <p:panelGrid  id="changeList" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
                                     <h:panelGroup rendered="#{assetInfoBulkEditController.displayControl('assetGroup')}">
                                         <label class="label">#{msg.assetGroup}</label>
@@ -134,7 +147,7 @@
 
                             </p:fieldset>
 
-                            <p:commandButton id="commitBulkEditBtn" value="确认批量修改" actionListener="#{assetInfoBulkEditController.commitBulkEdit}"
+                            <p:commandButton id="btnBulkEdit" value="确认批量修改" actionListener="#{assetInfoBulkEditController.commitBulkEdit}"
                                              disabled="#{assetInfoBulkEditController.disableBulkEditButton()}" update="@form"/>
 
                         </p:tab>
