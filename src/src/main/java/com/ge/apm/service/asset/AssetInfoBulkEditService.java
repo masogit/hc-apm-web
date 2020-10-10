@@ -153,6 +153,10 @@ public class AssetInfoBulkEditService {
             OrgInfo targetSite = targetAsset.getSiteOrg();
 
             QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(assetInfo.getQrCode(), assetInfo.getSiteUID());
+
+            if (null == qrCodeLib) {
+                continue;
+            }
             qrCodeLib.setSiteUID(targetSite.getSiteUID());
             qrCodeLib.setHospitalUID(targetSite.getHospitalUID());
             qrCodeLib.setInstitutionUID(targetSite.getInstitutionUID());
