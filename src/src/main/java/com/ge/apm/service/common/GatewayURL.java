@@ -93,7 +93,9 @@ public enum GatewayURL {
     PART_ORDER_SEND_EMAIL("/hcapmreportservice/api/apm/report/partOrder/sendHtmlForPartOrder"),
     PART_ORDER_SEND_RETURN_EMAIL("/hcapmreportservice/api/apm/report/partOrder/sendHtmlForReturn"),
     PART_ORDER_SEND_MESSAGE("/hcapmreportservice/api/apm/report/partOrder/sendMessage"),
-    PART_ORDER_SEND_WECHAT_MESSAGE("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatMessages");
+    PART_ORDER_SEND_WECHAT_MESSAGE("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatMessages"),
+    SMS_VERIFICATION_CODE("/hcapmreportservice/api/apm/report/partOrder/sendTheVerificationCode"),
+    SMS_SEND_MAIL("/hcapmreportservice/api/apm/report/partOrder/sendMail");
     private final String url;
 
     GatewayURL(String url) {
