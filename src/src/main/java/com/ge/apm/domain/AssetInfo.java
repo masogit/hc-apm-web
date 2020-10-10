@@ -563,6 +563,9 @@ public class AssetInfo implements ChineseName,Serializable {
     private SharedAssetType sharedAssetType;
 
     @Transient
+    private OrgInfo siteOrg;
+
+    @Transient
     private OrgInfo assetDeptOrg;
 
     @Transient
@@ -2003,5 +2006,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setSecondDirectory(String secondDirectory) {
         this.secondDirectory = secondDirectory;
+    }
+
+    public OrgInfo getSiteOrg() {
+        return siteOrg;
+    }
+
+    public void setSiteOrg(OrgInfo siteOrg) {
+        this.siteOrg = siteOrg;
     }
 }
