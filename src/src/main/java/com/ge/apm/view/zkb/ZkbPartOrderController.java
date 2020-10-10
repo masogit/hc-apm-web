@@ -191,6 +191,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }*/
 
                         /*searchFilters.add(new SearchFilter("closedAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1+"));*/
+                    }else{
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
+
                     }
                 }
                 //endregion
@@ -226,6 +229,16 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
         searchFilters.clear();
         return zkbContractPage;
+    }
+
+    public String techAuditField(ZkbPartOrder zkbPartOrder){
+        if(StringUtils.isNotEmpty(zkbPartOrder.getTechAuditer())){
+            return zkbPartOrder.getTechAuditer();
+        }else if(StringUtils.isNotEmpty(zkbPartOrder.getOnlineEngineer())){
+            return zkbPartOrder.getOnlineEngine().getName();
+        }else{
+            return zkbPartOrder.getAssetTypeDi();
+        }
     }
 
     public String queryListByStatus(String status){
