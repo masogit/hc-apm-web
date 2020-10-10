@@ -1,12 +1,8 @@
 --2020-10-09 start
 --自定义模板修改字段类型
 alter table unstructured_data alter column value type text;
---区域信息字典表
-# ************************************************************
-# 中华人民共和国行政区划代码 SQL dump
-# Generation Time: Tue Dec 31 2019 12:00:46 GMT+0800 (GMT+08:00)
-# ************************************************************
 
+--区域信息字典表
 CREATE TABLE region_info (
 	id int NOT null primary key,
 	code varchar(32) NULL,
