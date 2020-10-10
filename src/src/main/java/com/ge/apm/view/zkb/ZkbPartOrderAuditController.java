@@ -88,6 +88,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             if(StringUtils.isNotEmpty(this.selected.getArtificialType())){
                 artificialType = this.selected.getArtificialType();
             }
+            System.out.println(orderType);
             zkbContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
             selectedWorkFlow = m.get("V2_WorkOrder") == null ? null : (V2_WorkOrder)m.get("V2_WorkOrder");
             v2_blobObjectList = m.get("v2_blobObjectList") == new ArrayList<>() ? null : (List<V2_BlobObject>)m.get("v2_blobObjectList");
@@ -170,8 +171,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else {
                 zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(selected.getCurrentStep());
             }
+            System.out.println(zkbPartOrderUserConfigs);
+
             if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
+                System.out.println(currentUser);
                 for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
+                    System.out.println("====");
+                    System.out.println(c);
                     if(currentUser.getLoginName().equals(c.getLoginName())){
                         canEditFlag = true;
                     }
