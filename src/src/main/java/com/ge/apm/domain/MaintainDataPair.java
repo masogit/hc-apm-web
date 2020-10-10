@@ -182,7 +182,7 @@ public class MaintainDataPair {
 	
 	public void parseStr(List<MaintainDataPair> listP,String content,Object defaultValue){
 		if(listP==null){
-			new ArrayList<MaintainDataPair>();
+			listP = new ArrayList<>();
 		}
 		else{
 			listP.clear();
@@ -192,7 +192,7 @@ public class MaintainDataPair {
 			for(int i=0;i<array.size();++i){
 				JSONObject objInner=array.getJSONObject(i);
 				Set<String> setKey=objInner.keySet();
-				if(objInner!=null && setKey.size()>0){
+				if(setKey.size() > 0){
 					Iterator<String> it=setKey.iterator();
 					while(it.hasNext()){
 						String key=it.next();

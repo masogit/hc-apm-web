@@ -38,6 +38,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = new ArrayList<>();
     private String queryStatus = "";
     private boolean showStatusBtn = true;
+    private boolean vacationBtn = false;
     private String isVacation;
 
 
@@ -69,6 +70,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 }
                 if(zkbPartOrderUserConfigList.size() == 2){
                     isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? "f" : zkbPartOrderUserConfig.getIsVacation();
+                    vacationBtn = true;
                 }
             }
         }
@@ -189,6 +191,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         }*/
 
                         /*searchFilters.add(new SearchFilter("closedAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1+"));*/
+                    }else{
+                        searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, queryStatus));
+
                     }
                 }
                 //endregion
@@ -224,6 +229,16 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
         searchFilters.clear();
         return zkbContractPage;
+    }
+
+    public String techAuditField(ZkbPartOrder zkbPartOrder){
+        if(StringUtils.isNotEmpty(zkbPartOrder.getTechAuditer())){
+            return zkbPartOrder.getTechAuditer();
+        }else if(StringUtils.isNotEmpty(zkbPartOrder.getOnlineEngineer())){
+            return zkbPartOrder.getOnlineEngine().getName();
+        }else{
+            return zkbPartOrder.getAssetTypeDi();
+        }
     }
 
     public String queryListByStatus(String status){
@@ -363,5 +378,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setIsVacation(String isVacation) {
         this.isVacation = isVacation;
+    }
+
+    public boolean isVacationBtn() {
+        return vacationBtn;
+    }
+
+    public void setVacationBtn(boolean vacationBtn) {
+        this.vacationBtn = vacationBtn;
     }
 }

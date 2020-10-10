@@ -515,20 +515,34 @@ public class AssetFileImportBaseService {
             UserContextService userContextService = WebUtil.getBean(UserContextService.class);
             boolean zkbAccountBoolean = userContextService.isZkbAccount();
             if(zkbAccountBoolean){
-                List<ZkbFileDirectory> mainDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,newAsset.getMainDirectory());
-                if (mainDirectoryList.isEmpty()) {
+                if(StringUtils.isEmpty(newAsset.getMainDirectory())){
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
-                    AssetRow.addErrMessage(item, "错误: 主目录名字不存在");
+                    AssetRow.addErrMessage(item, "错误: 主目录名字不能为空");
                     continue;
+                }else {
+                    List<ZkbFileDirectory> mainDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,newAsset.getMainDirectory());
+                    if (mainDirectoryList.isEmpty()) {
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 主目录名字没有找到! "+newAsset.getMainDirectory());
+                        continue;
+                    }
                 }
-                List<ZkbFileDirectory> secondDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.SUB_DIRECTORY_LEVEL_VALUE,newAsset.getSecondDirectory());
-                if (secondDirectoryList.isEmpty()) {
-                    item.put("status", ImportStatus.CheckFail);
-                    result.add(Boolean.FALSE);
-                    AssetRow.addErrMessage(item, "错误: 子目录名字不存在");
-                    continue;
-                }
+               if(StringUtils.isEmpty(newAsset.getSecondDirectory())){
+                   item.put("status", ImportStatus.CheckFail);
+                   result.add(Boolean.FALSE);
+                   AssetRow.addErrMessage(item, "错误: 子目录名字不能为空");
+                   continue;
+               }else {
+                   List<ZkbFileDirectory> secondDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.SUB_DIRECTORY_LEVEL_VALUE,newAsset.getSecondDirectory());
+                   if (secondDirectoryList.isEmpty()) {
+                       item.put("status", ImportStatus.CheckFail);
+                       result.add(Boolean.FALSE);
+                       AssetRow.addErrMessage(item, "错误: 子目录名字找不到! "+newAsset.getSecondDirectory());
+                       continue;
+                   }
+               }
             }
             //check clinical dept
             String clinicalDeptName = newAsset.getClinicalDeptName();

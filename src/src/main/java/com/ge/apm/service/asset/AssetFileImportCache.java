@@ -53,7 +53,9 @@ public class AssetFileImportCache {
     public AssetFileImportCache(List<Map<String, Object>> importAssetMap, OrgInfo selectedOrg, AssetFileImportCacheService assetFileImportCacheService) {
         this.assetFileImportCacheService = assetFileImportCacheService;
         this.importAssetMap = importAssetMap;
-        this.selectedOrg = selectedOrg;
+        if(selectedOrg != null){
+            this.selectedOrg = selectedOrg;
+        }
         allCilinicalOfSiteUid = getAllCilinicalOfSiteUid();
         departNumInAssetInfoCache = getDepartNumInAssetInfo();
         //orgClinicalCache = getClinicalOwnerNames();
@@ -70,6 +72,9 @@ public class AssetFileImportCache {
 
 
     public Map<String, OrgInfo> getAllCilinicalOfSiteUid(){
+        if(null == selectedOrg){
+            return Collections.EMPTY_MAP;
+        }
         Map<String, OrgInfo> cilinicalOfSiteUids = assetFileImportCacheService.allCilinicalOfSiteUid(selectedOrg.getSiteUID());
         return cilinicalOfSiteUids;
     }
@@ -86,6 +91,9 @@ public class AssetFileImportCache {
     }
 
     public Multimap<String, UserAccount> getAssetOwnerNames(){
+        if(null == selectedOrg){
+            return HashMultimap.create();
+        }
         List<String> assetOwnerNames = new LinkedList<>();
         for (Map<String, Object> item: importAssetMap) {
             AssetInfo asset = (AssetInfo) item.get("asset");
@@ -103,6 +111,9 @@ public class AssetFileImportCache {
     }
 
     public Multimap<String, UserAccount> getAssetOwnerNames2(){
+        if(null == selectedOrg){
+            return HashMultimap.create();
+        }
         List<String> assetOwnerNames2 = new LinkedList<>();
         for (Map<String, Object> item: importAssetMap) {
             AssetInfo asset = (AssetInfo) item.get("asset");
@@ -119,6 +130,9 @@ public class AssetFileImportCache {
     }
 
     public Multimap<String, UserAccount> getAssetOwnerNames3(){
+        if(null == selectedOrg){
+            return HashMultimap.create();
+        }
         List<String> assetOwnerNames3 = new LinkedList<>();
         for (Map<String, Object> item: importAssetMap) {
             AssetInfo asset = (AssetInfo) item.get("asset");
@@ -135,6 +149,9 @@ public class AssetFileImportCache {
     }
 
     public Multimap<String, UserAccount> getClinicalOwnerNames(){
+        if(null == selectedOrg){
+            return HashMultimap.create();
+        }
         List<String> clinicalOwnerNames = new LinkedList<>();
         for (Map<String, Object> item: importAssetMap) {
             AssetInfo asset = (AssetInfo) item.get("asset");
@@ -151,6 +168,9 @@ public class AssetFileImportCache {
     }
 
     public Multimap<String, UserAccount> getPmOwnerNames(){
+        if(null == selectedOrg){
+            return HashMultimap.create();
+        }
         List<String> assetPmOwnerNames = new LinkedList<>();
         for (Map<String, Object> item: importAssetMap) {
             AssetInfo asset = (AssetInfo) item.get("asset");
@@ -167,6 +187,9 @@ public class AssetFileImportCache {
     }
 
     public Map<String, Supplier> getSupplier(){
+        if(null == selectedOrg){
+            return Collections.EMPTY_MAP;
+        }
         List<String> assetSuppliers = new LinkedList<>();
         for (Map<String, Object> item: importAssetMap) {
             AssetInfo asset = (AssetInfo) item.get("asset");
@@ -183,6 +206,9 @@ public class AssetFileImportCache {
     }
 
     public Map<String, Supplier> getManufacturerCache(){
+        if(null == selectedOrg){
+            return Collections.EMPTY_MAP;
+        }
         List<String> assetManufacturers = new LinkedList<>();
         for (Map<String, Object> item: importAssetMap) {
             AssetInfo asset = (AssetInfo) item.get("asset");
@@ -199,6 +225,9 @@ public class AssetFileImportCache {
     }
 
     public Map<String, Supplier> getMaintainancerCache(){
+        if(null == selectedOrg){
+            return Collections.EMPTY_MAP;
+        }
         List<String> assetMaintainancers = new LinkedList<>();
         for (Map<String, Object> item: importAssetMap) {
             AssetInfo asset = (AssetInfo) item.get("asset");

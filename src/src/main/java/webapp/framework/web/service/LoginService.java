@@ -1,24 +1,12 @@
 package webapp.framework.web.service;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.zkb.LoginVerificationCodeService;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -28,18 +16,13 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.eclipse.jetty.util.B64Code;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.AccountStatusException;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.CredentialsExpiredException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -52,14 +35,21 @@ import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.jsf.FacesContextUtils;
-
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.utils.MicroServiceUtil;
-
 import webapp.framework.context.WrappedRequest;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LoginService implements Serializable, ApplicationEventPublisherAware {
 
@@ -75,9 +65,36 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     private MicroServiceUtil msUtil;
     private GeSsoService geSsoService;
     private TenantInfoRepository tenantInfoDao;
-    
+    private LoginVerificationCodeService loginVerificationCodeService;
     protected UserAccount user;
+    protected String telephone;
+    protected String verificationCode;
+    protected boolean readonlyFlag = false;
+    protected String bizStatusCode = "OK";
 
+    public boolean isReadonlyFlag() {
+        return readonlyFlag;
+    }
+
+    public void setReadonlyFlag(boolean readonlyFlag) {
+        this.readonlyFlag = readonlyFlag;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
     static {
         IdFuzzyResolver.registerResolver();
         // Global setting: change default timezone to UTC+0
@@ -95,6 +112,10 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         securityContextRepository = ctx.getBean(SecurityContextRepository.class);
         messageUtil = ctx.getBean(MessageUtil.class);
         msUtil = ctx.getBean(MicroServiceUtil.class);
+        loginVerificationCodeService = WebUtil.getBean(LoginVerificationCodeService.class);
+        telephone = null;
+        verificationCode = null;
+        readonlyFlag = false;
     }
 
     public void setSessionExpired(String value) {
@@ -128,7 +149,12 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     protected void afterLogin(UserAccount originUser,String userAgent) {
 
     }
-
+    public ResponseEntity<LinkedHashMap> sendVerificationCode(String telephone, String email ) {
+        return loginVerificationCodeService.sendTheVerificationCode(telephone, email);
+    }
+    public ResponseEntity<LinkedHashMap> sendEmail(String verificationCode,String telephone){
+        return loginVerificationCodeService.sendMail(verificationCode,telephone);
+    }
     protected void setCookieForUser(HttpServletResponse res, String userName, String password) throws Exception {
         String body = "{\"loginName\": \"" + userName + "\",\"password\": \"" + password + "\"}";
         Properties pro = new Properties();
@@ -341,6 +367,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
                     sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
             }
             catch(Exception ex){
+                ex.printStackTrace();
             }
 
             // below : do the same thing as in
