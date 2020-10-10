@@ -93,7 +93,6 @@
                             <label class="label">医院报修人电话*</label>
                             <p:inputText id="hospitalRepairerPhone" value="#{zkbPartOrderAuditController.selected.hospitalRepairerPhone}" disabled="true" />
                         </h:panelGroup>
-
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial')}">
                             <label class="label">订单标注*</label>
                             <p:selectOneMenu id="orderAnnotation" value="#{zkbPartOrderEditController.selected.orderAnnotation}" disabled="true" required="true" requiredMessage="#{msg.zkbPartOrder_orderAnnotation} #{msg.ValidationRequire}">

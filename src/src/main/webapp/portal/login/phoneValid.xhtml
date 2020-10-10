@@ -111,9 +111,10 @@
                         <label style="color: white;"><h1>GE APM</h1></label>
                     </center>
                 </div>
+                <h:inputHidden id="hiddenPwd" value="#{loginTelValidController.telephone}"/>
                 <div class="ui-g-12" style="padding: 0px; margin: 0px;">
                     <div class="ui-g-8">
-                        <p:inputText id="j_mobile" required="true" value="#{loginTelValidController.telephone}" requiredMessage="#{msg.telephone}: #{msg.ValidationRequire}" placeholder="手机号"/>
+                        <p:inputText id="j_mobile" disabled="true" required="true" value="#{loginTelValidController.encryTelephone}" requiredMessage="#{msg.telephone}: #{msg.ValidationRequire}" placeholder="手机号"/>
                     </div>
                 </div>
                 <div class="ui-g-12" style="padding: 0px; margin: 0px;">

@@ -4,6 +4,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -25,6 +26,7 @@ public class LoginTelValidController {
     private UserContextService userContextService;
     private MicroServiceUtil msUtil;
     private String telephone;
+    private String encryTelephone;
     private String msmcode;
 
     public String getTelephone() {
@@ -33,6 +35,14 @@ public class LoginTelValidController {
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    public String getEncryTelephone() {
+        return encryTelephone;
+    }
+
+    public void setEncryTelephone(String encryTelephone) {
+        this.encryTelephone = encryTelephone;
     }
 
     public String getMsmcode() {
@@ -51,6 +61,10 @@ public class LoginTelValidController {
         UserAccount user = userContextService.getLoginUser();
 
         telephone = user.getTelephone();
+
+        encryTelephone = StringUtil.mobileEncrypt(telephone);
+
+
     }
     public void sendMsMCode(){
         logger.info("发送短信验证码");
