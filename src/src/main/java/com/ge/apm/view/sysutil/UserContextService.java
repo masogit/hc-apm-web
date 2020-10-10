@@ -1107,4 +1107,9 @@ public class UserContextService implements Serializable {
         return cfgService.needScrappedControl();
     }
 
+    public boolean hasScrappedAuthority(){
+        AssetCreateService acService = WebUtil.getBean(AssetCreateService.class);
+        return acService.hasScrappedAuthority();
+    }
+
 }
