@@ -17,6 +17,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -299,7 +300,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showReturn = true;
                     showBtn = "1";
                 }
-            } else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
+            } else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
                     if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     }else {
@@ -477,6 +478,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String orderCancelNext(){
         zkbPartOrderService.orderCancelNext(this.selected,currentUser);
+        ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
@@ -487,6 +490,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void prepareReturnCreate(){
         this.actionReturnName = "Create";
         this.zkbPartOrderReturn = new ZkbPartOrderReturn();
+        zkbPartOrderReturn.setReturnDate(new Date());
         zkbPartOrderReturn.setPartOrderId(selected.getId());
         initPartList();
     }
