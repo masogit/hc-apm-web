@@ -2,12 +2,13 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.pm.V2_PmOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.ge.apm.service.asset.AssetInfoBulkEditUtils.*;
 
 @Service
 public class AssetInfoBulkEditService {
@@ -27,13 +28,18 @@ public class AssetInfoBulkEditService {
     @Autowired
     private V2_PmOrderRepository pmOrderDao;
 
+    @Autowired
+    private RelRuleAssetRepository relRuleAssetDao;
+
     @Transactional
     public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
 
-        updateSiteForAssetItself(assets, targetAsset);
+        commitSiteForAssetItself(assets, targetAsset);
         commitCorrectiveMaintenanceBulkEdit(assets, targetAsset);
         commitPreventativeMaintenanceBulkEdit(assets, targetAsset);
         commitQrCode(assets, targetAsset);
+        commitPmRule(assets, targetAsset);
+
     }
 
     @Transactional
@@ -49,7 +55,7 @@ public class AssetInfoBulkEditService {
         assetInfoDao.save(assets);
     }
 
-    private void updateSiteForAssetItself(List<AssetInfo> assets, AssetInfo targetAsset) {
+    private void commitSiteForAssetItself(List<AssetInfo> assets, AssetInfo targetAsset) {
 
         for (AssetInfo item: assets) {
             item.setSiteUID(targetAsset.getSiteOrg().getSiteUID());
@@ -63,6 +69,25 @@ public class AssetInfoBulkEditService {
         }
 
         assetInfoDao.save(assets);
+    }
+
+    private void commitPmRule(List<AssetInfo> assets, AssetInfo targetAsset) {
+
+        for (AssetInfo item: assets) {
+
+            RelRuleAsset relRuleAsset = relRuleAssetDao.findByAssetUID(item.getUid());
+
+            if (null == relRuleAsset) {
+                continue;
+            }
+
+            relRuleAsset.setSiteUID(targetAsset.getSiteOrg().getSiteUID());
+            relRuleAsset.setHospitalUID(targetAsset.getSiteOrg().getHospitalUID());
+            relRuleAsset.setInstitutionUID(targetAsset.getSiteOrg().getInstitutionUID());
+            relRuleAsset.setTenantUID(targetAsset.getSiteOrg().getTenantUID());
+
+            relRuleAssetDao.save(relRuleAsset);
+        }
     }
 
     /**
@@ -81,14 +106,14 @@ public class AssetInfoBulkEditService {
                     List<V2_WorkOrder_Detail> details = workOrder.getV2_workOrder_detail_list();
                     List<V2_WorkOrderCoworker> coworkers = workOrder.getV2_workOrder_coworker_list();
 
-                    updateWorkOrder(workOrder, targetAsset.getSiteOrg(), targetAsset.getClinicalDeptOrg());
-                    updateWorkOrderDetails(details, targetAsset.getSiteOrg(), targetAsset.getClinicalDeptOrg());
-                    updateWorkOrderCoworks(coworkers, targetAsset.getSiteOrg(), targetAsset.getClinicalDeptOrg());
+                    updateWorkOrder(workOrder, targetAsset.getSiteOrg());
+                    updateWorkOrderDetails(details, targetAsset.getSiteOrg());
+                    updateWorkOrderCoworks(coworkers, targetAsset.getSiteOrg());
                 }
                 workOrderDao.save(workOrders);
             }
 
-            updateServiceRequests(serviceRequests, targetAsset.getSiteOrg(), targetAsset.getClinicalDeptOrg());
+            updateServiceRequests(serviceRequests, targetAsset.getSiteOrg());
 
             serviceRequestDao.save(serviceRequests);
         }
@@ -109,8 +134,8 @@ public class AssetInfoBulkEditService {
                 List<V2_WorkOrderCoworker> coworkers = pmOrder.getCoworkers();
 
                 updatePMOrder(pmOrder, targetAsset.getSiteOrg(), targetAsset.getClinicalDeptOrg());
-                updateWorkOrderDetails(details, targetAsset.getSiteOrg(), targetAsset.getClinicalDeptOrg());
-                updateWorkOrderCoworks(coworkers, targetAsset.getSiteOrg(), targetAsset.getClinicalDeptOrg());
+                updateWorkOrderDetails(details, targetAsset.getSiteOrg());
+                updateWorkOrderCoworks(coworkers, targetAsset.getSiteOrg());
             }
 
             pmOrderDao.save(pmOrders);
@@ -137,49 +162,6 @@ public class AssetInfoBulkEditService {
         }
 
     }
-
-    private void updateServiceRequests(List<V2_ServiceRequest> serviceRequests, OrgInfo targetSite, OrgInfo targetClinicalDept) {
-        for (V2_ServiceRequest item: serviceRequests) {
-
-            item.setSiteUID(targetSite.getSiteUID());
-            item.setHospitalUID(targetSite.getHospitalUID());
-            item.setInstitutionUID(targetSite.getInstitutionUID());
-            item.setTenantUID(targetSite.getTenantUID());
-        }
-    }
-
-    private void updateWorkOrder(V2_WorkOrder workOrder, OrgInfo targetSite, OrgInfo targetClinicalDept) {
-        workOrder.setSiteUID(targetSite.getSiteUID());
-        workOrder.setHospitalUID(targetSite.getHospitalUID());
-        workOrder.setInstitutionUID(targetSite.getInstitutionUID());
-        workOrder.setTenantUID(targetSite.getTenantUID());
-    }
-
-    private void updatePMOrder(V2_PmOrder pmOrder, OrgInfo targetSite, OrgInfo targetClinicalDept) {
-        pmOrder.setClinicalDeptId(targetClinicalDept.getUid());
-
-        pmOrder.setSiteUID(targetSite.getSiteUID());
-        pmOrder.setHospitalUID(targetSite.getHospitalUID());
-        pmOrder.setInstitutionUID(targetSite.getInstitutionUID());
-        pmOrder.setTenantUID(targetSite.getTenantUID());
-    }
-
-    private void updateWorkOrderDetails(List<V2_WorkOrder_Detail> details, OrgInfo targetSite, OrgInfo targetClinicalDept) {
-        for (V2_WorkOrder_Detail item: details) {
-            item.setSiteUID(targetSite.getSiteUID());
-            item.setHospitalUID(targetSite.getHospitalUID());
-            item.setInstitutionUID(targetSite.getInstitutionUID());
-            item.setTenantUID(targetSite.getTenantUID());
-        }
-    }
-
-    private void updateWorkOrderCoworks(List<V2_WorkOrderCoworker> coworkers, OrgInfo targetSite, OrgInfo targetClinicalDept) {
-        for (V2_WorkOrderCoworker item: coworkers) {
-            item.setSiteUID(targetSite.getSiteUID());
-            item.setHospitalUID(targetSite.getHospitalUID());
-            item.setInstitutionUID(targetSite.getInstitutionUID());
-            item.setTenantUID(targetSite.getTenantUID());
-        }
-    }
+    
 
 }
