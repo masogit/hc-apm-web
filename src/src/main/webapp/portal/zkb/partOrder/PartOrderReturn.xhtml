@@ -38,7 +38,7 @@
 
                     <h:panelGroup rendered="#{(zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'DOA')}" style="text-align: left">
                         <label class="label">故障描述</label>
-                        <p:selectOneMenu id="partQualityIssue" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partQualityIssue}" style="text-align: left" >
+                        <p:selectOneMenu id="partQualityIssue" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partQualityIssue}" style="text-align: left"  >
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="Boot Up Issue" itemValue="Boot Up Issue"/>
                             <f:selectItem itemLabel="Cosmetic Issue" itemValue="Cosmetic Issue"/>
