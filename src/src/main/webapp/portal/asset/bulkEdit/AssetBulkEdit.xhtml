@@ -68,6 +68,14 @@
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.name}</label>
+                                        <p:inputText value="#{assetInfoBulkEditController.oneSearchStr}">
+                                            <p:ajax event="keyup" update="pickList" />
+                                        </p:inputText>
+                                    </h:panelGroup>
+
                                 </p:panelGrid>
                             </p:fieldset>
 
@@ -78,8 +86,17 @@
                                 <f:facet name="sourceCaption">待选设备</f:facet>
                                 <f:facet name="targetCaption">已选设备</f:facet>
                                 <p:ajax event="transfer" listener="#{assetInfoBulkEditController.onTransfer}" update="btnBulkEditSite btnBulkEdit"/>
-                                <p:column style="width:20%;">
+                                <p:column style="width:30%;">
                                     <h:outputText value="#{asset.name}" />
+                                </p:column>
+                                <p:column style="width:20%;">
+                                    <h:outputText value="#{asset.financingNum}" />
+                                </p:column>
+                                <p:column style="width:30%;">
+                                    <h:outputText value="#{asset.departNum}" />
+                                </p:column>
+                                <p:column style="width:20%;">
+                                    <h:outputText value="#{asset.departNum}" />
                                 </p:column>
                             </p:pickList>
 
