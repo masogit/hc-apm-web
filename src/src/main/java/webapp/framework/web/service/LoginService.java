@@ -64,7 +64,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
     private ApplicationEventPublisher applicationEventPublisher;
     private MicroServiceUtil msUtil;
     private GeSsoService geSsoService;
-    private TenantInfoRepository tenantInfoDao;
+    protected TenantInfoRepository tenantInfoDao;
     private LoginVerificationCodeService loginVerificationCodeService;
     protected UserAccount user;
     protected String telephone;

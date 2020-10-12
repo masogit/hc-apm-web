@@ -3,6 +3,7 @@ package com.ge.apm.view.sysutil;
 import com.ge.apm.dao.LoginRecordRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.LoginRecord;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.Digests;
@@ -59,6 +60,11 @@ public class LoginController extends LoginService {
             UserAccountService userAccountService = WebUtil.getBean(UserAccountService.class);
             UserAccount user = userAccountService.getUserByTelephone(telephone);
             if(user != null) {
+                TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
+                if(tenantInfo != null && tenantInfo.getType() != null && tenantInfo.getType() != 3){
+                    WebUtil.addErrorMessage("此手机号非智康宝用户!");
+                    return;
+                }
                 //发送手机验证码
                 ResponseEntity<LinkedHashMap> response = this.sendVerificationCode(telephone, user.getEmail());
                 if(response.getBody() != null && bizStatusCode.equals(response.getBody().get("bizStatusCode"))){

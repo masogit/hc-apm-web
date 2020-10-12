@@ -52,9 +52,11 @@ public class UserContextService implements Serializable {
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
+    private ZkbContractRepository zkbContractRepository;
 
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        zkbContractRepository= WebUtil.getBean(ZkbContractRepository.class);
         userContextService.userAccount = user;
 
         // reset previous cached data
@@ -887,6 +889,13 @@ public class UserContextService implements Serializable {
         if(tenantInfo.getType() != null && tenantInfo.getType() == 3){
             return true;
         }
+        //getzkb_contract
+        String contractNo = tenantInfo.getContractNo();
+        ZkbContract zkbContract = zkbContractRepository.findFirstByContractNo(contractNo);
+        Date now = new Date();
+        if(now.after(zkbContract.getEndDate()) || now.before(zkbContract.getStartDate())){
+            return false;
+        }
         return false;
     }
 
@@ -1105,6 +1114,11 @@ public class UserContextService implements Serializable {
     public boolean needScrappedControl(){
         ConfigService cfgService = WebUtil.getBean(ConfigService.class);
         return cfgService.needScrappedControl();
+    }
+
+    public boolean hasScrappedAuthority(){
+        AssetCreateService acService = WebUtil.getBean(AssetCreateService.class);
+        return acService.hasScrappedAuthority();
     }
 
 }
