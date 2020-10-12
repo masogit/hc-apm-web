@@ -3,34 +3,35 @@ package com.ge.apm.view.sysutil;
 import com.ge.apm.dao.LoginRecordRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.LoginRecord;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.Digests;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PasswordUtil;
+import com.ge.apm.web.cboard.CBoardController;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.util.TimeUtil;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.service.LoginService;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
-
-import com.ge.apm.web.cboard.CBoardController;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.B64Code;
-import org.primefaces.context.RequestContext;
-import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.util.TimeUtil;
-import webapp.framework.web.WebUtil;
-import webapp.framework.web.service.LoginService;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ManagedBean
 @RequestScoped
@@ -53,7 +54,45 @@ public class LoginController extends LoginService {
     public void setPlainPassword(String plainPassword) {
         this.plainPassword = plainPassword;
     }
-    
+    public void sendTheVerificationCode() {
+        if(StringUtils.isEmpty(telephone)) return;
+        try {
+            UserAccountService userAccountService = WebUtil.getBean(UserAccountService.class);
+            UserAccount user = userAccountService.getUserByTelephone(telephone);
+            if(user != null) {
+                TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
+                if(tenantInfo != null && tenantInfo.getType() != null && tenantInfo.getType() != 3){
+                    WebUtil.addErrorMessage("此手机号非智康宝用户!");
+                    return;
+                }
+                //发送手机验证码
+                ResponseEntity<LinkedHashMap> response = this.sendVerificationCode(telephone, user.getEmail());
+                if(response.getBody() != null && bizStatusCode.equals(response.getBody().get("bizStatusCode"))){
+                    readonlyFlag = true;
+                    WebUtil.addErrorMessage("验证码已发送请注意查收");
+                    return;
+                }
+            }else {
+                WebUtil.addErrorMessage("此手机号没找到对应的用户");
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void sendMail() {
+        if(StringUtils.isEmpty(verificationCode)){
+            WebUtil.addErrorMessage("验证码不能为空");
+            return;
+        }
+        if(!StringUtils.isEmpty(verificationCode)){
+            ResponseEntity<LinkedHashMap> response = this.sendEmail(verificationCode, telephone);
+            if(response.getBody() != null && bizStatusCode.equals(response.getBody().get("bizStatusCode"))){
+                WebUtil.addErrorMessage("新密码已发送到邮件注意查收");
+                return;
+            }
+        }
+    }
     public void validatePassword(){
         UserAccount user = UserContextService.getCurrentUserAccount();
         if(user==null){
@@ -163,6 +202,8 @@ public class LoginController extends LoginService {
             boolean factorValidLogin = isPhoneValidLogin(user);
             if(!factorValidLogin){
                 skipTelephoneValidlogin();
+            }else {
+                str = "/portal/login/phoneValid.xhtml";
             }
             WebUtil.redirectTo(str);
         }
