@@ -42,7 +42,7 @@ public class AssetFileImportUseCacheService extends AssetFileImportBaseService {
     }
 
     @Transactional
-    public void importAssetData(OrgInfo selectedOrg, List<Map<String, Object>> importAssetMap,
+    public void importAssetData(boolean crossSite, OrgInfo selectedOrg, List<Map<String, Object>> importAssetMap,
                                 Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, AssetFileImportCache assetFileImportCache) {
         LocalDateTime startTime = LocalDateTime.now();
 
@@ -56,7 +56,7 @@ public class AssetFileImportUseCacheService extends AssetFileImportBaseService {
                 for (Map<String, Object> item : importAssetMap) {
                     AssetInfo assetInfo = (AssetInfo)item.get("asset");
                     if(supportingService.isParentAssetForIBTenant(assetInfo)) {
-                        importOneAsset(selectedOrg, item, autoGenerateQrcode, orgNamesUriCache, importAssetMap, assetFileImportCache);
+                        importOneAsset(crossSite, selectedOrg, item, autoGenerateQrcode, orgNamesUriCache, importAssetMap, assetFileImportCache);
                     }
                 }
                 //second iteration: import child asset and other asset
@@ -68,7 +68,7 @@ public class AssetFileImportUseCacheService extends AssetFileImportBaseService {
                     if(supportingService.isChildAssetForIBTenant(assetInfo, parentAssetsMap)) {
                         supportingService.setParentAsset(assetInfo, parentAssetsMap);
                     }
-                    importOneAsset(selectedOrg, item, autoGenerateQrcode, orgNamesUriCache, importAssetMap, assetFileImportCache);
+                    importOneAsset(crossSite, selectedOrg, item, autoGenerateQrcode, orgNamesUriCache, importAssetMap, assetFileImportCache);
                 }
 
             } else {
@@ -78,7 +78,7 @@ public class AssetFileImportUseCacheService extends AssetFileImportBaseService {
                     }
 
                     ++row;
-                    importOneAsset(selectedOrg, item, autoGenerateQrcode, orgNamesUriCache, importAssetMap, assetFileImportCache);
+                    importOneAsset(crossSite,selectedOrg, item, autoGenerateQrcode, orgNamesUriCache, importAssetMap, assetFileImportCache);
                 }
             }
 
@@ -93,7 +93,7 @@ public class AssetFileImportUseCacheService extends AssetFileImportBaseService {
     }
 
     @Transactional
-    protected void importOneAsset(OrgInfo selectedOrg, Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, List<Map<String, Object>> importAssetMap,
+    protected void importOneAsset(boolean crossSite, OrgInfo selectedOrg, Map<String, Object> item, boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache, List<Map<String, Object>> importAssetMap,
                                   AssetFileImportCache assetFileImportCache) {
 
         Map<String, OrgInfo> allCilinicalOfSiteUidCache;

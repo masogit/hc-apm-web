@@ -340,9 +340,13 @@ public class UserAccountService {
 	public String getUserLanguageByLoginName(String loginName) {
 		return userAccountMapper.getUserLanguageByLoginName(loginName);
 	}
+	public UserAccount getUserByTelephone(String telephone) {
+		return userAccountRepository.findByTelephone(telephone);
+	}
 
     @Transactional
     public void deleteUserAccount(UserAccount userAccount){
+		userOrgDao.deleteByUserUid(userAccount.getUid());
         userRoleRepository.deleteByUserAccount(userAccount.getId());
         userAccountRepository.delete(userAccount);
     }

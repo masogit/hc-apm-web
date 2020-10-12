@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -113,9 +115,11 @@ public class ZkbContractService {
     }
 
     public String calcContractState(Date startDate,Date endDate){
-        if(whenEQ(startDate,new Date())){
+        Integer startFlag = whenEQ(new Date(),startDate);
+        Integer endFlag = whenEQ(new Date(),endDate);
+        if(startFlag < 0){
             return "未生效";
-        }else if(!whenEQ(new Date(),endDate)){
+        }else if(startFlag >= 0 && endFlag <=0){
             return "有效";
         }else{
             return "已过期";
@@ -128,13 +132,24 @@ public class ZkbContractService {
      * @param otherDate 另一个日期
      * @return 比较两日期大小。如果date>=otherDate则返回true,否则false
      */
-    public static Boolean whenEQ(Date date, Date otherDate) {
-        Boolean flag = true;
-        if (date != null && otherDate != null) {
-            long time = date.getTime() - otherDate.getTime();
-            if (time < 0) {
-                flag = false;
+    public static Integer whenEQ(Date d, Date o) {
+        Integer flag = 0;
+        try {
+            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = f.parse(f.format(d));
+            Date otherDate = f.parse(f.format(o));
+            if (date != null && otherDate != null) {
+                long time = date.getTime() - otherDate.getTime();
+                if (time < 0) {
+                    flag = -1;
+                }else if(time == 0){
+                    flag =0;
+                }else{
+                    flag = 1;
+                }
             }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
         return flag;
     }

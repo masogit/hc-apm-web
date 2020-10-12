@@ -50,10 +50,6 @@ public class GbCode {
 		return code;
 	}
 
-	public void setCode(Integer code) {
-		code = code;
-	}
-
 	public String getName() {
 		return name;
 	}

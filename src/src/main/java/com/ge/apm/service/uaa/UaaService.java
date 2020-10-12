@@ -1378,7 +1378,7 @@ public class UaaService {
 
             item.setType("hidden"); 
             OrgInfo org = (OrgInfo)item.getData();
-            if(!org.getName().contains(filterKeyword) && (org.getNamePyCode()!=null && !org.getNamePyCode().contains(filterKeyword))) return;
+            if(!org.getName().contains(filterKeyword) && (org.getNamePyCode()==null?true:!org.getNamePyCode().contains(filterKeyword))) return;
             if(maxOrgType >=0 && org.getOrgType()>maxOrgType) return;
             if(maxOrgLevel >=0 && org.getOrgLevel()>maxOrgLevel) return;
            

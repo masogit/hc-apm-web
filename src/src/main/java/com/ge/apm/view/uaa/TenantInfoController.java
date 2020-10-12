@@ -119,13 +119,11 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	public void loadTemplateFile() {
 		String rstr = "";
-		fhMap = new HashMap<String, String>();
+		fhMap = new HashMap<>();
 		for (File f : getResourceFolderFiles("/templateFile/")) {
-			try {
-				FileInputStream in = new FileInputStream(f);
-				BufferedReader br = new BufferedReader(new InputStreamReader(in, "GBK"));
-				String str = null;
-				StringBuffer xmlTemplate = new StringBuffer();
+			try (FileInputStream in = new FileInputStream(f);
+				 BufferedReader br = new BufferedReader(new InputStreamReader(in, "GBK"));){
+				String str;
 				while ((str = br.readLine()) != null) {
 					rstr += str;
 				}

@@ -194,11 +194,11 @@ public class AssetFileImportController {
 
             Map<String, OrgInfo> orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
 
-            AssetFileImportCacheService assetFileImportCacheService = WebUtil.getBean(AssetFileImportCacheService.class);
-            AssetFileImportCache assetFileImportCache = new AssetFileImportCache(importAssetMap, selectedOrg, assetFileImportCacheService);
+            //AssetFileImportCacheService assetFileImportCacheService = WebUtil.getBean(AssetFileImportCacheService.class);
+            //AssetFileImportCache assetFileImportCache = new AssetFileImportCache(importAssetMap, selectedOrg, assetFileImportCacheService);
 
-            //streamingService.importAssetData(importAssetMap, autoGenerateQrcode, orgNamesUriCache);
-            importUseCacheService.importAssetData(selectedOrg, importAssetMap, autoGenerateQrcode, orgNamesUriCache, assetFileImportCache);
+            streamingService.importAssetData(importAssetMap, autoGenerateQrcode, orgNamesUriCache);
+            //importUseCacheService.importAssetData(crossSite, selectedOrg, importAssetMap, autoGenerateQrcode, orgNamesUriCache, assetFileImportCache);
             isImported = true;
 
             filterErrorRecords();

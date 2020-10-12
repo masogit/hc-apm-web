@@ -184,6 +184,9 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "order_no")
     private String orderNo;
 
+    @Column(name = "price")
+    private String price;
+
     /**
      * 订货备注
      */
@@ -465,6 +468,14 @@ public class ZkbPartOrder implements Serializable {
 
     public String getPartSerialNumber() {
         return partSerialNumber;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 
     public void setPartSerialNumber(String partSerialNumber) {

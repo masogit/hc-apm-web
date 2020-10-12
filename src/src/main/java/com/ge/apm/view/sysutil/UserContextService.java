@@ -623,9 +623,6 @@ public class UserContextService implements Serializable {
         if (userAccount == null) {
             return "/login.xhtml";
         } else {
-            if(isPhoneValidLogin()){
-                return "/home.xhtml";
-            }
             if(isPartnerAccount())
                 return "/admin/uaa/siteInfo/List.xhtml";
 
@@ -635,11 +632,6 @@ public class UserContextService implements Serializable {
             UaaService uaaService = WebUtil.getBean(UaaService.class);
             return uaaService.getUserDefaultHomePage(userAccount);
         }
-    }
-    private boolean isPhoneValidLogin() {
-        TenantInfoRepository tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
-        TenantInfo tenantInfo = tenantInfoDao.findByuid(userAccount.getTenantUID());
-        return tenantInfo.getTwoFactorValid()==null?false:tenantInfo.getTwoFactorValid();
     }
     public static String getAccessToken() {
         return getAccessToken(null);
@@ -1122,6 +1114,11 @@ public class UserContextService implements Serializable {
     public boolean needScrappedControl(){
         ConfigService cfgService = WebUtil.getBean(ConfigService.class);
         return cfgService.needScrappedControl();
+    }
+
+    public boolean hasScrappedAuthority(){
+        AssetCreateService acService = WebUtil.getBean(AssetCreateService.class);
+        return acService.hasScrappedAuthority();
     }
 
 }
