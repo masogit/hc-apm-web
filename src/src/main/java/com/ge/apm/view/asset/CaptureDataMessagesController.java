@@ -8,6 +8,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jfree.util.Log;
 import org.primefaces.event.FileUploadEvent;
@@ -208,6 +209,10 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 	public void save() {
 		if (this.selected.getType() == null) {
 			this.selected.setType(0);
+		}
+		if (this.selected.getContent() != null){
+			String replacedContent  = StringEscapeUtils.escapeHtml4(this.selected.getContent());
+            this.selected.setContent(replacedContent);
 		}
 		if (this.selected.getType() == 0) {
 			if (checkedSystemId == null || checkedSystemId.equals(this.selected.getSystemId()) == false) {
