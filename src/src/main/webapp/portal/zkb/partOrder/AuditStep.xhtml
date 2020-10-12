@@ -383,7 +383,8 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">价格*</label>
-                                    <p:inputText value="#{zkbPartOrderAuditController.selected.price}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="价格 #{msg.ValidationRequire}" />
+                                    <!--<p:inputText value="#{zkbPartOrderAuditController.selected.price}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="价格 #{msg.ValidationRequire}" />-->
+                                    <p:inputNumber value="#{zkbPartOrderAuditController.selected.price}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="价格 #{msg.ValidationRequire}"> </p:inputNumber>
                                 </h:panelGroup>
 
                                 <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType eq 'HighValue') and !(userContextService.zkbUser)}">
@@ -436,7 +437,7 @@
                                     <label class="label">GE工程师电话*</label>
                                     <p:inputText value="#{zkbPartOrderAuditController.selected.geEngineerPhone}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_geEngineerPhone} #{msg.ValidationRequire}" />
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.artificialType eq '1'}">
                                     <label class="label">是否扣除名额*</label>
                                     <p:selectOneMenu id="whetherDeduct" value="#{zkbPartOrderAuditController.selected.whetherDeduct}" required="true" requiredMessage="#{msg.zkbPartOrder_whetherDeduct} #{msg.ValidationRequire}" >
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -523,7 +524,8 @@
                             <p:inputText value="#{item.orderNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </p:column>
                         <p:column headerText="价格*" rendered="#{!userContextService.zkbUser}">
-                            <p:inputText value="#{item.price}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                            <!--<p:inputText value="#{item.price}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />-->
+                            <p:inputNumber value="#{item.price}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" > </p:inputNumber>
                         </p:column>
                         <p:column headerText="备注（说明是否DOA或者Short life）">
                             <p:inputText value="#{item.remark}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
