@@ -467,7 +467,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())) {
             if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
-                if("1".equals(zkbPartOrder.getArtificialType())){
+                //if("1".equals(zkbPartOrder.getArtificialType())){
                     if("t".equals(zkbPartOrder.getWhetherDeduct())){
                         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                         subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
@@ -476,10 +476,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                         subApplyQty(zkbContract,zkbPartOrder, (0-zkbPartOrder.getQty()));
                     }
-                }else{
+                /*}else{
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                     subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
-                }
+                }*/
             }else {
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());

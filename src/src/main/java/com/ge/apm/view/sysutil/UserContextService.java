@@ -18,8 +18,6 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 import javaslang.control.Option;
-
-import javax.annotation.PostConstruct;
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -54,14 +52,12 @@ public class UserContextService implements Serializable {
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
-    private ZkbContractRepository zkbContractRepository;
+    private static ZkbContractRepository zkbContractRepository;
 
-    @PostConstruct
-    public void init(){
-        zkbContractRepository= WebUtil.getBean(ZkbContractRepository.class);
-    }
+
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        zkbContractRepository= WebUtil.getBean(ZkbContractRepository.class);
         userContextService.userAccount = user;
 
         // reset previous cached data
@@ -894,6 +890,13 @@ public class UserContextService implements Serializable {
         if(tenantInfo.getType() != null && tenantInfo.getType() == 3){
             return true;
         }
+        //getzkb_contract
+        /*String contractNo = tenantInfo.getContractNo();
+        ZkbContract zkbContract = zkbContractRepository.findFirstByContractNo(contractNo);
+        Date now = new Date();
+        if(now.after(zkbContract.getEndDate()) || now.before(zkbContract.getStartDate())){
+            return false;
+        }*/
         return false;
     }
 
