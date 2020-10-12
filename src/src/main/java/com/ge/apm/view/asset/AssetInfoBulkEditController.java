@@ -6,8 +6,10 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.KeyLabel;
+import com.ge.apm.service.asset.AssetInfoBulkEditCheckService;
 import com.ge.apm.service.asset.AssetInfoBulkEditService;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -46,6 +48,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private AssetInfoService assetInfoService;
     private UaaService uaaService;
     private AssetInfoBulkEditService assetInfoBulkEditService;
+    private AssetInfoBulkEditCheckService assetInfoBulkEditCheckService;
     private OrgInfoRepository orgInfoDao;
 
     //******* filter start
@@ -82,6 +85,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoBulkEditService = WebUtil.getBean(AssetInfoBulkEditService.class);
+        assetInfoBulkEditCheckService = WebUtil.getBean(AssetInfoBulkEditCheckService.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 
         selected = new AssetInfo();
@@ -319,6 +323,19 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         //commit changes after validated
         List<AssetInfo> selectedAssets = assets.getTarget();
+
+        //验证
+        if(!assetInfoBulkEditCheckService.verify(selectedAssets)){
+            WebUtil.addSuccessMessage("有设备正在调剂中!");
+            return;
+        }
+        // asset in repaire  status
+        for(AssetInfo as:selectedAssets){
+            if(as.getStatus()== AssetConstant.ASSET_STATUS_ILL){
+                WebUtil.addSuccessMessage("有设备正在维修中!");
+                return;
+            }
+        }
 
         assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
 
