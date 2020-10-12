@@ -8,6 +8,7 @@ package com.ge.apm.view.pm;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.excel.PmModel;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
@@ -20,32 +21,37 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
-import com.ge.apm.service.simpleparts.SimplePartsInventoryService;
-import com.ge.apm.service.simpleparts.SimplePartsItemService;
-import com.ge.apm.service.simpleparts.SimplePartsRequestService;
-import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
 import com.ge.apm.service.pm.PmFileExportTemplate;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
+import com.ge.apm.service.simpleparts.SimplePartsInventoryService;
+import com.ge.apm.service.simpleparts.SimplePartsItemService;
+import com.ge.apm.service.simpleparts.SimplePartsRequestService;
+import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
+import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
-
 import lombok.Getter;
 import lombok.Setter;
+import net.sf.jxls.transformer.XLSTransformer;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.HashedMap;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -57,7 +63,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -67,7 +72,9 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -89,7 +96,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Getter @Setter
     private PmOrderRule pmOrderRule;
 
-
+    @Getter @Setter
+    private FileScanService fileScanService;
     @Setter @Getter
     private Boolean isBatchOp=true;
     private SupplierController supplierController;
@@ -292,6 +300,54 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
    public void exportExcel() throws IOException{
+       if(queryIndex == 10){
+          long t1 = System.currentTimeMillis();
+//           List<Object> list =  dao.getAllPmOrder(user.getOrgInfoUID());
+           List<Object> list =  dao.getAllPmOrder1();
+           long t2 = System.currentTimeMillis();
+           System.out.println(t2-t1);
+           List<PmModel> pmModels = new ArrayList<>();
+           for(int i=0;i<list.size();i++){
+               PmModel pmModel = new PmModel();
+               Object[] cells = (Object[]) list.get(i);
+//               Map<String,Object> cells = (Map<String, Object>) list.get(i);
+               pmModel.setSiteName(checkValue(cells[0]));
+               pmModel.setAssetName(checkValue(cells[1]));
+
+               pmModel.setSerialNum(checkValue(cells[2]));
+               pmModel.setDepartNum(checkValue(cells[3]));
+               pmModel.setFunctionType(checkValue(cells[4]));
+               pmModel.setRuleLevel(checkValue(cells[5]));
+               pmModel.setPmType(checkValue(cells[6]));
+               pmModel.setClinicalDeptName(checkValue(cells[7]));
+               pmModel.setPmRuleName(checkValue(cells[8]));
+               pmModel.setPmRulePeriod(checkValue(cells[9]));
+               pmModel.setCreatorName(checkValue(cells[10]));
+               pmModel.setOwnerName(checkValue(cells[11]));
+               pmModel.setPmNum(checkValue(cells[12]));
+               pmModel.setCurrentStepName(checkValue(cells[13]));
+               pmModel.setIntExtType(FieldValueMessageController.fieldValue("intExtType",checkValue(cells[14])));
+               pmModel.setPlanTime(checkValue(cells[15]));
+               pmModels.add(pmModel);
+           }
+           String path = new DateTime().toString("yyyyMMddhhmm")+ File.separator+user.getLoginName();
+           String filePath = fileScanService.getUploadFileFullPath(path);
+           FileUtils.forceMkdir(new File(filePath));
+           String source = this.getClass().getClassLoader().getResource("template/PmOrder_export.xlsx").getPath();
+           Map<String,Object> map = new HashedMap<>();
+           map.put("list",pmModels);
+           XLSTransformer transformer = new XLSTransformer();
+           try {
+               transformer.transformXLS(source,map,filePath+File.separator+"pm.xlsx");
+           } catch (InvalidFormatException e) {
+               e.printStackTrace();
+           }
+           long t3 = System.currentTimeMillis();
+           excelFile = new DefaultStreamedContent(new FileInputStream(filePath+File.separator+"pm.xlsx"), "application/.ms-excel", "AssetInfo_export.xlsx");
+          long t4 = System.currentTimeMillis();
+           System.out.println(t4 - t2);
+           return;
+       }
        PmFileExportTemplate template = new PmFileExportTemplate();
         List<V2_PmOrder> pmOrderList = getPmListByselectedId();
        if(pmOrderList ==null && queryIndex!=10){
@@ -302,6 +358,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         template.exportPm(pmOrderList,pmFieldsExport);
        excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "AssetInfo_export.xlsx");
    }
+
+   public String checkValue(Object obj){
+        if(obj != null){
+            return obj.toString();
+        }else {
+            return "";
+        }
+   }
+
     List<String> pmIdList = new ArrayList<String>();
    private  List<V2_PmOrder> getPmListByselectedId(){
         selectedMap.forEach((k, v) -> {
@@ -1227,6 +1292,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     protected void init() {
+        fileScanService = WebUtil.getBean(FileScanService.class);
         tableService = WebUtil.getBean(TableDefinitionService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
