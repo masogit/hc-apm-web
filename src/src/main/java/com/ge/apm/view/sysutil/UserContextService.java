@@ -54,12 +54,12 @@ public class UserContextService implements Serializable {
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
-    private  ZkbContractRepository zkbContractRepository;
+//    private  ZkbContractRepository zkbContractRepository;
 
-    @PostConstruct
-    public void init(){
-        zkbContractRepository= WebUtil.getBean(ZkbContractRepository.class);
-    }
+//    @PostConstruct
+//    public void init(){
+//        zkbContractRepository= WebUtil.getBean(ZkbContractRepository.class);
+//    }
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
