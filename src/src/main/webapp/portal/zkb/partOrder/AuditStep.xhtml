@@ -682,6 +682,16 @@
                             <p:inputTextarea rows="10" cols="50" id="opRemark" value="#{zkbPartOrderAuditController.selected.orderedRemark}" required="true" requiredMessage="原因不能为空">
                             </p:inputTextarea>
                         </h:panelGroup>
+                        <c:choose>
+                            <c:when test="#{zkbPartOrderAuditController.selected.status eq 'OrderExtraPending'}">
+                                <p:inputTextarea rows="10" cols="50" value="#{zkbPartOrderAuditController.selected.unOrderRemark}" required="true" requiredMessage="原因不能为空">
+                                </p:inputTextarea>
+                            </c:when>
+                            <c:when test="#{zkbPartOrderAuditController.selected.status eq 'OrderPending'}">
+                                <p:inputTextarea rows="10" cols="50" value="#{zkbPartOrderAuditController.selected.orderedRemark}" required="true" requiredMessage="原因不能为空">
+                                </p:inputTextarea>
+                            </c:when>
+                        </c:choose>
                     </p:panelGrid>
                     <br/>
                     <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.orderCancelNext}" oncomplete="PF('zkbConfigDlg').hide()" update=":growl" icon="ui-icon-check" />
