@@ -1,17 +1,18 @@
 package com.ge.apm.view.asset;
 
 import javax.faces.bean.ManagedBean;
+
+import com.ge.apm.dao.ZkbContractRepository;
+import com.ge.apm.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.faces.bean.ViewScoped;
@@ -35,12 +36,13 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     private UaaService uuaService;
     private AssetInstallationService aiService;
     private String oneSearchStr;
-
+    private ZkbContractRepository zkbContractRepository;
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         uuaService = WebUtil.getBean(UaaService.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
+        zkbContractRepository= WebUtil.getBean(ZkbContractRepository.class);
         this.filterBySite = false;
         this.filterByHospital = false;
     }
@@ -155,6 +157,19 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     private AssetInfo selectedAsset = null;
 
     public void confirmSelection() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        if(userContextService.isZkbAccount()){
+            //getzkb_contract
+            TenantInfo tenantInfo = userContextService.getTenantInfo();
+            String contractNo = tenantInfo.getContractNo();
+            ZkbContract zkbContract = zkbContractRepository.findFirstByContractNo(contractNo);
+            Date now = new Date();
+            if(now.after(zkbContract.getEndDate()) || now.before(zkbContract.getStartDate())){
+                WebUtil.addErrorMessageKey("合同有效期的设备才可以创建报修工单");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
+        }
         if (this.selectedAsset == null) {
             WebUtil.addErrorMessageKey("noAssetSelected");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
