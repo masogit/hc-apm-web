@@ -52,7 +52,7 @@ public class UserContextService implements Serializable {
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
-    private ZkbContractRepository zkbContractRepository;
+    private static ZkbContractRepository zkbContractRepository;
 
 
     public static void setLoginUser(UserAccount user) {
@@ -891,12 +891,12 @@ public class UserContextService implements Serializable {
             return true;
         }
         //getzkb_contract
-        String contractNo = tenantInfo.getContractNo();
+        /*String contractNo = tenantInfo.getContractNo();
         ZkbContract zkbContract = zkbContractRepository.findFirstByContractNo(contractNo);
         Date now = new Date();
         if(now.after(zkbContract.getEndDate()) || now.before(zkbContract.getStartDate())){
             return false;
-        }
+        }*/
         return false;
     }
 
