@@ -49,6 +49,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private OrgInfoRepository orgInfoDao;
 
     //******* filter start
+
     @Getter @Setter
     private DualListModel<AssetInfo> assets = new DualListModel<>(null, new ArrayList<>());
 
@@ -58,6 +59,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private AssetInfo filter = new AssetInfo();
 
     private List<OrgInfo> clinicalDeptListAsFilter = Collections.emptyList();
+
+    @Getter @Setter
+    private String oneSearchStr;
+
     //******* filter end
 
 
@@ -183,6 +188,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         if (null != this.filter.getAssetGroup()) {
             searchFilter = new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.filter.getAssetGroup());
+            this.searchFilters.add(searchFilter);
+        }
+
+        if (null != this.oneSearchStr) {
+            searchFilter = new SearchFilter("name", SearchFilter.Operator.LIKE, this.oneSearchStr);
             this.searchFilters.add(searchFilter);
         }
     }
