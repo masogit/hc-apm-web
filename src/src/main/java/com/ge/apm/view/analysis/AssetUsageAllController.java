@@ -443,6 +443,9 @@ public class AssetUsageAllController implements Serializable, ServerEventInterfa
 			dt_total += dt;
 			wait_total += wait;
 
+			if (serve == 0) {
+				throw new IllegalStateException("cannot divide 0");
+			}
 			dt /= serve;
 			dt *= 100;
 
