@@ -61,6 +61,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String valueTypeTips = "";
     private String showOrderedFieldsetText = "";
     private String queryStatus;
+    private List<ZkbPartOrderItemVo> zkbPartOrderItemVoList = new ArrayList<>();
 
 
     @Override
@@ -139,6 +140,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showOrderedFieldsetText = "派工信息";
             }else{
                 showOrderedFieldsetText = "订货信息";
+            }
+
+            if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Parts.toString()) && selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString())){
+                List<String> ss = new ArrayList<>();
+                for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+                    ss.add(i.getPartNo());
+                }
+                zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),ss,selected.getId(),selected.getAssetTypeDi());
             }
         }
     }
@@ -744,6 +753,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setShowRejectOrder(boolean showRejectOrder) {
         this.showRejectOrder = showRejectOrder;
+    }
+
+    public List<ZkbPartOrderItemVo> getZkbPartOrderItemVoList() {
+        return zkbPartOrderItemVoList;
+    }
+
+    public void setZkbPartOrderItemVoList(List<ZkbPartOrderItemVo> zkbPartOrderItemVoList) {
+        this.zkbPartOrderItemVoList = zkbPartOrderItemVoList;
     }
 
     @Override
