@@ -212,7 +212,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 		}
 		if (this.selected.getContent() != null){
 			String replacedContent  = StringEscapeUtils.escapeHtml4(this.selected.getContent());
-            this.selected.setContent(replacedContent);
+			this.selected.setContent(replacedContent);
 		}
 		if (this.selected.getType() == 0) {
 			if (checkedSystemId == null || checkedSystemId.equals(this.selected.getSystemId()) == false) {
