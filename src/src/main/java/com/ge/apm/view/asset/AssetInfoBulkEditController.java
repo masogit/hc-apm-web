@@ -332,6 +332,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             WebUtil.addSuccessMessage("有设备正在调剂中!");
             return;
         }
+        assetInfoBulkEditCheckService.checkAsset(selectedAssets);
         // asset in repaire  status
         for(AssetInfo as:selectedAssets){
             if(as.getStatus()== AssetConstant.ASSET_STATUS_ILL){
