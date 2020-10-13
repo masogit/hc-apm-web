@@ -1,13 +1,15 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.NurseSiteMaintainDataRepository;
+import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.KeyLabel;
+import com.ge.apm.service.asset.AssetInfoBulkEditCheckService;
 import com.ge.apm.service.asset.AssetInfoBulkEditService;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -22,18 +24,17 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -46,7 +47,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private AssetInfoService assetInfoService;
     private UaaService uaaService;
     private AssetInfoBulkEditService assetInfoBulkEditService;
+    private AssetInfoBulkEditCheckService assetInfoBulkEditCheckService;
     private OrgInfoRepository orgInfoDao;
+    private NurseSiteMaintainItemRepository nurseSiteMaintainItemRepository;
+    private NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
 
     //******* filter start
 
@@ -82,7 +86,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoBulkEditService = WebUtil.getBean(AssetInfoBulkEditService.class);
+        assetInfoBulkEditCheckService = WebUtil.getBean(AssetInfoBulkEditCheckService.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
+        nurseSiteMaintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
+        nurseSiteMaintainDataRepository = WebUtil.getBean(NurseSiteMaintainDataRepository.class);
 
         selected = new AssetInfo();
 
@@ -319,6 +326,39 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         //commit changes after validated
         List<AssetInfo> selectedAssets = assets.getTarget();
+
+        //验证
+        if(!assetInfoBulkEditCheckService.verify(selectedAssets)){
+            WebUtil.addSuccessMessage("有设备正在调剂中!");
+            return;
+        }
+        // asset in repaire  status
+        for(AssetInfo as:selectedAssets){
+            if(as.getStatus()== AssetConstant.ASSET_STATUS_ILL){
+                WebUtil.addSuccessMessage("有设备正在维修中!");
+                return;
+            }
+            //临床助手检查进行中
+            List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findByAssetUid(as.getUid());
+            if(!StringUtils.isEmpty(nurseSiteMaintainItemList)){
+                Set<String> setMaintainIds = null;
+                for (int i = 0; i < nurseSiteMaintainItemList.size(); i++) {
+                    setMaintainIds = new HashSet<String>();
+                    setMaintainIds.add(nurseSiteMaintainItemList.get(i).getId());
+                }
+                if(!StringUtils.isEmpty(setMaintainIds)){
+                    Set<NurseSiteMaintainData> maintainDataByParentIds = nurseSiteMaintainDataRepository.findMaintainDataByParentIds(setMaintainIds);
+                    for (NurseSiteMaintainData nurseSiteMaintainData : maintainDataByParentIds) {
+                        Boolean checkValue = nurseSiteMaintainData.getCheckValue() != null ? nurseSiteMaintainData.getCheckValue() :false;
+                        if(!checkValue){
+                            WebUtil.addSuccessMessage("设备("+as.getName()+")当前有未完成的日常检查工单无法迁移 请先关闭工单！");
+                            return;
+                        }
+                    }
+                }
+
+            }
+        }
 
         assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
 
