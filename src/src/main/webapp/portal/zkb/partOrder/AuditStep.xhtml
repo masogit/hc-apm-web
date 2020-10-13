@@ -702,11 +702,11 @@
                         <h:panelGroup>
                             <label class="label">拒绝原因</label>
                             <c:choose>
-                                <c:when test="#{zkbPartOrderAuditController.selected.status eq 'OrderExtraPending'}">
+                                <c:when test="#{zkbPartOrderAuditController.selected.currentStep eq 'OrderExtraPending'}">
                                     <p:inputTextarea rows="10" cols="50" value="#{zkbPartOrderAuditController.selected.unOrderRemark}" required="true" requiredMessage="原因不能为空">
                                     </p:inputTextarea>
                                 </c:when>
-                                <c:when test="#{zkbPartOrderAuditController.selected.status eq 'OrderPending'}">
+                                <c:when test="#{zkbPartOrderAuditController.selected.currentStep eq 'OrderPending'}">
                                     <p:inputTextarea rows="10" cols="50" value="#{zkbPartOrderAuditController.selected.orderedRemark}" required="true" requiredMessage="原因不能为空">
                                     </p:inputTextarea>
                                 </c:when>
