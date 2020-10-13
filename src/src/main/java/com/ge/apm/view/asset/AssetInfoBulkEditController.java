@@ -354,12 +354,16 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             return;
         }
 
-        assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
+        try {
+            assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
 
-        assets.setSource(new ArrayList<>());
-        assets.setTarget(new ArrayList<>());
+            assets.setSource(new ArrayList<>());
+            assets.setTarget(new ArrayList<>());
 
-        WebUtil.addSuccessMessage("批量修改资产院区成功!");
+            WebUtil.addSuccessMessage("批量修改资产院区成功!");
+        } catch(Exception e) {
+            WebUtil.addErrorMessage(e.getMessage());
+        }
 
     }
 
