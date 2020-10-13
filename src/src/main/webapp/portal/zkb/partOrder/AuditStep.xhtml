@@ -453,7 +453,7 @@
                             </c:when>
                         </c:choose>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending')}">
-                            <label class="label">下单单审批人</label>
+                            <label class="label">下审批人</label>
                             <p:inputText value="#{zkbPartOrderAuditController.selected.orderedAuditer}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending')}">
@@ -533,19 +533,41 @@
                     </p:dataTable>
                 </p:fieldset>
                 <p:fieldset id="orderedCancelFieldset" legend="订货信息" rendered="#{zkbPartOrderAuditController.showRejectOrder}">
-                    <h:panelGroup>
-                        <label class="label">拒绝原因*</label>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <c:choose>
                             <c:when test="#{zkbPartOrderAuditController.selected.status eq 'OrderedReject'}">
-                                <p:inputTextarea value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderExtraPending' and zkbPartOrderAuditController.canEditFlag)}">
-                                </p:inputTextarea>
+                                <h:panelGroup>
+                                    <label class="label">下审批人</label>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.orderedAuditer}" disabled="true" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">下单审批时间*</label>
+                                    <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.orderedDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">拒绝原因*</label>
+                                    <p:inputTextarea value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderExtraPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                    </p:inputTextarea>
+                                </h:panelGroup>
                             </c:when>
                             <c:when test="#{zkbPartOrderAuditController.selected.status eq 'UnOrderedReject'}">
-                                <p:inputTextarea value="#{zkbPartOrderAuditController.selected.unOrderRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
-                                </p:inputTextarea>
+                                <h:panelGroup>
+                                    <label class="label">开单审批人</label>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.unOrderAuditer}" disabled="true" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">开单审批时间*</label>
+                                    <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.unOrderDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">拒绝原因*</label>
+                                    <p:inputTextarea value="#{zkbPartOrderAuditController.selected.unOrderRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                    </p:inputTextarea>
+                                </h:panelGroup>
                             </c:when>
                         </c:choose>
-                    </h:panelGroup>
+                    </p:panelGrid>
+
                 </p:fieldset>
                 <p:fieldset id="returnFieldset" legend="归还信息" rendered="#{zkbPartOrderAuditController.showReturn}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
@@ -648,7 +670,7 @@
                 <p:fieldset id="closeFieldset" legend="关单信息" rendered="#{zkbPartOrderAuditController.showClosed}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending')}">
-                            <label class="label">关单单审批人</label>
+                            <label class="label">关单审批人</label>
                             <p:inputText value="#{zkbPartOrderAuditController.selected.closedAuditer}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending')}">
