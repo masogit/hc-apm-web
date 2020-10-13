@@ -1,8 +1,10 @@
 package com.ge.apm.service.asset;
 
+import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetRequestRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.NurseSiteMaintainConfigItem;
 import com.ge.apm.domain.SharedAssetReqDetail;
 import com.ge.apm.domain.SharedAssetRequest;
 import com.ge.apm.service.constant.ReceiveBorrowConstant;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +24,9 @@ public class AssetInfoBulkEditCheckService {
 
     @Autowired
     private SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
+
+    @Autowired
+    private NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
 
     //验证调剂中心
     public boolean verify(List<AssetInfo> assets) {
@@ -50,6 +56,14 @@ public class AssetInfoBulkEditCheckService {
         return true;
     }
 
-
-
+    public void checkAsset(List<AssetInfo> assets) {
+        if(assets != null && !assets.isEmpty()){
+            List<String> uids = assets.stream().map(p->p.getUid()).collect(Collectors.toList());
+            List<NurseSiteMaintainConfigItem> assetinfos = nurseSiteMaintainConfigItemRepository.findByAssetUid(uids);
+            if(assetinfos !=null && !assetinfos.isEmpty()){
+                Set<String> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
+                nurseSiteMaintainConfigItemRepository.deleteMaintainData(ids);
+            }
+        }
+    }
 }
