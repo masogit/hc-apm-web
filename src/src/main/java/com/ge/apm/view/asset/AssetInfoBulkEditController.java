@@ -344,26 +344,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
                 return;
             }
-            //临床助手检查进行中
-            List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findByAssetUid(as.getUid());
-            if(!StringUtils.isEmpty(nurseSiteMaintainItemList)){
-                Set<String> setMaintainIds = null;
-                for (int i = 0; i < nurseSiteMaintainItemList.size(); i++) {
-                    setMaintainIds = new HashSet<String>();
-                    setMaintainIds.add(nurseSiteMaintainItemList.get(i).getId());
-                }
-                if(!StringUtils.isEmpty(setMaintainIds)){
-                    Set<NurseSiteMaintainData> maintainDataByParentIds = nurseSiteMaintainDataRepository.findMaintainDataByParentIds(setMaintainIds);
-                    for (NurseSiteMaintainData nurseSiteMaintainData : maintainDataByParentIds) {
-                        Boolean checkValue = nurseSiteMaintainData.getCheckValue() != null ? nurseSiteMaintainData.getCheckValue() :false;
-                        if(!checkValue){
-                            WebUtil.addSuccessMessage("设备("+as.getName()+")当前有未完成的日常检查工单无法迁移 请先关闭工单！");
-                            return;
-                        }
-                    }
-                }
 
-            }
+        }
+
+        //临床助手检查进行中
+        Optional<String> optionalResult = assetInfoBulkEditCheckService.verifyForNurseSite(selectedAssets);
+        if (optionalResult.isPresent()) {
+            WebUtil.addErrorMessage(optionalResult.get());
+            return;
         }
 
         assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
