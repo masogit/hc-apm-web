@@ -2,7 +2,10 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.InventoryOrderDetail;
 
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
+
+import java.util.List;
 
 /**
  * Created by 212605082 on 2017/6/20.
@@ -26,4 +29,8 @@ public interface InventoryOrderDetailAssetInfoRepository extends GenericReposito
 //
 //    @Query(nativeQuery = true, value = "SELECT * FROM inventory_order_detail d LEFT JOIN asset_info a ON d.asset_id = a.id LEFT JOIN inventory_order o ON d.inventory_order_id = o.id WHERE o.is_finished = FALSE AND a.is_deleted = FALSE AND a.depart_num = ?1 AND a.tenant_uid = ?2")
 //    List<InventoryOrderDetail> findByDepartNumAndTenant(String departNum, String tenantUID);
+
+    @Query(value = "SELECT count(1) FROM inventory_order_detail WHERE asset_id IN (?1) AND status = 0",nativeQuery = true)
+    int getInventoryingAssetCount(List<Integer> assetIds);
+
 }
