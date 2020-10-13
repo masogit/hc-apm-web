@@ -202,6 +202,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
                     showOrder = true;
                     showBtn = "";
+                }else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
+                    showRejectOrder = true;
+                    showBtn = "";
                 }
             }else{
                 if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus()) && canEditFlag){
@@ -219,8 +222,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showOrder = false;
                     showBtn = "";
                 }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
+                    showManage = true;
                     showOrder = true;
-                    showOrder = true;
+                    showBtn = "";
+                }else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
+                    showManage = true;
+                    showRejectOrder = true;
                     showBtn = "";
                 }
             }
