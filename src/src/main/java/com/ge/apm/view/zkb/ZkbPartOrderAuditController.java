@@ -484,6 +484,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             //归还时发送邮件
             zkbPartOrderService.sendEmail(zkbPartOrder);
         }
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep())){
+            zkbPartOrderService.sendEmail(zkbPartOrder);
+        }
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
