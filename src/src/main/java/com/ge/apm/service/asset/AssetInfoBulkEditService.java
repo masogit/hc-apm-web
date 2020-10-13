@@ -34,12 +34,14 @@ public class AssetInfoBulkEditService {
     @Transactional
     public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
 
-        commitSiteForAssetItself(assets, targetAsset);
+
         commitCorrectiveMaintenanceBulkEdit(assets, targetAsset);
         commitPreventativeMaintenanceBulkEdit(assets, targetAsset);
         commitQrCode(assets, targetAsset);
         commitPmRule(assets, targetAsset);
 
+        //make sure qrcode site update before asset site update, due to qrcode update depend on asset site
+        commitSiteForAssetItself(assets, targetAsset);
     }
 
     @Transactional
