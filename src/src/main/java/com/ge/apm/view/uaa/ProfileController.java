@@ -9,7 +9,7 @@ import javax.faces.bean.ViewScoped;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.B64Code;
+import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +36,7 @@ public class ProfileController implements Serializable {
     
     private String newPassword;
     private String newPassword2;
+    private String password;
     UserAccountService userAccountService;
     
     @PostConstruct
@@ -69,7 +70,16 @@ public class ProfileController implements Serializable {
     public void setNewPassword2(String newPassword2) {
         this.newPassword2 = newPassword2;
     }
-    
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
     public void saveProfile(){
         UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         if(!myAccount.getIsUnbunding()){
@@ -79,7 +89,13 @@ public class ProfileController implements Serializable {
         WebUtil.addSuccessMessage(WebUtil.getMessage("UserAccount")+WebUtil.getMessage("Updated"));
     }
     
-    public void resetPassword() throws NoSuchAlgorithmException{
+    public void resetPassword() throws NoSuchAlgorithmException, DecoderException {
+        // check current password.
+        if(!checkPassword()){
+            WebUtil.addSuccessMessage(WebUtil.getMessage("PasswordNotMatch"));
+            return;
+        }
+
         String tempNewPassword = UserContextService.decryptData(newPassword);
 
     	String result = PasswordUtil.checkPwd(tempNewPassword);
@@ -97,7 +113,8 @@ public class ProfileController implements Serializable {
         myAccount.setLastModifiedBy(myAccount.getLoginName());
         UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         userAccountDao.save(myAccount);
-        
+
+        password = "";
         newPassword = "";
         newPassword2 = "";
         
@@ -121,4 +138,21 @@ public class ProfileController implements Serializable {
 		}
 		return false;
 	}
+
+    /**
+     * check current password.
+     * @return
+     * @throws DecoderException
+     * @throws NoSuchAlgorithmException
+     */
+	public boolean checkPassword() throws DecoderException, NoSuchAlgorithmException {
+        String currentPwd = UserContextService.decryptData(password);
+        byte[] salt = Digests.decodeHex(myAccount.getPwdSalt());
+        byte[] hashPassword = Digests.sha1(currentPwd.getBytes(), salt, UserAccount.HASH_INTERATIONS);
+        String saltedPassword = Digests.encodeHex(hashPassword);
+        if(myAccount.getPassword().equals(saltedPassword)){
+            return true;
+        }
+        return false;
+    }
 }
