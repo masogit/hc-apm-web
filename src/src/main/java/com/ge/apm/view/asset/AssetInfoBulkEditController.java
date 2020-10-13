@@ -329,15 +329,19 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         //验证
         if(!assetInfoBulkEditCheckService.verify(selectedAssets)){
-            WebUtil.addSuccessMessage("有设备正在调剂中!");
+            WebUtil.addErrorMessage("有设备正在调剂中，不能更换院区!");
             return;
         }
-        assetInfoBulkEditCheckService.checkAsset(selectedAssets);
-        assetInfoBulkEditCheckService.checkAssetTagRule(selectedAssets);
+
+        if(!assetInfoBulkEditCheckService.verifyForInventory(selectedAssets)){
+            WebUtil.addErrorMessage("有设备正在盘点中，不能更换院区!");
+            return;
+        }
+
         // asset in repaire  status
         for(AssetInfo as:selectedAssets){
             if(as.getStatus()== AssetConstant.ASSET_STATUS_ILL){
-                WebUtil.addSuccessMessage("有设备正在维修中!");
+                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
                 return;
             }
             //临床助手检查进行中
@@ -395,22 +399,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             return false;
         }
 
-        if (selectedColumns.contains("hospitalId") && null == this.selected.getSiteOrg()) {
+        if (null == this.selected.getSiteOrg()) {
             WebUtil.addErrorMessage("请选择院区!");
             return false;
         }
 
-        if (selectedColumns.contains("clinicalDeptName")) {
-            if (!selectedColumns.contains("hospitalId")) {
-                WebUtil.addErrorMessage("请选择院区!");
-                return false;
-            }
-
-            if (null == this.selected.getClinicalDeptOrg()) {
-                WebUtil.addErrorMessage("请选择科室!");
-                return false;
-            }
-
+        if (null == this.selected.getClinicalDeptOrg()) {
+            WebUtil.addErrorMessage("请选择科室!");
+            return false;
         }
 
         return true;

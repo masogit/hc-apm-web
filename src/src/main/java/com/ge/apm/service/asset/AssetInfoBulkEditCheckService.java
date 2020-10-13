@@ -1,5 +1,6 @@
 package com.ge.apm.service.asset;
 
+import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
 import com.ge.apm.dao.AssetTagRuleRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
@@ -22,6 +23,9 @@ public class AssetInfoBulkEditCheckService {
 
     @Autowired
     private SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
+
+    @Autowired
+    private InventoryOrderDetailAssetInfoRepository inventoryOrderDetailAssetInfoRepository;
 
     @Autowired
     private NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
@@ -57,24 +61,16 @@ public class AssetInfoBulkEditCheckService {
         return true;
     }
 
-    public void checkAsset(List<AssetInfo> assets) {
+    //验证是否有正在盘点的设备
+    public boolean verifyForInventory(List<AssetInfo> assets) {
         if(assets != null && !assets.isEmpty()){
-            List<String> uids = assets.stream().map(p->p.getUid()).collect(Collectors.toList());
-            List<NurseSiteMaintainConfigItem> assetinfos = nurseSiteMaintainConfigItemRepository.findByAssetUid(uids);
-            if(assetinfos !=null && !assetinfos.isEmpty()){
-                Set<String> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
-                nurseSiteMaintainConfigItemRepository.deleteMaintainData(ids);
-            }
+            List<Integer> assetIds = assets.stream().map(assetInfo -> assetInfo.getId()).collect(Collectors.toList());
+            int inventoryingAssetCount = inventoryOrderDetailAssetInfoRepository.getInventoryingAssetCount(assetIds);
+            if(inventoryingAssetCount > 0)
+                return false;
         }
+        return true;
     }
-    public void checkAssetTagRule(List<AssetInfo> assets) {
-        if(assets != null && !assets.isEmpty()){
-            List<Integer> uids = assets.stream().map(p->p.getId()).collect(Collectors.toList());
-            List<AssetTagRule> assetinfos = assetTagRuleRepository.findByAssetUid(uids);
-            if(assetinfos !=null && !assetinfos.isEmpty()){
-                Set<Integer> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
-                assetTagRuleRepository.deleteAssetTagRuleData(ids);
-            }
-        }
-    }
+
+
 }
