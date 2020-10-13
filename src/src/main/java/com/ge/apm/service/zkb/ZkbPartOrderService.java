@@ -593,10 +593,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
             zkbPartOrder.setOrderedDate(new Date());
             zkbPartOrder.setOrderedAuditer(userAccount.getName());
+            zkbPartOrder.setOrderedAuditerUid(userAccount.getUid());
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.OrderedReject.toString());
         }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString())){
             zkbPartOrder.setUnOrderDate(new Date());
             zkbPartOrder.setUnOrderAuditer(userAccount.getName());
+            zkbPartOrder.setUnOrderAuditerUid(userAccount.getUid());
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString());
         }else{
             return;
