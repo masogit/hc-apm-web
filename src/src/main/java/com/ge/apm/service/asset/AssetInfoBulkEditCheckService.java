@@ -1,12 +1,10 @@
 package com.ge.apm.service.asset;
 
+import com.ge.apm.dao.AssetTagRuleRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigItemRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetRequestRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.NurseSiteMaintainConfigItem;
-import com.ge.apm.domain.SharedAssetReqDetail;
-import com.ge.apm.domain.SharedAssetRequest;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.ReceiveBorrowConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +25,9 @@ public class AssetInfoBulkEditCheckService {
 
     @Autowired
     private NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
+
+    @Autowired
+    private AssetTagRuleRepository  assetTagRuleRepository;
 
     //验证调剂中心
     public boolean verify(List<AssetInfo> assets) {
@@ -63,6 +64,16 @@ public class AssetInfoBulkEditCheckService {
             if(assetinfos !=null && !assetinfos.isEmpty()){
                 Set<String> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
                 nurseSiteMaintainConfigItemRepository.deleteMaintainData(ids);
+            }
+        }
+    }
+    public void checkAssetTagRule(List<AssetInfo> assets) {
+        if(assets != null && !assets.isEmpty()){
+            List<Integer> uids = assets.stream().map(p->p.getId()).collect(Collectors.toList());
+            List<AssetTagRule> assetinfos = assetTagRuleRepository.findByAssetUid(uids);
+            if(assetinfos !=null && !assetinfos.isEmpty()){
+                Set<Integer> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
+                assetTagRuleRepository.deleteAssetTagRuleData(ids);
             }
         }
     }

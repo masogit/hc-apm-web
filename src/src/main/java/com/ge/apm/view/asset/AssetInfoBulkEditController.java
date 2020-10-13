@@ -333,6 +333,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             return;
         }
         assetInfoBulkEditCheckService.checkAsset(selectedAssets);
+        assetInfoBulkEditCheckService.checkAssetTagRule(selectedAssets);
         // asset in repaire  status
         for(AssetInfo as:selectedAssets){
             if(as.getStatus()== AssetConstant.ASSET_STATUS_ILL){
