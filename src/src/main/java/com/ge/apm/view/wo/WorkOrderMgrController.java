@@ -1702,7 +1702,6 @@ public void test1(){
         AssetInfo assetinfo = assetDao.findById(this.selectedWorkOrder.getAssetId());
         return assetFaultTypeService.getFaultTypeList(assetinfo.getAssetGroup());
     }
-
     public String getFaultTypeName(Integer id) {
         return assetFaultTypeService.getFaultName(id);
     }
