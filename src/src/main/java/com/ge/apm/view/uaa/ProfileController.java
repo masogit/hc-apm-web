@@ -147,11 +147,13 @@ public class ProfileController implements Serializable {
      */
 	public boolean checkPassword() throws DecoderException, NoSuchAlgorithmException {
         String currentPwd = UserContextService.decryptData(password);
-        byte[] salt = Digests.decodeHex(myAccount.getPwdSalt());
-        byte[] hashPassword = Digests.sha1(currentPwd.getBytes(), salt, UserAccount.HASH_INTERATIONS);
-        String saltedPassword = Digests.encodeHex(hashPassword);
-        if(myAccount.getPassword().equals(saltedPassword)){
-            return true;
+        if (!StringUtils.isEmpty(currentPwd)) {
+            byte[] salt = Digests.decodeHex(myAccount.getPwdSalt());
+            byte[] hashPassword = Digests.sha1(currentPwd.getBytes(), salt, UserAccount.HASH_INTERATIONS);
+            String saltedPassword = Digests.encodeHex(hashPassword);
+            if(myAccount.getPassword().equals(saltedPassword)){
+                return true;
+            }
         }
         return false;
     }

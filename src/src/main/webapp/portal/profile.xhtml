@@ -4,7 +4,18 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
-
+    <ui:define name="head">
+    <script type="text/javascript">
+        function updatePwd() {
+            var pwd = document.getElementById("PasswordForm:password").value;
+            var pwd1 = document.getElementById("PasswordForm:passwordFirst").value;
+            var pwd2 = document.getElementById("PasswordForm:passwordSecond").value;
+            document.getElementById("PasswordForm:password").value = encryptAES(pwd);
+            document.getElementById("PasswordForm:passwordFirst").value = encryptAES(pwd1);
+            document.getElementById("PasswordForm:passwordSecond").value = encryptAES(pwd2);
+        }
+    </script>
+    </ui:define>
     <ui:define name="content">
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
@@ -61,7 +72,7 @@
                                 <p:password widgetVar="passwordSecond_var" id="passwordSecond" value="#{profileController.newPassword2}" required="true"/>
                             </h:panelGroup>
                         </p:panelGrid>
-                        <p:commandButton validateClient="true" onclick="updatePwd_c('passwordFirst_var', 'passwordSecond_var', 'password_var');" actionListener="#{profileController.resetPassword}" value="#{msg.ChangePassword}" update=":PasswordForm :growl"/>
+                        <p:commandButton validateClient="true"  onclick="updatePwd();" actionListener="#{profileController.resetPassword}" value="#{msg.ChangePassword}" update=":PasswordForm :growl"/>
                     </p:fieldset>
                 </h:form>
 
