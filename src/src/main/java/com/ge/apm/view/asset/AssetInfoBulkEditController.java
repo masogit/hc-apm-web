@@ -198,9 +198,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             this.searchFilters.add(searchFilter);
         }
 
-        if (null != this.oneSearchStr) {
-            searchFilter = new SearchFilter("name", SearchFilter.Operator.LIKE, this.oneSearchStr);
-            this.searchFilters.add(searchFilter);
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
     }
 
