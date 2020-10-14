@@ -75,11 +75,14 @@ public class AssetInfoBulkEditCheckService {
             status.add("tempRepair");
             status.add("approval");
             status.add("pass");
+            status.add("Maintain");
             status.add("repair");
             status.add("acceptNot");
             status.add("simplify");
             status.add("reject");
             status.add("partial");
+            status.add("AcceptTance");
+
             Set<V2_PmOrder> v2_pmOrders = v2_PmOrderRepository.findV2PmOrderByAssetUids(assetUids);
             if(v2_pmOrders !=null && !v2_pmOrders.isEmpty()){
                 for(V2_PmOrder order:v2_pmOrders){
