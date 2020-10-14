@@ -147,7 +147,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
                     ss.add(i.getPartNo());
                 }
-                zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),ss,selected.getId(),selected.getAssetTypeDi());
+                zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),selected.getId(),selected.getAssetTypeDi());
             }
         }
     }

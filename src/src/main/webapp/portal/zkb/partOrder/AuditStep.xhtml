@@ -270,6 +270,9 @@
                         <p:column headerText="申请编号" >
                             <h:outputText value="#{item.partOrderNo}"/>
                         </p:column>
+                        <p:column headerText="sr#">
+                            <h:outputText value="#{item.srNum}"/>
+                        </p:column>
                         <p:column headerText="配件号">
                             <h:outputText value="#{item.partNo}"/>
                         </p:column>
@@ -279,9 +282,9 @@
                         <p:column headerText="配件数量">
                             <h:outputText value="#{item.partQty}"/>
                         </p:column>
-                       <!-- <p:column headerText="备注（说明是否DOA或者Short life）">
+                       <p:column headerText="备注（说明是否DOA或者Short life）">
                             <h:outputText value="#{item.remark}"/>
-                        </p:column>-->
+                        </p:column>
                         <p:column headerText="当前步骤">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPoSteps',item.currentStep)}"/>
                         </p:column>
