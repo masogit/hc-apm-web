@@ -90,6 +90,10 @@ public class AssetInfoBulkEditService {
             item.setClinicalDeptId(targetAsset.getClinicalDeptOrg().getId());
             item.setClinicalDeptUID(targetAsset.getClinicalDeptOrg().getUid());
             item.setClinicalDeptName(targetAsset.getClinicalDeptOrg().getName());
+
+            //clear asset dept
+            item.setAssetDeptId(null);
+            item.setAssetDeptUID(null);
         }
 
         assetInfoDao.save(assets);

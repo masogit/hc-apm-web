@@ -70,8 +70,8 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup>
-                                        <label class="label">#{msg.name}</label>
-                                        <p:inputText value="#{assetInfoBulkEditController.oneSearchStr}">
+                                        <label class="label">#{msg.name}/#{msg.financingNum}/#{msg.departNum}/#{msg.qrCode}</label>
+                                        <p:inputText value="#{assetInfoBulkEditController.oneSearchStr}"  maxlength="100" style="width: 250px">
                                             <p:ajax event="keyup" update="pickList" />
                                         </p:inputText>
                                     </h:panelGroup>
@@ -81,7 +81,7 @@
 
                             <p:pickList id="pickList" value="#{assetInfoBulkEditController.assets}"
                                         var="asset" itemLabel="#{asset}" itemValue="#{asset}"
-                                        showSourceFilter="true" showTargetFilter="true" responsive="true"
+                                        showSourceFilter="false" showTargetFilter="false" responsive="true"
                                         filterMatchMode="contains" converter="assetInfoConverter" class="pickList">
                                 <f:facet name="sourceCaption">待选设备</f:facet>
                                 <f:facet name="targetCaption">已选设备</f:facet>
