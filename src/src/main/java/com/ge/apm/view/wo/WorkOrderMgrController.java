@@ -1711,6 +1711,11 @@ public void test1(){
         return orgDao.getByUid(orgUid);
     }
 
+    public OrgInfo getOrgNameByAssetid(String orgUid) {
+
+        return orgDao.getByUid(orgUid);
+    }
+
     public String getRequestReasonInShort(String reason) {
         if (reason == null) {
             return null;
