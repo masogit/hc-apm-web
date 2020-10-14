@@ -333,6 +333,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             return;
         }
 
+        if(!assetInfoBulkEditCheckService.verifyForMaintain(selectedAssets)){
+            WebUtil.addErrorMessage("有设备正在保养中，不能更换院区！");
+            return;
+        }
+
         if(!assetInfoBulkEditCheckService.verifyForInventory(selectedAssets)){
             WebUtil.addErrorMessage("有设备正在盘点中，不能更换院区!");
             return;

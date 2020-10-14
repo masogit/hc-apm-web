@@ -35,6 +35,9 @@ public class AssetInfoBulkEditCheckService {
     @Autowired
     private NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
 
+    @Autowired
+    private V2_PmOrderRepository v2_PmOrderRepository;
+
     //验证调剂中心
     public boolean verify(List<AssetInfo> assets) {
         if(assets != null && !assets.isEmpty()){
@@ -56,6 +59,33 @@ public class AssetInfoBulkEditCheckService {
                         if(assetUids.contains(detail.getAssetInfoId())){
                             return false;
                         }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    public boolean verifyForMaintain(List<AssetInfo> assets) {
+        if(assets != null && !assets.isEmpty()){
+            Set<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toSet());
+            List<String> status = new ArrayList<>();
+            status.add("assign");
+            status.add("accept");
+            status.add("reAssign");
+            status.add("tempRepair");
+            status.add("approval");
+            status.add("pass");
+            status.add("repair");
+            status.add("acceptNot");
+            status.add("simplify");
+            status.add("reject");
+            status.add("partial");
+            Set<V2_PmOrder> v2_pmOrders = v2_PmOrderRepository.findV2PmOrderByAssetUids(assetUids);
+            if(v2_pmOrders !=null && !v2_pmOrders.isEmpty()){
+                for(V2_PmOrder order:v2_pmOrders){
+                    List list = status.stream().filter(u -> u.equalsIgnoreCase(order.getCurrentStepId())).collect(Collectors.toList());
+                    if (list !=null && !list.isEmpty()) {
+                        return false;
                     }
                 }
             }
