@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,6 +45,9 @@ public class AssetInfoBulkEditService {
 
     @Autowired
     private NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
+
+    @Autowired
+    private NurseSiteMaintainConfigRepository  nurseSiteMaintainConfigRepository;
 
     @Autowired
     private AssetTagRuleRepository  assetTagRuleRepository;
@@ -197,6 +201,15 @@ public class AssetInfoBulkEditService {
             if(assetinfos !=null && !assetinfos.isEmpty()){
                 Set<String> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
                 nurseSiteMaintainConfigItemRepository.deleteMaintainData(ids);
+                Set<String> parentIds = assetinfos.stream().map(p->p.getParentId()).collect(Collectors.toSet());
+                List<NurseSiteMaintainConfigItem> items = nurseSiteMaintainConfigItemRepository.findByParentIds(parentIds);
+                if(items !=null && !items.isEmpty()){
+                    Set<String> temp = items.stream().map(u->u.getParentId()).collect(Collectors.toSet());
+                    parentIds.removeAll(temp);
+                }
+                if(parentIds !=null && !parentIds.isEmpty()){
+                    nurseSiteMaintainConfigRepository.deleteMaintainConfigData(parentIds);
+                }
             }
         }
     }
