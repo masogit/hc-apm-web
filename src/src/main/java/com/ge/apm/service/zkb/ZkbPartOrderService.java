@@ -770,7 +770,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep())){
                 AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                 if(assetInfo != null && assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 1){
-                    //return;
+                    return;
                 }
             }
         }
