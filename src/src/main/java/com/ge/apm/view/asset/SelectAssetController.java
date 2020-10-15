@@ -161,7 +161,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     private AssetInfo selectedAsset = null;
 
     public void confirmSelection() {
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+//        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 //        if(userContextService.isZkbAccount()){
 //            //getzkb_contract
 //            List<ZkbContractAsset>  contractAssetList = zkbContractAssetRepository.findByAssetId(selectedAsset.getId());
