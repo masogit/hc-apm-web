@@ -161,22 +161,23 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     private AssetInfo selectedAsset = null;
 
     public void confirmSelection() {
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        if(userContextService.isZkbAccount()){
-            //getzkb_contract
-            List<ZkbContractAsset>  contractAssetList = zkbContractAssetRepository.findByAssetId(selectedAsset.getId());
-            if(contractAssetList !=null && contractAssetList.size()>0){
-                ZkbContractAsset zkbContractAsset = contractAssetList.get(0);
-                String contractId = zkbContractAsset.getContractId();
-                ZkbContract zkbContract = zkbContractRepository.findById(contractId);
-                Date now = new Date();
-                if(now.after(zkbContract.getEndDate()) || now.before(zkbContract.getStartDate())){
-                    WebUtil.addErrorMessageKey("对于智康宝设备,合同有效期的设备才可以创建报修工单");
-                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                    return;
-                }
-            }
-        }
+//        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+//        if(userContextService.isZkbAccount()){
+//            //getzkb_contract
+//            List<ZkbContractAsset>  contractAssetList = zkbContractAssetRepository.findByAssetId(selectedAsset.getId());
+//            if(contractAssetList !=null && contractAssetList.size()>0){
+//                ZkbContractAsset zkbContractAsset = contractAssetList.get(0);
+//                String contractId = zkbContractAsset.getContractId();
+//                ZkbContract zkbContract = zkbContractRepository.findById(contractId);
+//                Date now = new Date();
+//                if(now.after(zkbContract.getEndDate()) || now.before(zkbContract.getStartDate())){
+//                    WebUtil.addErrorMessageKey("对于智康宝设备,合同有效期的设备才可以创建报修工单");
+//                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//                    return;
+//                }
+//            }
+//        }
+
         if (this.selectedAsset == null) {
             WebUtil.addErrorMessageKey("noAssetSelected");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
