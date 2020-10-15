@@ -177,6 +177,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
 //                }
 //            }
 //        }
+
         if (this.selectedAsset == null) {
             WebUtil.addErrorMessageKey("noAssetSelected");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
