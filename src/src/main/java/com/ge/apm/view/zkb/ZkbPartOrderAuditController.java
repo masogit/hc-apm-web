@@ -147,7 +147,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
                     ss.add(i.getPartNo());
                 }
-                zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),ss,selected.getId(),selected.getAssetTypeDi());
+                zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),selected.getId(),selected.getAssetTypeDi());
             }
         }
     }
@@ -202,6 +202,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
                     showOrder = true;
                     showBtn = "";
+                }else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
+                    showRejectOrder = true;
+                    showBtn = "";
                 }
             }else{
                 if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus()) && canEditFlag){
@@ -219,8 +222,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showOrder = false;
                     showBtn = "";
                 }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
+                    showManage = true;
                     showOrder = true;
-                    showOrder = true;
+                    showBtn = "";
+                }else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
+                    showManage = true;
+                    showRejectOrder = true;
                     showBtn = "";
                 }
             }
@@ -482,6 +489,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){
             //归还时发送邮件
+            zkbPartOrderService.sendEmail(zkbPartOrder);
+        }
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep())){
             zkbPartOrderService.sendEmail(zkbPartOrder);
         }
         return "List?faces-redirect=true&queryStatus="+queryStatus;

@@ -45811,4 +45811,5 @@ VALUES
 (45780,659006100000,'博古其镇',65,'90','06','100000'),
 (45781,659006101000,'双丰镇',65,'90','06','101000');
 --2020-10-09 end                                                                                                      
-                                                                                                      
+--增加ole工作台审批流程角色
+INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") VALUES ('/homeHead.xhtml', 'oleApprove', 'ole审批', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Local Background Operation Management');

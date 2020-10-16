@@ -324,20 +324,26 @@
 
             </h:panelGroup>
         </div>
-        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 1200px;max-height:900px;min-width:800px;min-height:600px">
+        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: available;max-height:available;min-width:800px;min-height:600px;overflow: hidden">
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
-                <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
+                <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span>
+                <span>
+                    <p:commandButton id="spin" value="旋转" styleClass="anticon-plus"/>
+                    <p:commandButton id="enlarge" value="放大" onclick ="ImageSuofang(true)"/>
+                    <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
+                </span>
+
+                <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
                     <span class="ui-icon ui-icon-closethick"></span></a>
+
                 <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
             </div>
-            <div class="ui-dialog-content ui-widget-content"  style="max-width: 1200px;max-height:900px;min-width:800px;min-height:600px;height: available">
+            <div class="ui-dialog-content ui-widget-content"  style="max-width: 1000px;max-height:700px;min-width:800px;min-height:600px;height: available">
 
-                <image id="shwoPicDialogImg" src="" style="max-width: 1200px; max-height: 900px"></image>
+                <image id="shwoPicDialogImg" src="" style="max-width: 1000px; max-height: 700px"></image>
             </div>
             <div>
-                <p:commandButton id="spin" value="旋转"/>
-                <p:commandButton id="enlarge" value="放大" onclick ="ImageSuofang(true)"/>
-                <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
+
             </div>
         </div>
         <script id="shwoPicDialog_s" type="text/javascript">$(function () {
@@ -350,12 +356,14 @@
             }
 
             function showthis(pic) {
-                var s = $('#shwoPicDialogImg')[0]
+                var s = $('#shwoPicDialogImg')[0];
                 s.src = pic.src;
                 s.style.transform = 'rotate('+ 0 +'deg)';
                 s.width = pic.width * 1.8;
                 s.height = pic.height * 1.8;
                 PF('shwoPicDialog').show();
+                var dia = $("#shwoPicDialog")[0];
+                dia.style.top = '5px';
             }
 
             //旋转
@@ -370,7 +378,7 @@
                 var imgsrc =  $("#shwoPicDialogImg")[0];
                 if (args) {
 
-                    if(imgsrc.width * 1.1 > 1200 ||imgsrc.height * 1.1 > 900 ){
+                    if(imgsrc.width * 1.1 > 1000 ||imgsrc.height * 1.1 > 700 ){
                         return;
                     }
 

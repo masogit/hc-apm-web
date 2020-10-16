@@ -17,6 +17,6 @@ public interface ZkbPartOrderItemRepository extends GenericRepositoryUUID<ZkbPar
 
     void deleteByPartOrderId(String partOrderId);
 
-    @Query("select new com.ge.apm.domain.ZkbPartOrderItemVo(i.partNo,i.partName,i.partQty,i.serialNumber,i.orderNo,i.price,i.remark,z.partOrderNo,z.currentStep,z.status,z.srNum) from ZkbPartOrder z, ZkbPartOrderItem i where z.srNum = ?1 and i.partNo in (?2) and z.id !=?3 and z.assetTypeDi = ?4")
-    public List<ZkbPartOrderItemVo>  queryHistoryPart(String srNum, List<String> partNos,String id,String assetTypeDi);
+    @Query("select new com.ge.apm.domain.ZkbPartOrderItemVo(i.partNo,i.partName,i.partQty,i.serialNumber,i.orderNo,i.price,i.remark,z.partOrderNo,z.currentStep,z.status,z.srNo) from ZkbPartOrder z, ZkbPartOrderItem i where z.id = i.partOrderId and z.srNum = ?1 and z.id !=?2 and z.assetTypeDi = ?3")
+    public List<ZkbPartOrderItemVo>  queryHistoryPart(String srNum, String id,String assetTypeDi);
 }
