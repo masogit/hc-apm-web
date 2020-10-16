@@ -113,7 +113,7 @@ public class AssetHistoryService {
                 if (((JSONObject) item).containsKey("oldColumnValue")) {
                     oldColumnValue = ((JSONObject) item).getString("oldColumnValue");
                 }
-                String newColumnValue = ((JSONObject) item).getString("newColumnValue");
+                String newColumnValue = ((JSONObject) item).getString("newColumnValue") != null ? ((JSONObject) item).getString("newColumnValue") : "";
                 //String columnValue = "新值：" + newColumnValue + " -> 旧值：" + oldColumnValue;
                 String columnValue = "旧值:" + oldColumnValue + " -> 新值:" + newColumnValue;
                 jsonObject.put(columnName, columnValue);
@@ -196,7 +196,15 @@ public class AssetHistoryService {
         if (Objects.equals(oldFieldValue, newFieldValue)) {
             return Optional.empty();
         }
-
+        if("purchasePrice".equals(fieldName)){
+            java.text.DecimalFormat df = new java.text.DecimalFormat("########.00");
+            if(oldFieldValue != null){
+                oldFieldValue = df.format(oldFieldValue);
+            }
+            if(newFieldValue != null){
+                newFieldValue = df.format(newFieldValue);
+            }
+        }
         AssetHistory.AssetHistoryInfo assetHistoryInfo = new AssetHistory.AssetHistoryInfo();
         assetHistoryInfo.setColumnName(fieldName);
         assetHistoryInfo.setOldColumnValue(objToString(fieldName, oldFieldValue));
