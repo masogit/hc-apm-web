@@ -164,14 +164,14 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         if(userContextService.isZkbUser()){
             //getzkb_contract
-            List<ZkbContractAsset>  contractAssetList = zkbContractAssetRepository.findByAssetId(String.valueOf(selectedAsset.getId()));
+            List<ZkbContractAsset>  contractAssetList = zkbContractAssetRepository.findByAssetId(String.valueOf(selectedAsset.getUid()));
             if(contractAssetList !=null && contractAssetList.size()>0){
                 ZkbContractAsset zkbContractAsset = contractAssetList.get(0);
                 String contractId = zkbContractAsset.getContractId();
                 ZkbContract zkbContract = zkbContractRepository.findById(contractId);
                 Date now = new Date();
                 if(zkbContract !=null &&(now.after(zkbContract.getEndDate()) || now.before(zkbContract.getStartDate()))){
-                    WebUtil.addErrorMessageKey("对于智康宝设备,合同有效期的设备才可以创建报修工单");
+                    WebUtil.addErrorMessageKey("对于智康宝设备，合同有效期内的设备才可以创建报修工单！");
                     RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                     return;
                 }
