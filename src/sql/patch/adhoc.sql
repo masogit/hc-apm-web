@@ -1,4 +1,4 @@
---2020-10-16 增加batchFileType字典 start
+--2020-10-16 增加批量导入文件类型字典 start
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'AconnectPerformanceExcel', '基础互通-用', 'Aconnect Performance', NULL,'-1');
 --2020-10-16 end
 
