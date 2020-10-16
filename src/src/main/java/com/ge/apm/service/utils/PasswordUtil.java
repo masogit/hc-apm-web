@@ -5,10 +5,10 @@ public class PasswordUtil {
 	public static final String DEFAULT_PWD = getEncryptedPass();
 
 	private static String getEncryptedPass() {
-		return "G125@e";
+		return "Apm@189ge";
 	}
 	private static String getEncryptedPass2() {
-		return "Apm@189ge";
+		return "G125@e";
 	}
         
 	public static boolean isDefaultPassword(String str){
