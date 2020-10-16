@@ -1,10 +1,10 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.NurseSiteMaintainDataRepository;
+import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.KeyLabel;
 import com.ge.apm.service.asset.AssetInfoBulkEditCheckService;
 import com.ge.apm.service.asset.AssetInfoBulkEditService;
@@ -24,18 +24,17 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -50,6 +49,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private AssetInfoBulkEditService assetInfoBulkEditService;
     private AssetInfoBulkEditCheckService assetInfoBulkEditCheckService;
     private OrgInfoRepository orgInfoDao;
+    private NurseSiteMaintainItemRepository nurseSiteMaintainItemRepository;
+    private NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
 
     //******* filter start
 
@@ -87,6 +88,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetInfoBulkEditService = WebUtil.getBean(AssetInfoBulkEditService.class);
         assetInfoBulkEditCheckService = WebUtil.getBean(AssetInfoBulkEditCheckService.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
+        nurseSiteMaintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
+        nurseSiteMaintainDataRepository = WebUtil.getBean(NurseSiteMaintainDataRepository.class);
 
         selected = new AssetInfo();
 
@@ -195,9 +198,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             this.searchFilters.add(searchFilter);
         }
 
-        if (null != this.oneSearchStr) {
-            searchFilter = new SearchFilter("name", SearchFilter.Operator.LIKE, this.oneSearchStr);
-            this.searchFilters.add(searchFilter);
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
     }
 
@@ -326,23 +331,46 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         //验证
         if(!assetInfoBulkEditCheckService.verify(selectedAssets)){
-            WebUtil.addSuccessMessage("有设备正在调剂中!");
+            WebUtil.addErrorMessage("有设备正在调剂中，不能更换院区!");
             return;
         }
+
+        if(!assetInfoBulkEditCheckService.verifyForMaintain(selectedAssets)){
+            WebUtil.addErrorMessage("有设备正在保养中，不能更换院区！");
+            return;
+        }
+
+        if(!assetInfoBulkEditCheckService.verifyForInventory(selectedAssets)){
+            WebUtil.addErrorMessage("有设备正在盘点中，不能更换院区!");
+            return;
+        }
+
         // asset in repaire  status
         for(AssetInfo as:selectedAssets){
             if(as.getStatus()== AssetConstant.ASSET_STATUS_ILL){
-                WebUtil.addSuccessMessage("有设备正在维修中!");
+                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
                 return;
             }
+
         }
 
-        assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
+        //临床助手检查进行中
+        Optional<String> optionalResult = assetInfoBulkEditCheckService.verifyForNurseSite(selectedAssets);
+        if (optionalResult.isPresent()) {
+            WebUtil.addErrorMessage(optionalResult.get());
+            return;
+        }
 
-        assets.setSource(new ArrayList<>());
-        assets.setTarget(new ArrayList<>());
+        try {
+            assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
 
-        WebUtil.addSuccessMessage("批量修改资产院区成功!");
+            assets.setSource(new ArrayList<>());
+            assets.setTarget(new ArrayList<>());
+
+            WebUtil.addSuccessMessage("批量修改资产院区成功!");
+        } catch(Exception e) {
+            WebUtil.addErrorMessage(e.getMessage());
+        }
 
     }
 
@@ -370,22 +398,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             return false;
         }
 
-        if (selectedColumns.contains("hospitalId") && null == this.selected.getSiteOrg()) {
+        if (null == this.selected.getSiteOrg()) {
             WebUtil.addErrorMessage("请选择院区!");
             return false;
         }
 
-        if (selectedColumns.contains("clinicalDeptName")) {
-            if (!selectedColumns.contains("hospitalId")) {
-                WebUtil.addErrorMessage("请选择院区!");
-                return false;
-            }
-
-            if (null == this.selected.getClinicalDeptOrg()) {
-                WebUtil.addErrorMessage("请选择科室!");
-                return false;
-            }
-
+        if (null == this.selected.getClinicalDeptOrg()) {
+            WebUtil.addErrorMessage("请选择科室!");
+            return false;
         }
 
         return true;

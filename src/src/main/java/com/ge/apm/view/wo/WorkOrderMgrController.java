@@ -1697,17 +1697,20 @@ public void test1(){
         itemDetail = null;
         coWorkerDetail = null;
     }
-
     public List<AssetFaultType> getAssetFaultType() {
         AssetInfo assetinfo = assetDao.findById(this.selectedWorkOrder.getAssetId());
         return assetFaultTypeService.getFaultTypeList(assetinfo.getAssetGroup());
     }
-
     public String getFaultTypeName(Integer id) {
         return assetFaultTypeService.getFaultName(id);
     }
 
     public OrgInfo getOrgInfoByUid(String orgUid) {
+        return orgDao.getByUid(orgUid);
+    }
+
+    public OrgInfo getOrgNameByAssetid(String orgUid) {
+
         return orgDao.getByUid(orgUid);
     }
 
