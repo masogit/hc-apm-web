@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -203,6 +204,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             try {
                 Transformer transformer = factory.newTransformer(new StreamSource(xsl));
                 Source src = new StreamSource(new StringReader(woXml));

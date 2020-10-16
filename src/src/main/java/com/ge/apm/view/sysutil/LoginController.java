@@ -438,8 +438,6 @@ public class LoginController extends LoginService {
             WebUtil.addErrorMessage("用户名或密码错误!");
         else if(PasswordUtil.DEFAULT_PWD.equals(tempNewPassword))
             WebUtil.addErrorMessage("请不要使用系统默认密码作为个人密码!");
-        else if(!checkPassword(tempPassword))
-            WebUtil.addErrorMessage("用户名或密码错误!");
         else{
             String checkResult = PasswordUtil.checkPwd(tempNewPassword);
             if(!StringUtils.isEmpty(checkResult))

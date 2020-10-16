@@ -1,8 +1,15 @@
 package com.ge.apm.service.utils;
 
 public class PasswordUtil {
-	public static final String DEFAULT_PWD2 = "G125@e";
-	public static final String DEFAULT_PWD = "Apm@189ge";
+	public static final String DEFAULT_PWD2 = getEncryptedPass2();
+	public static final String DEFAULT_PWD = getEncryptedPass();
+
+	private static String getEncryptedPass() {
+		return "G125@e";
+	}
+	private static String getEncryptedPass2() {
+		return "Apm@189ge";
+	}
         
 	public static boolean isDefaultPassword(String str){
             return DEFAULT_PWD.equals(str) || DEFAULT_PWD2.equals(str);

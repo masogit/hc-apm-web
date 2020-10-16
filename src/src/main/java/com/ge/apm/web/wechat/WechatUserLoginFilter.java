@@ -175,10 +175,12 @@ public class WechatUserLoginFilter extends OncePerRequestFilter {
                 } catch (WxErrorException ex) {
                     Logger.getLogger(WechatUserLoginFilter.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                request.setAttribute("appId",s.getAppid());
-                request.setAttribute("timestamp",s.getTimestamp());
-                request.setAttribute("nonceStr",s.getNoncestr());
-                request.setAttribute("signature",s.getSignature());
+                if (s != null) {
+                    request.setAttribute("appId",s.getAppid());
+                    request.setAttribute("timestamp",s.getTimestamp());
+                    request.setAttribute("nonceStr",s.getNoncestr());
+                    request.setAttribute("signature",s.getSignature());
+                }
                 request.getRequestDispatcher("/web/unloginScan").forward(request, response);
             } else {
                 request.getRequestDispatcher("/wechat/userInfo.jsp").forward(request, response);
