@@ -583,7 +583,9 @@ public class MeasureOrderRuleController extends JpaCRUDController<MeasureOrderRu
             pmRuleCheckItem.setSiteUID(selectedUserOrg.getSiteUID());
             pmRuleCheckItem.setStatus(1);
         } else {
-            pmRuleCheckItem = checkItemLists.stream().filter(item -> item.getUid().equals(itemId)).findAny().get();
+            if (checkItemLists.stream().filter(item -> item.getUid().equals(itemId)).findAny().isPresent()){
+                pmRuleCheckItem = checkItemLists.stream().filter(item -> item.getUid().equals(itemId)).findAny().get();
+            }
         }
     }
 

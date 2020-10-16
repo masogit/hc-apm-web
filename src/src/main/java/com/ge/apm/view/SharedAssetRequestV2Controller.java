@@ -676,7 +676,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                                 break;
                                             }
                                         }
-                                    }else if(sardList.size() == 0){
+                                    }else if(sardList != null && sardList.size() == 0){
                                         sardList.add(sard);
                                         selectedSard = sard;
                                     }
@@ -940,7 +940,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                                 break;
                                             }
                                         }
-                                    }else if(sardList.size() == 0){
+                                    }else if(sardList != null && sardList.size() == 0){
                                         sardList.add(assetDetaiVo);
                                         selectedSard = assetDetaiVo;
                                     }

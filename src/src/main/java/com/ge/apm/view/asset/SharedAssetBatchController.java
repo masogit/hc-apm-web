@@ -268,8 +268,10 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
                 List rentDetails = (List)approvedLeaseRequest.get(SERVICE_RESPONSE_RENT_DETAILS);
                 for(Object rentDetail : rentDetails) {
                     SharedAssetReqDetail reqDetail = JSON.parseObject(JSON.toJSONString(rentDetail), SharedAssetReqDetail.class);
-                    AssetInfo asset = submittedLeaseAssets.stream().filter(assetInfo -> assetInfo.getUid().equals(reqDetail.getAssetInfoId())).findFirst().get();
-                    asset.setSharedAssetReqDetail(reqDetail);
+                    if (submittedLeaseAssets.stream().filter(assetInfo -> assetInfo.getUid().equals(reqDetail.getAssetInfoId())).findFirst().isPresent()) {
+                        AssetInfo asset = submittedLeaseAssets.stream().filter(assetInfo -> assetInfo.getUid().equals(reqDetail.getAssetInfoId())).findFirst().get();
+                        asset.setSharedAssetReqDetail(reqDetail);
+                    }
                 }
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, null, "批量借用成功"));
             } else {
@@ -405,8 +407,10 @@ public class SharedAssetBatchController extends MyCRUDController<AssetInfo> {
         Boolean result = Boolean.TRUE;
         //验证新加入设备的使用科室是否和之前加入到待归还列表中设备使用科室是否一致
         if(returnAssets.size() > 0) {
-            AssetInfo assetInReturnList = returnAssets.stream().findFirst().get();
-            result = assetInReturnList.getAssetDeptUID().equals(assetInfo.getAssetDeptUID());
+            if (returnAssets.stream().findFirst().isPresent()) {
+                AssetInfo assetInReturnList = returnAssets.stream().findFirst().get();
+                result = assetInReturnList.getAssetDeptUID().equals(assetInfo.getAssetDeptUID());
+            }
         }
         return result;
     }
