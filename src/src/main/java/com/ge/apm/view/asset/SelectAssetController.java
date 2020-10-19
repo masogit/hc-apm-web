@@ -170,7 +170,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
                 String contractId = zkbContractAsset.getContractId();
                 ZkbContract zkbContract = zkbContractRepository.findById(contractId);
                 Date now = new Date();
-                if(zkbContract !=null &&(now.getTime() >= zkbContract.getEndDate().getTime() || now.getTime() <= zkbContract.getStartDate().getTime())){
+                if(zkbContract !=null &&(now.getTime() >= getSomeDay(zkbContract.getEndDate(),"+").getTime() || now.getTime() <= getSomeDay(zkbContract.getStartDate(),"-").getTime())){
                     WebUtil.addErrorMessageKey("对于智康宝设备，合同有效期内的设备才可以创建报修工单！");
                     RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                     return;
@@ -188,6 +188,26 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         if (callingController != null) {
             callingController.onServerEvent("onAssetSelected", this.selectedAsset);
         }
+    }
+
+    public Date getSomeDay(Date date,String operator) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        int day1 = c.get(Calendar.DATE);
+        if("+".equals(operator)){
+            //c.set(Calendar.DATE, day1 + 1);
+            c.set(Calendar.HOUR, 23);
+            c.set(Calendar.MINUTE, 59);
+            c.set(Calendar.SECOND, 59);
+        }else {
+            //c.set(Calendar.DATE, day1 - 1);
+            c.set(Calendar.HOUR, 00);
+            c.set(Calendar.MINUTE, 00);
+            c.set(Calendar.SECOND, 00);
+        }
+        String dayAfter = new SimpleDateFormat("yyyy-MM-dd").format(c.getTime());
+        System.out.println(dayAfter);
+        return c.getTime();
     }
 
     private String updateViewIDs;
