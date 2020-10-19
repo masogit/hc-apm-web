@@ -187,7 +187,7 @@ public class WorkOrderDetailExportController implements Serializable {
         if(filterMaxPrice != null && filterMaxPrice != 0D){
             filterMap.put("filterMaxPrice", filterMaxPrice);
         }
-        if(searchStr != null && searchStr.trim() != ""){
+        if(searchStr != null && !searchStr.trim().equals("")){
             filterMap.put("searchStr", searchStr);
         }
 

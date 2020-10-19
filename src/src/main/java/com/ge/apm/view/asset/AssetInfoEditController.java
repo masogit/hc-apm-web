@@ -357,6 +357,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         OrgInfo siteOrg = orgDao.findByUid(createRequest.getSiteUID());
         if(siteOrg !=null){
             selectedObjectMap.put("selectedOrg", siteOrg.getSiteUID() == null ? null : orgDao.findByUid(siteOrg.getSiteUID()));//业务单元
+            selected.setHospitalId(siteOrg.getId());
+            selected.setSiteId(siteOrg.getSiteId());
         }
         selected.setParentAssetId(createRequest.getParentAssetId());
         selectedObjectMap.put("parentAsset", createRequest.getParentAssetId() == null ? null : dao.findById(createRequest.getParentAssetId()));//主设备
@@ -369,8 +371,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             }
             selectedObjectMap.put("assetOwner", selected.getAssetOwnerId() == null ? null : userDao.findById(selected.getAssetOwnerId()));//维修负责人
         }
-        selected.setHospitalId(siteOrg.getId());
-        selected.setSiteId(siteOrg.getSiteId());
         selected.setTenantUID(createRequest.getTenantUID());
         selected.setHospitalUID(createRequest.getHospitalUID());
         selected.setInstitutionUID(createRequest.getInstitutionUID());

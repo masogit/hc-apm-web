@@ -163,8 +163,8 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 
         String jsonStr = requestPost(authenticateBasic, body);
         JSONObject obj = new JSONObject(jsonStr);
-        if (obj == null)
-            return;
+//        if (obj == null)
+//            return;
         JSONObject data = obj.getJSONObject("data");
         if (data == null)
             return;
