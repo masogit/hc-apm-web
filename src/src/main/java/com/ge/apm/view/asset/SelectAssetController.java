@@ -12,10 +12,10 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.faces.bean.ViewScoped;
 
@@ -170,7 +170,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
                 String contractId = zkbContractAsset.getContractId();
                 ZkbContract zkbContract = zkbContractRepository.findById(contractId);
                 Date now = new Date();
-                if(zkbContract !=null &&(now.after(zkbContract.getEndDate()) || now.before(zkbContract.getStartDate()))){
+                if(zkbContract !=null &&(now.getTime() >= zkbContract.getEndDate().getTime() || now.getTime() <= zkbContract.getStartDate().getTime())){
                     WebUtil.addErrorMessageKey("对于智康宝设备，合同有效期内的设备才可以创建报修工单！");
                     RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                     return;
