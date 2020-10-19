@@ -109,29 +109,27 @@ public class DepTranDetailController extends JpaCRUDController<DeptTransactionLo
             isSummarySelected=false;
         }else{
             if(search && transactionStatis!=null){
-                if(transactionStatis!=null){
+//                if(transactionStatis!=null){
                     depTranForTrans.setUserId(transactionStatis.getAuthorId());
                     deptTranLogList=refreshLoadData(depTranForTrans);
                     search=false;
-                }else{ //根据指定时间来查询
+//                }else{ //根据指定时间来查询
+//                    depTranForTrans.setUserId(userContextService.getLoginUserId());
+//                    depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
+//                    depTranForTrans.setEndTime(TimeUtils.getInputStartDate(endTime));
+//                }
+            }else{  //修改数据后保刷新 分有搜寻时间 和无搜寻时间
+                if(startTime ==null){
                     depTranForTrans.setUserId(userContextService.getLoginUserId());
+                    depTranForTrans.setStartTime(TimeUtils.getCurrentStartYYMM());
+                    depTranForTrans.setStartTime(TimeUtils.getCurrentEndYYMM());
+                    deptTranLogList=refreshLoadData(depTranForTrans);
+                }else{
                     depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
                     depTranForTrans.setEndTime(TimeUtils.getInputStartDate(endTime));
+                    depTranForTrans.setUserId(userContextService.getLoginUserId());
+                    deptTranLogList=refreshLoadData(depTranForTrans);
                 }
-
-            }else{  //修改数据后保刷新 分有搜寻时间 和无搜寻时间
-if(startTime ==null){
-    depTranForTrans.setUserId(userContextService.getLoginUserId());
-    depTranForTrans.setStartTime(TimeUtils.getCurrentStartYYMM());
-    depTranForTrans.setStartTime(TimeUtils.getCurrentEndYYMM());
-    deptTranLogList=refreshLoadData(depTranForTrans);
-}else{
-    depTranForTrans.setStartTime(TimeUtils.getInputStartDate(startTime));
-    depTranForTrans.setEndTime(TimeUtils.getInputStartDate(endTime));
-    depTranForTrans.setUserId(userContextService.getLoginUserId());
-    deptTranLogList=refreshLoadData(depTranForTrans);
-}
-
             }
 
         }

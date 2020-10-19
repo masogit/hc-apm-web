@@ -1,3 +1,7 @@
+--2020-10-16 增加批量导入文件类型字典 start
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'AconnectPerformanceExcel', '基础互通-用', 'Aconnect Performance', NULL,'-1');
+--2020-10-16 end
+
 --2020-10-10 增加九院设备字典 start
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroup','23','全自动核酸提取仪','Automatic nucleic acid extractor',NULL,112);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_23','1','全自动核酸提取仪','Automatic nucleic acid extractor',NULL,112);

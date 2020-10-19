@@ -25,8 +25,12 @@ public class CustomDataTable extends DataTable {
     public List<UIColumn> getColumns() {
         if (CustomColumnsList.isEmpty()) {
             List<UIColumn> sourceList = super.getColumns();
-            CustomColumnsList.add(sourceList.stream().filter(columItem -> "checkBoxColumn".equals(((Column) columItem).getId())).findAny().get());
-            CustomColumnsList.add(sourceList.stream().filter(columItem -> "operatorColumn".equals(((Column) columItem).getId())).findAny().get());
+            if(sourceList.stream().filter(columItem -> "checkBoxColumn".equals(((Column) columItem).getId())).findAny().isPresent()){
+                CustomColumnsList.add(sourceList.stream().filter(columItem -> "checkBoxColumn".equals(((Column) columItem).getId())).findAny().get());
+            }
+            if (sourceList.stream().filter(columItem -> "operatorColumn".equals(((Column) columItem).getId())).findAny().isPresent()){
+                CustomColumnsList.add(sourceList.stream().filter(columItem -> "operatorColumn".equals(((Column) columItem).getId())).findAny().get());
+            }
             customedColumn.forEach(item -> {
                 UIColumn itemColumn = sourceList.stream().filter(columItem -> item.equals(((Column) columItem).getId())).findAny().get();
                 ((Column) itemColumn).setVisible(true);
