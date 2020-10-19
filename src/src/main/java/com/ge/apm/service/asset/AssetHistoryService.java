@@ -34,7 +34,7 @@ public class AssetHistoryService {
     public static final String FIELD_ASSET_DEPT_NAME = "assetDeptName";
     public static final String FILED_DEVICE_STATUS = "deviceStatus";
 
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
     private AssetHistoryRepository assetHistoryRepository;

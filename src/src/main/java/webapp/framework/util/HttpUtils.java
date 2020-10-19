@@ -309,8 +309,16 @@ public class HttpUtils {
 	public static void main(String[] args) {
 //		String url = "http://116.58.219.203/MessageTransferQueryWebApp/servlet/MessageQueryServiceServletByJson?userName=gequery"
 //				+ "&passWord=gequery123456&beginDate=20170707104000&endDate=20170711314400&keyword=SID%Hp";
-		String url ="http://116.58.219.203/MessageTransferQueryWebApp/servlet/MessageQueryServiceServletByJson?userName=gequery&passWord=gequery123456&beginDate=20170707104500&endDate=20170707113500&keyword=SID%20Hp";
+		String url ="http://116.58.219.203/MessageTransferQueryWebApp/servlet/MessageQueryServiceServletByJson?userName=gequery&passWord="+getEncryptedPass()+"&beginDate=20170707104500&endDate=20170707113500&keyword=SID%20Hp";
 		System.out.println(doGet(url));
+	}
+
+	/**
+	 * extract password
+	 * @return
+	 */
+	private static String getEncryptedPass(){
+		return "gequery123456";
 	}
 	
 }
