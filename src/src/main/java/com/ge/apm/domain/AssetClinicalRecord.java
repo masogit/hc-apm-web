@@ -123,6 +123,9 @@ public class AssetClinicalRecord implements Serializable {
     @Column(name = "is_positive")
     private Integer isPositive;
 
+    @Column(name = "patient_from")
+    private String patientFrom;
+
     public AssetClinicalRecord() {
     }
 
@@ -336,6 +339,14 @@ public class AssetClinicalRecord implements Serializable {
 
     public void setIsPositive(Integer isPositive) {
         this.isPositive = isPositive;
+    }
+
+    public String getPatientFrom() {
+        return patientFrom;
+    }
+
+    public void setPatientFrom(String patientFrom) {
+        this.patientFrom = patientFrom;
     }
 
     @Override
