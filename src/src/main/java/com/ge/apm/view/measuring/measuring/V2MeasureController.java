@@ -190,7 +190,9 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderMeasuringDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         if (!accessoryList.isEmpty())
-            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            if (accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()) {
+                itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            }
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
         supplierName = itemDetail.getSupplier();
         nochange = true;
@@ -1610,8 +1612,10 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             }
         } else {
             switchTmp=false;
-            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
-            supplierName = itemDetail.getSupplier();
+            if (accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()){
+                itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+                supplierName = itemDetail.getSupplier();
+            }
         }
         supplierList = aimService.getSuplierListBySiteUid(selectedMeasureOrder.getTenantUID());
         nochange=false;
@@ -1639,7 +1643,9 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
             coWorkerDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             coWorkerDetail.setOrderId(selectedMeasureOrder.getId());
         } else {
-            coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            if (coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()){
+                coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            }
         }
     }
 

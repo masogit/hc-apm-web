@@ -19,6 +19,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.model.SelectItem;
+import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -295,6 +296,7 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             try {
                 Transformer transformer = factory.newTransformer(new StreamSource(xsl));
                 Source src = new StreamSource(new StringReader(woXml));

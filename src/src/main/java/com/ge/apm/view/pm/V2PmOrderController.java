@@ -348,16 +348,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void preBatchCancel(){
         cancelReason=null;
          List<V2_PmOrder> pmList =getPmListByselectedId();
-         //周期性工单的pmtype是1
-        Optional<V2_PmOrder> any = pmList.stream().filter(item -> item.getPmType() == 1).findAny();
-        if(any.isPresent()){
-            cancelInt="2";
-            periodShow=true;
-        }else{
-            cancelInt="1";
-            periodShow=false;
+        if (pmList != null) {
+            //周期性工单的pmtype是1
+            Optional<V2_PmOrder> any = pmList.stream().filter(item -> item.getPmType() == 1).findAny();
+            if(any.isPresent()){
+                cancelInt="2";
+                periodShow=true;
+            }else{
+                cancelInt="1";
+                periodShow=false;
+            }
         }
-
     }
 
     public boolean batchCancelShow(){
@@ -376,7 +377,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
         if (!accessoryList.isEmpty())
-            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            if (accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()){
+                itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            }
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
         supplierName = itemDetail.getSupplier();
         nochange = true;
@@ -2109,7 +2112,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
         } else {
             switchTmp=false;
-            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            if (accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()) {
+                itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            }
             supplierName = itemDetail.getSupplier();
         }
         supplierList = aimService.getSuplierListBySiteUid(selectedPmOrder.getTenantUID());
@@ -2136,7 +2141,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             coWorkerDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             coWorkerDetail.setWoId(selectedPmOrder.getId());
         } else {
-            coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            if (coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()) {
+                coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
+            }
         }
     }
 

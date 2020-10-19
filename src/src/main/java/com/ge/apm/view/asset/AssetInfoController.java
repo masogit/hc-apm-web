@@ -52,6 +52,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -2108,12 +2109,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	private SharedAssetReqDetail selectProperReqDetail(AssetInfo item) {
 		Date nowDate = new Date();
         List<SharedAssetReqDetail> sharedAssetReqDetailList = sharedAssetReqDetailRepository.findByAssetInfoUid(item.getUid());
-        SharedAssetReqDetail sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
-                                                            .filter(reqDetail -> reqDetail.getChargingEndTime() == null || reqDetail.getChargingEndTime().compareTo(nowDate) > 0)
-                                                            .findFirst()
-                                                            .orElse(null);
-
-    	if(sharedAssetReqDetail != null) {
+        SharedAssetReqDetail sharedAssetReqDetail = null;
+        if(Optional.ofNullable(sharedAssetReqDetailList).isPresent()){
+            sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
+                    .filter(reqDetail -> reqDetail.getChargingEndTime() == null || reqDetail.getChargingEndTime().compareTo(nowDate) > 0)
+                    .findFirst()
+                    .orElse(null);
+        }
+        if(sharedAssetReqDetail != null) {
             calcChargingByAssetReqDetail(item, sharedAssetReqDetail);
     	}
     	return sharedAssetReqDetail;
@@ -2121,22 +2124,25 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
 	private SharedAssetReqDetail findLatestReqDetail(AssetInfo item) {
         List<SharedAssetReqDetail> sharedAssetReqDetailList = sharedAssetReqDetailRepository.findByAssetInfoUid(item.getUid());
-        SharedAssetReqDetail sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
-                                                            .sorted((SharedAssetReqDetail o1, SharedAssetReqDetail o2) -> {
-                                                                if(o1.getChargingEndTime() == null) {
-                                                                        return -1;
-                                                                    } else if(o2.getChargingEndTime() == null) {
-                                                                        return 1;
-                                                                    } else {
-                                                                        if(o1.getChargingEndTime().before(o2.getChargingEndTime())) {
-                                                                            return 1;
-                                                                        } else {
-                                                                            return -1;
-                                                                        }
-                                                                    }
-                                                            })
-                                                            .findFirst()
-                                                            .orElse(null);
+        SharedAssetReqDetail sharedAssetReqDetail = null;
+        if(Optional.ofNullable(sharedAssetReqDetailList).isPresent()) {
+            sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
+                    .sorted((SharedAssetReqDetail o1, SharedAssetReqDetail o2) -> {
+                        if(o1.getChargingEndTime() == null) {
+                            return -1;
+                        } else if(o2.getChargingEndTime() == null) {
+                            return 1;
+                        } else {
+                            if(o1.getChargingEndTime().before(o2.getChargingEndTime())) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        }
+                    })
+                    .findFirst()
+                    .orElse(null);
+        }
         if(sharedAssetReqDetail != null) {
             calcChargingByAssetReqDetail(item, sharedAssetReqDetail);
         }
@@ -2215,11 +2221,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     {
         boolean isTargetHospital = false;
         List<OrgInfo> allocDeptList = orgDao.findByUids(new HashSet<>(orgUids));
-        OrgInfo allocDept = allocDeptList.stream().findFirst().get();
-        String hosName = allocDept.getOrgFullName();
-        if(hosName.contains("中国人民解放军总医院"))
-        {
-            isTargetHospital = true;
+        String hosName = null;
+        if (allocDeptList.stream().findFirst().isPresent()) {
+            OrgInfo allocDept = allocDeptList.stream().findFirst().get();
+            hosName = allocDept.getOrgFullName();
+            if(hosName != null && hosName.contains("中国人民解放军总医院")){
+                isTargetHospital = true;
+            }
         }
 
         return isTargetHospital;
@@ -2235,7 +2243,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 	        if(!asset.getAssetDeptUID().equals(asset.getClinicalDeptUID()))
 	        {
 	            List<OrgInfo> allocDeptList = orgDao.findByUids(new HashSet<>(orgUids));
-	            OrgInfo allocDept = allocDeptList.stream().findFirst().get();
+                OrgInfo allocDept = null;
+                if (allocDeptList.stream().findFirst().isPresent()) {
+                    allocDept = allocDeptList.stream().findFirst().get();
+                }
 	            Map<String, Object> info = new HashedMap();
 	
 	            info.put("抬头", allocDept.getParentOrg().getName() + allocDept.getName());
@@ -2288,6 +2299,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             try {
                 Transformer transformer = factory.newTransformer(new StreamSource(xsl));
                 Source src = new StreamSource(new StringReader(woXml));

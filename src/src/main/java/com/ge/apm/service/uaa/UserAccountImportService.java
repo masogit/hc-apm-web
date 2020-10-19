@@ -57,7 +57,7 @@ public class UserAccountImportService {
 	private static final String HEADER_ACCESSSCOPE="可见范围（科室）";
 	private static final String HEADER_POSITION="职务";
 	private static final String HEADER_TAGS="标签";
-	private static final String HEADER_PASSWORD="初始密码";
+	private static final String HEADER_PASSWORD= getEncryptedPass();
 	private static final String HEADER_UUID="UUID";
 	private static final String SHEET_USER="datalist";
 	private static final String ROLE_GUEST="仅报修权限账号";
@@ -109,6 +109,9 @@ public class UserAccountImportService {
 
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
+	private static String getEncryptedPass() {
+		return "初始密码";
+	}
 
 	private boolean isExistsByLoginName(String loginName) {
 		return userAccountMapper.getUserByLoginName(loginName) != null ? true : false;
