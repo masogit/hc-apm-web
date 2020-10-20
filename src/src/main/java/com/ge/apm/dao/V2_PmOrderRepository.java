@@ -2,7 +2,6 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.V2_PmOrder;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.Date;
@@ -50,14 +49,26 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 	public Set<String> getAssetUid(List<String> uidList);
 
 	@Query(value="select\n" +
-			"\t (select name from org_info where uid = vpo.site_uid) as siteName,\n" +
+			"\t(\n" +
+			"\tselect\n" +
+			"\t\tname\n" +
+			"\tfrom\n" +
+			"\t\torg_info\n" +
+			"\twhere\n" +
+			"\t\tuid = vpo.site_uid) as siteName,\n" +
 			"\tai.\"name\" as assetName,\n" +
 			"\tai.serial_num as serialNum,\n" +
 			"\tai.depart_num as departNum,\n" +
 			"\tai.function_type as functionType,\n" +
 			"\tvpo.rule_level as ruleLevel,\n" +
 			"\tvpo.pm_type as pmType,\n" +
-			"\t (select name from org_info where uid = vpo.clinical_dept_id) as clinicalDeptName,\n" +
+			"\t(\n" +
+			"\tselect\n" +
+			"\t\tname\n" +
+			"\tfrom\n" +
+			"\t\torg_info\n" +
+			"\twhere\n" +
+			"\t\tuid = vpo.clinical_dept_id) as clinicalDeptName,\n" +
 			"\tpor.\"name\" as pmRuleName,\n" +
 			"\tpor.\"period\" as pmRulePeriod,\n" +
 			"\tvpo.creator_name as creatorName,\n" +
@@ -67,27 +78,31 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 			"\tvpo.int_ext_type as intExtType,\n" +
 			"\tvpo.plan_time as planTime\n" +
 			"from\n" +
-			"\tv2_pm_order vpo,\n" +
-			"\tasset_info ai,\n" +
-			"\tpm_order_rule por,\n" +
-			"\trel_rule_asset rra\n" +
-			"where\n" +
-			"\tai.id = vpo.asset_id\n" +
-			"\tand rra.asset_uid = vpo.asset_uid\n" +
-			"\tand por.uid in(rra.rule_uid,\n" +
+			"  \tasset_info ai,\n" +
+			"\tv2_pm_order vpo\n" +
+			"full join rel_rule_asset rra on\n" +
+			"\tvpo.asset_uid = rra.asset_uid\n" +
+			"full join pm_order_rule por on\n" +
+			"\tpor.\"level\" = vpo.rule_level\n" +
+			"\tand por.uid in (rra.rule_uid,\n" +
 			"\trra.rule_uid1,\n" +
 			"\trra.rule_uid2)\n" +
-			"\tand por.\"level\" = vpo.rule_level\n" +
+			"where\n" +
+			"\tai.id = vpo.asset_id\n" +
 			"\tand ai.is_deleted != true\n" +
 			"\tand ai.status != 4\n" +
 			"\tand ai.status != 5\n" +
 			"\tand ai.is_valid = true\n" +
-			"\tand (vpo.tenant_uid = :userOrgUid\n" +
-			"\tor vpo.institution_uid = :userOrgUid\n" +
-			"\tor vpo.hospital_uid = :userOrgUid\n" +
-			"\tor vpo.site_uid = :userOrgUid)",nativeQuery = true)
-	List<Object> getAllPmOrder(@Param("userOrgUid") String userOrgUid);
+			"\tand (ai.tenant_uid in (?1)\n" +
+			"\tor ai.institution_uid in (?1)\n" +
+			"\tor ai.clinical_dept_uid in (?1)\n" +
+			"\tor ai.asset_dept_uid in (?1)\n" +
+			"\tor ai.hospital_uid in (?1)\n" +
+			"\tor ai.site_uid in (?1))",nativeQuery = true)
+	List<Object> getAllPmOrder(List<String >OrgUid);
 
+
+	//测试大数据量使用 上线后考虑删除
 	@Query(value="select\n" +
 			"\t (select name from org_info where uid = vpo.site_uid) as siteName,\n" +
 			"\tai.\"name\" as assetName,\n" +

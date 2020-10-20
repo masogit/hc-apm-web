@@ -8,7 +8,6 @@ package com.ge.apm.view.pm;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.excel.PmModel;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
@@ -44,13 +43,15 @@ import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
-import net.sf.jxls.transformer.XLSTransformer;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -74,6 +75,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -301,16 +303,46 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
    public void exportExcel() throws IOException{
        if(queryIndex == 10){
-          long t1 = System.currentTimeMillis();
-//           List<Object> list =  dao.getAllPmOrder(user.getOrgInfoUID());
-           List<Object> list =  dao.getAllPmOrder1();
-           long t2 = System.currentTimeMillis();
-           System.out.println(t2-t1);
+//          long t1 = System.currentTimeMillis();
+           List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+
+           List<Object> list =  dao.getAllPmOrder(orgUidList);
+         /*  List<String> pmNums = new ArrayList<>();
+           for (int i = 0; i < list.size() ; i++) {
+               Object[] cells = (Object[]) list.get(i);
+               pmNums.add(cells[12].toString());
+           }
+
+           List<PmOrderRule> pmOrderRules = new ArrayList<>();
+
+           Integer start = 0;
+           Integer end = 0;
+           Integer size = 10000;
+           Integer count = pmNums.size()/size;
+           List<String> subList = new ArrayList<>();
+           for (int i = 0; i <= count; i++) {
+               start = size*i;
+               end = start + count;
+               if(count == i){
+                    subList = pmNums.subList(start,pmNums.size());
+                   List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNumBatch(subList,userContextService.getLoginUser().getTenantUID());
+                   pmOrderRules.addAll(pmRuleByPmNum);
+               }else{
+                   subList = pmNums.subList(start,end);
+                   List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNumBatch(subList,userContextService.getLoginUser().getTenantUID());
+                   pmOrderRules.addAll(pmRuleByPmNum);
+               }
+           }*/
+
+
+
+//           List<Object> list =  dao.getAllPmOrder1();
+//           long t2 = System.currentTimeMillis();
+      /*     System.out.println(t2-t1);
            List<PmModel> pmModels = new ArrayList<>();
            for(int i=0;i<list.size();i++){
                PmModel pmModel = new PmModel();
                Object[] cells = (Object[]) list.get(i);
-//               Map<String,Object> cells = (Map<String, Object>) list.get(i);
                pmModel.setSiteName(checkValue(cells[0]));
                pmModel.setAssetName(checkValue(cells[1]));
 
@@ -329,23 +361,34 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                pmModel.setIntExtType(FieldValueMessageController.fieldValue("intExtType",checkValue(cells[14])));
                pmModel.setPlanTime(checkValue(cells[15]));
                pmModels.add(pmModel);
+           }*/
+           for (int i = 0; i <list.size() ; i++) {
+               Object[] cells = (Object[]) list.get(i);
+               cells[6] = FieldValueMessageController.fieldValue("pmType",cells[6].toString());
+               cells[14] = FieldValueMessageController.fieldValue("intExtType",cells[14].toString());
+               cells[15] = new DateTime(new Date(cells[15].toString())).toString("MM/dd/yyyy");
            }
+
            String path = new DateTime().toString("yyyyMMddhhmm")+ File.separator+user.getLoginName();
            String filePath = fileScanService.getUploadFileFullPath(path);
-           FileUtils.forceMkdir(new File(filePath));
-           String source = this.getClass().getClassLoader().getResource("template/PmOrder_export.xlsx").getPath();
-           Map<String,Object> map = new HashedMap<>();
+           File dest = new File(filePath + File.separator+"pm.xlsx");
+          FileUtils.forceMkdir(new File(filePath));
+            String sourcePath = this.getClass().getClassLoader().getResource("template/PmOrder_export.xlsx").getPath();
+            File source = new File(sourcePath);
+           FileUtils.copyFile(source,dest);
+          /* Map<String,Object> map = new HashedMap<>();
            map.put("list",pmModels);
            XLSTransformer transformer = new XLSTransformer();
            try {
                transformer.transformXLS(source,map,filePath+File.separator+"pm.xlsx");
            } catch (InvalidFormatException e) {
                e.printStackTrace();
-           }
-           long t3 = System.currentTimeMillis();
-           excelFile = new DefaultStreamedContent(new FileInputStream(filePath+File.separator+"pm.xlsx"), "application/.ms-excel", "AssetInfo_export.xlsx");
-          long t4 = System.currentTimeMillis();
-           System.out.println(t4 - t2);
+           }*/
+           genPmExcel(filePath + File.separator+"pm.xlsx",list);
+//           long t3 = System.currentTimeMillis();
+           excelFile = new DefaultStreamedContent(new FileInputStream(filePath+File.separator+"pm.xlsx"), "application/.ms-excel", "pm_export.xlsx");
+//          long t4 = System.currentTimeMillis();
+//           System.out.println(t4 - t2);
            return;
        }
        PmFileExportTemplate template = new PmFileExportTemplate();
@@ -356,7 +399,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
            return;
        }
         template.exportPm(pmOrderList,pmFieldsExport);
-       excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "AssetInfo_export.xlsx");
+       excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "pm_export.xlsx");
    }
 
    public String checkValue(Object obj){
@@ -365,6 +408,70 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }else {
             return "";
         }
+   }
+
+   public void genPmExcel(String path,List<Object> list){
+       SXSSFWorkbook wb = new SXSSFWorkbook(100);
+       Sheet sheet = wb.createSheet();
+       Row headRow = sheet.createRow(0);
+
+       Cell cell0 = headRow.createCell(0);
+       cell0.setCellValue(WebUtil.getMessage("hospitalId"));
+       Cell cell1 = headRow.createCell(1);
+       cell1.setCellValue(WebUtil.getMessage("assetName"));
+       Cell cell2 = headRow.createCell(2);
+       cell2.setCellValue(WebUtil.getMessage("serialNum"));
+       Cell cell3 = headRow.createCell(3);
+       cell3.setCellValue(WebUtil.getMessage("departNum"));
+       Cell cell4 = headRow.createCell(4);
+       cell4.setCellValue(WebUtil.getMessage("functionType"));
+       Cell cell5 = headRow.createCell(5);
+       cell5.setCellValue(WebUtil.getMessage("MeasurementGrade2"));
+       Cell cell6 = headRow.createCell(6);
+       cell6.setCellValue(WebUtil.getMessage("MaintenanceType"));
+       Cell cell7 = headRow.createCell(7);
+       cell7.setCellValue(WebUtil.getMessage("clinicalDeptId"));
+       Cell cell8 = headRow.createCell(8);
+       cell8.setCellValue(WebUtil.getMessage("PmOrderRule"));
+       Cell cell9 = headRow.createCell(9);
+       cell9.setCellValue(WebUtil.getMessage("MaintenancePeriod"));
+       Cell cell10 = headRow.createCell(10);
+       cell10.setCellValue(WebUtil.getMessage("creatorUID"));
+       Cell cell11 = headRow.createCell(11);
+       cell11.setCellValue(WebUtil.getMessage("caseOwnerId"));
+       Cell cell12 = headRow.createCell(12);
+       cell12.setCellValue(WebUtil.getMessage("MaintenanceNumber"));
+       Cell cell13 = headRow.createCell(13);
+       cell13.setCellValue(WebUtil.getMessage("currentStep"));
+       Cell cell14 = headRow.createCell(14);
+       cell14.setCellValue(WebUtil.getMessage("intExtType"));
+       Cell cell15 = headRow.createCell(15);
+       cell15.setCellValue(WebUtil.getMessage("PlannedCompletionTime"));
+
+       for(int i=0;i<list.size();i++){
+           Row dataRow = sheet.createRow(i+1);
+           for (int j = 0; j <16 ; j++) {
+               Cell dataCell = dataRow.createCell(j);
+               dataCell.setCellValue(checkValue(((Object[])list.get(i))[j]));
+           }
+       }
+       FileOutputStream fileOutputStream = null;
+       try {
+            fileOutputStream = new FileOutputStream(path);
+           wb.write(fileOutputStream);
+           fileOutputStream.flush();
+           fileOutputStream.close();
+       } catch (Exception e) {
+           e.printStackTrace();
+       }finally {
+           if(fileOutputStream != null){
+               try {
+                   fileOutputStream.close();
+               } catch (IOException e) {
+                   e.printStackTrace();
+               }
+           }
+       }
    }
 
     List<String> pmIdList = new ArrayList<String>();
@@ -2846,4 +2953,81 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return null;
         }
     }
+
+   //生成Excel测试
+   /* public static void main(String[] args) {
+
+        long start = System.currentTimeMillis();
+        List<PmModel> list = new ArrayList<>();
+        for (int i = 0; i <50000 ; i++) {
+            PmModel object = new PmModel("保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i);
+            list.add(object);
+        }
+
+
+        SXSSFWorkbook wb = new SXSSFWorkbook(100);
+        Sheet sheet = wb.createSheet();
+//        Row headRow = sheet.createRow(0);
+        for(int i=0;i<list.size();i++){
+            Row dataRow = sheet.createRow(i+1);
+           *//* for (int j = 0; j <15 ; j++) {
+                Cell dataCell = dataRow.createCell(j);
+                dataCell.setCellValue(list.get(i)[j].toString());
+            }*//*
+
+            Cell dataCell0 = dataRow.createCell(0);
+            dataCell0.setCellValue(list.get(i).getAssetName());
+            Cell dataCell1 = dataRow.createCell(1);
+            dataCell1.setCellValue(list.get(i).getAssetName());
+            Cell dataCell2 = dataRow.createCell(2);
+            dataCell2.setCellValue(list.get(i).getAssetName());
+            Cell dataCell3 = dataRow.createCell(3);
+            dataCell3.setCellValue(list.get(i).getAssetName());
+            Cell dataCell4 = dataRow.createCell(4);
+            dataCell4.setCellValue(list.get(i).getAssetName());
+            Cell dataCell5 = dataRow.createCell(5);
+            dataCell5.setCellValue(list.get(i).getAssetName());
+            Cell dataCell6 = dataRow.createCell(6);
+            dataCell6.setCellValue(list.get(i).getAssetName());
+            Cell dataCell7 = dataRow.createCell(7);
+            dataCell7.setCellValue(list.get(i).getAssetName());
+            Cell dataCell8 = dataRow.createCell(8);
+            dataCell8.setCellValue(list.get(i).getAssetName());
+            Cell dataCell9 = dataRow.createCell(9);
+            dataCell9.setCellValue(list.get(i).getAssetName());
+            Cell dataCell10 = dataRow.createCell(10);
+            dataCell10.setCellValue(list.get(i).getAssetName());
+            Cell dataCell11 = dataRow.createCell(11);
+            dataCell11.setCellValue(list.get(i).getAssetName());
+            Cell dataCell12 = dataRow.createCell(12);
+            dataCell12.setCellValue(list.get(i).getAssetName());
+            Cell dataCell13 = dataRow.createCell(13);
+            dataCell13.setCellValue(list.get(i).getAssetName());
+            Cell dataCell14 = dataRow.createCell(14);
+            dataCell14.setCellValue(list.get(i).getAssetName());
+            Cell dataCell15 = dataRow.createCell(15);
+            dataCell15.setCellValue(list.get(i).getAssetName());
+        }
+
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream("pm.xlsx");
+            wb.write(fileOutputStream);
+            fileOutputStream.flush();
+            fileOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            if(fileOutputStream != null){
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        long end = System.currentTimeMillis();
+        System.out.println(end - start);
+    }*/
 }
