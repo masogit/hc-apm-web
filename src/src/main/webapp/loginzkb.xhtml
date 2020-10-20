@@ -147,6 +147,10 @@
                         <div class="ui-g-12" style="display: flex;justify-content: center;">
                             <p:commandButton onclick="handleUpdateFormValue();" onerror="handleLoginError(xhr, status);" onsuccess="handleSuccess(data, status, xhr)" styleClass="secondary" validateClient="true" actionListener="#{loginController.doLogin()}" value="#{msg.login}" update="growl" oncomplete="handleComplete();" style="background: #025CB9;width: 298px;margin-top: 60px;"/>
                         </div>
+                        <div   style="color: blue;display: flex;justify-content: center;font-size: 12px;width: 98%;">
+                            <p:commandLink update="forgetPasswordForm" value="?忘记密码" oncomplete="PF('forgetPassword').show()"/>
+                        </div>
+
                     </div>
                 </div>
 
@@ -163,7 +167,19 @@
                 <br/><br/>
                 <p:commandButton value="#{msg.Confirm}" onclick="PF('dlgLoginError').hide()"/>
             </p:dialog>
-
+            <p:dialog modal="true"  widgetVar="forgetPassword" header="忘记密码" appendTo="@(body)">
+                <h:form id="forgetPasswordForm">
+                    <p:growl id="growl1" autoUpdate="true" showDetail="true"/>
+                    <label class="label">手机号*</label>
+                    <p:inputText value="#{loginController.telephone}"  required="true" requiredMessage="手机号不能为空" readonly="#{loginController.readonlyFlag}"/>
+                    <br/><br/>
+                    <label class="label" >验证码*</label>
+                    <p:inputText value="#{loginController.verificationCode}"/>
+                    <br/><br/>
+                    <p:commandButton value="发送验证码" actionListener="#{loginController.sendTheVerificationCode()}" update="forgetPasswordForm" rendered="#{!loginController.readonlyFlag}"/>
+                    <p:commandButton value="提交" actionListener="#{loginController.sendMail()}"  onclick="PF('forgetPassword').hide()" rendered="true"/>
+                </h:form>
+            </p:dialog>
             <p:dialog modal="true" widgetVar="dlgAccountLocked" header="登录失败" appendTo="@(body)">
                 <i class="ui-icon ui-icon-error"></i>&nbsp;&nbsp;
                 <h:outputText value="帐号被锁定，请24小时后再试！"/>

@@ -46,7 +46,7 @@ public class TimeUtils {
     }
 
     public static  String getInputStartDate(Date date){
-        String sdf = new SimpleDateFormat("YYYYMMDDHHMMSS").format(date);
+        String sdf = new SimpleDateFormat("yyyyMMDDHHMMSS").format(date);
         sdf=sdf.substring(0,6)+"01000000";
         return sdf;
     }
@@ -90,7 +90,7 @@ public class TimeUtils {
 
     //获取当月的第一个天的日期
     public static String getCurrentStartYYMM(){
-        String sdf = new SimpleDateFormat("YYYYMMDDHHMMSS").format(new Date());
+        String sdf = new SimpleDateFormat("yyyyMMDDHHMMSS").format(new Date());
         sdf=sdf.substring(0,6)+"01000000";
         return sdf;
     }

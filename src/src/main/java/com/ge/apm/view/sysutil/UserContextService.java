@@ -18,6 +18,8 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 import javaslang.control.Option;
+
+import javax.annotation.PostConstruct;
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -52,7 +54,12 @@ public class UserContextService implements Serializable {
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
+//    private  ZkbContractRepository zkbContractRepository;
 
+//    @PostConstruct
+//    public void init(){
+//        zkbContractRepository= WebUtil.getBean(ZkbContractRepository.class);
+//    }
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
@@ -1105,6 +1112,11 @@ public class UserContextService implements Serializable {
     public boolean needScrappedControl(){
         ConfigService cfgService = WebUtil.getBean(ConfigService.class);
         return cfgService.needScrappedControl();
+    }
+
+    public boolean hasScrappedAuthority(){
+        AssetCreateService acService = WebUtil.getBean(AssetCreateService.class);
+        return acService.hasScrappedAuthority();
     }
 
 }

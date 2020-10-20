@@ -19,8 +19,10 @@
 								<p:ajax update="@this"></p:ajax>
 								<f:selectItem itemLabel="单个设备" itemValue="0"></f:selectItem>
 								<f:selectItem itemLabel="设备类型" itemValue="1"></f:selectItem>
+								<f:selectItem itemLabel="banner图" itemValue="2"></f:selectItem>
 							</p:selectOneRadio>
-							<span id="type0Span" style="#{captureDataMessagesController.selected.type==1?'display: none; ':' display: block;'}"> <label class="label">SystemID*</label>
+							<span id="type0Span" style="#{captureDataMessagesController.selected.type==1?'display: none; ':' display: block;'}">
+								<label class="label">SystemID*</label>
 								<p:inputText id="systemId" value="#{captureDataMessagesController.selected.systemId}" required="#{captureDataMessagesController.selected.type==0?true:false}" requiredMessage="请输入SystemID">
 								</p:inputText>
 								<p:commandButton id="searchSystemId" value="查找" actionListener="#{captureDataMessagesController.checkSystemId()}" update="idIbStatus,idGeDeviceType" process="@parent"/>
@@ -30,6 +32,8 @@
 									<f:selectItem itemLabel="是" itemValue="1" />
 								</p:selectOneMenu>
 							</span>
+							<span id="type1Span" style="#{captureDataMessagesController.selected.type==2?'display: none; ':' display: block;'}">
+
 							<label class="label">
 								<h:outputText id="deviceTypeLabel" value="#{captureDataMessagesController.selected.type==0?'设备类型':'设备类型*'}"></h:outputText>
 							</label>
@@ -45,6 +49,7 @@
 							<p:calendar value="#{captureDataMessagesController.selected.startDate}" pattern="MM/dd/yyyy HH:mm:ss" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
 							<label class="label">截止日期</label>
 							<p:calendar value="#{captureDataMessagesController.selected.endDate}" pattern="MM/dd/yyyy HH:mm:ss" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+							</span>
 						</h:panelGroup>
 						<h:panelGroup>
 							<p:commandButton validateClient="false" value="#{msg.Save}" actionListener="#{captureDataMessagesController.save}"
