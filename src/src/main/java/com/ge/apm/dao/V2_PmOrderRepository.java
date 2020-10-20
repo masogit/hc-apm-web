@@ -100,7 +100,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 			"\tor ai.clinical_dept_uid in (?1)\n" +
 			"\tor ai.asset_dept_uid in (?1)\n" +
 			"\tor ai.hospital_uid in (?1)\n" +
-			"\tor ai.site_uid in (?1))",nativeQuery = true)
+			"\tor ai.site_uid in (?1)) order by vpo.plan_time desc nulls last",nativeQuery = true)
 	List<Object> getAllPmOrder(List<String >OrgUid);
 
 }
