@@ -843,7 +843,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Transactional
     public void updateUserRole(Integer creatorUserType){
         List<String> role = new ArrayList<String>();
-        if(creatorUserType != null && creatorUserType == LX_USER_TYPE){
+        if(creatorUserType != null && creatorUserType.equals(LX_USER_TYPE)){
             role.add(SYSTEM_ACTIVE_ROLE);
         }else{
             role.add(DEFAULT_USER_ROLE);

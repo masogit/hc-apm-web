@@ -136,7 +136,9 @@ public class WebServiceUtil {
                 if("int".equals(this.paramTypes[i])){
                     try{
                         Integer intValue = Integer.parseInt(value);
-                        messageHeaders.put(paramName, intValue);
+                        if (messageHeaders != null){
+                            messageHeaders.put(paramName, intValue);
+                        }
                     }
                     catch(Exception ex){
                         throw new Exception("parseInt error: paramName="+paramName+", value="+value, ex);
@@ -145,14 +147,18 @@ public class WebServiceUtil {
                 else if("double".equals(this.paramTypes[i])){
                     try{
                         Double doubleValue = Double.parseDouble(value);
-                        messageHeaders.put(paramName, doubleValue);
+                        if (messageHeaders != null){
+                            messageHeaders.put(paramName, doubleValue);
+                        }
                     }
                     catch(Exception ex){
                         throw new Exception("parseDouble error: paramName="+paramName+", value="+value, ex);
                     }
                 }
                 else  //String type param
-                    messageHeaders.put(paramName, value);
+                    if (messageHeaders != null){
+                        messageHeaders.put(paramName, value);
+                    }
             }
             else{
                 logger.warn("getSoapRequestParams: param value not found in request, param="+paramName);
@@ -181,7 +187,7 @@ public class WebServiceUtil {
         String paramOptionalSqlWheres = "(1=1)";
         for (int i=0; i<this.optionalParams.length; i++) {
             String paramName = this.optionalParams[i];
-            if(messageHeaders.get(paramName)!=null){
+            if(messageHeaders.get(paramName)!=null && this.optionalSqlWheres != null){
                 paramOptionalSqlWheres += " and (" + this.optionalSqlWheres[i] + ")";
             }
         }

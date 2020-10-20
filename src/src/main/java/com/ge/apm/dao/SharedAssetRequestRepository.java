@@ -47,5 +47,7 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
 
 //    @Query("select o from AssetInfo o  where (o.departNum = :departNum or o.financingNum = :financingNum or o.qrCode = :qrCode) and o.siteUID = :siteUID")
 //    public List<AssetInfo> findSwapTypeInfo(@Param("departNum") String departNum ,@Param("financingNum") String financingNum ,@Param("qrCode") String qrCode, @Param("siteUID") String siteUID );
-    
+
+    @Query(value = "select o from SharedAssetRequest o where o.state in :states")
+    public List<SharedAssetRequest> findListByState(@Param("states") List<Integer> states);
 }

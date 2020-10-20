@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -119,6 +120,7 @@ public class WorkOrderPublishRenderService {
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             try {
                 Transformer transformer = factory.newTransformer(new StreamSource(xsl));
                 Source src = new StreamSource(new StringReader(woXml));

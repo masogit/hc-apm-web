@@ -59,6 +59,8 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	
 	@Query(value="select o.* from nurse_site_maintain_item o where o.schedule_date<?3 and o.status=3 and date_trunc('day',o.check_date)<=o.schedule_date order by o.id limit ?1 offset ?2*?1",nativeQuery=true)
 	public List<NurseSiteMaintainItem> findError8ByLimit(int limit,int offset,Date date);
+
+	public List<NurseSiteMaintainItem> findByAssetUid(String assetUid);
 	
 	@Transactional
 	@Modifying

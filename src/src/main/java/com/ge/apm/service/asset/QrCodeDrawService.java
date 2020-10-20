@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.QrCodeTemplateElement;
@@ -13,31 +14,25 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import javax.imageio.ImageIO;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.logging.log4j.util.Strings;
 
 /**
  *
@@ -180,6 +175,54 @@ public class QrCodeDrawService {
             url = url.concat("?").concat(code);
         }
         return url;
+    }
+
+    public BufferedImage createImageWithLogo(String content, String imgPath, boolean needCompress) throws Exception {
+        BufferedImage image = createBitMatrixImage(content,QRCODE_SIZE);
+        if (imgPath == null || "".equals(imgPath)) {
+            return image;
+        }
+        // 插入Logo图片
+        insertImage(image, imgPath, needCompress);
+        return image;
+    }
+
+    public void insertImage(BufferedImage source, String imgPath, boolean needCompress) throws Exception {
+        File file = new File(imgPath);
+        if (!file.exists()) {
+            System.err.println("" + imgPath + "   该文件不存在！");
+            return;
+        }
+        Image src = ImageIO.read(new File(imgPath));
+        int width = src.getWidth(null);
+        int height = src.getHeight(null);
+        if (needCompress) { // 压缩LOGO
+            if (width > WIDTH) {
+                width = WIDTH;
+            }
+            if (height > HEIGHT) {
+                height = HEIGHT;
+            }
+            Image image = src.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            BufferedImage tag = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics g = tag.getGraphics();
+            g.drawImage(image, 0, 0, null); // 绘制缩小后的图
+            g.dispose();
+            src = image;
+        }
+        // 插入LOGO
+        Graphics2D graph = source.createGraphics();
+        int x = (QRCODE_SIZE - width) / 2;
+        int y = (QRCODE_SIZE - height) / 2;
+        graph.drawImage(src, x, y, width, height, null);
+        graph.setStroke(new BasicStroke(3f));
+        graph.dispose();
+    }
+
+    public BufferedImage getQrCodeImageWithGeLogo(QrCodeLib qrCodeLib) throws Exception{
+        String url = webContextUrl.concat("/r/").concat(qrCodeLib.getId().toString());
+        String logoPath = this.getClass().getClassLoader().getResource("/image/logo.jpg").getPath(); ;
+        return createImageWithLogo(url, logoPath, true);
     }
 
     public static void main(String[] args) throws Exception {
