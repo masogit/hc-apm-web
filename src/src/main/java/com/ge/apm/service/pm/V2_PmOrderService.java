@@ -105,8 +105,9 @@ public class V2_PmOrderService extends MicroServiceInvoker {
                 TableDefinition byBaseId = tableDao.findById(reporter.getSchemaId());
                 if(byBaseId == null){
                     WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("MaintainReportNotExist")));
+                } else {
+                    hm.put("pmReportNeedFill",byBaseId.getName());
                 }
-                hm.put("pmReportNeedFill",byBaseId.getName());
             }
         }
         reporter =reportDao.findSaftyReport(v2PmOrder.getId());
@@ -114,9 +115,10 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             TableDefinition byBaseId = tableDao.findById(reporter.getSchemaId());
             if(byBaseId == null){
                 WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", WebUtil.getMessage("MaintainReportNotExist")));
-            }
-            if(CollectionUtils.isEmpty(reporter.getData())){
-                hm.put("saftyReportNeedFill",byBaseId.getName());
+            } else {
+                if(CollectionUtils.isEmpty(reporter.getData())){
+                    hm.put("saftyReportNeedFill",byBaseId.getName());
+                }
             }
         }
         return hm;

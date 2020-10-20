@@ -69,7 +69,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Autowired
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYYMMdd");
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
 
     public List<TenantInfo> getSourceTenantInfoList(){
@@ -467,7 +467,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())) {
             if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
-                if("1".equals(zkbPartOrder.getArtificialType())){
+                //if("1".equals(zkbPartOrder.getArtificialType())){
                     if("t".equals(zkbPartOrder.getWhetherDeduct())){
                         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                         subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
@@ -476,10 +476,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                         subApplyQty(zkbContract,zkbPartOrder, (0-zkbPartOrder.getQty()));
                     }
-                }else{
+                /*}else{
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                     subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
-                }
+                }*/
             }else {
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
@@ -593,10 +593,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
             zkbPartOrder.setOrderedDate(new Date());
             zkbPartOrder.setOrderedAuditer(userAccount.getName());
+            zkbPartOrder.setOrderedAuditerUid(userAccount.getUid());
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.OrderedReject.toString());
         }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString())){
             zkbPartOrder.setUnOrderDate(new Date());
             zkbPartOrder.setUnOrderAuditer(userAccount.getName());
+            zkbPartOrder.setUnOrderAuditerUid(userAccount.getUid());
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString());
         }else{
             return;
@@ -768,7 +770,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep())){
                 AssetInfo assetInfo = assetInfoRepository.findByUid(zkbPartOrder.getAssetId());
                 if(assetInfo != null && assetInfo.getAssetGroup() != null && assetInfo.getAssetGroup() == 1){
-                    return;
+                    //return;
                 }
             }
         }

@@ -1,7 +1,8 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.ZkbContractAsset;
 import com.ge.apm.domain.ZkbPartOrderItem;
+import com.ge.apm.domain.ZkbPartOrderItemVo;
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
@@ -15,4 +16,7 @@ public interface ZkbPartOrderItemRepository extends GenericRepositoryUUID<ZkbPar
     public List<ZkbPartOrderItem> findByPartOrderId(String partOrderId);
 
     void deleteByPartOrderId(String partOrderId);
+
+    @Query("select new com.ge.apm.domain.ZkbPartOrderItemVo(i.partNo,i.partName,i.partQty,i.serialNumber,i.orderNo,i.price,i.remark,z.partOrderNo,z.currentStep,z.status,z.srNo) from ZkbPartOrder z, ZkbPartOrderItem i where z.id = i.partOrderId and z.srNum = ?1 and z.id !=?2 and z.assetTypeDi = ?3")
+    public List<ZkbPartOrderItemVo>  queryHistoryPart(String srNum, String id,String assetTypeDi);
 }

@@ -19,6 +19,8 @@ import java.util.UUID;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.UserTagsMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -32,14 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SysRoleRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
-import com.ge.apm.dao.UserRoleRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.AssetInfo;
@@ -89,6 +86,12 @@ public class UserAccountService {
 	
 	@Autowired
 	UserRoleRepository userRoleRepository;
+
+	@Autowired
+	UserTagsMapper userTagsMapper;
+
+	@Autowired
+	UserTagsRepository userTagsRepository;
 
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
@@ -340,11 +343,16 @@ public class UserAccountService {
 	public String getUserLanguageByLoginName(String loginName) {
 		return userAccountMapper.getUserLanguageByLoginName(loginName);
 	}
+	public UserAccount getUserByTelephone(String telephone) {
+		return userAccountRepository.findByTelephone(telephone);
+	}
 
-    @Transactional
+	@Transactional
     public void deleteUserAccount(UserAccount userAccount){
-		userOrgDao.deleteByUserUid(userAccount.getUid());
+		String userUid = userAccount.getUid();
+		userTagsRepository.deleteByUserUid(userUid);
+		userOrgDao.deleteByUserUid(userUid);
         userRoleRepository.deleteByUserAccount(userAccount.getId());
-        userAccountRepository.delete(userAccount);
+        userAccountRepository.deleteByUid(userUid);
     }
 }

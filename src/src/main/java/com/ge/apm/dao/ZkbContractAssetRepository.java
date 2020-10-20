@@ -13,6 +13,7 @@ import java.util.List;
 public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbContractAsset> {
 
     List<ZkbContractAsset> findByContractId(String contractId);
+    List<ZkbContractAsset> findByAssetId(String assetId);
 
     ZkbContractAsset findFirstByContractIdAndAssetId(String contractId, String assetId);
 
