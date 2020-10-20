@@ -61,7 +61,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 			"\tai.depart_num as departNum,\n" +
 			"\tai.function_type as functionType,\n" +
 			"\tvpo.rule_level as ruleLevel,\n" +
-			"\tvpo.pm_type as pmType,\n" +
+			"\t (select value_zh from i18n_message where msg_type='pmType' and msg_key = cast(vpo.pm_type as text)) as pmType,\n" +
 			"\t(\n" +
 			"\tselect\n" +
 			"\t\tname\n" +
@@ -75,8 +75,8 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 			"\tvpo.owner_name as ownerName,\n" +
 			"\tvpo.pm_num as pmNum,\n" +
 			"\tvpo.current_step_name as currentStepName,\n" +
-			"\tvpo.int_ext_type as intExtType,\n" +
-			"\tvpo.plan_time as planTime\n" +
+			"\t (select value_zh from i18n_message where msg_type='intExtType' and msg_key = cast(vpo.int_ext_type as text)) as intExtType,\n" +
+			"\t to_char(vpo.plan_time,'MM/dd/yyyy') as planTime\n" +
 			"from\n" +
 			"  \tasset_info ai,\n" +
 			"\tv2_pm_order vpo\n" +
@@ -101,38 +101,4 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 			"\tor ai.site_uid in (?1))",nativeQuery = true)
 	List<Object> getAllPmOrder(List<String >OrgUid);
 
-
-	//测试大数据量使用 上线后考虑删除
-	@Query(value="select\n" +
-			"\t (select name from org_info where uid = vpo.site_uid) as siteName,\n" +
-			"\tai.\"name\" as assetName,\n" +
-			"\tai.serial_num as serialNum,\n" +
-			"\tai.depart_num as departNum,\n" +
-			"\tai.function_type as functionType,\n" +
-			"\tvpo.rule_level as ruleLevel,\n" +
-			"\tvpo.pm_type as pmType,\n" +
-			"\t (select name from org_info where uid = vpo.clinical_dept_id) as clinicalDeptName,\n" +
-			"\tpor.\"name\" as pmRuleName,\n" +
-			"\tpor.\"period\" as pmRulePeriod,\n" +
-			"\tvpo.creator_name as creatorName,\n" +
-			"\tvpo.owner_name as ownerName,\n" +
-			"\tvpo.pm_num as pmNum,\n" +
-			"\tvpo.current_step_name as currentStepName,\n" +
-			"\tvpo.int_ext_type as intExtType,\n" +
-			"\tvpo.plan_time as planTime\n" +
-			"from\n" +
-			"\tv2_pm_order vpo,\n" +
-			"\tasset_info ai,\n" +
-			"\tpm_order_rule por,\n" +
-			"\trel_rule_asset rra\n" +
-			"where\n" +
-			"\tai.id = vpo.asset_id\n" +
-			"\tand rra.asset_uid = vpo.asset_uid\n" +
-			"\tand por.uid in(rra.rule_uid,\n" +
-			"\trra.rule_uid1,\n" +
-			"\trra.rule_uid2)\n" +
-			"\tand por.\"level\" = vpo.rule_level\n"+
-			"order by vpo.id limit 2000 offset 0"
-			,nativeQuery = true)
-	List<Object> getAllPmOrder1();
 }

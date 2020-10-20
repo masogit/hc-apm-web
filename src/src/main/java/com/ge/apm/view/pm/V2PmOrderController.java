@@ -35,7 +35,6 @@ import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.SupplierController;
-import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
@@ -47,7 +46,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -303,71 +302,25 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
    public void exportExcel() throws IOException{
        if(queryIndex == 10){
-//          long t1 = System.currentTimeMillis();
+           long start = System.currentTimeMillis();
            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
 
            List<Object> list =  dao.getAllPmOrder(orgUidList);
-         /*  List<String> pmNums = new ArrayList<>();
-           for (int i = 0; i < list.size() ; i++) {
-               Object[] cells = (Object[]) list.get(i);
-               pmNums.add(cells[12].toString());
-           }
-
-           List<PmOrderRule> pmOrderRules = new ArrayList<>();
-
-           Integer start = 0;
-           Integer end = 0;
-           Integer size = 10000;
-           Integer count = pmNums.size()/size;
-           List<String> subList = new ArrayList<>();
-           for (int i = 0; i <= count; i++) {
-               start = size*i;
-               end = start + count;
-               if(count == i){
-                    subList = pmNums.subList(start,pmNums.size());
-                   List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNumBatch(subList,userContextService.getLoginUser().getTenantUID());
-                   pmOrderRules.addAll(pmRuleByPmNum);
-               }else{
-                   subList = pmNums.subList(start,end);
-                   List<PmOrderRule> pmRuleByPmNum = pmOrderRuleRepository.findPmRuleByPmNumBatch(subList,userContextService.getLoginUser().getTenantUID());
-                   pmOrderRules.addAll(pmRuleByPmNum);
-               }
-           }*/
-
-
-
-//           List<Object> list =  dao.getAllPmOrder1();
-//           long t2 = System.currentTimeMillis();
-      /*     System.out.println(t2-t1);
-           List<PmModel> pmModels = new ArrayList<>();
-           for(int i=0;i<list.size();i++){
-               PmModel pmModel = new PmModel();
-               Object[] cells = (Object[]) list.get(i);
-               pmModel.setSiteName(checkValue(cells[0]));
-               pmModel.setAssetName(checkValue(cells[1]));
-
-               pmModel.setSerialNum(checkValue(cells[2]));
-               pmModel.setDepartNum(checkValue(cells[3]));
-               pmModel.setFunctionType(checkValue(cells[4]));
-               pmModel.setRuleLevel(checkValue(cells[5]));
-               pmModel.setPmType(checkValue(cells[6]));
-               pmModel.setClinicalDeptName(checkValue(cells[7]));
-               pmModel.setPmRuleName(checkValue(cells[8]));
-               pmModel.setPmRulePeriod(checkValue(cells[9]));
-               pmModel.setCreatorName(checkValue(cells[10]));
-               pmModel.setOwnerName(checkValue(cells[11]));
-               pmModel.setPmNum(checkValue(cells[12]));
-               pmModel.setCurrentStepName(checkValue(cells[13]));
-               pmModel.setIntExtType(FieldValueMessageController.fieldValue("intExtType",checkValue(cells[14])));
-               pmModel.setPlanTime(checkValue(cells[15]));
-               pmModels.add(pmModel);
-           }*/
+           long search = System.currentTimeMillis();
+           logger.info("cost time :"+ (search - start)/1000);
+/*
            for (int i = 0; i <list.size() ; i++) {
                Object[] cells = (Object[]) list.get(i);
                cells[6] = FieldValueMessageController.fieldValue("pmType",cells[6].toString());
                cells[14] = FieldValueMessageController.fieldValue("intExtType",cells[14].toString());
-               cells[15] = new DateTime(new Date(cells[15].toString())).toString("MM/dd/yyyy");
-           }
+               *//*try {
+                   if(null != cells[15] && StringUtils.isNotEmpty(cells[15].toString())) {
+                       cells[15] = new DateTime(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(cells[15].toString())).toString("MM/dd/yyyy");
+                   }
+               } catch (Exception e) {
+                   e.printStackTrace();
+               }*//*
+           }*/
 
            String path = new DateTime().toString("yyyyMMddhhmm")+ File.separator+user.getLoginName();
            String filePath = fileScanService.getUploadFileFullPath(path);
@@ -376,19 +329,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             String sourcePath = this.getClass().getClassLoader().getResource("template/PmOrder_export.xlsx").getPath();
             File source = new File(sourcePath);
            FileUtils.copyFile(source,dest);
-          /* Map<String,Object> map = new HashedMap<>();
-           map.put("list",pmModels);
-           XLSTransformer transformer = new XLSTransformer();
-           try {
-               transformer.transformXLS(source,map,filePath+File.separator+"pm.xlsx");
-           } catch (InvalidFormatException e) {
-               e.printStackTrace();
-           }*/
            genPmExcel(filePath + File.separator+"pm.xlsx",list);
-//           long t3 = System.currentTimeMillis();
-           excelFile = new DefaultStreamedContent(new FileInputStream(filePath+File.separator+"pm.xlsx"), "application/.ms-excel", "pm_export.xlsx");
-//          long t4 = System.currentTimeMillis();
-//           System.out.println(t4 - t2);
+           excelFile = new DefaultStreamedContent(new FileInputStream(filePath+File.separator+"pm.xlsx"), "application/.ms-excel", "PmOrder_Export.xlsx");
+           long end = System.currentTimeMillis();
+           logger.info("cost time :"+ (end - search)/1000);
            return;
        }
        PmFileExportTemplate template = new PmFileExportTemplate();
@@ -399,7 +343,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
            return;
        }
         template.exportPm(pmOrderList,pmFieldsExport);
-       excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "pm_export.xlsx");
+       excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "PmOrder_Export.xlsx");
    }
 
    public String checkValue(Object obj){
@@ -2954,80 +2898,4 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
-   //生成Excel测试
-   /* public static void main(String[] args) {
-
-        long start = System.currentTimeMillis();
-        List<PmModel> list = new ArrayList<>();
-        for (int i = 0; i <50000 ; i++) {
-            PmModel object = new PmModel("保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i,"保养测试"+i);
-            list.add(object);
-        }
-
-
-        SXSSFWorkbook wb = new SXSSFWorkbook(100);
-        Sheet sheet = wb.createSheet();
-//        Row headRow = sheet.createRow(0);
-        for(int i=0;i<list.size();i++){
-            Row dataRow = sheet.createRow(i+1);
-           *//* for (int j = 0; j <15 ; j++) {
-                Cell dataCell = dataRow.createCell(j);
-                dataCell.setCellValue(list.get(i)[j].toString());
-            }*//*
-
-            Cell dataCell0 = dataRow.createCell(0);
-            dataCell0.setCellValue(list.get(i).getAssetName());
-            Cell dataCell1 = dataRow.createCell(1);
-            dataCell1.setCellValue(list.get(i).getAssetName());
-            Cell dataCell2 = dataRow.createCell(2);
-            dataCell2.setCellValue(list.get(i).getAssetName());
-            Cell dataCell3 = dataRow.createCell(3);
-            dataCell3.setCellValue(list.get(i).getAssetName());
-            Cell dataCell4 = dataRow.createCell(4);
-            dataCell4.setCellValue(list.get(i).getAssetName());
-            Cell dataCell5 = dataRow.createCell(5);
-            dataCell5.setCellValue(list.get(i).getAssetName());
-            Cell dataCell6 = dataRow.createCell(6);
-            dataCell6.setCellValue(list.get(i).getAssetName());
-            Cell dataCell7 = dataRow.createCell(7);
-            dataCell7.setCellValue(list.get(i).getAssetName());
-            Cell dataCell8 = dataRow.createCell(8);
-            dataCell8.setCellValue(list.get(i).getAssetName());
-            Cell dataCell9 = dataRow.createCell(9);
-            dataCell9.setCellValue(list.get(i).getAssetName());
-            Cell dataCell10 = dataRow.createCell(10);
-            dataCell10.setCellValue(list.get(i).getAssetName());
-            Cell dataCell11 = dataRow.createCell(11);
-            dataCell11.setCellValue(list.get(i).getAssetName());
-            Cell dataCell12 = dataRow.createCell(12);
-            dataCell12.setCellValue(list.get(i).getAssetName());
-            Cell dataCell13 = dataRow.createCell(13);
-            dataCell13.setCellValue(list.get(i).getAssetName());
-            Cell dataCell14 = dataRow.createCell(14);
-            dataCell14.setCellValue(list.get(i).getAssetName());
-            Cell dataCell15 = dataRow.createCell(15);
-            dataCell15.setCellValue(list.get(i).getAssetName());
-        }
-
-        FileOutputStream fileOutputStream = null;
-        try {
-            fileOutputStream = new FileOutputStream("pm.xlsx");
-            wb.write(fileOutputStream);
-            fileOutputStream.flush();
-            fileOutputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            if(fileOutputStream != null){
-                try {
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        long end = System.currentTimeMillis();
-        System.out.println(end - start);
-    }*/
 }
