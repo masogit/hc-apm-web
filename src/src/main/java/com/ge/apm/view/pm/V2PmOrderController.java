@@ -20,16 +20,17 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
-import com.ge.apm.service.simpleparts.SimplePartsInventoryService;
-import com.ge.apm.service.simpleparts.SimplePartsItemService;
-import com.ge.apm.service.simpleparts.SimplePartsRequestService;
-import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
 import com.ge.apm.service.pm.PmFileExportTemplate;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
+import com.ge.apm.service.simpleparts.SimplePartsInventoryService;
+import com.ge.apm.service.simpleparts.SimplePartsItemService;
+import com.ge.apm.service.simpleparts.SimplePartsRequestService;
+import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
+import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -39,13 +40,18 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.ExportFields;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -57,7 +63,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -67,7 +72,10 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -89,7 +97,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Getter @Setter
     private PmOrderRule pmOrderRule;
 
-
+    @Getter @Setter
+    private FileScanService fileScanService;
     @Setter @Getter
     private Boolean isBatchOp=true;
     private SupplierController supplierController;
@@ -292,6 +301,40 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
    public void exportExcel() throws IOException{
+       if(queryIndex == 10){
+           long start = System.currentTimeMillis();
+           List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+
+           List<Object> list =  dao.getAllPmOrder(orgUidList);
+           long search = System.currentTimeMillis();
+           logger.info("cost time :"+ (search - start)/1000);
+/*
+           for (int i = 0; i <list.size() ; i++) {
+               Object[] cells = (Object[]) list.get(i);
+               cells[6] = FieldValueMessageController.fieldValue("pmType",cells[6].toString());
+               cells[14] = FieldValueMessageController.fieldValue("intExtType",cells[14].toString());
+               *//*try {
+                   if(null != cells[15] && StringUtils.isNotEmpty(cells[15].toString())) {
+                       cells[15] = new DateTime(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(cells[15].toString())).toString("MM/dd/yyyy");
+                   }
+               } catch (Exception e) {
+                   e.printStackTrace();
+               }*//*
+           }*/
+
+           String path = new DateTime().toString("yyyyMMddhhmm")+ File.separator+user.getLoginName();
+           String filePath = fileScanService.getUploadFileFullPath(path);
+           File dest = new File(filePath + File.separator+"pm.xlsx");
+          FileUtils.forceMkdir(new File(filePath));
+            String sourcePath = this.getClass().getClassLoader().getResource("template/PmOrder_export.xlsx").getPath();
+            File source = new File(sourcePath);
+           FileUtils.copyFile(source,dest);
+           genPmExcel(filePath + File.separator+"pm.xlsx",list);
+           excelFile = new DefaultStreamedContent(new FileInputStream(filePath+File.separator+"pm.xlsx"), "application/.ms-excel", "PmOrder_Export.xlsx");
+           long end = System.currentTimeMillis();
+           logger.info("cost time :"+ (end - search)/1000);
+           return;
+       }
        PmFileExportTemplate template = new PmFileExportTemplate();
         List<V2_PmOrder> pmOrderList = getPmListByselectedId();
        if(pmOrderList ==null && queryIndex!=10){
@@ -300,8 +343,81 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
            return;
        }
         template.exportPm(pmOrderList,pmFieldsExport);
-       excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "AssetInfo_export.xlsx");
+       excelFile = new DefaultStreamedContent(template.getInputStream(), "application/.ms-excel", "PmOrder_Export.xlsx");
    }
+
+   public String checkValue(Object obj){
+        if(obj != null){
+            return obj.toString();
+        }else {
+            return "";
+        }
+   }
+
+   public void genPmExcel(String path,List<Object> list){
+       SXSSFWorkbook wb = new SXSSFWorkbook(100);
+       Sheet sheet = wb.createSheet();
+       Row headRow = sheet.createRow(0);
+
+       Cell cell0 = headRow.createCell(0);
+       cell0.setCellValue(WebUtil.getMessage("hospitalId"));
+       Cell cell1 = headRow.createCell(1);
+       cell1.setCellValue(WebUtil.getMessage("assetName"));
+       Cell cell2 = headRow.createCell(2);
+       cell2.setCellValue(WebUtil.getMessage("serialNum"));
+       Cell cell3 = headRow.createCell(3);
+       cell3.setCellValue(WebUtil.getMessage("departNum"));
+       Cell cell4 = headRow.createCell(4);
+       cell4.setCellValue(WebUtil.getMessage("functionType"));
+       Cell cell5 = headRow.createCell(5);
+       cell5.setCellValue(WebUtil.getMessage("MeasurementGrade2"));
+       Cell cell6 = headRow.createCell(6);
+       cell6.setCellValue(WebUtil.getMessage("MaintenanceType"));
+       Cell cell7 = headRow.createCell(7);
+       cell7.setCellValue(WebUtil.getMessage("clinicalDeptId"));
+       Cell cell8 = headRow.createCell(8);
+       cell8.setCellValue(WebUtil.getMessage("PmOrderRule"));
+       Cell cell9 = headRow.createCell(9);
+       cell9.setCellValue(WebUtil.getMessage("MaintenancePeriod"));
+       Cell cell10 = headRow.createCell(10);
+       cell10.setCellValue(WebUtil.getMessage("creatorUID"));
+       Cell cell11 = headRow.createCell(11);
+       cell11.setCellValue(WebUtil.getMessage("caseOwnerId"));
+       Cell cell12 = headRow.createCell(12);
+       cell12.setCellValue(WebUtil.getMessage("MaintenanceNumber"));
+       Cell cell13 = headRow.createCell(13);
+       cell13.setCellValue(WebUtil.getMessage("currentStep"));
+       Cell cell14 = headRow.createCell(14);
+       cell14.setCellValue(WebUtil.getMessage("intExtType"));
+       Cell cell15 = headRow.createCell(15);
+       cell15.setCellValue(WebUtil.getMessage("PlannedCompletionTime"));
+
+       for(int i=0;i<list.size();i++){
+           Row dataRow = sheet.createRow(i+1);
+           for (int j = 0; j <16 ; j++) {
+               Cell dataCell = dataRow.createCell(j);
+               dataCell.setCellValue(checkValue(((Object[])list.get(i))[j]));
+           }
+       }
+       FileOutputStream fileOutputStream = null;
+       try {
+            fileOutputStream = new FileOutputStream(path);
+           wb.write(fileOutputStream);
+           fileOutputStream.flush();
+           fileOutputStream.close();
+       } catch (Exception e) {
+           e.printStackTrace();
+       }finally {
+           if(fileOutputStream != null){
+               try {
+                   fileOutputStream.close();
+               } catch (IOException e) {
+                   e.printStackTrace();
+               }
+           }
+       }
+   }
+
     List<String> pmIdList = new ArrayList<String>();
    private  List<V2_PmOrder> getPmListByselectedId(){
         selectedMap.forEach((k, v) -> {
@@ -1230,6 +1346,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     protected void init() {
+        fileScanService = WebUtil.getBean(FileScanService.class);
         tableService = WebUtil.getBean(TableDefinitionService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
@@ -2787,4 +2904,5 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return null;
         }
     }
+
 }

@@ -2,12 +2,18 @@ package com.ge.apm.service.simpleparts;
 
 import com.ge.apm.dao.simpleparts.SimplePartsInventoryRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsItemRepository;
+import com.ge.apm.dao.simpleparts.SimplePartsWarehouseOrgRepository;
+import com.ge.apm.dao.simpleparts.SimplePartsWarehouseRepository;
 import com.ge.apm.domain.simpleparts.SimplePartsInventory;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.simpleparts.SimplePartsWareHouseOrg;
+import com.ge.apm.domain.simpleparts.SimplePartsWarehouse;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +33,19 @@ import java.util.stream.Collectors;
 @Transactional
 public class SimplePartsInventoryService {
 
+    Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private SimplePartsInventoryRepository partsInventoryRepository;
 
     @Autowired
     SimplePartsItemRepository partsItemRepository;
+
+    @Autowired
+    private SimplePartsWarehouseOrgRepository simplePartsWarehouseOrgRepository;
+
+    @Autowired
+    private SimplePartsWarehouseRepository simplePartsWarehouseRepository;
 
     /**
      * @return java.util.List<com.ge.apm.domain.simpleparts.PartsInventory>
@@ -42,9 +56,25 @@ public class SimplePartsInventoryService {
      * @description 查找所有的备件库存信息
      */
     public List<SimplePartsItem> findAll() {
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        List<SimplePartsInventory> all = partsInventoryRepository.findByTenantUid(currentUserAccount.getTenantUID());
         List<SimplePartsItem> list = Lists.newArrayList();
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        List<SimplePartsWareHouseOrg> simplePartsWareHouseOrgList = simplePartsWarehouseOrgRepository.findAllByOrgUid(currentUserAccount.getSiteUID());
+        if(simplePartsWareHouseOrgList.size() == 0){
+            logger.info("根据当前操作用户,未查询到关联的仓库组织. SiteUID : " +currentUserAccount.getOrgInfoUID());
+            return list;
+        }
+
+        Set<String> partsWarehouseIds = simplePartsWareHouseOrgList.stream().map(p->p.getPartsWarehouseId()).collect(Collectors.toSet());
+        List<SimplePartsWarehouse>  simplePartsWarehouseList = simplePartsWarehouseRepository.getByIds(currentUserAccount.getTenantUID(),partsWarehouseIds);
+
+        if(simplePartsWarehouseList.size() == 0){
+            logger.info("根据当前操作用户,未查询到关联的仓库. SiteUID : " +currentUserAccount.getOrgInfoUID());
+            return list;
+        }
+        Set<String> partsWarehouseIds2 = simplePartsWarehouseList.stream().map(p->p.getId()).collect(Collectors.toSet());
+
+//        List<SimplePartsInventory> all = partsInventoryRepository.findByTenantUid(currentUserAccount.getTenantUID());
+        List<SimplePartsInventory> all = partsInventoryRepository.findByPartsWarehouseIds(partsWarehouseIds2);
         if(all.size() > 0){
             Set<String> uidSet = all.stream().filter(item -> item.getPartsItemId() !=null).map(item -> item.getPartsItemId()).collect(Collectors.toSet());
             list = this.findByIds(uidSet);
