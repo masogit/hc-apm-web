@@ -924,6 +924,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         super.prepareEdit();
         selectedUserOrg = orgInfoDao.getByUid(selected.getOrgInfoUID());
         filterTreeNodeByUid();
+        if(selected.getId() != null){
+            List<String> existingTags = userTagsMapper.getTagsByUser(selected.getUid());
+            this.selected.setTags(existingTags);
+        }
     }
 
     public OrgInfo getSelectedUserOrg() {

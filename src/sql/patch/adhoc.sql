@@ -1,7 +1,3 @@
---2020-10-16 增加批量导入文件类型字典 start
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'AconnectPerformanceExcel', '基础互通-用', 'Aconnect Performance', NULL,'-1');
---2020-10-16 end
-
 --2020-10-10 增加九院设备字典 start
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroup','23','全自动核酸提取仪','Automatic nucleic acid extractor',NULL,112);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_23','1','全自动核酸提取仪','Automatic nucleic acid extractor',NULL,112);
@@ -45813,3 +45809,4 @@ VALUES
 --2020-10-09 end                                                                                                      
 --增加ole工作台审批流程角色
 INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") VALUES ('/homeHead.xhtml', 'oleApprove', 'ole审批', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Local Background Operation Management');
+INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") VALUES ('/homeHead.xhtml', 'RepairWorkbench', '维修工作台', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'repair,repair.workbench', 'Local Background Operation Management');
