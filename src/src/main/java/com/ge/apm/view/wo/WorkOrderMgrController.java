@@ -538,10 +538,8 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         }
 
         if (!Strings.isNullOrEmpty(fileterAssetDeptOrgName)) {
-            if (clinicalDeptList.stream().filter(item -> fileterAssetDeptOrgName.equals(item.getName())).findAny().isPresent()){
-                OrgInfo deptOrg = clinicalDeptList.stream().filter(item -> fileterAssetDeptOrgName.equals(item.getName())).findAny().get();
-                this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, deptOrg.getUid(), "1*"));
-            }
+            OrgInfo deptOrg = clinicalDeptList.stream().filter(item -> fileterAssetDeptOrgName.equals(item.getName())).findAny().get();
+            this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.EQ, deptOrg.getUid(), "1*"));
         } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "assetDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
@@ -1513,10 +1511,8 @@ public void test1(){
             itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
         } else {
             switchTmp=false;
-            if (accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().isPresent()){
-                itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
-                supplierName = itemDetail.getSupplier();
-            }
+            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
+            supplierName = itemDetail.getSupplier();
         }
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         nochange=false;
@@ -1524,10 +1520,8 @@ public void test1(){
     public void prepareEditAccDetail(V2_WorkOrder_Detail vwd) {
         switchTmp=false;
         accessoryList = woService.getWorkOrderDetails(selectedWorkOrder.getId());
-        if (accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().isPresent()){
-            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
+            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(vwd.getId())).findAny().get();
             supplierName = itemDetail.getSupplier();
-        }
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         selectedObjectMap.put("supplier",supplierName);
         nochange=false;
@@ -1535,12 +1529,11 @@ public void test1(){
 
     public void prepareEditAccDetailonPrice(String itemId) {
         accessoryList = woService.getWorkOrderDetails(selected.getId());//?如果一条woId仅仅对应一条workOrderDetail 这条代码就不需要
-        if (accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().isPresent()){
-            itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
-            supplierName=itemDetail.getSupplier();
-
-        }
+        itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+
+        supplierName=itemDetail.getSupplier();
+
         nochange = true;
     }
 
@@ -1602,9 +1595,7 @@ public void test1(){
             coWorkerDetail.setWoId(selectedWorkOrder.getId());
 
         } else {
-            if (coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()){
-                coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
-            }
+            coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }
     }
     public void saveAndadd(int oper){
