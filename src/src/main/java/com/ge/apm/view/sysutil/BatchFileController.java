@@ -176,7 +176,9 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         while (fileList != null && !fileList.isEmpty()) {
             removeFile(0);
         }
-        this.fileList.clear();
+        if (this.fileList != null) {
+            this.fileList.clear();
+        }
         this.fileType = ImportFiles.ImportFileType.ColdHeaderExcel.toString();
     }
 

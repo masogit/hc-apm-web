@@ -61,6 +61,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String valueTypeTips = "";
     private String showOrderedFieldsetText = "";
     private String queryStatus;
+    private List<ZkbPartOrderItemVo> zkbPartOrderItemVoList = new ArrayList<>();
 
 
     @Override
@@ -140,6 +141,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else{
                 showOrderedFieldsetText = "订货信息";
             }
+
+            if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Parts.toString()) && selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString())){
+                List<String> ss = new ArrayList<>();
+                for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+                    ss.add(i.getPartNo());
+                }
+                zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),selected.getId(),selected.getAssetTypeDi());
+            }
         }
     }
 
@@ -156,7 +165,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                     if(selected.getAssetInfo() != null && selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup() == 2){
                         ZkbPartOrderUserConfig zkbPartOrderUserConfig = selected.getOnlineEngine();
-                        zkbPartOrderUserConfigs.add(zkbPartOrderUserConfig);
+                        if(zkbPartOrderUserConfig != null){
+                            zkbPartOrderUserConfigs.add(zkbPartOrderUserConfig);
+                        }
                     }else if(selected.getAssetInfo() != null && selected.getAssetInfo().getAssetGroup() != null && selected.getAssetInfo().getAssetGroup() == 1){
                         zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(selected.getCurrentStep(),selected.getAssetTypeDi());
                     }
@@ -191,6 +202,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
                     showOrder = true;
                     showBtn = "";
+                }else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
+                    showRejectOrder = true;
+                    showBtn = "";
                 }
             }else{
                 if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus()) && canEditFlag){
@@ -208,8 +222,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     showOrder = false;
                     showBtn = "";
                 }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
+                    showManage = true;
                     showOrder = true;
-                    showOrder = true;
+                    showBtn = "";
+                }else if(ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
+                    showManage = true;
+                    showRejectOrder = true;
                     showBtn = "";
                 }
             }
@@ -471,6 +489,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){
             //归还时发送邮件
+            zkbPartOrderService.sendEmail(zkbPartOrder);
+        }
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep())){
             zkbPartOrderService.sendEmail(zkbPartOrder);
         }
         return "List?faces-redirect=true&queryStatus="+queryStatus;
@@ -742,6 +763,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setShowRejectOrder(boolean showRejectOrder) {
         this.showRejectOrder = showRejectOrder;
+    }
+
+    public List<ZkbPartOrderItemVo> getZkbPartOrderItemVoList() {
+        return zkbPartOrderItemVoList;
+    }
+
+    public void setZkbPartOrderItemVoList(List<ZkbPartOrderItemVo> zkbPartOrderItemVoList) {
+        this.zkbPartOrderItemVoList = zkbPartOrderItemVoList;
     }
 
     @Override

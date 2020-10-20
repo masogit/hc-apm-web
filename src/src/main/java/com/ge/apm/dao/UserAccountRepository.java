@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.domain.UserAccount;
@@ -25,7 +26,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     UserAccount getById(int userId);
-    
+    UserAccount findByTelephone(String telephone);
+
     UserAccount getByUid(String userUid);
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
@@ -223,4 +225,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value = "select u from UserAccount u where u.uid in (:userList)")
     List<UserAccount> getApprovalPersonByUserId(@Param(value = "userList") List<String> userList);
 
+    @Transactional
+    @Modifying
+    @Query(value = "delete from user_account where uid = ?1", nativeQuery = true)
+    int deleteByUid(String uid);
 }

@@ -485,7 +485,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 				LOGGER.error(e.getMessage());
 			}
 		} else {
-			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+			addMessage("上传失败！是空文件");
 		}
 	}
 	public void handleFileUpload2(FileUploadEvent event) {
@@ -502,7 +502,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 				LOGGER.error(e.getMessage());
 			}
 		} else {
-			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+			addMessage("上传失败！是空文件");
 		}
 	}
 	public void handleFileUpload3(FileUploadEvent event) {
@@ -519,7 +519,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 				LOGGER.error(e.getMessage());
 			}
 		} else {
-			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+			addMessage("上传失败！是空文件");
 		}
 	}
 	public void handleFileUpload4(FileUploadEvent event) {
@@ -536,7 +536,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 				LOGGER.error(e.getMessage());
 			}
 		} else {
-			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+			addMessage("上传失败！是空文件");
 		}
 	}
 	
@@ -554,7 +554,7 @@ public class PccExamineReportEditController implements Serializable, ServerEvent
 				LOGGER.error(e.getMessage());
 			}
 		} else {
-			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+			addMessage("上传失败！是空文件");
 		}
 	}
 	

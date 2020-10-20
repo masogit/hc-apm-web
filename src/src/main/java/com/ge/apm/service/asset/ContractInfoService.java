@@ -87,7 +87,10 @@ public class ContractInfoService {
         if (null == arrivalItemList || arrivalItemList.isEmpty()) {
             return;
         }
-        String contractItemId = arrivalItemList.stream().findAny().get().getArrivalList().getContractItemId();
+        String contractItemId = "";
+        if(arrivalItemList.stream().findAny().isPresent()){
+            contractItemId = arrivalItemList.stream().findAny().get().getArrivalList().getContractItemId();
+        }
         ContractInfoItem currentContractItem = contractItemDao.findById(contractItemId);
         List<ContractInfoItem> itemList = arrivalItemList.stream().map(item -> {
             ContractInfoItem contractItem = new ContractInfoItem();
