@@ -147,7 +147,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 return;
             }
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
-            if(assetInfo.getAssetGroup() != null && (assetInfo.getAssetGroup() == 2 || assetInfo.getAssetGroup() == 1)){
+            if(assetInfo.getAssetGroup() != null && !(assetInfo.getAssetGroup() == 2 || assetInfo.getAssetGroup() == 1)){
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件申请只能选择超声类或者放射类设备！", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 return;
