@@ -2,22 +2,13 @@
  */
 package com.ge.apm.domain;
 
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  *
@@ -71,6 +62,10 @@ public class QrCodeLib implements Serializable {
     private Integer orgId;
     @Column(name = "user_id")
     private Integer userId;
+
+    /**码类型 null/0标识模板码 1标识一机一码**/
+    @Column(name = "type")
+    private Integer type;
 
     @Column(name = "serial_num")
     private String serialNum;
@@ -363,4 +358,11 @@ public class QrCodeLib implements Serializable {
         return "com.ge.apm.domain.QrCodeLib[ uid=" + uid + " ]";
     }
 
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
 }

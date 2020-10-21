@@ -5,6 +5,7 @@ import javax.faces.bean.ManagedBean;
 import com.ge.apm.dao.ZkbContractAssetRepository;
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.domain.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -165,17 +166,21 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         if(userContextService.isZkbUser()){
             //getzkb_contract
             List<ZkbContractAsset>  contractAssetList = zkbContractAssetRepository.findByAssetId(String.valueOf(selectedAsset.getUid()));
-            if(contractAssetList !=null && contractAssetList.size()>0){
-                ZkbContractAsset zkbContractAsset = contractAssetList.get(0);
-                String contractId = zkbContractAsset.getContractId();
-                ZkbContract zkbContract = zkbContractRepository.findById(contractId);
-                Date now = new Date();
-                if(zkbContract !=null &&(now.getTime() >= getSomeDay(zkbContract.getEndDate(),"+").getTime() || now.getTime() <= getSomeDay(zkbContract.getStartDate(),"-").getTime())){
-                    WebUtil.addErrorMessageKey("对于智康宝设备，合同有效期内的设备才可以创建报修工单！");
-                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                    return;
-                }
+            if(CollectionUtils.isEmpty(contractAssetList)){
+                WebUtil.addErrorMessageKey("对于智康宝设备，设备有合同才可以创建报修工单！");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
             }
+            ZkbContractAsset zkbContractAsset = contractAssetList.get(0);
+            String contractId = zkbContractAsset.getContractId();
+            ZkbContract zkbContract = zkbContractRepository.findById(contractId);
+            Date now = new Date();
+            if(zkbContract !=null &&(now.getTime() >= getSomeDay(zkbContract.getEndDate(),"+").getTime() || now.getTime() <= getSomeDay(zkbContract.getStartDate(),"-").getTime())){
+                WebUtil.addErrorMessageKey("对于智康宝设备，合同有效期内的设备才可以创建报修工单！");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
+
         }
 
         if (this.selectedAsset == null) {

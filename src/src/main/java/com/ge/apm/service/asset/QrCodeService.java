@@ -98,6 +98,11 @@ public class QrCodeService {
             qrCodeLib.setStatus(status);
             qrCodeLib.setIssueDate(new Date());
             qrCodeLib.setQrCode(qrCode);
+            if("基础互通".equals(currentOrg.getName())){
+                qrCodeLib.setType(1);
+            }else{
+                qrCodeLib.setType(0);
+            }
             qrCodeLibDao.save(qrCodeLib);
         }
         return qrCodeLib;
