@@ -33,7 +33,7 @@
                     <br/>
                     <br/>
                     <h:outputLabel for="hospitalIdSelect" value="#{msg.QRCodeQuantity} ： " />
-                    <p:inputNumber id="qrCodeNum" decimalPlaces="0" minValue="1" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="#{msg.QuantityCannotBeEmpty}"/>
+                    <p:inputNumber id="qrCodeNum" decimalPlaces="0" minValue="0" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="#{msg.QuantityCannotBeEmpty}"/>
                     <br/>
                     <br/>
                 </c:when>
