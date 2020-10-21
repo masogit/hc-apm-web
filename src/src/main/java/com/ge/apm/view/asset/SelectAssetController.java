@@ -171,15 +171,15 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
-                ZkbContractAsset zkbContractAsset = contractAssetList.get(0);
-                String contractId = zkbContractAsset.getContractId();
-                ZkbContract zkbContract = zkbContractRepository.findById(contractId);
-                Date now = new Date();
-                if(zkbContract !=null &&(now.getTime() >= getSomeDay(zkbContract.getEndDate(),"+").getTime() || now.getTime() <= getSomeDay(zkbContract.getStartDate(),"-").getTime())){
-                    WebUtil.addErrorMessageKey("对于智康宝设备，合同有效期内的设备才可以创建报修工单！");
-                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                    return;
-                }
+            ZkbContractAsset zkbContractAsset = contractAssetList.get(0);
+            String contractId = zkbContractAsset.getContractId();
+            ZkbContract zkbContract = zkbContractRepository.findById(contractId);
+            Date now = new Date();
+            if(zkbContract !=null &&(now.getTime() >= getSomeDay(zkbContract.getEndDate(),"+").getTime() || now.getTime() <= getSomeDay(zkbContract.getStartDate(),"-").getTime())){
+                WebUtil.addErrorMessageKey("对于智康宝设备，合同有效期内的设备才可以创建报修工单！");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
 
         }
 
