@@ -119,7 +119,6 @@ public class SimplePartsInventoryService {
     public List<SimplePartsInventory> findByWarehouseId(String warehouseId) {
         if(StringUtils.isEmpty(warehouseId)){
             //修改 : 原先是查询租户下所有库存,现在是查询仓库机构映射下以及仓库管理员下,所有仓库,再根据这些仓库去查询库存
-//            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
             List<SimplePartsWarehouse> list = simplePartsWarehouseService.findWarehouseListInRequest();
             if(list == null || list.size() == 0){
                 return Lists.newArrayList();
@@ -128,7 +127,6 @@ public class SimplePartsInventoryService {
                     .filter(item -> item.getId() != null)
                     .map(item -> item.getId()).collect(Collectors.toSet());
             return partsInventoryRepository.findByPartsWarehouseIds(warehouseIds);
-//            return partsInventoryRepository.findByTenantUid(currentUserAccount.getTenantUID());
         }
 
         return partsInventoryRepository.findByPartsWarehouseId(warehouseId);
