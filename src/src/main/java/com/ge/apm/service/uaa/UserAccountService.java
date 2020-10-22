@@ -1,61 +1,27 @@
 package com.ge.apm.service.uaa;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserTagsMapper;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.PasswordUtil;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.mapper.AssetInfoMapper;
-import com.ge.apm.dao.mapper.UserAccountMapper;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysRole;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UploadFileErrorTypeEnum;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserModel;
-import com.ge.apm.domain.UserOrgInfo;
-import com.ge.apm.domain.UserRole;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.ExcelParser;
-import com.ge.apm.service.utils.PasswordUtil;
-import com.ge.apm.view.sysutil.UserContextService;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 @Service
 public class UserAccountService {
 	private Logger logger = LoggerFactory.getLogger(getClass());
+	private static org.slf4j.Logger log = LoggerFactory.getLogger(UserAccountService.class);
+
 	private static final String SHEET_USER="datalist";
 	boolean isInsulate=false;
 	UserAccount currentUser;
@@ -354,5 +320,6 @@ public class UserAccountService {
 		userOrgDao.deleteByUserUid(userUid);
         userRoleRepository.deleteByUserAccount(userAccount.getId());
         userAccountRepository.deleteByUid(userUid);
-    }
+		log.info("delete userAccount , uid: {}",userAccount.getUid());
+	}
 }
