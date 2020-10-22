@@ -14,7 +14,6 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.ExcelDocumentStreamingReader;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -32,10 +31,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -190,6 +186,7 @@ public class AssetFileImportController {
             if (!crossSite) {
                 //if cross site import, org list excel sheet is useless, no need to import org
                 streamingService.importOrgData(importOrgMap);
+                logger.info(" import org data successful ");
             }
 
             Map<String, OrgInfo> orgNamesUriCache = orgInfoLocalCacheService.flatternLocalOrgNamesCache(UserContextService.getCurrentUserAccount().getTenantUID());
@@ -203,12 +200,14 @@ public class AssetFileImportController {
 
             filterErrorRecords();
 
+            logger.info("... import asset data successful ...");
 //            downloadImportFailureData();
         } catch (Throwable e) {
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
             FacesContext.getCurrentInstance().addMessage(null, message);
 
             isImported = true; //disable import button
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -231,6 +230,7 @@ public class AssetFileImportController {
         }else{
             assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
         }
+        logger.info(" export asset excel template successful. ");
     }
 
     public void exportCrossSiteAssetExcelTemplate() throws IOException {
@@ -250,6 +250,7 @@ public class AssetFileImportController {
         }else{
             assetTemplateFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "APM_Asset_Template_en.xlsx");
         }
+        logger.info(" export cross site asset excel template successful. ");
     }
 
     private void insertCrossSiteColumns(List<String> exportFields) {
