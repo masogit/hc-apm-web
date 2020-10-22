@@ -296,7 +296,6 @@ public class SharedAssetStockController extends MyCRUDController<AssetInfo> {
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             TransformerFactory factory = TransformerFactory.newInstance();
-            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             try {
                 Transformer transformer = factory.newTransformer(new StreamSource(xsl));
                 Source src = new StreamSource(new StringReader(woXml));
