@@ -658,10 +658,9 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             List<HashMap> map = assetTagsMapper.getTagsByAssetMap(uids);
 
             assetMap = new HashMap<String, List<String>>();
-
+            /*
             for (int i = 0; i <map.size() ; i++) {
                 //判断assetMap中有没有当前的key
-                //assetMap.put(map.get(i).get("asset_uid"),map.get(i).get("tag"));
                 List<String> assetTagNow = assetMap.get(map.get(i).get("asset_uid"));//尝试从当前assetMap中获取asset_uid对应的数组
                 if(null==assetTagNow){//如果没有塞过值则放入新值
                     List<String> assetTags = new ArrayList();
@@ -672,7 +671,8 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                     assetTagOld.add((String) map.get(i).get("tag"));
                     assetMap.put((String) map.get(i).get("asset_uid"),assetTagOld);
                 }
-            }
+            }*/
+
             List<Integer> parendAssetIdList = new ArrayList<>(parendAssetIds);
             List<AssetInfo> parentAssetMap = new ArrayList();
             if(parendAssetIdList.size()==0){

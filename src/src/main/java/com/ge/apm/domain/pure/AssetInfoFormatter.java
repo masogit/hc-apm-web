@@ -742,8 +742,8 @@ public class AssetInfoFormatter {
     }
 
     private String joinTags(Map<String,List<String>> assetMap) {
-        //List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
-        List<String> assetTags = assetMap.get(assetInfo.getUid());
+        List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
+        //List<String> assetTags = assetMap.get(assetInfo.getUid());
         if (assetTags==null || assetTags.isEmpty()) {
             return null;
         }
