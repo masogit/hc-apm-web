@@ -29,4 +29,6 @@ public interface ApmConstant {
     //默认site_id
     static final int DEFAULT_SITE_ID = -1;
 
+    static String stepNameClosed="已关单";
+
 }

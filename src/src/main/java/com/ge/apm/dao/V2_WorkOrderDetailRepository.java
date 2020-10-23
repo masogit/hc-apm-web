@@ -28,6 +28,5 @@ public interface V2_WorkOrderDetailRepository extends GenericRepositoryUUID<V2_W
 
     @Query("select wod from V2_WorkOrder_Detail wod  where wod.woId=?1")
     List<V2_WorkOrder_Detail> findWorkOrderDetailByWoId(String woId);
-
     
 }
