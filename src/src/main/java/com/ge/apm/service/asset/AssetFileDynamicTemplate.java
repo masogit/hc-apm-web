@@ -416,14 +416,15 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         int startRow = EXCEL_ASSET_DATA_ROW;
 
-        GetAllElement getAllElement = new GetAllElement(assetList).invoke();
+        /*GetAllElement getAllElement = new GetAllElement(assetList).invoke();
         Map<String, List<String>> assetMap = getAllElement.getAssetMap();
         Map parentAssets = getAllElement.getParentAssets();
-        Map supliers = getAllElement.getSupliers();
+        Map supliers = getAllElement.getSupliers();*/
 
         for (AssetInfo assetInfo: assetList) {
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, supplierDao,userDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite,assetMap,parentAssets, supliers);
+            //Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite,assetMap,parentAssets, supliers);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite,null,null, null);
 
             writer.writeRowData(startRow, rowMap);
 
