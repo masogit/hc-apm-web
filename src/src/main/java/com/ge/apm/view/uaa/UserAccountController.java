@@ -24,6 +24,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -136,6 +137,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private List<String> unselectInstitutions = new ArrayList<String>();
 
     private List<String> unselectUidss = new ArrayList<String>();
+
+    private static org.slf4j.Logger log = LoggerFactory.getLogger(UserAccountController.class);
 
     TreeNode deleteTreeNode = new DefaultTreeNode("root", null, null);
     boolean deleteDisabled = true;
@@ -672,6 +675,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         if (canDelete()) {
             //super.delete();
+            log.info("start delete user, uid: {}",this.selected.getUid());
             userAccountService.deleteUserAccount(this.selected);
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
         }
@@ -802,8 +806,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
             }
             super.save();
+            log.info("save/update user to user_account successful, id: {}",selected.getId());
 
             saveTags();
+            log.info("add new tags to user_tags successful, uid: {}",selected.getUid());
 
             if (this.crudActionName.equals("Create")) {
                 updateUserRole(loginUser.getType());
