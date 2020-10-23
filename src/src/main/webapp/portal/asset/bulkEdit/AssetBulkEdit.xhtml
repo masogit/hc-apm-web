@@ -70,8 +70,8 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup>
-                                        <label class="label">#{msg.name}</label>
-                                        <p:inputText value="#{assetInfoBulkEditController.oneSearchStr}">
+                                        <label class="label">#{msg.name}/#{msg.financingNum}/#{msg.departNum}/#{msg.qrCode}</label>
+                                        <p:inputText value="#{assetInfoBulkEditController.oneSearchStr}"  maxlength="100" style="width: 250px">
                                             <p:ajax event="keyup" update="pickList" />
                                         </p:inputText>
                                     </h:panelGroup>
@@ -81,7 +81,7 @@
 
                             <p:pickList id="pickList" value="#{assetInfoBulkEditController.assets}"
                                         var="asset" itemLabel="#{asset}" itemValue="#{asset}"
-                                        showSourceFilter="true" showTargetFilter="true" responsive="true"
+                                        showSourceFilter="false" showTargetFilter="false" responsive="true"
                                         filterMatchMode="contains" converter="assetInfoConverter" class="pickList">
                                 <f:facet name="sourceCaption">待选设备</f:facet>
                                 <f:facet name="targetCaption">已选设备</f:facet>
@@ -96,13 +96,14 @@
                                     <h:outputText value="#{asset.departNum}" />
                                 </p:column>
                                 <p:column style="width:20%;">
-                                    <h:outputText value="#{asset.departNum}" />
+                                    <h:outputText value="#{asset.qrCode}" />
                                 </p:column>
                             </p:pickList>
 
                         </p:tab>
 
                         <p:tab title="变更资产所属院区" >
+                            <span  style="color:red">请务必将相关资产的维修负责人/保养负责人/设备标签工程师等用户迁移到新院区，以免导致工作流问题！</span>
                             <p:fieldset>
                                 <p:panelGrid  id="changeSite" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
