@@ -368,7 +368,29 @@ public class ArrivalListItem implements Serializable {
 
     @Column(name = "is_checked")
     private Boolean isChecked=true;//是否盘点
-    
+
+    @Column(name = "guarantee")
+    private String guarantee;//保修
+
+    @Column(name = "annual_maintenance_times")
+    private Integer annualMaintenanceTimes;//年保修次数
+
+    public String getGuarantee() {
+        return guarantee;
+    }
+
+    public void setGuarantee(String guarantee) {
+        this.guarantee = guarantee;
+    }
+
+    public Integer getAnnualMaintenanceTimes() {
+        return annualMaintenanceTimes;
+    }
+
+    public void setAnnualMaintenanceTimes(Integer annualMaintenanceTimes) {
+        this.annualMaintenanceTimes = annualMaintenanceTimes;
+    }
+
     public String getId() {
         return id;
     }
