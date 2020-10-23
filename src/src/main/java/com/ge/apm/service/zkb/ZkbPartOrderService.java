@@ -244,6 +244,56 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    public ZkbPartOrder copyZkbPartOrder(ZkbPartOrder oldZkbPartOrder,UserAccount userAccount) throws Exception {
+        List<ZkbPartOrderItem> oldZkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(oldZkbPartOrder.getId());
+        List<ZkbPartOrderReturn> oldZkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderId(oldZkbPartOrder.getId());
+        List<V2_BlobObject> v2_blobObjects = blobObjectRepository.findByBoUuid(oldZkbPartOrder.getId());
+        ZkbPartOrder newZkbPartOrder = oldZkbPartOrder;
+        newZkbPartOrder.setId(null);
+        newZkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
+
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(newZkbPartOrder.getOrderType())){
+            newZkbPartOrder.setCurrentStep("TechnicalPending");
+        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(newZkbPartOrder.getOrderType())) {
+            newZkbPartOrder.setCurrentStep("TechnicalPending");
+        }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(newZkbPartOrder.getOrderType())) {
+            //如果为超声高端则不需要进行区域经理审批
+            if("2".equals(newZkbPartOrder.getArtificialType())){
+                newZkbPartOrder.setCurrentStep("OrderPending");
+            }else{
+                newZkbPartOrder.setCurrentStep("ManagePending");
+            }
+        }else if(ZkbPartOrder.OrderType.Tool.toString().equals(newZkbPartOrder.getOrderType())){
+            newZkbPartOrder.setCurrentStep("ManagePending");
+        }
+        newZkbPartOrder.setCreatedBy(userAccount.getLoginName());
+        newZkbPartOrder.setCreatedDate(new Date());
+        Object o= zkbPartOrderRepository.getMaxIndex("PO"+simpleDateFormat.format(new Date())+"%") ;
+        int index = o == null ? 0 : Integer.parseInt(o.toString());
+        index++;
+        String partOrderNo = "PO"+simpleDateFormat.format(new Date())+String.format("%04d",index);
+        newZkbPartOrder.setPartOrderNo(partOrderNo);
+        newZkbPartOrder.setPartOrderIndex(index);
+        newZkbPartOrder = zkbPartOrderRepository.save(newZkbPartOrder);
+
+        for(ZkbPartOrderItem zkbPartOrderItem : oldZkbPartOrderItems){
+            ZkbPartOrderItem newItem = CopyByInvok.translateField(zkbPartOrderItem,ZkbPartOrderItem.class);
+            newItem.setId(null);
+            newItem.setPartOrderId(newZkbPartOrder.getId());
+            zkbPartOrderItemRepository.save(newItem);
+        }
+
+        for(V2_BlobObject v : v2_blobObjects){
+            V2_BlobObject nv =  CopyByInvok.translateField(v,V2_BlobObject.class);
+            nv.setBoUuid(newZkbPartOrder.getId());
+        }
+
+        ZkbContract zkbContract = zkbContractRepository.findById(newZkbPartOrder.getContractId());
+        subApplyQty(zkbContract,newZkbPartOrder,newZkbPartOrder.getQty());
+        return newZkbPartOrder;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public void saveUploadFile(List<V2_BlobObject> v2_blobObjects,String uid){
         if(v2_blobObjects != null){
             for (V2_BlobObject v : v2_blobObjects){
@@ -856,9 +906,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //}
     }
 
-    public void copyZkbPartOrder(ZkbPartOrder oldZkbPartOrder){
-        
-    }
+
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
         List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
