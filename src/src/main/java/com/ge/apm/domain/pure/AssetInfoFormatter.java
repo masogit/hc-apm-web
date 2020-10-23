@@ -799,7 +799,9 @@ public class AssetInfoFormatter {
         if(vendorId != null){
             Supplier supplier= supplierDao.getById(vendorId);
           //return  (String) supliers.get(vendorId);
-          return  supplier.getTel();
+            if(null!=supplier && null!=supplier.getTel()){
+                return  supplier.getTel();
+            }
         }
         return null;
     }
@@ -934,5 +936,7 @@ public class AssetInfoFormatter {
         }
         return null;
     }
+
+
 
 }
