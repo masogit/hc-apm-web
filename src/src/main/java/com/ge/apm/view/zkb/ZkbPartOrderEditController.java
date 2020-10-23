@@ -99,7 +99,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 v2_listHashMap.add(mm);
             }
             v2_blobObjectList = m.get("v2_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_blobObjectList");
-            initZknPartCat(c.getStartDate());
+            if (c != null) {
+                initZknPartCat(c.getStartDate());
+            }
         }
 
     }
@@ -144,8 +146,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 return;
             }
-        }else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-            if(assetInfo.getAssetGroup() != null && (assetInfo.getAssetGroup() == 2 || assetInfo.getAssetGroup() == 1)){
+        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
+            if(assetInfo.getAssetGroup() != null && !(assetInfo.getAssetGroup() == 2 || assetInfo.getAssetGroup() == 1)){
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件申请只能选择超声类或者放射类设备！", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 return;
@@ -464,11 +466,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void orderTypeChange(){
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-            if("2".equals(artificialType)){
-                this.selected.setQty(1);
-            }else {
-                this.selected.setQty(1);
-            }
+//            if("2".equals(artificialType)){
+//                this.selected.setQty(1);
+//            }else {
+//                this.selected.setQty(1);
+//            }
+            this.selected.setQty(1);
         }else{
             this.selected.setQty(0);
             if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){

@@ -28,6 +28,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -46,26 +47,28 @@ public class DataService {
         String tableName = tablename.toLowerCase();
         String daoName = "com.ge.apm.dao."+tabelNameToClassName(tableName) + "Repository";
         Class<?> dao = getDao(daoName);
-        try {
+        if (dao != null) {
             try {
-                List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
-                if (hospitalId != null && !"".equals(hospitalId))
-                    searchFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, hospitalId));
-                if (siteId != null && !"".equals(siteId))
-                    searchFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, siteId));
-                if (page == null || size == null || "".equals(page) || "".equals(size)) {
-                    return dao.getMethod("findBySearchFilter", List.class).invoke(WebUtil.getBean(dao), searchFilters);
-                } else {
-                    Sort sort = new Sort(Sort.Direction.ASC, "id");
-                    PageRequest pageRequest = new PageRequest(Integer.parseInt(page), Integer.parseInt(size), sort);
-                    Page<Object> objPage = (Page<Object>)dao.getMethod("findBySearchFilter", List.class, Pageable.class).invoke(WebUtil.getBean(dao), searchFilters, pageRequest);
-                    return objPage.getContent();
+                try {
+                    List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+                    if (hospitalId != null && !"".equals(hospitalId))
+                        searchFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, hospitalId));
+                    if (siteId != null && !"".equals(siteId))
+                        searchFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, siteId));
+                    if (page == null || size == null || "".equals(page) || "".equals(size)) {
+                        return dao.getMethod("findBySearchFilter", List.class).invoke(WebUtil.getBean(dao), searchFilters);
+                    } else {
+                        Sort sort = new Sort(Sort.Direction.ASC, "id");
+                        PageRequest pageRequest = new PageRequest(Integer.parseInt(page), Integer.parseInt(size), sort);
+                        Page<Object> objPage = (Page<Object>)dao.getMethod("findBySearchFilter", List.class, Pageable.class).invoke(WebUtil.getBean(dao), searchFilters, pageRequest);
+                        return objPage.getContent();
+                    }
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                    Logger.getLogger(DataGetAndPushController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            } catch (NoSuchMethodException | SecurityException ex) {
                 Logger.getLogger(DataGetAndPushController.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (NoSuchMethodException | SecurityException ex) {
-            Logger.getLogger(DataGetAndPushController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -75,14 +78,16 @@ public class DataService {
         String tableName = tablename.toLowerCase();
         String daoName = "com.ge.apm.dao."+tabelNameToClassName(tableName) + "Repository";
         Class<?> dao = getDao(daoName);
-        try {
+        if (dao!=null) {
             try {
-                return dao.getMethod("findById", Integer.class).invoke(WebUtil.getBean(dao), Integer.parseInt(id));
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                try {
+                    return dao.getMethod("findById", Integer.class).invoke(WebUtil.getBean(dao), Integer.parseInt(id));
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                    Logger.getLogger(DataGetAndPushController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (NoSuchMethodException | SecurityException ex) {
                 Logger.getLogger(DataGetAndPushController.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (NoSuchMethodException | SecurityException ex) {
-            Logger.getLogger(DataGetAndPushController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -206,12 +211,14 @@ public class DataService {
     }
     
     private Map<String, String> getFields(Class<?> table){
-        Field[] fields = table.getDeclaredFields();
         Map<String, String> map = new TreeMap<String, String>();
-        for (int i = 0; i < fields.length; i++) {
-            Column column = fields[i].getAnnotation(Column.class);
-            if (column == null) continue;
-            map.put(fields[i].getName(), column.name());
+        if (table!=null) {
+            Field[] fields = table.getDeclaredFields();
+            for (int i = 0; i < fields.length; i++) {
+                Column column = fields[i].getAnnotation(Column.class);
+                if (column == null) continue;
+                map.put(fields[i].getName(), column.name());
+            }
         }
         return map;
     }

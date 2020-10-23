@@ -69,7 +69,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Autowired
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYYMMdd");
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
 
     public List<TenantInfo> getSourceTenantInfoList(){

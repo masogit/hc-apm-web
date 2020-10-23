@@ -478,6 +478,7 @@ public class ElectricSafetyService {
 					date = convertStringDate("dd.MM.yy", strValue);
 				}
 				data.setCheckDate(date);
+				data.setOriginCheckDate(strValue.replaceAll("\\+", "").trim());
 			}
 			// 55,存储器日期（格式：日-月-年）30.10.18 56,存储器时间（格式：H:M）13:20
 			else if (StringUtils.equals(key, "55")) {
@@ -488,6 +489,7 @@ public class ElectricSafetyService {
 					date = convertStringDate("dd.MM.yy", strValue);
 				}
 				data.setStorageDate(date);
+				data.setOriginStorageDate(strValue.replaceAll("\\+", "").trim());
 			}
 			// 60,设备编号
 			else if (StringUtils.equals(key, "60")) {
@@ -503,9 +505,9 @@ public class ElectricSafetyService {
 				data.setType(strValue.replaceAll("\\+", "").trim());
 			}
 			// 5，——》测试仪日期（格式：日-月-年）
-			else if (StringUtils.equals(key, "5")) {
-				data.setOriginCheckDate(strValue.replaceAll("\\+", "").trim());
-			}
+//			else if (StringUtils.equals(key, "5")) {
+//				data.setOriginCheckDate(strValue.replaceAll("\\+", "").trim());
+//			}
 			// 6，——》测试仪时间（格式：H:M:S）
 			else if (StringUtils.equals(key, "6")) {
 				data.setOriginCheckTime(strValue.replaceAll("\\+", "").trim());
@@ -639,9 +641,9 @@ public class ElectricSafetyService {
 				data.setCityVoltageRefVal(dbValue + "");
 			}
 			// 55，——》存储器日期（格式：日-月-年）
-			else if (StringUtils.equals(key, "55")) {
-				data.setOriginStorageDate(strValue.replaceAll("\\+", "").trim());
-			}
+//			else if (StringUtils.equals(key, "55")) {
+//				data.setOriginStorageDate(strValue.replaceAll("\\+", "").trim());
+//			}
 			// 56，——》存储器时间（格式：H:M）
 			else if (StringUtils.equals(key, "56")) {
 				data.setOriginStorageTime(strValue.replaceAll("\\+", "").trim());

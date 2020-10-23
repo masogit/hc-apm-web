@@ -1,21 +1,21 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.NurseSiteMaintainDataRepository;
-import com.ge.apm.dao.NurseSiteMaintainItemRepository;
-import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.KeyLabel;
 import com.ge.apm.service.asset.AssetInfoBulkEditCheckService;
 import com.ge.apm.service.asset.AssetInfoBulkEditService;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.constant.AssetConstant;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.TransferEvent;
@@ -51,7 +51,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private OrgInfoRepository orgInfoDao;
     private NurseSiteMaintainItemRepository nurseSiteMaintainItemRepository;
     private NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
-
+    private V2_WorkOrderRepository v2WorkerOrderRepository;
+    private V2_WorkOrderDetailRepository v2WorkerOrderDetailRepository;
+    private V2_WorkOrderStepRepository v2_WorkOrderStepRepository;
     //******* filter start
 
     @Getter @Setter
@@ -90,9 +92,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         nurseSiteMaintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
         nurseSiteMaintainDataRepository = WebUtil.getBean(NurseSiteMaintainDataRepository.class);
-
+        v2WorkerOrderRepository = WebUtil.getBean(V2_WorkOrderRepository.class);
+        v2WorkerOrderDetailRepository= WebUtil.getBean(V2_WorkOrderDetailRepository.class);
+        v2_WorkOrderStepRepository= WebUtil.getBean(V2_WorkOrderStepRepository.class);
         selected = new AssetInfo();
-
         initCandidateKeyLabels();
     }
 
@@ -347,11 +350,28 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         // asset in repaire  status
         for(AssetInfo as:selectedAssets){
-            if(as.getStatus()== AssetConstant.ASSET_STATUS_ILL){
-                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
-                return;
+            List<String> list=new ArrayList<>();
+            list.add("待验收");
+            list.add("待关单");
+            List<V2_WorkOrder> pmOrderList = v2WorkerOrderRepository.findByAssetIdAndCurrentStepName(as.getId(), list);
+            if(CollectionUtils.isNotEmpty(pmOrderList)){
+                for(V2_WorkOrder workerOder : pmOrderList){
+                        // 维修已完成
+                        List<V2_WorkOrder_Step> workOrderStepList = v2_WorkOrderStepRepository.findByWorkOrder(workerOder.getId());
+                        workOrderStepList.stream().sorted(Comparator.comparing(V2_WorkOrder_Step:: getStepId));
+                        List<V2_WorkOrder_Detail> workOrderDetailList = v2WorkerOrderDetailRepository.findPmOrderByWoId(workerOder.getId());
+                        for(V2_WorkOrder_Detail detail : workOrderDetailList){
+                            if(! detail.getClosed()){
+                                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
+                                return;
+                            }
+                        }
+                        if(5 == workOrderStepList.get(0).getStepId()){
+                            WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
+                            return;
+                        }
+                    }
             }
-
         }
 
         //临床助手检查进行中

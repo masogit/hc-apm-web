@@ -60,8 +60,10 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
     
     @Query(value="select distinct(o.*) from v2_work_order o where o.id in (?1)",nativeQuery=true)
     public List<V2_WorkOrder> getWorkOrderById(Set<String> ids);
-    
-    public List<V2_WorkOrder> findByAssetId(Integer asstId);
 
 
+    public List<V2_WorkOrder> findByAssetId(Integer asstId );
+
+    @Query(nativeQuery = true, value = "SELECT  * FROM v2_work_order  WHERE asset_id=?1 and current_step_name in ?2")
+    public List<V2_WorkOrder> findByAssetIdAndCurrentStepName(Integer asstId , Collection<String> c);
 }
