@@ -9,6 +9,8 @@ import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
 
 import java.util.Date;
@@ -26,6 +28,8 @@ public class AssetInfoFormatter {
     private SupplierRepository supplierDao;
     private UserAccountRepository userDao;
     private int siteId;
+
+    private static final Logger logger = LoggerFactory.getLogger(AssetInfoFormatter.class);
 
     public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
                               AssetFileImportBaseService importService,
@@ -581,8 +585,8 @@ public class AssetInfoFormatter {
             return null;
         }
 
-        //AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
-        AssetInfo parentAsset = (AssetInfo) parentAssets.get(assetInfo.getParentAssetId());
+        AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
+        //AssetInfo parentAsset = (AssetInfo) parentAssets.get(assetInfo.getParentAssetId());
         if (parentAsset == null) return null;
 
         String departNum = parentAsset.getDepartNum() == null ? "" : parentAsset.getDepartNum();
@@ -742,8 +746,8 @@ public class AssetInfoFormatter {
     }
 
     private String joinTags(Map<String,List<String>> assetMap) {
-        //List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
-        List<String> assetTags = assetMap.get(assetInfo.getUid());
+        List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
+        //List<String> assetTags = assetMap.get(assetInfo.getUid());
         if (assetTags==null || assetTags.isEmpty()) {
             return null;
         }
@@ -793,11 +797,12 @@ public class AssetInfoFormatter {
     public String getVendorTel(Map supliers){
         Integer vendorId = assetInfo.getSupplierId();
         if(vendorId != null){
-            //Supplier supplier2= supplierDao.getById(vendorId);
-          return  (String) supliers.get(vendorId);
-
+            Supplier supplier= supplierDao.getById(vendorId);
+          //return  (String) supliers.get(vendorId);
+            if(null!=supplier && null!=supplier.getTel()){
+                return  supplier.getTel();
+            }
         }
-
         return null;
     }
 
@@ -806,114 +811,124 @@ public class AssetInfoFormatter {
         Map<String, Object> map = new HashMap<>();
 
         // key "name" is used by a lot of modules, the definition is wrong, so use a new key name to redefine
-        map.put(WebUtil.getMessage("EquipmentName"), this.getName());
+        map.put(getMessage("EquipmentName"), this.getName());
 //        map.put(WebUtil.getMessage("name"), this.getName());
 
-        map.put(WebUtil.getMessage("departNum"), this.getDepartNum());
-        map.put(WebUtil.getMessage("financingNum"), this.getFinancingNum());
-        map.put(WebUtil.getMessage("aliasName"), this.getAliasName());
+        map.put(getMessage("departNum"), this.getDepartNum());
+        map.put(getMessage("financingNum"), this.getFinancingNum());
+        map.put(getMessage("aliasName"), this.getAliasName());
 
-        map.put(WebUtil.getMessage("assetOwnerName"), this.getAssetOwnerName());
-        map.put(WebUtil.getMessage("assetOwnerTel"), assetInfo.getAssetOwnerTel());
-        map.put(WebUtil.getMessage("assetOwnerName2"), this.getAssetOwnerName2());
-        map.put(WebUtil.getMessage("assetOwnerTel2"), assetInfo.getAssetOwnerTel2());
-        map.put(WebUtil.getMessage("assetOwnerName3"), this.getAssetOwnerName3());
-        map.put(WebUtil.getMessage("assetOwnerTel3"), assetInfo.getAssetOwnerTel3());
+        map.put(getMessage("assetOwnerName"), this.getAssetOwnerName());
+        map.put(getMessage("assetOwnerTel"), assetInfo.getAssetOwnerTel());
+        map.put(getMessage("assetOwnerName2"), this.getAssetOwnerName2());
+        map.put(getMessage("assetOwnerTel2"), assetInfo.getAssetOwnerTel2());
+        map.put(getMessage("assetOwnerName3"), this.getAssetOwnerName3());
+        map.put(getMessage("assetOwnerTel3"), assetInfo.getAssetOwnerTel3());
 
-        map.put(WebUtil.getMessage("pmOwnerName"), this.getPmOwnerName());
-        map.put(WebUtil.getMessage("pmOwnerTel"), assetInfo.getPmOwnerTel());
-        map.put(WebUtil.getMessage("measuringOwner"), assetInfo.getMeasuringOwnerName());
+        map.put(getMessage("pmOwnerName"), this.getPmOwnerName());
+        map.put(getMessage("pmOwnerTel"), assetInfo.getPmOwnerTel());
+        map.put(getMessage("measuringOwner"), assetInfo.getMeasuringOwnerName());
 
         if (crossSite) {
-            map.put(WebUtil.getMessage("Hospital"), this.getHospitalName());
-            map.put(WebUtil.getMessage("Institution"), this.getInstitutionName());
+            map.put(getMessage("Hospital"), this.getHospitalName());
+            map.put(getMessage("Institution"), this.getInstitutionName());
         }
 
-        map.put(WebUtil.getMessage("hospitalId"), this.getSiteName());
-        map.put(WebUtil.getMessage("clinicalDeptName"), this.getClinicalDeptName());
-        map.put(WebUtil.getMessage("clinicalOwnerName"),  this.getClinicalOwnerName());
-        map.put(WebUtil.getMessage("clinicalOwnerTel"), assetInfo.getClinicalOwnerTel());
-        map.put(WebUtil.getMessage("assetDeptName"), this.getAssetDeptName());
-        map.put(WebUtil.getMessage("manufacture"), this.getManufacture());
-        map.put(WebUtil.getMessage("makerShortName"), this.getMakerShortName());
-        map.put(WebUtil.getMessage("deviceName"), this.getDeviceName());
-        map.put(WebUtil.getMessage("registrationNo"), this.getRegistrationNo());
-        map.put(WebUtil.getMessage("vendor"), this.getVendor());
-        map.put(WebUtil.getMessage("vendorTel"), this.getVendorTel(supliers));
-        map.put(WebUtil.getMessage("parentAsset"), this.getParentAssetName(parentAssets));
+        map.put(getMessage("hospitalId"), this.getSiteName());
+        map.put(getMessage("clinicalDeptName"), this.getClinicalDeptName());
+        map.put(getMessage("clinicalOwnerName"),  this.getClinicalOwnerName());
+        map.put(getMessage("clinicalOwnerTel"), assetInfo.getClinicalOwnerTel());
+        map.put(getMessage("assetDeptName"), this.getAssetDeptName());
+        map.put(getMessage("manufacture"), this.getManufacture());
+        map.put(getMessage("makerShortName"), this.getMakerShortName());
+        map.put(getMessage("deviceName"), this.getDeviceName());
+        map.put(getMessage("registrationNo"), this.getRegistrationNo());
+        map.put(getMessage("vendor"), this.getVendor());
+        map.put(getMessage("vendorTel"), this.getVendorTel(supliers));
+        map.put(getMessage("parentAsset"), this.getParentAssetName(parentAssets));
 
-        map.put(WebUtil.getMessage("functionGroup"), this.getFunctionGroupAsString());
-        map.put(WebUtil.getMessage("assetCode68"), this.getAssetCode68AsString());
+        map.put(getMessage("functionGroup"), this.getFunctionGroupAsString());
+        map.put(getMessage("assetCode68"), this.getAssetCode68AsString());
 
-        map.put(WebUtil.getMessage("assetGroup"),this.getAssetGroupAsString());
+        map.put(getMessage("assetGroup"),this.getAssetGroupAsString());
 
-        map.put(WebUtil.getMessage("functionGrade"),  this.getFunctionGrade());
-        map.put(WebUtil.getMessage("repairForm"), this.getRepairFormAsString());
-        map.put(WebUtil.getMessage("functionType"), this.getFunctionType());
-        map.put(WebUtil.getMessage("serialNum"), this.getSerialNum());
-        map.put(WebUtil.getMessage("systemId"), this.getSystemId());
-        map.put(WebUtil.getMessage("barcode"), this.getBarcode());
-        map.put(WebUtil.getMessage("nationalStandardCode"), this.getNationalStandardCode());
-        map.put(WebUtil.getMessage("modalityId"), this.getModalityId());
+        map.put(getMessage("functionGrade"),  this.getFunctionGrade());
+        map.put(getMessage("repairForm"), this.getRepairFormAsString());
+        map.put(getMessage("functionType"), this.getFunctionType());
+        map.put(getMessage("serialNum"), this.getSerialNum());
+        map.put(getMessage("systemId"), this.getSystemId());
+        map.put(getMessage("barcode"), this.getBarcode());
+        map.put(getMessage("nationalStandardCode"), this.getNationalStandardCode());
+        map.put(getMessage("modalityId"), this.getModalityId());
 
-        map.put(WebUtil.getMessage("purchasePrice"), this.getPurchasePrice());
-        map.put(WebUtil.getMessage("salvageValue"), this.getSalvageValue());
-        map.put(WebUtil.getMessage("lifecycle"), this.getLifecycleInYear());
-        map.put(WebUtil.getMessage("depreciationMethod"), this.getDepreciationMethodAsString());
+        map.put(getMessage("purchasePrice"), this.getPurchasePrice());
+        map.put(getMessage("salvageValue"), this.getSalvageValue());
+        map.put(getMessage("lifecycle"), this.getLifecycleInYear());
+        map.put(getMessage("depreciationMethod"), this.getDepreciationMethodAsString());
 
-        map.put(WebUtil.getMessage("manufactDate"),this.getManufactDate());
-        map.put(WebUtil.getMessage("purchaseDate"),  this.getPurchaseDate());
-        map.put(WebUtil.getMessage("arriveDate"), this.getArriveDate());
-        map.put(WebUtil.getMessage("installDate"), this.getInstallDate());
-        map.put(WebUtil.getMessage("factoryWarrantyDate"),this.getFactoryWarrantyDate());
-        map.put(WebUtil.getMessage("warrantyDate"), this.getWarrantyDate());
-        map.put(WebUtil.getMessage("terminateDate"), this.getTerminateDate());
-        map.put(WebUtil.getMessage("lastPmDate"), this.getLastPmDate());
-        map.put(WebUtil.getMessage("lastMeteringDate"), this.getLastMeteringDate());
-        map.put(WebUtil.getMessage("lastQaDate"), this.getLastQaDate());
+        map.put(getMessage("manufactDate"),this.getManufactDate());
+        map.put(getMessage("purchaseDate"),  this.getPurchaseDate());
+        map.put(getMessage("arriveDate"), this.getArriveDate());
+        map.put(getMessage("installDate"), this.getInstallDate());
+        map.put(getMessage("factoryWarrantyDate"),this.getFactoryWarrantyDate());
+        map.put(getMessage("warrantyDate"), this.getWarrantyDate());
+        map.put(getMessage("terminateDate"), this.getTerminateDate());
+        map.put(getMessage("lastPmDate"), this.getLastPmDate());
+        map.put(getMessage("lastMeteringDate"), this.getLastMeteringDate());
+        map.put(getMessage("lastQaDate"), this.getLastQaDate());
 
-        map.put(WebUtil.getMessage("maitanance"), this.getMaitanance());
-        map.put(WebUtil.getMessage("maitananceTel"), this.getMaitananceTel());
-        map.put(WebUtil.getMessage("qrCode"), this.getQrCode());
-        map.put(WebUtil.getMessage("locationCode"), this.getLocationCode());
-        map.put(WebUtil.getMessage("locationName"), this.getLocationName());
-        map.put(WebUtil.getMessage("comments"), this.getComments());
+        map.put(getMessage("maitanance"), this.getMaitanance());
+        map.put(getMessage("maitananceTel"), this.getMaitananceTel());
+        map.put(getMessage("qrCode"), this.getQrCode());
+        map.put(getMessage("locationCode"), this.getLocationCode());
+        map.put(getMessage("locationName"), this.getLocationName());
+        map.put(getMessage("comments"), this.getComments());
 
-        map.put(WebUtil.getMessage("assetUsage"),this.getAssetUsageAsString());
-        map.put(WebUtil.getMessage("capitalSource"), this.getCapitalSourceAsString());
-        map.put(WebUtil.getMessage("riskGrade"), this.getRiskGradeAsString());
-        map.put(WebUtil.getMessage("measureGrade"), this.getMeasureGradeAsString());
-        map.put(WebUtil.getMessage("measuringItemCategory"), this.getMeasuringItemCategoryAsString());
-        map.put(WebUtil.getMessage("emergencyEquipment"),  this.getEmergencyEquipmentAsString());
-        map.put(WebUtil.getMessage("importEquipment"), this.getImportEquipmentAsString());
-        map.put(WebUtil.getMessage("status"), this.getStatusAsString());
-        map.put(WebUtil.getMessage("accountingCategory"), this.getAccountingCategoryAsString());
-        map.put(WebUtil.getMessage("isAssetPMed"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
-        map.put(WebUtil.getMessage("isAssetChecked"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? WebUtil.getMessage("true") : WebUtil.getMessage("false"));
+        map.put(getMessage("assetUsage"),this.getAssetUsageAsString());
+        map.put(getMessage("capitalSource"), this.getCapitalSourceAsString());
+        map.put(getMessage("riskGrade"), this.getRiskGradeAsString());
+        map.put(getMessage("measureGrade"), this.getMeasureGradeAsString());
+        map.put(getMessage("measuringItemCategory"), this.getMeasuringItemCategoryAsString());
+        map.put(getMessage("emergencyEquipment"),  this.getEmergencyEquipmentAsString());
+        map.put(getMessage("importEquipment"), this.getImportEquipmentAsString());
+        map.put(getMessage("status"), this.getStatusAsString());
+        map.put(getMessage("accountingCategory"), this.getAccountingCategoryAsString());
+        map.put(getMessage("isAssetPMed"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? getMessage("true") : getMessage("false"));
+        map.put(getMessage("isAssetChecked"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? getMessage("true") : getMessage("false"));
 
-        map.put(WebUtil.getMessage("assetValueCategory"), this.getAssetValueCategoryName());
-        map.put(WebUtil.getMessage("deviceStatus"), this.getDeviceStatusAsString());
-        map.put(WebUtil.getMessage("capitalSource2"), this.getCapitalSource2AsString());
-        map.put(WebUtil.getMessage("isWarrantyNotice"), this.getWarrantyAsString());
-        map.put(WebUtil.getMessage("assetTags"), this.joinTags(assetMap));
-        map.put(WebUtil.getMessage("UCMID"), assetInfo.getUCMID());
+        map.put(getMessage("assetValueCategory"), this.getAssetValueCategoryName());
+        map.put(getMessage("deviceStatus"), this.getDeviceStatusAsString());
+        map.put(getMessage("capitalSource2"), this.getCapitalSource2AsString());
+        map.put(getMessage("isWarrantyNotice"), this.getWarrantyAsString());
+        map.put(getMessage("assetTags"), this.joinTags(assetMap));
+        map.put(getMessage("UCMID"), assetInfo.getUCMID());
 
         //fields not used by default
-        map.put(WebUtil.getMessage("createdDate"), assetInfo.getCreatedDate());
-        map.put(WebUtil.getMessage("assetGroupSecondary"), this.getAssetGroupSecondayName());
-        map.put(WebUtil.getMessage("subjectProject"), assetInfo.getSubjectProject());
-        map.put(WebUtil.getMessage("acceptDate"), assetInfo.getAcceptDate());
-        map.put(WebUtil.getMessage("warrantyMonth"), assetInfo.getWarrantyMonth());
-        map.put(WebUtil.getMessage("proprietaryClass"), this.getProprietaryClassAsString());
+        map.put(getMessage("createdDate"), assetInfo.getCreatedDate());
+        map.put(getMessage("assetGroupSecondary"), this.getAssetGroupSecondayName());
+        map.put(getMessage("subjectProject"), assetInfo.getSubjectProject());
+        map.put(getMessage("acceptDate"), assetInfo.getAcceptDate());
+        map.put(getMessage("warrantyMonth"), assetInfo.getWarrantyMonth());
+        map.put(getMessage("proprietaryClass"), this.getProprietaryClassAsString());
 
-        map.put(WebUtil.getMessage("createdBy"), this.selectCreatedBy(assetInfo.getCreatedBy()));
-        map.put(WebUtil.getMessage("mainDirectory"), assetInfo.getMainDirectory());
-        map.put(WebUtil.getMessage("secondDirectory"), assetInfo.getSecondDirectory());
-        map.put(WebUtil.getMessage("UUID"), this.getUid());
+        map.put(getMessage("createdBy"), this.selectCreatedBy(assetInfo.getCreatedBy()));
+        map.put(getMessage("mainDirectory"), assetInfo.getMainDirectory());
+        map.put(getMessage("secondDirectory"), assetInfo.getSecondDirectory());
+        map.put(getMessage("UUID"), this.getUid());
 
         return map;
 
     }
+
+    private String getMessage(String departNum) {
+        //Long startTime = System.currentTimeMillis();
+        String message = WebUtil.getMessage(departNum);
+        //Long endTime = System.currentTimeMillis();
+        //Long tempTime = (endTime - startTime);
+        //logger.info("===========================getMessage.key={},time={}",departNum,tempTime);
+        return message;
+    }
+
     public String selectCreatedBy(String loginName) {
         UserAccount user = userDao.getByLoginName(loginName);
         if(user != null){
@@ -921,5 +936,7 @@ public class AssetInfoFormatter {
         }
         return null;
     }
+
+
 
 }

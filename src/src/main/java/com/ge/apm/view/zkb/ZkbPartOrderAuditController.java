@@ -149,6 +149,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
                 zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),selected.getId(),selected.getAssetTypeDi());
             }
+            if(selected.getQty() >= 3){
+                WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导","");
+                return;
+            }
         }
     }
 
@@ -302,7 +306,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showManage = true;
                 showRejectOrder = true;
                 showBtn="";
-            }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
+            }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())  || ZkbPartOrder.PartOrderStatus.PartReturned.toString().equals(selected.getStatus())){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
                     if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     }else {
@@ -398,6 +402,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.auditNext(this.selected,false,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        return "List?faces-redirect=true&queryStatus="+queryStatus;
+    }
+
+    public String closedBack(){
+        zkbPartOrderService.closedBack(this.selected,currentUser);
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
