@@ -30,5 +30,6 @@ public interface ApmConstant {
     static final int DEFAULT_SITE_ID = -1;
 
     static String stepNameClosed="已关单";
+    static String stepNameStop="已关闭";
 
 }
