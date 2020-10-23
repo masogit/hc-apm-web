@@ -61,8 +61,9 @@ public class QrCodeImportController {
     }
 
     public void finishUpload() {
-        importQrCodeMap = qrcodeService.importQrCode(importQrCodeMap, orgInfoList.stream().filter(item -> Objects.equals(item.getUid(), selectedSiteUID)).findAny().get());
-
+        if (orgInfoList.stream().filter(item -> Objects.equals(item.getUid(), selectedSiteUID)).findAny().isPresent()) {
+            importQrCodeMap = qrcodeService.importQrCode(importQrCodeMap, orgInfoList.stream().filter(item -> Objects.equals(item.getUid(), selectedSiteUID)).findAny().get());
+        }
     }
 
     public void onSiteChange() {

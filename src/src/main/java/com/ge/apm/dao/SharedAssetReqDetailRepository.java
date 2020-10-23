@@ -43,6 +43,8 @@ public interface SharedAssetReqDetailRepository extends GenericRepositoryUUID<Sh
 
     @Query(value = "select borrowId from SharedAssetReqDetail where assetInfoId = :assetInfoId and clinicalDeptUid = :clinicalDeptUid and returnId is null")
     public List<String> getBorrowDetail(@Param("assetInfoId") String assetInfoId, @Param("clinicalDeptUid") String clinicalDeptUid);
-    
-    
+
+    @Query(value = "select o.* from shared_asset_req_detail o where o.shared_id in ?1",nativeQuery = true)
+    public List<SharedAssetReqDetail> findListBySharedIds(List<String> sharedIds);
+
 }

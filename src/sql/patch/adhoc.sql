@@ -1,3 +1,13 @@
+--2020-10-10 增加九院设备字典 start
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroup','23','全自动核酸提取仪','Automatic nucleic acid extractor',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_23','1','全自动核酸提取仪','Automatic nucleic acid extractor',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroup','24','标本转运箱','Specimen Transfer Box',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_24','1','标本转运箱','Specimen Transfer Box',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_9','25','心电监护仪工作站','ECG monitor workstation',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_11','17','放射性薄层色谱扫描仪','Radioactive TLC scanner',NULL,112);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetGroupSecondary_14','38','全自动真菌细菌动态监测仪','Automatic fungal bacteria dynamic monitor',NULL,112);
+--2020-10-10 end
+
 --2020-10-09 start
 --自定义模板修改字段类型
 alter table unstructured_data alter column value type text;
@@ -45797,4 +45807,6 @@ VALUES
 (45780,659006100000,'博古其镇',65,'90','06','100000'),
 (45781,659006101000,'双丰镇',65,'90','06','101000');
 --2020-10-09 end                                                                                                      
-                                                                                                      
+--增加ole工作台审批流程角色
+INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") VALUES ('/homeHead.xhtml', 'oleApprove', 'ole审批', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Local Background Operation Management');
+INSERT INTO sys_role ("home_page", "name", "role_desc", "created_by", "created_date", "last_modified_by", "last_modified_date", "authorities", "authorities_ch", "cards", "cards_ch", "menus", "role_desc_en") VALUES ('/homeHead.xhtml', 'RepairWorkbench', '维修工作台', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'repair,repair.workbench', 'Local Background Operation Management');

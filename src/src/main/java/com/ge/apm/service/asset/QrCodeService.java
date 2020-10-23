@@ -11,42 +11,30 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.dao.QrCodeTemplateRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.QrCodeTemplate;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-import javax.imageio.ImageIO;
 import org.joda.time.DateTime;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  *
@@ -110,6 +98,11 @@ public class QrCodeService {
             qrCodeLib.setStatus(status);
             qrCodeLib.setIssueDate(new Date());
             qrCodeLib.setQrCode(qrCode);
+            if("基础互通".equals(currentOrg.getName())){
+                qrCodeLib.setType(1);
+            }else{
+                qrCodeLib.setType(0);
+            }
             qrCodeLibDao.save(qrCodeLib);
         }
         return qrCodeLib;
@@ -167,6 +160,16 @@ public class QrCodeService {
         }
     }
 
+    public BufferedImage getQrCodeImageWithGeLogo(QrCodeLib qrCodeLib) {
+        BufferedImage img = null;
+        try {
+            img = qrCodeDrawService.getQrCodeImageWithGeLogo(qrCodeLib);
+        } catch (Exception ex) {
+            Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return img;
+    }
+
     public BufferedImage getQrCodeImage(String qrCode, String siteUid) {
         return getQrCodeImage(null, null, qrCode, siteUid);
     }
@@ -188,7 +191,19 @@ public class QrCodeService {
     }
 
     private BufferedImage getQrCodeImage(QrCodeTemplate template, AssetInfo asset, String qrCode, String siteUid) {
+        BufferedImage img = null;
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode);
+        //一机一码
+        if(qrCodeLib != null && qrCodeLib.getType()!=null && qrCodeLib.getType()==1){
+            try {
+                img = qrCodeDrawService.getQrCodeImageWithGeLogo(qrCodeLib);
+            } catch (Exception ex) {
+                Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return img;
+        }
 
+        //模板码
         if (template == null) {
             if (null != asset && !Strings.isNullOrEmpty(asset.getSiteUID())) {
                 template = getTemplateBySiteUid(asset.getSiteUID());
@@ -219,7 +234,6 @@ public class QrCodeService {
             qrCodeObject = templateService.getJSONObjectByTemplate(template);
         }
 
-        BufferedImage img = null;
         try {
             qrCodeObject = fillElementsValue(qrCodeObject, asset);
             img = qrCodeDrawService.createQrCodeTag(qrCodeObject, siteUid);
@@ -377,7 +391,12 @@ public class QrCodeService {
                 BufferedImage image = null;
                 if (item instanceof QrCodeLib) {
                     QrCodeLib codeItem = (QrCodeLib) item;
-                    image = getQrCodeImage(codeItem);
+                    //一机一码
+                    if("基础互通".equals(orgNamesMap.get(codeItem.getSiteUID()))){
+                        image = getQrCodeImageWithGeLogo(codeItem);
+                    }else{
+                        image = getQrCodeImage(codeItem);
+                    }
                     fileName = Optional.ofNullable(orgNamesMap.get(codeItem.getSiteUID())).orElse("").concat("_").concat(codeItem.getQrCode());
                 } else if (item instanceof AssetInfo) {
                     AssetInfo asset = (AssetInfo) item;

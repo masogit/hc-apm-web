@@ -1,19 +1,21 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.KeyLabel;
+import com.ge.apm.service.asset.AssetInfoBulkEditCheckService;
 import com.ge.apm.service.asset.AssetInfoBulkEditService;
 import com.ge.apm.service.asset.AssetInfoService;
+import com.ge.apm.service.constant.AssetConstant;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.TransferEvent;
@@ -22,18 +24,17 @@ import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -46,8 +47,13 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private AssetInfoService assetInfoService;
     private UaaService uaaService;
     private AssetInfoBulkEditService assetInfoBulkEditService;
+    private AssetInfoBulkEditCheckService assetInfoBulkEditCheckService;
     private OrgInfoRepository orgInfoDao;
-
+    private NurseSiteMaintainItemRepository nurseSiteMaintainItemRepository;
+    private NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
+    private V2_WorkOrderRepository v2WorkerOrderRepository;
+    private V2_WorkOrderDetailRepository v2WorkerOrderDetailRepository;
+    private V2_WorkOrderStepRepository v2_WorkOrderStepRepository;
     //******* filter start
 
     @Getter @Setter
@@ -82,10 +88,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoBulkEditService = WebUtil.getBean(AssetInfoBulkEditService.class);
+        assetInfoBulkEditCheckService = WebUtil.getBean(AssetInfoBulkEditCheckService.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
-
+        nurseSiteMaintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
+        nurseSiteMaintainDataRepository = WebUtil.getBean(NurseSiteMaintainDataRepository.class);
+        v2WorkerOrderRepository = WebUtil.getBean(V2_WorkOrderRepository.class);
+        v2WorkerOrderDetailRepository= WebUtil.getBean(V2_WorkOrderDetailRepository.class);
+        v2_WorkOrderStepRepository= WebUtil.getBean(V2_WorkOrderStepRepository.class);
         selected = new AssetInfo();
-
         initCandidateKeyLabels();
     }
 
@@ -191,9 +201,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             this.searchFilters.add(searchFilter);
         }
 
-        if (null != this.oneSearchStr) {
-            searchFilter = new SearchFilter("name", SearchFilter.Operator.LIKE, this.oneSearchStr);
-            this.searchFilters.add(searchFilter);
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
     }
 
@@ -320,12 +332,62 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         //commit changes after validated
         List<AssetInfo> selectedAssets = assets.getTarget();
 
-        assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
+        //验证
+        if(!assetInfoBulkEditCheckService.verify(selectedAssets)){
+            WebUtil.addErrorMessage("有设备正在调剂中，不能更换院区!");
+            return;
+        }
 
-        assets.setSource(new ArrayList<>());
-        assets.setTarget(new ArrayList<>());
+        if(!assetInfoBulkEditCheckService.verifyForMaintain(selectedAssets)){
+            WebUtil.addErrorMessage("有设备正在保养中，不能更换院区！");
+            return;
+        }
 
-        WebUtil.addSuccessMessage("批量修改资产院区成功!");
+        if(!assetInfoBulkEditCheckService.verifyForInventory(selectedAssets)){
+            WebUtil.addErrorMessage("有设备正在盘点中，不能更换院区!");
+            return;
+        }
+
+        for(AssetInfo as:selectedAssets){
+            List<V2_WorkOrder> pmOrderList = v2WorkerOrderRepository.findByAssetId(as.getId());
+            if(CollectionUtils.isNotEmpty(pmOrderList)){
+                for(V2_WorkOrder workerOder : pmOrderList){
+                        List<V2_WorkOrder_Step> workOrderStepList = v2_WorkOrderStepRepository.findByWorkOrder(workerOder.getId());
+                        workOrderStepList.stream().sorted(Comparator.comparing(V2_WorkOrder_Step:: getStepId));
+                        List<V2_WorkOrder_Detail> workOrderDetailList = v2WorkerOrderDetailRepository.findPmOrderByWoId(workerOder.getId());
+                        for(V2_WorkOrder_Step step : workOrderStepList){
+                            if(! "未关单".equals(step.getStepName())){
+                                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
+                                return;
+                            }
+                        }
+                        for(V2_WorkOrder_Detail detail : workOrderDetailList){
+                            if(! detail.getClosed()){
+                                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
+                                return;
+                            }
+                        }
+                    }
+            }
+        }
+
+        //临床助手检查进行中
+        Optional<String> optionalResult = assetInfoBulkEditCheckService.verifyForNurseSite(selectedAssets);
+        if (optionalResult.isPresent()) {
+            WebUtil.addErrorMessage(optionalResult.get());
+            return;
+        }
+
+        try {
+            assetInfoBulkEditService.commitBulkEditSite(selectedAssets, selected, selectedColumns);
+
+            assets.setSource(new ArrayList<>());
+            assets.setTarget(new ArrayList<>());
+
+            WebUtil.addSuccessMessage("批量修改资产院区成功!");
+        } catch(Exception e) {
+            WebUtil.addErrorMessage(e.getMessage());
+        }
 
     }
 
@@ -353,22 +415,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             return false;
         }
 
-        if (selectedColumns.contains("hospitalId") && null == this.selected.getSiteOrg()) {
+        if (null == this.selected.getSiteOrg()) {
             WebUtil.addErrorMessage("请选择院区!");
             return false;
         }
 
-        if (selectedColumns.contains("clinicalDeptName")) {
-            if (!selectedColumns.contains("hospitalId")) {
-                WebUtil.addErrorMessage("请选择院区!");
-                return false;
-            }
-
-            if (null == this.selected.getClinicalDeptOrg()) {
-                WebUtil.addErrorMessage("请选择科室!");
-                return false;
-            }
-
+        if (null == this.selected.getClinicalDeptOrg()) {
+            WebUtil.addErrorMessage("请选择科室!");
+            return false;
         }
 
         return true;

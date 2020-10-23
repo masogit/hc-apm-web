@@ -5,6 +5,7 @@ import javax.faces.bean.ManagedBean;
 import com.ge.apm.dao.ZkbContractAssetRepository;
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.domain.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -12,10 +13,10 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.faces.bean.ViewScoped;
 
@@ -162,21 +163,26 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
 
     public void confirmSelection() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        if(userContextService.isZkbAccount()){
+        if(userContextService.isZkbUser()){
             //getzkb_contract
-            List<ZkbContractAsset>  contractAssetList = zkbContractAssetRepository.findByAssetId(selectedAsset.getId());
-            if(contractAssetList !=null && contractAssetList.size()>0){
-                ZkbContractAsset zkbContractAsset = contractAssetList.get(0);
-                String contractId = zkbContractAsset.getContractId();
-                ZkbContract zkbContract = zkbContractRepository.findById(contractId);
-                Date now = new Date();
-                if(now.after(zkbContract.getEndDate()) || now.before(zkbContract.getStartDate())){
-                    WebUtil.addErrorMessageKey("对于智康宝设备,合同有效期的设备才可以创建报修工单");
-                    RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                    return;
-                }
+            List<ZkbContractAsset>  contractAssetList = zkbContractAssetRepository.findByAssetId(String.valueOf(selectedAsset.getUid()));
+            if(CollectionUtils.isEmpty(contractAssetList)){
+                WebUtil.addErrorMessageKey("对于智康宝设备，设备有合同才可以创建报修工单！");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
             }
+            ZkbContractAsset zkbContractAsset = contractAssetList.get(0);
+            String contractId = zkbContractAsset.getContractId();
+            ZkbContract zkbContract = zkbContractRepository.findById(contractId);
+            Date now = new Date();
+            if(zkbContract !=null &&(now.getTime() >= getSomeDay(zkbContract.getEndDate(),"+").getTime() || now.getTime() <= getSomeDay(zkbContract.getStartDate(),"-").getTime())){
+                WebUtil.addErrorMessageKey("对于智康宝设备，合同有效期内的设备才可以创建报修工单！");
+                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+                return;
+            }
+
         }
+
         if (this.selectedAsset == null) {
             WebUtil.addErrorMessageKey("noAssetSelected");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -187,6 +193,26 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         if (callingController != null) {
             callingController.onServerEvent("onAssetSelected", this.selectedAsset);
         }
+    }
+
+    public Date getSomeDay(Date date,String operator) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        int day1 = c.get(Calendar.DATE);
+        if("+".equals(operator)){
+            //c.set(Calendar.DATE, day1 + 1);
+            c.set(Calendar.HOUR, 23);
+            c.set(Calendar.MINUTE, 59);
+            c.set(Calendar.SECOND, 59);
+        }else {
+            //c.set(Calendar.DATE, day1 - 1);
+            c.set(Calendar.HOUR, 00);
+            c.set(Calendar.MINUTE, 00);
+            c.set(Calendar.SECOND, 00);
+        }
+        String dayAfter = new SimpleDateFormat("yyyy-MM-dd").format(c.getTime());
+        System.out.println(dayAfter);
+        return c.getTime();
     }
 
     private String updateViewIDs;

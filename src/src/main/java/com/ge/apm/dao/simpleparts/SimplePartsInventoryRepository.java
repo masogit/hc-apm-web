@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
-
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author csh
@@ -98,4 +98,14 @@ public interface SimplePartsInventoryRepository extends GenericRepositoryUUID<Si
      */
     @Query(value = "select * from simple_parts_inventory where tenant_uid = ?1 and parts_locator_id != 'VIRTUAL_LOCATOR'", nativeQuery = true)
     List<SimplePartsInventory> findNotIsVirtualLoctorByTenantUid(String tenantUid);
+
+    /**
+     * @param uids
+     * @return java.util.List<com.ge.apm.domain.SimplePartsInventory>
+     * @date 2020/7/21 18:41
+     * 根据仓库id查询库存备件
+     */
+    @Query(value = "select * from simple_parts_inventory where parts_warehouse_id in ?1 ", nativeQuery = true)
+    public List<SimplePartsInventory> findByPartsWarehouseIds(Set<String> uids);
+
 }
