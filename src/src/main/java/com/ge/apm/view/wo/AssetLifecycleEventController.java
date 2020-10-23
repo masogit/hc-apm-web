@@ -268,7 +268,9 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 			Boolean exportFlag = service.exportData(doc, data);
 			if (exportFlag) {
 				exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "woMgr_export.xlsx");
+				LOGGER.info("export file:woMgr_export.xlsx successful..");
 			}
+			LOGGER.info("export file:woMgrOutList_export.xlsx successful..");
 		} catch (IOException ex) {
 			LOGGER.error(ex.getMessage());
 		}

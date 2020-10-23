@@ -6,6 +6,7 @@
 package com.ge.apm.view.asset;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -147,6 +148,8 @@ public class AssetInstallationController {
     @Getter
     private CustomConfigObject customConfig;
 
+    private SupplierService supplierService;
+
     @PostConstruct
     protected void init() {
         aiService = WebUtil.getBean(AssetInstallationService.class);
@@ -199,6 +202,7 @@ public class AssetInstallationController {
             parentAssetInfo = assetDao.findById(arrivalListItem.getParentAssetId());
         }
         getParentAssetList();
+        supplierService = WebUtil.getBean(SupplierService.class);
     }
 
     private void initOwner() {
@@ -364,7 +368,144 @@ public class AssetInstallationController {
         }
         return returnAction();
     }
+    public String finishInstallBatch() {
+        Boolean isValidate = true;
+        String contractNum = arrivalListItem.getArrivalList().getContractNum();
+        String clinicalDeptUID = arrivalListItem.getClinicalDeptUID();
+        if(StringUtils.isBlank(contractNum)){
+            WebUtil.addErrorMessage("合同编号不能为空");
+            return null;
+        }
+        if(StringUtils.isBlank(clinicalDeptUID)){
+            WebUtil.addErrorMessage("所属科室不能为空");
+            return null;
+        }
+        List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+        String errorMessage = "";
+        for(ArrivalListItem arrivalListItem : itemList){
+            String message = "";
+            if (null != gbCodeName) {
+                GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
+                if (null == gbCode) {
+                    message = WebUtil.getMessage("无效的国标码");
+                    isValidate = false;
+                }
+                arrivalListItem.setNationalStandardCode(selectedGb.getCode());
+                //更新资产国标码
+                assetDao.updateStandardCode(selectedGb.getCode(), arrivalListItem.getAssetUID());
+            }
+            if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
+                message = message +"、"+ WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire");
+                RequestContext.getCurrentInstance().addCallbackParam("ClinicalDeptName", true);
+                isValidate = false;
+            }
+            if (arrivalListItem.getWorkHours() == null) {
+                message = message + "、安装工时" + WebUtil.getMessage("ValidationRequire");
+                RequestContext.getCurrentInstance().addCallbackParam("workHours", true);
+                isValidate = false;
+            }
+            if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getDepartNum())) {
+                message = message + "、设备编号（院方）不能为空";
+                isValidate = false;
+            }
+            if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getFinancingNum())) {
+                message = message + "、资产编号不能为空";
+                isValidate = false;
+            }
+            if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getQrCode())) {
+                message = message + "、二维码不能为空";
+                isValidate = false;
+            }
+            if(arrivalListItem.getBusinessAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
+                arrivalListItem.setBusinessAckStatus(arrivalListItem.ACK_STATUS_PASS);
+                arrivalListItem.setBusinessAckDate(new Date());
+            }
+            if(arrivalListItem.getTechnicalAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
+                arrivalListItem.setTechnicalAckStatus(arrivalListItem.ACK_STATUS_PASS);
+                arrivalListItem.setTechnicalAckDate(new Date());
+            }
+            if(arrivalListItem.getClinicalAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
+                arrivalListItem.setClinicalAckStatus(arrivalListItem.ACK_STATUS_PASS);
+                arrivalListItem.setClinicalAckDate(new Date());
+            }
+            if(arrivalListItem.getFixassetAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
+                arrivalListItem.setFixassetAckStatus(arrivalListItem.ACK_STATUS_PASS);
+                arrivalListItem.setFixassetAckDate(new Date());
+            }
+            if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
+                String qrCodeStatus = qrCodeService.checkAvailableBeforeSave(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
+                if (!"Normal".equals(qrCodeStatus)) {
+                    message = message + "、" + WebUtil.getMessage(qrCodeStatus);
+                    isValidate = false;
+                }
+            }
 
+            Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
+            if (!isvalidDeptNum._1) {
+                isValidate = false;
+                message = message + "、" + isvalidDeptNum._2;
+            }
+
+            if (!isValidate) {
+                String name = arrivalListItem.getArrivalList().getName();
+                if(errorMessage.contains("到货单名称/编号："+name)){
+                    errorMessage =  errorMessage + WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"错误信息-->" + message;
+                }else{
+                    message = "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"错误信息-->" + message.replaceFirst("、","");
+                    errorMessage = errorMessage + message ;
+                }
+                isValidate = true;
+            }
+
+            if (arrivalListItem.getWarrantyYear() != null) {
+                Integer monthLong = Double.valueOf(arrivalListItem.getWarrantyYear() * 12).intValue();
+                Calendar calender = Calendar.getInstance();
+                calender.setTime(arrivalListItem.getInstallDate() == null ? new Date() : arrivalListItem.getInstallDate());
+                calender.add(Calendar.MONTH, monthLong);
+                arrivalListItem.setFactoryWarrantyDate(calender.getTime());
+            }
+
+            if (configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())) {
+                //待审核
+                arrivalListItem.setUsageStatus(2);
+            } else {
+                arrivalListItem.setUsageStatus(3);
+            }
+        }
+
+        if(!errorMessage.equals("")){
+            WebUtil.addErrorMessage(errorMessage);
+            return "";
+        }
+
+        finishInstallHandle(itemList);
+
+        return returnAction();
+    }
+    public void finishInstallHandle(List<ArrivalListItem> itemList) {
+        String message = "";
+        for(ArrivalListItem arrivalListItem : itemList){
+            if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
+                arrivalListItem.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+                aiService.saveOrUpdateItem(arrivalListItem);
+                arrivalListItem = itemDao.findById(arrivalListItem.getId());
+                if (!aiService.submitInstallItem(arrivalListItem.getId(), true, arrivalListItem.getIsGeneratePmOrder() == null ? false : arrivalListItem.getIsGeneratePmOrder())) {
+                    String name = arrivalListItem.getArrivalList().getName();
+                    if(message.contains("到货单名称/编号："+name)){
+                        message =  "、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"-->，记录提交失败";
+                    }else{
+                        message = message + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"-->，记录提交失败";
+                    }
+                }
+
+            }
+        }
+        if(StringUtils.isEmpty(message)){
+            WebUtil.addSuccessMessage("提交成功");
+        }else{
+            WebUtil.addErrorMessage(message);
+        }
+    }
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
@@ -753,6 +894,31 @@ public class AssetInstallationController {
         }
     }
 
+    public void exportReportBatch(String reportType) {
+        String contractNum = arrivalListItem.getArrivalList().getContractNum();
+        String clinicalDeptUID = arrivalListItem.getClinicalDeptUID();
+        if(StringUtils.isBlank(contractNum)){
+            WebUtil.addErrorMessage("合同号不能为空");
+            return;
+        }
+        if(StringUtils.isBlank(clinicalDeptUID)){
+            WebUtil.addErrorMessage("所属科室不能为空");
+            return;
+        }
+        List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+        try {
+            Map<String, Object> data = assetInstallationReportService.createReportDataBatch(itemList);
+            byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);
+
+            if (templateBytes != null) {
+                exportFile = assetInstallationReportService.exportDocxBatch(data, templateBytes, reportType);
+            }
+        } catch (IOException e) {
+            Logger.getLogger(AssetInstallationController.class.getName()).log(Level.SEVERE, null, e);
+            WebUtil.addErrorMessage("导出失败");
+        }
+    }
+
     public UserAccount getUserAccountByUid(String uid) {
         return aiService.getUserAccountByUid(uid);
     }
@@ -872,4 +1038,8 @@ public class AssetInstallationController {
 //	public void setParentAssetInfo(AssetInfo parentAssetInfo) {
 //		this.parentAssetInfo = parentAssetInfo;
 //	}
+
+    public boolean activeSupplier(){
+        return supplierService.activeSupplier();
+    }
 }
