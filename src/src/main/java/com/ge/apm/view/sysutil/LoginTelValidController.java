@@ -118,7 +118,7 @@ public class LoginTelValidController {
             doTelephoneValidlogin(request, response);
             // called after user logined.
             String str = userContextService.getUserDefaultHomePage();
-
+            logger.info("phone valid login ,userDefaultHomePage: {}",str);
             WebUtil.redirectTo(str);
         }else {
             WebUtil.addErrorMessage("验证码错误");

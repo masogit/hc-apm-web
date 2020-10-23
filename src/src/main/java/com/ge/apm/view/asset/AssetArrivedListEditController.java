@@ -404,8 +404,40 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void takeWorkOrder(String itemId) {
         ArrivalListItem item = itemDao.findById(itemId);
-        item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
-        aiService.reAssignWorkOrder(item);
+        if(activeSupplier()){//批量接单
+            String contractNum = item.getArrivalList().getContractNum();
+            String clinicalDeptUID = item.getClinicalDeptUID();
+            if(StringUtils.isEmpty(contractNum)){
+                WebUtil.addErrorMessage("合同编号不能为空");
+                return ;
+            }
+            if(StringUtils.isEmpty(clinicalDeptUID)){
+                WebUtil.addErrorMessage("所属科室不能为空");
+                return ;
+            }
+            List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+            String errorMessage = "";
+            for(ArrivalListItem arrivalListItem:itemList){
+                arrivalListItem.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+                Boolean responseStatus = aiService.reAssignWorkOrder(arrivalListItem);
+                if(!responseStatus){
+                    String name = arrivalListItem.getArrivalList().getName();
+                    if(errorMessage.contains("到货单名称/编号："+name)){
+                        errorMessage =  "、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"-->，记录提交失败";
+                    }else{
+                        errorMessage = errorMessage + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"-->，记录提交失败";
+                    }
+                }
+            }
+            if(StringUtils.isEmpty(errorMessage)){
+                WebUtil.addSuccessMessage("批量提交成功");
+            }else{
+                WebUtil.addErrorMessage(errorMessage);
+            }
+        }else{
+            item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+            aiService.reAssignWorkOrder(item);
+        }
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
 //        cancel();
     }
