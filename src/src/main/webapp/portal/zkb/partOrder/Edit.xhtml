@@ -149,7 +149,14 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.haveTrainCourseFlag}">
+                            <label class="label">是否上过培训课*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.haveTrainCourseFlag}" required="true" requiredMessage="是否上过培训课 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="是" itemValue="t"/>
+                                <f:selectItem itemLabel="否" itemValue="f"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
                             <p:selectOneMenu id="region" value="#{zkbPartOrderEditController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}" disabled="true">

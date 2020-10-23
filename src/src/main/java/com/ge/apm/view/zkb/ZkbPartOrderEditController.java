@@ -255,6 +255,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             selected.setRegion(zkbContract.getRegion());
             initZknPartCat(zkbContract.getStartDate());
+            trainCourseRender();
         }
         calcRemainQty();
 
@@ -262,6 +263,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void contractRowSelected(SelectEvent event){
 
+    }
+
+    private boolean haveTrainCourseFlag = false;
+    public void trainCourseRender(){
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            if(contractList != null && contractList.size() > 0){
+                ZkbContract zkbContract = contractList.get(0);
+                if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+                    haveTrainCourseFlag = true;
+                }
+            }
+        }
     }
 
     private boolean showProblemOrderNumber = false;
@@ -660,6 +673,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setValueTypeTips(String valueTypeTips) {
         this.valueTypeTips = valueTypeTips;
+    }
+
+    public boolean isHaveTrainCourseFlag() {
+        return haveTrainCourseFlag;
+    }
+
+    public void setHaveTrainCourseFlag(boolean haveTrainCourseFlag) {
+        this.haveTrainCourseFlag = haveTrainCourseFlag;
     }
 
     @Override
