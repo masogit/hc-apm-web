@@ -130,7 +130,7 @@ public class PccExamineReportConfigController  implements Serializable{
 				LOGGER.error(e.getMessage());
 			}
 		} else {
-			addMessage("上传失败！" + tempFile.getFileName() + "是空文件");
+			addMessage("上传失败！是空文件");
 		}
 		// V2_BlobObject blobObject = service.uploadFile(event);
 		// String type = event.getComponent().getId();

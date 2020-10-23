@@ -1520,8 +1520,10 @@ public void test1(){
     public void prepareEditAccDetail(V2_WorkOrder_Detail vwd) {
         switchTmp=false;
         accessoryList = woService.getWorkOrderDetails(selectedWorkOrder.getId());
+        if (accessoryList.stream().filter(item -> item.getId().equals(vwd.getId())).findAny().isPresent()){
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(vwd.getId())).findAny().get();
             supplierName = itemDetail.getSupplier();
+        }
         supplierList = aimService.getSuplierListBySiteUid(selectedWorkOrder.getTenantUID());
         selectedObjectMap.put("supplier",supplierName);
         nochange=false;

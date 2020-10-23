@@ -148,7 +148,8 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
 
     public String getTemplateName(){
         UserContextService ucs = WebUtil.getBean(UserContextService.class);
-        return ucs.isLocale() == true ? "excel/APM_ZKB_Contract_imp_Template.xlsx":"excel/APM_ZKB_Contract_imp_Template.xlsx";
+        // return ucs.isLocale() == true ? "excel/APM_ZKB_Contract_imp_Template.xlsx":"excel/APM_ZKB_Contract_imp_Template.xlsx";
+        return "excel/APM_ZKB_Contract_imp_Template.xlsx";
     }
 
     private StreamedContent exportFile;

@@ -293,7 +293,10 @@ public class SharedAssetStockService {
     private String getVoucherTitle4Print(UserAccount currentUser, String flag) {
         List<String> orgUids = wfCfigDao.findDeptForSharedAsset(currentUser.getSiteUID());
         List<OrgInfo> allocDeptList = orgInfoRepository.findByUids(new HashSet<>(orgUids));
-        OrgInfo allocDept = allocDeptList.stream().findFirst().get();
+        OrgInfo allocDept = null;
+        if (allocDeptList.stream().findFirst().isPresent()){
+            allocDept = allocDeptList.stream().findFirst().get();
+        }
         if(null != flag && flag.equals("301"))
         {
         	return allocDept.getOrgFullName();
@@ -306,22 +309,25 @@ public class SharedAssetStockService {
 
     private SharedAssetReqDetail findLatestReqDetailByAsset(AssetInfo asset) {
         List<SharedAssetReqDetail> sharedAssetReqDetailList = sharedAssetReqDetailRepository.findByAssetInfoUid(asset.getUid());
-        SharedAssetReqDetail sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
-                                                            .sorted((SharedAssetReqDetail o1, SharedAssetReqDetail o2) -> {
-                                                                if(o1.getChargingEndTime() == null) {
-                                                                    return -1;
-                                                                } else if(o2.getChargingEndTime() == null) {
-                                                                    return 1;
-                                                                } else {
-                                                                    if(o1.getChargingEndTime().before(o2.getChargingEndTime())) {
-                                                                        return 1;
-                                                                    } else {
-                                                                        return -1;
-                                                                    }
-                                                                }
-                                                            })
-                                                            .findFirst()
-                                                            .orElse(null);
+        SharedAssetReqDetail sharedAssetReqDetail = null;
+        if (Optional.ofNullable(sharedAssetReqDetailList).isPresent()) {
+            sharedAssetReqDetail = Optional.ofNullable(sharedAssetReqDetailList).get().stream()
+                    .sorted((SharedAssetReqDetail o1, SharedAssetReqDetail o2) -> {
+                        if(o1.getChargingEndTime() == null) {
+                            return -1;
+                        } else if(o2.getChargingEndTime() == null) {
+                            return 1;
+                        } else {
+                            if(o1.getChargingEndTime().before(o2.getChargingEndTime())) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        }
+                    })
+                    .findFirst()
+                    .orElse(null);
+        }
         return sharedAssetReqDetail;
     }
 

@@ -6,26 +6,6 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
-
-        <div class="ui-g-12">
-            <p:tabView id="measuringTab" class="ui-g-12">
-                <p:tab title="全部设备" id="tab1">
-                    <!--<p:graphicImage name="/img/ninthAsset_1.png"/>-->
-                    <img src="ninthAsset_1.png"/>
-                </p:tab>
-                <p:tab title="口腔设备" id="tab2">
-                    <img src="ninthAsset_2_1.png"/>
-                </p:tab>
-                <p:tab title="急救和生命支持设备" id="tab3">
-                    <img src="ninthAsset_3_1.png"/>
-                </p:tab>
-                <p:tab title="放射放疗及核医学设备" id="tab4">
-                    <img src="ninthAsset_4_1.png"/>
-                </p:tab>
-            </p:tabView>
-        </div>
-
+        <iframe id="chartFrame" src="/reports/asset-overview" width="100%" height="900"></iframe>
     </ui:define>
-
-
 </ui:composition>
