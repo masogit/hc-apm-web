@@ -24,11 +24,10 @@ public class AssetInfoFormatter {
     private List<OrgInfo> sites;
     private AssetFileImportBaseService importService;
     private AssetInfoRepository assetDao;
-    private OrgInfoRepository orgDao;
     private SupplierRepository supplierDao;
     private UserAccountRepository userDao;
     private int siteId;
-
+    private static Map<String, String> messageCacheMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(AssetInfoFormatter.class);
 
     public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites,
@@ -40,7 +39,6 @@ public class AssetInfoFormatter {
         this.sites = sites;
         this.importService = importService;
         this.assetDao = assetDao;
-        this.orgDao = orgDao;
         this.supplierDao = supplierDao;
         this.userDao = userDao;
         this.siteId = UserContextService.getCurrentUserAccount().getSiteId();
@@ -812,7 +810,6 @@ public class AssetInfoFormatter {
 
         // key "name" is used by a lot of modules, the definition is wrong, so use a new key name to redefine
         map.put(getMessage("EquipmentName"), this.getName());
-//        map.put(WebUtil.getMessage("name"), this.getName());
 
         map.put(getMessage("departNum"), this.getDepartNum());
         map.put(getMessage("financingNum"), this.getFinancingNum());
@@ -920,13 +917,11 @@ public class AssetInfoFormatter {
 
     }
 
-    private String getMessage(String departNum) {
-        //Long startTime = System.currentTimeMillis();
-        String message = WebUtil.getMessage(departNum);
-        //Long endTime = System.currentTimeMillis();
-        //Long tempTime = (endTime - startTime);
-        //logger.info("===========================getMessage.key={},time={}",departNum,tempTime);
-        return message;
+    private String getMessage(String key) {
+        if(!messageCacheMap.containsKey(key)) {
+            messageCacheMap.put(key, WebUtil.getMessage(key));
+        }
+        return messageCacheMap.get(key);
     }
 
     public String selectCreatedBy(String loginName) {
