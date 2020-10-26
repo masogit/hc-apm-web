@@ -27,7 +27,6 @@ public interface V2_WorkOrderDetailRepository extends GenericRepositoryUUID<V2_W
     List<V2_PmOrder> findPmOrderByContractNum(String contractNum, String tenant_uid);
 
     @Query("select wod from V2_WorkOrder_Detail wod  where wod.woId=?1")
-    List<V2_WorkOrder_Detail> findWorkOrderByWoId(String woId);
-
+    List<V2_WorkOrder_Detail> findWorkOrderDetailByWoId(String woId);
     
 }
