@@ -192,7 +192,7 @@
                         <h:panelGroup id="problemOrderNumberGrid" rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
                             <h:panelGroup id="problemOrderNumberGroup" rendered="#{!(zkbPartOrderEditController.showProblemOrderNumber)}" style="text-align: left">
                                 <label class="label">发生问题的order number*</label>
-                                <p:inputText id="problemOrderNumber" value="#{zkbPartOrderEditController.selected.problemOrderNumber}"  required="true" requiredMessage="#{msg.zkbPartOrder_problemOrderNumber} #{msg.ValidationRequire}"  />
+                                <p:inputText id="problemOrderNumber" value="#{zkbPartOrderEditController.selected.problemOrderNumber}"  required="true" requiredMessage="#{msg.zkbPartOrder_problemOrderNumber} #{msg.ValidationRequire}" />
                             </h:panelGroup>
                         </h:panelGroup>
                         <h:panelGroup>
