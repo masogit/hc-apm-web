@@ -158,6 +158,71 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return zkbContracts;
     }
 
+    public Boolean checkThreeValid(ZkbPartOrder zkbPartOrder){
+        List<SearchFilter> filters = new ArrayList<>();
+        filters.add(new SearchFilter("srNum", SearchFilter.Operator.EQ,zkbPartOrder.getSrNum()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.TechnicalReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.ManageReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.OrderedReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString()));
+        filters.add(new SearchFilter("requestDate", SearchFilter.Operator.LT,zkbPartOrder.getRequestDate()));
+        List<ZkbPartOrder> historyList = zkbPartOrderRepository.findBySearchFilter(filters);
+        Integer historyQty = 0;
+        for(ZkbPartOrder o : historyList){
+            historyQty += o.getQty();
+        }
+        if(historyQty >=3 ){
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
+    }
+
+    public String checkContractWeekValid(ZkbPartOrder zkbPartOrder,ZkbContract zkbContract){
+        List<SearchFilter> filters = new ArrayList<>();
+        filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbPartOrder.getContractId()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.TechnicalReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.ManageReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.OrderedReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString()));
+        filters.add(new SearchFilter("requestDate", SearchFilter.Operator.GTE,DateUtils.addDays(zkbContract.getEndDate(),-6)));
+        filters.add(new SearchFilter("requestDate", SearchFilter.Operator.LT,DateUtils.addDays(zkbContract.getEndDate(),1)));
+        List<ZkbPartOrder> historyList = zkbPartOrderRepository.findBySearchFilter(filters);
+        Integer historyQty = 0;
+        for(ZkbPartOrder o : historyList){
+            if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+                historyQty++;
+            }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+                historyQty += o.getQty();
+            }
+        }
+
+        Integer days = getBetweenDay(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()) + 1;
+        if(days > 7 || days < 1){
+            return "";
+        }else{
+            return "合同还有【"+String.valueOf(days)+"】天到期，合同临结束7天内已订购【"+String.valueOf(historyQty)+"】个备件/探头！";
+        }
+    }
+
+    public static int getBetweenDay(Date date1, Date date2) {
+        Calendar d1 = new GregorianCalendar();
+        d1.setTime(date1);
+        Calendar d2 = new GregorianCalendar();
+        d2.setTime(date2);
+        int days = d2.get(Calendar.DAY_OF_YEAR)- d1.get(Calendar.DAY_OF_YEAR);
+        System.out.println("days="+days);
+        int y2 = d2.get(Calendar.YEAR);
+        if (d1.get(Calendar.YEAR) != y2) {
+            //      d1 = (Calendar) d1.clone();
+            do {
+                days += d1.getActualMaximum(Calendar.DAY_OF_YEAR);
+                d1.add(Calendar.YEAR, 1);
+            } while (d1.get(Calendar.YEAR) != y2);
+        }
+        return days;
+    }
+
+
     /**
      * 申请保存方法：
  *      根据不同的申请类型，步骤、状态也不相同
