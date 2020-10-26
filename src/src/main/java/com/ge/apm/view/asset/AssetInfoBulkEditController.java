@@ -357,7 +357,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                         //workOrderStepList.stream().sorted(Comparator.comparing(V2_WorkOrder_Step:: getStepId));
                         List<V2_WorkOrder_Detail> workOrderDetailList = v2WorkerOrderDetailRepository.findWorkOrderDetailByWoId(workerOder.getId());
                         for(V2_WorkOrder_Step step : workOrderStepList){
-                            if( ! (ApmConstant.stepNameWaitForClosed.equals(step.getStepName()) && step.getEndTime() !=null)){
+                            if( ApmConstant.stepNameWaitForClosed.equals(step.getStepName()) && step.getEndTime() !=null){
+                                // 这一种情况可以更换园区，其他都不行
+//                                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
+//                                return;
+                            }else{
                                 WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
                                 return;
                             }
