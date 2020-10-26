@@ -318,6 +318,14 @@
                             <label class="label">区域经理审批时间*</label>
                             <p:calendar timeZone="GMT+8"  id="manageAuditDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.manageAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.haveTrainCourseFlag}">
+                            <label class="label">是否上过培训课*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.haveTrainCourseFlag}" required="true" requiredMessage="是否上过培训课 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="是" itemValue="t"/>
+                                <f:selectItem itemLabel="否" itemValue="f"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <c:choose>
                                 <c:when test="#{zkbPartOrderAuditController.orderType eq 'Artificial'}">
