@@ -111,12 +111,13 @@
                                 <f:selectItem itemLabel="Short Life" itemValue="Short Life"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup id="problemOrderNumberGrid" rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
-                            <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial') and !(zkbPartOrderAuditController.selected.orderAnnotation eq 'NormalOrder')}">
-                                <label class="label">发生问题的order number</label>
-                                <p:inputText id="problemOrderNumber" value="#{zkbPartOrderAuditController.selected.problemOrderNumber}" disabled="true" />
-                            </h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.orderType eq 'Artificial') and !(zkbPartOrderAuditController.selected.orderAnnotation eq 'NormalOrder')}">
+                            <label class="label">发生问题的order number</label>
+                            <p:inputText id="problemOrderNumber" value="#{zkbPartOrderAuditController.selected.problemOrderNumber}" disabled="true" />
                         </h:panelGroup>
+                       <!-- <h:panelGroup id="problemOrderNumberGrid" rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
+
+                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">是否为紧急订单*</label>
                             <p:selectOneMenu id="urgentOrder" value="#{zkbPartOrderAuditController.selected.urgentOrder}" disabled="true" >
@@ -317,6 +318,14 @@
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
                             <label class="label">区域经理审批时间*</label>
                             <p:calendar timeZone="GMT+8"  id="manageAuditDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.manageAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.haveTrainCourseFlag}">
+                            <label class="label">是否上过培训课*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.haveTrainCourseFlag}" required="true" requiredMessage="是否上过培训课 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="是" itemValue="t"/>
+                                <f:selectItem itemLabel="否" itemValue="f"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
                             <c:choose>
