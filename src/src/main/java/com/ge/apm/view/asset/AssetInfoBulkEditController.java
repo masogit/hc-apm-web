@@ -9,6 +9,7 @@ import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -354,13 +355,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 for(V2_WorkOrder workerOder : pmOrderList){
                         List<V2_WorkOrder_Step> workOrderStepList = v2_WorkOrderStepRepository.findByWorkOrder(workerOder.getId());
                         //workOrderStepList.stream().sorted(Comparator.comparing(V2_WorkOrder_Step:: getStepId));
-                        List<V2_WorkOrder_Detail> workOrderDetailList = v2WorkerOrderDetailRepository.findWorkOrderByWoId(workerOder.getId());
+                        List<V2_WorkOrder_Detail> workOrderDetailList = v2WorkerOrderDetailRepository.findWorkOrderDetailByWoId(workerOder.getId());
                         for(V2_WorkOrder_Step step : workOrderStepList){
-                            if(! "未关单".equals(step.getStepName())){
+                            if( ! (ApmConstant.stepNameWaitForClosed.equals(step.getStepName()) && step.getEndTime() !=null)){
                                 WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
                                 return;
                             }
                         }
+
                         for(V2_WorkOrder_Detail detail : workOrderDetailList){
                             if(! detail.getClosed()){
                                 WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
