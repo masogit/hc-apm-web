@@ -598,6 +598,26 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId());
     }
 
+    private boolean haveTrainCourseFlag = false;
+    public void trainCourseRender(){
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            if(zkbContract != null ){
+                if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+                    haveTrainCourseFlag = true;
+                }
+            }
+        }
+    }
+
+    public boolean isHaveTrainCourseFlag() {
+        return haveTrainCourseFlag;
+    }
+
+    public void setHaveTrainCourseFlag(boolean haveTrainCourseFlag) {
+        this.haveTrainCourseFlag = haveTrainCourseFlag;
+    }
+
+
     public String backList(){
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
