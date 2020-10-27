@@ -423,9 +423,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 if(!responseStatus){
                     String name = arrivalListItem.getArrivalList().getName();
                     if(errorMessage.contains("到货单名称/编号："+name)){
-                        errorMessage =  "、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"-->，记录提交失败";
+                        errorMessage = errorMessage + "、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
                     }else{
-                        errorMessage = errorMessage + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"-->，记录提交失败";
+                        errorMessage = errorMessage + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
                     }
                 }
             }

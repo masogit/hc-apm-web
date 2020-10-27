@@ -448,10 +448,13 @@ public class AssetInstallationController {
 
             if (!isValidate) {
                 String name = arrivalListItem.getArrivalList().getName();
+                String financingNumName = WebUtil.getMessage("financingNum");
+                String financingNum = arrivalListItem.getFinancingNum()==null?"不可为空！":arrivalListItem.getFinancingNum();
+                message = message.replaceFirst("、","");
                 if(errorMessage.contains("到货单名称/编号："+name)){
-                    errorMessage =  errorMessage + WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"错误信息-->" + message;
+                    errorMessage =  errorMessage + "、"+ financingNumName +"："+ financingNum +"---->" + message;
                 }else{
-                    message = "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"错误信息-->" + message.replaceFirst("、","");
+                    message = "到货单名称/编号：" + name +","+ financingNumName +"："+ financingNum +"---->" + message;
                     errorMessage = errorMessage + message ;
                 }
                 isValidate = true;
@@ -492,9 +495,9 @@ public class AssetInstallationController {
                 if (!aiService.submitInstallItem(arrivalListItem.getId(), true, arrivalListItem.getIsGeneratePmOrder() == null ? false : arrivalListItem.getIsGeneratePmOrder())) {
                     String name = arrivalListItem.getArrivalList().getName();
                     if(message.contains("到货单名称/编号："+name)){
-                        message =  "、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"-->，记录提交失败";
+                        message =  message +"、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->当前记录提交失败";
                     }else{
-                        message = message + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"-->，记录提交失败";
+                        message = message + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->当前记录提交失败";
                     }
                 }
 
