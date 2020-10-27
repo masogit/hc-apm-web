@@ -316,7 +316,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         ZkbPartOrder newZkbPartOrder = oldZkbPartOrder;
         newZkbPartOrder.setId(null);
         newZkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
-
+        newZkbPartOrder.setRequestDate(new Date());
+        newZkbPartOrder.setRequestUser(userAccount.getName());
         if(ZkbPartOrder.OrderType.Parts.toString().equals(newZkbPartOrder.getOrderType())){
             newZkbPartOrder.setCurrentStep("TechnicalPending");
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(newZkbPartOrder.getOrderType())) {
@@ -489,7 +490,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty());
         }else {
             if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(oldStep)){
-                if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
+                if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType()) && "1".equals(zkbPartOrder.getArtificialType())) {
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                     if (ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())) {
                         if(!"t".equals(zkbPartOrder.getHaveTrainCourseFlag())){

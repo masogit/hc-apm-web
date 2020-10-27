@@ -614,7 +614,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     private boolean haveTrainCourseFlag = false;
     public void trainCourseRender(){
-        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && "1".equals(selected.getArtificialType())){
             if(zkbContract != null ){
                 if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
                     haveTrainCourseFlag = true;
