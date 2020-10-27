@@ -143,12 +143,10 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{zkbPartOrderController.createAction}"  disabled="#{empty zkbPartOrderController.selectionTenantInfo}" rendered="#{userContextService.zkbUser}"/>
                             <p:commandButton id="editButton" style="margin-left: 0px" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{zkbPartOrderController.editAction}" disabled="#{empty zkbPartOrderController.selected.id}"/>
-                            <p:commandButton id="copyButton" style="margin-left: 0px" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.copy}" action="#{zkbPartOrderController.copyAction}" disabled="#{empty zkbPartOrderController.selected.id}"/>
+                            <p:commandButton id="copyButton" style="margin-left: 0px" icon="ui-icon-content-copy" class="btn btn-sm btn-gray" title="#{msg.copy}" action="#{zkbPartOrderController.copyAction}" disabled="#{empty zkbPartOrderController.selected.id}"/>
                             <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{zkbPartOrderController.delete}" update=":zkbPartOrderListForm:datalist, :growl" disabled="#{empty zkbPartOrderController.selected.id}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
-
-
                         </f:facet>
                     </p:dataTable>
                 </h:form>
