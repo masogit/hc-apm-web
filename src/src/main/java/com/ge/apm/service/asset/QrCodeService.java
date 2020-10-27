@@ -192,7 +192,7 @@ public class QrCodeService {
 
     private BufferedImage getQrCodeImage(QrCodeTemplate template, AssetInfo asset, String qrCode, String siteUid) {
         BufferedImage img = null;
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode);
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,siteUid);
         //一机一码
         if(qrCodeLib != null && qrCodeLib.getType()!=null && qrCodeLib.getType()==1){
             try {

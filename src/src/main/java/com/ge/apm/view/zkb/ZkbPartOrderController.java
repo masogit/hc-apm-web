@@ -313,6 +313,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     }
 
     public void copyAction(){
+        try {
+            ZkbPartOrder newPartOrder = zkbPartOrderService.copyZkbPartOrder(selected,currentUser);
+            zkbPartOrderService.sendEmail(newPartOrder);
+            zkbPartOrderService.sendMessage(newPartOrder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

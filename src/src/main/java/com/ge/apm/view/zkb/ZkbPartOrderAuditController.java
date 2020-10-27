@@ -141,7 +141,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else{
                 showOrderedFieldsetText = "订货信息";
             }
-
+            trainCourseRender();
             if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Parts.toString()) && selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString())){
                 List<String> ss = new ArrayList<>();
                 for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
@@ -149,13 +149,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
                 zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),selected.getId(),selected.getAssetTypeDi());
             }
-            if(selected.getQty() >= 3){
+
+            if(!zkbPartOrderService.checkThreeValid(selected)){
                 WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导","");
-                return;
+                //return;
+            }
+            if(showcheckContractWeekFlag){
+                String validString = zkbPartOrderService.checkContractWeekValid(selected,zkbContract);
+                if(StringUtils.isNotBlank(validString)){
+                    WebUtil.addErrorMessage(validString,"");
+                }
             }
         }
     }
 
+    private Boolean showcheckContractWeekFlag = false;
     public void fieldRendered(){
         if(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
             if(currentUser.getTenantUID().equals(selected.getTenantUID())){
@@ -189,6 +197,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
                     if(currentUser.getLoginName().equals(c.getLoginName())){
                         canEditFlag = true;
+                        if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(c.getConfigType()) ||
+                           ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(c.getConfigType()) ||
+                           ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(c.getConfigType()) ||
+                           ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(c.getConfigType())){
+                            showcheckContractWeekFlag = true;
+                        }
                     }
                 }
             }
@@ -306,7 +320,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showManage = true;
                 showRejectOrder = true;
                 showBtn="";
-            }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())  || ZkbPartOrder.PartOrderStatus.PartReturned.toString().equals(selected.getStatus())){
+            }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
                     if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     }else {
@@ -334,7 +348,23 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                     showUnOrder = true;
                 }
-            }else if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus())){
+            }else if(ZkbPartOrder.PartOrderStatus.PartReturned.toString().equals(selected.getStatus())){
+                if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
+                    if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
+                    }else {
+                        showTech= true;
+                    }
+                }
+                showManage = true;
+                if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                    showUnOrder = true;
+                }
+                showOrder = true;
+                if(canEditFlag){
+                    showReturn = true;
+                    showBtn = "1";
+                }
+            }else if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus()) ){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
                     if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     }else {
@@ -576,11 +606,31 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId());
             return;
         }
-
+        zkbPartOrderReturn.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.New.toString());
         zkbPartOrderReturnRepository.save(zkbPartOrderReturn);
         zkbPartOrderReturn = null;
         zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId());
     }
+
+    private boolean haveTrainCourseFlag = false;
+    public void trainCourseRender(){
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType) && "1".equals(selected.getArtificialType())){
+            if(zkbContract != null ){
+                if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
+                    haveTrainCourseFlag = true;
+                }
+            }
+        }
+    }
+
+    public boolean isHaveTrainCourseFlag() {
+        return haveTrainCourseFlag;
+    }
+
+    public void setHaveTrainCourseFlag(boolean haveTrainCourseFlag) {
+        this.haveTrainCourseFlag = haveTrainCourseFlag;
+    }
+
 
     public String backList(){
         return "List?faces-redirect=true&queryStatus="+queryStatus;

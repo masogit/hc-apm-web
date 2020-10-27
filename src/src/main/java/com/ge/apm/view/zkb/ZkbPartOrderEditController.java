@@ -257,7 +257,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             selected.setRegion(zkbContract.getRegion());
             initZknPartCat(zkbContract.getStartDate());
-            trainCourseRender();
         }
         calcRemainQty();
 
@@ -267,17 +266,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     }
 
-    private boolean haveTrainCourseFlag = false;
-    public void trainCourseRender(){
-        if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-            if(contractList != null && contractList.size() > 0){
-                ZkbContract zkbContract = contractList.get(0);
-                if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())){
-                    haveTrainCourseFlag = true;
-                }
-            }
-        }
-    }
+
 
     private boolean showProblemOrderNumber = false;
     public void orderAnnotationChange(){
@@ -438,6 +427,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             flag=false;
             errorLog += "剩余数量不能小于0！";
         }
+
+
         if(!flag){
             WebUtil.addErrorMessage(errorLog);
             return "";
@@ -678,13 +669,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.valueTypeTips = valueTypeTips;
     }
 
-    public boolean isHaveTrainCourseFlag() {
-        return haveTrainCourseFlag;
-    }
-
-    public void setHaveTrainCourseFlag(boolean haveTrainCourseFlag) {
-        this.haveTrainCourseFlag = haveTrainCourseFlag;
-    }
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {
