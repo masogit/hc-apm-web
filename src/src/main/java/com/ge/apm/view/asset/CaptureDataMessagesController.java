@@ -228,7 +228,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 				FacesMessage message = new FacesMessage("注意！保存失败,SystemID对应设备未找到");
 				FacesContext.getCurrentInstance().addMessage("other", message);
 			}
-		} else {
+		} else if (this.selected.getType() == 1) {
 			if (this.selected.getGeDeviceType() == null) {
 				FacesMessage message = new FacesMessage("注意！保存失败，设备类型不能为空");
 				FacesContext.getCurrentInstance().addMessage("other", message);
@@ -238,6 +238,19 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 				this.selected.setIbStatus(0);
 				super.save();
 			}
+		} else{
+			String content = this.selected.getContent();
+			if(!content.contains("data:image/jpeg;base64")){
+				FacesMessage message = new FacesMessage("注意！保存失败，请插入图片");
+				FacesContext.getCurrentInstance().addMessage("other", message);
+			}else {
+				setIndexValue();
+				this.selected.setSystemId("");
+				this.selected.setIbStatus(0);
+				this.selected.setComment("banner image");
+				super.save();
+			}
+
 		}
 		this.selected = null;
 	}

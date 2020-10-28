@@ -98,6 +98,11 @@ public class QrCodeService {
             qrCodeLib.setStatus(status);
             qrCodeLib.setIssueDate(new Date());
             qrCodeLib.setQrCode(qrCode);
+            if("基础互通".equals(currentOrg.getName())){
+                qrCodeLib.setType(1);
+            }else{
+                qrCodeLib.setType(0);
+            }
             qrCodeLibDao.save(qrCodeLib);
         }
         return qrCodeLib;
@@ -186,7 +191,19 @@ public class QrCodeService {
     }
 
     private BufferedImage getQrCodeImage(QrCodeTemplate template, AssetInfo asset, String qrCode, String siteUid) {
+        BufferedImage img = null;
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,siteUid);
+        //一机一码
+        if(qrCodeLib != null && qrCodeLib.getType()!=null && qrCodeLib.getType()==1){
+            try {
+                img = qrCodeDrawService.getQrCodeImageWithGeLogo(qrCodeLib);
+            } catch (Exception ex) {
+                Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return img;
+        }
 
+        //模板码
         if (template == null) {
             if (null != asset && !Strings.isNullOrEmpty(asset.getSiteUID())) {
                 template = getTemplateBySiteUid(asset.getSiteUID());
@@ -217,7 +234,6 @@ public class QrCodeService {
             qrCodeObject = templateService.getJSONObjectByTemplate(template);
         }
 
-        BufferedImage img = null;
         try {
             qrCodeObject = fillElementsValue(qrCodeObject, asset);
             img = qrCodeDrawService.createQrCodeTag(qrCodeObject, siteUid);
