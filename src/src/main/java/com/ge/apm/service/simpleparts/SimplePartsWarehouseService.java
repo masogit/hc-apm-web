@@ -196,14 +196,9 @@ public class SimplePartsWarehouseService {
 
         if (warehouseList.size() == 0) {
             return Optional.empty();
+        } else {
+            return Optional.of(warehouseList.get(0));
         }
-
-        //then find the first general warehouse
-        for (SimplePartsWarehouse warehouse: warehouseList) {
-            return Optional.of(warehouse);
-        }
-
-        return Optional.empty();
     }
 
     public List<SimplePartsWarehouse> findWarehouseListMappedBySiteUid(String siteUid) {

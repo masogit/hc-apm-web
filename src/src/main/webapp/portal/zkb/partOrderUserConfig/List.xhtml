@@ -21,7 +21,7 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-<!--                        <p:ajax event="rowSelect" listener="#{zkbFileDirectoryController.prepareEdit}" update="deleteButton editButton"/>-->
+                        <p:ajax event="rowSelect" listener="#{zkbPartOrderUserConfigController.prepareEdit}" update="deleteButton editButton"/>
                         <p:ajax event="filter" listener="#{zkbPartOrderUserConfigController.onFilter}" />
                         <p:column headerText="账号" filterBy="#{item.loginName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.loginName}"/>
@@ -84,14 +84,15 @@
                             <h:outputText value="#{item.isVacation}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-<!--                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbFileDirectoryController.prepareCreate}" update=":dialogDirectory :dialogDirectoryEditForm" oncomplete="PF('dialogDirectory').show()"/>-->
-<!--                            <p:commandButton id="editButton" actionListener="#{zkbFileDirectoryController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":dialogDirectory :dialogDirectoryEditForm" oncomplete="PF('dialogDirectory').show()" disabled="#{empty zkbFileDirectoryController.selected.id}"/>-->
-<!--                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFileDirectoryController.delete}" update=":zkbFileDirectoryListForm" disabled="#{empty zkbFileDirectoryController.selected.id}">-->
-<!--                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
-<!--                            </p:commandButton>-->
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbPartOrderUserConfigController.prepareCreate}" update=":zkbPartOrderUserConfigEditForm" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray batch-terminated" title="#{msg.Edit}" actionListener="#{zkbPartOrderUserConfigController.prepareEdit}"  update=":zkbPartOrderUserConfigEditForm" disabled="#{empty zkbPartOrderUserConfigController.selected.id}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" actionListener="#{zkbPartOrderUserConfigController.delete}" update=":zkbPartOrderUserConfigListForm :zkbPartOrderUserConfigEditForm :growl" disabled="#{empty zkbPartOrderUserConfigController.selected.id}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
+                            </p:commandButton>
                         </f:facet>
                     </p:dataTable>
                 </h:form>
+                <ui:include src="Edit.xhtml"/>
             </div>
         </div>
     </ui:define>

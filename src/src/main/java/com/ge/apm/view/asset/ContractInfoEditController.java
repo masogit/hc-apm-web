@@ -172,9 +172,11 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 break;
             case "bidWinner":
                 Supplier bidWinner = (Supplier) selectedObjectMap.get(idx);
-                selected.setBidWinner(bidWinner == null ? null : bidWinner.getUid());
-                selected.setBidWinnerPerson(bidWinner.getContactor());
-                selected.setBidWinnerTelphone(bidWinner.getTel());
+                if(bidWinner != null ) {
+                    selected.setBidWinner(bidWinner.getUid());
+                    selected.setBidWinnerPerson(bidWinner.getContactor());
+                    selected.setBidWinnerTelphone(bidWinner.getTel());
+                }
                 break;
             case "applyDept":
                 OrgInfo clinicalDept = (OrgInfo) selectedObjectMap.get(idx);

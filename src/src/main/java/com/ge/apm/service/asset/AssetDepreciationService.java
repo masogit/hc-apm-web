@@ -63,7 +63,7 @@ public class AssetDepreciationService {
 			}
 			int lifeCycleFromYear = convertMonthToYear(assetInfo.getLifecycle());
 			BigDecimal lifeCycle = new BigDecimal(lifeCycleFromYear);//以年为单位
-			BigDecimal unit = new BigDecimal(2d).divide(lifeCycle,2, RoundingMode.HALF_UP);
+			BigDecimal unit = BigDecimal.valueOf(2d).divide(lifeCycle,2, RoundingMode.HALF_UP);
 			int depreciationMethod = assetInfo.getDepreciationMethod();
 			if(depreciationMethod == AVERAGE ){
 				result = (purchasePrice.subtract(salvageValue)).divide(lifeCycle, 2, RoundingMode.HALF_UP);
@@ -81,7 +81,7 @@ public class AssetDepreciationService {
 					if((lifeCycle.intValue() - whichYear < 2) && (lifeCycle.intValue() - whichYear >= 0)){
 						result = purchasePrice.subtract(salvageValue).divide(lifeCycle,2, RoundingMode.HALF_UP);
 					}else{
-						BigDecimal temp = new BigDecimal(1d);
+						BigDecimal temp = BigDecimal.valueOf(1d);
 						temp = temp.subtract(unit);
 						temp = temp.pow(whichYear-1);
 						result = purchasePrice.multiply(unit).multiply(temp);
@@ -206,7 +206,7 @@ public class AssetDepreciationService {
 			}
 			int lifeCycleFromYear = convertMonthToYear(lifecycleFromAsset);
 			BigDecimal lifeCycle = new BigDecimal(lifeCycleFromYear);//以年为单位
-			BigDecimal unit = new BigDecimal(2d).divide(lifeCycle,2, RoundingMode.HALF_UP);
+			BigDecimal unit = BigDecimal.valueOf(2d).divide(lifeCycle,2, RoundingMode.HALF_UP);
 			int depreciationMethod = depreciationMethodFromAsset;
 			if(depreciationMethod == AVERAGE ){
 				result = (purchasePrice.subtract(salvageValue)).divide(lifeCycle, 2, RoundingMode.HALF_UP);
@@ -224,7 +224,7 @@ public class AssetDepreciationService {
 					if((lifeCycle.intValue() - whichYear < 2) && (lifeCycle.intValue() - whichYear >= 0)){
 						result = purchasePrice.subtract(salvageValue).divide(lifeCycle,2, RoundingMode.HALF_UP);
 					}else{
-						BigDecimal temp = new BigDecimal(1d);
+						BigDecimal temp = BigDecimal.valueOf(1d);
 						temp = temp.subtract(unit);
 						temp = temp.pow(whichYear-1);
 						result = purchasePrice.multiply(unit).multiply(temp);

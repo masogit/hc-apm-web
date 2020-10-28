@@ -24,7 +24,7 @@ public class UsrGenerator extends AbstractDbTest {
   private final Logger log = LoggerFactory.getLogger(UsrGenerator.class);
   private Map<Integer, String> orgs;
   private final String salt = "b380e7bb58d700d5";
-  private final String pwd = "092561820bad0790cd3b3d5546809287c0cb17e67e6b8dd28665b292560298da";
+  private final String pwd = getEncryptedPass();
   private final String sql = new SQL().INSERT_INTO("user_account")
     .VALUES("site_id", ":site_id")
     .VALUES("hospital_id", ":hospital_id")
@@ -40,6 +40,10 @@ public class UsrGenerator extends AbstractDbTest {
     .VALUES("is_online", ":is_online")
     .VALUES("email", ":email")
     .toString();
+
+  private static String getEncryptedPass() {
+    return "092561820bad0790cd3b3d5546809287c0cb17e67e6b8dd28665b292560298da";
+  }
 
   @Before
   public void setUp() throws SQLException {

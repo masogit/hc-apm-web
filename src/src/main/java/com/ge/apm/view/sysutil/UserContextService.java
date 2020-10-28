@@ -18,6 +18,8 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 import javaslang.control.Option;
+
+import javax.annotation.PostConstruct;
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -52,7 +54,12 @@ public class UserContextService implements Serializable {
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
+//    private  ZkbContractRepository zkbContractRepository;
 
+//    @PostConstruct
+//    public void init(){
+//        zkbContractRepository= WebUtil.getBean(ZkbContractRepository.class);
+//    }
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
@@ -192,7 +199,8 @@ public class UserContextService implements Serializable {
      * @return boolean
      */
     public static boolean isDeparmentUser() {
-        return  null == getCurrentUserAccount().getOrgType() ? false : 4 == getCurrentUserAccount().getOrgType();
+        OrgInfo org = WebUtil.getBean(OrgInfoRepository.class).getByUid(getCurrentUserAccount().getOrgInfoUID());
+        return  null == org.getOrgType() ? false : 4 == org.getOrgType();
     }
 
     //add MVSAdmin,MVSFE
@@ -349,14 +357,7 @@ public class UserContextService implements Serializable {
             userAccount = dao.getByLoginName(userName);
         }
 
-        if(userAccount != null){
-            OrgInfo orgInfo = WebUtil.getBean(OrgInfoRepository.class).getByUid(userAccount.getOrgInfoUID());
-            if(orgInfo != null){
-                userAccount.setOrgType(orgInfo.getOrgType());
-            }
-        }
-/*
-        else {
+    /* else {
             // check if user has switch account by WeChat Client
             HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
             String userName = UserContext.getUsername(request);
@@ -365,7 +366,7 @@ public class UserContextService implements Serializable {
                 userAccount = WebUtil.getUserAccountFromRequest();
             }
         }
-*/
+     */
 
         return userAccount;
     }
@@ -1105,6 +1106,11 @@ public class UserContextService implements Serializable {
     public boolean needScrappedControl(){
         ConfigService cfgService = WebUtil.getBean(ConfigService.class);
         return cfgService.needScrappedControl();
+    }
+
+    public boolean hasScrappedAuthority(){
+        AssetCreateService acService = WebUtil.getBean(AssetCreateService.class);
+        return acService.hasScrappedAuthority();
     }
 
 }

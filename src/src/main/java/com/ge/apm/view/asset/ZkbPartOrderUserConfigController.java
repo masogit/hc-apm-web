@@ -17,7 +17,7 @@ import javax.faces.bean.ViewScoped;
 import java.util.List;
 
 /**
- * @author 503202755 2020/9/325
+ * @author 503202755 2020/9/25
  */
 @ManagedBean
 @ViewScoped
@@ -66,5 +66,18 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         List<SearchFilter> searchFilters = this.searchFilters;
         zkbPartOrderUserConfigPage=zkbPartOrderUserConfigRepository.findBySearchFilter(searchFilters, pageRequest);
         return zkbPartOrderUserConfigPage;
+    }
+
+    /**
+     * 取消
+     */
+    public void cancel() {
+        this.selected = null;
+    }
+
+    @Override
+    public void save() {
+        super.save();
+        this.selected = null;
     }
 }

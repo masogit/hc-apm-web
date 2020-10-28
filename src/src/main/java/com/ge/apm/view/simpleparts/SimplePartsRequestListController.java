@@ -431,7 +431,7 @@ public class SimplePartsRequestListController extends GenericCRUDUUIDController<
             }
             WebUtil.addWarnMessage("须指定仓位");
             return;
-        }else{
+        }else if(!enableWarehouseLocator){
             partsRequestLineItem.setPartsLocatorId(SimplePartsConstant.VIRTUAL_LOCATOR_ID);
         }
 

@@ -1,23 +1,15 @@
 package com.ge.apm.web.cboard;
 
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HttpContext;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class CBoardControllerTest {
 
@@ -26,6 +18,7 @@ public class CBoardControllerTest {
     }
 
     @Test
+    @Ignore
     public void getCommonUrl() throws IOException {
 
         CBoardController controller = new CBoardController();
@@ -54,6 +47,7 @@ public class CBoardControllerTest {
     }
 
     @Test
+    @Ignore
     public void getCboardUrlForDev() throws IOException {
 
         CBoardController controller = new CBoardController();
@@ -64,6 +58,7 @@ public class CBoardControllerTest {
     }
 
     @Test
+    @Ignore
     public void getCboardUrlForSIT() throws IOException {
 
         CBoardController controller = new CBoardController();
@@ -74,6 +69,7 @@ public class CBoardControllerTest {
     }
 
     @Test
+    @Ignore
     public void getCboardUrlForStaging() throws IOException {
 
         CBoardController controller = new CBoardController();
