@@ -263,6 +263,9 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "is_deleted")
 	private Boolean isDeleted;//是否删除
 
+	@Column(name = "comment")
+	private String comment;
+
 	@Transient
 	private List<String> tags = new ArrayList<>();
 
@@ -1153,5 +1156,13 @@ public class UserAccount implements ChineseName, Serializable {
 		} else {
 			return null;
 		}
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 }

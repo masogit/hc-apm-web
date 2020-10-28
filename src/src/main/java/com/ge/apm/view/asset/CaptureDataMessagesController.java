@@ -8,6 +8,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jfree.util.Log;
 import org.primefaces.event.FileUploadEvent;
@@ -209,6 +210,10 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 		if (this.selected.getType() == null) {
 			this.selected.setType(0);
 		}
+		if (this.selected.getContent() != null){
+			String replacedContent  = StringEscapeUtils.escapeHtml4(this.selected.getContent());
+			this.selected.setContent(replacedContent);
+		}
 		if (this.selected.getType() == 0) {
 			if (checkedSystemId == null || checkedSystemId.equals(this.selected.getSystemId()) == false) {
 				getAssetInfo();
@@ -223,7 +228,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 				FacesMessage message = new FacesMessage("注意！保存失败,SystemID对应设备未找到");
 				FacesContext.getCurrentInstance().addMessage("other", message);
 			}
-		} else {
+		} else if (this.selected.getType() == 1) {
 			if (this.selected.getGeDeviceType() == null) {
 				FacesMessage message = new FacesMessage("注意！保存失败，设备类型不能为空");
 				FacesContext.getCurrentInstance().addMessage("other", message);
@@ -233,6 +238,19 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 				this.selected.setIbStatus(0);
 				super.save();
 			}
+		} else{
+			String content = this.selected.getContent();
+			if(!content.contains("data:image/jpeg;base64")){
+				FacesMessage message = new FacesMessage("注意！保存失败，请插入图片");
+				FacesContext.getCurrentInstance().addMessage("other", message);
+			}else {
+				setIndexValue();
+				this.selected.setSystemId("");
+				this.selected.setIbStatus(0);
+				this.selected.setComment("banner image");
+				super.save();
+			}
+
 		}
 		this.selected = null;
 	}

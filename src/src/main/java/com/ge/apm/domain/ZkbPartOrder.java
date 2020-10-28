@@ -28,7 +28,7 @@ public class ZkbPartOrder implements Serializable {
      * Returned：归还  Closed：关单
      */
     public enum PartOrderStatus {
-        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,UnOrdered,UnOrderedReject,Ordered,OrderedReject,Returned,Closed
+        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,UnOrdered,UnOrderedReject,Ordered,OrderedReject,PartReturned,Returned,Closed
     }
 
     /**
@@ -183,6 +183,9 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "order_no")
     private String orderNo;
+
+    @Column(name = "price")
+    private String price;
 
     /**
      * 订货备注
@@ -463,8 +466,30 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "new_cat_flag")
     private String newCatFlag;
 
+    /**
+     * 是否上过培训课
+     */
+    @Column(name = "have_train_course_flag")
+    private String haveTrainCourseFlag;
+
+    public String getHaveTrainCourseFlag() {
+        return haveTrainCourseFlag;
+    }
+
+    public void setHaveTrainCourseFlag(String haveTrainCourseFlag) {
+        this.haveTrainCourseFlag = haveTrainCourseFlag;
+    }
+
     public String getPartSerialNumber() {
         return partSerialNumber;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 
     public void setPartSerialNumber(String partSerialNumber) {

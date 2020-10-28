@@ -1,10 +1,6 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TableDefinitionRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.TenantInfo;
@@ -12,6 +8,22 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.TenantInfoConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.Lists;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.primefaces.context.RequestContext;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.JpaCRUDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,25 +33,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.primefaces.context.RequestContext;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.JpaCRUDController;
 
 @ManagedBean
 @ViewScoped
 public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	private static final Logger logger = Logger.getLogger(TenantInfoController.class);
+	private static org.slf4j.Logger log = LoggerFactory.getLogger(TenantInfoController.class);
+
 	TenantInfoRepository dao = null;
 	UserAccountRepository userAccountRepository;
 	UserAccount loginUser;
@@ -119,13 +119,11 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
 	public void loadTemplateFile() {
 		String rstr = "";
-		fhMap = new HashMap<String, String>();
+		fhMap = new HashMap<>();
 		for (File f : getResourceFolderFiles("/templateFile/")) {
-			try {
-				FileInputStream in = new FileInputStream(f);
-				BufferedReader br = new BufferedReader(new InputStreamReader(in, "GBK"));
-				String str = null;
-				StringBuffer xmlTemplate = new StringBuffer();
+			try (FileInputStream in = new FileInputStream(f);
+				 BufferedReader br = new BufferedReader(new InputStreamReader(in, "GBK"));){
+				String str;
 				while ((str = br.readLine()) != null) {
 					rstr += str;
 				}
@@ -222,7 +220,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 				orgInfoDao.save(tenantOrg);
 			}
 		}
-
+		log.info("save/update TenantInfo successful, tenantName:{}", this.selected.getName());
 	}
 
 	List<TableDefinition> tbList = new ArrayList<TableDefinition>();
@@ -289,6 +287,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 			return;
 		}
 		super.delete();
+		log.info("delete tenantInfo successful, uid:{}", uid);
 	}
 
 	public void markDeleted() {

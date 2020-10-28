@@ -83,11 +83,13 @@ public class AppContextService implements Serializable{
             session.clear();
         }
 
-        SessionFactory sessionFactory = session.getSessionFactory();
-        Cache cache = sessionFactory.getCache();
-        if (cache != null) {
-            cache.evictEntityRegions();
-            cache.evictQueryRegions();
+        if (session != null) {
+            SessionFactory sessionFactory = session.getSessionFactory();
+            Cache cache = sessionFactory.getCache();
+            if (cache != null) {
+                cache.evictEntityRegions();
+                cache.evictQueryRegions();
+            }
         }
 
     }

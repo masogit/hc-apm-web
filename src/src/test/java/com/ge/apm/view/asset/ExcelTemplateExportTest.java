@@ -3,6 +3,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.mock.FacesContextTestExecutionListener;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -17,7 +18,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.context.ServletContextAware;
 
 import javax.servlet.ServletContext;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +40,8 @@ public class ExcelTemplateExportTest implements ServletContextAware {
     AssetInfoRepository assetInfoDao;
 
     @Test
-    public void loadTemplate() throws MalformedURLException {
+    @Ignore
+    public void loadTemplate() {
 
         Pageable pageable = new PageRequest(0, 10);
 

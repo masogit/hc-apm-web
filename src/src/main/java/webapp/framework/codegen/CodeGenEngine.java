@@ -232,10 +232,10 @@ public class CodeGenEngine {
     private static boolean updateMessageBundleFile(Class clazz, Map<String, Object> params){
         if(params==null) params = getTemplateParams(clazz);
 
-        try {
+        try (
             FileWriter fw = new FileWriter(resourceFilePath + "bundle.properties", true);
             FileWriter fwZh = new FileWriter(resourceFilePath + "bundle_zh.properties", true);
-            
+        ){
             String entityName = clazz.getSimpleName();
             String entityNameTitle = getBetterName(entityName);
             fw.write(entityName+"Title="+entityNameTitle+"\n");
@@ -248,9 +248,6 @@ public class CodeGenEngine {
                 fw.write(field.getFieldName()+"="+fieldName+"\n");
                 fwZh.write(field.getFieldName()+"="+fieldName+"\n");
             }
-            
-            fw.close();
-            fwZh.close();
         } catch (Exception e) {
             e.printStackTrace();
             return Boolean.FALSE;
@@ -259,18 +256,15 @@ public class CodeGenEngine {
     }
 
     public static boolean updateMessageBundleFileForNativeSQL(Map<String, Object> params){
-        try {
+        try (
             FileWriter fw = new FileWriter(resourceFilePath + "bundle.properties", true);
             FileWriter fwZh = new FileWriter(resourceFilePath + "bundle_zh.properties", true);
-            
+        ){
             for(FieldInfo field: (List<FieldInfo> )params.get("fieldInfoList")){
                 String fieldName = getBetterName(field.getFieldName());
                 fw.write(field.getFieldName()+"="+fieldName+"\n");
                 fwZh.write(field.getFieldName()+"="+fieldName+"\n");
             }
-            
-            fw.close();
-            fwZh.close();
         } catch (Exception e) {
             e.printStackTrace();
             return Boolean.FALSE;
@@ -289,23 +283,19 @@ public class CodeGenEngine {
             Template template = cfg.getTemplate(templateFileName);
 
             mkdirs(outputFilePath);
-            File file = new File(outputFilePath + outputFileName);
-            
+
             //Writer out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-            StringWriter out = new StringWriter();
-            template.process(params, out);
-            String result = out.getBuffer().toString();
-            result = result.replaceAll("<~", "#{").replaceAll("~>", "}");
-            
-            FileWriter fw = new FileWriter(outputFilePath + outputFileName);    
-            fw.write(result);
-            fw.close();
-            out.flush();
-            out.close();
-        } catch (TemplateException e) {
-            e.printStackTrace();
-            return Boolean.FALSE;
-        } catch (IOException e) {
+            try (StringWriter out = new StringWriter()) {
+                template.process(params, out);
+                String result = out.getBuffer().toString();
+                result = result.replaceAll("<~", "#{").replaceAll("~>", "}");
+
+                try (FileWriter fw = new FileWriter(outputFilePath + outputFileName)) {
+                    fw.write(result);
+                }
+                out.flush();
+            }
+        } catch (TemplateException | IOException e) {
             e.printStackTrace();
             return Boolean.FALSE;
         }

@@ -1,0 +1,232 @@
+package com.ge.apm.service.asset;
+
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.ge.apm.service.asset.AssetInfoBulkEditUtils.*;
+
+@Service
+public class AssetInfoBulkEditService {
+
+    @Autowired
+    private AssetInfoRepository assetInfoDao;
+
+    @Autowired
+    private QrCodeLibRepository qrCodeLibDao;
+
+    @Autowired
+    private ServiceRequestRepository serviceRequestDao;
+
+    @Autowired
+    private V2_WorkOrderRepository workOrderDao;
+
+    @Autowired
+    private V2_PmOrderRepository pmOrderDao;
+
+    @Autowired
+    private RelRuleAssetRepository relRuleAssetDao;
+
+    @Autowired
+    private SharedAssetRequestRepository sharedAssetRequestRepository;
+
+    @Autowired
+    private InventoryOrderDetailAssetInfoRepository inventoryOrderDetailAssetInfoRepository;
+
+    @Autowired
+    SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
+
+    @Autowired
+    private NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
+
+    @Autowired
+    private NurseSiteMaintainConfigRepository  nurseSiteMaintainConfigRepository;
+
+    @Autowired
+    private AssetTagRuleRepository  assetTagRuleRepository;
+
+    @Transactional
+    public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
+
+        commitCorrectiveMaintenanceBulkEdit(assets, targetAsset);
+        commitPreventativeMaintenanceBulkEdit(assets, targetAsset);
+        commitQrCode(assets, targetAsset);
+        commitPmRule(assets, targetAsset);
+        commitAssetTagRule(assets);
+        commitNurseSiteConfig(assets);
+
+        //make sure qrcode site update before asset site update, due to qrcode update depend on asset site
+        commitSiteForAssetItself(assets, targetAsset);
+    }
+
+    @Transactional
+    public void commitBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
+
+        for (AssetInfo item: assets) {
+
+            if (selectedColumns.contains("assetGroup")) {
+                item.setAssetGroup(targetAsset.getAssetGroup());
+            }
+        }
+
+        assetInfoDao.save(assets);
+    }
+
+    private void commitSiteForAssetItself(List<AssetInfo> assets, AssetInfo targetAsset) {
+
+        for (AssetInfo item: assets) {
+            item.setSiteUID(targetAsset.getSiteOrg().getSiteUID());
+            item.setHospitalUID(targetAsset.getSiteOrg().getHospitalUID());
+            item.setInstitutionUID(targetAsset.getSiteOrg().getInstitutionUID());
+            item.setTenantUID(targetAsset.getSiteOrg().getTenantUID());
+
+            item.setClinicalDeptId(targetAsset.getClinicalDeptOrg().getId());
+            item.setClinicalDeptUID(targetAsset.getClinicalDeptOrg().getUid());
+            item.setClinicalDeptName(targetAsset.getClinicalDeptOrg().getName());
+
+            //clear asset dept
+            item.setAssetDeptId(null);
+            item.setAssetDeptUID(null);
+        }
+
+        assetInfoDao.save(assets);
+    }
+
+    private void commitPmRule(List<AssetInfo> assets, AssetInfo targetAsset) {
+
+        for (AssetInfo item: assets) {
+
+            RelRuleAsset relRuleAsset = relRuleAssetDao.findByAssetUID(item.getUid());
+
+            if (null == relRuleAsset) {
+                continue;
+            }
+
+            relRuleAsset.setSiteUID(targetAsset.getSiteOrg().getSiteUID());
+            relRuleAsset.setHospitalUID(targetAsset.getSiteOrg().getHospitalUID());
+            relRuleAsset.setInstitutionUID(targetAsset.getSiteOrg().getInstitutionUID());
+            relRuleAsset.setTenantUID(targetAsset.getSiteOrg().getTenantUID());
+
+            relRuleAssetDao.save(relRuleAsset);
+        }
+    }
+
+    /**
+     * 维修 (step 没有site uid)
+     * correctvie maintenance
+     */
+    private void commitCorrectiveMaintenanceBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset) {
+
+        for (AssetInfo assetInfo: assets) {
+            List<V2_ServiceRequest> serviceRequests = serviceRequestDao.findByAssetId(assetInfo.getId());
+
+            for (V2_ServiceRequest serviceRequest: serviceRequests) {
+                List<V2_WorkOrder> workOrders = serviceRequest.getV2_workOrder_List();
+                serviceRequest.setFromDeptId(targetAsset.getClinicalDeptOrg().getId());
+                serviceRequest.setFromDeptUID(targetAsset.getClinicalDeptOrg().getUid());
+                serviceRequest.setFromDeptName(targetAsset.getClinicalDeptOrg().getName());
+
+                for (V2_WorkOrder workOrder: workOrders) {
+                    List<V2_WorkOrder_Detail> details = workOrder.getV2_workOrder_detail_list();
+                    List<V2_WorkOrderCoworker> coworkers = workOrder.getV2_workOrder_coworker_list();
+
+                    updateWorkOrder(workOrder, targetAsset.getSiteOrg());
+                    updateWorkOrderDetails(details, targetAsset.getSiteOrg());
+                    updateWorkOrderCoworks(coworkers, targetAsset.getSiteOrg());
+                }
+                workOrderDao.save(workOrders);
+            }
+
+            updateServiceRequests(serviceRequests, targetAsset.getSiteOrg());
+
+            serviceRequestDao.save(serviceRequests);
+        }
+    }
+
+    /**
+     * 保养 （附件没有site uid)
+     * preventative maintenance
+     */
+    private void commitPreventativeMaintenanceBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset) {
+
+        for (AssetInfo assetInfo: assets) {
+            List<V2_PmOrder> pmOrders = pmOrderDao.getByAssetUid(assetInfo.getUid());
+
+            for (V2_PmOrder pmOrder: pmOrders) {
+
+                List<V2_WorkOrder_Detail> details = pmOrder.getDetails();
+                List<V2_WorkOrderCoworker> coworkers = pmOrder.getCoworkers();
+
+                updatePMOrder(pmOrder, targetAsset.getSiteOrg(), targetAsset.getClinicalDeptOrg());
+                updateWorkOrderDetails(details, targetAsset.getSiteOrg());
+                updateWorkOrderCoworks(coworkers, targetAsset.getSiteOrg());
+            }
+
+            pmOrderDao.save(pmOrders);
+        }
+
+    }
+
+    private void commitQrCode(List<AssetInfo> assets, AssetInfo targetAsset) {
+
+        for (AssetInfo assetInfo: assets) {
+            if (null == assetInfo.getQrCode()) {
+                continue;
+            }
+
+            OrgInfo targetSite = targetAsset.getSiteOrg();
+
+            QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(assetInfo.getQrCode(), assetInfo.getSiteUID());
+
+            if (null == qrCodeLib) {
+                continue;
+            }
+            qrCodeLib.setSiteUID(targetSite.getSiteUID());
+            qrCodeLib.setHospitalUID(targetSite.getHospitalUID());
+            qrCodeLib.setInstitutionUID(targetSite.getInstitutionUID());
+            qrCodeLib.setTenantUID(targetSite.getTenantUID());
+
+            qrCodeLibDao.save(qrCodeLib);
+        }
+
+    }
+
+    public void commitNurseSiteConfig(List<AssetInfo> assets) {
+        if(assets != null && !assets.isEmpty()){
+            List<String> uids = assets.stream().map(p->p.getUid()).collect(Collectors.toList());
+            List<NurseSiteMaintainConfigItem> assetinfos = nurseSiteMaintainConfigItemRepository.findByAssetUid(uids);
+            if(assetinfos !=null && !assetinfos.isEmpty()){
+                Set<String> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
+                nurseSiteMaintainConfigItemRepository.deleteMaintainData(ids);
+                Set<String> parentIds = assetinfos.stream().map(p->p.getParentId()).collect(Collectors.toSet());
+                List<NurseSiteMaintainConfigItem> items = nurseSiteMaintainConfigItemRepository.findByParentIds(parentIds);
+                if(items !=null && !items.isEmpty()){
+                    Set<String> temp = items.stream().map(u->u.getParentId()).collect(Collectors.toSet());
+                    parentIds.removeAll(temp);
+                }
+                if(parentIds !=null && !parentIds.isEmpty()){
+                    nurseSiteMaintainConfigRepository.deleteMaintainConfigData(parentIds);
+                }
+            }
+        }
+    }
+    public void commitAssetTagRule(List<AssetInfo> assets) {
+        if(assets != null && !assets.isEmpty()){
+            List<Integer> uids = assets.stream().map(p->p.getId()).collect(Collectors.toList());
+            List<AssetTagRule> assetinfos = assetTagRuleRepository.findByAssetUid(uids);
+            if(assetinfos !=null && !assetinfos.isEmpty()){
+                Set<Integer> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
+                assetTagRuleRepository.deleteAssetTagRuleData(ids);
+            }
+        }
+    }
+
+
+}
