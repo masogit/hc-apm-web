@@ -353,25 +353,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             List<V2_WorkOrder> pmOrderList = v2WorkerOrderRepository.findByAssetId(as.getId());
             if(CollectionUtils.isNotEmpty(pmOrderList)){
                 for(V2_WorkOrder workerOder : pmOrderList){
-                        List<V2_WorkOrder_Step> workOrderStepList = v2_WorkOrderStepRepository.findByWorkOrder(workerOder.getId());
-                        //workOrderStepList.stream().sorted(Comparator.comparing(V2_WorkOrder_Step:: getStepId));
-                        List<V2_WorkOrder_Detail> workOrderDetailList = v2WorkerOrderDetailRepository.findWorkOrderDetailByWoId(workerOder.getId());
-                        for(V2_WorkOrder_Step step : workOrderStepList){
-                            if( ApmConstant.stepNameWaitForClosed.equals(step.getStepName()) && step.getEndTime() !=null){
-                                // 这一种情况可以更换园区，其他都不行
-//                                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
-//                                return;
-                            }else{
-                                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
-                                return;
-                            }
-                        }
-
-                        for(V2_WorkOrder_Detail detail : workOrderDetailList){
-                            if(! detail.getClosed()){
-                                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
-                                return;
-                            }
+                        if("已取消".equals(workerOder.getCurrentStepName()) || "反馈".equals(workerOder.getCurrentStepName()) || "3分".equals(workerOder.getCurrentStepName())){
+                            continue;
+                        }else{
+                            WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
+                            return;
                         }
                     }
             }
