@@ -2214,6 +2214,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     public void prepareEditAccDetail(String itemId) throws Exception{
+        statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
         Object eval;
         if ("new".equals(itemId)) {
             switchTmp=true;
