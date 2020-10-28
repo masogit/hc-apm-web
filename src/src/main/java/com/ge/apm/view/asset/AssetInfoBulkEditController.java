@@ -9,6 +9,7 @@ import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -348,25 +349,13 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             return;
         }
 
-        // asset in repaire  status
         for(AssetInfo as:selectedAssets){
-            List<String> list=new ArrayList<>();
-            list.add("待验收");
-            list.add("待关单");
-            List<V2_WorkOrder> pmOrderList = v2WorkerOrderRepository.findByAssetIdAndCurrentStepName(as.getId(), list);
+            List<V2_WorkOrder> pmOrderList = v2WorkerOrderRepository.findByAssetId(as.getId());
             if(CollectionUtils.isNotEmpty(pmOrderList)){
                 for(V2_WorkOrder workerOder : pmOrderList){
-                        // 维修已完成
-                        List<V2_WorkOrder_Step> workOrderStepList = v2_WorkOrderStepRepository.findByWorkOrder(workerOder.getId());
-                        workOrderStepList.stream().sorted(Comparator.comparing(V2_WorkOrder_Step:: getStepId));
-                        List<V2_WorkOrder_Detail> workOrderDetailList = v2WorkerOrderDetailRepository.findPmOrderByWoId(workerOder.getId());
-                        for(V2_WorkOrder_Detail detail : workOrderDetailList){
-                            if(! detail.getClosed()){
-                                WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
-                                return;
-                            }
-                        }
-                        if(5 == workOrderStepList.get(0).getStepId()){
+                        if("已取消".equals(workerOder.getCurrentStepName()) || "反馈".equals(workerOder.getCurrentStepName()) || "3分".equals(workerOder.getCurrentStepName())){
+                            continue;
+                        }else{
                             WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
                             return;
                         }

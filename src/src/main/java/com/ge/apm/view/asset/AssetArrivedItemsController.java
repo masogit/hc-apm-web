@@ -7,8 +7,9 @@ import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import com.ge.apm.service.asset.AssetInstallationReportService;
+import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.component.tree.Tree;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
@@ -22,8 +23,6 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.service.asset.AssetInstallationService;
-import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -38,7 +37,6 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
-import com.ge.apm.service.asset.QrCodeTemplateService;
 
 @ManagedBean
 @ViewScoped
@@ -65,6 +63,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private TreeNode selectedNode;
 
+    private SupplierService supplierService;
+
     @Override
     protected void init() {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
@@ -72,7 +72,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
-
+        supplierService = WebUtil.getBean(SupplierService.class);
         addDateTimeFields("arrivalList.arrivalDate");
     }
 
@@ -141,8 +141,40 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     public void takeWorkOrder(String itemId) {
         ArrivalListItem item = dao.findById(itemId);
-        item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
-        aiService.reAssignWorkOrder(item);
+        if(activeSupplier()){//批量接单
+            String contractNum = item.getArrivalList().getContractNum();
+            String clinicalDeptUID = item.getClinicalDeptUID();
+            if(StringUtils.isEmpty(contractNum)){
+                WebUtil.addErrorMessage("合同编号不能为空");
+                return ;
+            }
+            if(StringUtils.isEmpty(clinicalDeptUID)){
+                WebUtil.addErrorMessage("所属科室不能为空");
+                return ;
+            }
+            List<ArrivalListItem> itemList = dao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+            String errorMessage = "";
+            for(ArrivalListItem arrivalListItem:itemList){
+                arrivalListItem.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+                Boolean responseStatus = aiService.reAssignWorkOrder(arrivalListItem);
+                if(!responseStatus){
+                    String name = arrivalListItem.getArrivalList().getName();
+                    if(errorMessage.contains("到货单名称/编号："+name)){
+                        errorMessage = errorMessage + "、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
+                    }else{
+                        errorMessage = errorMessage + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
+                    }
+                }
+            }
+            if(StringUtils.isBlank(errorMessage)){
+                WebUtil.addSuccessMessage("批量提交成功");
+            }else{
+                WebUtil.addErrorMessage(errorMessage);
+            }
+        }else{
+            item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+            aiService.reAssignWorkOrder(item);
+        }
         cancel();
     }
 
@@ -274,5 +306,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
         this.exportQrCodeTemplateId = exportQrCodeTemplateId;
+    }
+    public boolean activeSupplier(){
+        return supplierService.activeSupplier();
     }
 }

@@ -92,7 +92,6 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             searchFilters = new ArrayList<>();
         }
 
-
         if(userContextService.isZkbUser()) {
             if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
                 searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
@@ -125,7 +124,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                             searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType()));
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
                         }else if("all".equals(queryStatus)){
-                            if(searchFilters.size() > 0) {
+                            /*if(searchFilters.size() > 0) {
                                 searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1*2+3*"));
                                 searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"1*2+3*"));
                                 searchFilters.add(new SearchFilter("techAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1*2+"));
@@ -133,7 +132,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                                 searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1+2*"));
                                 searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"1+2*"));
                                 searchFilters.add(new SearchFilter("techAuditerUid", SearchFilter.Operator.EQ, currentUser.getUid(),"1+"));
-                            }
+                            }*/
+                            searchFilters.add(new SearchFilter("assetTypeDi", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getAssetType(),"1*2+3*"));
                         }
                     }
 
@@ -310,6 +310,17 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     }
     public String editAction() {
         return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus);
+    }
+
+    public void copyAction(){
+        try {
+            ZkbPartOrder newPartOrder = zkbPartOrderService.copyZkbPartOrder(selected,currentUser);
+            zkbPartOrderService.sendEmail(newPartOrder);
+            zkbPartOrderService.sendMessage(newPartOrder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public String backList(){
