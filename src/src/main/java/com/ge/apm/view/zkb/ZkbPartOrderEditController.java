@@ -266,6 +266,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     }
 
+
+
     private boolean showProblemOrderNumber = false;
     public void orderAnnotationChange(){
         if("NormalOrder".equals(selected.getOrderAnnotation())){
@@ -425,6 +427,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             flag=false;
             errorLog += "剩余数量不能小于0！";
         }
+
+
         if(!flag){
             WebUtil.addErrorMessage(errorLog);
             return "";
@@ -664,6 +668,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     public void setValueTypeTips(String valueTypeTips) {
         this.valueTypeTips = valueTypeTips;
     }
+
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {
