@@ -2,10 +2,13 @@ package com.ge.apm.service.utils;
 
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
 public class PinYinComparator implements Comparator<String> {
+    Logger logger = LoggerFactory.getLogger(PinYinComparator.class);
 
     @Override
     public int compare(String org1, String org2) {
@@ -15,6 +18,7 @@ public class PinYinComparator implements Comparator<String> {
             return name1.compareTo(name2);
 
         }catch(Exception e) {
+            logger.error(e.getMessage(), e);
             return 0;
         }
     }
