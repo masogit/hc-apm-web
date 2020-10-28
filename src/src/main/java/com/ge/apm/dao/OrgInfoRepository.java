@@ -223,7 +223,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 	String listOrgInfoNamePathInHierarchyWithSlash(String uid);
 
     //根据tenant_uid找出所有的集团
-	@Query(value = "select * from org_info where parent_uid=?1", nativeQuery = true)
+	@Query(value = "select * from org_info where parent_uid=?1 and org_type=1 ", nativeQuery = true)
 	public List<OrgInfo> getHospitalByTenantUIDAndType(String tenantUID);
 
 	@Query(value = "select * from org_info where uid=?1", nativeQuery = true)
