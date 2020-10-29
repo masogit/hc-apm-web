@@ -2,10 +2,13 @@ package com.ge.apm.service.utils;
 
 import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
 public class PinYinComparator implements Comparator<String> {
+    Logger logger = LoggerFactory.getLogger(PinYinComparator.class);
 
     /**
      * why org1 and org2 will be null? because the old saved custom config contains some old fields not exists any more.
@@ -29,6 +32,7 @@ public class PinYinComparator implements Comparator<String> {
             }
 
         }catch(Exception e) {
+            logger.error(e.getMessage(), e);
             return 0;
         }
     }
