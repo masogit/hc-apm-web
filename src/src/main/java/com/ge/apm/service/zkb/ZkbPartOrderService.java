@@ -493,7 +493,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType()) && "1".equals(zkbPartOrder.getArtificialType())) {
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                     if (ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())) {
-                        if(!"t".equals(zkbPartOrder.getHaveTrainCourseFlag())){
+                        if(StringUtils.isNotEmpty(zkbPartOrder.getHaveTrainCourseFlag()) && "f".equals(zkbPartOrder.getHaveTrainCourseFlag())){
                             zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) + zkbPartOrder.getQty());
                             zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) - zkbPartOrder.getQty());
                             zkbContractRepository.save(zkbContract);
@@ -875,7 +875,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) - qty);
                 zkbContractRepository.save(zkbContract);
             }else{
-                if("t".equals(zkbPartOrder.getHaveTrainCourseFlag())) {
+                if(StringUtils.isEmpty(zkbPartOrder.getHaveTrainCourseFlag()) || "t".equals(zkbPartOrder.getHaveTrainCourseFlag())) {
                     zkbContract.setSpareArtificailUse((zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse()) + qty);
                     zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) - qty);
                     zkbContractRepository.save(zkbContract);

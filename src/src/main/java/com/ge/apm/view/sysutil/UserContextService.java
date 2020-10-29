@@ -199,7 +199,8 @@ public class UserContextService implements Serializable {
      * @return boolean
      */
     public static boolean isDeparmentUser() {
-        return  null == getCurrentUserAccount().getOrgType() ? false : 4 == getCurrentUserAccount().getOrgType();
+        OrgInfo org = WebUtil.getBean(OrgInfoRepository.class).getByUid(getCurrentUserAccount().getOrgInfoUID());
+        return  null == org.getOrgType() ? false : 4 == org.getOrgType();
     }
 
     //add MVSAdmin,MVSFE
@@ -356,14 +357,7 @@ public class UserContextService implements Serializable {
             userAccount = dao.getByLoginName(userName);
         }
 
-        if(userAccount != null){
-            OrgInfo orgInfo = WebUtil.getBean(OrgInfoRepository.class).getByUid(userAccount.getOrgInfoUID());
-            if(orgInfo != null){
-                userAccount.setOrgType(orgInfo.getOrgType());
-            }
-        }
-/*
-        else {
+    /* else {
             // check if user has switch account by WeChat Client
             HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
             String userName = UserContext.getUsername(request);
@@ -372,7 +366,7 @@ public class UserContextService implements Serializable {
                 userAccount = WebUtil.getUserAccountFromRequest();
             }
         }
-*/
+     */
 
         return userAccount;
     }
