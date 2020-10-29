@@ -37,6 +37,15 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetClass')}" ><!--设备分类-->
+        <h:panelGroup>
+            <label class="label">#{msg.assetClass}<span style="color:red">*</span></label>
+            <p:selectOneMenu id="assetClass" value="#{assetInfoEditController.selected.assetClass}" required="true" requiredMessage="#{msg.assetClass} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetClass')}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'assetGroupSecondary')}" >
         <h:panelGroup>
             <label class="label">#{msg.assetGroupSecondary}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['assetGroupSecondary'].required? '*':''}</span></label>
