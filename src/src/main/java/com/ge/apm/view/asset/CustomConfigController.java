@@ -36,6 +36,8 @@ import lombok.Setter;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.ReorderEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -45,6 +47,7 @@ import webapp.framework.web.WebUtil;
 @ManagedBean
 @ViewScoped
 public class CustomConfigController {
+    private static final Logger logger = LoggerFactory.getLogger(CustomConfigController.class);
 
     private CustomConfigService ccService;
     private OrgInfoRepository orgDao;
@@ -409,6 +412,9 @@ public class CustomConfigController {
         List<CustomConfigAssetField> res = customConfigObject.getAssetFields().entrySet().stream().map(Entry::getValue).collect(Collectors.toList());
 
         res.sort((CustomConfigAssetField o1, CustomConfigAssetField o2) -> {
+            if (allFields.get(o1.getKey()) == null || allFields.get(o2.getKey()) == null) {
+                logger.error("One of label of key not found!, key1: " + o1.getKey() + ", key2: " + o2.getKey());
+            }
             return pinYinComparator.compare(allFields.get(o1.getKey()), allFields.get(o2.getKey()));
         });
 
