@@ -132,7 +132,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请人电话*</label>
-                            <p:inputText id="requestPhone" value="#{zkbPartOrderEditController.selected.requestPhone}" />
+                            <p:inputText id="requestPhone" value="#{zkbPartOrderEditController.selected.requestPhone}" required="true" requiredMessage="#{msg.zkbPartOrder_requestPhone} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请时间*</label>
