@@ -102,6 +102,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> clinicalDeptList;
 
     private Integer assetGroup;
+    private Integer assetClass;
     private Integer assetGroupSecondary;
 
     private List<I18nMessage> assetGroupSecondayList;
@@ -705,6 +706,16 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public void assetClassChangeListener() {
+
+        if (assetClass == null) {
+            assetGroupSecondayList = Collections.emptyList();
+        } else {
+            assetGroupSecondayList = i18nDao.getByMsgTypeAndSiteId("assetClassSecondary_" + String.valueOf(assetGroup.intValue()), userContextService.getLoginUser().getSiteId());
+        }
+
+    }
+
     public void assetGroupSecondaryChangeListener() {
 
     }
@@ -872,13 +883,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return t -> seen.add(keyExtractor.apply(t));
     }
 
-    public Integer getAssetGroup() {
-        return assetGroup;
-    }
+    public Integer getAssetGroup() { return assetGroup; }
 
     public void setAssetGroup(Integer assetGroup) {
         this.assetGroup = assetGroup;
     }
+
+    public Integer getAssetClass() { return assetClass; }
+
+    public void setAssetClass(Integer assetClass) { this.assetClass = assetClass; }
 
     public List<I18nMessage> getAssetGroupSecondayList() {
         return assetGroupSecondayList;
