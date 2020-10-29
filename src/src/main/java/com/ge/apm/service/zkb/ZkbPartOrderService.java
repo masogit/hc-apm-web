@@ -222,6 +222,60 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return days;
     }
 
+    public boolean checkApplyNumValid(ZkbPartOrder zkbPartOrder,ZkbContract zkbContract){
+        List<SearchFilter> filters = new ArrayList<>();
+        filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,zkbPartOrder.getOrderType()));
+        filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbPartOrder.getContractId()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Returned.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Closed.toString()));
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+            List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
+            Integer qty = 0;
+            for(ZkbPartOrder o : zkbPartOrders){
+                qty++;
+            }
+            if ((zkbPartOrder.getQty() + qty)/zkbContract.getProbeQuotaTotal() > 0.3){
+                return false;
+            }
+        }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+            filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
+            List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
+            Integer unReturnQty = 0;
+            for(ZkbPartOrder o : zkbPartOrders){
+                unReturnQty += o.getQty();
+            }
+
+            List<SearchFilter> partFilters = new ArrayList<>();
+            partFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,zkbPartOrder.getOrderType()));
+            partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbPartOrder.getContractId()));
+            partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
+            List<ZkbPartOrder> partReturnZkbPartOrders =  zkbPartOrderRepository.findBySearchFilter(partFilters);
+            List<String> partReturnIds = new ArrayList<>();
+            Integer partQty = 0;
+            for(ZkbPartOrder o : partReturnZkbPartOrders){
+                partReturnIds.add(o.getId());
+                partQty += o.getQty();
+            }
+            List<SearchFilter> returnFilters = new ArrayList<>();
+            returnFilters.add(new SearchFilter("partOrderId", SearchFilter.Operator.IN, partReturnIds));
+            List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findBySearchFilter(returnFilters);
+            Integer partReturnQty  = 0;
+            for(ZkbPartOrderReturn r : zkbPartOrderReturns){
+                partReturnQty += r.getQty();
+            }
+            unReturnQty += (partQty - partReturnQty);
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
+                if ((zkbPartOrder.getQty() + unReturnQty)/zkbContract.getSpareQuotaTotal() > 0.3){
+                    return false;
+                }
+            }else {
+                if ((zkbPartOrder.getQty() + unReturnQty)/zkbContract.getSpareArtificailTotal() > 0.3){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * 申请保存方法：
@@ -789,6 +843,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
         subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty());
     }
+
 
     public void subApplyQty(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty){
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())) {
