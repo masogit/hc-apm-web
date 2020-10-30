@@ -10,6 +10,7 @@ public interface V2ServiceRequestRepository extends GenericRepository<V2_Service
     public List<V2_ServiceRequest> findByIdIn(List<String> ids);
 
     public List<V2_ServiceRequest> findByAssetId(Integer assetId);
+
 //
 //    public List<AssetInfo> findByUidIn(List<String> assetUids, Sort sort);
 //
