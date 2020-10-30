@@ -55,6 +55,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private V2_WorkOrderRepository v2WorkerOrderRepository;
     private V2_WorkOrderDetailRepository v2WorkerOrderDetailRepository;
     private V2_WorkOrderStepRepository v2_WorkOrderStepRepository;
+    private V2ServiceRequestRepository v2ServiceRequestRepository;
+
     //******* filter start
 
     @Getter @Setter
@@ -350,17 +352,36 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
 
         for(AssetInfo as:selectedAssets){
-            List<V2_WorkOrder> pmOrderList = v2WorkerOrderRepository.findByAssetId(as.getId());
-            if(CollectionUtils.isNotEmpty(pmOrderList)){
-                for(V2_WorkOrder workerOder : pmOrderList){
-                        if("已取消".equals(workerOder.getCurrentStepName()) || "反馈".equals(workerOder.getCurrentStepName()) || "3分".equals(workerOder.getCurrentStepName())){
+            boolean assetFlag =true;
+            List<V2_ServiceRequest> serviceRequestList =v2ServiceRequestRepository.findByAssetId(as.getId());
+                 if(CollectionUtils.isNotEmpty(serviceRequestList)){
+                        for(V2_ServiceRequest service: serviceRequestList){
+                            if(service.getCloseTime()==null){
+                                assetFlag=false;
+                            }
+                        }
+                        if(assetFlag){
                             continue;
                         }else{
                             WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
                             return;
                         }
-                    }
-            }
+                 }
+
+//            List<V2_WorkOrder> pmOrderList = v2WorkerOrderRepository.findByAssetId(as.getId());
+//            if(CollectionUtils.isNotEmpty(pmOrderList)){
+//                for(V2_WorkOrder workerOder : pmOrderList){
+////                    List<String> ids=new ArrayList<>();
+////                    ids.add(workerOder.getSrId());
+////                    List<V2_ServiceRequest> serviceRequestList = v2ServiceRequestRepository.findByIdIn(ids);
+//                        if("已取消".equals(workerOder.getCurrentStepName()) || "反馈".equals(workerOder.getCurrentStepName()) || "3分".equals(workerOder.getCurrentStepName())){
+//                            continue;
+//                        }else{
+//                            WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
+//                            return;
+//                        }
+//                    }
+//            }
         }
 
         //临床助手检查进行中
