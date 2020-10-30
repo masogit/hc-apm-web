@@ -55,19 +55,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private AssetInfoMgrService aimService;
     private AutoCompleteService autoCompleteService;
     private GbCodeRepository gbDao;
-    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
     private GbCodeService gbCodeService;
     private QrCodeService qrCodeService;
     private CustomConfigService ccService;
     private AssetInfoBulkEditService assetInfoBulkEditService;
     private AssetInfoBulkEditCheckService assetInfoBulkEditCheckService;
     private OrgInfoRepository orgInfoDao;
-    private NurseSiteMaintainItemRepository nurseSiteMaintainItemRepository;
-    private NurseSiteMaintainDataRepository nurseSiteMaintainDataRepository;
-    private V2_WorkOrderRepository v2WorkerOrderRepository;
-    private V2_WorkOrderDetailRepository v2WorkerOrderDetailRepository;
-    private V2_WorkOrderStepRepository v2_WorkOrderStepRepository;
     private V2ServiceRequestRepository v2ServiceRequestRepository;
+    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
     //******* filter start
 
@@ -150,11 +145,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         assetInfoBulkEditService = WebUtil.getBean(AssetInfoBulkEditService.class);
         assetInfoBulkEditCheckService = WebUtil.getBean(AssetInfoBulkEditCheckService.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
-        nurseSiteMaintainItemRepository = WebUtil.getBean(NurseSiteMaintainItemRepository.class);
-        nurseSiteMaintainDataRepository = WebUtil.getBean(NurseSiteMaintainDataRepository.class);
-        v2WorkerOrderRepository = WebUtil.getBean(V2_WorkOrderRepository.class);
-        v2WorkerOrderDetailRepository= WebUtil.getBean(V2_WorkOrderDetailRepository.class);
-        v2_WorkOrderStepRepository= WebUtil.getBean(V2_WorkOrderStepRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         ucService = WebUtil.getBean(UserCommonService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
