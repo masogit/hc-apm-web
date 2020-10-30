@@ -98,6 +98,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         v2WorkerOrderRepository = WebUtil.getBean(V2_WorkOrderRepository.class);
         v2WorkerOrderDetailRepository= WebUtil.getBean(V2_WorkOrderDetailRepository.class);
         v2_WorkOrderStepRepository= WebUtil.getBean(V2_WorkOrderStepRepository.class);
+        v2ServiceRequestRepository=WebUtil.getBean(V2ServiceRequestRepository.class);
         selected = new AssetInfo();
         initCandidateKeyLabels();
     }
