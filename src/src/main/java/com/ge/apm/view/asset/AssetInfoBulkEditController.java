@@ -158,6 +158,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
+        v2ServiceRequestRepository = WebUtil.getBean(V2ServiceRequestRepository.class);
         selected = new AssetInfo();
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
