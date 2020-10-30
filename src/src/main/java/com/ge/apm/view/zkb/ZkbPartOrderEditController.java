@@ -81,6 +81,34 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             selected.setRequestUser(currentUser.getName());
             selected.setRequestPhone(currentUser.getTelephone());
             v2_blobObjectList = new ArrayList<>();
+        } else if("Copy".equals(actionName)){
+            String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
+            HashMap m = zkbPartOrderService.queryEditInfo(selectedId);
+            selected =  m.get("zkbPartOrder") ==null ? new ZkbPartOrder() : (ZkbPartOrder)m.get("zkbPartOrder");
+            copyZkbPartOrder();
+            if(StringUtils.isNotEmpty(this.selected.getOrderType())){
+                orderType = this.selected.getOrderType();
+            }
+            ZkbContract c = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
+            if(c != null){
+                contractList = new ArrayList<>();
+                contractList.add(c);
+            }
+            HashMap<String, Object> mm = m.get("v2") == null ? null : (HashMap<String, Object>)m.get("v2");
+            v2_listHashMap = new ArrayList<>();
+            if(mm != null){
+                v2_listHashMap.add(mm);
+                selectedWorkFlow = mm;
+                assetInfo = assetInfoRepository.findByUid(String.valueOf(selectedWorkFlow.get("assetId")));
+            }
+            v2_blobObjectList = m.get("v2_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_blobObjectList");
+            if (c != null) {
+                initZknPartCat(c.getStartDate());
+            }
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
+                zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending","CS");
+            }
+            calcRemainQty();
         }else{
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             HashMap m = zkbPartOrderService.queryEditInfo(selectedId);
@@ -98,11 +126,60 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(mm != null){
                 v2_listHashMap.add(mm);
             }
+            selectedWorkFlow = mm;
             v2_blobObjectList = m.get("v2_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_blobObjectList");
             if (c != null) {
                 initZknPartCat(c.getStartDate());
             }
         }
+
+    }
+
+    public void copyZkbPartOrder(){
+        selected.setId(null);
+        selected.setStatus(null);
+        selected.setCurrentStep(null);
+        selected.setRequestDate(new Date());
+        selected.setCreatedBy(currentUser.getLoginName());
+        selected.setCreatedDate(new Date());
+        selected.setRequestUser(currentUser.getName());
+        selected.setPartOrderNo(null);
+        selected.setPartOrderIndex(null);
+        selected.setTechAuditer(null);
+        selected.setTechAuditerUid(null);
+        selected.setTechRemark(null);
+        selected.setTechAuditDate(null);
+        selected.setManageAuditerUid(null);
+        selected.setManageAuditer(null);
+        selected.setManageAuditDate(null);
+        selected.setManageRemark(null);
+        selected.setSrNo(null);
+        selected.setActivityNo(null);
+        selected.setOrderNo(null);
+        selected.setPrice(null);
+        selected.setOrderedRemark(null);
+        selected.setUnOrderRemark(null);
+        selected.setOrderedDate(null);
+        selected.setUnOrderDate(null);
+        selected.setUnOrderAuditer(null);
+        selected.setUnOrderAuditerUid(null);
+        selected.setOrderedAuditerUid(null);
+        selected.setReturnAuditerUid(null);
+        selected.setReturnAuditer(null);
+        selected.setReturnAuditDate(null);
+        selected.setReturnQty(0);
+        selected.setReturnDate(null);
+        selected.setReturnRemark(null);
+        selected.setReturnType(null);
+        selected.setWaybillNo(null);
+        selected.setWhetherDeduct(null);
+        selected.setPartSerialNumber(null);
+        selected.setPartQualityIssue(null);
+        selected.setClosedAuditerUid(null);
+        selected.setClosedAuditer(null);
+        selected.setClosedDate(null);
+        selected.setClosedRemark(null);
+        selected.setZkbPartOrderStepSet(null);
 
     }
 
@@ -419,7 +496,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                flag=false;
+                //flag=false;
                 errorLog += "附件不能为空！";
             }
         }

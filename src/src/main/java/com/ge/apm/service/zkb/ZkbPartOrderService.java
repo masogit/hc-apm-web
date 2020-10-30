@@ -542,19 +542,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(!nextFlag){
             ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
             subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty());
-        }else {
-            if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(oldStep)){
-                if (ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType()) && "1".equals(zkbPartOrder.getArtificialType())) {
-                    ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-                    if (ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.DI.toString().equals(zkbContract.getContractType())) {
-                        if(StringUtils.isNotEmpty(zkbPartOrder.getHaveTrainCourseFlag()) && "f".equals(zkbPartOrder.getHaveTrainCourseFlag())){
-                            zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) + zkbPartOrder.getQty());
-                            zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) - zkbPartOrder.getQty());
-                            zkbContractRepository.save(zkbContract);
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -881,11 +868,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbContract.setGeArtificialSupportTimesApply((zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply()) + qty);
                 zkbContractRepository.save(zkbContract);
             }else{
-                //if("t".equals(zkbPartOrder.getHaveTrainCourseFlag())){
-                    zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) - qty);
-                    zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + qty);
-                    zkbContractRepository.save(zkbContract);
-                //}
+                zkbContract.setSpareArtificail((zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail()) - qty);
+                zkbContract.setSpareArtificailApply((zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply()) + qty);
+                zkbContractRepository.save(zkbContract);
+
             }
         }else if(ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
             zkbContract.setSpareQuota((zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota()) - qty);

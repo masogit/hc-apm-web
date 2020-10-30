@@ -312,14 +312,15 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus);
     }
 
-    public void copyAction(){
-        try {
+    public String copyAction(){
+        /*try {
             ZkbPartOrder newPartOrder = zkbPartOrderService.copyZkbPartOrder(selected,currentUser);
             zkbPartOrderService.sendEmail(newPartOrder);
             zkbPartOrderService.sendMessage(newPartOrder);
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
+        return UrlEncryptController.encodeUrlParam("Edit?action=Copy&selectionTenantInfo=".concat(selectionTenantInfo)+"&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus);
 
     }
 
