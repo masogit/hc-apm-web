@@ -23,14 +23,13 @@ public class PinYinComparator implements Comparator<String> {
                 return 0;
             } else if (null == org1) {
                 return -1;
-            } else if (null == org2){
+            } else if (null == org2) {
                 return 1;
             } else {
                 String name1 = PinyinHelper.convertToPinyinString(org1, "", PinyinFormat.WITHOUT_TONE);
                 String name2 = PinyinHelper.convertToPinyinString(org2, "", PinyinFormat.WITHOUT_TONE);
                 return name1.compareTo(name2);
             }
-
         }catch(Exception e) {
             logger.error(e.getMessage(), e);
             return 0;
