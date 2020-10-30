@@ -158,6 +158,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
+        v2ServiceRequestRepository = WebUtil.getBean(V2ServiceRequestRepository.class);
         selected = new AssetInfo();
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
@@ -1029,21 +1030,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                             return;
                         }
                  }
-
-//            List<V2_WorkOrder> pmOrderList = v2WorkerOrderRepository.findByAssetId(as.getId());
-//            if(CollectionUtils.isNotEmpty(pmOrderList)){
-//                for(V2_WorkOrder workerOder : pmOrderList){
-////                    List<String> ids=new ArrayList<>();
-////                    ids.add(workerOder.getSrId());
-////                    List<V2_ServiceRequest> serviceRequestList = v2ServiceRequestRepository.findByIdIn(ids);
-//                        if("已取消".equals(workerOder.getCurrentStepName()) || "反馈".equals(workerOder.getCurrentStepName()) || "3分".equals(workerOder.getCurrentStepName())){
-//                            continue;
-//                        }else{
-//                            WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
-//                            return;
-//                        }
-//                    }
-//            }
         }
 
         //临床助手检查进行中
