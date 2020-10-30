@@ -434,6 +434,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return "";
         }
         this.selected.setOrderType(orderType);
+        ZkbContract zkbContract = contractList.get(0);
+
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
+            if(!r){
+                WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还");
+                return "";
+            }
+        }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
             if(this.selected.getOnlineEngine() != null){
@@ -447,7 +456,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         }
         HashMap m = v2_listHashMap.get(0);
-        ZkbContract zkbContract = contractList.get(0);
         selected = zkbPartOrderService.create(m.get("id").toString(),m.get("assetId").toString(),zkbContract,this.selected,currentUser,selectionTenantInfo,m.get("srNum").toString());
         zkbPartOrderService.saveUploadFile(v2_blobObjectList,this.selected.getId());
         zkbPartOrderService.sendEmail(selected);

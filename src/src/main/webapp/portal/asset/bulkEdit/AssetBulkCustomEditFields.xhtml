@@ -1,0 +1,801 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <!-- 制造商序列号 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('serialNum')}">
+        <h:panelGroup>
+            <label class="label">#{msg.serialNum}</label>
+            <p:inputText id="serialNum" value="#{assetInfoBulkEditController.selected.serialNum}"/>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 名称 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('name')}">
+        <h:panelGroup>
+            <label class="label">#{msg.name}</label>
+            <p:autoComplete id="name" value="#{assetInfoBulkEditController.selected.name}" completeMethod="#{assetInfoBulkEditController.completeAssetName}"/>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 设备别名 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('aliasName')}">
+        <h:panelGroup>
+            <label class="label">#{msg.aliasName}</label>
+            <p:inputText id="aliasName" value="#{assetInfoBulkEditController.selected.aliasName}"/>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 设备分类 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetGroup')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetGroup}</label>
+            <p:selectOneMenu id="assetGroup" value="#{assetInfoBulkEditController.selected.assetGroup}">
+                <p:ajax listener="#{assetInfoBulkEditController.onAssetGroupChange()}" update="@(.assetGroupChange)"/>
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}"
+                               itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 维修负责人-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetOwnerName')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetOwnerName}</label>
+            <p:autoComplete id="assetOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['assetOwner']}"
+                            converter="userAccountConverter" dropdown="true"
+                            forceSelection="true"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}"
+                            completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner')}"
+                        process="@this" update="@(.assetOwnerNameChange)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner')}" process="@this"
+                        update="@(.assetOwnerNameChange)"/>
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 维修负责人电话 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetOwnerTel')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetOwnerTel}</label>
+            <p:inputText id="assetOwnerTel" value="#{assetInfoBulkEditController.selected.assetOwnerTel}" readonly="true" class="assetOwnerNameChange"/>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 维修负责任人2 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetOwnerName2')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetOwnerName2}</label>
+            <p:autoComplete id="assetOwnerName2" value="#{assetInfoBulkEditController.selectedObjectMap['assetOwner2']}"
+                            converter="userAccountConverter" dropdown="true"
+                            forceSelection="true" var="t"
+                            itemLabel="#{t.name}" itemValue="#{t}"
+                            completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner2')}"
+                        process="@this" update="@(.assetOwnerName2Change)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner2')}" process="@this"
+                        update="@(.assetOwnerName2Change)"/>
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 维修负责人2电话 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetOwnerTel2')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetOwnerTel2}</label>
+            <p:inputText id="assetOwnerTel2" value="#{assetInfoBulkEditController.selected.assetOwnerTel2}"  readonly="true"
+                         class="assetOwnerName2Change"/>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 维修负责人3 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetOwnerName3')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetOwnerName3}</label>
+            <p:autoComplete id="assetOwnerName3" value="#{assetInfoBulkEditController.selectedObjectMap['assetOwner3']}"
+                            converter="userAccountConverter" dropdown="true"
+                            forceSelection="true" var="t"
+                            itemLabel="#{t.name}" itemValue="#{t}"
+                            completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner3')}"
+                        process="@this" update="@(.assetOwnerName3Change)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner3')}" process="@this"
+                        update="@(.assetOwnerName3Change)"/>
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 维修负责人3电话 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetOwnerTel3')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetOwnerTel3}</label>
+            <p:inputText id="assetOwnerTel3" value="#{assetInfoBulkEditController.selected.assetOwnerTel3}"  readonly="true" class="assetOwnerName3Change"/>
+        </h:panelGroup>
+    </c:if>
+    <!--保养负责人-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('pmOwnerName')}">
+        <h:panelGroup>
+            <label class="label">#{msg.pmOwnerName}</label>
+            <p:autoComplete id="pmOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['pmOwner']}"
+                            converter="userAccountConverter" dropdown="true"
+                            forceSelection="true" var="t"
+                            itemLabel="#{t.name}" itemValue="#{t}"
+                            completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('pmOwner')}"
+                        process="@this" update="@(.pmOwnerNameChange)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('pmOwner')}" process="@this"
+                        update="@(.pmOwnerNameChange)"/>
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+    <!-- 保养负责人电话 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('pmOwnerTel')}">
+        <h:panelGroup>
+            <label class="label">#{msg.pmOwnerTel}</label>
+            <p:inputText id="pmOwnerTel" value="#{assetInfoBulkEditController.selected.pmOwnerTel}" readonly="true" class="pmOwnerNameChange"/>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 分院区UID -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('hospitalId')}">
+        <h:panelGroup>
+            <label class="label">#{msg.hospitalId}</label>
+            <p:inputText id="selectedUserOrgName1" value="#{assetInfoBulkEditController.selectedObjectMap['selectedOrg']}"
+                         readonly="true" class="SiteUIDChange"/>
+            <p:commandButton id="btnOrg2" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" />
+            <p:overlayPanel id="popupPanel2" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"
+                            style="width:300px" modal="false">
+                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                    <p:tree id="orgTree1" class="tree" style="width:98%;border:0;"
+                            value="#{assetInfoBulkEditController.orgTree}" var="node" selectionMode="single">
+                        <p:ajax process="@this" event="select" update=" "
+                                listener="#{assetInfoBulkEditController.onSelectTreeNode}"
+                                oncomplete="PF('varPanelOrg').hide();"/>
+                        <p:ajax process="@this" event="expand"/>
+                        <p:ajax process="@this" event="collapse"/>
+
+                        <p:treeNode type="org">
+                            <h:outputText value="#{node}"/>
+                        </p:treeNode>
+                    </p:tree>
+                </p:scrollPanel>
+            </p:overlayPanel>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 使用者责任人 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('clinicalOwnerName')}">
+        <h:panelGroup>
+            <label class="label">#{msg.clinicalOwnerName}</label>
+            <p:autoComplete id="clinicalOwnerName"
+                            value="#{assetInfoBulkEditController.selectedObjectMap['clinicalOwner']}"
+                            converter="userAccountConverter" dropdown="true"
+                            forceSelection="true" var="t"
+                            itemLabel="#{t.name}" itemValue="#{t}"
+                            completeMethod="#{assetInfoBulkEditController.completeClinicalOwnerList}"
+                            class="SiteUIDChange clinicalDeptNameChange">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('clinicalOwner')}"
+                        process="@this" update="@(.clinicalOwnerNameChange)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('clinicalOwner')}" process="@this"
+                        update="@(.clinicalOwnerNameChange)"/>
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 使用责任人电话 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('clinicalOwnerTel')}">
+        <h:panelGroup>
+            <label class="label">#{msg.clinicalOwnerTel}</label>
+            <p:inputText id="clinicalOwnerTel" value="#{assetInfoBulkEditController.selected.clinicalOwnerTel}" readonly="true"
+                         class="SiteUIDChange clinicalDeptNameChange clinicalOwnerNameChange"/>
+        </h:panelGroup>
+    </c:if>
+
+    <!--制造商 下拉 assetInfoBulkEditController.needEdit('manufacture') 这里不能用"manufacturer"-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('manufacture')}">
+        <h:panelGroup>
+            <label class="label">#{msg.manufacture}</label>
+            <p:autoComplete id="manufacture" dropdown="true"
+                            value="#{assetInfoBulkEditController.selectedObjectMap['manufacturer']}" scrollHeight="300"
+                            completeMethod="#{assetInfoBulkEditController.autoCompleteManufacture}" var="t"
+                            itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter"
+                            class="inputManufacture">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onSupplierChange('manufacturer')}"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onSupplierChange('manufacturer')}"/>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 制造商名称 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('makerShortName')}">
+        <h:panelGroup>
+            <label class="label">#{msg.makerShortName}</label>
+            <p:inputText id="makerShortName" value="#{assetInfoBulkEditController.selected.makerShortName}"/>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 供应商 下拉-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('vendor')}">
+        <h:panelGroup><!--供应商 下拉-->
+            <label class="label">#{msg.vendor}</label>
+            <p:autoComplete id="vendor" dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['supplier']}"
+                            scrollHeight="300"
+                            forceSelection="true"
+                            completeMethod="#{assetInfoBulkEditController.autoCompleteSupplier}" var="t"
+                            itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputVendor">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onSupplierChange('supplier')}"
+                        update="@(.telephone)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onSupplierChange('supplier')}"/>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 供应商电话 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('vendorTel')}">
+        <h:panelGroup >
+            <label class="label">#{msg.vendorTel}</label>
+            <p:inputText id="vendorTel" value="#{assetInfoBulkEditController.selected.vendorTel}" class="telephone"
+                         readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+
+    <!--维修商下拉-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('maitanance')}">
+        <h:panelGroup>
+            <label class="label">#{msg.maitanance}</label>
+            <p:autoComplete id="vendor3" dropdown="true"
+                            value="#{assetInfoBulkEditController.selectedObjectMap['maintainer']}" scrollHeight="300"
+                            forceSelection="true"
+                            completeMethod="#{assetInfoBulkEditController.autoCompleteMaintainer}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter"
+                            class="inputVendor3">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onSupplierChange('maintainer')}"
+                        update="@(.telephone)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onSupplierChange('maintainer')}"
+                        update="@(.telephone)"/>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 维修商电话 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('maitananceTel')}">
+        <h:panelGroup>
+            <label class="label">#{msg.maitananceTel}</label>
+            <p:inputText id="maitananceTel" value="#{assetInfoBulkEditController.selected.maitananceTel}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 国际标吗 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('nationalStandardCode')}">
+        <h:panelGroup>
+            <label class="label">#{msg.nationalStandardCode}</label>
+            <p:autoComplete id="gbname" value="#{assetInfoBulkEditController.gbCodeName}"
+                            completeMethod="#{assetInfoBulkEditController.completeGbName}"
+                            class="">
+                <p:ajax process="@this" update=""
+                        listener="#{assetInfoBulkEditController.updateFinancingNumByNationalStandardCode()}"/>
+            </p:autoComplete>
+            <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton" process="@this"
+                             icon="ui-icon-arrow-drop-down"/>
+            <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false"
+                            style="width:300px" modal="false">
+                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                    <p:tree id="gbTree" class="tree" style="width:98%;border:0;"
+                            value="#{assetInfoBulkEditController.gbTree}" var="node" selectionMode="single">
+                        <p:ajax process="@this" event="select" listener="#{assetInfoBulkEditController.onSelectGbTreeNode}"
+                                update=":bulkEditForm:tab:gbname" oncomplete="PF('varPanelOrg1').hide();"/>
+
+                        <p:ajax process="@this" event="expand"/>
+                        <p:ajax process="@this" event="collapse"/>
+
+                        <p:treeNode type="gb">
+                            <h:outputText value="#{node}"/>
+                        </p:treeNode>
+                    </p:tree>
+                </p:scrollPanel>
+            </p:overlayPanel>
+        </h:panelGroup>
+    </c:if>
+
+    <!-- 使用部门 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetDeptName')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetDeptName}</label>
+            <p:autoComplete dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['assetDept']}"
+                            scrollHeight="300" forceSelection="true"
+                            completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter"
+                            class="SiteUIDChange">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onAssetDeptChange('assetDept')}"
+                        update="@(.clinicalDeptNameChange)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onAssetDeptChange('assetDept')}"
+                        update="@(.clinicalDeptNameChange)"/>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+
+    <!--资产价值分类-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetValueCategory')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetValueCategory}</label>
+            <p:selectOneMenu value="#{assetInfoBulkEditController.selected.assetValueCategory}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetValueCategory')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+
+   <!--资金来源2-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('capitalSource2')}">
+        <h:panelGroup>
+            <label class="label">#{msg.capitalSource2}</label>
+            <p:selectOneMenu id="capitalSource2" value="#{assetInfoBulkEditController.selected.capitalSource2}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource2')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--主设备-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('parentAsset')}">
+        <h:panelGroup>
+            <label class="label">#{msg.parentAsset}</label>
+            <p:autoComplete id="parentAssetList" dropdown="true" scrollHeight="300"
+                            value="#{assetInfoBulkEditController.selectedObjectMap['parentAsset']}"
+                            completeMethod="#{assetInfoBulkEditController.completeParentAssetId}"
+                            class="SiteUIDChange clinicalDeptNameChange"
+                            var="t" itemLabel="#{t.getParentAssetDisplayName()}" itemValue="#{t}"
+                            converter="assetInfoConverter">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onParentAssetChange()}"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onParentAssetChange()}"/>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+    <!--设备标准名称-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('deviceName')}">
+        <h:panelGroup>
+            <label class="label">#{msg.deviceName}</label>
+            <p:inputText id="deviceName" value="#{assetInfoBulkEditController.selected.deviceName}"/>
+        </h:panelGroup>
+    </c:if>
+    <!--System厂商保修ID-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('systemId')}">
+        <h:panelGroup>
+            <label class="label">#{msg.systemId}</label>
+            <p:inputText id="systemId" value="#{assetInfoBulkEditController.selected.systemId}"/>
+        </h:panelGroup>
+    </c:if>
+    <!--资产编号-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('financingNum')}">
+        <h:panelGroup>
+            <label class="label">#{msg.financingNum}</label>
+            <p:inputText value="#{assetInfoBulkEditController.selected.financingNum}" class="financingNumChange" maxlength="64">
+                <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onDepartNumChange('financingNum')}"
+                        update="@(.financingNumChange)"/>
+            </p:inputText>
+            <p:commandButton id="generateFinancingNum"
+                             actionListener="#{assetInfoBulkEditController.generateFinancialNum()}"
+                             process="@(.financingNumChange) " update="@(.financingNumChange)" icon="ui-icon-repeat"
+                             title="#{msg.Renew}" class="popupIconButton financingNumChange"/>
+        </h:panelGroup>
+    </c:if>
+    <!--设备编号(院方)-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('departNum')}">
+        <h:panelGroup>
+            <label class="label">#{msg.departNum}</label>
+            <p:inputText id="departNum" value="#{assetInfoBulkEditController.selected.departNum}" class="financingNumChange" maxlength="64">
+                <p:ajax process="@this" listener="#{assetInfoBulkEditController.onDepartNumChange('departNum')}"
+                        update="@(.financingNumChange)"/>
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <!--条码-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('barcode')}">
+        <h:panelGroup>
+            <label class="label">#{msg.barcode}</label>
+            <p:inputText id="barcode" value="#{assetInfoBulkEditController.selected.barcode}"/>
+        </h:panelGroup>
+    </c:if>
+    <!--注册证号-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('registrationNo')}">
+        <h:panelGroup>
+            <label class="label">#{msg.registrationNo}</label>
+            <p:inputText id="registrationNo" value="#{assetInfoBulkEditController.selected.registrationNo}"/>
+        </h:panelGroup>
+    </c:if>
+    <!--院内IT系统编号-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('modalityId')}">
+        <h:panelGroup>
+            <label class="label">#{msg.modalityId}</label>
+            <p:inputText id="modalityId" value="#{assetInfoBulkEditController.selected.modalityId}"/>
+        </h:panelGroup>
+    </c:if>
+    <!--二维码-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('qrCode')}">
+        <h:panelGroup>
+            <label class="label">#{msg.qrCode}</label>
+            <p:inputText id="qrCode" value="#{assetInfoBulkEditController.qrCode}" class="SiteUIDChange financingNumChange" maxlength="64">
+                <p:ajax process="@this" listener="#{assetInfoBulkEditController.onDepartNumChange('qrCode')}"
+                        update="@(.financingNumChange)"/>
+            </p:inputText>
+            <p:commandButton id="qrCodeButton" actionListener="#{assetInfoBulkEditController.renewQrcode()}"
+                             update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}"
+                             class="popupIconButton financingNumChange" process="@this"/>
+        </h:panelGroup>
+    </c:if>
+    <!--设备型号-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('functionType')}">
+        <h:panelGroup>
+            <label class="label">#{msg.functionType}</label>
+            <p:inputText id="functionType" value="#{assetInfoBulkEditController.selected.functionType}"/>
+        </h:panelGroup>
+    </c:if>
+    <!--医疗器械分类-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('functionGroup')}">
+        <h:panelGroup>
+            <label class="label">#{msg.functionGroup}</label>
+            <p:selectOneMenu id="functionGroup" value="#{assetInfoBulkEditController.selected.functionGroup}" tyle="width: 100%">
+                <p:ajax listener="#{assetInfoBulkEditController.onFunctionGroupChange()}" update="@(.functionGroupChange)"/>
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionType')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--医疗器械子分类-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetCode68')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetCode68}</label>
+            <p:selectOneMenu id="assetCode68" value="#{assetInfoBulkEditController.selected.assetCode68}" style="width: 100%" class="functionGroupChange">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{assetInfoBulkEditController.code68List}" var="item" itemLabel="#{item.value}"
+                               itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--功能等级-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('functionGrade')}">
+        <h:panelGroup>
+            <label class="label">#{msg.functionGrade}</label>
+            <p:selectOneMenu id="functionGrade" value="#{assetInfoBulkEditController.selected.functionGrade}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionGrade')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--维修类型-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('repairForm')}">
+        <h:panelGroup>
+            <label class="label">#{msg.repairForm}</label>
+            <p:selectOneMenu id="repairForm" value="#{assetInfoBulkEditController.selected.repairForm}">
+                <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}"
+                               itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--安装位置编码-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('locationCode')}">
+        <h:panelGroup>
+            <label class="label">#{msg.locationCode}</label>
+            <p:inputText id="locationCode" value="#{assetInfoBulkEditController.selected.locationCode}"/>
+        </h:panelGroup>
+    </c:if>
+    <!-- 安装位置 -->
+    <c:if test="#{assetInfoBulkEditController.displayControl('locationName')}">
+        <h:panelGroup>
+            <label class="label">#{msg.locationName}</label>
+            <p:inputText id="locationName" value="#{assetInfoBulkEditController.selected.locationName}"/>
+        </h:panelGroup>
+    </c:if>
+    <!--当前状态-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('status')}">
+        <h:panelGroup>
+            <label class="label">#{msg.status}</label>
+            <p:selectOneRadio id="status" value="#{assetInfoBulkEditController.selected.status}">
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}"
+                               itemValue="#{item.msgKey}"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <!--资产状态-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('deviceStatus')}">
+        <h:panelGroup>
+            <label class="label">#{msg.deviceStatus}</label>
+            <p:selectOneRadio id="deviceStatus" value="#{assetInfoBulkEditController.selected.deviceStatus}">
+                <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <!--是否PM-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('isAssetPMed')}">
+        <h:panelGroup>
+            <label class="label">#{msg.isAssetPMed}</label>
+            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.isPm}">
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <!--是否盘点-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('isAssetChecked')}">
+        <h:panelGroup>
+            <label class="label">#{msg.isAssetChecked}</label>
+            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.isChecked}">
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <!--备注-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('comments')}">
+        <h:panelGroup>
+            <label class="label">#{msg.comments}</label>
+            <p:inputTextarea value="#{assetInfoBulkEditController.selected.comments}" maxlength="256"/>
+        </h:panelGroup>
+
+    </c:if>
+
+    <!--用途分类-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('assetUsage')}">
+        <h:panelGroup>
+            <label class="label">#{msg.assetUsage}</label>
+            <p:selectOneMenu id="assetUsage" value="#{assetInfoBulkEditController.selected.assetUsage}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetUsage')}" var="item" itemLabel="#{item.value}"
+                               itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--资金来源-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('capitalSource')}">
+        <h:panelGroup>
+            <label class="label">#{msg.capitalSource}</label>
+            <p:selectOneMenu id="capitalSource" value="#{assetInfoBulkEditController.selected.capitalSource}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--计量等级-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('measureGrade')}">
+        <h:panelGroup>
+            <label class="label">#{msg.measureGrade}</label>
+            <p:selectOneMenu id="measureGrade" value="#{assetInfoBulkEditController.selected.measureGrade}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--风险等级-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('riskGrade')}">
+        <h:panelGroup>
+            <label class="label">#{msg.riskGrade}</label>
+            <p:selectOneMenu id="riskGrade" value="#{assetInfoBulkEditController.selected.riskGrade}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}"
+                               itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--是否急救设备-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('emergencyEquipment')}">
+        <h:panelGroup>
+            <label class="label">#{msg.emergencyEquipment}</label>
+            <p:selectOneMenu id="emergencyEquipment" value="#{assetInfoBulkEditController.selected.emergencyEquipment}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--是否进出口设备-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('importEquipment')}">
+        <h:panelGroup>
+            <label class="label">#{msg.importEquipment}</label>
+            <p:selectOneMenu id="importEquipment" value="#{assetInfoBulkEditController.selected.importEquipment}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--计量项目类别-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('measuringItemCategory')}">
+        <h:panelGroup>
+            <label class="label">#{msg.measuringItemCategory}</label>
+            <p:selectOneMenu id="measuringItemCategory"
+                             value="#{assetInfoBulkEditController.selected.measuringItemCategory}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--核算类别-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('accountingCategory')}">
+        <h:panelGroup>
+            <label class="label">#{msg.accountingCategory}</label>
+            <p:selectOneMenu id="accountingCategory" value="#{assetInfoBulkEditController.selected.accountingCategory}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('accountingCategory')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <!--出厂日期-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('manufactDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.manufactDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                        locale="#{userContextService.getCalendarLocale()}" id="manufactDate"
+                        pattern="#{userContextService.timeFormat()}"
+                        value="#{assetInfoBulkEditController.selected.manufactDate}"
+                        maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false"
+                        showButtonPanel="true" navigator="true" mask="true">
+                <p:ajax process="@(this)" update="@(.inputDate) @(.manufactDateChange)"/>
+            </p:calendar>
+        </h:panelGroup>
+    </c:if>
+    <!--采购日期-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('purchaseDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.purchaseDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                        locale="#{userContextService.getCalendarLocale()}" id="purchaseDate"
+                        pattern="#{userContextService.timeFormat()}"
+                        value="#{assetInfoBulkEditController.selected.purchaseDate}"
+                        maxdate="#{appContextService.curentDate}"
+                        class="manufactDateChange"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true">
+            <p:ajax process="@this"  event="dateSelect" listener="#{assetInfoBulkEditController.handleDateSelect}"/>
+        </p:calendar>
+        </h:panelGroup>
+    </c:if>
+    <!--到货日期-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('arriveDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.arriveDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                        locale="#{userContextService.getCalendarLocale()}" id="arriveDate"
+                        pattern="#{userContextService.timeFormat()}"
+                        value="#{assetInfoBulkEditController.selected.arriveDate}"
+                        maxdate="#{appContextService.curentDate}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <!--启用日期-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('installDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.installDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                        locale="#{userContextService.getCalendarLocale()}" id="installDate"
+                        pattern="#{userContextService.timeFormat()}"
+                        value="#{assetInfoBulkEditController.selected.installDate}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <!--质保截止日期-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('factoryWarrantyDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.factoryWarrantyDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                        locale="#{userContextService.getCalendarLocale()}" id="factoryWarrantyDate"
+                        pattern="#{userContextService.timeFormat()}"
+                        value="#{assetInfoBulkEditController.selected.factoryWarrantyDate}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <!--维保截止日期-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('warrantyDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.warrantyDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                        locale="#{userContextService.getCalendarLocale()}" id="warrantyDate"
+                        pattern="#{userContextService.timeFormat()}"
+                        value="#{assetInfoBulkEditController.selected.warrantyDate}"
+                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <!--报废日期-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('terminateDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.terminateDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}"
+                        locale="#{userContextService.getCalendarLocale()}" id="terminateDate"
+                        pattern="#{userContextService.timeFormat()}"
+                        value="#{assetInfoBulkEditController.selected.terminateDate}" showOn="button" readonlyInput="false"
+                        showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <!--是否对维保到期提醒-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('isWarrantyNotice')}">
+        <h:panelGroup>
+            <label class="label">#{msg.isWarrantyNotice}</label>
+            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.warranty}">
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <!--采购价格-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('purchasePrice')}">
+        <h:panelGroup>
+            <label class="label">#{msg.purchasePrice}</label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice"
+                           value="#{assetInfoBulkEditController.selected.purchasePrice}"/>
+        </h:panelGroup>
+    </c:if>
+    <!--最终残值(元)-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('salvageValue')}">
+        <h:panelGroup>
+            <label class="label">#{msg.salvageValue}</label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue"
+                           value="#{assetInfoBulkEditController.selected.salvageValue}"/>
+        </h:panelGroup>
+    </c:if>
+    <!--使用年限-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('lifecycle')}">
+        <h:panelGroup>
+            <label class="label">#{msg.lifecycle}</label>
+            <p:inputNumber minValue="0" decimalPlaces="1" id="lifecycle"
+                           value="#{assetInfoBulkEditController.selected.lifecycleInYear}"/>
+        </h:panelGroup>
+    </c:if>
+<!--折旧算法-->
+    <c:if test="#{assetInfoBulkEditController.displayControl('depreciationMethod')}">
+        <h:panelGroup>
+            <label class="label">#{msg.depreciationMethod}</label>
+            <p:selectOneMenu id="depreciationMethod" value="#{assetInfoBulkEditController.selected.depreciationMethod}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('depreciationMethodList')}" var="item"
+                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+
+</ui:composition>
