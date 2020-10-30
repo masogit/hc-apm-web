@@ -150,7 +150,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),selected.getId(),selected.getAssetTypeDi());
             }
 
-            /*if(!zkbPartOrderService.checkThreeValid(selected)){
+            if(!zkbPartOrderService.checkThreeValid(selected)){
                 WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导","");
                 //return;
             }
@@ -159,7 +159,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(StringUtils.isNotBlank(validString)){
                     WebUtil.addErrorMessage(validString,"");
                 }
-            }*/
+            }
         }
     }
 
