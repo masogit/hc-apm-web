@@ -101,6 +101,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         v2ServiceRequestRepository=WebUtil.getBean(V2ServiceRequestRepository.class);
         selected = new AssetInfo();
         initCandidateKeyLabels();
+
     }
 
     private void initCandidateKeyLabels() {
