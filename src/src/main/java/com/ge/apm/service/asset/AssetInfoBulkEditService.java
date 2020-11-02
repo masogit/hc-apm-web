@@ -124,7 +124,7 @@ public class AssetInfoBulkEditService {
             }
             if (selectedColumns.contains("manufacture")) {
                 item.setManufacture(targetAsset.getManufacture());
-                item.setManufacture(targetAsset.getManufactureId());
+                item.setManufactureId(targetAsset.getManufactureId());
             }
             if (selectedColumns.contains("makerShortName")) {
                 item.setMakerShortName(targetAsset.getMakerShortName());
