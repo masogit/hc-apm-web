@@ -93,6 +93,11 @@
                             <p:autoComplete id="tags" multiple="true" value="#{userAccountController.selected.tags}" completeMethod="#{userAccountController.autoCompleteTags}"
                                             var="tag" itemLabel="#{tag}" itemValue="#{tag}" forceSelection="false" styleClass="user-tags"/>
                         </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.comments}</label>
+                            <p:inputText id="comment" label="#{msg.comments}" value="#{userAccountController.selected.comment}" required="false" requiredMessage="#{msg.comments} #{msg.ValidationRequire}" />
+                        </h:panelGroup>
                     </p:panelGrid>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{userAccountController.save}" value="#{msg.Save}" update="@(.datalist) :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'UserAccountEditDialog');"/>
