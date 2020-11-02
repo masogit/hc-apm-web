@@ -169,7 +169,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         List<ZkbPartOrder> historyList = zkbPartOrderRepository.findBySearchFilter(filters);
         Integer historyQty = 0;
         for(ZkbPartOrder o : historyList){
-            historyQty += o.getQty();
+            if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+                historyQty++;
+            }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+                historyQty += o.getQty();
+            }
         }
         if(historyQty >=3 ){
             return Boolean.FALSE;
