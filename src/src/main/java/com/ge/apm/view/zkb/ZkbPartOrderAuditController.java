@@ -55,6 +55,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
     private ZkbPartOrderRepository zkbPartOrderRepository;
     private I18nMessageRepository i18nDao;
+    private List<HashMap<String, Object>> v2_listHashMap;
 
     private List<HashMap<String, String>> partNoList = new ArrayList<>();
     private List<I18nMessage> returnTypeList= new ArrayList<>();
@@ -62,6 +63,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String showOrderedFieldsetText = "";
     private String queryStatus;
     private List<ZkbPartOrderItemVo> zkbPartOrderItemVoList = new ArrayList<>();
+    private List<ZkbContract> contractList;
 
 
     @Override
@@ -90,7 +92,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 artificialType = this.selected.getArtificialType();
             }
             zkbContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
+            if(zkbContract != null){
+                contractList = new ArrayList<>();
+                contractList.add(zkbContract);
+            }
             selectedWorkFlow = m.get("V2_WorkOrder") == null ? null : (V2_WorkOrder)m.get("V2_WorkOrder");
+            HashMap<String, Object> mm = m.get("v2") == null ? null : (HashMap<String, Object>)m.get("v2");
+            v2_listHashMap = new ArrayList<>();
+            if(mm != null){
+                v2_listHashMap.add(mm);
+            }
             v2_blobObjectList = m.get("v2_blobObjectList") == new ArrayList<>() ? null : (List<V2_BlobObject>)m.get("v2_blobObjectList");
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selectedId);
             fieldRendered();
@@ -830,6 +841,22 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setZkbPartOrderItemVoList(List<ZkbPartOrderItemVo> zkbPartOrderItemVoList) {
         this.zkbPartOrderItemVoList = zkbPartOrderItemVoList;
+    }
+
+    public List<HashMap<String, Object>> getV2_listHashMap() {
+        return v2_listHashMap;
+    }
+
+    public void setV2_listHashMap(List<HashMap<String, Object>> v2_listHashMap) {
+        this.v2_listHashMap = v2_listHashMap;
+    }
+
+    public List<ZkbContract> getContractList() {
+        return contractList;
+    }
+
+    public void setContractList(List<ZkbContract> contractList) {
+        this.contractList = contractList;
     }
 
     @Override
