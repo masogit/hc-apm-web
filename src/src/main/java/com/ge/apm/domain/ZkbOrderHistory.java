@@ -77,16 +77,28 @@ public class ZkbOrderHistory {
     private Integer quantityIb;
 
     /**
-     * 人工备件数量
+     * 人工名额
      */
-    @Column(name = "spare_parts_quantity")
-    private Integer sparePartsQuantity;
+    @Column(name = "labour_quantity")
+    private Integer labourQuantity;
 
     /**
-     * fw
+     * 配件名额
      */
-    @Column(name = "fw")
-    private String fw;
+    @Column(name = "parts_quantity")
+    private Integer partsQuantity;
+
+    /**
+     * 探头名额
+     */
+    @Column(name = "probe_quantity")
+    private Integer probeQuantity;
+
+    /**
+     * 人工,备件，保险联合名额
+     */
+    @Column(name = "count_quantity")
+    private Integer countQuantity;
 
     /**
      * 发生日期
@@ -95,10 +107,10 @@ public class ZkbOrderHistory {
     private Date eventDate;
 
     /**
-     * 发生季度
+     * 类别
      */
-    @Column(name = "event_quarter")
-    private String eventQuarter;
+    @Column(name = "type")
+    private String type;
 
     /**
      * 系统编号
@@ -173,12 +185,6 @@ public class ZkbOrderHistory {
     private String act;
 
     /**
-     *剩余配件次数
-     */
-    @Column(name = "spare_parts_left")
-    private Integer sparePartsLeft;
-
-    /**
      *配件归还
      */
     @Column(name = "spare_parts_return")
@@ -197,10 +203,16 @@ public class ZkbOrderHistory {
     private String insuranceDescription;
 
     /**
-     *代理商确认派工
+     * 探头类型
      */
-    @Column(name = "arrangement")
-    private String arrangement;
+    @Column(name = "probe_type")
+    private String probeType;
+
+    /**
+     *是否使用名额
+     */
+    @Column(name = "use_status")
+    private String useStatus;
 
     /**
      *电话号码
@@ -209,10 +221,16 @@ public class ZkbOrderHistory {
     private String callNo;
 
     /**
-     *rowner
+     *Srowner
      */
     @Column(name = "rowner")
     private String rowner;
+
+    /**
+     * owner name
+     */
+    @Column(name = "owner_name")
+    private String ownerName;
 
     /**
      *进展状态
@@ -221,28 +239,11 @@ public class ZkbOrderHistory {
     private String status;
 
     /**
-     *归属人
-     */
-    @Column(name = "owner")
-    private String owner;
-
-    /**
-     *zone
-     */
-    @Column(name = "zone")
-    private String zone;
-
-    /**
-     *source
-     */
-    @Column(name = "source")
-    private String source;
-
-    /**
      *tenant_info表里uid
      */
     @Column(name = "tenant_uid")
     private String tenantUid;
+
 
     @Override
     public int hashCode() {
@@ -275,6 +276,14 @@ public class ZkbOrderHistory {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
     public String getRegion() {
@@ -333,20 +342,36 @@ public class ZkbOrderHistory {
         this.quantityIb = quantityIb;
     }
 
-    public Integer getSparePartsQuantity() {
-        return sparePartsQuantity;
+    public Integer getLabourQuantity() {
+        return labourQuantity;
     }
 
-    public void setSparePartsQuantity(Integer sparePartsQuantity) {
-        this.sparePartsQuantity = sparePartsQuantity;
+    public void setLabourQuantity(Integer labourQuantity) {
+        this.labourQuantity = labourQuantity;
     }
 
-    public String getFw() {
-        return fw;
+    public Integer getPartsQuantity() {
+        return partsQuantity;
     }
 
-    public void setFw(String fw) {
-        this.fw = fw;
+    public void setPartsQuantity(Integer partsQuantity) {
+        this.partsQuantity = partsQuantity;
+    }
+
+    public Integer getProbeQuantity() {
+        return probeQuantity;
+    }
+
+    public void setProbeQuantity(Integer probeQuantity) {
+        this.probeQuantity = probeQuantity;
+    }
+
+    public Integer getCountQuantity() {
+        return countQuantity;
+    }
+
+    public void setCountQuantity(Integer countQuantity) {
+        this.countQuantity = countQuantity;
     }
 
     public Date getEventDate() {
@@ -357,12 +382,12 @@ public class ZkbOrderHistory {
         this.eventDate = eventDate;
     }
 
-    public String getEventQuarter() {
-        return eventQuarter;
+    public String getType() {
+        return type;
     }
 
-    public void setEventQuarter(String eventQuarter) {
-        this.eventQuarter = eventQuarter;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getSystemNo() {
@@ -461,14 +486,6 @@ public class ZkbOrderHistory {
         this.act = act;
     }
 
-    public Integer getSparePartsLeft() {
-        return sparePartsLeft;
-    }
-
-    public void setSparePartsLeft(Integer sparePartsLeft) {
-        this.sparePartsLeft = sparePartsLeft;
-    }
-
     public String getSparePartsReturn() {
         return sparePartsReturn;
     }
@@ -493,12 +510,20 @@ public class ZkbOrderHistory {
         this.insuranceDescription = insuranceDescription;
     }
 
-    public String getArrangement() {
-        return arrangement;
+    public String getProbeType() {
+        return probeType;
     }
 
-    public void setArrangement(String arrangement) {
-        this.arrangement = arrangement;
+    public void setProbeType(String probeType) {
+        this.probeType = probeType;
+    }
+
+    public String getUseStatus() {
+        return useStatus;
+    }
+
+    public void setUseStatus(String useStatus) {
+        this.useStatus = useStatus;
     }
 
     public String getCallNo() {
@@ -517,44 +542,20 @@ public class ZkbOrderHistory {
         this.rowner = rowner;
     }
 
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public String getZone() {
-        return zone;
-    }
-
-    public void setZone(String zone) {
-        this.zone = zone;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
     }
 
     public String getTenantUid() {

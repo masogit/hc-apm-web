@@ -1,6 +1,7 @@
 package com.ge.apm.dao;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -66,4 +67,13 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
 
     @Query(nativeQuery = true, value = "SELECT  * FROM v2_work_order  WHERE asset_id=?1 and current_step_name in ?2")
     public List<V2_WorkOrder> findByAssetIdAndCurrentStepName(Integer asstId , Collection<String> c);
+
+
+    /**
+     * 设备ID
+     * @param assetIdList 设备ID
+     * @return
+     */
+    @Query(value = "SELECT count(id)  from v2_work_order  where asset_id in ?1 and created_date between ?2 and ?3", nativeQuery = true)
+    Integer fetchCount(List<Integer> assetIdList,Date firstday, Date lastday);
 }
