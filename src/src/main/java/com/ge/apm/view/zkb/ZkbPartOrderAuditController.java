@@ -165,7 +165,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导","");
                 //return;
             }
-            if(showcheckContractWeekFlag){
+            if(canEditFlag){
                 String validString = zkbPartOrderService.checkContractWeekValid(selected,zkbContract);
                 if(StringUtils.isNotBlank(validString)){
                     WebUtil.addErrorMessage(validString,"");
@@ -174,7 +174,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
-    private Boolean showcheckContractWeekFlag = false;
     public void fieldRendered(){
         if(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
             if(currentUser.getTenantUID().equals(selected.getTenantUID())){
@@ -208,12 +207,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
                     if(currentUser.getLoginName().equals(c.getLoginName())){
                         canEditFlag = true;
-                        if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(c.getConfigType()) ||
-                           ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(c.getConfigType()) ||
-                           ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(c.getConfigType()) ||
-                           ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(c.getConfigType())){
-                            showcheckContractWeekFlag = true;
-                        }
                     }
                 }
             }
