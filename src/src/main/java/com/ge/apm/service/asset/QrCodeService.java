@@ -660,7 +660,21 @@ public class QrCodeService {
             }
         }
     }
-
+    public void releaseOrSaveQrCode(String qrCode, String siteUid) {
+        QrCodeLib qrCodeLib = findByQrCode(qrCode, siteUid);
+        if (qrCodeLib != null) {
+            if (qrCodeLib.getStatus() != 4) {
+                qrCodeLib.setStatus(5);
+                qrCodeLibDao.save(qrCodeLib);
+                List<V2_BlobObject> blobObjectsList = blobObjectService.findBlobObjectsByBoUid(qrCodeLib.getUid());
+                blobObjectsList.forEach(item -> {
+                    blobObjectService.deleteBlobFile(item);
+                });
+            }
+        }else{
+            createSpecialQrCode(qrCode, siteUid);
+        }
+    }
     public QrCodeLib findByQrCode(String qrCode, String siteUid) {
         return qrCodeLibDao.findByQrCode(qrCode, siteUid);
     }
