@@ -25,10 +25,7 @@ public class OrderHistoryVO extends ZkbOrderHistory {
                 &&this.getContractBeginningTime()==null
                 &&this.getContractEndingTime()==null
                 &&this.getQuantityIb()==null
-                &&this.getSparePartsQuantity()==null
-                &&this.getFw()==null
                 &&this.getEventDate()==null
-                &&this.getEventQuarter()==null
                 &&this.getSystemNo()==null
                 &&this.getFaultDescription()==null
                 &&this.getHospitalName()==null
@@ -41,17 +38,12 @@ public class OrderHistoryVO extends ZkbOrderHistory {
                 &&this.getQuantity()==null
                 &&this.getSr()==null
                 &&this.getAct()==null
-                &&this.getSparePartsLeft()==null
                 &&this.getSparePartsReturn()==null
                 &&this.getComment()==null
                 &&this.getInsuranceDescription()==null
-                &&this.getArrangement()==null
                 &&this.getCallNo()==null
                 &&this.getRowner()==null
-                &&this.getStatus()==null
-                &&this.getOwner()==null
-                &&this.getZone()==null
-                &&this.getSource()==null){
+                &&this.getStatus()==null){
             flag = true;
         }
         return flag;
@@ -68,10 +60,7 @@ public class OrderHistoryVO extends ZkbOrderHistory {
         stringBuffer=stringBuffer.append(this.getContractBeginningTime() != null ? this.getContractBeginningTime().toString() : "");
         stringBuffer=stringBuffer.append(this.getContractEndingTime() != null ? this.getContractEndingTime().toString() : "");
         stringBuffer=stringBuffer.append(this.getQuantityIb() != null ? this.getQuantityIb().toString() : "");
-        stringBuffer=stringBuffer.append(this.getSparePartsQuantity() != null ? this.getSparePartsQuantity().toString() : "");
-        stringBuffer=stringBuffer.append(this.getFw() != null ? this.getFw().toString() : "");
         stringBuffer=stringBuffer.append(this.getEventDate() != null ? this.getEventDate().toString() : "");
-        stringBuffer=stringBuffer.append(this.getEventQuarter() != null ? this.getEventQuarter().toString() : "");
         stringBuffer=stringBuffer.append(this.getSystemNo() != null ? this.getSystemNo().toString() : "");
         stringBuffer=stringBuffer.append(this.getFaultDescription() != null ? this.getFaultDescription().toString() : "");
         stringBuffer=stringBuffer.append(this.getHospitalName() != null ? this.getHospitalName().toString() : "");
@@ -84,17 +73,12 @@ public class OrderHistoryVO extends ZkbOrderHistory {
         stringBuffer=stringBuffer.append(this.getQuantity() != null ? this.getQuantity().toString() : "");
         stringBuffer=stringBuffer.append(this.getSr() != null ? this.getSr().toString() : "");
         stringBuffer=stringBuffer.append(this.getAct() != null ? this.getAct().toString() : "");
-        stringBuffer=stringBuffer.append(this.getSparePartsLeft() != null ? this.getSparePartsLeft().toString() : "");
         stringBuffer=stringBuffer.append(this.getSparePartsReturn() != null ? this.getSparePartsReturn().toString() : "");
         stringBuffer=stringBuffer.append(this.getComment() != null ? this.getComment().toString() : "");
         stringBuffer=stringBuffer.append(this.getInsuranceDescription() != null ? this.getInsuranceDescription().toString() : "");
-        stringBuffer=stringBuffer.append(this.getArrangement() != null ? this.getArrangement().toString() : "");
         stringBuffer=stringBuffer.append(this.getCallNo() != null ? this.getCallNo().toString() : "");
         stringBuffer=stringBuffer.append(this.getRowner() != null ? this.getRowner().toString() : "");
         stringBuffer=stringBuffer.append(this.getStatus() != null ? this.getStatus().toString() : "");
-        stringBuffer=stringBuffer.append(this.getOwner() != null ? this.getOwner().toString() : "");
-        stringBuffer=stringBuffer.append(this.getZone() != null ? this.getZone().toString() : "");
-        stringBuffer=stringBuffer.append(this.getSource() != null ? this.getSource().toString() : "");
         return stringBuffer.toString().hashCode();
     }
 
