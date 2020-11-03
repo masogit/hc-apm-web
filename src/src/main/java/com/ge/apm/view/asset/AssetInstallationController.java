@@ -381,6 +381,10 @@ public class AssetInstallationController {
             return null;
         }
         List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+        if(itemList.isEmpty()){
+            WebUtil.addErrorMessage(String.format("没有找到合同编号[%s]以及所属科室的到货单记录 .", contractNum));
+            return null;
+        }
         String errorMessage = "";
         for(ArrivalListItem arrivalListItem : itemList){
             String message = "";
@@ -412,9 +416,23 @@ public class AssetInstallationController {
                 message = message + "、资产编号不能为空";
                 isValidate = false;
             }
-            if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getQrCode())) {
+            String qrCode = arrivalListItem.getQrCode();
+            if (needInstorageCheck && StringUtils.isEmpty(qrCode)) {
                 message = message + "、二维码不能为空";
                 isValidate = false;
+            }
+            if(StringUtils.isNotBlank(qrCode)){
+                if (qrCode.length() > 64) {
+                    message = message + "、二维码超长,最大64位";
+                    isValidate = false;
+                }else{
+                    releaseOrSaveQrCode(qrCode, arrivalListItem.getArrivalList().getSiteUID());
+                    String qrCodeStatus = qrCodeService.checkAvailableBeforeSave(qrCode, arrivalListItem.getArrivalList().getSiteUID());
+                    if (!"Normal".equals(qrCodeStatus)) {
+                        message = message + "、" + WebUtil.getMessage(qrCodeStatus);
+                        isValidate = false;
+                    }
+                }
             }
             if(arrivalListItem.getBusinessAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
                 arrivalListItem.setBusinessAckStatus(arrivalListItem.ACK_STATUS_PASS);
@@ -431,13 +449,6 @@ public class AssetInstallationController {
             if(arrivalListItem.getFixassetAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
                 arrivalListItem.setFixassetAckStatus(arrivalListItem.ACK_STATUS_PASS);
                 arrivalListItem.setFixassetAckDate(new Date());
-            }
-            if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-                String qrCodeStatus = qrCodeService.checkAvailableBeforeSave(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
-                if (!"Normal".equals(qrCodeStatus)) {
-                    message = message + "、" + WebUtil.getMessage(qrCodeStatus);
-                    isValidate = false;
-                }
             }
 
             Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
@@ -743,6 +754,11 @@ public class AssetInstallationController {
             oldQrCode = "";
         }
         onDepartNumChange("qrCode");
+    }
+
+    public void releaseOrSaveQrCode(String qrcode, String siteUid) {
+        //release old qrCode
+        qrCodeService.releaseOrSaveQrCode(oldQrCode, arrivalListItem.getArrivalList().getSiteUID());
     }
 
     public void onDepartNumChange(String fieldName) {
