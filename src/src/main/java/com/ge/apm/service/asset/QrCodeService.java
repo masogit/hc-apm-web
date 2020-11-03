@@ -663,18 +663,8 @@ public class QrCodeService {
     public void releaseOrSaveQrCode(String qrCode, String siteUid) {
         QrCodeLib qrCodeLib = findByQrCode(qrCode, siteUid);
         if (qrCodeLib != null) {
-            if (qrCodeLib.getStatus() != 1) {
-                qrCodeLib.setStatus(1);
-                qrCodeLib.setAssetGroup(null);
-                qrCodeLib.setAssetName(null);
-                qrCodeLib.setComment(null);
-                qrCodeLib.setFeedback(null);
-                qrCodeLib.setModelNum(null);
-                qrCodeLib.setIssueDate(new Date());
-                qrCodeLib.setSerialNum(null);
-                qrCodeLib.setSubmitDate(null);
-                qrCodeLib.setSubmitWechatId(null);
-                qrCodeLib.setUserId(null);
+            if (qrCodeLib.getStatus() != 4) {
+                qrCodeLib.setStatus(5);
                 qrCodeLibDao.save(qrCodeLib);
                 List<V2_BlobObject> blobObjectsList = blobObjectService.findBlobObjectsByBoUid(qrCodeLib.getUid());
                 blobObjectsList.forEach(item -> {
