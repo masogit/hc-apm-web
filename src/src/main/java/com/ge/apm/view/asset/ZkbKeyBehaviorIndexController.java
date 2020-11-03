@@ -7,6 +7,7 @@ import com.ge.apm.domain.ZkbKeyBehaviorIndex;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbKeyBehaviorIndexService;
 import com.ge.apm.view.sysutil.UserContextService;
+import net.sf.json.util.WebUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -99,6 +100,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         zkbKeyBehaviorIndexService = WebUtil.getBean(ZkbKeyBehaviorIndexService.class);
         zkbKeyBehaviorIndexRepository = WebUtil.getBean(ZkbKeyBehaviorIndexRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        currentUser = UserContextService.getCurrentUserAccount();
         loadData();
         if(!userContextService.isZkbAdmin())
         {
