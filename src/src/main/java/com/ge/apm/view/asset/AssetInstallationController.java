@@ -421,18 +421,10 @@ public class AssetInstallationController {
                 message = message + "、二维码不能为空";
                 isValidate = false;
             }
-            if(StringUtils.isNotBlank(qrCode)){
-                if (qrCode.length() > 64) {
-                    message = message + "、二维码超长,最大64位";
-                    isValidate = false;
-                }else{
-                    releaseOrSaveQrCode(qrCode, arrivalListItem.getArrivalList().getSiteUID());
-                    String qrCodeStatus = qrCodeService.checkAvailableBeforeSave(qrCode, arrivalListItem.getArrivalList().getSiteUID());
-                    if (!"Normal".equals(qrCodeStatus)) {
-                        message = message + "、" + WebUtil.getMessage(qrCodeStatus);
-                        isValidate = false;
-                    }
-                }
+            String qrCodeStatus = qrCodeService.checkAvailableBeforeSaveYunNan(qrCode, arrivalListItem.getArrivalList().getSiteUID());
+            if (!"Normal".equals(qrCodeStatus)) {
+                message = message + "、" + WebUtil.getMessage(qrCodeStatus);
+                isValidate = false;
             }
             if(arrivalListItem.getBusinessAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
                 arrivalListItem.setBusinessAckStatus(arrivalListItem.ACK_STATUS_PASS);
@@ -754,11 +746,6 @@ public class AssetInstallationController {
             oldQrCode = "";
         }
         onDepartNumChange("qrCode");
-    }
-
-    public void releaseOrSaveQrCode(String qrcode, String siteUid) {
-        //release old qrCode
-        qrCodeService.releaseOrSaveQrCode(qrcode, siteUid);
     }
 
     public void onDepartNumChange(String fieldName) {
