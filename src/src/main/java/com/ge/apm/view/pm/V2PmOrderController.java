@@ -1768,6 +1768,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             pmIdList= new ArrayList<>();
 
         }
+        if(selectedMap.size() > 0){
+            selectedMap = new HashMap();
+        }
         return result;
     }
 

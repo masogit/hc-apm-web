@@ -11,8 +11,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -153,6 +151,9 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "asset_group")
     private Integer assetGroup;//设备分类
+
+    @Column(name = "asset_class") // 1 医疗设备  2 家具
+    private Integer assetClass;//资产分类
 
     @Column(name = "asset_group_secondary")
     private Integer assetGroupSecondary;//设备分类2级
@@ -1131,6 +1132,10 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setAssetGroup(Integer assetGroup) {
         this.assetGroup = assetGroup;
     }
+
+    public Integer getAssetClass() { return assetClass; }
+
+    public void setAssetClass(Integer assetClass) { this.assetClass = assetClass; }
 
     public Integer getAssetDeptId() {
         return assetDeptId;
