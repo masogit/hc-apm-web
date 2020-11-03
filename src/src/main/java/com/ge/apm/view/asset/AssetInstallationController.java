@@ -758,7 +758,7 @@ public class AssetInstallationController {
 
     public void releaseOrSaveQrCode(String qrcode, String siteUid) {
         //release old qrCode
-        qrCodeService.releaseOrSaveQrCode(oldQrCode, arrivalListItem.getArrivalList().getSiteUID());
+        qrCodeService.releaseOrSaveQrCode(qrcode, siteUid);
     }
 
     public void onDepartNumChange(String fieldName) {
