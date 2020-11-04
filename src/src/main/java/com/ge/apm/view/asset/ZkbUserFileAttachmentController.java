@@ -5,8 +5,11 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.FileAttachmentOrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.ZkbFileDirectory;
 import com.ge.apm.service.zkb.V2_BlobObjectService;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -63,12 +66,18 @@ public class ZkbUserFileAttachmentController extends GenericCRUDUUIDController<F
      */
     private List<V2_BlobObject> v2_BlobObjectList;
 
+    /**
+     * 目录关系service
+     */
+    private ZkbFileDirectoryService zkbFileDirectoryService;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(FileAttachmentOrgInfoRepository.class);
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         v2_BlobObjectService = WebUtil.getBean(V2_BlobObjectService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         this.loadData();
     }
 
@@ -94,6 +103,35 @@ public class ZkbUserFileAttachmentController extends GenericCRUDUUIDController<F
                 this.boSubType,
                 this.operationType,
                 tenantUID);
+    }
+    /**
+     * 获取所有主目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> findMainDirectory() {
+        return zkbFileDirectoryService.findMainDirectory(null);
+    }
+
+
+    /**
+     * 根据主目录值获取子目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> getSubZkbFileDirectoryListByMainDirectory() {
+        if(StringUtils.isBlank(this.mainDirectory))
+        {
+            return null;
+        }
+        List<ZkbFileDirectory> mainZkbFileDirectory = this.zkbFileDirectoryService.findByLevelAndName(
+                ZkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,
+                this.getMainDirectory());
+        if(CollectionUtils.isEmpty(mainZkbFileDirectory))
+        {
+            return null;
+        }
+        ZkbFileDirectory zkbFileDirectory = new ZkbFileDirectory();
+        zkbFileDirectory=mainZkbFileDirectory.get(0);
+        return this.zkbFileDirectoryService.findByZkbFileDirectory(zkbFileDirectory);
     }
 
     public String getMainDirectory() {

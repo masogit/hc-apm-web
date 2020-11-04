@@ -6,12 +6,7 @@
 package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.AssetLifecycleEventRepository;
-import com.ge.apm.dao.ServiceRequestRepository;
-import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.V2_PmOrderRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
@@ -20,6 +15,8 @@ import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
@@ -54,6 +51,8 @@ public class AssetInfoMgrService {
     @Autowired
     private NurseSiteMaintainService nurseSiteMaintainService;
 
+    private static final Logger logger = LoggerFactory.getLogger(AssetInfoMgrService.class);
+
     public void deleteAsset(AssetInfo asset) {
         List<V2_ServiceRequest> srlist = srDao.findByAssetId(asset.getId());
         if (srlist != null && !srlist.isEmpty()) {
@@ -85,6 +84,7 @@ public class AssetInfoMgrService {
         asset.setLastModifiedDate(new Date());
         assetDao.save(asset);
         updateNurseSiteMaintain(asset.getUid());
+        logger.info("delete asset info successful. assetName: {}", asset.getName());
     }
     
     public void updateNurseSiteMaintain(String assetUid){
@@ -118,6 +118,7 @@ public class AssetInfoMgrService {
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));  //不能待报废
+        assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull,null));
 
         if (asset == null ? clinicalDeptUID != null : asset.getClinicalDeptUID() != null) {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, asset == null ? clinicalDeptUID : asset.getClinicalDeptUID()));

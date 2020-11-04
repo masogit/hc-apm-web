@@ -2,7 +2,10 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.InventoryOrderDetail;
 
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
+
+import java.util.List;
 
 /**
  * Created by 212605082 on 2017/6/20.
@@ -22,8 +25,12 @@ public interface InventoryOrderDetailAssetInfoRepository extends GenericReposito
 //    List<InventoryOrderDetail> getInventoryAssetList(String orderId, String clinicalDeptUID);
 //
 //    @Query(nativeQuery = true, value = "SELECT * FROM inventory_order_detail d LEFT JOIN asset_info a ON d.asset_id = a.id LEFT JOIN inventory_order o ON d.inventory_order_id = o.id WHERE o.is_finished = FALSE AND a.is_deleted = FALSE AND a.qr_code = ?1 AND a.tenant_uid = ?2")
-//    List<InventoryOrderDetail> findByQrCodeAndTenant(String qrCode, String tenantUID);
+//    List<InventoryOrderDetail> findByQrCodeAndTenant(String qrCogde, String tenantUID);
 //
 //    @Query(nativeQuery = true, value = "SELECT * FROM inventory_order_detail d LEFT JOIN asset_info a ON d.asset_id = a.id LEFT JOIN inventory_order o ON d.inventory_order_id = o.id WHERE o.is_finished = FALSE AND a.is_deleted = FALSE AND a.depart_num = ?1 AND a.tenant_uid = ?2")
 //    List<InventoryOrderDetail> findByDepartNumAndTenant(String departNum, String tenantUID);
+
+    @Query(value = "SELECT count(1) FROM inventory_order_detail LEFT JOIN inventory_order ON inventory_order_detail.inventory_order_id = inventory_order.\"id\" WHERE asset_id IN (?1) AND status = 0 AND inventory_order.is_finished = FALSE",nativeQuery = true)
+    int getInventoryingAssetCount(List<Integer> assetIds);
+
 }

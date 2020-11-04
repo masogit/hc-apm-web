@@ -1,22 +1,17 @@
 package com.ge.apm.view.asset;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.event.AjaxBehaviorEvent;
-
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.criterion.Order;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -28,20 +23,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-
-import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
-import com.ge.apm.service.orginfo.OrgInfoTreeService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.event.AjaxBehaviorEvent;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -107,6 +102,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> clinicalDeptList;
 
     private Integer assetGroup;
+    private Integer assetClass;
     private Integer assetGroupSecondary;
 
     private List<I18nMessage> assetGroupSecondayList;
@@ -444,6 +440,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void deleteAsset(AssetInfo asset) {
         int originStatus = asset.getStatus();
         aiMgrService.deleteAsset(asset);
+        logger.info("delete asset successful. assetName: {}", asset.getName());
         assetLifecyleService.saveLifecycle(originStatus,asset,UserContextService.getCurrentUserAccount());
     }
 
@@ -478,6 +475,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         logger.info("exported asset list to excel, start to get input stream");
 
         excelFile = new DefaultStreamedContent(template.getInputStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+
+        logger.info("export file: AssetInfo_export.xlsx successful.");
     }
 
     public void batchProcessToBeTerminated() {
@@ -707,6 +706,16 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public void assetClassChangeListener() {
+
+        if (assetClass == null) {
+            assetGroupSecondayList = Collections.emptyList();
+        } else {
+            assetGroupSecondayList = i18nDao.getByMsgTypeAndSiteId("assetClassSecondary_" + String.valueOf(assetGroup.intValue()), userContextService.getLoginUser().getSiteId());
+        }
+
+    }
+
     public void assetGroupSecondaryChangeListener() {
 
     }
@@ -874,13 +883,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return t -> seen.add(keyExtractor.apply(t));
     }
 
-    public Integer getAssetGroup() {
-        return assetGroup;
-    }
+    public Integer getAssetGroup() { return assetGroup; }
 
     public void setAssetGroup(Integer assetGroup) {
         this.assetGroup = assetGroup;
     }
+
+    public Integer getAssetClass() { return assetClass; }
+
+    public void setAssetClass(Integer assetClass) { this.assetClass = assetClass; }
 
     public List<I18nMessage> getAssetGroupSecondayList() {
         return assetGroupSecondayList;

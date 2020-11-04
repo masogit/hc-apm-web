@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.ge.apm.service.asset.AssetInfoBulkEditUtils.*;
 
@@ -31,14 +34,33 @@ public class AssetInfoBulkEditService {
     @Autowired
     private RelRuleAssetRepository relRuleAssetDao;
 
+    @Autowired
+    private SharedAssetRequestRepository sharedAssetRequestRepository;
+
+    @Autowired
+    private InventoryOrderDetailAssetInfoRepository inventoryOrderDetailAssetInfoRepository;
+
+    @Autowired
+    SharedAssetReqDetailRepository sharedAssetReqDetailRepository;
+
+    @Autowired
+    private NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
+
+    @Autowired
+    private NurseSiteMaintainConfigRepository  nurseSiteMaintainConfigRepository;
+
+    @Autowired
+    private AssetTagRuleRepository  assetTagRuleRepository;
+
     @Transactional
     public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
-
 
         commitCorrectiveMaintenanceBulkEdit(assets, targetAsset);
         commitPreventativeMaintenanceBulkEdit(assets, targetAsset);
         commitQrCode(assets, targetAsset);
         commitPmRule(assets, targetAsset);
+        commitAssetTagRule(assets);
+        commitNurseSiteConfig(assets);
 
         //make sure qrcode site update before asset site update, due to qrcode update depend on asset site
         commitSiteForAssetItself(assets, targetAsset);
@@ -48,9 +70,213 @@ public class AssetInfoBulkEditService {
     public void commitBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
 
         for (AssetInfo item: assets) {
-
+            if (selectedColumns.contains("serialNum")) {
+                item.setSerialNum(targetAsset.getSerialNum());
+            }
+            if (selectedColumns.contains("name")) {
+                item.setName(targetAsset.getName());
+            }
+            if (selectedColumns.contains("aliasName")) {
+                item.setAliasName(targetAsset.getAliasName());
+            }
             if (selectedColumns.contains("assetGroup")) {
                 item.setAssetGroup(targetAsset.getAssetGroup());
+            }
+            if (selectedColumns.contains("assetOwnerName")) {
+                item.setAssetOwnerName(targetAsset.getAssetOwnerName());
+                item.setAssetOwnerId(targetAsset.getAssetOwnerId());
+                item.setAssetOwnerTel(targetAsset.getAssetOwnerTel());
+            }
+            if (selectedColumns.contains("assetOwnerTel")) {
+                item.setAssetOwnerTel(targetAsset.getAssetOwnerTel());
+            }
+            if (selectedColumns.contains("assetOwnerName2")) {
+                item.setAssetOwnerName2(targetAsset.getAssetOwnerName2());
+                item.setAssetOwnerId2(targetAsset.getAssetOwnerId2());
+                item.setAssetOwnerTel2(targetAsset.getAssetOwnerTel2());
+            }
+            if (selectedColumns.contains("assetOwnerTel2")) {
+                item.setAssetOwnerTel2(targetAsset.getAssetOwnerTel2());
+            }
+            if (selectedColumns.contains("assetOwnerName3")) {
+                item.setAssetOwnerId3(targetAsset.getAssetOwnerId3());
+                item.setAssetOwnerName3(targetAsset.getAssetOwnerName3());
+                item.setAssetOwnerTel3(targetAsset.getAssetOwnerTel3());
+            }
+            if (selectedColumns.contains("assetOwnerTel3")) {
+                item.setAssetOwnerTel3(targetAsset.getAssetOwnerTel3());
+            }
+            if (selectedColumns.contains("pmOwnerName")) {
+                item.setPmOwnerName(targetAsset.getPmOwnerName());
+                item.setPmOwnerId(targetAsset.getPmOwnerId());
+                item.setPmOwnerTel(targetAsset.getPmOwnerTel());
+            }
+            if (selectedColumns.contains("pmOwnerTel")) {
+                item.setPmOwnerTel(targetAsset.getPmOwnerTel());
+            }
+            if (selectedColumns.contains("clinicalOwnerName")) {
+                item.setClinicalOwnerName(targetAsset.getClinicalOwnerName());
+                item.setClinicalOwnerId(targetAsset.getClinicalOwnerId());
+                item.setClinicalOwnerTel(targetAsset.getClinicalOwnerTel());
+            }
+            if (selectedColumns.contains("clinicalOwnerTel")) {
+                item.setClinicalOwnerTel(targetAsset.getClinicalOwnerTel());
+            }
+            if (selectedColumns.contains("manufacture")) {
+                item.setManufacture(targetAsset.getManufacture());
+                item.setManufactureId(targetAsset.getManufactureId());
+            }
+            if (selectedColumns.contains("makerShortName")) {
+                item.setMakerShortName(targetAsset.getMakerShortName());
+            }
+            if (selectedColumns.contains("vendor")) {
+                item.setVendor(targetAsset.getVendor());
+                item.setSupplierId(targetAsset.getSupplierId());
+                item.setVendorTel(targetAsset.getVendorTel());
+            }
+            if (selectedColumns.contains("vendorTel")) {
+                item.setVendorTel(targetAsset.getVendorTel());
+            }
+            if (selectedColumns.contains("maitanance")) {
+                item.setMaitanance(targetAsset.getMaitanance());
+                item.setMaitananceId(targetAsset.getMaitananceId());
+                item.setMaitananceTel(targetAsset.getMaitananceTel());
+            }
+            if (selectedColumns.contains("maitananceTel")) {
+                item.setMaitananceTel(targetAsset.getMaitananceTel());
+            }
+            if (selectedColumns.contains("nationalStandardCode")) {
+                item.setNationalStandardCode(targetAsset.getNationalStandardCode());
+            }
+            if (selectedColumns.contains("assetDeptName")) {
+                item.setAssetDeptId(targetAsset.getAssetDeptId());
+                item.setAssetDeptUID(targetAsset.getAssetDeptUID());
+            }
+            if (selectedColumns.contains("assetValueCategory")) {
+                item.setAssetValueCategory(targetAsset.getAssetValueCategory());
+            }
+            if (selectedColumns.contains("capitalSource2")) {
+                item.setCapitalSource2(targetAsset.getCapitalSource2());
+            }
+            if (selectedColumns.contains("deviceName")) {
+                item.setDeviceName(targetAsset.getDeviceName());
+            }
+            if (selectedColumns.contains("systemId")) {
+                item.setSystemId(targetAsset.getSystemId());
+            }
+            if (selectedColumns.contains("financingNum")) {
+                item.setFinancingNum(targetAsset.getFinancingNum());
+            }
+            if (selectedColumns.contains("departNum")) {
+                item.setDepartNum(targetAsset.getDepartNum());
+            }
+            if (selectedColumns.contains("barcode")) {
+                item.setBarcode(targetAsset.getBarcode());
+            }
+            if (selectedColumns.contains("registrationNo")) {
+                item.setRegistrationNo(targetAsset.getRegistrationNo());
+            }
+            if (selectedColumns.contains("modalityId")) {
+                item.setModalityId(targetAsset.getModalityId());
+            }
+            if (selectedColumns.contains("qrCode")) {
+                item.setQrCode(targetAsset.getQrCode());
+            }
+            if (selectedColumns.contains("functionType")) {
+                item.setFunctionType(targetAsset.getFunctionType());
+            }
+            if (selectedColumns.contains("functionGroup")) {
+                item.setFunctionGroup(targetAsset.getFunctionGroup());
+            }
+            if (selectedColumns.contains("assetCode68")) {
+                item.setAssetCode68(targetAsset.getAssetCode68());
+            }
+            if (selectedColumns.contains("functionGrade")) {
+                item.setFunctionGrade(targetAsset.getFunctionGrade());
+            }
+            if (selectedColumns.contains("repairForm")) {
+                item.setRepairForm(targetAsset.getRepairForm());
+            }
+            if (selectedColumns.contains("locationCode")) {
+                item.setLocationCode(targetAsset.getLocationCode());
+            }
+            if (selectedColumns.contains("locationName")) {
+                item.setLocationName(targetAsset.getLocationName());
+            }
+            if (selectedColumns.contains("status")) {
+                item.setStatus(targetAsset.getStatus());
+            }
+            if (selectedColumns.contains("deviceStatus")) {
+                item.setDeviceStatus(targetAsset.getDeviceStatus());
+            }
+            if (selectedColumns.contains("isAssetPMed")) {
+                item.setIsPm(targetAsset.getIsPm());
+            }
+            if (selectedColumns.contains("isAssetChecked")) {
+                item.setIsChecked(targetAsset.getIsChecked());
+            }
+            if (selectedColumns.contains("comments")) {
+                item.setComments(targetAsset.getComments());
+            }
+            if (selectedColumns.contains("assetUsage")) {
+                item.setAssetUsage(targetAsset.getAssetUsage());
+            }
+            if (selectedColumns.contains("capitalSource")) {
+                item.setCapitalSource(targetAsset.getCapitalSource());
+            }
+            if (selectedColumns.contains("measureGrade")) {
+                item.setMeasureGrade(targetAsset.getMeasureGrade());
+            }
+            if (selectedColumns.contains("riskGrade")) {
+                item.setRiskGrade(targetAsset.getRiskGrade());
+            }
+            if (selectedColumns.contains("emergencyEquipment")) {
+                item.setEmergencyEquipment(targetAsset.getEmergencyEquipment());
+            }
+            if (selectedColumns.contains("importEquipment")) {
+                item.setImportEquipment(targetAsset.getImportEquipment());
+            }
+            if (selectedColumns.contains("measuringItemCategory")) {
+                item.setMeasuringItemCategory(targetAsset.getMeasuringItemCategory());
+            }
+            if (selectedColumns.contains("accountingCategory")) {
+                item.setAccountingCategory(targetAsset.getAccountingCategory());
+            }
+            if (selectedColumns.contains("manufactDate")) {
+                item.setManufactDate(targetAsset.getManufactDate());
+            }
+            if (selectedColumns.contains("purchaseDate")) {
+                item.setPurchaseDate(targetAsset.getPurchaseDate());
+            }
+            if (selectedColumns.contains("arriveDate")) {
+                item.setArriveDate(targetAsset.getArriveDate());
+            }
+            if (selectedColumns.contains("installDate")) {
+                item.setInstallDate(targetAsset.getInstallDate());
+            }
+            if (selectedColumns.contains("factoryWarrantyDate")) {
+                item.setFactoryWarrantyDate(targetAsset.getFactoryWarrantyDate());
+            }
+            if (selectedColumns.contains("warrantyDate")) {
+                item.setWarrantyDate(targetAsset.getWarrantyDate());
+            }
+            if (selectedColumns.contains("terminateDate")) {
+                item.setTerminateDate(targetAsset.getTerminateDate());
+            }
+            if (selectedColumns.contains("isWarrantyNotice")) {
+                item.setWarranty(targetAsset.getWarranty());
+            }
+            if (selectedColumns.contains("purchasePrice")) {
+                item.setPurchasePrice(targetAsset.getPurchasePrice());
+            }
+            if (selectedColumns.contains("salvageValue")) {
+                item.setSalvageValue(targetAsset.getSalvageValue());
+            }
+            if (selectedColumns.contains("lifecycle")) {
+                item.setLifecycle(targetAsset.getLifecycle());
+            }
+            if (selectedColumns.contains("depreciationMethod")) {
+                item.setDepreciationMethod(targetAsset.getDepreciationMethod());
             }
         }
 
@@ -68,6 +294,10 @@ public class AssetInfoBulkEditService {
             item.setClinicalDeptId(targetAsset.getClinicalDeptOrg().getId());
             item.setClinicalDeptUID(targetAsset.getClinicalDeptOrg().getUid());
             item.setClinicalDeptName(targetAsset.getClinicalDeptOrg().getName());
+
+            //clear asset dept
+            item.setAssetDeptId(null);
+            item.setAssetDeptUID(null);
         }
 
         assetInfoDao.save(assets);
@@ -103,6 +333,9 @@ public class AssetInfoBulkEditService {
 
             for (V2_ServiceRequest serviceRequest: serviceRequests) {
                 List<V2_WorkOrder> workOrders = serviceRequest.getV2_workOrder_List();
+                serviceRequest.setFromDeptId(targetAsset.getClinicalDeptOrg().getId());
+                serviceRequest.setFromDeptUID(targetAsset.getClinicalDeptOrg().getUid());
+                serviceRequest.setFromDeptName(targetAsset.getClinicalDeptOrg().getName());
 
                 for (V2_WorkOrder workOrder: workOrders) {
                     List<V2_WorkOrder_Detail> details = workOrder.getV2_workOrder_detail_list();
@@ -168,6 +401,36 @@ public class AssetInfoBulkEditService {
         }
 
     }
-    
+
+    public void commitNurseSiteConfig(List<AssetInfo> assets) {
+        if(assets != null && !assets.isEmpty()){
+            List<String> uids = assets.stream().map(p->p.getUid()).collect(Collectors.toList());
+            List<NurseSiteMaintainConfigItem> assetinfos = nurseSiteMaintainConfigItemRepository.findByAssetUid(uids);
+            if(assetinfos !=null && !assetinfos.isEmpty()){
+                Set<String> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
+                nurseSiteMaintainConfigItemRepository.deleteMaintainData(ids);
+                Set<String> parentIds = assetinfos.stream().map(p->p.getParentId()).collect(Collectors.toSet());
+                List<NurseSiteMaintainConfigItem> items = nurseSiteMaintainConfigItemRepository.findByParentIds(parentIds);
+                if(items !=null && !items.isEmpty()){
+                    Set<String> temp = items.stream().map(u->u.getParentId()).collect(Collectors.toSet());
+                    parentIds.removeAll(temp);
+                }
+                if(parentIds !=null && !parentIds.isEmpty()){
+                    nurseSiteMaintainConfigRepository.deleteMaintainConfigData(parentIds);
+                }
+            }
+        }
+    }
+    public void commitAssetTagRule(List<AssetInfo> assets) {
+        if(assets != null && !assets.isEmpty()){
+            List<Integer> uids = assets.stream().map(p->p.getId()).collect(Collectors.toList());
+            List<AssetTagRule> assetinfos = assetTagRuleRepository.findByAssetUid(uids);
+            if(assetinfos !=null && !assetinfos.isEmpty()){
+                Set<Integer> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
+                assetTagRuleRepository.deleteAssetTagRuleData(ids);
+            }
+        }
+    }
+
 
 }

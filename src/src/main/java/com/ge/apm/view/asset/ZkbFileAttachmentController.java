@@ -11,6 +11,7 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
@@ -63,6 +64,11 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
     private Map<String, List<String>> zkbSecondDirectoryData;
 
     private List<Map<String, Object>> errorDirectoryList;
+
+    /**
+     * 主目录
+     */
+    private String mainDirectory;
 
     /**
      * 导入文件
@@ -258,13 +264,14 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
         this.selectedTenantInfoList = selectedTenantInfoList;
     }
 
-    /**;v
+    /**
      * 获取所有主目录信息
      * @return
      */
     public List<ZkbFileDirectory> findMainDirectory() {
         return zkbFileDirectoryService.findMainDirectory(null);
     }
+
 
     /**
      * 根据主目录值获取子目录信息
@@ -286,6 +293,27 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
         zkbFileDirectory=mainZkbFileDirectory.get(0);
         subZkbFileDirectoryList=this.zkbFileDirectoryService.findByZkbFileDirectory(zkbFileDirectory);
         return subZkbFileDirectoryList;
+    }
+
+    /**
+     * 根据主目录值获取子目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> getSubZkbFileDirectoryListByMainDirectory() {
+        if(StringUtils.isBlank(this.mainDirectory))
+        {
+            return null;
+        }
+        List<ZkbFileDirectory> mainZkbFileDirectory = this.zkbFileDirectoryService.findByLevelAndName(
+                ZkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,
+                this.getMainDirectory());
+        if(CollectionUtils.isEmpty(mainZkbFileDirectory))
+        {
+            return null;
+        }
+        ZkbFileDirectory zkbFileDirectory = new ZkbFileDirectory();
+        zkbFileDirectory=mainZkbFileDirectory.get(0);
+        return this.zkbFileDirectoryService.findByZkbFileDirectory(zkbFileDirectory);
     }
 
     public void setSubZkbFileDirectoryList(List<ZkbFileDirectory> subZkbFileDirectoryList) {
@@ -354,5 +382,13 @@ public class ZkbFileAttachmentController extends GenericCRUDUUIDController<V2_Bl
 
     public void setErrorDirectoryList(List<Map<String, Object>> errorDirectoryList) {
         this.errorDirectoryList = errorDirectoryList;
+    }
+
+    public String getMainDirectory() {
+        return mainDirectory;
+    }
+
+    public void setMainDirectory(String mainDirectory) {
+        this.mainDirectory = mainDirectory;
     }
 }
