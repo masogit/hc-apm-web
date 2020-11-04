@@ -1,0 +1,28 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="台账配置"/>
+            </div>
+            <div class="ui-g-12 card ">
+                <h:form id="basic">
+                    <p:fieldset legend="台账排序配置">
+
+                        <h:panelGrid columns="6" style="margin-bottom:10px" cellpadding="20">
+                            <p:selectBooleanCheckbox value="#{tenantOptionConfigController.selected.orderByCreateTimeByDefault}" itemLabel="设备台账默认以创建时间降序排序" />
+                        </h:panelGrid>
+                    </p:fieldset>
+
+                    <p:commandButton value="保存" actionListener="#{tenantOptionConfigController.save()}"   update="basic" icon="pi pi-check"/>
+                </h:form>
+
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -369,7 +369,6 @@ public class AssetInstallationController {
         return returnAction();
     }
     public String finishInstallBatch() {
-        Boolean isValidate = true;
         String contractNum = arrivalListItem.getArrivalList().getContractNum();
         String clinicalDeptUID = arrivalListItem.getClinicalDeptUID();
         if(StringUtils.isBlank(contractNum)){
@@ -392,7 +391,6 @@ public class AssetInstallationController {
                 GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
                 if (null == gbCode) {
                     message = WebUtil.getMessage("无效的国标码");
-                    isValidate = false;
                 }
                 arrivalListItem.setNationalStandardCode(selectedGb.getCode());
                 //更新资产国标码
@@ -401,37 +399,25 @@ public class AssetInstallationController {
             if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
                 message = message +"、"+ WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire");
                 RequestContext.getCurrentInstance().addCallbackParam("ClinicalDeptName", true);
-                isValidate = false;
             }
             if (arrivalListItem.getWorkHours() == null) {
                 message = message + "、安装工时" + WebUtil.getMessage("ValidationRequire");
                 RequestContext.getCurrentInstance().addCallbackParam("workHours", true);
-                isValidate = false;
             }
             if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getDepartNum())) {
                 message = message + "、设备编号（院方）不能为空";
-                isValidate = false;
             }
             if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getFinancingNum())) {
                 message = message + "、资产编号不能为空";
-                isValidate = false;
             }
             String qrCode = arrivalListItem.getQrCode();
             if (needInstorageCheck && StringUtils.isEmpty(qrCode)) {
                 message = message + "、二维码不能为空";
-                isValidate = false;
             }
             if(StringUtils.isNotBlank(qrCode)){
-                if (qrCode.length() > 64) {
-                    message = message + "、二维码超长,最大64位";
-                    isValidate = false;
-                }else{
-                    releaseOrSaveQrCode(qrCode, arrivalListItem.getArrivalList().getSiteUID());
-                    String qrCodeStatus = qrCodeService.checkAvailableBeforeSave(qrCode, arrivalListItem.getArrivalList().getSiteUID());
-                    if (!"Normal".equals(qrCodeStatus)) {
-                        message = message + "、" + WebUtil.getMessage(qrCodeStatus);
-                        isValidate = false;
-                    }
+                String qrCodeStatus = qrCodeService.checkAvailableBeforeSaveJiuYuan(qrCode, arrivalListItem.getArrivalList().getSiteUID());
+                if (!"Normal".equals(qrCodeStatus)) {
+                    message = message + "、" + WebUtil.getMessage(qrCodeStatus);
                 }
             }
             if(arrivalListItem.getBusinessAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
@@ -453,11 +439,10 @@ public class AssetInstallationController {
 
             Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
             if (!isvalidDeptNum._1) {
-                isValidate = false;
                 message = message + "、" + isvalidDeptNum._2;
             }
 
-            if (!isValidate) {
+            if (StringUtils.isNotBlank(message)) {
                 String name = arrivalListItem.getArrivalList().getName();
                 String financingNumName = WebUtil.getMessage("financingNum");
                 String financingNum = arrivalListItem.getFinancingNum()==null?"不可为空！":arrivalListItem.getFinancingNum();
@@ -468,7 +453,6 @@ public class AssetInstallationController {
                     message = "到货单名称/编号：" + name +","+ financingNumName +"："+ financingNum +"---->" + message;
                     errorMessage = errorMessage + message ;
                 }
-                isValidate = true;
             }
 
             if (arrivalListItem.getWarrantyYear() != null) {
@@ -487,7 +471,7 @@ public class AssetInstallationController {
             }
         }
 
-        if(!errorMessage.equals("")){
+        if(StringUtils.isNotBlank(errorMessage)){
             WebUtil.addErrorMessage(errorMessage);
             return "";
         }
@@ -754,11 +738,6 @@ public class AssetInstallationController {
             oldQrCode = "";
         }
         onDepartNumChange("qrCode");
-    }
-
-    public void releaseOrSaveQrCode(String qrcode, String siteUid) {
-        //release old qrCode
-        qrCodeService.releaseOrSaveQrCode(qrcode, siteUid);
     }
 
     public void onDepartNumChange(String fieldName) {

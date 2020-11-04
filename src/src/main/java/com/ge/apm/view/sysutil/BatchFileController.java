@@ -30,10 +30,7 @@ import webapp.framework.web.WebUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -167,6 +164,11 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     public void restartBatchJob() {
         selected.setStatus(ImportFiles.STATUS_STARTING);
+        List<String> typeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel");
+        // game plan数据导入，重试时重新添加任务
+        if (typeList.contains(selected.getFileType())) {
+            selected.setId(null);
+        }
         dao.save(selected);
         WebUtil.addSuccessMessage("任务已经重新启动");
     }
