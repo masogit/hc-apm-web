@@ -96,6 +96,9 @@
 			<p:column headerText="#{msg.userTags}" filterBy="#{item.userTags.tag}" filterMatchMode="LIKE">
 				<h:outputText value="#{item.userTagsView}"/>
 			</p:column>
+			<p:column headerText="#{msg.comments}" sortBy="#{item.comment}">
+				<h:outputText value="#{item.comment}" />
+			</p:column>
 			<f:facet name="{Toolbar}">
 				<p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{userAccountController.prepareCreate}" process="@this"
 					update=":userAccountTab:UserAccountEditDlg" oncomplete="PF('UserAccountEditDialog').show()" />

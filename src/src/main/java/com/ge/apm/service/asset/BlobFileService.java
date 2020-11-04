@@ -55,7 +55,7 @@ public class BlobFileService {
         try {
             path = fsService.saveUploadedFile(file);
         } catch (Exception ex) {
-            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
+//            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
             Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
@@ -90,7 +90,7 @@ public class BlobFileService {
         try {
             path = fsService.saveUploadedFile(file);
         } catch (Exception ex) {
-            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
+//            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
             Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
@@ -125,7 +125,7 @@ public class BlobFileService {
         try {
             path = fsService.saveUploadedFile(input,fileName);
         } catch (Exception ex) {
-            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
+//            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
             Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
@@ -159,7 +159,7 @@ public class BlobFileService {
         try {
             path = fsService.saveFileString(str);
         } catch (Exception ex) {
-            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
+//            WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
             Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }

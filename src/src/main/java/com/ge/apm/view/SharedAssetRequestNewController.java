@@ -462,7 +462,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                                 break;
                                             }
                                         }
-                                    }else if(sardList.size() == 0){
+                                    }else if(sardList != null && sardList.size() == 0){
                                         sardList.add(assetDetaiVo);
                                         selectedSard = assetDetaiVo;
                                     }

@@ -109,7 +109,7 @@ public class SharedAssetInfoUtils {
                 totalAmount = BigDecimal.valueOf(startPrice).add(rentTimeMinusStartDuriation.multiply(BigDecimal.valueOf(unitPrice)));
             }
         } else {//普通医院
-            totalAmount = unit.multiply(new BigDecimal(unitPrice.doubleValue()));
+            totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice.doubleValue()));
             if("2".equals(reqDetail.getChargingType())) {
                 unit = unit.divide(BigDecimal.valueOf(2));
                 totalAmount = unit.multiply(BigDecimal.valueOf(unitPrice));

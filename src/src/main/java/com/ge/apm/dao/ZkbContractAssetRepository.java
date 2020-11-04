@@ -13,12 +13,20 @@ import java.util.List;
 public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbContractAsset> {
 
     List<ZkbContractAsset> findByContractId(String contractId);
-    List<ZkbContractAsset> findByAssetId(Integer assetId);
+    List<ZkbContractAsset> findByAssetId(String assetId);
 
     ZkbContractAsset findFirstByContractIdAndAssetId(String contractId, String assetId);
 
     @Query(value = "select distinct a.contract_id from zkb_contract_asset a where a.asset_id=?1", nativeQuery = true)
     List<String> findDistinctContractId(String assetId);
+
+
+    /**
+     * 根据多个合同ID获取合同列表
+     * @param contractIdList 合同ID集合
+     * @return
+     */
+    List<ZkbContractAsset> findByContractIdIn(List<String> contractIdList);
 
 
 }

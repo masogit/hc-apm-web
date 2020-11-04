@@ -29,4 +29,8 @@ public interface ApmConstant {
     //默认site_id
     static final int DEFAULT_SITE_ID = -1;
 
+    //static String stepNameCanceld="已取消";
+    static String stepNameWaitAssign="待派工";
+    static String stepNameWaitForClosed="待关单";
+
 }
