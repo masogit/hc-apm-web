@@ -167,7 +167,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         selected.setReturnAuditerUid(null);
         selected.setReturnAuditer(null);
         selected.setReturnAuditDate(null);
-        selected.setReturnQty(0);
+        selected.setReturnQty(null);
+        selected.setNewCatSn(null);
         selected.setReturnDate(null);
         selected.setReturnRemark(null);
         selected.setReturnType(null);
@@ -180,6 +181,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         selected.setClosedDate(null);
         selected.setClosedRemark(null);
         selected.setZkbPartOrderStepSet(null);
+        selected.setWhetherDeduct(null);
+        selected.setHaveTrainCourseFlag(null);
     }
 
     public void getQueryWorkFlowList(){
