@@ -281,6 +281,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return true;
     }
 
+    public boolean checkContractLastDay(ZkbContract zkbContract,String orderType){
+        if(getBetweenDay(zkbContract.getEndDate(),new Date()) == 0){
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 申请保存方法：
  *      根据不同的申请类型，步骤、状态也不相同
