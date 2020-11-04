@@ -477,7 +477,7 @@ public class QrCodeService {
         }
         return "Normal";
     }
-    public String checkAvailableBeforeSaveYunNan(String qrcode, String siteUid) {
+    public String checkAvailableBeforeSaveJiuYuan(String qrcode, String siteUid) {
         if (Strings.isNullOrEmpty(qrcode)) {
             return "Normal";
         }
