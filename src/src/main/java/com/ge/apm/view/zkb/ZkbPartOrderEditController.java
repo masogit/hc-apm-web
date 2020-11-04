@@ -109,6 +109,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending","CS");
             }
             calcRemainQty();
+            orderAnnotationChange();
         }else{
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             HashMap m = zkbPartOrderService.queryEditInfo(selectedId);
@@ -132,7 +133,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 initZknPartCat(c.getStartDate());
             }
         }
-
     }
 
     public void copyZkbPartOrder(){
@@ -180,7 +180,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         selected.setClosedDate(null);
         selected.setClosedRemark(null);
         selected.setZkbPartOrderStepSet(null);
-
     }
 
     public void getQueryWorkFlowList(){
@@ -207,7 +206,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void workFlowSelected(SelectEvent event){
-
         if(v2_listHashMap ==null || v2_listHashMap.get(0) ==null || event.getObject() == null ){
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "未查询出合同数据！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -334,16 +332,19 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             selected.setRegion(zkbContract.getRegion());
             initZknPartCat(zkbContract.getStartDate());
+            if(zkbPartOrderService.checkContractLastDay(zkbContract,orderType)){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请电话联络400先开出工单，避免由于次日审批结束无法订购备件", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "电话：400-812-8188", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
         }
         calcRemainQty();
-
     }
 
     public void contractRowSelected(SelectEvent event){
 
     }
-
-
 
     private boolean showProblemOrderNumber = false;
     public void orderAnnotationChange(){
@@ -504,7 +505,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             flag=false;
             errorLog += "剩余数量不能小于0！";
         }
-
 
         if(!flag){
             WebUtil.addErrorMessage(errorLog);
