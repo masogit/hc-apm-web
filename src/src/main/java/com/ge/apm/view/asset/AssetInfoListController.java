@@ -55,6 +55,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
     private I18nMessageRepository i18nDao;
+    private TenantOptionConfigRepository tenantOptionConfigRepository;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -141,6 +142,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
+        tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
 
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         this.filterBySite = false;
@@ -191,14 +193,24 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
-        lastPageSort = pageRequest.getSort(); //export excel use
+
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
         setUserSearchFilters();
         selected = null;
-
-        pageRequest =addRequiredSortById(pageRequest);
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
+        if (tenantOptionConfigOptional.isPresent()) {
+            TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
+            if(tenantOptionConfig.getOrderByCreateTimeByDefault()){
+                pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"createdDate"));
+            }else {
+                pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.ASC,"namePyCode"));
+            }
+        }else {
+            pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.ASC,"namePyCode"));
+        }
+        lastPageSort = pageRequest.getSort(); //export excel use
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
 
