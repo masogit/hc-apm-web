@@ -193,23 +193,30 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
-
+        Sort sort = pageRequest.getSort();
+        Sort.Order orders = sort.getOrderFor("namePyCode");
+        String property = null;
+        if(orders != null){
+            property =orders.getProperty();
+        }
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
         setUserSearchFilters();
         selected = null;
-        Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
-        if (tenantOptionConfigOptional.isPresent()) {
-            TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
-            if(tenantOptionConfig.getOrderByCreateTimeByDefault()){
-                pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"createdDate"));
-            }else {
-                pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.ASC,"namePyCode"));
+        if("namePyCode".equals(property)){
+            Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
+            if (tenantOptionConfigOptional.isPresent()) {
+                TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
+                if(tenantOptionConfig.getOrderByCreateTimeByDefault()){
+                    pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"createdDate"));
+                }
             }
+            pageRequest =addRequiredSortById(pageRequest);
         }else {
-            pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.ASC,"namePyCode"));
+            pageRequest =addRequiredSortById(pageRequest);
         }
+
         lastPageSort = pageRequest.getSort(); //export excel use
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
