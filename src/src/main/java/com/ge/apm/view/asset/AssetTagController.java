@@ -232,9 +232,15 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
         this.initSearchData();
+        //this.getQueryBiomedGroupList();
+        //this.getQueryAssetsList();
 
-        this.getQueryBiomedGroupList();
-        this.getQueryAssetsList();
+        sourceBiomedGroup = new ArrayList<>();
+        targetBiomedGroup = new ArrayList<>();
+        sourceAssets = new ArrayList<>();
+        targetAssets = new ArrayList<>();
+        availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+        availableBiomedGroup = new DualListModel<>(sourceBiomedGroup, targetBiomedGroup);
 
     }
 
