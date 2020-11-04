@@ -64,6 +64,11 @@ public class AssetInstallationReportService {
         reportData.put("brand", arrivalListItem.getArrivalList().getBrand());//品牌
         reportData.put("manufact_num", arrivalListItem.getSerialNum());//出厂编号
         reportData.put("clinical_dept_name", orgInfoDao.findByUid(arrivalListItem.getClinicalDeptUID()));//设备所属科室
+        reportData.put("import_equipment", arrivalListItem.getImportEquipment()==null?"":FieldValueMessageController.doGetFieldValue("importEquipment",arrivalListItem.getImportEquipment()+""));//是否进口设备[1:进口,2:国产]
+        reportData.put("item_num", 1);//数量
+        reportData.put("guarantee", arrivalListItem.getGuarantee()==null?"":arrivalListItem.getGuarantee());
+        reportData.put("annual_maintenance_times", arrivalListItem.getAnnualMaintenanceTimes()==null?0:arrivalListItem.getAnnualMaintenanceTimes());//年保修次数
+        reportData.put("hospital_num", "");//医院编号
 
         reportData.put("contract_num", arrivalListItem.getArrivalList().getContractNum());//合同号
         reportData.put("invoice_num", arrivalListItem.getArrivalList().getInvoiceNum());//发票号
