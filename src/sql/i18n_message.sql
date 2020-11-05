@@ -3363,6 +3363,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('ibDeviceStatus', '1', '未见异常', 'No Exception', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('ibDeviceStatus', '2', '报警', 'In Alarm', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('ibDeviceStatus', '3', '维修中', 'In Maintenance', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('ibDeviceStatus', '4', '无联通无报警', 'Not Connected', NULL, '-1');
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoSteps','TechnicalPending','待技术支持审批','Technical Support pending',NULL,-1);
