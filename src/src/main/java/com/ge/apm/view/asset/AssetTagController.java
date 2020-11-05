@@ -235,9 +235,8 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         //this.getQueryBiomedGroupList();
         //this.getQueryAssetsList();
 
-        sourceBiomedGroup = new ArrayList<>();
         targetBiomedGroup = new ArrayList<>();
-        sourceAssets = new ArrayList<>();
+        sourceBiomedGroup = assetTagService.getBiomedGroupList(queryBiomedGroup);
         targetAssets = new ArrayList<>();
         availableAssets = new DualListModel<>(sourceAssets, targetAssets);
         availableBiomedGroup = new DualListModel<>(sourceBiomedGroup, targetBiomedGroup);
