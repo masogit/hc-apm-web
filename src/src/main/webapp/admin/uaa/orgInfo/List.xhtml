@@ -87,9 +87,15 @@
                                         <label class="label">#{msg.name}*</label>
                                         <p:inputText id="name" value="#{orgInfoController.orgName}"  required="#{param['editForm:adminListSearch']==null}" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
                                             <p:ajax listener="#{orgInfoController.checkName()}" process="@this"  update=":growl" ></p:ajax></p:inputText>
-
                                     </h:panelGroup>
-                                    <br/>
+                                    <h:panelGroup rendered="#{orgInfoController.isShjyDept}" >
+                                        <label class="label">#{msg.DeptStatus}</label>
+                                        <p:selectOneMenu value="#{orgInfoController.status}" rendered="true">
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItem itemLabel="#{msg.EnableDept}" itemValue="0" />
+                                            <f:selectItem itemLabel="#{msg.DisableDept}" itemValue="1" />
+                                        </p:selectOneMenu>
+                                    </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.nameEn}</label>
                                         <p:inputText id="nameEn" value="#{orgInfoController.orgNameEn}" />
