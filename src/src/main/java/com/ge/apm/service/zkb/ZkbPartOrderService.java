@@ -966,7 +966,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     /**
      * 发送邮件
      */
-    public void sendEmail(ZkbPartOrder zkbPartOrder){
+    public void sendEmail(ZkbPartOrder zkbPartOrder,boolean isLastDayFlag){
         try {
             HashMap<String, String> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
@@ -974,7 +974,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()));
 
-            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL);
+            String url = "";
+            if(isLastDayFlag){
+                url = getGatewayURL(GatewayURL.PART_ORDER_SEND_LAST_DAY_EMAIL);
+            }else{
+                url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL);
+            }
             String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
@@ -983,6 +988,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             e.printStackTrace();
         }
     }
+
 
     public void sendMessage(ZkbPartOrder zkbPartOrder) {
         //如果是备件申请，并且在技术支持审批and放射类设备则不需要发短信
