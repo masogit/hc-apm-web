@@ -89,6 +89,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(StringUtils.isNotEmpty(this.selected.getOrderType())){
                 orderType = this.selected.getOrderType();
             }
+            artificialType = this.selected.getArtificialType();
             ZkbContract c = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
             if(c != null){
                 contractList = new ArrayList<>();
@@ -189,6 +190,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         selected.setZkbPartOrderStepSet(null);
         selected.setWhetherDeduct(null);
         selected.setHaveTrainCourseFlag(null);
+        selected.setNewCatFlag(null);
     }
 
     public void getQueryWorkFlowList(){
