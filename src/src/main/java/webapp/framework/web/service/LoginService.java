@@ -182,8 +182,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
         }
     }
     protected boolean isPhoneValidLogin(UserAccount user) {
-        TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
-        return tenantInfo.getTwoFactorValid()==null?false:tenantInfo.getTwoFactorValid();
+        return user.getTwoFactorValid()==null?false:user.getTwoFactorValid();
     }
     public String requestPost(String url, String body) {
         CloseableHttpClient httpclient = null;
