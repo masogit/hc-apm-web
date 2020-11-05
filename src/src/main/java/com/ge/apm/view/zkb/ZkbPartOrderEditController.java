@@ -110,6 +110,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             calcRemainQty();
             orderAnnotationChange();
+            if(zkbPartOrderService.checkContractLastDay(c,orderType)){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请电话联络400先开出工单，避免由于次日审批结束无法订购备件", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "电话：400-812-8188", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
         }else{
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             HashMap m = zkbPartOrderService.queryEditInfo(selectedId);
@@ -167,7 +173,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         selected.setReturnAuditerUid(null);
         selected.setReturnAuditer(null);
         selected.setReturnAuditDate(null);
-        selected.setReturnQty(0);
+        selected.setReturnQty(null);
+        selected.setNewCatSn(null);
         selected.setReturnDate(null);
         selected.setReturnRemark(null);
         selected.setReturnType(null);
@@ -180,6 +187,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         selected.setClosedDate(null);
         selected.setClosedRemark(null);
         selected.setZkbPartOrderStepSet(null);
+        selected.setWhetherDeduct(null);
+        selected.setHaveTrainCourseFlag(null);
     }
 
     public void getQueryWorkFlowList(){
@@ -535,8 +544,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         HashMap m = v2_listHashMap.get(0);
         selected = zkbPartOrderService.create(m.get("id").toString(),m.get("assetId").toString(),zkbContract,this.selected,currentUser,selectionTenantInfo,m.get("srNum").toString());
         zkbPartOrderService.saveUploadFile(v2_blobObjectList,this.selected.getId());
-        zkbPartOrderService.sendEmail(selected);
+        zkbPartOrderService.sendEmail(selected,false);
         zkbPartOrderService.sendMessage(selected);
+        if(zkbPartOrderService.checkContractLastDay(zkbContract,orderType)){
+            zkbPartOrderService.sendEmail(selected,true);
+        }
         return "List?faces-redirect=true";
     }
 
