@@ -551,6 +551,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "second_directory")
     private String secondDirectory;
 
+    //联通状态，默认 1未联通，2 联通, 3 N/A
+    @Column(name = "connect_to_insite")
+    private Integer connectToInsite=3;
+
     @Transient
     private int lineNum;
 
@@ -665,6 +669,14 @@ public class AssetInfo implements ChineseName,Serializable {
             rst = Boolean.TRUE;
         }
         return rst;
+    }
+
+    public Integer getConnectToInsite() {
+        return connectToInsite;
+    }
+
+    public void setConnectToInsite(Integer connectToInsite) {
+        this.connectToInsite = connectToInsite;
     }
 
     public OrgInfo getClinicalDeptOrg() {
