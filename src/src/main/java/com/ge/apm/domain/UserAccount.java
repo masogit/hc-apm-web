@@ -265,6 +265,17 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@Column(name = "comment")
 	private String comment;
+	@Column(name = "two_factor_valid",columnDefinition="bool default false")
+	private Boolean twoFactorValid;          //登录是否2次验证开关
+
+	public Boolean getTwoFactorValid() {
+		return twoFactorValid;
+	}
+
+	public void setTwoFactorValid(Boolean twoFactorValid) {
+		this.twoFactorValid = twoFactorValid;
+	}
+
 
 	@Transient
 	private List<String> tags = new ArrayList<>();
