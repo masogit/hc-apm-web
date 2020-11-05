@@ -151,11 +151,11 @@ public class ZkbKeyBehaviorIndexService {
     }
 
     /**
-     * 获取 kbi 数据列表
+     * 获取 kpi 数据列表
      * @param tenantUID 租户UID
      * @param beginningTime 开始时间
      * @param endingTime 结束时间
-     * @return kbi 数据列表
+     * @return kpi 数据列表
      */
     public List<ZkbKeyBehaviorIndex> loadZkbKeyBehaviorIndex(String tenantUID,
                                                              Date beginningTime,
@@ -203,14 +203,14 @@ public class ZkbKeyBehaviorIndexService {
         {
             series1.setLabel(zkbKeyBehaviorIndexList.get(0).getTenantName());
             zkbKeyBehaviorIndexList.forEach(item->{
-                series1.set(DateFormatUtils.format(item.getKbiDate(),"yyyyMM"), item.getTotalScore());
+                series1.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
             });
         }else
             {
                 series1.set("未找到相关数据", 0);
             }
         areaModel.addSeries(series1);
-        areaModel.setTitle("KBI");
+        areaModel.setTitle("KPI");
         areaModel.setLegendPosition("ne");
         areaModel.setStacked(true);
         areaModel.setShowPointLabels(true);
@@ -447,7 +447,7 @@ public class ZkbKeyBehaviorIndexService {
 
     /**
      * 计算配件配件归还得分
-     * @param zkbKeyBehaviorIndex KBI
+     * @param zkbKeyBehaviorIndex KPI
      * @param contractIdList 合同ID列表
      */
     private void calculatePartReturnScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<String> contractIdList,Date firstday,Date lastday)

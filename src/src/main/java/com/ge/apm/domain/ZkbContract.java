@@ -614,9 +614,9 @@ public class ZkbContract implements ChineseName, Serializable {
         return null;
     }
 
-    public Long getRemainDaysContract()
+    public Integer getRemainDaysContract()
     {
-        Long zeroDay = new Long(0);
+        Integer zeroDay = new Integer(0);
         if(this.startDate==null)
         {
             return zeroDay;
@@ -627,10 +627,10 @@ public class ZkbContract implements ChineseName, Serializable {
         }
         LocalDate startLocaleData = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate endLocaleData = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        Long days = ChronoUnit.DAYS.between(startLocaleData,endLocaleData);
+        Integer days = (int)ChronoUnit.DAYS.between(startLocaleData,endLocaleData);
         if(days<0)
         {
-            return 0L;
+            return 0;
         }
         return days;
     }
