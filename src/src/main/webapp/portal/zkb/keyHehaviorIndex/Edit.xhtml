@@ -19,7 +19,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_kbiDate}</label>
-                        <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  value="#{zkbKeyBehaviorIndexController.selected.kbiDate}"
+                        <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM"  value="#{zkbKeyBehaviorIndexController.selected.kbiDate}"
                                     required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_BeginningTime} #{msg.ValidationRequire}"
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
@@ -33,49 +33,49 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_partReturnFullScore}</label>
-                        <p:inputNumber id="partReturnFullScore"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.partReturnFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_partReturnFullScore}#{msg.ValidationRequire}">
+                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}" id="partReturnFullScore"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.partReturnFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_partReturnFullScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm" listener="#{zkbKeyBehaviorIndexController.calculateScore}"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}</label>
-                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.intactPartReturnRateFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}#{msg.ValidationRequire}">
+                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}" maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.intactPartReturnRateFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm" listener="#{zkbKeyBehaviorIndexController.calculateScore}"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore}</label>
-                        <p:inputNumber   maxValue="100" minValue="0" decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.pasteQuickResponseRateFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore}#{msg.ValidationRequire}">
+                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}"   maxValue="100" minValue="0" decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.pasteQuickResponseRateFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm" listener="#{zkbKeyBehaviorIndexController.calculateScore}"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_apmBillingRateFullScore}</label>
-                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.apmBillingRateFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_apmBillingRateFullScore}#{msg.ValidationRequire}">
+                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.apmBillingRateFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_apmBillingRateFullScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm" listener="#{zkbKeyBehaviorIndexController.calculateScore}"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeFullScore}</label>
-                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.satisfactoryDegreeFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeFullScore}#{msg.ValidationRequire}">
+                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.satisfactoryDegreeFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeFullScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_complianceFullScore}</label>
-                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.complianceFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_complianceFullScore}#{msg.ValidationRequire}">
+                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.complianceFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_complianceFullScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_engineerFullScore}</label>
-                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.engineerFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_engineerFullScore}#{msg.ValidationRequire}">
+                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.engineerFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_engineerFullScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_totalFullScore}</label>
-                        <p:inputNumber disabled="true"   minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.totalFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_totalFullScore}#{msg.ValidationRequire}">
+                        <p:inputNumber  disabled="true"   minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.totalFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_totalFullScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm"/>
                         </p:inputNumber>
                     </h:panelGroup>
@@ -105,19 +105,19 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeScore}</label>
-                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.satisfactoryDegreeScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeScore}#{msg.ValidationRequire}">
+                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}" maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.satisfactoryDegreeScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_complianceScore}</label>
-                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.complianceScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_complianceScore}#{msg.ValidationRequire}">
+                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.complianceScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_complianceScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm"/>
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_engineerScore}</label>
-                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.engineerScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_engineerScore}#{msg.ValidationRequire}">
+                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.engineerScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_engineerScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm"/>
                         </p:inputNumber>
                     </h:panelGroup>
@@ -154,8 +154,8 @@
                     </p:dataTable>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{zkbKeyBehaviorIndexController.save}"  update=":zkbKeyBehaviorIndexForm :zkbKeyBehaviorIndexEditForm :growl"  value="#{msg.Save}" icon="ui-icon-check"/>
-                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" actionListener="#{zkbKeyBehaviorIndexController.cancel}"  update=":zkbKeyBehaviorIndexEditForm :growl"/>
+                    <p:commandButton validateClient="true" actionListener="#{zkbKeyBehaviorIndexController.save}" rendered="#{userContextService.zkbAdmin}"  update=":zkbKeyBehaviorIndexForm :zkbKeyBehaviorIndexEditForm :growl"  value="#{msg.Save}" icon="ui-icon-check"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" rendered="#{userContextService.zkbAdmin}" actionListener="#{zkbKeyBehaviorIndexController.cancel}"  update=":zkbKeyBehaviorIndexEditForm :growl"/>
                 </h:panelGroup>
             </h:panelGroup>
         </p:fieldset>

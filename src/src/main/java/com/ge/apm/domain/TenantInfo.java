@@ -2,23 +2,19 @@
  */
 package com.ge.apm.domain;
 
-import java.io.Serializable;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.UUID;
+import com.ge.apm.service.utils.Digests;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.util.StringUtils;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ge.apm.service.utils.Digests;
-import com.ge.apm.service.utils.PasswordEncodeUtil;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.util.StringUtils;
+import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  *
