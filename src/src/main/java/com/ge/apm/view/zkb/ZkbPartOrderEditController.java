@@ -232,11 +232,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }
         selectedWorkFlow = (HashMap<String, Object>) event.getObject();
-        System.out.println("======");
-        long d1= System.currentTimeMillis();
         assetInfo = assetInfoRepository.findByUid(String.valueOf(selectedWorkFlow.get("assetId")));
-        long d2 = System.currentTimeMillis();
-        System.out.println("asset : "+ (d2-d1));
         selected.setProductNumber(assetInfo.getFunctionType());
 
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
@@ -254,8 +250,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
 
         contractList = zkbPartOrderService.queryContractByAsset(selectionTenantInfo,String.valueOf(selectedWorkFlow.get("assetId")),(Date)selectedWorkFlow.get("requestTime"));
-        long d3 = System.currentTimeMillis();
-        System.out.println("asset : "+ (d3-d2));
+        System.out.println("========================");
+        long d1 = System.currentTimeMillis();
         if(contractList.size() == 0){
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "未查询出合同数据！", "");
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -267,6 +263,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }else if(contractList.size() == 1){
             ZkbContract zkbContract = contractList.get(0);
+            long dc = System.currentTimeMillis();
+            System.out.println("zkbContract : "+ (dc-d1));
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 0){
@@ -332,7 +330,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     return;
                 }
             }
-
+            long d2 = System.currentTimeMillis();
+            System.out.println(d2 - d1);
             if(selectedWorkFlow.get("customerName") != null){
                 selected.setHospitalRepairer(selectedWorkFlow.get("customerName").toString());
             }else {
@@ -356,19 +355,22 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending","CS");
             }
+            long d3 = System.currentTimeMillis();
+            System.out.println("zkbPartOrderUserConfigList : "+ (d3-d2));
             selected.setRegion(zkbContract.getRegion());
             initZknPartCat(zkbContract.getStartDate());
-            if(zkbPartOrderService.checkContractLastDay(zkbContract,orderType)){
+           /* if(zkbPartOrderService.checkContractLastDay(zkbContract,orderType)){
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请电话联络400先开出工单，避免由于次日审批结束无法订购备件", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "电话：400-812-8188", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
-            }
+            }*/
+            long d4 = System.currentTimeMillis();
+            System.out.println("end : "+ (d4-d3));
+            System.out.println("=-----------------");
         }
         calcRemainQty();
-        long d4 = System.currentTimeMillis();
-        System.out.println("end : "+ (d4-d3));
-        System.out.println("=-----------------");
+
     }
 
     public void contractRowSelected(SelectEvent event){
