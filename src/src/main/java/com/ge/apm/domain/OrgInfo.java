@@ -122,6 +122,9 @@ public class OrgInfo implements Serializable, ChineseName {
     @Column(name = "hospital_ucmid")
     private String hospitalUcmid;
 
+    @Column(name = "status")
+    private Integer status;
+
     @Transient
     private String orgUri;
 
@@ -419,6 +422,14 @@ public class OrgInfo implements Serializable, ChineseName {
 
     public void setOrgUri(String orgUri) {
         this.orgUri = orgUri;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public OrgInfo(Integer id) {

@@ -1043,7 +1043,17 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //}
     }
 
-
+    public void sendWeChatBackMessages(ZkbPartOrder zkbPartOrder){
+        try {
+            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_BACK_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
+            String token = UserContextService.getAccessToken();
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+    }
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
         List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
