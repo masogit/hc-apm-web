@@ -17,4 +17,7 @@ public interface ZkbKeyBehaviorIndexMapper {
 
     @SelectProvider(type = ZkbKeyBehaviorIndexProvider.class,method="loadZkbKeyBehaviorIndex")
     List<ZkbKeyBehaviorIndex> loadZkbKeyBehaviorIndex(@Param("filters") List<SearchFilter> filters);
+
+    @SelectProvider(type = ZkbKeyBehaviorIndexProvider.class,method="loadAverageZkbKeyBehaviorIndex")
+    List<ZkbKeyBehaviorIndex> loadAverageZkbKeyBehaviorIndex(@Param("filters") List<SearchFilter> filters);
 }

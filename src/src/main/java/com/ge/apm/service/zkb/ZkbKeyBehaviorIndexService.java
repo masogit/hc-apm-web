@@ -161,6 +161,21 @@ public class ZkbKeyBehaviorIndexService {
                                                              Date beginningTime,
                                                              Date endingTime)
     {
+        List<SearchFilter> searchFilters = this.generageSearchFilter(tenantUID,beginningTime,endingTime);
+        return this.zkbKeyBehaviorIndexMapper.loadZkbKeyBehaviorIndex(searchFilters);
+    }
+
+    /**
+     * 生成过滤条件
+     * @param tenantUID 租户UID
+     * @param beginningTime 开始时间
+     * @param endingTime 结束时间
+     * @return
+     */
+    private List<SearchFilter> generageSearchFilter(String tenantUID,
+                                                    Date beginningTime,
+                                                    Date endingTime)
+    {
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         if(StringUtils.isNotBlank(tenantUID))
         {
@@ -185,7 +200,21 @@ public class ZkbKeyBehaviorIndexService {
             SearchFilter endingTimeFilter = new SearchFilter("endingTime", SearchFilter.Operator.LT, lastday);
             searchFilters.add(endingTimeFilter);
         }
-        return this.zkbKeyBehaviorIndexMapper.loadZkbKeyBehaviorIndex(searchFilters);
+        return searchFilters;
+    }
+    /**
+     * 获取平均 kpi 数据列表
+     * @param tenantUID 租户UID
+     * @param beginningTime 开始时间
+     * @param endingTime 结束时间
+     * @return kpi 数据列表
+     */
+    public List<ZkbKeyBehaviorIndex> loadAverageZkbKeyBehaviorIndex(String tenantUID,
+                                                             Date beginningTime,
+                                                             Date endingTime)
+    {
+        List<SearchFilter> searchFilters = this.generageSearchFilter(tenantUID,beginningTime,endingTime);
+        return this.zkbKeyBehaviorIndexMapper.loadAverageZkbKeyBehaviorIndex(searchFilters);
     }
 
     /**
@@ -198,8 +227,9 @@ public class ZkbKeyBehaviorIndexService {
     {
         LineChartModel areaModel = new LineChartModel();
         List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.loadZkbKeyBehaviorIndex(tenantUID,beginningTime,endingTime);
+        List<ZkbKeyBehaviorIndex> zkbAverageKeyBehaviorIndexList = this.loadAverageZkbKeyBehaviorIndex(null,beginningTime,endingTime);
         LineChartSeries series1 = new LineChartSeries();
-        if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList)&&StringUtils.isNotBlank(tenantUID))
+        if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
         {
             series1.setLabel(zkbKeyBehaviorIndexList.get(0).getTenantName());
             zkbKeyBehaviorIndexList.forEach(item->{
@@ -207,9 +237,23 @@ public class ZkbKeyBehaviorIndexService {
             });
         }else
             {
-                series1.set("未找到相关数据", 0);
+                series1.setLabel("该租户没有相关数据");
+                series1.set("该租户没有相关数据", 0);
             }
+
+        LineChartSeries series2 = new LineChartSeries();
+        series2.setLabel("平均分数");
+        if(CollectionUtils.isNotEmpty(zkbAverageKeyBehaviorIndexList))
+        {
+            zkbAverageKeyBehaviorIndexList.forEach(item->{
+                series2.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
+            });
+        }else
+        {
+            series2.set("平均分数", 0);
+        }
         areaModel.addSeries(series1);
+        areaModel.addSeries(series2);
         areaModel.setTitle("KPI");
         areaModel.setLegendPosition("ne");
         areaModel.setStacked(true);
@@ -222,7 +266,6 @@ public class ZkbKeyBehaviorIndexService {
         yAxis.setMax(100);
         return areaModel;
     }
-
     /**
      * 根据KPI数据组装导出excel需要的map
      * @param zkbKeyBehaviorIndexList KPI数据
