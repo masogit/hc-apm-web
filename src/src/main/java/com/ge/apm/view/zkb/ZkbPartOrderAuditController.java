@@ -443,6 +443,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String closedBack(){
         zkbPartOrderService.closedBack(this.selected,currentUser);
+        ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        zkbPartOrderService.sendWeChatBackMessages(zkbPartOrder);
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
