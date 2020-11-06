@@ -53,7 +53,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     private OrgInfo currentOrg;
 
-    private static final Integer SHANGHAIJIUYUAN_HOSPITALID = 9999;
+    private static final Integer SHANGHAIJIUYUAN_SITEID = 112;
 
     @Override
     protected void init() {
@@ -577,7 +577,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public boolean getIsShjyDept() {
         //判断是否是九院科室
-        if (selected.getHospitalId().equals(SHANGHAIJIUYUAN_HOSPITALID)&&selected.getOrgType().equals(4)){
+        if (selected.getSiteId().equals(SHANGHAIJIUYUAN_SITEID)&&selected.getOrgType().equals(4)){
             return true;
         }
         return false;
