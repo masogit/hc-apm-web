@@ -161,14 +161,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),selected.getId(),selected.getAssetTypeDi());
             }
 
-            if(canEditFlag && !zkbPartOrderService.checkThreeValid(selected)){
-                WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导","");
-                //return;
-            }
-            if(canEditFlag){
-                String validString = zkbPartOrderService.checkContractWeekValid(selected,zkbContract);
-                if(StringUtils.isNotBlank(validString)){
-                    WebUtil.addErrorMessage(validString,"");
+            if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Parts.toString()) || this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
+                if(canEditFlag && !zkbPartOrderService.checkThreeValid(selected)){
+                    WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导","");
+                    //return;
+                }
+                if(canEditFlag){
+                    String validString = zkbPartOrderService.checkContractWeekValid(selected,zkbContract);
+                    if(StringUtils.isNotBlank(validString)){
+                        WebUtil.addErrorMessage(validString,"");
+                    }
                 }
             }
         }
