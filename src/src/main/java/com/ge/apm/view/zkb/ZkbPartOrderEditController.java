@@ -269,15 +269,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             ZkbContract zkbContract = contractList.get(0);
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                    if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于1，请检查！", "");
+                    if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 0){
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于0，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         contractList = new ArrayList<>();
                         return;
                     }
                 }else{
-                    if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件+人工+保养剩余名额小于等于1，请检查！", "");
+                    if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 0){
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件+人工+保养剩余名额小于等于0，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         contractList = new ArrayList<>();
                         return;
@@ -310,23 +310,23 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }*/
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                    if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 1){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于1，请检查！", "");
+                    if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 0){
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于0，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         contractList = new ArrayList<>();
                         return;
                     }
                 }else{
-                    if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于1，请检查！", "");
+                    if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 0){
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于0，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         contractList = new ArrayList<>();
                         return;
                     }
                 }
             }else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
-                if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 1){
-                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于1，请检查！", "");
+                if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 0){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于0，请检查！", "");
                     FacesContext.getCurrentInstance().addMessage(null, message);
                     contractList = new ArrayList<>();
                     return;
@@ -366,6 +366,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         }
         calcRemainQty();
+        long d4 = System.currentTimeMillis();
+        System.out.println("end : "+ (d4-d3));
+        System.out.println("=-----------------");
     }
 
     public void contractRowSelected(SelectEvent event){
