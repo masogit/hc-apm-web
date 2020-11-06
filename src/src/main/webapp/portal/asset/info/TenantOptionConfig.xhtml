@@ -19,6 +19,13 @@
                         </h:panelGrid>
                     </p:fieldset>
 
+                    <p:fieldset legend="微信端资产编辑配置">
+
+                        <h:panelGrid columns="6" style="margin-bottom:10px" cellpadding="20">
+                            <p:selectBooleanCheckbox value="#{tenantOptionConfigController.qrCodeEditable}" itemLabel="二维码是否可编辑" />
+                        </h:panelGrid>
+                    </p:fieldset>
+
                     <p:commandButton value="保存" actionListener="#{tenantOptionConfigController.save()}"   update="basic" icon="pi pi-check"/>
                 </h:form>
 
