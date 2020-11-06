@@ -154,9 +154,22 @@ public class TenantInfo implements Serializable {
     @Column(name = "have_ib_device")
     private Boolean haveIbDevice;
 
-
     @Column(name = "two_factor_valid",columnDefinition="bool default false")
     private Boolean twoFactorValid;          //登录是否2次验证开关
+
+    @Column(name = "qrcode_editable")
+    private Boolean qrCodeEditable;
+
+    public boolean getQrCodeEditable() {
+        if(null == qrCodeEditable){
+            return false;
+        }
+        return qrCodeEditable;
+    }
+
+    public void setQrCodeEditable(boolean qrCodeEditable) {
+        this.qrCodeEditable = qrCodeEditable;
+    }
 
     public Boolean getTwoFactorValid() {
         return twoFactorValid;
