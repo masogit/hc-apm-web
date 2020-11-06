@@ -220,7 +220,11 @@ public class QrCodeDrawService {
     }
 
     public BufferedImage getQrCodeImageWithGeLogo(QrCodeLib qrCodeLib) throws Exception{
-        String url = webContextUrl.concat("/r/").concat(qrCodeLib.getId().toString());
+        String domain = webContextUrl;
+        if(domain.indexOf("geapm.gechs.cn")>-1){
+            domain = "http://apm.gehealthcloud.cn";
+        }
+        String url = domain.concat("/r/").concat(qrCodeLib.getId().toString());
         String logoPath = this.getClass().getClassLoader().getResource("/image/logo.jpg").getPath(); ;
         return createImageWithLogo(url, logoPath, true);
     }
