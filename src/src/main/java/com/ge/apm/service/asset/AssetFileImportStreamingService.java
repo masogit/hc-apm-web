@@ -192,6 +192,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("CurrentStatus")), "setStatus", assetStatusList, map, 1);
                 assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("AccountingCategory")), "setAccountingCategory", accountingCategoryList, map, null);
                 assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("IsPM")), "setIsPm", true);
+                assetRow.setFieldDropdownValue(trimMsgKey(WebUtil.getMessage("assetClass")), "setAssetClass", assetClassList, map, null);
                 assetRow.setFieldBooleanValue(trimMsgKey(WebUtil.getMessage("IsChecked")), "setIsChecked", true);
 
                 assetRow.setFieldDropdownValueAsString(trimMsgKey(WebUtil.getMessage("assetValueCategory")), "setAssetValueCategory", assetValueCategoryList, map, null);
@@ -205,7 +206,6 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
                 assetRow.setFieldIntegerValue(trimMsgKey(WebUtil.getMessage("WarrantyPeriodMonths")), "setWarrantyMonth");
 
                 assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("QRCode")), "setQrCode", true);
-
                 assetRow.setFieldDropdownValueAsString(trimMsgKey(WebUtil.getMessage("ProprietaryClass")), "setProprietaryClass", proprietaryClassList, map, null);
 
                 if (crossSite) {
