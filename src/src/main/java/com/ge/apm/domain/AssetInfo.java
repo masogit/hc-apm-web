@@ -555,6 +555,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "connect_to_insite")
     private Integer connectToInsite=3;
 
+    //默认1：未见异常、 2：报警、 3：维修中、 4: 无联通无报警、 5： 无显示
+    @Column(name = "ib_device_status")
+    private Integer ibDeviceStatus = 5;
+
     @Transient
     private int lineNum;
 
@@ -677,6 +681,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setConnectToInsite(Integer connectToInsite) {
         this.connectToInsite = connectToInsite;
+    }
+
+    public Integer getIbDeviceStatus() {
+        return ibDeviceStatus;
+    }
+
+    public void setIbDeviceStatus(Integer ibDeviceStatus) {
+        this.ibDeviceStatus = ibDeviceStatus;
     }
 
     public OrgInfo getClinicalDeptOrg() {
