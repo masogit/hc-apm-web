@@ -1409,7 +1409,6 @@ public void test1(){
     }
 
     private void onSelectedAsset(AssetInfo asset) {
-            //报修时，无论资产是否有位置，都不看直接取当前登录人所在科室或院区代入到报修界面
         String lName ="";
         final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
         OrgInfo org = orgDao.findByUid(orgInfoUID);
