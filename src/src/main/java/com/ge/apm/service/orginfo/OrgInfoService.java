@@ -126,6 +126,7 @@ public class OrgInfoService {
                     String siteName = ExcelDocument.getCellStringValue(rowMap.get("院区"));
                     String departName = ExcelDocument.getCellStringValue(rowMap.get("科室"));
                     String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
+                    String ucmid = ExcelDocument.getCellStringValue(rowMap.get("UCMID"));
 
                     if (getLastRow(institutionName, hospitalName, siteName, departName, uuid)) break;
 
@@ -135,6 +136,7 @@ public class OrgInfoService {
                     result.put("siteName", siteName);
                     result.put("departName", departName);
                     result.put("uuid", uuid);
+                    result.put("ucmid", ucmid);
                     result.put("excelIndex", String.valueOf(dataRow));
 
                     checkRowData(institutionName, hospitalName, siteName, departName);
@@ -185,6 +187,9 @@ public class OrgInfoService {
                             }
                             found.setShortName(name);
                             found.setName(name);
+
+                            found.setHospitalUcmid(ucmid);
+
                             orgDao.save(found);
                             if (found.getOrgType() == 4) {
                                 assetInfoDao.updateClinicalDeptName(found.getName(), found.getUid(), found.getTenantUID());
@@ -517,6 +522,8 @@ public class OrgInfoService {
         }
 
         map.put("UUID", orgInfo.getUid());
+
+        map.put("UCMID", orgInfo.getHospitalUcmid());
 
         resultList.add(map);
 
