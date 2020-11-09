@@ -4,6 +4,7 @@ import com.ge.apm.dao.mapper.ZkbAssetStatisticMapper;
 import com.ge.apm.domain.ZkbAssetStatistic;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,9 +54,11 @@ public class ZkbAssetStatisticService {
      * 根据添加统计设备信息
      * @param tenantUid 租户UID
      * @param systemId SystemID/厂商报修ID
+     * @param qrCodeCount 二维码个数
+     * @param qrCodeCountState 二维码状态
      * @return
      */
-    public List<ZkbAssetStatistic> loadAllAsset(String tenantUid,String systemId){
+    public List<ZkbAssetStatistic> loadAllAsset(String tenantUid,String systemId,String qrCodeCount,String qrCodeCountState){
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         if(tenantUid!=null)
         {
@@ -86,6 +89,14 @@ public class ZkbAssetStatisticService {
             ZkbAssetStatistic item=map.get(zkbAssetStatistic.getAssetUid());
             if(item==null) continue;
             zkbAssetStatistic.setQrCodeCount(item.getQrCodeCount());
+        }
+        if(StringUtils.isNotBlank(qrCodeCount))
+        {
+            assetList=assetList.stream().filter(s->qrCodeCount.equals(s.getQrCodeCount())).collect(Collectors.toList());
+        }
+        if(StringUtils.isNotBlank(qrCodeCountState))
+        {
+            assetList=assetList.stream().filter(s->qrCodeCountState.equals(s.getQrCodeCountState())).collect(Collectors.toList());
         }
         return assetList;
     }

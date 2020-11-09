@@ -18,7 +18,7 @@ public class ZkbAssetStatisticProvider {
     public String loadAllAsset(Map<String,Object> param){
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
         StringBuilder sb = new StringBuilder();
-        sb.append(" SELECT " +
+        sb.append(" SELECT DISTINCT " +
                 " ai.system_id," +
                 " ti.uid AS tenant_uid," +
                 " ti. NAME," +
