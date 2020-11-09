@@ -50,6 +50,16 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
     private String systemId;
 
     /**
+     * 二维码个数
+     */
+    private String qrCodeCount;
+
+    /**
+     * 二维码状态
+     */
+    private String qrCodeCountState;
+
+    /**
      * 导出文件
      */
     private StreamedContent exportFile;
@@ -65,7 +75,7 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
      * 根据页面条件查询
      */
     public void loadData() {
-        zkbAssetStatisticList=this.zkbAssetStatisticService.loadAllAsset(this.tenantUid,this.systemId);
+        zkbAssetStatisticList=this.zkbAssetStatisticService.loadAllAsset(this.tenantUid,this.systemId,this.qrCodeCount,this.qrCodeCountState);
     }
 
     public String getTenantUid() {
@@ -101,7 +111,7 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
      * 数据导出
      */
     public void exportAll(){
-        List<ZkbAssetStatistic> allZkbAssetStatisticList = this.zkbAssetStatisticService.loadAllAsset(null,null);
+        List<ZkbAssetStatistic> allZkbAssetStatisticList = this.zkbAssetStatisticService.loadAllAsset(null,null,null,null);
         List<Map<String, Object>> zkbAssetStatisticMapList = zkbAssetStatisticService.createZkbAssetStatisticData(allZkbAssetStatisticList);
         try {
             UserContextService ucs = WebUtil.getBean(UserContextService.class);
@@ -122,5 +132,20 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
 
     public void setSystemId(String systemId) {
         this.systemId = systemId;
+    }
+    public String getQrCodeCount() {
+        return qrCodeCount;
+    }
+
+    public void setQrCodeCount(String qrCodeCount) {
+        this.qrCodeCount = qrCodeCount;
+    }
+
+    public String getQrCodeCountState() {
+        return qrCodeCountState;
+    }
+
+    public void setQrCodeCountState(String qrCodeCountState) {
+        this.qrCodeCountState = qrCodeCountState;
     }
 }

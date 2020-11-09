@@ -128,6 +128,11 @@ public class ZkbKeyBehaviorIndexService {
     private static final String dateFormat = "yyyyMMddHHmmss";
 
     /**
+     * 日期格式化
+     */
+    private static final String monthDateFormat = "yyyy年MM月";
+
+    /**
      * 权重最高分
      */
     public static final int  totalFullScore = 100;
@@ -240,7 +245,6 @@ public class ZkbKeyBehaviorIndexService {
                 series1.setLabel("该租户没有相关数据");
                 series1.set("该租户没有相关数据", 0);
             }
-
         LineChartSeries series2 = new LineChartSeries();
         series2.setLabel("平均分数");
         if(CollectionUtils.isNotEmpty(zkbAverageKeyBehaviorIndexList))
@@ -252,9 +256,10 @@ public class ZkbKeyBehaviorIndexService {
         {
             series2.set("平均分数", 0);
         }
+        String title = this.getTitle(beginningTime,endingTime);
         areaModel.addSeries(series1);
         areaModel.addSeries(series2);
-        areaModel.setTitle("KPI");
+        areaModel.setTitle(title);
         areaModel.setLegendPosition("ne");
         areaModel.setStacked(true);
         areaModel.setShowPointLabels(true);
@@ -265,6 +270,24 @@ public class ZkbKeyBehaviorIndexService {
         yAxis.setMin(0);
         yAxis.setMax(100);
         return areaModel;
+    }
+
+    /**
+     * 获取title
+     * @param beginningTime 开始时间
+     * @param endingTime 结束事假
+     * @return 标题
+     */
+    private String getTitle(Date beginningTime,Date endingTime)
+    {
+       String beginningTimeString =  this.getDateFormat(beginningTime);
+       String endingTimeString =  this.getDateFormat(endingTime);
+       return "KPI"+"("+beginningTimeString+"至"+endingTimeString+")";
+    }
+    private String getDateFormat(Date date)
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexService.monthDateFormat);
+        return formatter.format(date);
     }
     /**
      * 根据KPI数据组装导出excel需要的map

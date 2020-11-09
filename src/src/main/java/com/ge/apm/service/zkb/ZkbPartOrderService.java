@@ -242,7 +242,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             for(ZkbPartOrder o : zkbPartOrders){
                 qty++;
             }
-            if ((zkbPartOrder.getQty() + qty)/zkbContract.getProbeQuotaTotal() > 0.3){
+            if ((1 + qty)/zkbContract.getProbeQuotaTotal() > 0.3){
                 return false;
             }
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
