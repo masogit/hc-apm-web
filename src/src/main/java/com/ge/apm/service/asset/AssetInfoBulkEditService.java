@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,8 +66,38 @@ public class AssetInfoBulkEditService {
         commitSiteForAssetItself(assets, targetAsset);
     }
 
+    public Boolean isAllParrentAssetAndChildAssetTransfer(List<String> parrentAssetUids, List<AssetInfo> assets){
+
+        List<Boolean> isAllTransferResult = new ArrayList<>();
+
+        assets.stream().forEach(item ->{
+            List<AssetInfo> assetInfos = null;
+            if(null == item.getParentAssetId()){
+                assetInfos = assetInfoDao.findAssetByParrentAssetId(item.getId());
+            }else {
+                assetInfos = assetInfoDao.findAssetByParrentAssetId(item.getParentAssetId());
+            }
+            List<String> assetUids = assetInfos.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+            if(parrentAssetUids.containsAll(assetUids)){
+                isAllTransferResult.add(true);
+            }else {
+                isAllTransferResult.add(false);
+            }
+        });
+
+        for(Boolean result : isAllTransferResult){
+            if(result == false){
+                return  false;
+            }
+        }
+        return true;
+    }
+
     @Transactional
     public void commitBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
+
+        List<String> parrentAssetUids = assets.stream().map(AssetInfo::getUid).filter(item -> item != null).collect(Collectors.toList());
+        Boolean isAllTransfer = isAllParrentAssetAndChildAssetTransfer(parrentAssetUids, assets);
 
         for (AssetInfo item: assets) {
             if (selectedColumns.contains("serialNum")) {
@@ -277,6 +307,9 @@ public class AssetInfoBulkEditService {
             }
             if (selectedColumns.contains("depreciationMethod")) {
                 item.setDepreciationMethod(targetAsset.getDepreciationMethod());
+            }
+            if( !isAllTransfer){
+                item.setParentAssetId(null);
             }
         }
 
