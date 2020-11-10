@@ -1113,4 +1113,22 @@ public class UserContextService implements Serializable {
         return acService.hasScrappedAuthority();
     }
 
+    public static boolean isAllowAssetBatchUpdate() {
+        TenantOptionConfigRepository tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        if (!tenantOptionConfigOptional.isPresent()) {
+            return false;
+        }
+
+        TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
+
+        if (null == tenantOptionConfig.getAllowAssetBatchUpdate()) {
+            return false;
+        }
+
+        return tenantOptionConfig.getAllowAssetBatchUpdate();
+
+    }
+
 }
