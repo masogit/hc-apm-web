@@ -163,7 +163,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
             if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Parts.toString()) || this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
                 if(canEditFlag && !zkbPartOrderService.checkThreeValid(selected)){
-                    WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导","");
+                    WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导！","");
                     //return;
                 }
                 if(canEditFlag){
