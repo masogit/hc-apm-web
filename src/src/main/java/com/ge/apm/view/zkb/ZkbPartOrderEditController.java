@@ -113,9 +113,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             calcRemainQty();
             orderAnnotationChange();
             if(zkbPartOrderService.checkContractLastDay(c,orderType)){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请电话联络400先开出工单，避免由于次日审批结束无法订购备件", "");
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请电话联络400先开出工单，避免由于次日审批结束无法订购备件！", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
-                FacesMessage message2 = new FacesMessage(FacesMessage.SEVERITY_ERROR, "电话：400-812-8188", "");
+                FacesMessage message2 = new FacesMessage(FacesMessage.SEVERITY_ERROR, "电话：400-812-8188。", "");
                 FacesContext.getCurrentInstance().addMessage(null, message2);
             }
         }else{
