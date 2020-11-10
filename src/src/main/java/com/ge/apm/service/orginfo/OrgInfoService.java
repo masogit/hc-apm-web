@@ -189,9 +189,11 @@ public class OrgInfoService {
                             found.setShortName(name);
                             found.setName(name);
 
-                            OrgInfo sameUcmidOrg = orgDao.findByHospitalUcmid(ucmid);
-                            if (sameUcmidOrg != null && sameUcmidOrg.getUid() != found.getUid()) {
-                                throw new Exception(ucmid + "重复");
+                            if (!StringUtils.isEmpty(ucmid)) {
+                                OrgInfo sameUcmidOrg = orgDao.findByHospitalUcmid(ucmid);
+                                if (sameUcmidOrg != null && sameUcmidOrg.getUid() != found.getUid()) {
+                                    throw new Exception(ucmid + "重复");
+                                }
                             }
                             found.setHospitalUcmid(ucmid);
 
