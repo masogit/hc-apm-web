@@ -559,6 +559,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "ib_device_status")
     private Integer ibDeviceStatus = 5;
 
+    //全量IB客户可见性标记
+    @Column(name = "visible_status")
+    private Integer visibleStatus;
+
     @Transient
     private int lineNum;
 
@@ -2043,5 +2047,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setSiteOrg(OrgInfo siteOrg) {
         this.siteOrg = siteOrg;
+    }
+
+    public Integer getVisibleStatus() {
+        return visibleStatus;
+    }
+
+    public void setVisibleStatus(Integer visibleStatus) {
+        this.visibleStatus = visibleStatus;
     }
 }
