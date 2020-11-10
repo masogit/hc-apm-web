@@ -247,4 +247,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value="select *from asset_info where parent_asset_id = ?1  or id = ?1",nativeQuery=true)
     List<AssetInfo> findAssetByParrentAssetId(Integer parrentAssetId);
+
+    @Query(value="select *from asset_info where parent_asset_id = ?1",nativeQuery=true)
+    List<AssetInfo> findChildAssets(Integer id);
 }

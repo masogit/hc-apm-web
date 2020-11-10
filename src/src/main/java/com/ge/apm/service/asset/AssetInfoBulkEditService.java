@@ -334,6 +334,11 @@ public class AssetInfoBulkEditService {
 
             if( !isAllTransfer){
                 item.setParentAssetId(null);
+                List<AssetInfo> childAssetInfos = assetInfoDao.findChildAssets(item.getId());
+                if(childAssetInfos.size() > 0){
+                    childAssetInfos.stream().forEach(childs ->childs.setParentAssetId(null));
+                    assetInfoDao.save(childAssetInfos);
+                }
             }
         }
 
