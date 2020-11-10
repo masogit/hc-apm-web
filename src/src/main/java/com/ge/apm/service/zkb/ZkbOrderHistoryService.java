@@ -68,12 +68,12 @@ public class ZkbOrderHistoryService {
     /**
      * excel模板名称
      */
-    public static final String EXCEL_TEMPLATE_NAME="Order_History_Service_Template.xlsx";
+    public static final String EXCEL_TEMPLATE_NAME="Order_History_Service_Export.xlsx";
 
     /**
      * excel模板英文名称
      */
-    public static final String EXCEL_TEMPLATE_EN_NAME="Order_History_Service_Template_EN.xlsx";
+    public static final String EXCEL_TEMPLATE_EN_NAME="Order_History_Service_Export_EN.xlsx";
 
     /**
      * 目录地址
