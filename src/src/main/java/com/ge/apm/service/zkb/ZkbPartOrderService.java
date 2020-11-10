@@ -18,6 +18,7 @@ import org.springframework.web.client.RestClientException;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -211,27 +212,26 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     public static int getBetweenDay(Date date1, Date date2) {
-        Calendar d1 = new GregorianCalendar();
-        d1.setTime(date1);
-        Calendar d2 = new GregorianCalendar();
-        d2.setTime(date2);
-        int days = d2.get(Calendar.DAY_OF_YEAR)- d1.get(Calendar.DAY_OF_YEAR);
-        System.out.println("days="+days);
-        int y2 = d2.get(Calendar.YEAR);
-        if (d1.get(Calendar.YEAR) != y2) {
-            //      d1 = (Calendar) d1.clone();
-            do {
-                days += d1.getActualMaximum(Calendar.DAY_OF_YEAR);
-                d1.add(Calendar.YEAR, 1);
-            } while (d1.get(Calendar.YEAR) != y2);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String sd1 = format.format(date1);
+        String sd2 = format.format(date2);
+        try {
+            date1 = format.parse(sd1);
+            date2 = format.parse(sd2);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        return days;
+        long days = (date2.getTime() - date1.getTime()) / (24*3600*1000);
+        if((date2.getTime() - date1.getTime())% (24*3600*1000) != 0){
+            days++;
+        }
+        return (int)days;
     }
 
     public boolean checkApplyNumValid(ZkbPartOrder zkbPartOrder,ZkbContract zkbContract){
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,zkbPartOrder.getOrderType()));
-        filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbPartOrder.getContractId()));
+        filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbContract.getId()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Returned.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Closed.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.TechnicalReject.toString()));
@@ -244,7 +244,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             for(ZkbPartOrder o : zkbPartOrders){
                 qty++;
             }
-            if ((1 + qty)/zkbContract.getProbeQuotaTotal() > 0.3){
+            int a = 1 + qty ;
+            int b = zkbContract.getProbeQuotaTotal();
+            double d = new BigDecimal((float)a/b).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            if (d > 0.3){
                 return false;
             }
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
@@ -275,11 +278,17 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
             unReturnQty += (partQty - partReturnQty);
             if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
-                if ((zkbPartOrder.getQty() + unReturnQty)/zkbContract.getSpareQuotaTotal() > 0.3){
+                int a = zkbPartOrder.getQty() + unReturnQty;
+                int b = zkbContract.getSpareQuotaTotal();
+                double d = new BigDecimal((float)a/b).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                if (d > 0.3){
                     return false;
                 }
             }else {
-                if ((zkbPartOrder.getQty() + unReturnQty)/zkbContract.getSpareArtificailTotal() > 0.3){
+                int a = zkbPartOrder.getQty() + unReturnQty;
+                int b = zkbContract.getSpareArtificailTotal();
+                double d =new BigDecimal((float)a/b).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                if (d > 0.3){
                     return false;
                 }
             }
