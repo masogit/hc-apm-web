@@ -260,8 +260,7 @@ public class ZkbKeyBehaviorIndexService {
         areaModel.addSeries(series1);
         areaModel.addSeries(series2);
         areaModel.setTitle(title);
-        areaModel.setLegendPosition("ne");
-        areaModel.setStacked(true);
+        areaModel.setLegendPosition("e");
         areaModel.setShowPointLabels(true);
         Axis xAxis = new CategoryAxis("Months");
         areaModel.getAxes().put(AxisType.X, xAxis);
