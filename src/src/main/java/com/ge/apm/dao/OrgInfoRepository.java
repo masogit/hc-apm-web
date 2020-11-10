@@ -139,6 +139,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
 	public int countByParentUIDAndOrgType(String parentUid, int orgType);
 
+	public OrgInfo findByHospitalUcmid(String ucmid);
+
 	@Query(value = "select o.* from org_info o ", nativeQuery = true)
 	public List<OrgInfo> findAllAsList();
 

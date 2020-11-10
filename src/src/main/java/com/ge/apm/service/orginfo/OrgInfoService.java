@@ -153,6 +153,7 @@ public class OrgInfoService {
                                 || (found.getOrgType() == 3 && !found.getName().equals(siteName))
                                 || (found.getOrgType() == 2 && !found.getName().equals(hospitalName))
                                 || (found.getOrgType() == 1 && !found.getName().equals(institutionName))
+                                || (found.getOrgType() == 2 && !found.getHospitalUcmid().equals(ucmid))
                                 ) {
                             String name = null;
                             if (found.getOrgType() == 4) {
@@ -188,6 +189,10 @@ public class OrgInfoService {
                             found.setShortName(name);
                             found.setName(name);
 
+                            OrgInfo sameUcmidOrg = orgDao.findByHospitalUcmid(ucmid);
+                            if (sameUcmidOrg != null && sameUcmidOrg.getUid() != found.getUid()) {
+                                throw new Exception(ucmid + "重复");
+                            }
                             found.setHospitalUcmid(ucmid);
 
                             orgDao.save(found);
