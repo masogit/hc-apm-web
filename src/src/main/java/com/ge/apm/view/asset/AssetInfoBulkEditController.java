@@ -276,10 +276,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             keyLabel = new KeyLabel("capitalSource2", WebUtil.getMessage("capitalSource2"));
             candidateColumns.add(keyLabel);
         }
-        if(readableFieldsList.contains("parentAsset")){
+        /*if(readableFieldsList.contains("parentAsset")){
             keyLabel = new KeyLabel("parentAsset", WebUtil.getMessage("parentAsset"));
             candidateColumns.add(keyLabel);
-        }
+        }*/
         if(readableFieldsList.contains("deviceName")){
             keyLabel = new KeyLabel("deviceName", WebUtil.getMessage("deviceName"));
             candidateColumns.add(keyLabel);

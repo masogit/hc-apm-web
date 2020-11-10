@@ -25,6 +25,9 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +96,8 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      */
     private UserAccount currentUser;
 
+    private static final String dateFormat = "yyyyMMddHHmmss";
+
     @Override
     protected void init() {
         super.init();
@@ -130,9 +135,55 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      */
     public void generateCharts()
     {
+        Date date = new Date();
+        if(this.beginningTime==null)
+        {
+            this.beginningTime=this.getFirstDay(date);
+        }
+        if(this.endingTime==null)
+        {
+            this.endingTime=this.getLastDay(date);
+        }
         this.lineModel = this.zkbKeyBehaviorIndexService.generateCharts(tenantUID,beginningTime,endingTime);
     }
 
+
+    private Date getLastDay(final Date date)
+    {
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        String lastDay = format.format(cal.getTime());
+        lastDay = lastDay+"235959";
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexController.dateFormat);
+        Date date1 = null;
+        try {
+            date1 = formatter.parse(lastDay);
+        } catch (ParseException e) {
+            LOGGER.info(e.getMessage());
+        }
+        return date1;
+    }
+
+    private Date getFirstDay(final Date date)
+    {
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        final int last = cal.getActualMinimum(Calendar.DAY_OF_YEAR);
+        cal.set(Calendar.DAY_OF_YEAR, last);
+        String lastDay = format.format(cal.getTime());
+        lastDay = lastDay+"000000";
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexController.dateFormat);
+        Date date1 = null;
+        try {
+            date1 = formatter.parse(lastDay);
+        } catch (ParseException e) {
+            LOGGER.info(e.getMessage());
+        }
+        return date1;
+    }
     /**
      * 图表
      */

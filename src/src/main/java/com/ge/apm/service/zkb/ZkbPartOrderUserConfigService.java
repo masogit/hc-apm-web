@@ -66,7 +66,7 @@ public class ZkbPartOrderUserConfigService {
         New, Exist, Created, Failure, CheckFail
     }
 
-    public static List<I18nMessage> listI18nMessage = FieldValueMessageController.getFieldValueListByMsgType("zkbPoSteps");
+    public static List<I18nMessage> listI18nMessage = FieldValueMessageController.getFieldValueListByMsgType("zkbPoStepsRole");
 
 
 
@@ -81,7 +81,6 @@ public class ZkbPartOrderUserConfigService {
         Map<String, String> listI18nMessageMap =
                 ZkbPartOrderUserConfigService.listI18nMessage.stream().collect(Collectors.toMap(I18nMessage::getValueZh,
                         I18nMessage::getMsgKey));
-        listI18nMessageMap.put("400公用邮箱","OrderCommon");
         LocalDateTime startTime = LocalDateTime.now();
         List<Map<String, Object>> result = new ArrayList<>();
         for (int i = EXCEL_USER_CONFIG_DATA_ROW ; i <= doc.getWorkBook().getSheet(SHEET_SERVICE_KEY_USER_CONFIG_INDEX).getLastRowNum() + 1 ; i++) {
@@ -186,7 +185,6 @@ public class ZkbPartOrderUserConfigService {
         Map<String, String> listI18nMessageMap =
                 ZkbPartOrderUserConfigService.listI18nMessage.stream().collect(Collectors.toMap(I18nMessage::getMsgKey,
                         I18nMessage::getValueZh));
-        listI18nMessageMap.put("OrderCommon","400公用邮箱");
         if(!listI18nMessageMap.containsKey(zkbPartOrderUserConfigVO.getConfigType()))
         {
             item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);

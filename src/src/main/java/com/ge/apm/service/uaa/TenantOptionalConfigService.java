@@ -18,14 +18,17 @@ public class TenantOptionalConfigService  {
     private TenantInfoRepository tenantInfoDao;
 
     @Transactional
-    public void save(TenantOptionConfig config, boolean qrCodeEditable){
+    public void save(TenantOptionConfig config, TenantInfo selectedTenant){
         //保存config
         tenantOptionConfigDao.save(config);
         //保存qrCodeEditable字段到tenantInfo表
-        TenantInfo tenantInfo = tenantInfoDao.findByUid(UserContextService.getCurrentUserAccount().getTenantUID());
-        if(null != tenantInfoDao.findByUid(UserContextService.getCurrentUserAccount().getTenantUID())){
-            tenantInfoDao.updateQrCodeEditable(qrCodeEditable,tenantInfo.getUid());
-        }
+
+        boolean qrCodeEditable = selectedTenant.getQrCodeEditable();
+
+        TenantInfo tenantInfo = tenantInfoDao.findByUid(selectedTenant.getUid());
+        tenantInfo.setQrCodeEditable(qrCodeEditable);
+
+        tenantInfoDao.save(tenantInfo);
     }
 
 }
