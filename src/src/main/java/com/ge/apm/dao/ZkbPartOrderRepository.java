@@ -24,7 +24,7 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @param lastday 某月最后一天
      * @return
      */
-    List<ZkbPartOrder> findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndPartOrderDateGreaterThanEqualAndPartOrderDateLessThanEqual(List<String> contractIdList, Date firstday, Date lastday);
+    List<ZkbPartOrder> findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndPartOrderDateGreaterThanEqualAndPartOrderDateLessThanEqual(List<String> contractIdList, Date firstday, Date lastday, Date firstday1, Date lastday1);
 
     /**
      * 根据多个合同ID，获取总申请数

@@ -521,7 +521,7 @@ public class ZkbKeyBehaviorIndexService {
         cd.setTime(lastday);
         cd.add(Calendar.DATE,14);
         Date lastday1 = cd.getTime();
-        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndPartOrderDateGreaterThanEqualAndPartOrderDateLessThanEqual(contractIdList,firstday,lastday);
+        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndPartOrderDateGreaterThanEqualAndPartOrderDateLessThanEqual(contractIdList,firstday,lastday,firstday,lastday1);
         if(CollectionUtils.isEmpty(zkbPartOrderList))
         {
             zkbKeyBehaviorIndex.setPartReturnScore(0);

@@ -22,6 +22,7 @@ public class ZkbKeyBehaviorIndexProvider {
                 " 1 = 1");
         String filter = buildFilter_zkbOrderHistoryDetail(searchFilterList);
         sb.append(filter);
+        sb.append(" order by kbi_date asc");
         return sb.toString();
     }
 
@@ -60,7 +61,7 @@ public class ZkbKeyBehaviorIndexProvider {
                         "from zkb_key_behavior_index where 1=1 ");
         String filter = buildFilter_zkbOrderHistoryDetail(searchFilterList);
         sb.append(filter);
-        sb.append("GROUP BY kbi_date");
+        sb.append("GROUP BY kbi_date ORDER BY kbi_date ASC");
         return sb.toString();
     }
 }
