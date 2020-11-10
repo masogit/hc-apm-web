@@ -45,8 +45,7 @@
                         <label class="label">类型</label>
                         <p:selectOneMenu id="configType" value="#{zkbPartOrderUserConfigController.selected.configType}" required="false" requiredMessage="类型#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItem itemLabel="400公用邮箱"  itemValue="OrderCommon"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoSteps')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoStepsRole')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>

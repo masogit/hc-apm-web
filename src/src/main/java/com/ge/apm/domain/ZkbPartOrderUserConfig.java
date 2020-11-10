@@ -218,7 +218,6 @@ public class ZkbPartOrderUserConfig implements Serializable {
         Map<String, String> listI18nMessageMap =
                 ZkbPartOrderUserConfigService.listI18nMessage.stream().collect(Collectors.toMap(I18nMessage::getMsgKey,
                         I18nMessage::getValueZh));
-        listI18nMessageMap.put("OrderCommon","400公用邮箱");
         return listI18nMessageMap.get(this.configType);
     }
 
