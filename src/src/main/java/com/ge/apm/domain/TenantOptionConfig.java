@@ -21,6 +21,9 @@ public class TenantOptionConfig implements Serializable {
     @Column(name = "order_by_create_time_by_default")
     private Boolean orderByCreateTimeByDefault;
 
+    @Column(name = "display_asset_batch_update")
+    private Boolean displayAssetBatchUpdate;
+
     @Column(name = "tenant_uid")
     private String tenantUid;
 }
