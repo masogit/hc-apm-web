@@ -615,21 +615,21 @@ public class ZkbKeyBehaviorIndexService {
             zkbKeyBehaviorIndex.setApmBillingRateScore(0);
             return;
         }
-        List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findByContractIdIn(contractIdList);
-        if(CollectionUtils.isEmpty(zkbContractAssetList))
-        {
-            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
-            return;
-        }
-        List<String> assetUid = zkbContractAssetList.stream().map(p -> p.getAssetId()).collect(Collectors.toList());
-        List<AssetInfo> assetInfoList = this.assetInfoRepository.findByUidIn(assetUid);
-        if(CollectionUtils.isEmpty(assetInfoList))
-        {
-            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
-            return;
-        }
-        List<Integer> assetId=assetInfoList.stream().map(p -> p.getId()).collect(Collectors.toList());
-        Integer countWorkOrder = this.v2_WorkOrderRepository.fetchCount(assetId,firstday,lastday);
+//        List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findByContractIdIn(contractIdList);
+//        if(CollectionUtils.isEmpty(zkbContractAssetList))
+//        {
+//            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
+//            return;
+//        }
+//        List<String> assetUid = zkbContractAssetList.stream().map(p -> p.getAssetId()).collect(Collectors.toList());
+//        List<AssetInfo> assetInfoList = this.assetInfoRepository.findByUidIn(assetUid);
+//        if(CollectionUtils.isEmpty(assetInfoList))
+//        {
+//            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
+//            return;
+//        }
+//        List<Integer> assetId=assetInfoList.stream().map(p -> p.getId()).collect(Collectors.toList());
+        Integer countWorkOrder = this.zkbPartOrderRepository.fetchCount(contractIdList,firstday,lastday);
         Integer apmBillingRateScore = new BigDecimal(countWorkOrder).divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN)
                 .multiply(new BigDecimal(zkbKeyBehaviorIndex.getApmBillingRateFullScore())).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
         zkbKeyBehaviorIndex.setApmBillingRateScore(apmBillingRateScore);
