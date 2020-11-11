@@ -1,3 +1,12 @@
+-- 2020-11-11 fix YHAAO-8335: 维修工单状态显示不正常, 同步i18n_message表和asset_fault_type表的定义--
+delete from "public"."asset_fault_type";
+INSERT INTO "public"."asset_fault_type" VALUES ('1', '-1', '自然故障(设备老化/过度使用等)');
+INSERT INTO "public"."asset_fault_type" VALUES ('2', '-1', '人为故障(操作不当/校正失调等)');
+INSERT INTO "public"."asset_fault_type" VALUES ('3', '-1', '环境故障(温湿度/灰尘/磁场干扰等)');
+INSERT INTO "public"."asset_fault_type" VALUES ('4', '-1', '设计故障(设备软硬设计故障)');
+INSERT INTO "public"."asset_fault_type" VALUES ('5', '-1', '其它');
+INSERT INTO "public"."asset_fault_type" VALUES ('6', '-1', '可规避故障');
+
 --2020-11-04 xray报警规则 begin
 INSERT INTO "asset_alert_config" (id ,asset_uid ,config_type ,create_by ,create_date ,lower_limit ,upper_limit ,check_type ,device_type ,is_default ,is_notify_customer ,is_notify_fe ,is_notify_ole ,is_notify_sales ,label ,mute_period ,pad_message ,unit_of_measure ,valid_values ,wechat_message ,is_enabled ,ole_config ,message_delay )
 VALUES ('ff8080816be5306d016bf4eb25baxr01',null, '701', null, '2020-11-01 12:00:00', null, null, '4', '7', true, false, false, false, false, '胸片架', '0', '胸片架垂直运动放大器故障，可能导致自动走位、拼接功能不能使用，建议及时检查，如有需要，请更换相应备件。', null, '1090411', '胸片架垂直运动放大器故障，可能导致自动走位、拼接功能不能使用，建议及时检查，如有需要，请更换相应备件。', true, false, false);
