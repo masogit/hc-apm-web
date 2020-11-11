@@ -168,6 +168,9 @@ public class QrCodeDrawService {
             String qrCodeId = code;
             if(StringUtils.isNotBlank(siteUid) && StringUtils.isNotBlank(code)) {
                 QrCodeLib qrCodeLib = qrCodeLibRepository.findByQrCode(code, siteUid);
+                if (null == qrCodeLib) {
+                    return url;
+                }
                 qrCodeId = qrCodeLib.getId().toString();
             }
             url = webContextUrl.concat("/q/").concat(qrCodeId);
