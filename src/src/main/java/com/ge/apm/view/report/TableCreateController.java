@@ -296,14 +296,14 @@ public class TableCreateController extends TieWebSheetBean {
         if (null == editGroup.getItems()) {
             editGroup.setItems(new ArrayList<TableItem>());
         }
-        if (templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
+       /*if (templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
             editTableItem.setKey(null);
             return;
-        }
+        }*/
         if (templateService.hasDuplicatedKey(table)) {
             if (!editGroup.getItems().contains(editTableItem) && templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
+                    WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
                 editTableItem.setKey(null);
                 return;
             }
