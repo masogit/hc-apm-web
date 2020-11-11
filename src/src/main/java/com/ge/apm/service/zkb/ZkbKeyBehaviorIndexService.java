@@ -521,10 +521,10 @@ public class ZkbKeyBehaviorIndexService {
         cd.setTime(lastday);
         cd.add(Calendar.DATE,14);
         Date lastday1 = cd.getTime();
-        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndPartOrderDateGreaterThanEqualAndPartOrderDateLessThanEqual(contractIdList,firstday,lastday,firstday,lastday1);
+        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndPartOrderDateGreaterThanEqualAndPartOrderDateLessThanEqual(contractIdList,firstday,lastday1,firstday,lastday);
         if(CollectionUtils.isEmpty(zkbPartOrderList))
         {
-            zkbKeyBehaviorIndex.setPartReturnScore(0);
+            zkbKeyBehaviorIndex.setPartReturnScore(zkbKeyBehaviorIndex.getPartReturnFullScore());
             return ;
         }
         Integer returnQty = zkbPartOrderList.stream().mapToInt(ZkbPartOrder::getReturnQty).sum();
