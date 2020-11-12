@@ -24,7 +24,7 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @param lastday 某月最后一天
      * @return
      */
-    List<ZkbPartOrder> findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndPartOrderDateGreaterThanEqualAndPartOrderDateLessThanEqual(List<String> contractIdList, Date firstday, Date lastday, Date firstday1, Date lastday1);
+    List<ZkbPartOrder> findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndOrderedDateGreaterThanEqualAndOrderedDateLessThanEqual(List<String> contractIdList, Date firstday, Date lastday, Date firstday1, Date lastday1);
 
     /**
      * 根据多个合同ID，获取总申请数
@@ -41,5 +41,15 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      */
     @Query(value = "SELECT sum(return_qty) from zkb_part_order where contract_id in ?1 and return_type='goodReturn'", nativeQuery = true)
     Integer fetchReturnGoodQty(List<String> contractIdList);
+
+    /**
+     * 设备ID
+     * @param contractIdList 设备ID
+     * @param firstday 开始时间
+     * @param lastday 结束时间
+     * @return
+     */
+    @Query(value = "SELECT count(id)  from zkb_part_order  where contract_id in ?1 and ordered_date between ?2 and ?3", nativeQuery = true)
+    Integer fetchCount(List<String> contractIdList, Date firstday, Date lastday);
 }
 

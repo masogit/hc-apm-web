@@ -521,7 +521,7 @@ public class ZkbKeyBehaviorIndexService {
         cd.setTime(lastday);
         cd.add(Calendar.DATE,14);
         Date lastday1 = cd.getTime();
-        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndPartOrderDateGreaterThanEqualAndPartOrderDateLessThanEqual(contractIdList,firstday,lastday1,firstday,lastday);
+        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndOrderedDateGreaterThanEqualAndOrderedDateLessThanEqual(contractIdList,firstday,lastday1,firstday,lastday);
         if(CollectionUtils.isEmpty(zkbPartOrderList))
         {
             zkbKeyBehaviorIndex.setPartReturnScore(zkbKeyBehaviorIndex.getPartReturnFullScore());
@@ -590,14 +590,14 @@ public class ZkbKeyBehaviorIndexService {
         List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findByContractIdIn(contractIdList);
         if(CollectionUtils.isEmpty(zkbContractAssetList))
         {
-            zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore());
+            zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
             return totalIbNumber;
         }
         List<String> assetId = zkbContractAssetList.stream().map(p -> p.getAssetId()).collect(Collectors.toList());
         Integer countAssetWithQRcode = this.assetInfoRepository.countAssetWithQRcode(assetId);
         Integer pasteQuickResponseRateScore = new BigDecimal(countAssetWithQRcode).
                 divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
-                multiply(new BigDecimal(zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore())).intValue();
+                multiply(new BigDecimal(zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore())).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
         zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(pasteQuickResponseRateScore);
         return totalIbNumber;
     }
@@ -615,21 +615,21 @@ public class ZkbKeyBehaviorIndexService {
             zkbKeyBehaviorIndex.setApmBillingRateScore(0);
             return;
         }
-        List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findByContractIdIn(contractIdList);
-        if(CollectionUtils.isEmpty(zkbContractAssetList))
-        {
-            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
-            return;
-        }
-        List<String> assetUid = zkbContractAssetList.stream().map(p -> p.getAssetId()).collect(Collectors.toList());
-        List<AssetInfo> assetInfoList = this.assetInfoRepository.findByUidIn(assetUid);
-        if(CollectionUtils.isEmpty(assetInfoList))
-        {
-            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
-            return;
-        }
-        List<Integer> assetId=assetInfoList.stream().map(p -> p.getId()).collect(Collectors.toList());
-        Integer countWorkOrder = this.v2_WorkOrderRepository.fetchCount(assetId,firstday,lastday);
+//        List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findByContractIdIn(contractIdList);
+//        if(CollectionUtils.isEmpty(zkbContractAssetList))
+//        {
+//            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
+//            return;
+//        }
+//        List<String> assetUid = zkbContractAssetList.stream().map(p -> p.getAssetId()).collect(Collectors.toList());
+//        List<AssetInfo> assetInfoList = this.assetInfoRepository.findByUidIn(assetUid);
+//        if(CollectionUtils.isEmpty(assetInfoList))
+//        {
+//            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
+//            return;
+//        }
+//        List<Integer> assetId=assetInfoList.stream().map(p -> p.getId()).collect(Collectors.toList());
+        Integer countWorkOrder = this.zkbPartOrderRepository.fetchCount(contractIdList,firstday,lastday);
         Integer apmBillingRateScore = new BigDecimal(countWorkOrder).divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN)
                 .multiply(new BigDecimal(zkbKeyBehaviorIndex.getApmBillingRateFullScore())).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
         zkbKeyBehaviorIndex.setApmBillingRateScore(apmBillingRateScore);
