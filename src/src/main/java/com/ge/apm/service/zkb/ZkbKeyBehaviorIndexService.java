@@ -299,7 +299,7 @@ public class ZkbKeyBehaviorIndexService {
             Map<String, Object> orderHistoryMap = new HashMap<>();
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_systemId"),zeyBehaviorIndex.getId());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_tenant"),zeyBehaviorIndex.getTenantName());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_kbiDate"),zeyBehaviorIndex.getKbiDate());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_kbiDate"),zeyBehaviorIndex.getKbiDateFormat());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScore"),zeyBehaviorIndex.getTotalScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnFullScore"),zeyBehaviorIndex.getPartReturnFullScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnScore"),zeyBehaviorIndex.getPartReturnScore());
@@ -342,7 +342,7 @@ public class ZkbKeyBehaviorIndexService {
             keyBehaviorIndexRow.setFieldIntegerValue(WebUtil.getMessage("zkbKeyBehaviorIndex_complianceScore"), "setComplianceScore");
             keyBehaviorIndexRow.setFieldIntegerValue(WebUtil.getMessage("zkbKeyBehaviorIndex_engineerScore"), "setEngineerScore");
             if(keyBehaviorIndexVO.isNull()){
-                break;
+                continue;
             }
             map.put("keyBehaviorIndexVO", keyBehaviorIndexVO);
             map.put("rowData", rowMap);
@@ -410,12 +410,13 @@ public class ZkbKeyBehaviorIndexService {
         keyBehaviorIndexVO1.setSatisfactoryDegreeScore(keyBehaviorIndexVO.getSatisfactoryDegreeScore());
         keyBehaviorIndexVO1.setComplianceScore(keyBehaviorIndexVO.getComplianceScore());
         keyBehaviorIndexVO1.setEngineerScore(keyBehaviorIndexVO.getEngineerScore());
+        keyBehaviorIndexVO1.setLineNum(keyBehaviorIndexVO.getLineNum());
         item.put("keyBehaviorIndexVO",keyBehaviorIndexVO1);
         if(keyBehaviorIndexVO1.getSatisfactoryDegreeScore()>keyBehaviorIndexVO1.getSatisfactoryDegreeFullScore())
         {
             StringBuffer errorMessage = new StringBuffer(WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeScore"));
             errorMessage=errorMessage.append(WebUtil.getMessage("zkbKeyBehaviorIndex_fieldThanAnotherFieldErro"));
-            errorMessage=errorMessage.append(WebUtil.getMessage("zkbKeyBehaviorIndex_complianceFullScore"));
+            errorMessage=errorMessage.append(WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeFullScore"));
             item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
             AssetInfoRow.addErrMessage(item, errorMessage.toString());
             isValidateData = false;
@@ -442,7 +443,7 @@ public class ZkbKeyBehaviorIndexService {
         {
             StringBuffer errorMessage = new StringBuffer();
             errorMessage=errorMessage.append(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScoreError"));
-            errorMessage=errorMessage.append(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScoreError"));
+//            errorMessage=errorMessage.append(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScoreError"));
             item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
             AssetInfoRow.addErrMessage(item, errorMessage.toString());
             isValidateData = false;
