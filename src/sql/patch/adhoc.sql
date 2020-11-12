@@ -76,3 +76,6 @@ INSERT INTO "public"."zkb_key_behavior_index_config" ("id", "apm_billing_rate_fu
 update asset_info set connect_to_insite = 3 where (connect_to_insite is null or connect_to_insite != 3) and (ib_status is null or ib_status not in (1, 2, 4)) and ge_device_type is not null;
 update asset_info set ib_device_status = 5 where (ib_device_status = 1 or ib_device_status is null) and (ib_status is null or ib_status not in (1, 2, 4)) and ge_device_type is not null;
 update asset_info set ib_device_status = 5 where (ib_device_status = 1 or ib_device_status is null) and ib_status = 10 ;
+
+--2020-11-11 update positions type
+alter table ops_message alter column positions type text

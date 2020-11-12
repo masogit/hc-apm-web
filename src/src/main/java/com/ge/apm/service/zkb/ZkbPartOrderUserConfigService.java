@@ -89,7 +89,7 @@ public class ZkbPartOrderUserConfigService {
             ZkbPartOrderUserConfigVO zkbPartOrderUserConfigVO = new ZkbPartOrderUserConfigVO();
             zkbPartOrderUserConfigVO.setLineNum(i);
             ZkbPartOrderUserConfigRow zkbPartOrderUserConfigRow = new ZkbPartOrderUserConfigRow(zkbPartOrderUserConfigVO,rowMap);
-            zkbPartOrderUserConfigRow.setFieldStringValue("账号", "setLoginName");
+            zkbPartOrderUserConfigRow.setFieldStringValue("APM用户名", "setLoginName");
             zkbPartOrderUserConfigRow.setFieldStringValue("名称", "setName");
             zkbPartOrderUserConfigRow.setFieldStringValue("邮箱", "setEmail");
             zkbPartOrderUserConfigRow.setFieldStringValue("电话", "setPhone");
@@ -175,17 +175,22 @@ public class ZkbPartOrderUserConfigService {
                 ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
                 isValidateData = false;
             }
-        }
-        if(StringUtils.isBlank(zkbPartOrderUserConfigVO.getEmail()))
-        {
-            item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
-            ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_emailError"));
-            isValidateData = false;
-        }
+        }else
+            {
+                item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
+                ZkbPartOrderUserConfigRow.addErrMessage(item, "APM用户名"+WebUtil.getMessage("ValidationRequire"));
+                isValidateData = false;
+
+            }
         Map<String, String> listI18nMessageMap =
                 ZkbPartOrderUserConfigService.listI18nMessage.stream().collect(Collectors.toMap(I18nMessage::getMsgKey,
                         I18nMessage::getValueZh));
-        if(!listI18nMessageMap.containsKey(zkbPartOrderUserConfigVO.getConfigType()))
+        if(StringUtils.isBlank(zkbPartOrderUserConfigVO.getConfigType()))
+        {
+            item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
+            ZkbPartOrderUserConfigRow.addErrMessage(item, "类型"+WebUtil.getMessage("ValidationRequire"));
+            isValidateData = false;
+        }else if(!listI18nMessageMap.containsKey(zkbPartOrderUserConfigVO.getConfigType()))
         {
             item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
             ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_configTypeError"));
@@ -195,7 +200,7 @@ public class ZkbPartOrderUserConfigService {
         assetTypeMap.put("CS","CS");
         assetTypeMap.put("CT","CT");
         assetTypeMap.put("XR","XR");
-        if(!assetTypeMap.containsKey(zkbPartOrderUserConfigVO.getAssetType()))
+        if(StringUtils.isNotBlank(zkbPartOrderUserConfigVO.getAssetType())&&!assetTypeMap.containsKey(zkbPartOrderUserConfigVO.getAssetType()))
         {
             item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
             ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_assetTypeError"));
