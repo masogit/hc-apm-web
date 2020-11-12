@@ -17,7 +17,7 @@
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup >
                                 <label class="label">#{msg.zkbHistory_agent}</label>
-                                <p:selectOneMenu id="agent" value="#{zkbAssetStatisticController.tenantUid}">
+                                <p:selectOneMenu id="agent" value="#{zkbAssetStatisticController.tenantUid}" disabled="#{!userContextService.zkbAdmin}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{zkbPartOrderController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
@@ -26,10 +26,10 @@
                                 <label class="label">#{msg.systemId}</label>
                                 <p:inputText id="contractNo" value="#{zkbAssetStatisticController.systemId}" />
                             </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.zkbAssetStatistic_countOfImage}</label>
-                                <p:inputNumber maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbAssetStatisticController.qrCodeCount}" />
-                            </h:panelGroup>
+<!--                            <h:panelGroup>-->
+<!--                                <label class="label">#{msg.zkbAssetStatistic_countOfImage}</label>-->
+<!--                                <p:inputNumber maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbAssetStatisticController.qrCodeCount}" />-->
+<!--                            </h:panelGroup>-->
                             <h:panelGroup >
                                 <label class="label">#{msg.zkbAssetStatistic_qrCodeOfPaste}</label>
                                 <p:selectOneMenu  value="#{zkbAssetStatisticController.qrCodeCountState}">
@@ -65,9 +65,9 @@
                         <p:column  headerText="#{msg.zkbAssetStatistic_countOfImage}" >
                             <h:outputText value="#{item.qrCodeCount}"/>
                         </p:column>
-                        <p:column  headerText="#{msg.zkbAssetStatistic_qrCodeOfPaste}" >
-                            <h:outputText value="#{item.qrCodeCountState}"/>
-                        </p:column>
+<!--                        <p:column  headerText="#{msg.zkbAssetStatistic_qrCodeOfPaste}" >-->
+<!--                            <h:outputText value="#{item.qrCodeCountState}"/>-->
+<!--                        </p:column>-->
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbAssetStatisticController.exportAll}" icon="ui-icon-arrowthick-1-s">
                                 <p:fileDownload value="#{zkbAssetStatisticController.exportFile}"/>

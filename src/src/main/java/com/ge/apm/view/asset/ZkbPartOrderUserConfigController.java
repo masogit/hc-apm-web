@@ -157,7 +157,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         }
         if(StringUtils.isNotBlank(this.selected.getLoginName()))
         {
-            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findByLoginName(this.selected.getLoginName());
+            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findByLoginNameAndIdNot(this.selected.getLoginName(),this.selected.getId());
             if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfigList))
             {
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
