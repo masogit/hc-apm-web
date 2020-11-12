@@ -26,7 +26,7 @@
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:ajax event="rowSelect" listener="#{zkbPartOrderUserConfigController.prepareEdit}" update="deleteButton editButton"/>
                         <p:ajax event="filter" listener="#{zkbPartOrderUserConfigController.onFilter}" />
-                        <p:column headerText="账号" filterBy="#{item.loginName}" filterMatchMode="LIKE">
+                        <p:column headerText="APM用户名" filterBy="#{item.loginName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.loginName}"/>
                         </p:column>
                         <p:column headerText="名称" filterBy="#{item.name}" filterMatchMode="LIKE">
