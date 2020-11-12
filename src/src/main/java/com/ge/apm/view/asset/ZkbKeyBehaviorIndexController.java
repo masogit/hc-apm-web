@@ -329,14 +329,41 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
 
     @Override
     public void save() {
+        String fieldThanAnotherFieldErro = WebUtil.getMessage("zkbKeyBehaviorIndex_fieldThanAnotherFieldErro");
+        boolean ok = true;
         if(ZkbKeyBehaviorIndexService.totalFullScore!=this.selected.getTotalFullScore())
         {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyBehaviorIndex_totalFullScoreError"));
-            return;
+            ok=false;
         }
         if(this.selected.getTotalScore()>ZkbKeyBehaviorIndexService.totalFullScore)
         {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScoreError"));
+            ok=false;
+        }
+        if(this.selected.getSatisfactoryDegreeScore()>this.selected.getSatisfactoryDegreeFullScore())
+        {
+            String satisfactoryDegreeFullScore = WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeFullScore");
+            String satisfactoryDegreeScore = WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeScore");
+            WebUtil.addErrorMessage(satisfactoryDegreeScore+fieldThanAnotherFieldErro+satisfactoryDegreeFullScore);
+            ok=false;
+        }
+        if(this.selected.getComplianceScore()>this.selected.getComplianceFullScore())
+        {
+            String complianceFullScore = WebUtil.getMessage("zkbKeyBehaviorIndex_complianceFullScore");
+            String complianceScore = WebUtil.getMessage("zkbKeyBehaviorIndex_complianceScore");
+            WebUtil.addErrorMessage(complianceScore+fieldThanAnotherFieldErro+complianceFullScore);
+            ok=false;
+        }
+        if(this.selected.getEngineerScore()>this.selected.getEngineerFullScore())
+        {
+            String engineerFullScore = WebUtil.getMessage("zkbKeyBehaviorIndex_engineerFullScore");
+            String engineerScore = WebUtil.getMessage("zkbKeyBehaviorIndex_engineerScore");
+            WebUtil.addErrorMessage(engineerScore+fieldThanAnotherFieldErro+engineerFullScore);
+            ok=false;
+        }
+        if(!ok)
+        {
             return;
         }
         super.save();
