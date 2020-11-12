@@ -3354,16 +3354,16 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','TrainReport','培训报告','Train Report',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'TrainBookTime', '培训预约时间', 'Train Appointment Time', NULL, '-1');
 
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'connectToInsite', '联通状态', 'Connect Status', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('connectToInsite', '1', '未联通', 'Not Connect', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('connectToInsite', '2', '联通', 'Connecting', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'connectToInsite', '连通状态', 'Connect Status', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('connectToInsite', '1', '未连通', 'Not Connect', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('connectToInsite', '2', '连通', 'Connecting', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('connectToInsite', '3', 'N/A', 'N/A', NULL, '-1');
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ibDeviceStatus', 'IB状态', 'IB Status', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('ibDeviceStatus', '1', '未见异常', 'No Exception', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('ibDeviceStatus', '2', '报警', 'In Alarm', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('ibDeviceStatus', '3', '维修中', 'In Maintenance', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('ibDeviceStatus', '4', '无联通无报警', 'Not Connected', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('ibDeviceStatus', '4', '无连通无报警', 'Not Connected', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('ibDeviceStatus', '5', 'NA', 'No Exception Basic', NULL, '-1');
 
 
