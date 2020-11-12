@@ -230,6 +230,13 @@ public class OrgInfoService {
 
                             if (hospital == null) {
                                 hospital = OrgInfoBuilder.buildOrgHospital(tenantInfo, hospitalName, institution);
+                                if (!StringUtils.isEmpty(ucmid)) {
+                                    OrgInfo sameUcmidOrg = orgDao.findByHospitalUcmid(ucmid);
+                                    if (sameUcmidOrg != null && sameUcmidOrg.getName()!= hospitalName) {
+                                        throw new Exception(ucmid + "重复");
+                                    }
+                                }
+                                hospital.setHospitalUcmid(ucmid);
                                 orgDao.save(hospital);
                                 hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
                                 message = "导入成功";
