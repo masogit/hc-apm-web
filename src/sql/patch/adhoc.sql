@@ -69,4 +69,4 @@ update asset_info set ib_device_status = 5 where (ib_device_status = 1 or ib_dev
 update asset_info set ib_device_status = 5 where (ib_device_status = 1 or ib_device_status is null) and ib_status = 10 ;
 
 --2020-11-11 update positions type
-alter table ops_message alter column positions type text
+alter table ops_message alter column positions type text;
