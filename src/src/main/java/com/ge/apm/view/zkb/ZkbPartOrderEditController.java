@@ -524,6 +524,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         this.selected.setOrderType(orderType);
         ZkbContract zkbContract = contractList.get(0);
+        zkbContract = zkbPartOrderService.getZkbContractRepository().findById(zkbContract.getId());
 
         if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
