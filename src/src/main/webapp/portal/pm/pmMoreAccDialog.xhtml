@@ -197,10 +197,9 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.ContractPriceRMB}</label>
-                            <p:inputNumber  decimalPlaces="0" maxValue="999999" class="hetongjia" id="closedPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}">
+                            <p:inputNumber  decimalPlaces="4" maxValue="999999" class="hetongjia" id="closedPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}">
                                 <p:ajax listener="#{v2PmOrderController.closePrcieUpdate()}">
                                 </p:ajax>
-                                <f:convertNumber pattern="0" type="number"/>
                             </p:inputNumber>
                         </h:panelGroup>
 
