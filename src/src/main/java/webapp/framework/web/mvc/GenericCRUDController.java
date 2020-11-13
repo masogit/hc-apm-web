@@ -160,6 +160,14 @@ public abstract class GenericCRUDController<E> implements Serializable {
             if(isDateTimeField(fieldName)){
                 // support lte & gte for datetime field
                 String[] values = filterValue.toString().split(" ");
+                if(values.length==1 && "EQ".equals(filterMatchModes.get(fieldName))){
+                    filterValue = TimeUtil.fromString("yyyy-MM-dd", values[0]);
+                    if(filterValue!=null){
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime)filterValue).toDate()));
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime)filterValue).toDate()));
+                        continue;
+                    }
+                }
                 if(values.length>0){
                     filterValue = TimeUtil.fromString("yyyy-MM-dd", values[0]);
                     if(filterValue!=null)
