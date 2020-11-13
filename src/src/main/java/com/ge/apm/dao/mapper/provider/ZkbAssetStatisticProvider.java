@@ -69,7 +69,7 @@ public class ZkbAssetStatisticProvider {
                 " FROM" +
                 " v2_blob_object" +
                 " WHERE" +
-                " 1=1 and bo_uuid in (");
+                " bo_sub_type = '1' and bo_uuid in (");
         String filter = buildFilter_loadQrCount(list);
         sb.append(filter);
         sb.append(") GROUP BY bo_uuid");
