@@ -461,7 +461,6 @@ public class QrCodeService {
         WebUtil.addErrorMessage(WebUtil.getMessage("QRCodeHasBeenInUse"));
         return "";
     }
-
     public String checkAvailableBeforeSave(String qrcode, String siteUid) {
         if (Strings.isNullOrEmpty(qrcode)) {
             return "Normal";
@@ -478,7 +477,29 @@ public class QrCodeService {
         }
         return "Normal";
     }
+    public String checkAvailableBeforeSaveJiuYuan(String qrcode, String siteUid) {
+        if (Strings.isNullOrEmpty(qrcode)) {
+            return "Normal";
+        }
+        if (qrcode.length() > 64) {
+            return "TooLong";
+        }
+        AssetInfo assetInfo = assetDao.findFirstByQrCode(qrcode);
+        if(assetInfo != null){
+            return "QRCodeHasBeenInUse";
+        }
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode, siteUid);
+        if (qrCodeLib == null) {
+            createSpecialQrCode(qrcode, siteUid);
+//            return "InvalidQRCode";
+        }else{
+            if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2 && qrCodeLib.getStatus() != 5) {
+                return "AlreadyUsingQrCode";
+            }
+        }
 
+        return "Normal";
+    }
     /**
      * Return "Normal" is available;
      *
