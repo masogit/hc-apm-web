@@ -599,7 +599,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         currentQuantity = 0;
         itemDetail.setParts(null);
         itemDetail.setPartsPrice(null);
-        itemDetail.setPartsPrice(null);
+        itemDetail.setClosedPrice(null);
         if (itemDetail != null) {
             String partsType = itemDetail.getPartsType();
             if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
@@ -687,9 +687,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void partsPriceUpdate() {
-        if (itemDetail.getClosedPrice() == null || itemDetail.getClosedPrice() == 0.0) {
-            itemDetail.setClosedPrice(itemDetail.getPartsPrice());
-        }
+       itemDetail.setClosedPrice(itemDetail.getPartsPrice());
     }
 
     public void closePrcieUpdate() {
