@@ -175,7 +175,7 @@ public abstract class GenericCRUDController<E> implements Serializable {
                 }
                 
                 if(values.length>1){
-                    filterValue = TimeUtil.fromString("yyyy-MM-dd", values[1]);
+                    filterValue = TimeUtil.fromString("yyyy-MM-dd", values[2]);
                     if(filterValue!=null)
                         searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime)filterValue).toDate()));
                 }
