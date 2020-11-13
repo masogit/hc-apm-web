@@ -163,9 +163,9 @@
                         <h:panelGroup id="EstimatedUnitPriceRMB">
                             <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
                             <p:inputNumber disabled="#{v2PmOrderController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}" >
-                                <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.contractPrice)" >
+                                <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
                                 </p:ajax>
-
+                                <f:convertNumber pattern="0" type="number"/>
                             </p:inputNumber>
                         </h:panelGroup>
 
