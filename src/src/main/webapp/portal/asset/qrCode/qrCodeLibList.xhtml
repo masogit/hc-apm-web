@@ -95,8 +95,8 @@
                         <!--<p:column headerText="#{msg.issueDate}" sortBy="#{item.issueDate}" >
                             <h:outputText value="#{item.issueDate}" style="max-width: 50px;"/>
                         </p:column>-->
-                        <!--================================================================新逻辑====================================================================-->
-                        <p:column headerText="#{msg.issueDate}"  sortBy="#{item.issueDate}" filterBy="#{item.issueDate}" filterMatchMode="GTE" >
+                        <!--================================================================新逻辑=============filterMatchMode="GTE"=======================================================-->
+                        <p:column headerText="#{msg.issueDate}"  sortBy="#{item.issueDate}" filterBy="#{item.issueDate}" filterMatchMode="EQ" >
                             <f:facet name="filter">
                                 <p:inputText id="filterPlannedCompletionTime" widgetVar="varFilterPlannedCompletionTime" value="#{qrCodeLibController.plannedCompletionTimeFormat}"/>
                             </f:facet>
@@ -136,7 +136,7 @@
                 <p:graphicImage name="img/ajaxloader.gif" />
             </p:dialog>
             <!--====================================增加时间过滤========================================-->
-            <p:overlayPanel id="idPanelFilterPlannedCompletionTime" widgetVar="panelFilterPlannedCompletionTime" for="qrCodeLibListForm:datalist:filterPlannedCompletionTime" dismissable="false" >
+            <!--<p:overlayPanel id="idPanelFilterPlannedCompletionTime" widgetVar="panelFilterPlannedCompletionTime" for="qrCodeLibListForm:datalist:filterPlannedCompletionTime" dismissable="false" >
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{msg.From}"/>
                     <p:calendar  timeZone="GMT+8"   pattern="yyyy-MM-dd"  widgetVar="varPlannedCompletionTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
@@ -144,6 +144,14 @@
                     <p:calendar  timeZone="GMT+8"   pattern="yyyy-MM-dd"  widgetVar="varPlannedCompletionTimeTo"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
                 </h:panelGrid>
                 <p:commandButton onclick="setDateFilter2('varDataList', 'varFilterPlannedCompletionTime', 'varPlannedCompletionTimeFrom', 'varPlannedCompletionTimeTo'); PF('varFilterPlannedCompletionTime').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                <p:commandButton onclick="PF('panelFilterPlannedCompletionTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+            </p:overlayPanel>-->
+            <p:overlayPanel id="idPanelFilterPlannedCompletionTime" widgetVar="panelFilterPlannedCompletionTime" for="qrCodeLibListForm:datalist:filterPlannedCompletionTime" dismissable="false" >
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{msg.Date}"/>
+                    <p:calendar  timeZone="GMT+8"   pattern="yyyy-MM-dd"  widgetVar="varPlannedCompletionTimeFrom"  showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" />
+                </h:panelGrid>
+                <p:commandButton onclick="setDateFilter3('varDataList', 'varFilterPlannedCompletionTime', 'varPlannedCompletionTimeFrom', 'varPlannedCompletionTimeTo'); PF('varFilterPlannedCompletionTime').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                 <p:commandButton onclick="PF('panelFilterPlannedCompletionTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
             </p:overlayPanel>
 
@@ -170,6 +178,19 @@
                     value = dateToString(dateFrom);
                 if (dateTo !== null)
                     value = value + " " + dateToString(dateTo);
+
+                if(oldValue===value) return;
+
+                input.value = value;
+                PF(dataTableWidgetVar).filter();
+            }
+            function setDateFilter3(dataTableWidgetVar, inputWidgetVar, fromDateWidgetVar, toDateWidgetVar) {
+                var input = document.getElementById(PF(inputWidgetVar).id);
+                var oldValue = input.value;
+                var dateFrom = PF(fromDateWidgetVar).getDate();
+                var value = "";
+                if (dateFrom !== null)
+                    value = dateToString(dateFrom);
 
                 if(oldValue===value) return;
 
