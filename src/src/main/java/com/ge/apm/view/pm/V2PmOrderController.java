@@ -687,9 +687,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void partsPriceUpdate() {
-        if (itemDetail.getClosedPrice() == null || itemDetail.getClosedPrice() == 0.0) {
-            itemDetail.setClosedPrice(itemDetail.getPartsPrice());
-        }
+       itemDetail.setClosedPrice(itemDetail.getPartsPrice());
     }
 
     public void closePrcieUpdate() {
@@ -1449,9 +1447,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             isBatchOp=wfc.getPmIsSupportBatchFinish();
         loadClinicalDeptList();
         loadRuleList();
-        if(itemDetail != null){
-            itemDetail.setClosedPrice(null);
-        }
 
     }
 
