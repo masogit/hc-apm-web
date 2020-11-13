@@ -305,6 +305,13 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 		return WebUtil.getMessage("name") + "=" + site.getName();
 	}
 
+	public String getNameByUid(String uid)
+	{
+		if(StringUtils.isBlank(uid)) return "";
+		TenantInfo tenantInfo = this.dao.findByUid(uid);
+		return tenantInfo.getName();
+	}
+
 	@Override
 	public void onAfterNewObject(TenantInfo tenant, boolean isOK) {
 		if (!isOK)

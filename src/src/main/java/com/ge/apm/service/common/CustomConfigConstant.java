@@ -159,6 +159,7 @@ public class CustomConfigConstant {
             allFields.put("assetTags", WebUtil.getMessage("assetTags"));
             allFields.put("connectToInsite", WebUtil.getMessage("connectToInsite"));
             allFields.put("createdBy", WebUtil.getMessage("createdBy"));
+            allFields.put("assetClass", WebUtil.getMessage("assetClass"));
 //        }
         return allFields;
     }

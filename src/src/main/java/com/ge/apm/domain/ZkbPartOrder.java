@@ -222,7 +222,7 @@ public class ZkbPartOrder implements Serializable {
     private String returnType;
 
     @Column(name = "return_qty")
-    private int returnQty = 0;
+    private Integer returnQty = 0;
 
     /**
      * 运单号
@@ -712,11 +712,11 @@ public class ZkbPartOrder implements Serializable {
         this.catNum = catNum;
     }
 
-    public int getReturnQty() {
+    public Integer getReturnQty() {
         return returnQty;
     }
 
-    public void setReturnQty(int returnQty) {
+    public void setReturnQty(Integer returnQty) {
         this.returnQty = returnQty;
     }
 
