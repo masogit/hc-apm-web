@@ -313,6 +313,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         currentQuantity = 0;
         itemDetail.setParts(null);
         itemDetail.setPartsPrice(null);
+        itemDetail.setClosedPrice(null);
         if (itemDetail != null) {
             String partsType = itemDetail.getPartsType();
             if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
