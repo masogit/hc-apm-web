@@ -71,6 +71,8 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
     private String retrieval;
     private TreeNode tenantOrgTreePage;
 
+    private String plannedCompletionTimeFormat = null;
+
     public TreeNode getTenantOrgTreePage() {
         return tenantOrgTreePage;
     }
@@ -93,6 +95,15 @@ public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 
     public void setHospitalOn(boolean hospitalOn) {
         this.hospitalOn = hospitalOn;
+    }
+
+
+    public String getPlannedCompletionTimeFormat() {
+        return plannedCompletionTimeFormat;
+    }
+
+    public void setPlannedCompletionTimeFormat(String plannedCompletionTimeFormat) {
+        this.plannedCompletionTimeFormat = plannedCompletionTimeFormat;
     }
 
     @Override
