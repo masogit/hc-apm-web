@@ -48,5 +48,5 @@ public interface SharedAssetReqDetailRepository extends GenericRepositoryUUID<Sh
     public List<SharedAssetReqDetail> findListBySharedIds(List<String> sharedIds);
 
     @Query(value = "select count(a.id) from shared_asset_req_detail a inner join shared_asset_request b on b.id = a.shared_id where a.asset_info_id in ?1 and b.state  in ?2 ",nativeQuery = true)
-    public int  findListByAssetInfoIdsAndState(List<String> assetInfoIds, List<Integer> states);
+    public int  findCountByAssetInfoIdsAndState(List<String> assetInfoIds, List<Integer> states);
 }

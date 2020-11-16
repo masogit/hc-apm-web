@@ -62,7 +62,7 @@ public class AssetInfoBulkEditCheckService {
 //                    }
 //                }
 //            }
-            int count = sharedAssetReqDetailRepository.findListByAssetInfoIdsAndState(assetUids,status);
+            int count = sharedAssetReqDetailRepository.findCountByAssetInfoIdsAndState(assetUids,status);
             if(count > 0){
                 return false;
             }
