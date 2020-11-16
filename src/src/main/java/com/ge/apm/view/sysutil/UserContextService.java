@@ -1033,11 +1033,11 @@ public class UserContextService implements Serializable {
     }
 
     public String getCalendarLocale(){
-        if(!isLocale()){
-            return Locale.US.toString();
-        }else{
+//        if(!isLocale()){
+//            return Locale.US.toString();
+//        }else{
             return Locale.SIMPLIFIED_CHINESE.getLanguage();
-        }
+//        }
     }
 
     public boolean isZkbUser(){
