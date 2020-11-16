@@ -1,10 +1,8 @@
 package com.ge.apm.view.sysutil;
 
-import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
@@ -13,14 +11,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class LogoutHandler extends SimpleUrlLogoutSuccessHandler implements LogoutSuccessHandler {
   private static final Logger log = LoggerFactory.getLogger(LogoutHandler.class);
   private static String logoutSuccessUrl = "/login.xhtml";
-  @Autowired
-  protected UserAccountRepository userAccountDao;
+
   public static void setLogoutSuccessUrl(String _logoutSuccessUrl) {
     logoutSuccessUrl = _logoutSuccessUrl;
   }
@@ -37,19 +32,6 @@ public class LogoutHandler extends SimpleUrlLogoutSuccessHandler implements Logo
     }
 
     if (auth != null) {
-//      UserAccount user = userAccountDao.getById(Integer.parseInt(request.getParameter("uid")));
-//      Integer errorTimes = user.getPasswordErrorCount();
-//      if (errorTimes == null) {
-//        errorTimes = 0;
-//      }
-//      AtomicInteger ai = new AtomicInteger(errorTimes);
-//      ai.getAndAdd(1);
-//      errorTimes = ai.get();
-//      //user.setIsLocked(false);
-//      //user.setLockTime(new Date());
-//      user.setPasswordErrorCount(errorTimes);
-//      userAccountDao.save(user);
-      request.getSession().invalidate();
       super.onLogoutSuccess(request, response, auth);
     } else
       request.getRequestDispatcher(logoutSuccessUrl).forward(request, response);
