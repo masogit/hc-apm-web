@@ -50,18 +50,6 @@ public class AssetInfoBulkEditCheckService {
             status.add(ReceiveBorrowConstant.STATE_RETURN_ACCEPTED);
             status.add(ReceiveBorrowConstant.STATE_RETURN_DELIVERED);
             status.add(ReceiveBorrowConstant.STATE_RETURN_SUSPENDED);
-//            List<SharedAssetRequest> listByState = sharedAssetRequestRepository.findListByState(status);
-//            if(listByState !=null && !listByState.isEmpty()){
-//                List<String> sharedIds = listByState.stream().map(p -> p.getId()).collect(Collectors.toList());
-//                List<SharedAssetReqDetail> details = sharedAssetReqDetailRepository.findListBySharedIds(sharedIds);
-//                if(details!=null && !details.isEmpty()){
-//                    for(SharedAssetReqDetail detail:details){
-//                        if(assetUids.contains(detail.getAssetInfoId())){
-//                            return false;
-//                        }
-//                    }
-//                }
-//            }
             int count = sharedAssetReqDetailRepository.findCountByAssetInfoIdsAndState(assetUids,status);
             if(count > 0){
                 return false;
