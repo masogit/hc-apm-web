@@ -373,6 +373,11 @@
                             <p:inputTextarea id="techRemark" value="#{zkbPartOrderAuditController.selected.techRemark}" rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
                             </p:inputTextarea>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.canEditFlag}">
+                            <p:commandLink immediate="false" process="@this" id="historyData" update="growl" oncomplete="PF('zkbHistoryQueryDlg').show()" style="margin-right:20px;">
+                                <h:outputText value="历史数据" />
+                            </p:commandLink>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset id="managementFieldset" legend="区域经理审批" rendered="#{zkbPartOrderAuditController.showManage}">
@@ -773,7 +778,7 @@
 
             </h:form>
             <ui:include src="PartOrderReturn.xhtml"/>
-
+            <ui:include src="historyData.xhtml"/>
             <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
 
                 <h:form id="zkbConfigForm">

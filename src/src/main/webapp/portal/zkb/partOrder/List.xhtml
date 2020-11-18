@@ -47,6 +47,7 @@
                                  rowsPerPageTemplate="20,50,100,500" >
 
                         <p:ajax event="rowSelect" listener="#{zkbPartOrderController.prepareEdit}" update="deleteButton editButton copyButton"/>
+                        <p:ajax event="rowDblselect" listener="#{zkbPartOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
                         <p:ajax event="filter" listener="#{zkbPartOrderController.onFilter}" />
 
                         <p:column headerText="#{msg.zkbContact_tenant}">
@@ -167,10 +168,14 @@
                         <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderController.saveVacation}" oncomplete="PF('zkbVacationDlg').hide()" update=":growl :zkbVacationForm" icon="ui-icon-check" />
                         <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbVacationDlg').hide()"/>
                     </h:form>
-
                 </p:dialog>
             </div>
-
         </div>
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+        </script>
     </ui:define>
 </ui:composition>
