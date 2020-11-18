@@ -95,7 +95,18 @@ public class AssetInstallationReportService {
         reportData.put("contact_person_tel", arrivalListItem.getArrivalList().getContactPersonTel());//联系人电话
         reportData.put("repairer", arrivalListItem.getArrivalList().getRepairer());//维修联系人
         reportData.put("repairer_tel", arrivalListItem.getArrivalList().getRepairerTel());//维修联系人电话
-        reportData.put("location_name", arrivalListItem.getLocationName());//安置地点
+        // 安装位置
+        String locationName = "";
+        if(StringUtils.isNotBlank(arrivalListItem.getLocationName())){
+            locationName = arrivalListItem.getLocationName();
+        }
+        if(StringUtils.isNotBlank(arrivalListItem.getFloorName())){
+            locationName = arrivalListItem.getFloorName() + locationName;
+        }
+        if(StringUtils.isNotBlank(arrivalListItem.getBuildingName())){
+            locationName = arrivalListItem.getBuildingName() + locationName;
+        }
+        reportData.put("location_name", locationName);//安置地点
         reportData.put("fixasset_ack_date", ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getFixassetAckStatus()) ? arrivalListItem.getFixassetAckDate() : "");//验收日期
 
         return reportData;
@@ -121,6 +132,18 @@ public class AssetInstallationReportService {
             arrivalItemMap.put("annual_maintenance_times", arrivalListItem.getAnnualMaintenanceTimes()==null?0:arrivalListItem.getAnnualMaintenanceTimes());//年保修次数
             arrivalItemMap.put("manufact_num", arrivalListItem.getSerialNum()==null?"":arrivalListItem.getSerialNum());//出厂SN编号
             arrivalItemMap.put("hospital_num", "");//医院编号
+            // 安装位置
+            String locationName = "";
+            if(StringUtils.isNotBlank(arrivalListItem.getLocationName())){
+                locationName = arrivalListItem.getLocationName();
+            }
+            if(StringUtils.isNotBlank(arrivalListItem.getFloorName())){
+                locationName = arrivalListItem.getFloorName() + locationName;
+            }
+            if(StringUtils.isNotBlank(arrivalListItem.getBuildingName())){
+                locationName = arrivalListItem.getBuildingName() + locationName;
+            }
+            arrivalItemMap.put("location_name", locationName);//安置地点
             arrivalItemList.add(arrivalItemMap);
         }
         reportData.put("arrival_item_batch",arrivalItemList);
@@ -158,7 +181,7 @@ public class AssetInstallationReportService {
         reportData.put("contact_person_tel", arrivalListItem.getArrivalList().getContactPersonTel());//联系人电话
         reportData.put("repairer", arrivalListItem.getArrivalList().getRepairer());//维修联系人
         reportData.put("repairer_tel", arrivalListItem.getArrivalList().getRepairerTel());//维修联系人电话
-        reportData.put("location_name", arrivalListItem.getLocationName());//安置地点
+//        reportData.put("location_name", locationName);//安置地点
         reportData.put("fixasset_ack_date", ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getFixassetAckStatus()) ? arrivalListItem.getFixassetAckDate() : "");//验收日期
 
         return reportData;
