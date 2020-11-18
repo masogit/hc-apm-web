@@ -522,9 +522,64 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             WebUtil.addErrorMessage(errorLog);
             return "";
         }
-        this.selected.setOrderType(orderType);
+
         ZkbContract zkbContract = contractList.get(0);
         zkbContract = zkbPartOrderService.getZkbContractRepository().findById(zkbContract.getId());
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 0){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于0，请检查！", "");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                    contractList = new ArrayList<>();
+                    contractList.add(zkbContract);
+                    return "";
+                }
+            }else{
+                if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 0){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件+人工+保养剩余名额小于等于0，请检查！", "");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                    contractList = new ArrayList<>();
+                    contractList.add(zkbContract);
+                    return "";
+                }
+            }
+        } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
+            if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() <= 0){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同探头数量小于等于0，请检查！", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                contractList = new ArrayList<>();
+                contractList.add(zkbContract);
+                return "";
+            }
+        } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 0){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于0，请检查！", "");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                    contractList = new ArrayList<>();
+                    contractList.add(zkbContract);
+                    return "";
+                }
+            }else{
+                if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 0){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于0，请检查！", "");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                    contractList = new ArrayList<>();
+                    contractList.add(zkbContract);
+                    return "";
+                }
+            }
+        }else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
+            if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 0){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于0，请检查！", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                contractList = new ArrayList<>();
+                contractList.add(zkbContract);
+                return "";
+            }
+        }
+
+        this.selected.setOrderType(orderType);
 
         if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
