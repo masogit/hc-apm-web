@@ -1,6 +1,7 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.ZkbPartOrderMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
@@ -441,6 +442,22 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return newZkbPartOrder;
     }
 
+    @Autowired
+    ZkbPartOrderMapper zkbPartOrderMapper;
+
+    public List<ZkbPoHistoryQueryVo> queryZkbHistoryByCondition(List<SearchFilter> filters,String tenantUID){
+        List<ZkbPoHistoryQueryVo> zkbPoHistoryQueryVos = zkbPartOrderMapper.queryZkbHistory(filters,tenantUID);
+        return zkbPoHistoryQueryVos;
+    }
+
+    public List<ZkbPoHistoryQueryVo> queryGeHistoryByCondition(List<SearchFilter> filters,String tenantUID){
+        List<ZkbPoHistoryQueryVo> zkbPoHistoryQueryVos = zkbPartOrderMapper.queryGeHistory(filters,tenantUID);
+        return zkbPoHistoryQueryVos;
+    }
+
+    /**
+     * 保存附件
+     */
     @Transactional(rollbackFor = Exception.class)
     public void saveUploadFile(List<V2_BlobObject> v2_blobObjects,String uid){
         if(v2_blobObjects != null){
@@ -708,17 +725,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
                 /*ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subReturnQty(zkbContract,zkbPartOrder, zkbPartOrder.getReturnQty());*/
-            }/*else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
-                List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderIdAndReturnTypeIsNot(zkbPartOrder.getId(),"badReturn");
-                if(zkbPartOrderReturns != null && zkbPartOrderReturns.size() > 0){
-                    int v = 0;
-                    ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-                    for (ZkbPartOrderReturn r : zkbPartOrderReturns){
-                        v += r.getQty();
-                    }
-                    subReturnQty(zkbContract,zkbPartOrder,v);
-                }
-            }*/
+            }
         }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString())){
            /* ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
             subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());*/

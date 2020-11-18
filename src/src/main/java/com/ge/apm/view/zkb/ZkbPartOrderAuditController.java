@@ -11,15 +11,14 @@ import com.ge.apm.view.sysutil.UserContextService;
 import net.sf.json.util.WebUtils;
 import org.apache.commons.lang3.StringUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author : 503189362
@@ -58,12 +57,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<HashMap<String, Object>> v2_listHashMap;
 
     private List<HashMap<String, String>> partNoList = new ArrayList<>();
+    private List<HashMap<String, String>> orderNoList = new ArrayList<>();
     private List<I18nMessage> returnTypeList= new ArrayList<>();
     private String valueTypeTips = "";
     private String showOrderedFieldsetText = "";
     private String queryStatus;
     private List<ZkbPartOrderItemVo> zkbPartOrderItemVoList = new ArrayList<>();
     private List<ZkbContract> contractList;
+    private HashMap<String,String> conditionMap = new HashMap<>();
+    private List<ZkbPoHistoryQueryVo> zkbHistoryDataList;
+    private List<ZkbPoHistoryQueryVo> geHistoryDataList;
 
 
     @Override
@@ -423,8 +426,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
-
-
     public String acceptNext(){
         zkbPartOrderService.auditNext(this.selected,true,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
@@ -546,12 +547,23 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void initPartList(){
         partNoList = new ArrayList<>();
+        orderNoList = new ArrayList<>();
         List<ZkbPartOrderItem> zkbPartOrderItemList = zkbPartOrderService.queryItemBuPartOrderId(selected.getId());
+        List<String> orderContains = new ArrayList<>();
         for(ZkbPartOrderItem i :zkbPartOrderItemList){
             HashMap<String, String> m = new HashMap<>();
             m.put("text",i.getPartName());
             m.put("value",i.getPartNo());
             partNoList.add(m);
+            if(StringUtils.isNotEmpty(i.getOrderNo())){
+                if(!orderContains.contains(i.getOrderNo())){
+                    HashMap<String, String> mm = new HashMap<>();
+                    mm.put("text",i.getOrderNo());
+                    mm.put("value",i.getOrderNo());
+                    orderNoList.add(mm);
+                    orderContains.add(i.getOrderNo());
+                }
+            }
         }
     }
 
@@ -605,6 +617,19 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }
+    }
+
+    public void queryHistoryData(){
+        List<SearchFilter> filters = new ArrayList<>();
+        for (Map.Entry<String, String> entry : conditionMap.entrySet()) {
+            if(StringUtils.isEmpty(entry.getValue())){
+                continue;
+            }
+            SearchFilter filter = new SearchFilter(entry.getKey(), SearchFilter.Operator.LIKE, entry.getValue());
+            filters.add(filter);
+        }
+        zkbHistoryDataList = zkbPartOrderService.queryZkbHistoryByCondition(filters,selected.getTenantUID());
+        geHistoryDataList = zkbPartOrderService.queryGeHistoryByCondition(filters,selected.getTenantUID());
     }
 
     public boolean isHaveTrainCourseFlag() {
@@ -830,6 +855,38 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setContractList(List<ZkbContract> contractList) {
         this.contractList = contractList;
+    }
+
+    public List<ZkbPoHistoryQueryVo> getZkbHistoryDataList() {
+        return zkbHistoryDataList;
+    }
+
+    public void setZkbHistoryDataList(List<ZkbPoHistoryQueryVo> zkbHistoryDataList) {
+        this.zkbHistoryDataList = zkbHistoryDataList;
+    }
+
+    public List<ZkbPoHistoryQueryVo> getGeHistoryDataList() {
+        return geHistoryDataList;
+    }
+
+    public void setGeHistoryDataList(List<ZkbPoHistoryQueryVo> geHistoryDataList) {
+        this.geHistoryDataList = geHistoryDataList;
+    }
+
+    public HashMap<String, String> getConditionMap() {
+        return conditionMap;
+    }
+
+    public void setConditionMap(HashMap<String, String> conditionMap) {
+        this.conditionMap = conditionMap;
+    }
+
+    public List<HashMap<String, String>> getOrderNoList() {
+        return orderNoList;
+    }
+
+    public void setOrderNoList(List<HashMap<String, String>> orderNoList) {
+        this.orderNoList = orderNoList;
     }
 
     @Override

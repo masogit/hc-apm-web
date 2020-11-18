@@ -2,6 +2,7 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.ZkbPartOrder;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.Date;
@@ -51,5 +52,12 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      */
     @Query(value = "SELECT count(id)  from zkb_part_order  where contract_id in ?1 and ordered_date between ?2 and ?3", nativeQuery = true)
     Integer fetchCount(List<String> contractIdList, Date firstday, Date lastday);
+
+
+
+    @Query(value = "select count(1) as totalTimes, ai.asset_owner_id,ai.asset_owner_id2,ai.asset_owner_id3 from asset_info ai where ai.asset_owner_id=:assetOwnerId and ai.site_uid=:siteUID "
+            + "group by ai.asset_owner_id2,ai.asset_owner_id3,ai.asset_owner_id order by totalTimes desc limit 1",nativeQuery = true)
+    public List<Object[]> queryZkbHistoryData(@Param("assetOwnerId") Integer assetOwnerId, @Param("siteUID") String siteUID);
+
 }
 
