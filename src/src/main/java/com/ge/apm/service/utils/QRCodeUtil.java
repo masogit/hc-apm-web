@@ -5,44 +5,26 @@
  */
 package com.ge.apm.service.utils;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Random;
-//import java.util.UUID;
-import java.util.UUID;
-
-import javax.imageio.ImageIO;
-
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.stereotype.Component;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.codec.binary.Base64;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import java.util.stream.Stream;
+
+//import java.util.UUID;
 
 /**
  *
@@ -204,25 +186,49 @@ public class QRCodeUtil {
     }
 
     public static void main(String[] args) throws Exception {
-
-        String logoFile = "c:/Temp/logo.jpg";//GE logo
+        batchCode();
+        String logoFile = "c:/Temp/logo2.jpg";//GE logo
         String backGroundPath = "c:/Temp/background.png";//图片背景
-        String prefix = "http://weixin.qq.com/r/nCnx6dbEDItzrZKK93yO"; //nCnx6dbEDItzrZKK93yO 公众号
+        String prefix = "http://apm.gehealthcloud.cn/r/"; //nCnx6dbEDItzrZKK93yO 公众号
         String text = "1703307223655922";//qrCode
 //		QRCodeUtil.encode(text, logoFile, "c:/Temp", true);
 
         //    批量生成
-        String srcFolder = "c:/Temp/180419";
-        String[] files = new File(srcFolder).list();
-        for (String item : files) {
-            System.out.println(item);
-            qrCodeBatchJob(srcFolder + File.separator + item, logoFile, backGroundPath, prefix,1000);
-        }
-//        BufferedImage image = QRCodeUtil.createImage(prefix + "1703307223655922", logoFile, true);
-//        BufferedImage img = addBackground(backGroundPath, image, 472, "1703307223655922");
-//        ImageIO.write(img, FORMAT_NAME, new File("c:/Temp/" + text + ".jpg"));
+//        String srcFolder = "c:/Temp/180419";
+//        String[] files = new File(srcFolder).list();
+//        for (String item : files) {
+//            System.out.println(item);
+//            qrCodeBatchJob(srcFolder + File.separator + item, logoFile, backGroundPath, prefix,1000);
+//        }
+        BufferedImage image = QRCodeUtil.createImage(prefix + "1703307223655922", logoFile, true);
+        //BufferedImage img = addBackground(backGroundPath, image, 472, "1703307223655922");
+        ImageIO.write(image, FORMAT_NAME, new File("c:/Temp/" + text + ".jpg"));
 //        
 //        
+    }
+
+    public static void batchCode(){
+        String logoFile = "c:/Temp/logo2.jpg";//GE logo
+        String prefix = "http://apm.gehealthcloud.cn/r/"; //nCnx6dbEDItzrZKK93yO 公众号
+        String qrCodeFix = "202010";
+
+        int cycleTimes = 100;
+        int numLength = 10;
+
+        Stream.iterate(1000080000, item->item+1).limit(cycleTimes).map(item -> String.valueOf(item)).map(item -> {
+            while(item.length() < numLength) {
+                item = "0" + item;
+            }
+            return item;
+        }).forEach(x -> {
+            try {
+                String qrCode = qrCodeFix + x;
+                BufferedImage image = QRCodeUtil.createImage(prefix + x, logoFile, true);
+                ImageIO.write(image, FORMAT_NAME, new File("c:/Temp/100/" + qrCode + ".jpg"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private static BufferedImage addBackground(String bgPath, BufferedImage innerImg, int size, String text) throws IOException {
