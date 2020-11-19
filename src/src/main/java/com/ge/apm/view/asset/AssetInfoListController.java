@@ -121,6 +121,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private SupplierRepository supplierDao;
     private UserAccountRepository userDao;
+    private String oneQrCodeStatus;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -305,6 +306,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             }
+        }
+
+        if (oneQrCodeStatus != null && !oneQrCodeStatus.isEmpty()) {
+            this.removeFilterOnField("oneQrCodeStatus");
+            searchFilters.add(new SearchFilter("qrCodeLib.status", SearchFilter.Operator.EQ, oneQrCodeStatus));
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
@@ -973,5 +979,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setFactoryWarrantyDateFormatTime(String factoryWarrantyDateFormatTime) {
         this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
+    }
+
+    public String getOneQrCodeStatus() {
+        return oneQrCodeStatus;
+    }
+
+    public void setOneQrCodeStatus(String oneQrCodeStatus) {
+        this.oneQrCodeStatus = oneQrCodeStatus;
     }
 }

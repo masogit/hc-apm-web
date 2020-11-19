@@ -2,26 +2,25 @@
  */
 package com.ge.apm.domain;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-
 import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
+import org.hibernate.annotations.Formula;
 import org.joda.time.DateTime;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import webapp.framework.util.TimeUtil;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author 212547631
@@ -538,6 +537,17 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "UCMID")
     private String UCMID;
+
+    @Size(max = 256)
+    @Column(name = "one_qr_code")
+    private String oneQrCode;
+
+    @Formula("(select qcl.status from qr_code_lib qcl where qcl.qr_code=one_qr_code)")
+    private String oneQrCodeStatus;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "one_qr_code", referencedColumnName = "qr_code", unique = true, insertable = false, updatable = false)
+    private QrCodeLib qrCodeLib;
 
     /**
      * 主目录
@@ -2055,5 +2065,29 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setVisibleStatus(Integer visibleStatus) {
         this.visibleStatus = visibleStatus;
+    }
+
+    public String getOneQrCode() {
+        return oneQrCode;
+    }
+
+    public void setOneQrCode(String oneQrCode) {
+        this.oneQrCode = oneQrCode;
+    }
+
+    public String getOneQrCodeStatus() {
+        return oneQrCodeStatus;
+    }
+
+    public void setOneQrCodeStatus(String oneQrCodeStatus) {
+        this.oneQrCodeStatus = oneQrCodeStatus;
+    }
+
+    public QrCodeLib getQrCodeLib() {
+        return qrCodeLib;
+    }
+
+    public void setQrCodeLib(QrCodeLib qrCodeLib) {
+        this.qrCodeLib = qrCodeLib;
     }
 }
