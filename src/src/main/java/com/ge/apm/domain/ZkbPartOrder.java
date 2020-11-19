@@ -472,6 +472,28 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "have_train_course_flag")
     private String haveTrainCourseFlag;
 
+    @Column(name = "need_letter_flag")
+    private String needLetterFlag = "f";
+
+    @Column(name = "upload_letter_flag")
+    private String uploadLetterFlag;
+
+    public String getNeedLetterFlag() {
+        return needLetterFlag;
+    }
+
+    public void setNeedLetterFlag(String needLetterFlag) {
+        this.needLetterFlag = needLetterFlag;
+    }
+
+    public String getUploadLetterFlag() {
+        return uploadLetterFlag;
+    }
+
+    public void setUploadLetterFlag(String uploadLetterFlag) {
+        this.uploadLetterFlag = uploadLetterFlag;
+    }
+
     public String getHaveTrainCourseFlag() {
         return haveTrainCourseFlag;
     }
