@@ -479,6 +479,14 @@
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup>
+                                    <label class="label">是否需要探头说明函</label>
+                                    <p:selectOneMenu id="needLetterFlag" value="#{zkbPartOrderAuditController.selected.needLetterFlag}"  disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItem itemLabel="需要" itemValue="t"/>
+                                        <f:selectItem itemLabel="不需要" itemValue="f"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup>
                                     <label class="label">备注</label>
                                     <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
                                     </p:inputTextarea>
