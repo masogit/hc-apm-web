@@ -1,5 +1,5 @@
 -- begin 2020-11-16 自助注册时， 根据所选“职务”信息， 自动将账号创建在医院级别 历史数据处理
-update user_org uo set org_uid=t.hospital_uid from
+update user_org uo set org_uid=t.hospital_uid,org_type=2 from
 (
 select uid,ua.org_uid,hospital_uid from user_account ua where ua.site_id=46 and exists(
 select mail from user_self_register ufr where "position" in('deviceDirector','deviceRepairer','deviceOtherStaff','hospitalTechnician') and ua.login_name=ufr.mail)
