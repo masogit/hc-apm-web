@@ -1036,7 +1036,7 @@ public class UserContextService implements Serializable {
 //        if(!isLocale()){
 //            return Locale.US.toString();
 //        }else{
-            return Locale.SIMPLIFIED_CHINESE.getLanguage();
+            return Locale.CHINESE.getLanguage();
 //        }
     }
 

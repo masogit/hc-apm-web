@@ -64,7 +64,7 @@ public class TenantOptionConfigController extends GenericCRUDUUIDController<Tena
         try {
             super.prepareCreate();
 
-            selected.setTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
+            selected.setTenantUid(selectedTenant.getUid());
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -89,6 +89,7 @@ public class TenantOptionConfigController extends GenericCRUDUUIDController<Tena
             this.selected = tenantOptionConfigOptional.get();
         } else {
             this.selected = new TenantOptionConfig();
+            this.selected.setTenantUid(selectedTenant.getUid());
         }
 
     }
