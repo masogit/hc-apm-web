@@ -10,6 +10,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import net.sf.json.util.WebUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
@@ -632,6 +633,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         geHistoryDataList = zkbPartOrderService.queryGeHistoryByCondition(filters,selected.getTenantUID());
     }
 
+    public void handleFileUpload(FileUploadEvent event) {
+        boolean b = zkbPartOrderService.uploadFile(event,selected);
+        if(b){
+            selected = zkbPartOrderRepository.findById(selected.getId());
+            WebUtil.addSuccessMessage(selected.getUploadLetterFileName() + WebUtil.getMessage("SuccessUploaded"));
+        }else{
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
     public boolean isHaveTrainCourseFlag() {
         return haveTrainCourseFlag;
     }
@@ -639,7 +650,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void setHaveTrainCourseFlag(boolean haveTrainCourseFlag) {
         this.haveTrainCourseFlag = haveTrainCourseFlag;
     }
-
 
     public String backList(){
         return "List?faces-redirect=true&queryStatus="+queryStatus;

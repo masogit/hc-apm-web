@@ -757,6 +757,21 @@
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
+                    <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0" rendered="#{zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.uploadLetterFlag eq 't')}">
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|XLS|XLSX|DOC|DOCX|PDF)$/"
+                                          fileUploadListener="#{zkbPartOrderAuditController.handleFileUpload}"
+                                          mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                          multiple="false" sizeLimit="500000000"
+                                          update=":zkbPartOrderEditForm:upload" auto="true"
+                                          invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                        </h:panelGroup>
+                        <h:panelGroup id="namepanel" rendered="#{zkbPartOrderAuditController.selected.uploadLetterFlag eq 't'}">
+                            <label class="label">说明函</label>
+                            <p:inputText id="name" value="#{zkbPartOrderAuditController.selected.uploadLetterFileName}"
+                                         required="false" requiredMessage="#{msg.SelectUploadFile}" disabled="true"/>
+                        </h:panelGroup>
+                    </p:panel>
                 </p:fieldset>
                 <p:fieldset id="closeFieldset" legend="关单信息" rendered="#{zkbPartOrderAuditController.showClosed}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
