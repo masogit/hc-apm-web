@@ -576,7 +576,7 @@
                             <p:menuitem style="padding: 0px;" immediate="true" value="临床验收报告" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('clinical')}">
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
-                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('fixasset')}">
+                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('fixasset')}" rendered="#{assetInstallationController.activeSupplier()}">
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
                             <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(批量)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatch')}" rendered="#{assetInstallationController.activeSupplier()}">

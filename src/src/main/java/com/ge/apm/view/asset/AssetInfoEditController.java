@@ -1153,6 +1153,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return false;
         }
 
+        if(selected.getSiteId()==46){
+            selected.setVisibleStatus(1);
+        }
         return true;
     }
 

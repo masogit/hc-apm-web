@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+>
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.zkbAssetStatistic_titile}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <p:fieldset legend="#{msg.FilterCondition}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup >
+                                <label class="label">#{msg.zkbHistory_agent}</label>
+                                <p:selectOneMenu id="agent" value="#{zkbAssetStatisticController.tenantUid}" disabled="#{!userContextService.zkbAdmin}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{zkbPartOrderController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.systemId}</label>
+                                <p:inputText id="contractNo" value="#{zkbAssetStatisticController.systemId}" />
+                            </h:panelGroup>
+<!--                            <h:panelGroup>-->
+<!--                                <label class="label">#{msg.zkbAssetStatistic_countOfImage}</label>-->
+<!--                                <p:inputNumber maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbAssetStatisticController.qrCodeCount}" />-->
+<!--                            </h:panelGroup>-->
+                            <h:panelGroup >
+                                <label class="label">#{msg.zkbAssetStatistic_qrCodeOfPaste}</label>
+                                <p:selectOneMenu  value="#{zkbAssetStatisticController.qrCodeCountState}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="Y" itemValue="Y"/>
+                                    <f:selectItem itemLabel="N" itemValue="N"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:commandButton value="#{msg.SearchResult}" actionListener="#{zkbAssetStatisticController.loadData}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :zkbAssetStatisticListForm:datalist">
+                            </p:commandButton>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
+                <h:form id="zkbAssetStatisticListForm">
+                    <p:dataTable id="datalist" value="#{zkbAssetStatisticController.zkbAssetStatisticList}" var="item" widgetVar="varDataList"
+                                  selection="#{zkbAssetStatisticController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 sortMode="single" sortOrder="descending"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:column headerText="#{msg.zkbHistory_agent}" >
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.systemId}" >
+                            <h:outputText value="#{item.systemId}"/>
+                        </p:column>
+<!--                        <p:column  headerText="#{msg.zkbAssetStatistic_countOfImage}" >-->
+<!--                            <h:outputText value="#{item.qrCodeCount}"/>-->
+<!--                        </p:column>-->
+                        <p:column  headerText="#{msg.zkbAssetStatistic_qrCodeOfPaste}" >
+                            <h:outputText value="#{item.qrCodeCountState}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbAssetStatisticController.exportAll}" icon="ui-icon-arrowthick-1-s">
+                                <p:fileDownload value="#{zkbAssetStatisticController.exportFile}"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
