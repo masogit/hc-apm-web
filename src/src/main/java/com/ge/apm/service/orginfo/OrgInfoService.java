@@ -126,6 +126,7 @@ public class OrgInfoService {
                     String siteName = ExcelDocument.getCellStringValue(rowMap.get("院区"));
                     String departName = ExcelDocument.getCellStringValue(rowMap.get("科室"));
                     String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
+                    String ucmid = ExcelDocument.getCellStringValue(rowMap.get("UCMID"));
 
                     if (getLastRow(institutionName, hospitalName, siteName, departName, uuid)) break;
 
@@ -135,6 +136,7 @@ public class OrgInfoService {
                     result.put("siteName", siteName);
                     result.put("departName", departName);
                     result.put("uuid", uuid);
+                    result.put("ucmid", ucmid);
                     result.put("excelIndex", String.valueOf(dataRow));
 
                     checkRowData(institutionName, hospitalName, siteName, departName);
@@ -151,6 +153,7 @@ public class OrgInfoService {
                                 || (found.getOrgType() == 3 && !found.getName().equals(siteName))
                                 || (found.getOrgType() == 2 && !found.getName().equals(hospitalName))
                                 || (found.getOrgType() == 1 && !found.getName().equals(institutionName))
+                                || (found.getOrgType() == 2 && !found.getHospitalUcmid().equals(ucmid))
                                 ) {
                             String name = null;
                             if (found.getOrgType() == 4) {
@@ -185,6 +188,15 @@ public class OrgInfoService {
                             }
                             found.setShortName(name);
                             found.setName(name);
+
+                            if (!StringUtils.isEmpty(ucmid)) {
+                                OrgInfo sameUcmidOrg = orgDao.findByHospitalUcmid(ucmid);
+                                if (sameUcmidOrg != null && sameUcmidOrg.getUid() != found.getUid()) {
+                                    throw new Exception(ucmid + "重复");
+                                }
+                            }
+                            found.setHospitalUcmid(ucmid);
+
                             orgDao.save(found);
                             if (found.getOrgType() == 4) {
                                 assetInfoDao.updateClinicalDeptName(found.getName(), found.getUid(), found.getTenantUID());
@@ -218,6 +230,13 @@ public class OrgInfoService {
 
                             if (hospital == null) {
                                 hospital = OrgInfoBuilder.buildOrgHospital(tenantInfo, hospitalName, institution);
+                                if (!StringUtils.isEmpty(ucmid)) {
+                                    OrgInfo sameUcmidOrg = orgDao.findByHospitalUcmid(ucmid);
+                                    if (sameUcmidOrg != null && sameUcmidOrg.getName()!= hospitalName) {
+                                        throw new Exception(ucmid + "重复");
+                                    }
+                                }
+                                hospital.setHospitalUcmid(ucmid);
                                 orgDao.save(hospital);
                                 hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
                                 message = "导入成功";
@@ -517,6 +536,8 @@ public class OrgInfoService {
         }
 
         map.put("UUID", orgInfo.getUid());
+
+        map.put("UCMID", orgInfo.getHospitalUcmid());
 
         resultList.add(map);
 

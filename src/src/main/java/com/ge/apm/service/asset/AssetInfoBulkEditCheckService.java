@@ -41,7 +41,7 @@ public class AssetInfoBulkEditCheckService {
     //验证调剂中心
     public boolean verify(List<AssetInfo> assets) {
         if(assets != null && !assets.isEmpty()){
-            List<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toList());
+           List<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toList());
             List<Integer> status = new ArrayList<>();
             status.add(ReceiveBorrowConstant.STATE_RENT_ACCEPTED);
             status.add(ReceiveBorrowConstant.STATE_RENT_DELIVERED);
@@ -50,17 +50,9 @@ public class AssetInfoBulkEditCheckService {
             status.add(ReceiveBorrowConstant.STATE_RETURN_ACCEPTED);
             status.add(ReceiveBorrowConstant.STATE_RETURN_DELIVERED);
             status.add(ReceiveBorrowConstant.STATE_RETURN_SUSPENDED);
-            List<SharedAssetRequest> listByState = sharedAssetRequestRepository.findListByState(status);
-            if(listByState !=null && !listByState.isEmpty()){
-                List<String> sharedIds = listByState.stream().map(p -> p.getId()).collect(Collectors.toList());
-                List<SharedAssetReqDetail> details = sharedAssetReqDetailRepository.findListBySharedIds(sharedIds);
-                if(details!=null && !details.isEmpty()){
-                    for(SharedAssetReqDetail detail:details){
-                        if(assetUids.contains(detail.getAssetInfoId())){
-                            return false;
-                        }
-                    }
-                }
+            int count = sharedAssetReqDetailRepository.findCountByAssetInfoIdsAndState(assetUids,status);
+            if(count > 0){
+                return false;
             }
         }
         return true;

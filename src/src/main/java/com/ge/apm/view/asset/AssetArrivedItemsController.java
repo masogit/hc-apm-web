@@ -141,39 +141,41 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     public void takeWorkOrder(String itemId) {
         ArrivalListItem item = dao.findById(itemId);
-        if(activeSupplier()){//批量接单
-            String contractNum = item.getArrivalList().getContractNum();
-            String clinicalDeptUID = item.getClinicalDeptUID();
-            if(StringUtils.isEmpty(contractNum)){
-                WebUtil.addErrorMessage("合同编号不能为空");
-                return ;
-            }
-            if(StringUtils.isEmpty(clinicalDeptUID)){
-                WebUtil.addErrorMessage("所属科室不能为空");
-                return ;
-            }
-            List<ArrivalListItem> itemList = dao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
-            String errorMessage = "";
-            for(ArrivalListItem arrivalListItem:itemList){
-                arrivalListItem.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
-                Boolean responseStatus = aiService.reAssignWorkOrder(arrivalListItem);
-                if(!responseStatus){
-                    String name = arrivalListItem.getArrivalList().getName();
-                    if(errorMessage.contains("到货单名称/编号："+name)){
-                        errorMessage = errorMessage + "、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
-                    }else{
-                        errorMessage = errorMessage + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
-                    }
+        item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+        aiService.reAssignWorkOrder(item);
+        cancel();
+    }
+
+    public void takeWorkOrderBatch(String itemId) {
+        ArrivalListItem item = dao.findById(itemId);
+        String contractNum = item.getArrivalList().getContractNum();
+        String clinicalDeptUID = item.getClinicalDeptUID();
+        if(StringUtils.isEmpty(contractNum)){
+            WebUtil.addErrorMessage("合同编号不能为空");
+            return ;
+        }
+        if(StringUtils.isEmpty(clinicalDeptUID)){
+            WebUtil.addErrorMessage("所属科室不能为空");
+            return ;
+        }
+        List<ArrivalListItem> itemList = dao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+        String errorMessage = "";
+        for(ArrivalListItem arrivalListItem:itemList){
+            arrivalListItem.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+            Boolean responseStatus = aiService.reAssignWorkOrder(arrivalListItem);
+            if(!responseStatus){
+                String name = arrivalListItem.getArrivalList().getName();
+                if(errorMessage.contains("到货单名称/编号："+name)){
+                    errorMessage = errorMessage + "、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
+                }else{
+                    errorMessage = errorMessage + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
                 }
             }
-            if(StringUtils.isBlank(errorMessage)){
-                WebUtil.addSuccessMessage("批量提交成功");
-            }else{
-                WebUtil.addErrorMessage(errorMessage);
-            }
+        }
+        if(StringUtils.isBlank(errorMessage)){
+            WebUtil.addSuccessMessage("批量提交成功");
         }else{
-            item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
-            aiService.reAssignWorkOrder(item);
+            WebUtil.addErrorMessage(errorMessage);
         }
         cancel();
     }

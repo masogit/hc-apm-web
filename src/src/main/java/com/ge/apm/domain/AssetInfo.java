@@ -11,8 +11,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -153,6 +151,9 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "asset_group")
     private Integer assetGroup;//设备分类
+
+    @Column(name = "asset_class") // 1 医疗设备  2 家具
+    private Integer assetClass;//资产分类
 
     @Column(name = "asset_group_secondary")
     private Integer assetGroupSecondary;//设备分类2级
@@ -550,6 +551,18 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "second_directory")
     private String secondDirectory;
 
+    //联通状态，默认 1未联通，2 联通, 3 N/A
+    @Column(name = "connect_to_insite")
+    private Integer connectToInsite=3;
+
+    //默认1：未见异常、 2：报警、 3：维修中、 4: 无联通无报警、 5： 无显示
+    @Column(name = "ib_device_status")
+    private Integer ibDeviceStatus = 5;
+
+    //全量IB客户可见性标记
+    @Column(name = "visible_status")
+    private Integer visibleStatus;
+
     @Transient
     private int lineNum;
 
@@ -664,6 +677,22 @@ public class AssetInfo implements ChineseName,Serializable {
             rst = Boolean.TRUE;
         }
         return rst;
+    }
+
+    public Integer getConnectToInsite() {
+        return connectToInsite;
+    }
+
+    public void setConnectToInsite(Integer connectToInsite) {
+        this.connectToInsite = connectToInsite;
+    }
+
+    public Integer getIbDeviceStatus() {
+        return ibDeviceStatus;
+    }
+
+    public void setIbDeviceStatus(Integer ibDeviceStatus) {
+        this.ibDeviceStatus = ibDeviceStatus;
     }
 
     public OrgInfo getClinicalDeptOrg() {
@@ -1131,6 +1160,10 @@ public class AssetInfo implements ChineseName,Serializable {
     public void setAssetGroup(Integer assetGroup) {
         this.assetGroup = assetGroup;
     }
+
+    public Integer getAssetClass() { return assetClass; }
+
+    public void setAssetClass(Integer assetClass) { this.assetClass = assetClass; }
 
     public Integer getAssetDeptId() {
         return assetDeptId;
@@ -2014,5 +2047,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setSiteOrg(OrgInfo siteOrg) {
         this.siteOrg = siteOrg;
+    }
+
+    public Integer getVisibleStatus() {
+        return visibleStatus;
+    }
+
+    public void setVisibleStatus(Integer visibleStatus) {
+        this.visibleStatus = visibleStatus;
     }
 }

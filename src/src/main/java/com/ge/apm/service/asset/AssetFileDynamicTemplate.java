@@ -188,6 +188,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("CurrentStatus"), assetStatusList, false);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("AssetValueCategory"), assetValueCategoryList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("CapitalSourceTwo"), capitalSource2List, true);
+        createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("assetClass"),assetClassList , true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("deviceStatus"), deviceStatusList, true);
         createDropdownWithNamedRange(rowNum++, WebUtil.getMessage("ProprietaryClass"), proprietaryClassList, true);
 

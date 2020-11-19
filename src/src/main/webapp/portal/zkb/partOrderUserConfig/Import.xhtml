@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.zkbKeyUserConfig_userConfigImport}"/>
+            </div>
+        </div>
+        <div class="ui-g-12 card">
+            <h:form id="importForm">
+                <p:fieldset  legend="#{msg.zkbKeyUserConfig_userConfigImport}" id="uploaderContainer">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">#{msg.choseFileToUpload}</label>
+                            <p:fileUpload  id="fileUpload" fileUploadListener="#{zkbPartOrderUserConfigController.uploadDataFile}" value="#{zkbPartOrderUserConfigController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                           multiple="false" sizeLimit="10000000" auto="true"  update=":importForm :errorDataListForm" invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <div style="white-space:pre">#{msg.Description}<br/>        1.<a href="#{zkbPartOrderUserConfigController.getTemplateName()}" title="download">#{msg.downloadTemplateFile}</a><br/>        2.#{msg.zkbKeyBehaviorIndex_FileNeedDataOfUserConfig}<br/>        3.#{msg.UpFileImport}<br/>        </div>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/zkb/partOrderUserConfig/List?faces-redirect=true" immediate="true" />
+            </h:form>
+        </div>
+
+        <div class="ui-g-12 card">
+            <h:form id="errorDataListForm">
+                <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
+                <p:fieldset  legend="#{msg.ImportFailureData}">
+                    <p:dataTable id="errorDatalist" rendered="#{not empty zkbPartOrderUserConfigController.errorList}" value="#{zkbPartOrderUserConfigController.errorList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:column headerText="#{msg.EXCELRowNumber}">
+                            <h:outputText value="#{item.get('zkbPartOrderUserConfigVO').lineNum}" />
+                        </p:column>
+                        <p:column headerText="APM用户名" >
+                            <h:outputText value="#{item.get('zkbPartOrderUserConfigVO').loginName}"/>
+                        </p:column>
+                        <p:column headerText="邮箱" >
+                            <h:outputText value="#{item.get('zkbPartOrderUserConfigVO').email}"/>
+                        </p:column>
+                        <p:column headerText="资产类型" >
+                            <h:outputText value="#{item.get('zkbPartOrderUserConfigVO').assetType}"/>
+                        </p:column>
+                        <p:column headerText="类型" >
+                            <h:outputText  value="#{item.get('zkbPartOrderUserConfigVO').configTypeName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.FailureInformation}" >
+                            <h:outputText value="#{item.get('errmsg')}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>
