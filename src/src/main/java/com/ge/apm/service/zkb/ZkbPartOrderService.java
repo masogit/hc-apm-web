@@ -3,11 +3,15 @@ package com.ge.apm.service.zkb;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.ZkbPartOrderMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.UploadedFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -70,6 +74,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Autowired
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
+
+    @Autowired
+    private BlobFileService blobService;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -1064,6 +1071,24 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         } catch (RestClientException e) {
             e.printStackTrace();
         }
+    }
+
+
+    public boolean uploadFile(FileUploadEvent event, ZkbPartOrder zkbPartOrder){
+        V2_BlobObject v2_blobObject = blobService.uploadFile(event);
+        if (null != v2_blobObject) {
+            //blobObject.setBoId(selected.getId());
+            v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
+            v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_LETTER);
+            v2_blobObject.setBoUuid(zkbPartOrder.getId());
+            blobObjectRepository.save(v2_blobObject);
+
+            zkbPartOrder.setUploadLetterFileName(v2_blobObject.getObjectName());
+            zkbPartOrder.setUploadLetterFlag("t");
+            zkbPartOrderRepository.save(zkbPartOrder);
+            return true;
+        }
+        return false;
     }
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){

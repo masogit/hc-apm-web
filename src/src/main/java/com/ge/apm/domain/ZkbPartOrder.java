@@ -478,6 +478,17 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "upload_letter_flag")
     private String uploadLetterFlag;
 
+    @Column(name = "upload_letter_file_name")
+    private String uploadLetterFileName;
+
+    public String getUploadLetterFileName() {
+        return uploadLetterFileName;
+    }
+
+    public void setUploadLetterFileName(String uploadLetterFileName) {
+        this.uploadLetterFileName = uploadLetterFileName;
+    }
+
     public String getNeedLetterFlag() {
         return needLetterFlag;
     }
