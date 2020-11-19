@@ -253,7 +253,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }else if(contractList.size() == 1){
             ZkbContract zkbContract = contractList.get(0);
-            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 0){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于0，请检查！", "");
@@ -309,13 +309,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         contractList = new ArrayList<>();
                         return;
                     }
-                }
-            }else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
-                if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 0){
-                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于0，请检查！", "");
-                    FacesContext.getCurrentInstance().addMessage(null, message);
-                    contractList = new ArrayList<>();
-                    return;
                 }
             }
             if(selectedWorkFlow.get("customerName") != null){
@@ -525,7 +518,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
         ZkbContract zkbContract = contractList.get(0);
         zkbContract = zkbPartOrderService.getZkbContractRepository().findById(zkbContract.getId());
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
             if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                 if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 0){
                     FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于0，请检查！", "");
@@ -568,14 +561,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     contractList.add(zkbContract);
                     return "";
                 }
-            }
-        }else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
-            if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 0){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于0，请检查！", "");
-                FacesContext.getCurrentInstance().addMessage(null, message);
-                contractList = new ArrayList<>();
-                contractList.add(zkbContract);
-                return "";
             }
         }
 
