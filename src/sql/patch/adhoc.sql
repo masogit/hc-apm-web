@@ -3,7 +3,7 @@ update user_org uo set org_uid=t.hospital_uid,org_type=2 from
 (
 select uid,ua.org_uid,hospital_uid from user_account ua where ua.site_id=46 and exists(
 select mail from user_self_register ufr where "position" in('deviceDirector','deviceRepairer','deviceOtherStaff','hospitalTechnician') and ua.login_name=ufr.mail)
-) as t where uo.user_uid=t.uid and uo.org_uid=t.org_uid and org_type=4
+) as t where uo.user_uid=t.uid and uo.org_uid=t.org_uid and org_type=4;
 
 
 update user_account ua set site_uid=t.hospital_uid,org_uid=t.hospital_uid,org_id=t.hospital_id,org_level=t.org_leve2 from (
