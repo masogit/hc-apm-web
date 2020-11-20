@@ -45,7 +45,6 @@ public class AssetInfo implements ChineseName,Serializable {
     private int siteId;
 
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
@@ -187,7 +186,6 @@ public class AssetInfo implements ChineseName,Serializable {
 
     //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
     @Basic(optional = false)
-    @NotNull
     @Column(name = "status")
     private Integer status;//当前状态
 
