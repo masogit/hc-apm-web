@@ -104,12 +104,20 @@
                 <p:tabView id="tab">
                     <p:tab title="#{msg.Create2}">
                         <h:form id="AssetInfoEditForm">
+
                             <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
-                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
-                                        <ui:include src="customEditFields.xhtml"/>
-                                    </c:forEach>
-                                </p:panelGrid>
+                                <div class="ui-g-8">
+                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                        <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
+                                            <ui:include src="customEditFields.xhtml"/>
+                                        </c:forEach>
+                                    </p:panelGrid>
+                                </div>
+                                <div class="ui-g-4">
+                                    <p:galleria value="#{assetInfoDetailController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" panelWidth="380" panelHeight="260" showCaption="false"  autoPlay="false">
+                                        <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"  onclick="javascript:showthis(this);"/>
+                                    </p:galleria>
+                                </div>
                             </p:fieldset>
 
                             <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCodesFields}" >
@@ -269,20 +277,21 @@
                 <ui:include src="createSupplier.xhtml" />
             </div>
         </div>
-        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 900px;max-height:900px;min-width:800px;min-height:600px">
+        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: available;max-height:available;min-width:800px;min-height:600px;overflow: hidden">
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
-                <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
+                <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span>
+                <span>
+                    <p:commandButton id="spin" value="旋转" styleClass="anticon-plus"/>
+                    <p:commandButton id="enlarge" value="放大" onclick ="ImageSuofang(true)"/>
+                    <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
+                </span>
+                <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
                 <span class="ui-icon ui-icon-closethick"></span></a>
                 <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
             </div>
-            <div class="ui-dialog-content ui-widget-content"  style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px;">
+            <div class="ui-dialog-content ui-widget-content"  style="max-width: 1000px;max-height:700px;min-width:800px;min-height:600px;height: available">
 
-                <image id="shwoPicDialogImg" src="" style="max-height: 900px; max-width: 900px"></image>
-            </div>
-            <div>
-                <p:commandButton id="spin" value="旋转"/>
-                <p:commandButton id="enlarge" value="放大" onclick ="ImageSuofang(true)"/>
-                <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
+                <p style="text-align: center; vertical-align: middle"><image id="shwoPicDialogImg" src="" style="max-width: 1000px; max-height: 700px"></image></p>
             </div>
         </div>
         <script id="shwoPicDialog_s" type="text/javascript">$(function () {
@@ -295,9 +304,14 @@
                 var s = $('#shwoPicDialogImg')[0]
                 s.src = pic.src;
                 s.style.transform = 'rotate('+ 0 +'deg)';
-                s.width = pic.width * 1.6;
-                s.height = pic.height * 1.6;
+                s.width = pic.width * 1.8;
+                s.height = pic.height * 1.8;
                 PF('shwoPicDialog').show();
+                var dia = $("#shwoPicDialog")[0];
+                dia.style.top = '5px';
+                for (let i = 0; i < 10; i++) {
+                    ImageSuofang(true);
+                }
             }
 
             //旋转
@@ -305,13 +319,19 @@
             $("#spin").click(function () {
                 num++;
                 // $("#shwoPicDialogImg").style.rotate = num * 90;
-                $("#shwoPicDialogImg")[0].style.transform = 'rotate('+num * 90+'deg)';
+                var pic = $("#shwoPicDialogImg")[0];
+                pic.style.transform = 'rotate('+num * 90+'deg)';
+                if(pic.width > pic.height && num%2 ==1){
+                    pic.style.marginTop='140px';
+                }else{
+                    pic.style.marginTop='5px';
+                }
             })
 
             function ImageSuofang(args) {
                 var imgsrc =  $("#shwoPicDialogImg")[0];
                 if (args) {
-                    if(imgsrc.width * 1.1 > 900 ||imgsrc.height * 1.1>900 ){
+                    if(imgsrc.width * 1.1 > 1000 ||imgsrc.height * 1.1 > 700 ){
                         return;
                     }
                     imgsrc.width = imgsrc.width * 1.1;
