@@ -165,7 +165,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     @Getter
     private List<JSONObject> changeHistoryList = new ArrayList<>();
     private String uidList = null;
-    List<AssetInfo> assetInfoList = Collections.emptyList();
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -213,11 +212,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         qrCode = WebUtil.getRequestParameter("qrCode");
         updateAssetStatusList();
         uidList = WebUtil.getRequestParameter("uidList");
-        if(AssetInfoListController.resultAssetMap != null) {
-            assetInfoList = AssetInfoListController.resultAssetMap.get(uidList);
-            for (int i = 0; i < assetInfoList.size(); i++) {
-            }
-        }
     }
     public void saveNewSupplier() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -269,7 +263,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-
+        List<AssetInfo> assetInfoList = AssetInfoListController.resultAssetMap.get(uidList);
         List<AssetInfo> newList = new ArrayList<>();
         newList= depCopy(assetInfoList);
         for (AssetInfo assetInfo : newList ) {
