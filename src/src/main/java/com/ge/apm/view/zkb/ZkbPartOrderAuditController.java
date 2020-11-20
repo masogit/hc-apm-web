@@ -643,6 +643,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public void remindLetter(){
+        boolean r = zkbPartOrderService.sendWeChatRemindLetter(selected);
+        if(r){
+            WebUtil.addSuccessMessage("催函成功！");
+        }else{
+            WebUtil.addErrorMessage("催函失败！");
+        }
+    }
+
     public boolean isHaveTrainCourseFlag() {
         return haveTrainCourseFlag;
     }

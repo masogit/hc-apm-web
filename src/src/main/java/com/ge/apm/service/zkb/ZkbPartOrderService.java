@@ -1072,7 +1072,22 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             e.printStackTrace();
         }
     }
-
+    public boolean sendWeChatRemindLetter(ZkbPartOrder zkbPartOrder){
+        try {
+            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_REMIND_LETTER).concat("?id=").concat(zkbPartOrder.getId());
+            String token = UserContextService.getAccessToken();
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            if(response.getStatusCode() == HttpStatus.OK){
+                return true;
+            }
+        } catch (RestClientException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
 
     public boolean uploadFile(FileUploadEvent event, ZkbPartOrder zkbPartOrder){
         V2_BlobObject v2_blobObject = blobService.uploadFile(event);

@@ -476,7 +476,7 @@ public class ZkbPartOrder implements Serializable {
     private String needLetterFlag = "f";
 
     @Column(name = "upload_letter_flag")
-    private String uploadLetterFlag;
+    private String uploadLetterFlag = "f";
 
     @Column(name = "upload_letter_file_name")
     private String uploadLetterFileName;
