@@ -42,7 +42,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "site_id")
-    private int siteId;
+    private Integer siteId;
 
     @Basic(optional = false)
     @Size(min = 1, max = 64)
@@ -942,11 +942,11 @@ public class AssetInfo implements ChineseName,Serializable {
         this.id = id;
     }
 
-    public int getSiteId() {
+    public Integer getSiteId() {
         return siteId;
     }
 
-    public void setSiteId(int siteId) {
+    public void setSiteId(Integer siteId) {
         this.siteId = siteId;
     }
 
