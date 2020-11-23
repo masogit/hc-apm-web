@@ -88,6 +88,11 @@ public class UaaService {
     public String getUserDefaultHomePage(UserAccount user){
         String url;
         UserContextService userContextService = (UserContextService) WebUtil.getBean(UserContextService.class);
+        if(userContextService.isZkbUser())
+        {
+            url="zkbTenantHome.xhtml";
+            return url;
+        }
         if(userContextService.hasRole("NursingStaff"))
             url = getDefautHomePage("NursingStaff");
         else if(userContextService.hasRole("HospitalHead"))
