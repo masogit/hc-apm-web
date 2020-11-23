@@ -273,6 +273,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             if(selected.getAssetDeptId()==0){
                 selected.setAssetDeptId(null);
             }
+            selected.setSiteId(assetInfo.getSiteId());
+            selected.setHospitalId(assetInfo.getHospitalId());
+            selected.setTenantUID(assetInfo.getTenantUID());
+            selected.setHospitalUID(assetInfo.getHospitalUID());
+            selected.setInstitutionUID(assetInfo.getInstitutionUID());
             copyPropertiesExclude(selected, assetInfo);
         }
         this.saveAssetHistory(assetInfoList,newList);
