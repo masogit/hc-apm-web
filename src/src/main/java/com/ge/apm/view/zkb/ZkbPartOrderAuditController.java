@@ -68,7 +68,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private HashMap<String,String> conditionMap = new HashMap<>();
     private List<ZkbPoHistoryQueryVo> zkbHistoryDataList;
     private List<ZkbPoHistoryQueryVo> geHistoryDataList;
-
+    private String remindLetterFlag = "0";
 
     @Override
     protected void init() {
@@ -118,15 +118,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                 selected.setRemainQty(zkbContract.getProbeQuota());
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
-                /*if("1".equals(selected.getArtificialType())){
-                    selected.setRemainQty(zkbContract.getSpareArtificail());
-                }else if("3".equals(selected.getArtificialType())){
-                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
-                        selected.setRemainQty(zkbContract.getSpareArtificail());
-                    }else if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
-                        selected.setRemainQty(zkbContract.getGeArtificialSupportTimes());
-                    }
-                }*/
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     selected.setRemainQty(zkbContract.getGeArtificialSupportTimes());
                 }else{
@@ -168,7 +159,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Parts.toString()) || this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
                 if(canEditFlag && !zkbPartOrderService.checkThreeValid(selected)){
                     WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导！","");
-                    //return;
                 }
                 if(canEditFlag){
                     String validString = zkbPartOrderService.checkContractWeekValid(selected,zkbContract);
@@ -176,6 +166,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         WebUtil.addErrorMessage(validString,"");
                     }
                 }
+            }
+            if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
+                initRemindLetterFlag();
             }
         }
     }
@@ -410,7 +403,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
-
+    public void initRemindLetterFlag(){
+        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginName(currentUser.getLoginName());
+        if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
+            for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
+                if(c.getConfigType().equals(ZkbPartOrderStep.PartOrderStep.ClosePending.toString())){
+                    remindLetterFlag = "1";
+                    break;
+                }
+            }
+        }
+    }
 
     public void initReturnList(){
         returnTypeList = i18nDao.getByMsgType("zkbPoReturnType");
@@ -646,6 +649,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void remindLetter(){
         boolean r = zkbPartOrderService.sendWeChatRemindLetter(selected);
         if(r){
+            remindLetterFlag = "2";
             WebUtil.addSuccessMessage("催函成功！");
         }else{
             WebUtil.addErrorMessage("催函失败！");
@@ -906,6 +910,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setOrderNoList(List<HashMap<String, String>> orderNoList) {
         this.orderNoList = orderNoList;
+    }
+
+    public String getRemindLetterFlag() {
+        return remindLetterFlag;
+    }
+
+    public void setRemindLetterFlag(String remindLetterFlag) {
+        this.remindLetterFlag = remindLetterFlag;
     }
 
     @Override
