@@ -370,14 +370,15 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">技术支持审批备注</label>
-                            <p:inputTextarea id="techRemark" value="#{zkbPartOrderAuditController.selected.techRemark}" rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
+                            <p:inputTextarea id="techRemark" value="#{zkbPartOrderAuditController.selected.techRemark}" rows="3" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
                             </p:inputTextarea>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.canEditFlag}">
-                            <p:commandLink immediate="false" process="@this" id="historyData" update="growl" oncomplete="PF('zkbHistoryQueryDlg').show()" style="margin-right:20px;">
+                            <p:commandLink immediate="false" process="@this" id="historyData" update="growl" oncomplete="PF('zkbHistoryQueryDlg').show()" style="margin-right:20px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.canEditFlag}">
                                 <h:outputText value="历史数据" />
                             </p:commandLink>
                         </h:panelGroup>
+                        <!--<h:panelGroup >
+
+                        </h:panelGroup>-->
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset id="managementFieldset" legend="区域经理审批" rendered="#{zkbPartOrderAuditController.showManage}">
@@ -479,9 +480,8 @@
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">是否需要探头说明函</label>
-                                    <p:selectOneMenu id="needLetterFlag" value="#{zkbPartOrderAuditController.selected.needLetterFlag}"  disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
-                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <label class="label">是否需要探头说明函*</label>
+                                    <p:selectOneMenu id="needLetterFlag" value="#{zkbPartOrderAuditController.selected.needLetterFlag}" required="true" requiredMessage="是否需要探头说明函 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
                                         <f:selectItem itemLabel="需要" itemValue="t"/>
                                         <f:selectItem itemLabel="不需要" itemValue="f"/>
                                     </p:selectOneMenu>

@@ -415,7 +415,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     public void calcRemainQty(){
         if(contractList != null && contractList.size() > 0){
             ZkbContract zkbContract = contractList.get(0);
-            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
                 /*Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
                 this.selected.setRemainQty(contractCount - this.selected.getQty());*/
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
@@ -451,9 +451,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
                     this.selected.setRemainQty(contractCount - this.selected.getQty());
                 }
-            }else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
-                Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
-                this.selected.setRemainQty(contractCount - this.selected.getQty());
             }
         }
     }
@@ -502,7 +499,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                //flag=false;
+                flag=false;
                 errorLog += "附件不能为空！";
             }
         }
