@@ -34,8 +34,10 @@
                         <p:commandButton value="待关单"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ClosePending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('ClosePending')}" />
                         <p:commandButton value="完成"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'Complete'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('Complete')}" />
                         <p:commandButton value="全部"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbPartOrderController.queryListByStatus('all')}" />
+                        <p:commandLink id="btnRemindLetter" immediate="false" process="@this" style="text-align: right" oncomplete="PF('zkbVacationDlg').show()" rendered="#{zkbPartOrderController.vacationBtn}">
+                            <h:outputText value="是否休假" />
+                        </p:commandLink>
                     </h:panelGrid>
-                    <p:commandButton value="是否休假"  process="@this" style="text-align: right" rendered="#{zkbPartOrderController.vacationBtn}" oncomplete="PF('zkbVacationDlg').show()"/>
 
                     <p:dataTable id="datalist" value="#{zkbPartOrderController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbPartOrderController.selected}"
