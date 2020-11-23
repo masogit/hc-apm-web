@@ -758,8 +758,8 @@
                         </f:facet>
                     </p:dataTable>
                     <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0" rendered="#{zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
-                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.uploadLetterFlag eq 't')}">
-                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|XLS|XLSX|DOC|DOCX|PDF)$/"
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.uploadLetterFlag eq 't') and userContextService.zkbUser}">
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|rar|zip|htm|html|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|RAR|ZIP|HTM|HTML)$/"
                                           fileUploadListener="#{zkbPartOrderAuditController.handleFileUpload}"
                                           mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                           multiple="false" sizeLimit="500000000"
@@ -768,8 +768,7 @@
                         </h:panelGroup>
                         <h:panelGroup id="namepanel" rendered="#{zkbPartOrderAuditController.selected.uploadLetterFlag eq 't'}">
                             <label class="label">说明函</label>
-                            <p:inputText id="name" value="#{zkbPartOrderAuditController.selected.uploadLetterFileName}"
-                                         required="false" requiredMessage="#{msg.SelectUploadFile}" disabled="true"/>
+                            <p:inputText id="name" value="#{zkbPartOrderAuditController.selected.uploadLetterFileName}" style="width: 400px;" disabled="true"/>
                         </h:panelGroup>
                     </p:panel>
                 </p:fieldset>
@@ -799,8 +798,8 @@
                                         <f:selectItem itemLabel="是" itemValue="t"/>
                                         <f:selectItem itemLabel="否" itemValue="f"/>
                                     </p:selectOneMenu>
-                                    <p:commandLink immediate="false" process="@this" update="growl" action="#{zkbPartOrderAuditController.remindLetter}" style="padding-left:30px;">
-                                        <h:outputText value="是否催函" />
+                                    <p:commandLink id="btnRemindLetter" immediate="false" process="@this" update="growl zkbPartOrderEditForm" rendered="#{!(zkbPartOrderAuditController.remindLetterFlag eq '0')}" disabled="#{zkbPartOrderAuditController.remindLetterFlag eq '2'}" action="#{zkbPartOrderAuditController.remindLetter}" style="padding-left:30px;">
+                                        <h:outputText value="催函" />
                                     </p:commandLink>
                                 </c:otherwise>
                             </c:choose>
