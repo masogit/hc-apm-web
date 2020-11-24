@@ -3,6 +3,7 @@ package com.ge.apm.domain;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -186,6 +187,14 @@ public class ZkbKeyBehaviorIndex {
     public void setKbiDate(Date kbiDate) {
         this.kbiDate = kbiDate;
     }
+
+    public String getKbiDateFormat()
+    {
+        if(this.kbiDate==null) return "";
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM");
+        return sdf1.format(this.kbiDate);
+    }
+
 
 
     /**

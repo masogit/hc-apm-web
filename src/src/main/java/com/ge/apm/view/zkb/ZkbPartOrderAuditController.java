@@ -161,14 +161,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 zkbPartOrderItemVoList = zkbPartOrderService.getZkbPartOrderItemRepository().queryHistoryPart(selected.getSrNum(),selected.getId(),selected.getAssetTypeDi());
             }
 
-            if(canEditFlag && !zkbPartOrderService.checkThreeValid(selected)){
-                WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导","");
-                //return;
-            }
-            if(canEditFlag){
-                String validString = zkbPartOrderService.checkContractWeekValid(selected,zkbContract);
-                if(StringUtils.isNotBlank(validString)){
-                    WebUtil.addErrorMessage(validString,"");
+            if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Parts.toString()) || this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
+                if(canEditFlag && !zkbPartOrderService.checkThreeValid(selected)){
+                    WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导！","");
+                    //return;
+                }
+                if(canEditFlag){
+                    String validString = zkbPartOrderService.checkContractWeekValid(selected,zkbContract);
+                    if(StringUtils.isNotBlank(validString)){
+                        WebUtil.addErrorMessage(validString,"");
+                    }
                 }
             }
         }
@@ -427,7 +429,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.auditNext(this.selected,true,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendMessage(zkbPartOrder);
-        zkbPartOrderService.sendEmail(zkbPartOrder);
+        zkbPartOrderService.sendEmail(zkbPartOrder,false);
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
@@ -441,6 +443,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String closedBack(){
         zkbPartOrderService.closedBack(this.selected,currentUser);
+        ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
+        zkbPartOrderService.sendWeChatBackMessages(zkbPartOrder);
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
@@ -454,33 +458,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())){
-                /*HashMap<String, Integer> returnMap = new HashMap<>();
-                for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
-                    if(returnMap.containsKey(r.getPartNo())){
-                        Integer v = returnMap.get(r.getPartNo());
-                        v += r.getQty();
-                        returnMap.put(r.getPartNo(),v);
-                    }else{
-                        returnMap.put(r.getPartNo(),r.getQty());
-                    }
-                }
-                boolean flag = true;
-                String errorLog = "";
-                for(ZkbPartOrderItem zkbPartOrderItem : selected.getZkbPartOrderItems()){
-                    Integer returnQty = returnMap.get(zkbPartOrderItem.getPartNo());
-                    if(returnQty == null){
-                        flag = false;
-                        errorLog += zkbPartOrderItem.getPartNo() + ",";
-                    }else if(returnQty != zkbPartOrderItem.getPartQty()){
-                        flag = false;
-                        errorLog += zkbPartOrderItem.getPartNo() + ",";
-                    }
-                }
-                if(!flag){
-                    errorLog = errorLog.substring(0,errorLog.length()-1);
-                    WebUtil.addErrorMessage(errorLog+"归还数量不等于申请数量","");
-                    return "";
-                }*/
+
+
             }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
                 boolean flag = true;
                 String errorLog = "";
@@ -518,7 +497,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
+        if((ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType()))
+                && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(selected.getCurrentStep())){
             List<ZkbPartOrderReturn> currentZkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderIdAndDataStatus(selected.getId(),ZkbPartOrderReturn.DataStatusEnum.New.toString());
             if(currentZkbPartOrderReturns ==null || currentZkbPartOrderReturns.size() ==0){
                 WebUtil.addErrorMessage("请填写归还数据","");
@@ -532,10 +512,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){
             //归还时发送邮件
-            zkbPartOrderService.sendEmail(zkbPartOrder);
+            zkbPartOrderService.sendEmail(zkbPartOrder,false);
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep())){
-            zkbPartOrderService.sendEmail(zkbPartOrder);
+            zkbPartOrderService.sendEmail(zkbPartOrder,false);
         }
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }

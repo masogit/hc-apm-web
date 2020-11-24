@@ -2,26 +2,25 @@
  */
 package com.ge.apm.domain;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-
 import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
+import org.hibernate.annotations.Formula;
 import org.joda.time.DateTime;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import webapp.framework.util.TimeUtil;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author 212547631
@@ -43,10 +42,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "site_id")
-    private int siteId;
+    private Integer siteId;
 
     @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
@@ -188,7 +186,6 @@ public class AssetInfo implements ChineseName,Serializable {
 
     //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
     @Basic(optional = false)
-    @NotNull
     @Column(name = "status")
     private Integer status;//当前状态
 
@@ -539,6 +536,17 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "UCMID")
     private String UCMID;
 
+    @Size(max = 256)
+    @Column(name = "one_qr_code")
+    private String oneQrCode;
+
+    @Formula("(select qcl.status from qr_code_lib qcl where qcl.qr_code=one_qr_code)")
+    private String oneQrCodeStatus;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "one_qr_code", referencedColumnName = "qr_code", unique = true, insertable = false, updatable = false)
+    private QrCodeLib qrCodeLib;
+
     /**
      * 主目录
      */
@@ -550,6 +558,18 @@ public class AssetInfo implements ChineseName,Serializable {
      */
     @Column(name = "second_directory")
     private String secondDirectory;
+
+    //联通状态，默认 1未联通，2 联通, 3 N/A
+    @Column(name = "connect_to_insite")
+    private Integer connectToInsite=3;
+
+    //默认1：未见异常、 2：报警、 3：维修中、 4: 无联通无报警、 5： 无显示
+    @Column(name = "ib_device_status")
+    private Integer ibDeviceStatus = 5;
+
+    //全量IB客户可见性标记
+    @Column(name = "visible_status")
+    private Integer visibleStatus;
 
     @Transient
     private int lineNum;
@@ -665,6 +685,22 @@ public class AssetInfo implements ChineseName,Serializable {
             rst = Boolean.TRUE;
         }
         return rst;
+    }
+
+    public Integer getConnectToInsite() {
+        return connectToInsite;
+    }
+
+    public void setConnectToInsite(Integer connectToInsite) {
+        this.connectToInsite = connectToInsite;
+    }
+
+    public Integer getIbDeviceStatus() {
+        return ibDeviceStatus;
+    }
+
+    public void setIbDeviceStatus(Integer ibDeviceStatus) {
+        this.ibDeviceStatus = ibDeviceStatus;
     }
 
     public OrgInfo getClinicalDeptOrg() {
@@ -906,11 +942,11 @@ public class AssetInfo implements ChineseName,Serializable {
         this.id = id;
     }
 
-    public int getSiteId() {
+    public Integer getSiteId() {
         return siteId;
     }
 
-    public void setSiteId(int siteId) {
+    public void setSiteId(Integer siteId) {
         this.siteId = siteId;
     }
 
@@ -2019,5 +2055,37 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setSiteOrg(OrgInfo siteOrg) {
         this.siteOrg = siteOrg;
+    }
+
+    public Integer getVisibleStatus() {
+        return visibleStatus;
+    }
+
+    public void setVisibleStatus(Integer visibleStatus) {
+        this.visibleStatus = visibleStatus;
+    }
+
+    public String getOneQrCode() {
+        return oneQrCode;
+    }
+
+    public void setOneQrCode(String oneQrCode) {
+        this.oneQrCode = oneQrCode;
+    }
+
+    public String getOneQrCodeStatus() {
+        return oneQrCodeStatus;
+    }
+
+    public void setOneQrCodeStatus(String oneQrCodeStatus) {
+        this.oneQrCodeStatus = oneQrCodeStatus;
+    }
+
+    public QrCodeLib getQrCodeLib() {
+        return qrCodeLib;
+    }
+
+    public void setQrCodeLib(QrCodeLib qrCodeLib) {
+        this.qrCodeLib = qrCodeLib;
     }
 }

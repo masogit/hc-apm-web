@@ -15,9 +15,10 @@
                 <h:form id="searchForm">
                     <p:fieldset legend="#{msg.FilterCondition}">
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup rendered="#{userContextService.zkbAdmin}" >
+                            <h:panelGroup >
                                 <label class="label">#{msg.zkbKeyBehaviorIndex_tenant}</label>
-                                <p:selectOneMenu id="agent" value="#{zkbKeyBehaviorIndexController.tenantUID}" >
+                                <p:selectOneMenu  id="agent" value="#{zkbKeyBehaviorIndexController.tenantUID}" disabled="#{!userContextService.zkbAdmin}">
+                                    <p:ajax event="change" update="searchForm"/>
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{zkbPartOrderController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
@@ -35,11 +36,11 @@
                                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:commandButton value="#{msg.SearchResult}" actionListener="#{zkbKeyBehaviorIndexController.loadData}" validateClient="false"  update=":growl :zkbKeyBehaviorIndexForm:datalist">
+                                <p:commandButton value="#{msg.zkbKeyBehaviorIndex_quiry}" actionListener="#{zkbKeyBehaviorIndexController.loadData}"   update=":growl :zkbKeyBehaviorIndexForm:datalist">
                                 </p:commandButton>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <p:commandButton value="#{msg.zkbKeyBehaviorIndex_charts}" actionListener="#{zkbKeyBehaviorIndexController.generateCharts}"  update=":dialogCharts :charts"  oncomplete="PF('dialogCharts').show()">
+                                <p:commandButton value="#{msg.zkbKeyBehaviorIndex_charts}" actionListener="#{zkbKeyBehaviorIndexController.generateCharts}" disabled="#{zkbKeyBehaviorIndexController.tenantUID==null}" update=":dialogCharts :charts"  oncomplete="PF('dialogCharts').show()">
                                 </p:commandButton>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -63,49 +64,49 @@
                                 <f:convertDateTime pattern="yyyy-MM" />
                             </h:outputText>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_totalScore}" >
+                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_totalScore}" >
                             <h:outputText value="#{item.totalScore}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_partReturnFullScore}" >
                             <h:outputText value="#{item.partReturnFullScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_partReturnScore}" >
+                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_partReturnScore}" >
                             <h:outputText value="#{item.partReturnScore}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}" >
                             <h:outputText value="#{item.intactPartReturnRateFullScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateScore}" >
+                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateScore}" >
                             <h:outputText value="#{item.intactPartReturnRateScore}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeFullScore}" >
                             <h:outputText value="#{item.satisfactoryDegreeFullScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeScore}" >
+                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeScore}" >
                             <h:outputText value="#{item.satisfactoryDegreeScore}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_apmBillingRateFullScore}" >
                             <h:outputText value="#{item.apmBillingRateFullScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_apmBillingRateScore}" >
+                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_apmBillingRateScore}" >
                             <h:outputText value="#{item.apmBillingRateScore}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore}" >
                             <h:outputText value="#{item.pasteQuickResponseRateFullScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateScore}" >
+                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateScore}" >
                             <h:outputText value="#{item.pasteQuickResponseRateScore}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_complianceFullScore}" >
                             <h:outputText value="#{item.complianceFullScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_complianceScore}" >
+                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_complianceScore}" >
                             <h:outputText value="#{item.complianceScore}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_engineerFullScore}" >
                             <h:outputText value="#{item.engineerFullScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_engineerScore}" >
+                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_engineerScore}" >
                             <h:outputText value="#{item.engineerScore}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
@@ -113,7 +114,7 @@
                             <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbKeyBehaviorIndexController.exportAll}" oncomplete="PF('dialogKeyBehaviorIndex').show()" icon="ui-icon-arrowstop-1-s">
                                 <p:fileDownload value="#{zkbKeyBehaviorIndexController.exportFile}"/>
                             </p:commandButton>
-                            <p:commandButton title="#{msg.Import}" icon="ui-icon-arrowstop-1-n" class="btn btn-sm btn-gray" action="#{zkbKeyBehaviorIndexController.importAction}"></p:commandButton>
+                            <p:commandButton title="#{msg.Import}" icon="ui-icon-arrowstop-1-n" class="btn btn-sm btn-gray" rendered="#{userContextService.zkbAdmin}" action="#{zkbKeyBehaviorIndexController.importAction}"></p:commandButton>
                         </f:facet>
                     </p:dataTable>
                 </h:form>

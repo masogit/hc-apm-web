@@ -1033,11 +1033,11 @@ public class UserContextService implements Serializable {
     }
 
     public String getCalendarLocale(){
-        if(!isLocale()){
-            return Locale.US.toString();
-        }else{
-            return Locale.SIMPLIFIED_CHINESE.getLanguage();
-        }
+//        if(!isLocale()){
+//            return Locale.US.toString();
+//        }else{
+            return Locale.CHINESE.getLanguage();
+//        }
     }
 
     public boolean isZkbUser(){
@@ -1111,6 +1111,24 @@ public class UserContextService implements Serializable {
     public boolean hasScrappedAuthority(){
         AssetCreateService acService = WebUtil.getBean(AssetCreateService.class);
         return acService.hasScrappedAuthority();
+    }
+
+    public static boolean isAllowAssetBatchUpdate() {
+        TenantOptionConfigRepository tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
+
+        if (!tenantOptionConfigOptional.isPresent()) {
+            return false;
+        }
+
+        TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
+
+        if (null == tenantOptionConfig.getAllowAssetBatchUpdate()) {
+            return false;
+        }
+
+        return tenantOptionConfig.getAllowAssetBatchUpdate();
+
     }
 
     /**

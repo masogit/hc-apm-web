@@ -425,6 +425,15 @@ public class AssetInfoFormatter {
         return value;
     }
 
+    public String getAssetClassAsString() {
+
+        if (assetInfo.getAssetClass() == null) return null;
+
+        String value = findMatchValue(assetInfo.getAssetClass(), importService.assetClassList);
+
+        return value;
+    }
+
     public Date getManufactDate() {
         return assetInfo.getManufactDate();
     }
@@ -889,6 +898,7 @@ public class AssetInfoFormatter {
         map.put(getMessage("emergencyEquipment"),  this.getEmergencyEquipmentAsString());
         map.put(getMessage("importEquipment"), this.getImportEquipmentAsString());
         map.put(getMessage("status"), this.getStatusAsString());
+        map.put(getMessage("assetClass"), this.getAssetClassAsString());
         map.put(getMessage("accountingCategory"), this.getAccountingCategoryAsString());
         map.put(getMessage("isAssetPMed"), assetInfo.getIsPm() == null || assetInfo.getIsPm() ? getMessage("true") : getMessage("false"));
         map.put(getMessage("isAssetChecked"), assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? getMessage("true") : getMessage("false"));

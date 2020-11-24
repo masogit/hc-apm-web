@@ -2,6 +2,7 @@
  */
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -40,6 +41,7 @@ public class QrCodeLib implements Serializable {
     @Size(max = 64)
     private String qrCode;
     @Column(name = "issue_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.DATE)
     private Date issueDate;
     @Column(name = "submit_date")

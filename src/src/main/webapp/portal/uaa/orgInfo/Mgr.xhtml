@@ -100,6 +100,15 @@
                                             <h:outputLabel>#{msg.Other002}</h:outputLabel><p:inputText id="other" value="#{orgInfoController.selected.other}"/>
                                         </h:panelGroup>
 
+                                        <h:panelGroup rendered="#{orgInfoController.isShjyDept}" >
+                                            <label class="label">#{msg.DeptStatus}</label>
+                                            <p:selectOneMenu value="#{orgInfoController.status}" rendered="true">
+                                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                                <f:selectItem itemLabel="#{msg.EnableDept}" itemValue="0" />
+                                                <f:selectItem itemLabel="#{msg.DisableDept}" itemValue="1" />
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+
                                     </c:if>
                                     <h:panelGroup rendered="#{orgInfoController.isShow}">
                                         <label class="label">#{msg.hospitalUcmid}</label>

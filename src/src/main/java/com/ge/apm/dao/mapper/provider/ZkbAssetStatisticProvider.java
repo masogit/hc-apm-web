@@ -18,7 +18,7 @@ public class ZkbAssetStatisticProvider {
     public String loadAllAsset(Map<String,Object> param){
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
         StringBuilder sb = new StringBuilder();
-        sb.append(" SELECT " +
+        sb.append(" SELECT DISTINCT " +
                 " ai.system_id," +
                 " ti.uid AS tenant_uid," +
                 " ti. NAME," +
@@ -69,7 +69,7 @@ public class ZkbAssetStatisticProvider {
                 " FROM" +
                 " v2_blob_object" +
                 " WHERE" +
-                " 1=1 and bo_uuid in (");
+                " bo_sub_type = '1' and bo_uuid in (");
         String filter = buildFilter_loadQrCount(list);
         sb.append(filter);
         sb.append(") GROUP BY bo_uuid");
