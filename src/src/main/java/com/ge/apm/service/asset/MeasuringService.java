@@ -2,9 +2,10 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MeasuringCertificateDetailRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.MeasuringCertificateDetail;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.MeasuringTypeConfigRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.*;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -16,15 +17,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.util.DateUtil;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by 212605082 on 2017/11/7.
@@ -57,6 +56,8 @@ public class MeasuringService {
     private MeasuringCertificateDetailRepository measuringCertificateDetailDao;
     @Autowired
     private AssetInfoRepository assetInfoDao;
+    @Autowired
+    private MeasuringTypeConfigRepository measuringTypeConfigDao;
 
     public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
@@ -131,8 +132,17 @@ public class MeasuringService {
             }
 
             //更新设备台账
-            tempAssetInfo.setNextMeteringDate(needUpdateAssetMcd.getValidDateTo());
-            tempAssetInfo.setLastMeteringDate(needUpdateAssetMcd.getCheckDate());
+            Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
+            Date checkDate = needUpdateAssetMcd.getCheckDate();
+            if(UserContextService.hasCurrentTenantName("") && checkDate != null && tempAssetInfo.getMeasuringItemCategory() != null){
+                MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndTenantUID(tempAssetInfo.getMeasuringItemCategory().toString(), UserContextService.getCurrentUserAccount().getTenantUID());
+                Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
+                if(measureCycle != null && measureCycle > 0){//云南省阜外心血管病医院 下次计量日期=上次计量日期+周期（月）
+                    nextMeteringDate = DateUtil.addMonth(checkDate,measureCycle);
+                }
+            }
+            tempAssetInfo.setNextMeteringDate(nextMeteringDate);
+            tempAssetInfo.setLastMeteringDate(checkDate);
             tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
             if (needUpdateAssetMcd.getStatus() == 2) {//计量不合格
                 tempAssetInfo.setUsageStatus(2);//停用
@@ -475,5 +485,4 @@ public class MeasuringService {
 
         return header;
     }
-
 }

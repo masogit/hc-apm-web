@@ -176,6 +176,14 @@ public class WorkOrderReportExportController implements Serializable {
         }
     }
 
+    public void exportWo() {
+        if(selectedItems != null && selectedItems.size() > 0){
+            exportWoData(selectedItems);
+        }else if(workOrderList != null && workOrderList.size() > 0){
+            exportWoData(workOrderList);
+        }
+    }
+
     public void exportAllWo() {
         exportWoData(workOrderList);
     }
@@ -197,6 +205,13 @@ public class WorkOrderReportExportController implements Serializable {
         exportPdf = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
     }
 
+    public void exportWoDocx() {
+        if(selectedItems != null && selectedItems.size() > 0){
+            export2Docx(selectedItems);
+        }else if(workOrderList != null && workOrderList.size() > 0){
+            export2Docx(workOrderList);
+        }
+    }
     public void exportAllWoDocx() {
         export2Docx(workOrderList);
     }
