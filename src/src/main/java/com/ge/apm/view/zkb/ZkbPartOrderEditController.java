@@ -5,6 +5,7 @@ import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -585,10 +586,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         HashMap m = v2_listHashMap.get(0);
         selected = zkbPartOrderService.create(m.get("id").toString(),m.get("assetId").toString(),zkbContract,this.selected,currentUser,selectionTenantInfo,m.get("srNum").toString());
         zkbPartOrderService.saveUploadFile(v2_blobObjectList,this.selected.getId());
-        zkbPartOrderService.sendEmail(selected,false);
+        zkbPartOrderService.sendEmail(selected,"");
         zkbPartOrderService.sendMessage(selected);
         if(zkbPartOrderService.checkContractLastDay(zkbContract,orderType)){
-            zkbPartOrderService.sendEmail(selected,true);
+            zkbPartOrderService.sendEmail(selected, CopyByInvok.EMAIL_URL_TYPE_LASTDAY);
         }
         return "List?faces-redirect=true";
     }
