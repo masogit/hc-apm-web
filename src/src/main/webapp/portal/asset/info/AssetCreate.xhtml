@@ -104,22 +104,31 @@
                 <p:tabView id="tab">
                     <p:tab title="#{msg.Create2}">
                         <h:form id="AssetInfoEditForm">
-
-                            <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
-                                <div class="ui-g-8">
+                            <c:if test="#{assetInfoEditController.CRUDActionName.equals('新增')}">
+                                <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
                                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                         <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
                                             <ui:include src="customEditFields.xhtml"/>
                                         </c:forEach>
                                     </p:panelGrid>
-                                </div>
-                                <div class="ui-g-4">
-                                    <p:galleria value="#{assetInfoDetailController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" panelWidth="380" panelHeight="260" showCaption="false"  autoPlay="false">
-                                        <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"  onclick="javascript:showthis(this);"/>
-                                    </p:galleria>
-                                </div>
-                            </p:fieldset>
-
+                                </p:fieldset>
+                            </c:if>
+                            <c:if test="#{assetInfoEditController.CRUDActionName.equals('修改')}">
+                               <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
+                                    <div class="ui-g-8">
+                                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
+                                                <ui:include src="customEditFields.xhtml"/>
+                                            </c:forEach>
+                                        </p:panelGrid>
+                                    </div>
+                                    <div class="ui-g-4">
+                                        <p:galleria value="#{assetInfoDetailController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" panelWidth="380" panelHeight="260" showCaption="false"  autoPlay="false">
+                                            <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"  onclick="javascript:showthis(this);"/>
+                                        </p:galleria>
+                                    </div>
+                                </p:fieldset>
+                            </c:if>
                             <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCodesFields}" >
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCodesFields}" var="fieldItem" >
