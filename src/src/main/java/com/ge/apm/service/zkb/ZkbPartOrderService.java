@@ -984,7 +984,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     /**
      * 发送邮件
      */
-    public void sendEmail(ZkbPartOrder zkbPartOrder,boolean isLastDayFlag){
+    public void sendEmail(ZkbPartOrder zkbPartOrder,String urlType){
         try {
             HashMap<String, String> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
@@ -993,10 +993,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType", zkbPartOrder.getOrderType()));
 
             String url = "";
-            if(isLastDayFlag){
-                url = getGatewayURL(GatewayURL.PART_ORDER_SEND_LAST_DAY_EMAIL);
-            }else{
+            if(StringUtils.isEmpty(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_EMAIL);
+            }else if(CopyByInvok.EMAIL_URL_TYPE_LASTDAY.equals(urlType)){
+                url = getGatewayURL(GatewayURL.PART_ORDER_SEND_LAST_DAY_EMAIL);
+            }else if(CopyByInvok.EMAIL_URL_TYPE_UNORDER.equals(urlType)){
+                url = getGatewayURL(GatewayURL.PART_ORDER_SEND_LAST_DAY_EMAIL);
             }
             String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
@@ -1006,6 +1008,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             e.printStackTrace();
         }
     }
+
 
 
     public void sendMessage(ZkbPartOrder zkbPartOrder) {
