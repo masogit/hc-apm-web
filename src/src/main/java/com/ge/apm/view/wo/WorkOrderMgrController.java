@@ -335,6 +335,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             itemDetail.setParts(partsItem.getName());
             SimplePartsItemValue partsItemValue = partsRequestService.getInventoryNumAndAvgPriceByPartsItem(partsItem.getId(),null).get();
             itemDetail.setPartsPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
+            itemDetail.setClosedPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
             itemDetail.setCurrentQuantity(partsItemValue.getInStockNum());
             itemDetail.setPartsItemId(partsItem.getId());
         }

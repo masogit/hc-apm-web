@@ -260,6 +260,17 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
                                 </p:column>
                             </c:if>
+                            <c:if test="#{columnItem eq 'oneQrCodeStatus'}">
+                                <p:column headerText="#{msg.oneQrCodeStatus}" sortBy="#{item.oneQrCodeStatus}" filterBy="#{item.oneQrCodeStatus}" filterMatchMode="EQ" rendered="#{!assetInfoListController.terminate}">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.oneQrCodeStatus}" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('qrCodeLibStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('qrCodeLibStatus',item.oneQrCodeStatus)}"/>
+                                </p:column>
+                            </c:if>
                             <c:if test="#{columnItem eq 'warrantyDate'}">
                                 <p:column  headerText="#{msg.warrantyDate}" sortBy="#{item.warrantyDate}" filterBy="#{item.warrantyDate}" filterMatchMode="GTE">
                                     <f:facet name="filter">
@@ -662,6 +673,7 @@
                             </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}"/>
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoListController.exportExcel}" update=":growl"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >

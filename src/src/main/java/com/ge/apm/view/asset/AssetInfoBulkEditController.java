@@ -1,26 +1,28 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.KeyLabel;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
+import com.ge.apm.service.zkb.ZkbFileDirectoryService;
+import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.TabChangeEvent;
-import org.primefaces.event.TransferEvent;
+import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
@@ -28,12 +30,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
+import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,7 +70,12 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private OrgInfoRepository orgInfoDao;
     private V2ServiceRequestRepository v2ServiceRequestRepository;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
-
+    private AssetCreateService acService;
+    private ZkbFileDirectoryService zkbFileDirectoryService;
+    private BlobFileService blobService;
+    private AssetHistoryService assetHistoryService;
+    private SupplierController supplierController;
+    private QrCodeLib createRequest;
     //******* filter start
 
     @Getter @Setter
@@ -135,8 +147,24 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     @Setter
     private List<I18nMessage> code68List;
     private List<String> readableFieldsList;
+    private List<String> editableFieldsList;
     @Getter@Setter
     private CustomConfigObject customConfig;
+    //设备状态
+    @Getter
+    List<I18nMessage> assetStatusList = Collections.emptyList();
+    @Setter
+    private List<ZkbFileDirectory> subZkbFileDirectoryList;
+    private List<V2_BlobObject> attachements;
+    @Getter
+    @Setter
+    private List<V2_BlobObject> pictureList;
+    @Setter
+    @Getter
+    private String[] selectedPictures;
+    @Getter
+    private List<JSONObject> changeHistoryList = new ArrayList<>();
+    private String uidList = null;
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -159,10 +187,16 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         v2ServiceRequestRepository = WebUtil.getBean(V2ServiceRequestRepository.class);
+        acService = WebUtil.getBean(AssetCreateService.class);
+        zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
+        assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
+        supplierController = WebUtil.getBean(SupplierController.class);
+
         selected = new AssetInfo();
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        initCandidateKeyLabels();
+        editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         assetGroupSecondarySupport = i18nDao.countBySiteIdAndMsgTypeStartsWith(loginUser.getSiteId(), "assetGroupSecondary") > 0 ? true : false;
         if (assetGroupSecondarySupport) {
@@ -176,271 +210,343 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         mantainList = aimService.getOnlyMaintainListBySiteUid(selected.getTenantUID());
         initGbTree();
         qrCode = WebUtil.getRequestParameter("qrCode");
+        updateAssetStatusList();
+        uidList = WebUtil.getRequestParameter("uidList");
+    }
+    public void saveNewSupplier() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        this.newSupplier.setSiteId(loginUser.getSiteId());
+        this.newSupplier.setHospitalId(loginUser.getHospitalId());
+        this.newSupplier.setTenantUID(loginUser.getTenantUID());
+        this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+        this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
+        this.newSupplier.setSiteUID(loginUser.getSiteUID());
+        this.newSupplier.setCreatedDate(new Date());
+        this.newSupplier.setCreatedBy(loginUser.getName());
+
+        supplierController.setSelected(newSupplier);
+        supplierController.saveSubmit();
+        supplierList.add(newSupplier);
+        if (StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
+            supplierList.add(newSupplier);
+        }
+        changeSelect(createTpye);
+
+    }
+    public String getListPageLink() {
+        return "AssetList.xhtml?faces-redirect=true";
+    }
+    public String applyChange() throws Exception {
+
+        //check whether parent asset is valid when editing
+        if (!isValidParentAsset()) {
+            WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
+            return "";
+        }
+
+        //设置质保时间
+        if (null == selected.getFactoryWarrantyDate()) {
+            if (selected.getAcceptDate() != null && selected.getWarrantyMonth() != null) {
+                selected.setFactoryWarrantyDate(TimeUtil.toJodaDate(selected.getAcceptDate()).plusMonths(selected.getWarrantyMonth()).toDate());
+            }
+        }
+
+        if (null != gbCodeName) {
+            GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
+            if (null == gbCode) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
+                return "";
+            }
+
+            selected.setNationalStandardCode(selectedGb.getCode());
+        }
+        if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
+            this.selected.setMvsEquip(1);
+        }
+        List<AssetInfo> assetInfoList = AssetInfoListController.resultAssetMap.get(uidList);
+        List<AssetInfo> newList = new ArrayList<>();
+        newList= depCopy(assetInfoList);
+        for (AssetInfo assetInfo : newList ) {
+            selected.setIsValid(assetInfo.getIsValid());
+            selected.setIbDeviceStatus(assetInfo.getIbDeviceStatus());
+            selected.setConnectToInsite(assetInfo.getConnectToInsite());
+            if(selected.getAssetDeptId()==0){
+                selected.setAssetDeptId(null);
+            }
+            selected.setSiteId(assetInfo.getSiteId());
+            selected.setSiteUID(assetInfo.getSiteUID());
+            selected.setHospitalId(assetInfo.getHospitalId());
+            selected.setTenantUID(assetInfo.getTenantUID());
+            selected.setHospitalUID(assetInfo.getHospitalUID());
+            selected.setInstitutionUID(assetInfo.getInstitutionUID());
+            copyPropertiesExclude(selected, assetInfo);
+        }
+        this.saveAssetHistory(assetInfoList,newList);
+        for (AssetInfo assetInfo: newList) {
+            dao.save(assetInfo);
+            onAfterNewObject(assetInfo);
+        }
+        AssetInfoListController.resultAssetMap.clear();
+        return "AssetList.xhtml?faces-redirect=true";
     }
 
-    private void initCandidateKeyLabels() {
-        KeyLabel keyLabel;
-//        if(readableFieldsList.contains("serialNum")){
-//            keyLabel = new KeyLabel("serialNum", WebUtil.getMessage("serialNum"));
-//            candidateColumns.add(keyLabel);
-//        }
-        if(readableFieldsList.contains("name")){
-            keyLabel = new KeyLabel("name", WebUtil.getMessage("name"));
-            candidateColumns.add(keyLabel);
+    public void onAfterNewObject(AssetInfo object) {
+        if(attachements !=null){
+            attachements.forEach(item -> {
+                if (item.getBoId() == null) {
+                    item.setBoId(object.getId());
+                    item.setBoUuid(object.getUid());
+                    blobService.saveBlobObject(item);
+                }
+            });
         }
-        if(readableFieldsList.contains("aliasName")){
-            keyLabel = new KeyLabel("aliasName", WebUtil.getMessage("aliasName"));
-            candidateColumns.add(keyLabel);
+
+    }
+
+
+    public static <T> List<T> depCopy(List<T> srcList) {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(byteOut);
+            out.writeObject(srcList);
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+            ObjectInputStream inStream = new ObjectInputStream(byteIn);
+            List<T> destList = (List<T>) inStream.readObject();
+            return destList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        if(readableFieldsList.contains("assetGroup")){
-            keyLabel = new KeyLabel("assetGroup", WebUtil.getMessage("assetGroup"));
-            candidateColumns.add(keyLabel);
+        return null;
+    }
+
+
+
+
+
+
+
+    /**
+     * 复制对象属性：只复制需要的属性值，目标对象中原来的值不变
+     * 只适用于2个相同对象
+     * @param from 要复制的对象
+     * @param to 目标对象
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public static void copyPropertiesExclude(Object from, Object to) throws Exception {
+        if(!from.getClass().equals(to.getClass())){
+            throw new RuntimeException("对象不是同一类型，fromClass："+from.getClass()+",toClass："+to.getClass());
         }
-        if(readableFieldsList.contains("assetOwnerName")){
-            keyLabel = new KeyLabel("assetOwnerName", WebUtil.getMessage("assetOwnerName"));
-            candidateColumns.add(keyLabel);
-        }
-//        if(readableFieldsList.contains("assetOwnerTel")){
-//            keyLabel = new KeyLabel("assetOwnerTel", WebUtil.getMessage("assetOwnerTel"));
-//            candidateColumns.add(keyLabel);
-//        }
-        if(readableFieldsList.contains("assetOwnerName2")){
-            keyLabel = new KeyLabel("assetOwnerName2", WebUtil.getMessage("assetOwnerName2"));
-            candidateColumns.add(keyLabel);
-        }
-//        if(readableFieldsList.contains("assetOwnerTel2")){
-//            keyLabel = new KeyLabel("assetOwnerTel2", WebUtil.getMessage("assetOwnerTel2"));
-//            candidateColumns.add(keyLabel);
-//        }
-        if(readableFieldsList.contains("assetOwnerName3")){
-            keyLabel = new KeyLabel("assetOwnerName3", WebUtil.getMessage("assetOwnerName3"));
-            candidateColumns.add(keyLabel);
-        }
-//        if(readableFieldsList.contains("assetOwnerTel3")){
-//            keyLabel = new KeyLabel("assetOwnerTel3", WebUtil.getMessage("assetOwnerTel3"));
-//            candidateColumns.add(keyLabel);
-//        }
-        if(readableFieldsList.contains("pmOwnerName")){
-            keyLabel = new KeyLabel("pmOwnerName", WebUtil.getMessage("pmOwnerName"));
-            candidateColumns.add(keyLabel);
-        }
-//        if(readableFieldsList.contains("pmOwnerTel")){
-//            keyLabel = new KeyLabel("pmOwnerTel", WebUtil.getMessage("pmOwnerTel"));
-//            candidateColumns.add(keyLabel);
-//        }
-        if(readableFieldsList.contains("clinicalOwnerName")){
-            keyLabel = new KeyLabel("clinicalOwnerName", WebUtil.getMessage("clinicalOwnerName"));
-            candidateColumns.add(keyLabel);
-        }
-//        if(readableFieldsList.contains("clinicalOwnerTel")){
-//            keyLabel = new KeyLabel("clinicalOwnerTel", WebUtil.getMessage("clinicalOwnerTel"));
-//            candidateColumns.add(keyLabel);
-//        }
-        if(readableFieldsList.contains("manufacture")){
-            keyLabel = new KeyLabel("manufacture", WebUtil.getMessage("manufacture"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("makerShortName")){
-            keyLabel = new KeyLabel("makerShortName", WebUtil.getMessage("makerShortName"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("vendor")){
-            keyLabel = new KeyLabel("vendor", WebUtil.getMessage("vendor"));
-            candidateColumns.add(keyLabel);
-        }
-//        if(readableFieldsList.contains("vendorTel")){
-//            keyLabel = new KeyLabel("vendorTel", WebUtil.getMessage("vendorTel"));
-//            candidateColumns.add(keyLabel);
-//        }
-        if(readableFieldsList.contains("maitanance")){
-            keyLabel = new KeyLabel("maitanance", WebUtil.getMessage("maitanance"));
-            candidateColumns.add(keyLabel);
-        }
-//        if(readableFieldsList.contains("maitananceTel")){
-//            keyLabel = new KeyLabel("maitananceTel", WebUtil.getMessage("maitananceTel"));
-//            candidateColumns.add(keyLabel);
-//        }
-        if(readableFieldsList.contains("nationalStandardCode")){
-            keyLabel = new KeyLabel("nationalStandardCode", WebUtil.getMessage("nationalStandardCode"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("assetDeptName")){
-            keyLabel = new KeyLabel("assetDeptName", WebUtil.getMessage("assetDeptName"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("assetValueCategory")){
-            keyLabel = new KeyLabel("assetValueCategory", WebUtil.getMessage("assetValueCategory"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("capitalSource2")){
-            keyLabel = new KeyLabel("capitalSource2", WebUtil.getMessage("capitalSource2"));
-            candidateColumns.add(keyLabel);
-        }
-        /*if(readableFieldsList.contains("parentAsset")){
-            keyLabel = new KeyLabel("parentAsset", WebUtil.getMessage("parentAsset"));
-            candidateColumns.add(keyLabel);
-        }*/
-        if(readableFieldsList.contains("deviceName")){
-            keyLabel = new KeyLabel("deviceName", WebUtil.getMessage("deviceName"));
-            candidateColumns.add(keyLabel);
-        }
-//        if(readableFieldsList.contains("systemId")){
-//            keyLabel = new KeyLabel("systemId", WebUtil.getMessage("systemId"));
-//            candidateColumns.add(keyLabel);
-//        }
-//        if(readableFieldsList.contains("financingNum")){
-//            keyLabel = new KeyLabel("financingNum", WebUtil.getMessage("financingNum"));
-//            candidateColumns.add(keyLabel);
-//        }
-//        if(readableFieldsList.contains("departNum")){
-//            keyLabel = new KeyLabel("departNum", WebUtil.getMessage("departNum"));
-//            candidateColumns.add(keyLabel);
-//        }
-//        if(readableFieldsList.contains("barcode")){
-//            keyLabel = new KeyLabel("barcode", WebUtil.getMessage("barcode"));
-//            candidateColumns.add(keyLabel);
-//        }
-//        if(readableFieldsList.contains("registrationNo")){
-//            keyLabel = new KeyLabel("registrationNo", WebUtil.getMessage("registrationNo"));
-//            candidateColumns.add(keyLabel);
-//        }
-//        if(readableFieldsList.contains("modalityId")){
-//            keyLabel = new KeyLabel("modalityId", WebUtil.getMessage("modalityId"));
-//            candidateColumns.add(keyLabel);
-//        }
-//        if(readableFieldsList.contains("qrCode")){
-//            keyLabel = new KeyLabel("qrCode", WebUtil.getMessage("qrCode"));
-//            candidateColumns.add(keyLabel);
-//        }
-        if(readableFieldsList.contains("functionType")){
-            keyLabel = new KeyLabel("functionType", WebUtil.getMessage("functionType"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("functionGroup")){
-            keyLabel = new KeyLabel("functionGroup", WebUtil.getMessage("functionGroup"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("assetCode68")){
-            keyLabel = new KeyLabel("assetCode68", WebUtil.getMessage("assetCode68"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("functionGrade")){
-            keyLabel = new KeyLabel("functionGrade", WebUtil.getMessage("functionGrade"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("repairForm")){
-            keyLabel = new KeyLabel("repairForm", WebUtil.getMessage("repairForm"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("locationCode")){
-            keyLabel = new KeyLabel("locationCode", WebUtil.getMessage("locationCode"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("locationName")){
-            keyLabel = new KeyLabel("locationName", WebUtil.getMessage("locationName"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("status")){
-            keyLabel = new KeyLabel("status", WebUtil.getMessage("status"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("deviceStatus")){
-            keyLabel = new KeyLabel("deviceStatus", WebUtil.getMessage("deviceStatus"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("isAssetPMed")){
-            keyLabel = new KeyLabel("isAssetPMed", WebUtil.getMessage("isAssetPMed"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("isAssetChecked")){
-            keyLabel = new KeyLabel("isAssetChecked", WebUtil.getMessage("isAssetChecked"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("comments")){
-            keyLabel = new KeyLabel("comments", WebUtil.getMessage("comments"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("assetUsage")){
-            keyLabel = new KeyLabel("assetUsage", WebUtil.getMessage("assetUsage"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("capitalSource")){
-            keyLabel = new KeyLabel("capitalSource", WebUtil.getMessage("capitalSource"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("measureGrade")){
-            keyLabel = new KeyLabel("measureGrade", WebUtil.getMessage("measureGrade"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("riskGrade")){
-            keyLabel = new KeyLabel("riskGrade", WebUtil.getMessage("riskGrade"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("emergencyEquipment")){
-            keyLabel = new KeyLabel("emergencyEquipment", WebUtil.getMessage("emergencyEquipment"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("importEquipment")){
-            keyLabel = new KeyLabel("importEquipment", WebUtil.getMessage("importEquipment"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("measuringItemCategory")){
-            keyLabel = new KeyLabel("measuringItemCategory", WebUtil.getMessage("measuringItemCategory"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("accountingCategory")){
-            keyLabel = new KeyLabel("accountingCategory", WebUtil.getMessage("accountingCategory"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("manufactDate")){
-            keyLabel = new KeyLabel("manufactDate", WebUtil.getMessage("manufactDate"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("purchaseDate")){
-            keyLabel = new KeyLabel("purchaseDate", WebUtil.getMessage("purchaseDate"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("arriveDate")){
-            keyLabel = new KeyLabel("arriveDate", WebUtil.getMessage("arriveDate"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("installDate")){
-            keyLabel = new KeyLabel("installDate", WebUtil.getMessage("installDate"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("factoryWarrantyDate")){
-            keyLabel = new KeyLabel("factoryWarrantyDate", WebUtil.getMessage("factoryWarrantyDate"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("warrantyDate")){
-            keyLabel = new KeyLabel("warrantyDate", WebUtil.getMessage("warrantyDate"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("terminateDate")){
-            keyLabel = new KeyLabel("terminateDate", WebUtil.getMessage("terminateDate"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("isWarrantyNotice")){
-            keyLabel = new KeyLabel("isWarrantyNotice", WebUtil.getMessage("isWarrantyNotice"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("purchasePrice")){
-            keyLabel = new KeyLabel("purchasePrice", WebUtil.getMessage("purchasePrice"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("salvageValue")){
-            keyLabel = new KeyLabel("salvageValue", WebUtil.getMessage("salvageValue"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("lifecycle")){
-            keyLabel = new KeyLabel("lifecycle", WebUtil.getMessage("lifecycle"));
-            candidateColumns.add(keyLabel);
-        }
-        if(readableFieldsList.contains("depreciationMethod")){
-            keyLabel = new KeyLabel("depreciationMethod", WebUtil.getMessage("depreciationMethod"));
-            candidateColumns.add(keyLabel);
+        Method[] fromMethods = from.getClass().getDeclaredMethods();
+        Method[] toMethods = to.getClass().getDeclaredMethods();
+        Method fromMethod = null, toMethod = null;
+        String fromMethodName = null, toMethodName = null;
+        for (int i = 0; i < fromMethods.length; i++) {
+            fromMethod = fromMethods[i];
+            fromMethodName = fromMethod.getName();
+            if (!fromMethodName.contains("get")) {
+                continue;
+            }
+            toMethodName = "set" + fromMethodName.substring(3);
+            toMethod = findMethodByName(toMethods, toMethodName);
+            //如果方法为null，不处理
+            if (toMethod == null) {
+                continue;
+            }
+            Object value = fromMethod.invoke(from, new Object[0]);
+            //如果值为空，不处理
+            if(value == null) {
+                continue;
+            }
+            //集合类判空处理
+            if(value instanceof Collection) {
+                Collection newValue = (Collection)value;
+                if(newValue.size() <= 0)
+                    continue;
+            }
+            toMethod.invoke(to, new Object[] {value});
         }
     }
+    /**
+     * 从方法数组中获取指定名称的方法
+     *
+     * @param methods
+     * @param name
+     * @return
+     */
+    public static Method findMethodByName(Method[] methods, String name) {
+        for (int j = 0; j < methods.length; j++) {
+            if (methods[j].getName().equals(name))
+                return methods[j];
+        }
+        return null;
+    }
+
+    private void saveAssetHistory(List<AssetInfo> oldAssetInfoList,List<AssetInfo> assetInfoList) {
+        for (AssetInfo oldAssetInfo:oldAssetInfoList ) {
+            for (int i = 0; i < assetInfoList.size(); i++) {
+                int oldId = oldAssetInfo.getId();
+                int newId =assetInfoList.get(i).getId();
+                if( oldId == newId ){
+                    assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, assetInfoList.get(i), CustomConfigConstant.getAssetsImportantFieldsAll());
+                }
+            }
+        }
+
+    }
+    private boolean updateQrCode() {
+        QrCodeLib qrCodeLib = qrCodeService.findByQrCode(qrCode, selected.getSiteUID());
+        if (qrCodeLib == null) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("InvalidQRCode"));
+            return false;
+        }
+        if (!qrCodeLib.getSiteUID().equals(selected.getSiteUID())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("WrongHospitalQRCode"));
+            return false;
+        }
+        if (qrCodeLib.getStatus() != 1) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("AlreadyUsingQrCode"));
+            return false;
+        }
+
+        QrCodeLib oldQRCodeLib = qrCodeService.findByQrCode(selected.getQrCode(), selected.getSiteUID());
+        if (null != oldQRCodeLib) {
+            qrCodeService.releaseQrCode(oldQRCodeLib.getQrCode(), selected.getSiteUID());
+        }
+        qrCodeService.updateQrCodeStatus(qrCode, selected.getSiteUID(), 3);
+        selected.setQrCode(qrCode);
+        return true;
+    }
+    public boolean isValidParentAsset() {
+
+        if (selected.getParentAssetId() == null) {
+            return true;
+        }
+
+        AssetInfo assetInfo = dao.findById(selected.getParentAssetId());
+
+        if (null == assetInfo) {
+            return false;
+        }
+
+        if (StringUtils.isEmpty(selected.getClinicalDeptUID())) {
+            return false;
+        }
+
+        //parent asset and child asset will be in the same dept
+        if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean needEdit(String fieldKey) {
+        return editableFieldsList.contains(fieldKey);
+    }
+    public boolean needShow(String itemKey, String fieldKey) {
+        return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
+    }
+    public boolean needShow(String fieldKey) {
+
+        if (customConfig.getAssetsEditpageBasicFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageCatalogFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageCodesFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageDateFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageFinicialFields().contains(fieldKey)) return true;
+        if (customConfig.getAssetsEditpageStatusFields().contains(fieldKey)) return true;
+
+        return false;
+    }
+    public boolean getIsSelect46Account() {
+        if (UserContextService.getCurrentUserAccount().getSiteId()==46&&UserContextService.getCurrentUserAccount().getTenantUID().equals(UserContextService.getCurrentUserAccount().getSiteUID())) {
+            return true;
+        }
+        return false;
+    }
+    //重新获取资产状态枚举
+    public void updateAssetStatusList() {
+        assetStatusList = i18nDao.getByMsgTypeAndSiteId("assetStatus", ApmConstant.DEFAULT_SITE_ID);
+        assetStatusList.stream().forEach(status ->{
+            if(status.getMsgKey().equals("4")){
+                status.setEditable(hasScrappedAuthority());
+            }else{
+                status.setEditable(true);
+            }
+        });
+    }
+    //判断待报废按钮是否禁用
+    public boolean hasScrappedAuthority() {
+        return acService.hasScrappedAuthority();
+    }
+    public String selectCreatedBy(String loginName){
+        UserAccount user = userDao.getByLoginName(loginName);
+        if(user != null){
+            return user.getName();
+        }
+        return null;
+    }
+    /**
+     * 获取所有主目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> findMainDirectory() {
+        return zkbFileDirectoryService.findMainDirectory(null);
+    }
+
+    /**
+     * 根据主目录值获取子目录信息
+     * @return
+     */
+    public List<ZkbFileDirectory> getSubZkbFileDirectoryList() {
+        if(this.selected==null||this.selected.getMainDirectory()==null)
+        {
+            return null;
+        }
+        List<ZkbFileDirectory> mainZkbFileDirectory = this.zkbFileDirectoryService.findByLevelAndName(
+                ZkbFileDirectoryService.MAIN_DIRECTORY_LEVEL_VALUE,
+                this.selected.getMainDirectory());
+        if(CollectionUtils.isEmpty(mainZkbFileDirectory))
+        {
+            return null;
+        }
+        ZkbFileDirectory zkbFileDirectory = new ZkbFileDirectory();
+        zkbFileDirectory=mainZkbFileDirectory.get(0);
+        subZkbFileDirectoryList=this.zkbFileDirectoryService.findByZkbFileDirectory(zkbFileDirectory);
+        return subZkbFileDirectoryList;
+    }
+    public List<V2_BlobObject> getAttachList(String assetuid, String type) {
+        if (attachements == null) {
+            attachements = blobService.findBlobObjectsByBoUid(assetuid);
+        }
+        return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+    }
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
+    }
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            String type = event.getComponent().getId();
+            type = type.substring(type.indexOf("type") + 4);
+            attachements.add(blobObject);
+            blobObject.setBoId(selected.getId());
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+            blobObject.setBoSubType(type);
+            blobObject.setBoUuid(selected.getUid());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+    public int getAssetChangeHistoryCount() {
+        return changeHistoryList.size();
+    }
+
     public List<String> completeAssetName(String prefix) {
         String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
         List<String> names = null;

@@ -3630,7 +3630,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetClass','1','医疗设备','Medical Equipment',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('assetClass','2','家具','Furniture',NULL,-1);
 
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','oneQrCode','一机一码','One QR Code',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','oneQrCode','一机一码','One QR Code',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','oneQrCodeStatus','机码状态','One QR Code Status',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','oneQrCodeStatus','机码状态','One QR Code Status',NULL,-1);
 
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbKeyBehaviorIndex_kbi','KPI','KPI',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbKeyBehaviorIndex_kbiImport','KPI导入','KPI import',NULL,	-1	);
@@ -3696,4 +3699,9 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbAssetStatistic_qrCodeOfPaste','二维码是否已实施(粘贴及照片上传)','Qrcode of pasting',NULL,	-1	);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','MSARecommendExcel','MSA方案推荐','MSA Recommend',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','PromotionActivityExcel','促销活动','Promotion Activity',NULL,-1);
---INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','CarePackageExcel','关爱包','Care Package',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','CarePackageExcel','关爱包','Care Package',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '0', '已装机', 'Installed', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '1', '未装机', 'Shipped', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '2', '已删除', 'Deinstalled', NULL, '-1');
+
