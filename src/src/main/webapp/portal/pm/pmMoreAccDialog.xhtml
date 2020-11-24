@@ -24,10 +24,9 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
-                            <p:inputNumber  disabled="#{v2PmOrderController.nochange}" decimalPlaces="0" maxValue="999999" id="partsPrice1"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.EstimatedUnitPriceRMB} #{msg.ValidationRequire}">
+                            <p:inputNumber  disabled="#{v2PmOrderController.nochange}" decimalPlaces="4" maxValue="999999" id="partsPrice1"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.EstimatedUnitPriceRMB} #{msg.ValidationRequire}">
                                 <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
                                 </p:ajax>
-                                <f:convertNumber pattern="0" type="number"/>
 
                             </p:inputNumber>
                         </h:panelGroup>
@@ -66,10 +65,9 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.ContractPriceRMB}</label>
-                            <p:inputNumber  decimalPlaces="0" maxValue="999999" class="hetongjia" id="closedPrice1"  value="#{v2PmOrderController.itemDetail.closedPrice}">
+                            <p:inputNumber  decimalPlaces="4" maxValue="999999" class="hetongjia" id="closedPrice1"  value="#{v2PmOrderController.itemDetail.closedPrice}">
                                 <p:ajax listener="#{v2PmOrderController.closePrcieUpdate()}">
                                 </p:ajax>
-                                <f:convertNumber pattern="0" type="number"/>
                             </p:inputNumber>
                         </h:panelGroup>
 
@@ -165,7 +163,6 @@
                             <p:inputNumber disabled="#{v2PmOrderController.nochange}" decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="#{msg.PartUnitPriceRMB} #{msg.ValidationRequire}" >
                                 <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
                                 </p:ajax>
-                                <f:convertNumber pattern="0" type="number"/>
                             </p:inputNumber>
                         </h:panelGroup>
 
