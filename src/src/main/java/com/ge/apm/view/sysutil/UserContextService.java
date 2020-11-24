@@ -1131,4 +1131,27 @@ public class UserContextService implements Serializable {
 
     }
 
+    /**
+     * 验证租户名称
+     * @param tenantName 非必填，如不填将默认验证指定的租户名称
+     * @return
+     */
+    public static Boolean hasCurrentTenantName(String tenantName){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        TenantInfo currentTenantInfo = userContextService.getTenantInfo();
+        if(currentTenantInfo == null){
+            return Boolean.FALSE;
+        }
+        if(StringUtils.isBlank(tenantName)){
+            //tenantName为空则验证下面租户
+            if("云南省阜外心血管病医院".equals(currentTenantInfo.getName().trim())){
+                return Boolean.TRUE;
+            }
+        }else{
+            if(tenantName.equals(currentTenantInfo.getName().trim())){
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
 }

@@ -126,6 +126,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Setter
     @Getter
     private boolean isStatus;
+    private boolean isStatusAssetHistory;
     @Getter
     @Setter
     private List<V2_BlobObject> pictureList;
@@ -226,6 +227,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
         if ("Create".equalsIgnoreCase(actionName)) {
+            isStatusAssetHistory = false;
             try {
                 prepareCreate();
                 selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
@@ -235,6 +237,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 Logger.getLogger(AssetInfoEditController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else if ("Edit".equalsIgnoreCase(actionName)) {
+            isStatusAssetHistory = true;
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             setSelected(Integer.parseInt(selectedId));
             String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
@@ -680,7 +683,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-        if(!isStatus){
+        if(isStatusAssetHistory){
             this.saveAssetHistory();
         }
 

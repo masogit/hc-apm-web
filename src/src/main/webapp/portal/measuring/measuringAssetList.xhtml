@@ -4,11 +4,12 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
 
     <ui:composition>
         <div class="ui-g-12 card">
             <h:form id="measuringAssetListForm">
+                <h:outputLabel class="label" style="color: black!important;font-size: 16px!important;" rendered="#{userContextService.hasCurrentTenantName('')}">计量日期到期提醒：本月&nbsp;<span style="color:orange;">#{measureAssetListController.currentMonthCount}</span>&nbsp;台，下月&nbsp;<span style="color: orange;">#{measureAssetListController.nextMonthCount}</span>&nbsp;台</h:outputLabel>
                 <p:dataTable id="datalist_measuringAsset" value="#{measureAssetListController.lazyModel}" var="item" widgetVar="varDataList_measuringAsset"
                              selectionMode="single" selection="#{measureAssetListController.selected}"
                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"

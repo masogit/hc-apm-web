@@ -375,6 +375,30 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "annual_maintenance_times")
     private Integer annualMaintenanceTimes;//年保修次数
 
+    //楼
+    @Column(name = "building_name")
+    private String buildingName;
+
+    //层
+    @Column(name = "floor_name")
+    private String floorName;
+
+    public String getBuildingName() {
+        return buildingName;
+    }
+
+    public void setBuildingName(String buildingName) {
+        this.buildingName = buildingName;
+    }
+
+    public String getFloorName() {
+        return floorName;
+    }
+
+    public void setFloorName(String floorName) {
+        this.floorName = floorName;
+    }
+
     public String getGuarantee() {
         return guarantee;
     }

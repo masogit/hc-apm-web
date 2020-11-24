@@ -128,10 +128,18 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         String functionType = "%like%".replace("like", functionTypeStr);
 
         Page<V2_BlobObject> blobObjectPage;
-        if (StringUtils.isEmpty(functionTypeStr)) {
-            blobObjectPage = dao.loadDataForPageForFunctionType(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
-        } else {
-            blobObjectPage = dao.loadDataForPage(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+        if(UserContextService.hasCurrentTenantName("")){
+            if (StringUtils.isEmpty(functionTypeStr)) {
+                blobObjectPage = dao.loadDataForPageForFunctionTypeYunNan(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+            } else {
+                blobObjectPage = dao.loadDataForPageYunNan(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+            }
+        }else{
+            if (StringUtils.isEmpty(functionTypeStr)) {
+                blobObjectPage = dao.loadDataForPageForFunctionType(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+            } else {
+                blobObjectPage = dao.loadDataForPage(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
+            }
         }
 
         currentPageBlobObject = blobObjectPage.getContent();
