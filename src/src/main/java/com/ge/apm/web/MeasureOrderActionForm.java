@@ -27,6 +27,8 @@ public class MeasureOrderActionForm {
     String orderId;
     Integer measuringType;
     String applyTime;
+    Integer currentMonthCount;
+    Integer nextMonthCount;
 
     public String getOrderId() {
         return orderId;
@@ -172,5 +174,21 @@ public class MeasureOrderActionForm {
 
     public void setApplyTime(String applyTime) {
         this.applyTime = applyTime;
+    }
+
+    public Integer getCurrentMonthCount() {
+        return currentMonthCount;
+    }
+
+    public void setCurrentMonthCount(Integer currentMonthCount) {
+        this.currentMonthCount = currentMonthCount;
+    }
+
+    public Integer getNextMonthCount() {
+        return nextMonthCount;
+    }
+
+    public void setNextMonthCount(Integer nextMonthCount) {
+        this.nextMonthCount = nextMonthCount;
     }
 }
