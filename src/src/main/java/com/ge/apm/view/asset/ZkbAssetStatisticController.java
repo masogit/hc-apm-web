@@ -1,9 +1,11 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbAssetStatistic;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbAssetStatisticService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
@@ -50,14 +52,45 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
     private String systemId;
 
     /**
+     * 二维码个数
+     */
+    private String qrCodeCount;
+
+    /**
+     * 二维码状态
+     */
+    private String qrCodeCountState;
+
+    /**
      * 导出文件
      */
     private StreamedContent exportFile;
+    /**
+     * 当前登录用户信息service
+     */
+    private UserAccount currentUser;
+    /**
+     * 判断用户admin service
+     */
+    private UserContextService userContextService;
 
     @Override
     protected void init() {
         super.init();
         zkbAssetStatisticService = WebUtil.getBean(ZkbAssetStatisticService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        if(!userContextService.isZkbAdmin())
+        {
+            String tenantUID = currentUser.getTenantUID();
+            if(StringUtils.isNotEmpty(tenantUID))
+            {
+                this.tenantUid=tenantUID;
+            }else
+            {
+                this.tenantUid="-";
+            }
+        }
         loadData();
     }
 
@@ -65,7 +98,7 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
      * 根据页面条件查询
      */
     public void loadData() {
-        zkbAssetStatisticList=this.zkbAssetStatisticService.loadAllAsset(this.tenantUid,this.systemId);
+        zkbAssetStatisticList=this.zkbAssetStatisticService.loadAllAsset(this.tenantUid,this.systemId,this.qrCodeCount,this.qrCodeCountState);
     }
 
     public String getTenantUid() {
@@ -101,7 +134,7 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
      * 数据导出
      */
     public void exportAll(){
-        List<ZkbAssetStatistic> allZkbAssetStatisticList = this.zkbAssetStatisticService.loadAllAsset(null,null);
+        List<ZkbAssetStatistic> allZkbAssetStatisticList = this.zkbAssetStatisticService.loadAllAsset(null,null,null,null);
         List<Map<String, Object>> zkbAssetStatisticMapList = zkbAssetStatisticService.createZkbAssetStatisticData(allZkbAssetStatisticList);
         try {
             UserContextService ucs = WebUtil.getBean(UserContextService.class);
@@ -122,5 +155,20 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
 
     public void setSystemId(String systemId) {
         this.systemId = systemId;
+    }
+    public String getQrCodeCount() {
+        return qrCodeCount;
+    }
+
+    public void setQrCodeCount(String qrCodeCount) {
+        this.qrCodeCount = qrCodeCount;
+    }
+
+    public String getQrCodeCountState() {
+        return qrCodeCountState;
+    }
+
+    public void setQrCodeCountState(String qrCodeCountState) {
+        this.qrCodeCountState = qrCodeCountState;
     }
 }

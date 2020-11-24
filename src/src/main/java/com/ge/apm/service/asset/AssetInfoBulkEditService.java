@@ -2,11 +2,13 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.CustomConfigConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,6 +54,9 @@ public class AssetInfoBulkEditService {
     @Autowired
     private AssetTagRuleRepository  assetTagRuleRepository;
 
+    @Autowired
+    private AssetHistoryService assetHistoryService;
+
     @Transactional
     public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
 
@@ -65,6 +70,7 @@ public class AssetInfoBulkEditService {
         //make sure qrcode site update before asset site update, due to qrcode update depend on asset site
         commitSiteForAssetItself(assets, targetAsset);
     }
+
 
     @Transactional
     public void commitBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
@@ -283,9 +289,42 @@ public class AssetInfoBulkEditService {
         assetInfoDao.save(assets);
     }
 
+
+
+    public Boolean isAllParrentAssetAndChildAssetTransfer(List<String> parrentAssetUids, List<AssetInfo> assets){
+
+        List<Boolean> isAllTransferResult = new ArrayList<>();
+
+        for ( AssetInfo item :assets ) {
+            List<AssetInfo> assetInfos = null;
+            if(null == item.getParentAssetId()){
+                assetInfos = assetInfoDao.findByParentAssetIdOrId(item.getId(),item.getId());
+            }else {
+                assetInfos = assetInfoDao.findByParentAssetIdOrId(item.getParentAssetId(),item.getParentAssetId());
+            }
+            List<String> assetUids = assetInfos.stream().map(AssetInfo::getUid).collect(Collectors.toList());
+            if(parrentAssetUids.containsAll(assetUids)){
+                isAllTransferResult.add(true);
+            }else {
+                isAllTransferResult.add(false);
+            }
+        }
+
+        for(Boolean result : isAllTransferResult){
+            if(result == false){
+                return  false;
+            }
+        }
+        return true;
+    }
+
     private void commitSiteForAssetItself(List<AssetInfo> assets, AssetInfo targetAsset) {
 
+        List<String> parrentAssetUids = assets.stream().map(AssetInfo::getUid).filter(item -> item != null).collect(Collectors.toList());
+        Boolean isAllTransfer = isAllParrentAssetAndChildAssetTransfer(parrentAssetUids, assets);
+
         for (AssetInfo item: assets) {
+            AssetInfo oldAssetInfo = depCopy(item);
             item.setSiteUID(targetAsset.getSiteOrg().getSiteUID());
             item.setHospitalUID(targetAsset.getSiteOrg().getHospitalUID());
             item.setInstitutionUID(targetAsset.getSiteOrg().getInstitutionUID());
@@ -298,11 +337,37 @@ public class AssetInfoBulkEditService {
             //clear asset dept
             item.setAssetDeptId(null);
             item.setAssetDeptUID(null);
+            assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, item, CustomConfigConstant.getAssetsImportantFieldsAll());
+            if( !isAllTransfer){
+                item.setParentAssetId(null);
+                List<AssetInfo> childAssetInfos = assetInfoDao.findChildAssets(item.getId());
+                if(childAssetInfos.size() > 0){
+                    childAssetInfos.stream().forEach(childs ->childs.setParentAssetId(null));
+                    assetInfoDao.save(childAssetInfos);
+                }
+            }
         }
 
         assetInfoDao.save(assets);
+
     }
 
+    public static <T> T depCopy(T srcList) {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(byteOut);
+            out.writeObject(srcList);
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+            ObjectInputStream inStream = new ObjectInputStream(byteIn);
+            T destList = (T) inStream.readObject();
+            return destList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     private void commitPmRule(List<AssetInfo> assets, AssetInfo targetAsset) {
 
         for (AssetInfo item: assets) {

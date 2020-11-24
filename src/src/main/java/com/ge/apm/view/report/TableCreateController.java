@@ -87,7 +87,7 @@ public class TableCreateController extends TieWebSheetBean {
     private String instrumentDataLabel;
     private String templateLabel;
     private static final String SPLIT_STR = " == ";
-
+    private String operateType;
     // cache for exported file.
     private StreamedContent exportedFile;
 
@@ -284,26 +284,28 @@ public class TableCreateController extends TieWebSheetBean {
         editGroup = group;
         editTableItem = new TableItem();
         editTableItem.setExp(new HashMap<String, String>());
-
+        operateType = "add";
     }
 
     public void prepareEditItem(TableGroup group, TableItem item) {
         editGroup = group;
         editTableItem = item;
+        operateType = null;
     }
 
     public void editItem() {
         if (null == editGroup.getItems()) {
             editGroup.setItems(new ArrayList<TableItem>());
         }
-        if (templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
+       /*if (templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
             editTableItem.setKey(null);
             return;
-        }
+        }*/
+       //修改的时候校验key是否重复
         if (templateService.hasDuplicatedKey(table)) {
-            if (!editGroup.getItems().contains(editTableItem) && templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
+            if (templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
                 editTableItem.setKey(null);
                 return;
             }
@@ -315,6 +317,14 @@ public class TableCreateController extends TieWebSheetBean {
             requestContext.addCallbackParam("validationFailed", true);
             return;
         }
+        // 新增的时候校验key不能重复
+        if("add".equals(operateType)){
+            if(templateService.getItemKeyList(table).contains(editTableItem.getKey())){
+                WebUtil.addErrorMessage(WebUtil.getMessage("KeyHasBeenUsed"));
+                editTableItem.setKey(null);
+                return;
+            }
+        }
 
         if (!editGroup.getItems().contains(editTableItem)) {
             editGroup.getItems().add(editTableItem);
@@ -322,6 +332,7 @@ public class TableCreateController extends TieWebSheetBean {
 
         cancel();
         tableString = JSONObject.toJSONString(table);
+        operateType = null;
     }
 
     public void cancel() {
