@@ -3706,3 +3706,15 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '1', '未装机', 'Shipped', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '2', '已删除', 'Deinstalled', NULL, '-1');
 
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','1','科研','Research',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','2','教学','Teaching',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','3','医疗','Medical',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','4','干保','Cadre Heath Care',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','5','临床试验','Clinical Trial',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','6','自购','Self-purchase',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','7','租赁','Lease',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','8','投放','Launch',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','9','捐赠','Self-purchase',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','10','国家呼吸疾病区域医疗中心','National Regional Medical Center for Respiratory Diseases',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','11','国家综合类别区域医疗中心','National Comprehensive Category Regional Medical Center',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
