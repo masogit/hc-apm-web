@@ -90,7 +90,7 @@ public class UaaService {
         UserContextService userContextService = (UserContextService) WebUtil.getBean(UserContextService.class);
        /* if(userContextService.isZkbAccount())
         {
-            url="/zkbTenantHome.xhtml";
+            url="/portal/zkbTenantHome.xhtml";
             return url;
         }*/
         if(userContextService.hasRole("NursingStaff"))
