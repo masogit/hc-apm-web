@@ -3,8 +3,10 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.MeasuringCertificateDetailRepository;
 import com.ge.apm.dao.MeasuringTypeConfigRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.MeasuringCertificateDetail;
+import com.ge.apm.domain.MeasuringTypeConfig;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -131,16 +133,19 @@ public class MeasuringService {
                 }
             }
 
-            //更新设备台账
             Date nextMeteringDate = needUpdateAssetMcd.getValidDateTo();
             Date checkDate = needUpdateAssetMcd.getCheckDate();
-            if(UserContextService.hasCurrentTenantName("") && checkDate != null && tempAssetInfo.getMeasuringItemCategory() != null){
-                MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndTenantUID(tempAssetInfo.getMeasuringItemCategory().toString(), UserContextService.getCurrentUserAccount().getTenantUID());
-                Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
-                if(measureCycle != null && measureCycle > 0){//云南省阜外心血管病医院 下次计量日期=上次计量日期+周期（月）
-                    nextMeteringDate = DateUtil.addMonth(checkDate,measureCycle);
+            if(UserContextService.hasCurrentTenantName("")){
+                if(checkDate != null && nextMeteringDate == null && tempAssetInfo.getMeasuringItemCategory() != null){
+                    MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndTenantUID(tempAssetInfo.getMeasuringItemCategory().toString(), UserContextService.getCurrentUserAccount().getTenantUID());
+                    Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
+                    if(measureCycle != null && measureCycle > 0){//云南省阜外心血管病医院 下次计量日期=上次计量日期+周期（月）
+                        nextMeteringDate = DateUtil.addMonth(checkDate,measureCycle);
+                    }
                 }
             }
+
+            //更新设备台账
             tempAssetInfo.setNextMeteringDate(nextMeteringDate);
             tempAssetInfo.setLastMeteringDate(checkDate);
             tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
@@ -485,4 +490,5 @@ public class MeasuringService {
 
         return header;
     }
+
 }
