@@ -91,7 +91,15 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     @Override
     protected Page<ZkbPartOrder> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = this.searchFilters;
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
+        searchFilters.clear();
+        return zkbContractPage;
+    }
+
+
+    public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters){
+        List<SearchFilter> searchFilters = csearchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
@@ -229,10 +237,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 }
             }
         }
-
-        zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
-        searchFilters.clear();
-        return zkbContractPage;
+        return searchFilters;
     }
 
     public String techAuditField(ZkbPartOrder zkbPartOrder){
@@ -321,6 +326,12 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     }
     public String editAction() {
         return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus);
+    }
+
+    public void exportAll(){
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        List<ZkbPartOrder> zkbPartOrders =  dao.findBySearchFilter(searchFilters);
+
     }
 
     public String copyAction(){
