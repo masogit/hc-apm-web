@@ -42,6 +42,11 @@ public class ZkbAssetStatistic {
      */
     private String boUuid;
 
+    /**
+     * 合同编号
+     */
+    private String contractNo;
+
     public String getSystemId() {
         return systemId;
     }
@@ -90,7 +95,7 @@ public class ZkbAssetStatistic {
         if(StringUtils.isNotBlank(this.qrCodeCount))
         {
             Integer integerQrCodeCount = new Integer(this.qrCodeCount);
-            if(integerQrCodeCount.intValue()==3)
+            if(integerQrCodeCount.intValue()>=3)
             {
                 return "Y";
             }
@@ -109,5 +114,13 @@ public class ZkbAssetStatistic {
 
     public void setBoUuid(String boUuid) {
         this.boUuid = boUuid;
+    }
+
+    public String getContractNo() {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
     }
 }

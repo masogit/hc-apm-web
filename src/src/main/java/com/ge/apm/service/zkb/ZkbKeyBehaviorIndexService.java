@@ -569,16 +569,28 @@ public class ZkbKeyBehaviorIndexService {
         Integer goodReturnQty1 = this.zkbPartOrderReturnRepository.fetchReturnGoodQty(contractIdList);
         if(goodReturnQty==null) goodReturnQty = new Integer(0);
         if(goodReturnQty1==null) goodReturnQty1 = new Integer(0);
+        BigDecimal goodReturnRare = new BigDecimal(goodReturnQty+goodReturnQty1).divide(new BigDecimal(requireQty),2,BigDecimal.ROUND_HALF_DOWN).multiply(new BigDecimal(100));
+        goodReturnRare=goodReturnRare.subtract(new BigDecimal(30)).multiply(new BigDecimal(0.5)).setScale(0,BigDecimal.ROUND_HALF_DOWN);
         BigDecimal intactPartReturnRateFullScoreBigDecimal = new BigDecimal(zkbKeyBehaviorIndex.getIntactPartReturnRateFullScore());
-        Integer intactPartReturnRateScore = intactPartReturnRateFullScoreBigDecimal.multiply(
-                new BigDecimal(1).subtract(new BigDecimal(goodReturnQty+goodReturnQty1).divide(new BigDecimal(requireQty),2,BigDecimal.ROUND_HALF_DOWN))).
-                setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
-        zkbKeyBehaviorIndex.setIntactPartReturnRateScore(intactPartReturnRateScore);
+        BigDecimal result =intactPartReturnRateFullScoreBigDecimal.subtract(goodReturnRare);
+        if(result.compareTo(intactPartReturnRateFullScoreBigDecimal)==1)
+        {
+            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(zkbKeyBehaviorIndex.getIntactPartReturnRateFullScore());
+            return;
+        }else if(result.compareTo(intactPartReturnRateFullScoreBigDecimal)==-1)
+        {
+            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(0);
+            return;
+        }else
+        {
+            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(result.intValue());
+            return;
+        }
     }
 
     /**
      * 计算二维码粘贴率得分
-     * @param zkbKeyBehaviorIndex
+     * @param zkbKeyBehaviorIndex 当前用户得分
      * @param contractIdList 合同ID list
      */
     private Integer calculatePasteQuickResponseRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<String> contractIdList)
@@ -617,8 +629,15 @@ public class ZkbKeyBehaviorIndexService {
             return;
         }
         Integer countWorkOrder = this.zkbPartOrderRepository.fetchCount(contractIdList,firstday,lastday);
-        Integer apmBillingRateScore = new BigDecimal(countWorkOrder).divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN)
-                .multiply(new BigDecimal(zkbKeyBehaviorIndex.getApmBillingRateFullScore())).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
+        Integer apmBillingRateScore = new BigDecimal(countWorkOrder).
+                divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
+                multiply(new BigDecimal(100)).
+                setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
+        if(apmBillingRateScore>zkbKeyBehaviorIndex.getApmBillingRateFullScore())
+        {
+             zkbKeyBehaviorIndex.setApmBillingRateScore(zkbKeyBehaviorIndex.getApmBillingRateFullScore());
+            return;
+        }
         zkbKeyBehaviorIndex.setApmBillingRateScore(apmBillingRateScore);
     }
 

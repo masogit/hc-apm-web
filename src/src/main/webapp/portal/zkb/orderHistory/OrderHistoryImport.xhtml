@@ -43,20 +43,23 @@
                         <p:column headerText="#{msg.EXCELRowNumber}">
                             <h:outputText value="#{item.get('orderHistoryVO').lineNum}" />
                         </p:column>
-                        <p:column headerText="#{msg.dataType}" >
+                        <p:column headerText="#{msg.zkbHistory_dataType}" >
                             <h:outputText value="#{item.get('orderHistoryVO').dataType}"/>
                         </p:column>
-                        <p:column headerText="#{msg.region}" >
+                        <p:column headerText="#{msg.zkbHistory_region}" >
                             <h:outputText value="#{item.get('orderHistoryVO').region}"/>
                         </p:column>
-                        <p:column headerText="#{msg.agent}" >
+                        <p:column headerText="#{msg.zkbHistory_agent}" >
                             <h:outputText value="#{item.get('orderHistoryVO').agent}"/>
                         </p:column>
-                        <p:column headerText="#{msg.contractNo}" >
+                        <p:column headerText="#{msg.zkbHistory_contractNo}" >
                             <h:outputText value="#{item.get('orderHistoryVO').contractNo}"/>
                         </p:column>
-                        <p:column headerText="#{msg.contractType}" >
+                        <p:column headerText="#{msg.zkbHistory_contractType}" >
                             <h:outputText value="#{item.get('orderHistoryVO').contractType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbHistory_systemNo}" >
+                            <h:outputText value="#{item.get('orderHistoryVO').systemNo}"/>
                         </p:column>
                         <p:column headerText="#{msg.FailureInformation}" >
                             <h:outputText value="#{item.get('errmsg')}"/>

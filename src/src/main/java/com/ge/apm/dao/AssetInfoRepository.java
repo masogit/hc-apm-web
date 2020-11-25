@@ -242,7 +242,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     List<AssetInfo> findAllByDepartNumIn(List<String> departsNums);
 
     @Query(value="SELECT count(count1) from (" +
-            "SELECT count(id) as count1,bo_uuid from v2_blob_object where bo_sub_type = '1' and bo_uuid in ?1 GROUP BY bo_uuid HAVING count(id)=3) T",nativeQuery=true)
+            "SELECT count(id) as count1,bo_uuid from v2_blob_object where bo_sub_type = '1' and bo_uuid in ?1 GROUP BY bo_uuid HAVING count(id)>=3) T",nativeQuery=true)
     Integer countAssetWithQRcode(List<String> uidList);
 
     List<AssetInfo> findByParentAssetIdOrId(Integer parentAssetId,Integer id);
