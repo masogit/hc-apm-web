@@ -94,20 +94,26 @@ public class SimplePartsWarehouseUserController extends GenericCRUDUUIDControlle
             partsWareHouseUserList = partsWarehouseUserRepository.findAllByPartsWarehouseId(partsWarehouse.getId());
 
             Set<String> uidSets = partsWareHouseUserList.stream().filter(item -> item.getUserUid() != null).map(item -> item.getUserUid()).collect(Collectors.toSet());
+            SysRole role = roleDao.getByName(SimplePartsConstant.PARTS_ADMIN_MANAGER);
+            if(role == null){
+                WebUtil.addSuccessMessage("备件管理员角色不存在");
+                return;
+            }
+
             if (uidSets != null && uidSets.size() != 0) {
                 selectUserAccountList = userDao.getByUids(uidSets);
+                selectUserAccountList = selectUserAccountList.stream().filter(item -> item.getUserRoleList() != null &&
+                        item.getUserRoleList().stream().filter(r -> r.getRoleId() != null).map(r -> r.getRoleId()).collect(Collectors.toSet()).contains(role.getId())
+                ).collect(Collectors.toList());
             } else {
                 selectUserAccountList = Lists.newArrayList();
             }
-            SysRole role = roleDao.getByName(SimplePartsConstant.PARTS_ADMIN_MANAGER);
-            if (role != null) {
-                UserAccount userAccount = UserContextService.getCurrentUserAccount();
-                Set set = Sets.newHashSet();
-                set.add(role.getId());
-                Set<Integer> userIds = userRoleRepository.findUserIdByRoleIds(userAccount.getTenantUID(),set);
-                if (userIds != null && userIds.size() > 0) {
-                    userAccountList = userDao.getByIds(userIds);
-                }
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            Set set = Sets.newHashSet();
+            set.add(role.getId());
+            Set<Integer> userIds = userRoleRepository.findUserIdByRoleIds(userAccount.getTenantUID(),set);
+            if (userIds != null && userIds.size() > 0) {
+                userAccountList = userDao.getByIds(userIds);
             }
         } catch (Exception e) {
             logger.info(e.getMessage(), e);
