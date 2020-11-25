@@ -17,8 +17,8 @@ public class ZkbPartOrderProvider {
         List<SearchFilter> filters = (List<SearchFilter>) params.get("filters");
         String tenantUID = (String) params.get("tenantUID");
         StringBuilder sb = new StringBuilder();
-        sb.append("select p.id, p.part_order_no partOrderNo,a.system_id as systemId,p.sr_num srNum, i.part_no partNo,i.part_name partName,i.part_qty partQty,i.remark partRemark,p.status,p.current_step currentStep from zkb_part_order p inner join asset_info a on a.uid = p.asset_id left join zkb_part_order_item i on i.part_order_id = p.id ");
-        sb.append(" where p.tenant_uid = '"+tenantUID+"' ");
+        sb.append("select p.id, p.part_order_no partOrderNo,a.system_id as systemId,p.sr_num srNum, i.part_no partNo,i.part_name partName,i.part_qty partQty,i.remark partRemark,p.status,p.current_step currentStep from zkb_part_order p inner join asset_info a on a.uid = p.asset_id inner join zkb_part_order_item i on i.part_order_id = p.id ");
+        sb.append(" where p.tenant_uid = '"+tenantUID+"' and p.order_type = 'Parts' ");
         String filter = buildFilter_zkbOrderHistoryDetail(filters);
         sb.append(filter);
         sb.append(" order by p.created_date desc ");
