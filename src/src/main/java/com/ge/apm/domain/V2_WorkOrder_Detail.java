@@ -172,6 +172,12 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
     @Transient
     private OrgInfo siteOrg;
 
+    /**
+     * 工单审核签名字段(暂用展示备件审核签名字段)
+     */
+    @Column(name = "detail_review_signature")
+    private String detailReviewSignature;
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -484,7 +490,15 @@ public class V2_WorkOrder_Detail implements Serializable, Cloneable{
 		this.siteOrg = siteOrg;
 	}
 
-	@Override
+    public String getDetailReviewSignature() {
+        return detailReviewSignature;
+    }
+
+    public void setDetailReviewSignature(String detailReviewSignature) {
+        this.detailReviewSignature = detailReviewSignature;
+    }
+
+    @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof V2_WorkOrder_Detail)) {

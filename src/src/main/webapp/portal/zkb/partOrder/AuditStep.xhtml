@@ -139,7 +139,14 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.assetInfo.assetGroup eq 2 }">
+                            <label class="label">机型*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}" disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="超声高端机" itemValue="2"/>
+                                <f:selectItem itemLabel="超声低端机" itemValue="3"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
                             <p:selectOneMenu id="region" value="#{zkbPartOrderAuditController.selected.region}" disabled="true" required="true" requiredMessage="#{msg.zkbPartOrder_region} #{msg.ValidationRequire}">
@@ -250,7 +257,7 @@
                             <p:inputText id="softwareVersion" value="#{zkbPartOrderAuditController.selected.softwareVersion}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">故障描述*</label>
+                            <label class="label"> *</label>
                             <p:inputTextarea id="faultDescription" value="#{zkbPartOrderAuditController.selected.faultDescription}" disabled="true" />
                         </h:panelGroup>
                     </p:panelGrid>
@@ -370,9 +377,15 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">技术支持审批备注</label>
-                            <p:inputTextarea id="techRemark" value="#{zkbPartOrderAuditController.selected.techRemark}" rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
+                            <p:inputTextarea id="techRemark" value="#{zkbPartOrderAuditController.selected.techRemark}" rows="3" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
                             </p:inputTextarea>
+                            <p:commandLink immediate="false" process="@this" id="historyData" update="growl" oncomplete="PF('zkbHistoryQueryDlg').show()" style="margin-right:20px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.canEditFlag}">
+                                <h:outputText value="历史数据" />
+                            </p:commandLink>
                         </h:panelGroup>
+                        <!--<h:panelGroup >
+
+                        </h:panelGroup>-->
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset id="managementFieldset" legend="区域经理审批" rendered="#{zkbPartOrderAuditController.showManage}">
@@ -471,6 +484,13 @@
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItem itemLabel="是" itemValue="t"/>
                                         <f:selectItem itemLabel="否" itemValue="f"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">是否需要探头说明函*</label>
+                                    <p:selectOneMenu id="needLetterFlag" value="#{zkbPartOrderAuditController.selected.needLetterFlag}" required="true" requiredMessage="是否需要探头说明函 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                        <f:selectItem itemLabel="需要" itemValue="t"/>
+                                        <f:selectItem itemLabel="不需要" itemValue="f"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup>
@@ -744,6 +764,20 @@
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
+                    <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0" rendered="#{zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.uploadLetterFlag eq 't') and userContextService.zkbUser}">
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|rar|zip|htm|html|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|RAR|ZIP|HTM|HTML)$/"
+                                          fileUploadListener="#{zkbPartOrderAuditController.handleFileUpload}"
+                                          mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                          multiple="false" sizeLimit="500000000"
+                                          update=":zkbPartOrderEditForm:upload" auto="true"
+                                          invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                        </h:panelGroup>
+                        <h:panelGroup id="namepanel" rendered="#{zkbPartOrderAuditController.selected.uploadLetterFlag eq 't'}">
+                            <label class="label">说明函</label>
+                            <p:inputText id="name" value="#{zkbPartOrderAuditController.selected.uploadLetterFileName}" style="width: 400px;" disabled="true"/>
+                        </h:panelGroup>
+                    </p:panel>
                 </p:fieldset>
                 <p:fieldset id="closeFieldset" legend="关单信息" rendered="#{zkbPartOrderAuditController.showClosed}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -754,6 +788,28 @@
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending')}">
                             <label class="label">关单审批时间*</label>
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.closedDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                        </h:panelGroup>
+                        <h:panelGroup  rendered="#{zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
+                            <label class="label">是否已上传探头说明函</label>
+                            <c:choose>
+                                <c:when test="#{zkbPartOrderAuditController.selected.uploadLetterFlag eq 't'}">
+                                    <p:selectOneMenu id="uploadLetterFlag" value="#{zkbPartOrderAuditController.selected.uploadLetterFlag}" disabled="true">
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItem itemLabel="是" itemValue="t"/>
+                                        <f:selectItem itemLabel="否" itemValue="f"/>
+                                    </p:selectOneMenu>
+                                </c:when>
+                                <c:otherwise>
+                                    <p:selectOneMenu id="uploadLetterFlag2" value="#{zkbPartOrderAuditController.selected.uploadLetterFlag}" style="color: red;width: 120px;" disabled="true">
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItem itemLabel="是" itemValue="t"/>
+                                        <f:selectItem itemLabel="否" itemValue="f"/>
+                                    </p:selectOneMenu>
+                                    <p:commandLink id="btnRemindLetter" immediate="false" process="@this" update="growl zkbPartOrderEditForm" rendered="#{!(zkbPartOrderAuditController.remindLetterFlag eq '0')}" disabled="#{zkbPartOrderAuditController.remindLetterFlag eq '2'}" action="#{zkbPartOrderAuditController.remindLetter}" style="padding-left:30px;">
+                                        <h:outputText value="催函" />
+                                    </p:commandLink>
+                                </c:otherwise>
+                            </c:choose>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">关单备注</label>
@@ -773,7 +829,7 @@
 
             </h:form>
             <ui:include src="PartOrderReturn.xhtml"/>
-
+            <ui:include src="historyData.xhtml"/>
             <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
 
                 <h:form id="zkbConfigForm">
