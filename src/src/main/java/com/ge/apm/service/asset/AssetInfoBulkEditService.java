@@ -334,6 +334,8 @@ public class AssetInfoBulkEditService {
             item.setClinicalDeptUID(targetAsset.getClinicalDeptOrg().getUid());
             item.setClinicalDeptName(targetAsset.getClinicalDeptOrg().getName());
 
+            item.setHospitalId(targetAsset.getSiteOrg().getId());
+
             //clear asset dept
             item.setAssetDeptId(null);
             item.setAssetDeptUID(null);
