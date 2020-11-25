@@ -54,7 +54,7 @@
                 <p:outputLabel class="pageTitle" value="批量修改基本信息"/>
             </div>
             <div class="ui-g-12 card">
-
+                <span  style="color:red">如您未选择任何设备，此次批量修改将被应用到所有可见设备，请谨慎操作！</span>
             <h:form id="AssetInfoEditForm">
                             <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoBulkEditController.customConfig.assetsEditpageBasicFields}" >
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
