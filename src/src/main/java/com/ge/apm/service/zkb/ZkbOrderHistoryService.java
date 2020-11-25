@@ -9,6 +9,7 @@ import com.ge.apm.domain.ZkbOrderHistory;
 import com.ge.apm.service.asset.AssetInfoRow;
 import com.ge.apm.service.asset.OrderHistoryInfoRow;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -90,6 +91,9 @@ public class ZkbOrderHistoryService {
      */
     @Autowired
     private ZkbOrderHistoryMapper zkbOrderHistoryMapper;
+
+
+//    private UserContextService userContextService  = WebUtil.getBean(UserContextService.class);;
 
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
@@ -216,6 +220,28 @@ public class ZkbOrderHistoryService {
         boolean isValidateData = true;
         OrderHistoryVO orderHistoryVO = (OrderHistoryVO)item.get("orderHistoryVO");
         AssetInfoRow.clearErrMessage(item);
+
+        if(StringUtils.isBlank(orderHistoryVO.getRegion())){
+            item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorRegion"));
+            isValidateData = false;
+        }
+        if(StringUtils.isBlank(orderHistoryVO.getContractNo())){
+            item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorContractNo"));
+            isValidateData = false;
+        }
+        if(StringUtils.isBlank(orderHistoryVO.getContractType())){
+            item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorContractType"));
+            isValidateData = false;
+        }
+        if(StringUtils.isBlank(orderHistoryVO.getSystemNo())){
+            item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorSystemNo"));
+            isValidateData = false;
+        }
+
         if(StringUtils.isBlank(orderHistoryVO.getDataType())){
             item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorDataTypeIsEmpty"));
@@ -347,7 +373,7 @@ public class ZkbOrderHistoryService {
     }
 
 
-    public List<Map<String, Object>> createExportOrderHistoryData(List<ZkbOrderHistory> zkbOrderHistoryList){
+    public List<Map<String, Object>> createExportOrderHistoryData(List<ZkbOrderHistory> zkbOrderHistoryList,UserContextService userContextService){
         List<Map<String, Object>> orderHistoryMapList = new ArrayList<>();
         for (ZkbOrderHistory orderHistory : zkbOrderHistoryList) {
             Map<String, Object> orderHistoryMap = new HashMap<>();
@@ -371,7 +397,13 @@ public class ZkbOrderHistoryService {
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_hospitalName"),orderHistory.getHospitalName());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_machineType"),orderHistory.getMachineType());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sparePartsNo"),orderHistory.getSparePartsNo());
-            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sparePartsPrice"),orderHistory.getSparePartsPrice());
+            if(userContextService.isZkbAdmin())
+            {
+                orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sparePartsPrice"),orderHistory.getSparePartsPrice());
+            }else
+                {
+                    orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sparePartsPrice"),"-");
+                }
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_description"),orderHistory.getDescription());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_orderNo"),orderHistory.getOrderNo());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_RSESup"),orderHistory.getRSESup());
