@@ -590,7 +590,7 @@ public class ZkbKeyBehaviorIndexService {
 
     /**
      * 计算二维码粘贴率得分
-     * @param zkbKeyBehaviorIndex
+     * @param zkbKeyBehaviorIndex 当前用户得分
      * @param contractIdList 合同ID list
      */
     private Integer calculatePasteQuickResponseRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<String> contractIdList)
