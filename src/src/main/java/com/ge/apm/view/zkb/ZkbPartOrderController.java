@@ -2,10 +2,13 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.zkb.*;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -16,6 +19,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -87,7 +91,15 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     @Override
     protected Page<ZkbPartOrder> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = this.searchFilters;
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
+        searchFilters.clear();
+        return zkbContractPage;
+    }
+
+
+    public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters){
+        List<SearchFilter> searchFilters = csearchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
@@ -225,10 +237,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 }
             }
         }
-
-        zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
-        searchFilters.clear();
-        return zkbContractPage;
+        return searchFilters;
     }
 
     public String techAuditField(ZkbPartOrder zkbPartOrder){
@@ -243,8 +252,15 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public String queryListByStatus(String status){
         queryStatus = status;
-        System.out.println(status);
         return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus;
+    }
+
+    public void doubleClick(SelectEvent event){
+        selected = (ZkbPartOrder) event.getObject();
+        String str = "action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus;
+        String url = "AuditStep.xhtml?str="+UrlParamUtil.encodeUrlQueryString(str);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public boolean isContainOrder(){
@@ -310,6 +326,12 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     }
     public String editAction() {
         return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus);
+    }
+
+    public void exportAll(){
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        List<ZkbPartOrder> zkbPartOrders =  dao.findBySearchFilter(searchFilters);
+
     }
 
     public String copyAction(){
