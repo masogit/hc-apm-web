@@ -1,0 +1,800 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'serialNum')}">
+        <h:panelGroup>
+            <label class="label">#{msg.serialNum}</label>
+            <p:inputText id="serialNum" value="#{assetInfoBulkEditController.selected.serialNum}" required="#{assetInfoBulkEditController.customConfig.assetFields['serialNum'].required}"
+                          readonly="#{!assetInfoBulkEditController.needEdit('serialNum')}"/>
+        </h:panelGroup>
+    </c:if>
+
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'name')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.name}</label>
+            <p:autoComplete id="name" value="#{assetInfoBulkEditController.selected.name}" completeMethod="#{assetInfoBulkEditController.completeAssetName}"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'aliasName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.aliasName}</label>
+            <p:inputText  id="aliasName" value="#{assetInfoBulkEditController.selected.aliasName}" required="#{assetInfoBulkEditController.customConfig.assetFields['aliasName'].required}"
+                          readonly="#{!assetInfoBulkEditController.needEdit('aliasName')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetGroup')}" ><!--设备分类-->
+        <h:panelGroup>
+            <label class="label">#{msg.assetGroup}</label>
+            <p:selectOneMenu id="assetGroup" value="#{assetInfoBulkEditController.selected.assetGroup}"  disabled="#{!assetInfoBulkEditController.needEdit('assetGroup')}">
+                <p:ajax  listener="#{assetInfoBulkEditController.onAssetGroupChange()}" update="@(.assetGroupChange)" />
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetClass')}" ><!--设备分类-->
+        <h:panelGroup>
+            <label class="label">#{msg.assetClass}</label>
+            <p:selectOneMenu id="assetClass" value="#{assetInfoBulkEditController.selected.assetClass}" disabled="#{!assetInfoBulkEditController.needEdit('assetClass')}">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetGroupSecondary')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetGroupSecondary}</label>
+            <p:selectOneMenu id="assetGroupSecondary" value="#{assetInfoBulkEditController.selected.assetGroupSecondary}"
+                             required="#{assetInfoBulkEditController.customConfig.assetFields['assetGroupSecondary'].required}"  disabled="#{!assetInfoBulkEditController.needEdit('assetGroupSecondary')}"
+                             class="assetGroupChange">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{assetInfoBulkEditController.assetGroupSecondaryList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetOwnerName')}" >
+        <h:panelGroup ><!--新增资产信息中的 维修负责人 -->
+            <label class="label">#{msg.assetOwnerName}</label>
+            <p:autoComplete id="assetOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['assetOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('assetOwnerName')}"
+                            forceSelection="true" required="#{assetInfoBulkEditController.customConfig.assetFields['assetOwnerName'].required}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner')}" process="@this" update="@(.assetOwnerNameChange)" />
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner')}" process="@this" update="@(.assetOwnerNameChange)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetOwnerTel')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerTel}</label>
+            <p:inputText id="assetOwnerTel" value="#{assetInfoBulkEditController.selected.assetOwnerTel}" required="#{assetInfoBulkEditController.customConfig.assetFields['assetOwnerTel'].required}"
+                          readonly="true" class="assetOwnerNameChange"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetOwnerName2')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerName2}</label>
+            <p:autoComplete id="assetOwnerName2" value="#{assetInfoBulkEditController.selectedObjectMap['assetOwner2']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('assetOwnerName2')}"
+                            forceSelection="true" var="t" required="#{assetInfoBulkEditController.customConfig.assetFields['assetOwnerName2'].required}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner2')}" process="@this" update="@(.assetOwnerName2Change)" />
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner2')}" process="@this" update="@(.assetOwnerName2Change)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetOwnerTel2')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerTel2}</label>
+            <p:inputText id="assetOwnerTel2" value="#{assetInfoBulkEditController.selected.assetOwnerTel2}" required="#{assetInfoBulkEditController.customConfig.assetFields['assetOwnerTel2'].required}"
+                          readonly="true" class="assetOwnerName2Change"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetOwnerName3')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerName3}</label>
+            <p:autoComplete id="assetOwnerName3" value="#{assetInfoBulkEditController.selectedObjectMap['assetOwner3']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('assetOwnerName3')}"
+                            forceSelection="true" var="t" required="#{assetInfoBulkEditController.customConfig.assetFields['assetOwnerName3'].required}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner3')}" process="@this" update="@(.assetOwnerName3Change)" />
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('assetOwner3')}" process="@this" update="@(.assetOwnerName3Change)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetOwnerTel3')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerTel3}</label>
+            <p:inputText id="assetOwnerTel3" value="#{assetInfoBulkEditController.selected.assetOwnerTel3}" required="#{assetInfoBulkEditController.customConfig.assetFields['assetOwnerTel3'].required}"
+                         readonly="true" class="assetOwnerName3Change"/>
+        </h:panelGroup>
+    </c:if>
+    <!--保养负责人-->
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'pmOwnerName')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.pmOwnerName}</label>
+            <p:autoComplete id="pmOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['pmOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('pmOwnerName')}"
+                            forceSelection="true" var="t" required="#{assetInfoBulkEditController.customConfig.assetFields['pmOwnerName'].required}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('pmOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+
+
+    <!--计量负责人-->
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'measuringOwner')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.measuringOwnerName}</label>
+            <p:autoComplete id="measuringOwner" value="#{assetInfoBulkEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('measuringOwner')}"
+                            forceSelection="true" var="t" required="#{assetInfoBulkEditController.customConfig.assetFields['measuringOwner'].required}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('measuringOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('measuringOwner')}" process="@this" update="@(.pmOwnerNameChange)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+
+    <!--负责人-->
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'measuringOwnerName')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.measuringOwnerName}</label>
+            <p:autoComplete id="measuringOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['measuringOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('measuringOwnerName')}"
+                            forceSelection="true" var="t" required="#{assetInfoBulkEditController.customConfig.assetFields['measuringOwnerName'].required}" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('measuringOwner')}" process="@this"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('measuringOwner')}" process="@this" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'pmOwnerTel')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.pmOwnerTel}</label>
+            <p:inputText id="pmOwnerTel" value="#{assetInfoBulkEditController.selected.pmOwnerTel}" required="#{assetInfoBulkEditController.customConfig.assetFields['pmOwnerTel'].required}"
+                         readonly="true" class="pmOwnerNameChange"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'siteUID')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.hospitalId}</label>
+            <p:inputText id="selectedUserOrgName" value="" readonly="true" class="SiteUIDChange"/>
+            <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="true"/>
+            <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                <c:if test="#{assetInfoBulkEditController.isSelect46Account}">
+                    <p:inputText id="assetEditTreeNodeNameFilter" class="treeNodeNameFilter" value="#{assetInfoBulkEditController.treeNodeNameFilter}"/>
+                    <p:commandButton partialSubmit="true" icon="ui-icon-search" process=":AssetInfoEditForm:assetEditTreeNodeNameFilter @this" update=":AssetInfoEditForm:orgTree" actionListener="#{assetInfoBulkEditController.filterTreeNode()}" value="#{msg.Search2}"/>
+                </c:if>
+                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoBulkEditController.orgTree}" var="node" selectionMode="single">
+                        <p:ajax process="@this" event="select" update="@(.SiteUIDChange) :AssetInfoEditForm:buttonGroup"
+                                listener="#{assetInfoBulkEditController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                        <p:ajax process="@this" event="expand"/>
+                        <p:ajax process="@this" event="collapse"/>
+                        <p:treeNode type="org">
+                            <h:outputText value="#{node}"/>
+                        </p:treeNode>
+                    </p:tree>
+                </p:scrollPanel>
+            </p:overlayPanel>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetDeptName')}" >
+
+        <h:panelGroup>
+            <label class="label">#{msg.assetDeptName}</label>
+            <p:autoComplete dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['assetDept']}"  readonly="true"
+                            scrollHeight="300"  forceSelection="true" required="#{assetInfoBulkEditController.customConfig.assetFields['assetDeptName'].required}" completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onAssetDeptChange('assetDept')}" update="@(.clinicalDeptNameChange)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onAssetDeptChange('assetDept')}" update="@(.clinicalDeptNameChange)"/>
+            </p:autoComplete>
+        </h:panelGroup>
+
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'clinicalDeptName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.clinicalDeptName}</label>
+            <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['clinicalDept']}"  readonly="true"
+                            scrollHeight="300"  forceSelection="true" required="#{assetInfoBulkEditController.customConfig.assetFields['clinicalDeptName'].required}"
+                            completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
+<!--                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onAssetDeptChange('clinicalDept')}" update="@(.clinicalDeptNameChange)" />-->
+<!--                <p:ajax listener="#{assetInfoBulkEditController.onAssetDeptChange('clinicalDept')}" update="@(.clinicalDeptNameChange)" />-->
+            </p:autoComplete>
+        </h:panelGroup>
+
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'clinicalOwnerName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.clinicalOwnerName}</label>
+
+            <p:autoComplete id="clinicalOwnerName" value="#{assetInfoBulkEditController.selectedObjectMap['clinicalOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoBulkEditController.needEdit('clinicalOwnerName')}"
+                            forceSelection="true" var="t" required="#{assetInfoBulkEditController.customConfig.assetFields['clinicalOwnerName'].required}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoBulkEditController.completeClinicalOwnerList}" class="SiteUIDChange clinicalDeptNameChange">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onOwnerChange('clinicalOwner')}" process="@this" update="@(.clinicalOwnerNameChange)" />
+                <p:ajax listener="#{assetInfoBulkEditController.onOwnerChange('clinicalOwner')}" process="@this" update="@(.clinicalOwnerNameChange)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'clinicalOwnerTel')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.clinicalOwnerTel}</label>
+            <p:inputText id="clinicalOwnerTel" value="#{assetInfoBulkEditController.selected.clinicalOwnerTel}" required="#{assetInfoBulkEditController.customConfig.assetFields['clinicalOwnerTel'].required}"
+                          readonly="true" class="SiteUIDChange clinicalDeptNameChange clinicalOwnerNameChange"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'manufacture')}">
+        <h:panelGroup>
+            <label class="label">#{msg.manufacture}</label>
+            <p:autoComplete id="manufacture" dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['manufacturer']}" scrollHeight="300" readonly="#{!assetInfoBulkEditController.needEdit('manufacture')}" forceSelection="true"  required="#{assetInfoBulkEditController.customConfig.assetFields['manufacturer'].required}"
+                            completeMethod="#{assetInfoBulkEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputManufacture">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onSupplierChange('manufacturer')}"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onSupplierChange('manufacturer')}"/>
+            </p:autoComplete>
+
+            <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoBulkEditController.prepareCreateSupplier('manufacturer')}" update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'makerShortName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.makerShortName}</label>
+            <p:inputText id="makerShortName" value="#{assetInfoBulkEditController.selected.makerShortName}" required="#{assetInfoBulkEditController.customConfig.assetFields['makerShortName'].required}"
+                          readonly="#{!assetInfoBulkEditController.needEdit('makerShortName')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'vendor')}" >
+        <h:panelGroup><!--供应商 下拉-->
+            <label class="label">#{msg.vendor}</label>
+
+            <p:autoComplete id="vendor" dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['supplier']}" scrollHeight="300" readonly="#{!assetInfoBulkEditController.needEdit('vendor')}"
+                            forceSelection="true"  required="#{assetInfoBulkEditController.customConfig.assetFields['vendor'].required}"
+                            completeMethod="#{assetInfoBulkEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputVendor">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onSupplierChange('supplier')}" update="@(.vendorChange)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onSupplierChange('supplier')}" />
+            </p:autoComplete>
+            <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoBulkEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'vendorTel')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.vendorTel}</label>
+            <p:inputText id="vendorTel" value="#{assetInfoBulkEditController.selected.vendorTel}" class="vendorChange" readonly="true" />
+        </h:panelGroup>
+    </c:if>
+    <!--维修商下拉-->
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'maitanance')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.maitanance}</label>
+            <p:autoComplete id="vendor3" dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['maintainer']}" scrollHeight="300" readonly="#{!assetInfoBulkEditController.needEdit('maitanance')}"
+                            forceSelection="true" required="#{assetInfoBulkEditController.customConfig.assetFields['maitanance'].required}" completeMethod="#{assetInfoBulkEditController.autoCompleteMaintainer}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter" class="inputVendor3">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
+            </p:autoComplete>
+            <p:commandButton id="createSupplierButton2" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetInfoBulkEditController.prepareCreateSupplier('maintainer')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'maitananceTel')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.maitananceTel}</label>
+            <p:inputText id="maitananceTel" value="#{assetInfoBulkEditController.selected.maitananceTel}" required="#{assetInfoBulkEditController.customConfig.assetFields['maitananceTel'].required}"
+                          class="maitananceChange" readonly="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'nationalStandardCode')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.nationalStandardCode}</label>
+            <p:autoComplete id="gbname" value="#{assetInfoBulkEditController.gbCodeName}" completeMethod="#{assetInfoBulkEditController.completeGbName}" required="#{assetInfoBulkEditController.customConfig.assetFields['nationalStandardCode'].required}"
+                            readonly="#{!assetInfoBulkEditController.needEdit('nationalStandardCode')}" class="financingNumChange">
+                <p:ajax process="@this" update="" listener="#{assetInfoBulkEditController.updateFinancingNumByNationalStandardCode()}"/>
+            </p:autoComplete>
+            <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" disabled="#{!assetInfoBulkEditController.needEdit('nationalStandardCode')}" />
+            <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                    <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetInfoBulkEditController.gbTree}" var="node" selectionMode="single">
+                        <p:ajax process="@this" event="select" listener="#{assetInfoBulkEditController.onSelectGbTreeNode}" update="AssetInfoEditForm:gbname" oncomplete="PF('varPanelOrg1').hide();"/>
+
+                        <p:ajax process="@this" event="expand"/>
+                        <p:ajax process="@this" event="collapse"/>
+
+                        <p:treeNode type="gb">
+                            <h:outputText value="#{node}"/>
+                        </p:treeNode>
+                    </p:tree>
+                </p:scrollPanel>
+            </p:overlayPanel>
+        </h:panelGroup>
+    </c:if>
+    <!--UCMID-->
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'UCMID')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.UCMID}</label>
+            <p:inputText id="UCMID" value="#{assetInfoBulkEditController.selected.UCMID}" required="#{assetInfoBulkEditController.customConfig.assetFields['UCMID'].required}"
+                         readonly="#{!assetInfoBulkEditController.needEdit('UCMID')}"/>
+        </h:panelGroup>
+    </c:if>
+
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'parentAssetId')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.parentAsset}</label>
+            <p:autoComplete id="parentAssetList" dropdown="true" scrollHeight="300" value="#{assetInfoBulkEditController.selectedObjectMap['parentAsset']}" completeMethod="#{assetInfoBulkEditController.completeParentAssetId}" required="#{assetInfoBulkEditController.customConfig.assetFields['parentAssetId'].required}"
+                            forceSelection="true" readonly="true" class="SiteUIDChange clinicalDeptNameChange"
+                            var="t" itemLabel="#{t.getParentAssetDisplayName()}" itemValue="#{t}" converter="assetInfoConverter">
+                <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onParentAssetChange()}"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onParentAssetChange()}" />
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'deviceName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.deviceName}</label>
+            <p:inputText id="deviceName" value="#{assetInfoBulkEditController.selected.deviceName}" required="#{assetInfoBulkEditController.customConfig.assetFields['deviceName'].required}"
+                         readonly="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'subjectProject')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.subjectProject}</label>
+            <p:inputText  value="#{assetInfoBulkEditController.selected.subjectProject}" required="#{assetInfoBulkEditController.customConfig.assetFields['subjectProject'].required}"
+                          readonly="#{!assetInfoBulkEditController.needEdit('subjectProject')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'systemId')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemId}</label>
+            <p:inputText id="systemId" value="#{assetInfoBulkEditController.selected.systemId}" required="#{assetInfoBulkEditController.customConfig.assetFields['systemId'].required}"
+                         readonly="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'financingNum')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.financingNum}</label>
+            <p:inputText value="#{assetInfoBulkEditController.selected.financingNum}" class="financingNumChange" required="#{assetInfoBulkEditController.customConfig.assetFields['financingNum'].required}"
+                         readonly="true" maxlength="64">
+                <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
+                <p:ajax listener="#{assetInfoBulkEditController.onDepartNumChange('financingNum')}" update="@(.financingNumChange)" />
+            </p:inputText>
+            <p:commandButton id="generateFinancingNum" actionListener="#{assetInfoBulkEditController.generateFinancialNum()}"  disabled="true"
+                             process="@(.financingNumChange) " update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'departNum')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.departNum}</label>
+            <p:inputText id="departNum" value="#{assetInfoBulkEditController.selected.departNum}" required="#{assetInfoBulkEditController.customConfig.assetFields['departNum'].required}"
+                         readonly="true" class="financingNumChange" maxlength="64">
+                <p:ajax process="@this" listener="#{assetInfoBulkEditController.onDepartNumChange('departNum')}" update="@(.financingNumChange)"/>
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'barcode')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.barcode}</label>
+            <p:inputText id="barcode" value="#{assetInfoBulkEditController.selected.barcode}" required="#{assetInfoBulkEditController.customConfig.assetFields['barcode'].required}"
+                          readonly="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'registrationNo')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.registrationNo}</label>
+            <p:inputText id="registrationNo" value="#{assetInfoBulkEditController.selected.registrationNo}" required="#{assetInfoBulkEditController.customConfig.assetFields['registrationNo'].required}"
+                          readonly="#{!assetInfoBulkEditController.needEdit('registrationNo')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'modalityId')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.modalityId}</label>
+            <p:inputText id="modalityId" value="#{assetInfoBulkEditController.selected.modalityId}" required="#{assetInfoBulkEditController.customConfig.assetFields['modalityId'].required}"
+                          readonly="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'qrCode')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.QRCode}</label>
+            <p:inputText id="qrCode" value="#{assetInfoBulkEditController.qrCode}" required="true"
+                         readonly="true" maxlength="64">
+                <p:ajax process="@this" listener="#{assetInfoBulkEditController.onDepartNumChange('qrCode')}" update="@(.financingNumChange)"/>
+            </p:inputText>
+            <p:commandButton id="qrCodeButton" actionListener="#{assetInfoBulkEditController.renewQrcode()}" update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}"
+                             class="popupIconButton financingNumChange" process="@this" disabled="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'functionType')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.functionType}</label>
+            <p:inputText id="functionType" value="#{assetInfoBulkEditController.selected.functionType}" required="#{assetInfoBulkEditController.customConfig.assetFields['functionType'].required}"
+                         readonly="#{!assetInfoBulkEditController.needEdit('functionType')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'functionGroup')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.functionGroup}</label>
+            <p:selectOneMenu id="functionGroup" value="#{assetInfoBulkEditController.selected.functionGroup}" style="width: 100%" required="#{assetInfoBulkEditController.customConfig.assetFields['functionGroup'].required}"
+                              disabled="#{!assetInfoBulkEditController.needEdit('functionGroup')}" >
+                <p:ajax  listener="#{assetInfoBulkEditController.onFunctionGroupChange()}" update="@(.functionGroupChange)" />
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetCode68')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetCode68}</label>
+            <p:selectOneMenu id="assetCode68" value="#{assetInfoBulkEditController.selected.assetCode68}" style="width: 100%" required="#{assetInfoBulkEditController.customConfig.assetFields['assetCode68'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('assetCode68')}" class="functionGroupChange">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{assetInfoBulkEditController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'functionGrade')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.functionGrade}</label>
+            <p:selectOneMenu id="functionGrade" value="#{assetInfoBulkEditController.selected.functionGrade}" required="#{assetInfoBulkEditController.customConfig.assetFields['functionGrade'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('functionGrade')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'proprietaryClass')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.proprietaryClass}</label>
+            <p:selectOneMenu id="proprietaryClass" value="#{assetInfoBulkEditController.selected.proprietaryClass}" required="#{assetInfoBulkEditController.customConfig.assetFields['proprietaryClass'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('proprietaryClass')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('proprietaryClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'repairForm')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.repairForm}</label>
+            <p:selectOneMenu id="repairForm" value="#{assetInfoBulkEditController.selected.repairForm}" required="#{assetInfoBulkEditController.customConfig.assetFields['repairForm'].required}"
+                              disabled="#{!assetInfoBulkEditController.needEdit('repairForm')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'locationCode')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.locationCode}</label>
+            <p:inputText id="locationCode" value="#{assetInfoBulkEditController.selected.locationCode}" required="#{assetInfoBulkEditController.customConfig.assetFields['locationCode'].required}"
+                          readonly="#{!assetInfoBulkEditController.needEdit('locationCode')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'locationName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.locationName}</label>
+            <p:inputText id="locationName" value="#{assetInfoBulkEditController.selected.locationName}" required="#{assetInfoBulkEditController.customConfig.assetFields['locationName'].required}"
+                         readonly="#{!assetInfoBulkEditController.needEdit('locationName')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'status')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.status}</label>
+            <p:selectOneRadio id="status" value="#{assetInfoBulkEditController.selected.status}" >
+                <f:selectItems value="#{assetInfoBulkEditController.assetStatusList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'deviceStatus')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.deviceStatus}</label>
+            <p:selectOneRadio id="deviceStatus" value="#{assetInfoBulkEditController.selected.deviceStatus}" required="#{assetInfoBulkEditController.customConfig.assetFields['deviceStatus'].required}" disabled="#{!assetInfoBulkEditController.needEdit('deviceStatus')}" >
+                <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'isPm')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.isAssetPMed}</label>
+            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.isPm}" required="#{assetInfoBulkEditController.customConfig.assetFields['isPm'].required}"
+                              disabled="#{!assetInfoBulkEditController.needEdit('isPm')}" >
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="1"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="2"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'isChecked')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.isAssetChecked}</label>
+            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.isChecked}" required="#{assetInfoBulkEditController.customConfig.assetFields['isChecked'].required}"
+                               disabled="#{!assetInfoBulkEditController.needEdit('isChecked')}" >
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="1"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="2"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'comments')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.comments}<span style="color:#ff0000">#{assetInfoBulkEditController.customConfig.assetFields['comments'].required? '*':''}</span></label>
+            <p:inputTextarea value="#{assetInfoBulkEditController.selected.comments}" required="#{assetInfoBulkEditController.customConfig.assetFields['comments'].required}"
+                             readonly="#{!assetInfoBulkEditController.needEdit('comments')}"  maxlength="256"/>
+        </h:panelGroup>
+
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'locationNotes')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.locationNotes}</label>
+            <p:inputText id="locationNotes" value="#{assetInfoBulkEditController.selected.locationNotes}" required="#{assetInfoBulkEditController.customConfig.assetFields['locationNotes'].required}"
+                          readonly="#{!assetInfoBulkEditController.needEdit('locationNotes')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetUsage')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetUsage}</label>
+            <p:selectOneMenu id="assetUsage" value="#{assetInfoBulkEditController.selected.assetUsage}" required="#{assetInfoBulkEditController.customConfig.assetFields['assetUsage'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('assetUsage')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetUsage')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetValueCategory')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetValueCategory}</label>
+            <p:selectOneMenu value="#{assetInfoBulkEditController.selected.assetValueCategory}" required="#{assetInfoBulkEditController.customConfig.assetFields['assetValueCategory'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('assetValueCategory')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetValueCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'capitalSource')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.capitalSource}</label>
+            <p:selectOneMenu id="capitalSource" value="#{assetInfoBulkEditController.selected.capitalSource}" required="#{assetInfoBulkEditController.customConfig.assetFields['capitalSource'].required}"
+                              disabled="#{!assetInfoBulkEditController.needEdit('capitalSource')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'capitalSource2')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.capitalSource2}</label>
+            <p:selectOneMenu id="capitalSource2" value="#{assetInfoBulkEditController.selected.capitalSource2}" required="#{assetInfoBulkEditController.customConfig.assetFields['capitalSource2'].required}"
+                              disabled="#{!assetInfoBulkEditController.needEdit('capitalSource2')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource2')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'measureGrade')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.measureGrade}</label>
+            <p:selectOneMenu id="measureGrade" value="#{assetInfoBulkEditController.selected.measureGrade}" required="#{assetInfoBulkEditController.customConfig.assetFields['measureGrade'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('measureGrade')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'riskGrade')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.riskGrade}</label>
+            <p:selectOneMenu id="riskGrade" value="#{assetInfoBulkEditController.selected.riskGrade}" required="#{assetInfoBulkEditController.customConfig.assetFields['riskGrade'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('riskGrade')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'emergencyEquipment')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.emergencyEquipment}</label>
+            <p:selectOneMenu id="emergencyEquipment" value="#{assetInfoBulkEditController.selected.emergencyEquipment}" required="#{assetInfoBulkEditController.customConfig.assetFields['emergencyEquipment'].required}"
+                              disabled="#{!assetInfoBulkEditController.needEdit('emergencyEquipment')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'importEquipment')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.importEquipment}</label>
+            <p:selectOneMenu id="importEquipment" value="#{assetInfoBulkEditController.selected.importEquipment}" required="#{assetInfoBulkEditController.customConfig.assetFields['importEquipment'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('importEquipment')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'measuringItemCategory')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.measuringItemCategory}</label>
+            <p:selectOneMenu id="measuringItemCategory" value="#{assetInfoBulkEditController.selected.measuringItemCategory}" required="#{assetInfoBulkEditController.customConfig.assetFields['measuringItemCategory'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('measuringItemCategory')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'accountingCategory')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.accountingCategory}</label>
+            <p:selectOneMenu id="accountingCategory" value="#{assetInfoBulkEditController.selected.accountingCategory}" required="#{assetInfoBulkEditController.customConfig.assetFields['accountingCategory'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('accountingCategory')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('accountingCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'manufactDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.manufactDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="manufactDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.manufactDate}" required="#{assetInfoBulkEditController.customConfig.assetFields['manufactDate'].required}"
+                        readonly="#{!assetInfoBulkEditController.needEdit('manufactDate')}"
+                        maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  >
+                <p:ajax process="@(this)" update="@(.inputDate) @(.manufactDateChange)" />
+            </p:calendar>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'purchaseDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.purchaseDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="purchaseDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.purchaseDate}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoBulkEditController.needEdit('purchaseDate')}" class="manufactDateChange"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="#{assetInfoBulkEditController.customConfig.assetFields['purchaseDate'].required}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'arriveDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.arriveDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="arriveDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.arriveDate}" required="#{assetInfoBulkEditController.customConfig.assetFields['arriveDate'].required}"
+                         maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoBulkEditController.needEdit('arriveDate')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'acceptDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.acceptDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.acceptDate}" required="#{assetInfoBulkEditController.customConfig.assetFields['acceptDate'].required}"
+                         maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoBulkEditController.needEdit('acceptDate')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'warrantyMonth')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.warrantyMonth}</label>
+            <p:inputNumber minValue="0" decimalPlaces="0" value="#{assetInfoBulkEditController.selected.warrantyMonth}" required="#{assetInfoBulkEditController.customConfig.assetFields['warrantyMonth'].required}"
+                            readonly="#{!assetInfoBulkEditController.needEdit('warrantyMonth')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'installDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.installDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="installDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.installDate}" readonly="#{!assetInfoBulkEditController.needEdit('installDate')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  required="#{assetInfoBulkEditController.customConfig.assetFields['installDate'].required}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'factoryWarrantyDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.factoryWarrantyDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="factoryWarrantyDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.factoryWarrantyDate}" required="#{assetInfoBulkEditController.customConfig.assetFields['factoryWarrantyDate'].required}"
+                         readonly="#{!assetInfoBulkEditController.needEdit('factoryWarrantyDate')}"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'warrantyDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.warrantyDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="warrantyDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.warrantyDate}" required="#{assetInfoBulkEditController.customConfig.assetFields['warrantyDate'].required}"
+                        showOn="button" readonly="#{!assetInfoBulkEditController.needEdit('warrantyDate')}"
+                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'terminateDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.terminateDate}</label>
+            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="terminateDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.terminateDate}" showOn="button" required="#{assetInfoBulkEditController.customConfig.assetFields['terminateDate'].required}"
+                         readonly="#{!assetInfoBulkEditController.needEdit('terminateDate')}" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'warranty')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.isWarrantyNotice}</label>
+            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.warranty}" required="#{assetInfoBulkEditController.customConfig.assetFields['warranty'].required}"
+                               disabled="#{!assetInfoBulkEditController.needEdit('warranty')}" >
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="1"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="2"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'purchasePrice')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.purchasePrice}</label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoBulkEditController.selected.purchasePrice}" required="#{assetInfoBulkEditController.customConfig.assetFields['purchasePrice'].required}"
+                            readonly="#{!assetInfoBulkEditController.needEdit('purchasePrice')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'salvageValue')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.salvageValue}</label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoBulkEditController.selected.salvageValue}" required="#{assetInfoBulkEditController.customConfig.assetFields['salvageValue'].required}"
+                            readonly="#{!assetInfoBulkEditController.needEdit('salvageValue')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'lifecycle')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.lifecycle}</label>
+            <p:inputNumber minValue="0" decimalPlaces="1" id="lifecycle" value="#{assetInfoBulkEditController.selected.lifecycleInYear}" required="#{assetInfoBulkEditController.customConfig.assetFields['lifecycle'].required}"
+                            readonly="#{!assetInfoBulkEditController.needEdit('lifecycle')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'depreciationMethod')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.depreciationMethod}</label>
+            <p:selectOneMenu id="depreciationMethod" value="#{assetInfoBulkEditController.selected.depreciationMethod}" required="#{assetInfoBulkEditController.customConfig.assetFields['depreciationMethod'].required}"
+                             disabled="#{!assetInfoBulkEditController.needEdit('depreciationMethod')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('depreciationMethodList')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetTags')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetTags}</label>
+            <p:autoComplete id="tags" multiple="true" value="#{assetInfoBulkEditController.selected.tags}" completeMethod="#{assetInfoBulkEditController.autoCompleteTags}"
+                            var="tag" itemLabel="#{tag}" itemValue="#{tag}" forceSelection="false" styleClass="asset-tags"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'createdBy')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.creatorUID}</label>
+            <p:autoComplete id="createdBy" value="#{assetInfoBulkEditController.selectCreatedBy(assetInfoBulkEditController.selected.createdBy)}"  readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+</ui:composition>
