@@ -3,6 +3,8 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.CustomConfigConstant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +19,7 @@ import static com.ge.apm.service.asset.AssetInfoBulkEditUtils.*;
 
 @Service
 public class AssetInfoBulkEditService {
-
+    private Logger logger = LoggerFactory.getLogger(AssetInfoBulkEditService.class);
     @Autowired
     private AssetInfoRepository assetInfoDao;
 
@@ -59,7 +61,7 @@ public class AssetInfoBulkEditService {
 
     @Transactional
     public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
-
+        logger.info("start commitBulkEditSite!!!");
         commitCorrectiveMaintenanceBulkEdit(assets, targetAsset);
         commitPreventativeMaintenanceBulkEdit(assets, targetAsset);
         commitQrCode(assets, targetAsset);
@@ -319,7 +321,7 @@ public class AssetInfoBulkEditService {
     }
 
     private void commitSiteForAssetItself(List<AssetInfo> assets, AssetInfo targetAsset) {
-
+        logger.info("start commitSiteForAssetItself!!!");
         List<String> parrentAssetUids = assets.stream().map(AssetInfo::getUid).filter(item -> item != null).collect(Collectors.toList());
         Boolean isAllTransfer = isAllParrentAssetAndChildAssetTransfer(parrentAssetUids, assets);
 
@@ -339,6 +341,7 @@ public class AssetInfoBulkEditService {
             //clear asset dept
             item.setAssetDeptId(null);
             item.setAssetDeptUID(null);
+            logger.info("start saveAssetHistoryIfUpdated!!!");
             assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, item, CustomConfigConstant.getAssetsImportantFieldsAll());
             if( !isAllTransfer){
                 item.setParentAssetId(null);
@@ -371,7 +374,7 @@ public class AssetInfoBulkEditService {
         return null;
     }
     private void commitPmRule(List<AssetInfo> assets, AssetInfo targetAsset) {
-
+        logger.info("start commitPmRule!!!");
         for (AssetInfo item: assets) {
 
             RelRuleAsset relRuleAsset = relRuleAssetDao.findByAssetUID(item.getUid());
@@ -394,7 +397,7 @@ public class AssetInfoBulkEditService {
      * correctvie maintenance
      */
     private void commitCorrectiveMaintenanceBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset) {
-
+        logger.info("start commitCorrectiveMaintenanceBulkEdit!!!");
         for (AssetInfo assetInfo: assets) {
             List<V2_ServiceRequest> serviceRequests = serviceRequestDao.findByAssetId(assetInfo.getId());
 
@@ -426,7 +429,7 @@ public class AssetInfoBulkEditService {
      * preventative maintenance
      */
     private void commitPreventativeMaintenanceBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset) {
-
+        logger.info("start commitPreventativeMaintenanceBulkEdit!!!");
         for (AssetInfo assetInfo: assets) {
             List<V2_PmOrder> pmOrders = pmOrderDao.getByAssetUid(assetInfo.getUid());
 
@@ -446,7 +449,7 @@ public class AssetInfoBulkEditService {
     }
 
     private void commitQrCode(List<AssetInfo> assets, AssetInfo targetAsset) {
-
+        logger.info("start commitQrCode!!!");
         for (AssetInfo assetInfo: assets) {
             if (null == assetInfo.getQrCode()) {
                 continue;
@@ -470,6 +473,7 @@ public class AssetInfoBulkEditService {
     }
 
     public void commitNurseSiteConfig(List<AssetInfo> assets) {
+        logger.info("start commitNurseSiteConfig!!!");
         if(assets != null && !assets.isEmpty()){
             List<String> uids = assets.stream().map(p->p.getUid()).collect(Collectors.toList());
             List<NurseSiteMaintainConfigItem> assetinfos = nurseSiteMaintainConfigItemRepository.findByAssetUid(uids);
@@ -489,6 +493,7 @@ public class AssetInfoBulkEditService {
         }
     }
     public void commitAssetTagRule(List<AssetInfo> assets) {
+        logger.info("start commitAssetTagRule!!!");
         if(assets != null && !assets.isEmpty()){
             List<Integer> uids = assets.stream().map(p->p.getId()).collect(Collectors.toList());
             List<AssetTagRule> assetinfos = assetTagRuleRepository.findByAssetUid(uids);
