@@ -122,7 +122,7 @@
                                 <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" process="@this" actionListener="#{tableCreateController.removeExcelTemplate}" update="importExcel :uploadDialogForm preview" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId}" disabled="#{tableCreateController.isReadOnly}"/>
                             </h:panelGroup>
                             <p:fieldset legend="#{msg.preview}" id="preview">
-                                <tie:websheet id="sheet1" webSheetBean="#{tableCreateController}"  maxRowsPerPage="30" rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId}" showLineNumber="false" />
+                                <tie:websheet id="sheet1" webSheetBean="#{tableCreateController}"  maxRowsPerPage="30" rowsPerPageTemplate="30,60" rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId}" showLineNumber="false" />
                                 <p:panel rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId }">
                                     <p:commandButton value="#{msg.Test}"  update="preview" actionListener="#{tableCreateController.testSubmit()}" />
                                     <h:outputText value="#{tableCreateController.tableFields}" />
