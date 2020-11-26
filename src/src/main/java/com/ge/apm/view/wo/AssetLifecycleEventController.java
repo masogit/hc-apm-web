@@ -112,21 +112,21 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		if (!this.hasFilterOnField("eventType")) {
 			searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, tabStatus));// 3外部维修
 		}
-		List<String> listProp = new ArrayList<String>();
-		listProp.add("assetUid");
-		//listProp.add("createTime");
-		Sort sort = new Sort(Direction.DESC, listProp);
+//		List<String> listProp = new ArrayList<String>();
+//		listProp.add("assetUid");
+//		//listProp.add("createTime");
+//		Sort sort = new Sort(Direction.DESC, listProp);
 		//filter work order that status is cancelled
 		boolean cancelled = searchFilters.stream().anyMatch(
 				searchFilter -> searchFilter.value != null && StringUtils.contains(searchFilter.value.toString(), "Cancelled"));
 		if(!cancelled){
 			searchFilters.add(new SearchFilter("status", Operator.NE, 3));
 		}
-		PageRequest pr = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
-		pr =addRequiredSortById(pr);
+		//PageRequest pr = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
+		pageRequest =addRequiredSortById(pageRequest);
 		//Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
 
-		Page<AssetLifecycleEvent> pageResult = dao.findBySearchFilter(this.searchFilters, pr);
+		Page<AssetLifecycleEvent> pageResult = dao.findBySearchFilter(this.searchFilters, pageRequest);
 		updateSelectStatus(pageResult);
 		ignoreErrorDate(pageResult);
 		return pageResult;
