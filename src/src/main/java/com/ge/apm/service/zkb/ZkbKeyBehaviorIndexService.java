@@ -234,16 +234,19 @@ public class ZkbKeyBehaviorIndexService {
         List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.loadZkbKeyBehaviorIndex(tenantUID,beginningTime,endingTime);
         List<ZkbKeyBehaviorIndex> zkbAverageKeyBehaviorIndexList = this.loadAverageZkbKeyBehaviorIndex(null,beginningTime,endingTime);
         LineChartSeries series1 = new LineChartSeries();
+        boolean showNonData = true;
         if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
         {
             series1.setLabel(zkbKeyBehaviorIndexList.get(0).getTenantName());
             zkbKeyBehaviorIndexList.forEach(item->{
                 series1.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
             });
+            showNonData=false;
         }else
             {
                 series1.setLabel("该租户没有相关数据");
-                series1.set("该租户没有相关数据", 0);
+                series1.set(DateFormatUtils.format(beginningTime,"yyyy-MM"), 0);
+
             }
         LineChartSeries series2 = new LineChartSeries();
         series2.setLabel("平均分数");
@@ -252,9 +255,10 @@ public class ZkbKeyBehaviorIndexService {
             zkbAverageKeyBehaviorIndexList.forEach(item->{
                 series2.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
             });
+            showNonData=false;
         }else
         {
-            series2.set("平均分数", 0);
+            series2.set(DateFormatUtils.format(beginningTime,"yyyy-MM"), 0);
         }
         String title = this.getTitle(beginningTime,endingTime);
         areaModel.addSeries(series1);
@@ -262,7 +266,12 @@ public class ZkbKeyBehaviorIndexService {
         areaModel.setTitle(title);
         areaModel.setLegendPosition("e");
         areaModel.setShowPointLabels(true);
-        Axis xAxis = new CategoryAxis("Months");
+        String axisTitle = "Months";
+        if(showNonData)
+        {
+            axisTitle = "没有相关数据";
+        }
+        Axis xAxis = new CategoryAxis(axisTitle);
         areaModel.getAxes().put(AxisType.X, xAxis);
         Axis yAxis = areaModel.getAxis(AxisType.Y);
         yAxis.setLabel("得分");
