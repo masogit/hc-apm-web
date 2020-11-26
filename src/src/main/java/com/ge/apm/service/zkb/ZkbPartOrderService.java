@@ -1004,7 +1004,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }else if(CopyByInvok.EMAIL_URL_TYPE_LASTDAY.equals(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_LAST_DAY_EMAIL);
             }else if(CopyByInvok.EMAIL_URL_TYPE_UNORDER.equals(urlType)){
-                url = getGatewayURL(GatewayURL.PART_ORDER_SEND_LAST_DAY_EMAIL);
+                url = getGatewayURL(GatewayURL.PART_ORDER_SEND_UN_ORDER);
             }
             String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
