@@ -137,7 +137,7 @@ public class MeasuringService {
             Date checkDate = needUpdateAssetMcd.getCheckDate();
             if(UserContextService.hasCurrentTenantName("")){
                 if(checkDate != null && nextMeteringDate == null && tempAssetInfo.getMeasuringItemCategory() != null){
-                    MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndTenantUID(tempAssetInfo.getMeasuringItemCategory().toString(), UserContextService.getCurrentUserAccount().getTenantUID());
+                    MeasuringTypeConfig measuringTypeConfig = measuringTypeConfigDao.findByMeasuringItemCategoryAndSiteUID(tempAssetInfo.getMeasuringItemCategory().toString(), UserContextService.getCurrentUserAccount().getSiteUID());
                     Integer measureCycle = measuringTypeConfig == null ? null:measuringTypeConfig.getMeasureCycle();
                     if(measureCycle != null && measureCycle > 0){//云南省阜外心血管病医院 下次计量日期=上次计量日期+周期（月）
                         nextMeteringDate = DateUtil.addMonth(checkDate,measureCycle);
