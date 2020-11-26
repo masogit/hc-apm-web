@@ -168,12 +168,15 @@ public class ZkbPartOrderUserConfigService {
         ZkbPartOrderUserConfigRow.clearErrMessage(item);
         if(StringUtils.isNotBlank(zkbPartOrderUserConfigVO.getLoginName()))
         {
-            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findByLoginName(zkbPartOrderUserConfigVO.getLoginName());
-            if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfigList))
+            if(!("OrderExtraPending".equals(zkbPartOrderUserConfigVO.getConfigType())||"OrderPending".equals(zkbPartOrderUserConfigVO.getConfigType())))
             {
-                item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
-                ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
-                isValidateData = false;
+                List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findByLoginName(zkbPartOrderUserConfigVO.getLoginName());
+                if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfigList))
+                {
+                    item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
+                    ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
+                    isValidateData = false;
+                }
             }
         }else
             {
