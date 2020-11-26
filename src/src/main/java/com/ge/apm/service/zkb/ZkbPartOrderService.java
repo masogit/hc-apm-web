@@ -513,7 +513,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
 
         if(zkbPartOrder != null){
-            List<V2_BlobObject> v2_blobObjectList = blobObjectRepository.findByBoUuid(zkbPartOrder.getId());
+            List<V2_BlobObject> v2_blobObjectList = blobObjectRepository.fetchBlobObjectByUuidAndType(zkbPartOrder.getId(),V2_BlobObject.BO_TYPE_ZKB_PART_ORDER,V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
             map.put("v2_blobObjectList",v2_blobObjectList);
         }
 

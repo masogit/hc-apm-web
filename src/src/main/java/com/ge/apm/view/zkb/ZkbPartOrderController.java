@@ -2,6 +2,7 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.zkb.*;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -9,6 +10,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -18,9 +21,15 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author : 503189362
@@ -39,6 +48,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private String selectionTenantInfo;
     private Page<ZkbPartOrder> zkbContractPage;
     private ZkbPartOrderService zkbPartOrderService;
+    private ZkbPartOrderExcelService zkbPartOrderExcelService;
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = new ArrayList<>();
     private String queryStatus = "";
     private boolean showStatusBtn = true;
@@ -51,6 +61,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         super.init();
         dao = WebUtil.getBean(ZkbPartOrderRepository.class);
         zkbPartOrderService = WebUtil.getBean(ZkbPartOrderService.class);
+        zkbPartOrderExcelService = WebUtil.getBean(ZkbPartOrderExcelService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         queryStatus =WebUtil.getRequestParameter("queryStatus");
@@ -327,10 +338,21 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     public String editAction() {
         return UrlEncryptController.encodeUrlParam("AuditStep?action=Edit&selectedid=".concat(selected.getId())+"&queryStatus="+queryStatus);
     }
+    private StreamedContent exportFile;
 
     public void exportAll(){
         List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
         List<ZkbPartOrder> zkbPartOrders =  dao.findBySearchFilter(searchFilters);
+        HashMap<String, Object> dataMap = zkbPartOrderExcelService.createZkbPartOrderData(zkbPartOrders);
+
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/partOrder/excel/APM_ZKB_PartOrder_Exp_Template.xlsx");
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            zkbPartOrderExcelService.exportData(doc, dataMap);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbPartOrderExcel_Export.xlsx");
+        } catch (IOException ex) {
+            Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
@@ -348,6 +370,14 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public String backList(){
         return "List?faces-redirect=true&queryStatus="+queryStatus;
+    }
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
     }
 
     public UserAccount getCurrentUser() {

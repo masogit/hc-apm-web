@@ -481,6 +481,17 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "upload_letter_file_name")
     private String uploadLetterFileName;
 
+    @Column(name = "check_apply_num_flag")
+    private String checkApplyNumFlag = "t";// t是校验通过 f：校验不通过
+
+    public String getCheckApplyNumFlag() {
+        return checkApplyNumFlag;
+    }
+
+    public void setCheckApplyNumFlag(String checkApplyNumFlag) {
+        this.checkApplyNumFlag = checkApplyNumFlag;
+    }
+
     public String getUploadLetterFileName() {
         return uploadLetterFileName;
     }
