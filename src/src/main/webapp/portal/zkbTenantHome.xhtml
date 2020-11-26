@@ -11,7 +11,7 @@
                 <p:outputLabel class="pageTitle" value=""/>
             </div>
             <div class="ui-g-12 card">
-                <iframe id="chartFrame" scrolling="no" src="/reports/zkb-home" width="100%" height="900"></iframe>
+                <iframe id="chartFrame" scrolling="no" src="#" width="100%" height="900"></iframe>
             </div>
         </div>
         <script>
@@ -23,6 +23,7 @@
             function setIframeHeight(){
                 try{
                     var iframe = document.getElementById("chartFrame");
+                    iframe.src="/reports/zkb-home";
                     if(iframe.attachEvent){
                         iframe.attachEvent("onload", function(){
                             iframe.height =  iframe.contentWindow.document.documentElement.scrollHeight+200;
