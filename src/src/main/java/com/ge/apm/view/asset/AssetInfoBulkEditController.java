@@ -26,6 +26,8 @@ import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepository;
@@ -47,6 +49,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
+    private static final Logger logger = LoggerFactory.getLogger(AssetInfoBulkEditController.class);
 
     static PageRequest pageRequest = new PageRequest(0, 100);
 
@@ -1154,6 +1157,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             WebUtil.addSuccessMessage("批量修改资产院区成功!");
         } catch(Exception e) {
             WebUtil.addErrorMessage(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
 
     }
