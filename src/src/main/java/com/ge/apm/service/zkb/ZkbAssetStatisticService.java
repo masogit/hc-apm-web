@@ -117,6 +117,7 @@ public class ZkbAssetStatisticService {
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbHistory_agent"),zkbAssetStatistic.getName());
             zkbAssetStatisticMap.put(WebUtil.getMessage("systemId"),zkbAssetStatistic.getSystemId());
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_countOfImage"),zkbAssetStatistic.getQrCodeCount());
+            zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_contractNo"),zkbAssetStatistic.getContractNo());
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_qrCodeOfPaste"),zkbAssetStatistic.getQrCodeCountState());
             zkbAssetStatisticMapList.add(zkbAssetStatisticMap);
         }
