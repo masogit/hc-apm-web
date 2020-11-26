@@ -11,7 +11,7 @@
                 <p:outputLabel class="pageTitle" value=""/>
             </div>
             <div class="ui-g-12 card">
-                <iframe id="chartFrame" scrolling="no" src="#" width="100%" height="900"></iframe>
+                <iframe id="chartFrame" scrolling="no" src="" width="100%" height="900"></iframe>
             </div>
         </div>
         <script>
@@ -20,7 +20,7 @@
                 localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose
                 localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000);
             }
-            function setIframeHeight(){
+            window.setTimeout(function setIframeHeight(){
                 try{
                     var iframe = document.getElementById("chartFrame");
                     iframe.src="/reports/zkb-home";
@@ -38,8 +38,7 @@
                 }catch(e){
                     throw new Error('setIframeHeight Error');
                 }
-            }
-            setIframeHeight();
+            },1000);
         </script>
     </ui:define>
 
