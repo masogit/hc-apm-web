@@ -15,17 +15,22 @@
             </div>
         </div>
         <script>
+            window.onload = function () {
+                var token = "#{userContextService.getAccessToken()}";
+                localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose
+                localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000);
+            }
             function setIframeHeight(){
                 try{
                     var iframe = document.getElementById("chartFrame");
                     if(iframe.attachEvent){
                         iframe.attachEvent("onload", function(){
-                            iframe.height =  iframe.contentWindow.document.documentElement.scrollHeight+50;
+                            iframe.height =  iframe.contentWindow.document.documentElement.scrollHeight+200;
                         });
                         return;
                     }else{
                         iframe.onload = function(){
-                            iframe.height = iframe.contentDocument.body.scrollHeight+50;
+                            iframe.height = iframe.contentDocument.body.scrollHeight+200;
                         };
                         return;
                     }
