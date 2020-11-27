@@ -1109,6 +1109,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
             zkbPartOrder.setUploadLetterFileName(v2_blobObject.getObjectName());
             zkbPartOrder.setUploadLetterFlag("t");
+            zkbPartOrder.setUploadLetterFileId(v2_blobObject.getId());
             zkbPartOrderRepository.save(zkbPartOrder);
             return true;
         }

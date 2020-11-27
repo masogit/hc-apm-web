@@ -167,7 +167,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         WebUtil.addErrorMessage(validString,"");
                     }
                     if(StringUtils.isNotEmpty(selected.getCheckApplyNumFlag()) && "f".equals(selected.getCheckApplyNumFlag())){
-                        WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还,若场地有其他特殊情况请邮件申请。","");
+                        WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
                     }
                 }
             }
@@ -472,11 +472,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
                 boolean flag = true;
                 String errorLog = "";
+
                 for(ZkbPartOrderItem zkbPartOrderItem : selected.getZkbPartOrderItems()){
                     if(StringUtils.isEmpty(zkbPartOrderItem.getPartNo())){
                         flag = false;
                         errorLog += "配件号不能为空,";
                     }
+                    Optional.ofNullable(zkbPartOrderItem.getPartNo()).ifPresent(zkbPartOrderItem :: setOrderNo);
                     if(StringUtils.isEmpty(zkbPartOrderItem.getPartName())){
                         flag = false;
                         errorLog += "配件名称不能为空,";
