@@ -1100,7 +1100,19 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     public boolean uploadFile(FileUploadEvent event, ZkbPartOrder zkbPartOrder){
         V2_BlobObject v2_blobObject = blobService.uploadFile(event);
-        if (null != v2_blobObject) {
+        return Optional.ofNullable(v2_blobObject).map(t ->{
+            v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
+            v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_LETTER);
+            v2_blobObject.setBoUuid(zkbPartOrder.getId());
+            blobObjectRepository.save(v2_blobObject);
+
+            zkbPartOrder.setUploadLetterFileName(v2_blobObject.getObjectName());
+            zkbPartOrder.setUploadLetterFlag("t");
+            zkbPartOrder.setUploadLetterFileId(v2_blobObject.getObjectStorageId());
+            zkbPartOrderRepository.save(zkbPartOrder);
+            return true;
+        }).isPresent();
+        /*if (null != v2_blobObject) {
             //blobObject.setBoId(selected.getId());
             v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
             v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_LETTER);
@@ -1113,7 +1125,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrderRepository.save(zkbPartOrder);
             return true;
         }
-        return false;
+        return false;*/
     }
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
