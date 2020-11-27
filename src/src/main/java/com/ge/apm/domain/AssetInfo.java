@@ -542,7 +542,7 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "one_qr_code")
     private String oneQrCode;
 
-    @Formula("(select qcl.status from qr_code_lib qcl where qcl.qr_code=one_qr_code)")
+    @Transient
     private String oneQrCodeStatus;
 
     @OneToOne(cascade = CascadeType.ALL)
