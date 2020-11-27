@@ -343,7 +343,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 FacesMessage message2 = new FacesMessage(FacesMessage.SEVERITY_ERROR, "电话：400-812-8188。", "");
                 FacesContext.getCurrentInstance().addMessage(null, message2);
             }
-            if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && assetInfo.getAssetGroup() == 2){
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) && assetInfo.getAssetGroup() == 2){
                 selected.setArtificialType("2");
             }
         }
