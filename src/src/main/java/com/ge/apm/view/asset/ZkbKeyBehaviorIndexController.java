@@ -370,6 +370,10 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         this.selected = null;
     }
 
+    public void cancel() {
+        this.selected = null;
+    }
+
     public StreamedContent getExportFile() {
         return exportFile;
     }
