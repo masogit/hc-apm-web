@@ -56,9 +56,10 @@ public class ZkbAssetStatisticService {
      * @param systemId SystemID/厂商报修ID
      * @param qrCodeCount 二维码个数
      * @param qrCodeCountState 二维码状态
+     * @param contractNo 合同编号
      * @return
      */
-    public List<ZkbAssetStatistic> loadAllAsset(String tenantUid,String systemId,String qrCodeCount,String qrCodeCountState){
+    public List<ZkbAssetStatistic> loadAllAsset(String tenantUid,String systemId,String qrCodeCount,String qrCodeCountState,String contractNo){
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         if(tenantUid!=null)
         {
@@ -68,6 +69,11 @@ public class ZkbAssetStatisticService {
         if(systemId!=null)
         {
             SearchFilter systemIdFilter = new SearchFilter("systemId", SearchFilter.Operator.EQ, systemId);
+            searchFilters.add(systemIdFilter);
+        }
+        if(contractNo!=null)
+        {
+            SearchFilter systemIdFilter = new SearchFilter("contractNo", SearchFilter.Operator.EQ, contractNo);
             searchFilters.add(systemIdFilter);
         }
         List<ZkbAssetStatistic> assetList = zkbAssetStatisticMapper.loadAllAsset(searchFilters);
