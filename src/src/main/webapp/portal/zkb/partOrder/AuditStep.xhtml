@@ -378,9 +378,9 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">技术支持审批备注</label>
-                            <p:inputTextarea id="techRemark" value="#{zkbPartOrderAuditController.selected.techRemark}" rows="3" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
+                            <p:inputTextarea id="techRemark" value="#{zkbPartOrderAuditController.selected.techRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
                             </p:inputTextarea>
-                            <p:commandLink immediate="false" process="@this" id="historyData" update="growl" oncomplete="PF('zkbHistoryQueryDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' and zkbPartOrderAuditController.canEditFlag}">
+                            <p:commandLink immediate="false" process="@this" id="historyData" update="growl zkbHistoryQueryDlg" action="#{zkbPartOrderAuditController.preHistoryData}" oncomplete="PF('zkbHistoryQueryDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' and zkbPartOrderAuditController.canEditFlag}">
                                 <h:outputText value="历史数据" />
                             </p:commandLink>
                         </h:panelGroup>
@@ -416,7 +416,7 @@
                                     <label class="label">区域经理审批备注</label>
                                 </c:otherwise>
                             </c:choose>
-                            <p:inputTextarea id="manageRemark" value="#{zkbPartOrderAuditController.selected.manageRemark}" rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
+                            <p:inputTextarea id="manageRemark" value="#{zkbPartOrderAuditController.selected.manageRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}">
                             </p:inputTextarea>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -464,7 +464,7 @@
                                 </h:panelGroup>-->
                                 <h:panelGroup>
                                     <label class="label">备注</label>
-                                    <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                    <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
                                     </p:inputTextarea>
                                 </h:panelGroup>
                             </c:when>
@@ -496,7 +496,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">备注</label>
-                                    <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                    <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
                                     </p:inputTextarea>
                                 </h:panelGroup>
                             </c:when>
@@ -515,7 +515,7 @@
                             </h:panelGroup>-->
                                 <h:panelGroup>
                                     <label class="label">备注</label>
-                                    <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                    <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
                                     </p:inputTextarea>
                                 </h:panelGroup>
                             </c:when>
@@ -546,7 +546,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">备注</label>
-                                    <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                    <p:inputTextarea  value="#{zkbPartOrderAuditController.selected.orderedRemark}"  rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
                                     </p:inputTextarea>
                                 </h:panelGroup>
                             </c:when>
@@ -720,7 +720,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">归还备注</label>
-                            <p:inputTextarea id="returnRemark" value="#{zkbPartOrderAuditController.selected.returnRemark}"  rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}">
+                            <p:inputTextarea id="returnRemark" value="#{zkbPartOrderAuditController.selected.returnRemark}"  rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}">
                             </p:inputTextarea>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -815,7 +815,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">关单备注</label>
-                            <p:inputTextarea id="closedRemark" value="#{zkbPartOrderAuditController.selected.closedRemark}" rows="5" cols="30" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag)}">
+                            <p:inputTextarea id="closedRemark" value="#{zkbPartOrderAuditController.selected.closedRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag)}">
                             </p:inputTextarea>
                         </h:panelGroup>
                     </p:panelGrid>
