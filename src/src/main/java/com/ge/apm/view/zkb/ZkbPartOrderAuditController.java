@@ -90,12 +90,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         if(StringUtils.isNotEmpty(selectedId)){
             HashMap m = zkbPartOrderService.queryEditInfo(selectedId);
             this.selected = m.get("zkbPartOrder") ==null ? new ZkbPartOrder() : (ZkbPartOrder)m.get("zkbPartOrder");
-            if(StringUtils.isNotEmpty(this.selected.getOrderType())){
-                orderType = this.selected.getOrderType();
-            }
-            if(StringUtils.isNotEmpty(this.selected.getArtificialType())){
-                artificialType = this.selected.getArtificialType();
-            }
+
+            Optional.ofNullable(this.selected.getOrderType()).ifPresent(t -> orderType = this.selected.getOrderType());
+            Optional.ofNullable(this.selected.getArtificialType()).ifPresent(t -> artificialType = this.selected.getArtificialType());
+
             zkbContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
             if(zkbContract != null){
                 contractList = new ArrayList<>();
