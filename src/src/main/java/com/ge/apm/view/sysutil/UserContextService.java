@@ -896,8 +896,8 @@ public class UserContextService implements Serializable {
         return false;
     }
 
-    public boolean isZkbPartUserConfig() {
-        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfig = this.zkbPartOrderUserConfigRepository.findByConfigTypeIsNot("ClosePending");
+    public boolean isGeAdmin() {
+        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfig = this.zkbPartOrderUserConfigRepository.findByConfigType("ClosePending");
         if(CollectionUtils.isEmpty(zkbPartOrderUserConfig))
         {
             return false;
