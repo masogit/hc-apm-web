@@ -902,7 +902,7 @@ public class UserContextService implements Serializable {
         {
             return false;
         }
-        Map<String, String> zkbPartOrderUserConfigMap = zkbPartOrderUserConfig.stream().collect(
+        Map<String, String> zkbPartOrderUserConfigMap = zkbPartOrderUserConfig.stream().filter(partOrderUserConfig -> partOrderUserConfig.getLoginName()!=null).collect(
                 Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getLoginName()))),
                         ArrayList::new)).stream().collect(Collectors.toMap(ZkbPartOrderUserConfig::getLoginName,ZkbPartOrderUserConfig::getLoginName));
         UserAccount user = getLoginUser();
