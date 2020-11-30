@@ -1,9 +1,6 @@
 package com.ge.apm.view.zkb;
 
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.ZkbPartOrderRepository;
-import com.ge.apm.dao.ZkbPartOrderReturnRepository;
-import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
@@ -57,6 +54,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private ZkbPartOrderRepository zkbPartOrderRepository;
     private I18nMessageRepository i18nDao;
     private List<HashMap<String, Object>> v2_listHashMap;
+    private TenantInfo tenantInfo;
+    private TenantInfoRepository tenantInfoRepository;
 
     private List<HashMap<String, String>> partNoList = new ArrayList<>();
     private List<HashMap<String, String>> orderNoList = new ArrayList<>();
@@ -79,6 +78,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturnRepository = WebUtil.getBean(ZkbPartOrderReturnRepository.class);
         zkbPartOrderRepository = WebUtil.getBean(ZkbPartOrderRepository.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
 
@@ -90,12 +90,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         if(StringUtils.isNotEmpty(selectedId)){
             HashMap m = zkbPartOrderService.queryEditInfo(selectedId);
             this.selected = m.get("zkbPartOrder") ==null ? new ZkbPartOrder() : (ZkbPartOrder)m.get("zkbPartOrder");
-            if(StringUtils.isNotEmpty(this.selected.getOrderType())){
-                orderType = this.selected.getOrderType();
-            }
-            if(StringUtils.isNotEmpty(this.selected.getArtificialType())){
-                artificialType = this.selected.getArtificialType();
-            }
+            Optional.ofNullable(selected.getTenantUID()).ifPresent(t -> tenantInfo = tenantInfoRepository.findByuid(selected.getTenantUID()));
+            Optional.ofNullable(this.selected.getOrderType()).ifPresent(t -> orderType = this.selected.getOrderType());
+            Optional.ofNullable(this.selected.getArtificialType()).ifPresent(t -> artificialType = this.selected.getArtificialType());
+
             zkbContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
             if(zkbContract != null){
                 contractList = new ArrayList<>();
@@ -632,6 +630,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public void preHistoryData(){
+        conditionMap = new HashMap<>();
+    }
+
     public void queryHistoryData(){
         List<SearchFilter> filters = new ArrayList<>();
         for (Map.Entry<String, String> entry : conditionMap.entrySet()) {
@@ -927,6 +929,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setRemindLetterFlag(String remindLetterFlag) {
         this.remindLetterFlag = remindLetterFlag;
+    }
+
+    public TenantInfo getTenantInfo() {
+        return tenantInfo;
+    }
+
+    public void setTenantInfo(TenantInfo tenantInfo) {
+        this.tenantInfo = tenantInfo;
     }
 
     @Override
