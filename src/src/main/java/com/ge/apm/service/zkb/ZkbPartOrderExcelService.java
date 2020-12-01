@@ -115,7 +115,7 @@ public class ZkbPartOrderExcelService {
             zkbPartOrderDataMap.put("代理商", tenantInfo.getName());
         }
         zkbPartOrderDataMap.put("申请编号", p.getPartOrderNo());
-        zkbPartOrderDataMap.put("工单号", p.getSrNo());
+        zkbPartOrderDataMap.put("工单号", p.getSrNum());
         zkbPartOrderDataMap.put("合同号", p.getContractNo());
         if(p.getAssetInfo() != null){
             zkbPartOrderDataMap.put("Sys ID", p.getAssetInfo().getSystemId());
