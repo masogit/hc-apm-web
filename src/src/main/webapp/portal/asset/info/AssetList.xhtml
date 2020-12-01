@@ -261,7 +261,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'oneQrCodeStatus'}">
-                                <p:column headerText="#{msg.oneQrCodeStatus}" sortBy="#{item.oneQrCodeStatus}" filterBy="#{item.oneQrCodeStatus}" filterMatchMode="EQ" rendered="#{!assetInfoListController.terminate}">
+                                <p:column headerText="#{msg.oneQrCodeStatus}" sortBy="#{item.qrCodeLib.status}" filterBy="#{item.oneQrCodeStatus}" filterMatchMode="EQ" rendered="#{!assetInfoListController.terminate}">
                                     <f:facet name="filter">
                                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.oneQrCodeStatus}" >
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
