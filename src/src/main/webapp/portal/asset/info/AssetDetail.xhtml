@@ -353,8 +353,6 @@
         <script>
             afterPageLoad = function () {
                 $(".jqplot-table-legend").css("display", "none");
-
-
             }
 
             function showthis(pic) {
@@ -377,14 +375,12 @@
                 num++;
                 // $("#shwoPicDialogImg").style.rotate = num * 90;
                 var pic = $("#shwoPicDialogImg")[0];
-                debugger;
                 pic.style.transform = 'rotate('+num * 90+'deg)';
                 if(pic.width > pic.height &amp;&amp; num%2 ==1){
                     pic.style.marginTop='140px';
                 }else{
                     pic.style.marginTop='5px';
                 }
-
             })
 
             function ImageSuofang(args) {

@@ -79,3 +79,12 @@ update asset_info set ib_device_status = 5 where (ib_device_status = 1 or ib_dev
 
 --2020-11-11 update positions type
 alter table ops_message alter column positions type text;
+
+-- 2020-11-19 资产列表增加机码状态
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','oneQrCode','一机一码','One QR Code',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','oneQrCode','一机一码','One QR Code',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','oneQrCodeStatus','机码状态','One QR Code Status',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','oneQrCodeStatus','机码状态','One QR Code Status',NULL,-1);
+
+--添加索引
+CREATE INDEX asset_service_member_system_id ON asset_service_member(system_id);
