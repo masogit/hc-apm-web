@@ -5,21 +5,22 @@ import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderReturnRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import net.sf.json.util.WebUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author : 503189362
@@ -58,13 +59,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<HashMap<String, Object>> v2_listHashMap;
 
     private List<HashMap<String, String>> partNoList = new ArrayList<>();
+    private List<HashMap<String, String>> orderNoList = new ArrayList<>();
     private List<I18nMessage> returnTypeList= new ArrayList<>();
     private String valueTypeTips = "";
     private String showOrderedFieldsetText = "";
     private String queryStatus;
     private List<ZkbPartOrderItemVo> zkbPartOrderItemVoList = new ArrayList<>();
     private List<ZkbContract> contractList;
-
+    private HashMap<String,String> conditionMap = new HashMap<>();
+    private List<ZkbPoHistoryQueryVo> zkbHistoryDataList;
+    private List<ZkbPoHistoryQueryVo> geHistoryDataList;
+    private String remindLetterFlag = "0";
 
     @Override
     protected void init() {
@@ -114,15 +119,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                 selected.setRemainQty(zkbContract.getProbeQuota());
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
-                /*if("1".equals(selected.getArtificialType())){
-                    selected.setRemainQty(zkbContract.getSpareArtificail());
-                }else if("3".equals(selected.getArtificialType())){
-                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
-                        selected.setRemainQty(zkbContract.getSpareArtificail());
-                    }else if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
-                        selected.setRemainQty(zkbContract.getGeArtificialSupportTimes());
-                    }
-                }*/
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     selected.setRemainQty(zkbContract.getGeArtificialSupportTimes());
                 }else{
@@ -164,7 +160,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Parts.toString()) || this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
                 if(canEditFlag && !zkbPartOrderService.checkThreeValid(selected)){
                     WebUtil.addErrorMessage("此订单下已订购三个及以上备件或探头，建议联络技术支持或区经理寻求指导！","");
-                    //return;
                 }
                 if(canEditFlag){
                     String validString = zkbPartOrderService.checkContractWeekValid(selected,zkbContract);
@@ -172,6 +167,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         WebUtil.addErrorMessage(validString,"");
                     }
                 }
+            }
+            if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
+                initRemindLetterFlag();
             }
         }
     }
@@ -406,7 +404,17 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
-
+    public void initRemindLetterFlag(){
+        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginName(currentUser.getLoginName());
+        if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
+            for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
+                if(c.getConfigType().equals(ZkbPartOrderStep.PartOrderStep.ClosePending.toString())){
+                    remindLetterFlag = "1";
+                    break;
+                }
+            }
+        }
+    }
 
     public void initReturnList(){
         returnTypeList = i18nDao.getByMsgType("zkbPoReturnType");
@@ -423,13 +431,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
-
-
     public String acceptNext(){
         zkbPartOrderService.auditNext(this.selected,true,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
         zkbPartOrderService.sendMessage(zkbPartOrder);
-        zkbPartOrderService.sendEmail(zkbPartOrder,false);
+        zkbPartOrderService.sendEmail(zkbPartOrder,"");
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
@@ -512,10 +518,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
         if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){
             //归还时发送邮件
-            zkbPartOrderService.sendEmail(zkbPartOrder,false);
+            zkbPartOrderService.sendEmail(zkbPartOrder,"");
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep())){
-            zkbPartOrderService.sendEmail(zkbPartOrder,false);
+            zkbPartOrderService.sendEmail(zkbPartOrder,"");
+        }
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep())){
+            zkbPartOrderService.sendEmail(zkbPartOrder, CopyByInvok.EMAIL_URL_TYPE_UNORDER);
         }
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
@@ -546,12 +555,23 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void initPartList(){
         partNoList = new ArrayList<>();
+        orderNoList = new ArrayList<>();
         List<ZkbPartOrderItem> zkbPartOrderItemList = zkbPartOrderService.queryItemBuPartOrderId(selected.getId());
+        List<String> orderContains = new ArrayList<>();
         for(ZkbPartOrderItem i :zkbPartOrderItemList){
             HashMap<String, String> m = new HashMap<>();
             m.put("text",i.getPartName());
             m.put("value",i.getPartNo());
             partNoList.add(m);
+            if(StringUtils.isNotEmpty(i.getOrderNo())){
+                if(!orderContains.contains(i.getOrderNo())){
+                    HashMap<String, String> mm = new HashMap<>();
+                    mm.put("text",i.getOrderNo());
+                    mm.put("value",i.getOrderNo());
+                    orderNoList.add(mm);
+                    orderContains.add(i.getOrderNo());
+                }
+            }
         }
     }
 
@@ -607,6 +627,39 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public void queryHistoryData(){
+        List<SearchFilter> filters = new ArrayList<>();
+        for (Map.Entry<String, String> entry : conditionMap.entrySet()) {
+            if(StringUtils.isEmpty(entry.getValue())){
+                continue;
+            }
+            SearchFilter filter = new SearchFilter(entry.getKey(), SearchFilter.Operator.LIKE, entry.getValue());
+            filters.add(filter);
+        }
+        zkbHistoryDataList = zkbPartOrderService.queryZkbHistoryByCondition(filters,selected.getTenantUID());
+        geHistoryDataList = zkbPartOrderService.queryGeHistoryByCondition(filters,selected.getTenantUID());
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        boolean b = zkbPartOrderService.uploadFile(event,selected);
+        if(b){
+            selected = zkbPartOrderRepository.findById(selected.getId());
+            WebUtil.addSuccessMessage(selected.getUploadLetterFileName() + WebUtil.getMessage("SuccessUploaded"));
+        }else{
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void remindLetter(){
+        boolean r = zkbPartOrderService.sendWeChatRemindLetter(selected);
+        if(r){
+            remindLetterFlag = "2";
+            WebUtil.addSuccessMessage("催函成功！");
+        }else{
+            WebUtil.addErrorMessage("催函失败！");
+        }
+    }
+
     public boolean isHaveTrainCourseFlag() {
         return haveTrainCourseFlag;
     }
@@ -614,7 +667,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void setHaveTrainCourseFlag(boolean haveTrainCourseFlag) {
         this.haveTrainCourseFlag = haveTrainCourseFlag;
     }
-
 
     public String backList(){
         return "List?faces-redirect=true&queryStatus="+queryStatus;
@@ -830,6 +882,46 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setContractList(List<ZkbContract> contractList) {
         this.contractList = contractList;
+    }
+
+    public List<ZkbPoHistoryQueryVo> getZkbHistoryDataList() {
+        return zkbHistoryDataList;
+    }
+
+    public void setZkbHistoryDataList(List<ZkbPoHistoryQueryVo> zkbHistoryDataList) {
+        this.zkbHistoryDataList = zkbHistoryDataList;
+    }
+
+    public List<ZkbPoHistoryQueryVo> getGeHistoryDataList() {
+        return geHistoryDataList;
+    }
+
+    public void setGeHistoryDataList(List<ZkbPoHistoryQueryVo> geHistoryDataList) {
+        this.geHistoryDataList = geHistoryDataList;
+    }
+
+    public HashMap<String, String> getConditionMap() {
+        return conditionMap;
+    }
+
+    public void setConditionMap(HashMap<String, String> conditionMap) {
+        this.conditionMap = conditionMap;
+    }
+
+    public List<HashMap<String, String>> getOrderNoList() {
+        return orderNoList;
+    }
+
+    public void setOrderNoList(List<HashMap<String, String>> orderNoList) {
+        this.orderNoList = orderNoList;
+    }
+
+    public String getRemindLetterFlag() {
+        return remindLetterFlag;
+    }
+
+    public void setRemindLetterFlag(String remindLetterFlag) {
+        this.remindLetterFlag = remindLetterFlag;
     }
 
     @Override

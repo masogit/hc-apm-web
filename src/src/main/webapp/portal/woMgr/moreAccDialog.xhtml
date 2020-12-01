@@ -26,6 +26,11 @@
 
                         </p:inputNumber>
                     </h:panelGroup>
+
+                    <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
+                        <img src="#{fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
+                    </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">#{msg.PartType}</label>
                         <p:selectOneMenu value="#{workOrderMgrController.itemDetail.partsType}">

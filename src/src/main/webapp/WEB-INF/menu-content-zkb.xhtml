@@ -154,9 +154,9 @@
             <p:submenu label="维修服务 New" icon="fa fa-wrench">
                 <p:menuitem value="申请工作台 New" outcome="/portal/zkb/partOrder/List.xhtml" />
                 <p:menuitem value="历史申请数据 New" outcome="/portal/zkb/orderHistory/List.xhtml"/>
-                <p:menuitem value="统计表" outcome="/portal/zkb/assetStatistic/List.xhtml" rendered="#{userContextService.accessContains('knowledge.zkbMgt') and userContextService.zkbAdmin}"/>
-                <p:menuitem value="KPI" outcome="/portal/zkb/keyHehaviorIndex/List.xhtml"/>
-                <p:menuitem value="权重配置" outcome="/portal/zkb/keyHehaviorIndex/ConfigList.xhtml" rendered="#{userContextService.accessContains('knowledge.zkbMgt') and userContextService.zkbAdmin}"/>
+                <p:menuitem value="二维码实施统计表" outcome="/portal/zkb/assetStatistic/List.xhtml" rendered="#{ userContextService.zkbAccount}"/>
+                <p:menuitem value="KPI" outcome="/portal/zkb/keyHehaviorIndex/List.xhtml" rendered="#{ userContextService.zkbAccount}"  />
+                <p:menuitem value="权重配置" outcome="/portal/zkb/keyHehaviorIndex/ConfigList.xhtml" rendered="#{ userContextService.zkbAccount}"/>
 <!--                <p:menuitem value="USER CONFIG配置" outcome="/portal/zkb/partOrderUserConfig/List.xhtml"/>-->
             </p:submenu>
 

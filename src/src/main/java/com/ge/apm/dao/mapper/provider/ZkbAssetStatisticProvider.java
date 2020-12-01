@@ -22,12 +22,13 @@ public class ZkbAssetStatisticProvider {
                 " ai.system_id," +
                 " ti.uid AS tenant_uid," +
                 " ti. NAME," +
-                " ai.uid AS asset_uid" +
+                " ai.uid AS asset_uid," +
+                " ac.contract_no"+
                 " FROM" +
                 " zkb_contract ac" +
                 " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
                 " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
-                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id where 1=1 ");
+                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id where ac.contract_no is not null ");
         String filter = buildFilter_loadAllAsset(searchFilterList);
         sb.append(filter);
         return sb.toString();

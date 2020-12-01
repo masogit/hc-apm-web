@@ -45,6 +45,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private static final Logger logger = LoggerFactory.getLogger(AssetInfoListController.class);
 
     private static final long serialVersionUID = -1L;
+    static Map<String,List<AssetInfo>> resultAssetMap = null;
     private AssetInfoRepository dao = null;
     private AssetInfoMgrService aiMgrService;
     private AssetCreateService acService;
@@ -121,6 +122,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private SupplierRepository supplierDao;
     private UserAccountRepository userDao;
+    private String oneQrCodeStatus;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -220,6 +222,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
 
+        //设置OneQrCodeStatus
+        currentPageAssets.stream().forEach(item -> {
+            if(item.getQrCodeLib()!=null){
+                item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
+            }
+        });
+
         addMisingClinicalDeptOrg(currentPageAssets);
 
         setWarrantyAlerts(currentPageAssets);
@@ -305,6 +314,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             }
+        }
+
+        if (oneQrCodeStatus != null && !oneQrCodeStatus.isEmpty()) {
+            this.removeFilterOnField("oneQrCodeStatus");
+            searchFilters.add(new SearchFilter("qrCodeLib.status", SearchFilter.Operator.EQ, oneQrCodeStatus));
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
@@ -538,6 +552,25 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
 
         return resultList;
+    }
+    public void getAssetInfoBatchEdit() {
+        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+        List<AssetInfo> resultList;
+        if (assetUids.isEmpty()) {
+            resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
+        } else {
+            resultList = dao.findByUidIn(assetUids, lastPageSort);
+        }
+        String verificationCode = "";
+        Random random = new Random();
+        for (int i = 0; i < 6; i++) {
+            int r = random.nextInt(10); //每次随机出一个数字（0-9）
+            verificationCode = verificationCode + r;  //把每次随机出的数字拼在一起
+        }
+        resultAssetMap = new HashMap<>();
+
+        resultAssetMap.put(verificationCode,resultList);
+        WebUtil.navigateTo("AssetInfoBatchEdit.xhtml?faces-redirect=true&uidList= "+ verificationCode);
     }
 
     public String getParentAssetNameByAssetId(int assetId) {
@@ -973,5 +1006,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setFactoryWarrantyDateFormatTime(String factoryWarrantyDateFormatTime) {
         this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
+    }
+
+    public String getOneQrCodeStatus() {
+        return oneQrCodeStatus;
+    }
+
+    public void setOneQrCodeStatus(String oneQrCodeStatus) {
+        this.oneQrCodeStatus = oneQrCodeStatus;
     }
 }

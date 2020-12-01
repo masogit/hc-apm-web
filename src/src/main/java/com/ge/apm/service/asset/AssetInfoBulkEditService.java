@@ -2,10 +2,14 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.CustomConfigConstant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +19,7 @@ import static com.ge.apm.service.asset.AssetInfoBulkEditUtils.*;
 
 @Service
 public class AssetInfoBulkEditService {
-
+    private Logger logger = LoggerFactory.getLogger(AssetInfoBulkEditService.class);
     @Autowired
     private AssetInfoRepository assetInfoDao;
 
@@ -52,9 +56,11 @@ public class AssetInfoBulkEditService {
     @Autowired
     private AssetTagRuleRepository  assetTagRuleRepository;
 
+    @Autowired
+    private AssetHistoryService assetHistoryService;
+
     @Transactional
     public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
-
         commitCorrectiveMaintenanceBulkEdit(assets, targetAsset);
         commitPreventativeMaintenanceBulkEdit(assets, targetAsset);
         commitQrCode(assets, targetAsset);
@@ -290,12 +296,12 @@ public class AssetInfoBulkEditService {
 
         List<Boolean> isAllTransferResult = new ArrayList<>();
 
-        assets.stream().forEach(item ->{
+        for ( AssetInfo item :assets ) {
             List<AssetInfo> assetInfos = null;
             if(null == item.getParentAssetId()){
-                assetInfos = assetInfoDao.findAssetByParrentAssetId(item.getId());
+                assetInfos = assetInfoDao.findByParentAssetIdOrId(item.getId(),item.getId());
             }else {
-                assetInfos = assetInfoDao.findAssetByParrentAssetId(item.getParentAssetId());
+                assetInfos = assetInfoDao.findByParentAssetIdOrId(item.getParentAssetId(),item.getParentAssetId());
             }
             List<String> assetUids = assetInfos.stream().map(AssetInfo::getUid).collect(Collectors.toList());
             if(parrentAssetUids.containsAll(assetUids)){
@@ -303,7 +309,7 @@ public class AssetInfoBulkEditService {
             }else {
                 isAllTransferResult.add(false);
             }
-        });
+        }
 
         for(Boolean result : isAllTransferResult){
             if(result == false){
@@ -314,11 +320,11 @@ public class AssetInfoBulkEditService {
     }
 
     private void commitSiteForAssetItself(List<AssetInfo> assets, AssetInfo targetAsset) {
-
         List<String> parrentAssetUids = assets.stream().map(AssetInfo::getUid).filter(item -> item != null).collect(Collectors.toList());
         Boolean isAllTransfer = isAllParrentAssetAndChildAssetTransfer(parrentAssetUids, assets);
 
         for (AssetInfo item: assets) {
+            AssetInfo oldAssetInfo = depCopy(item);
             item.setSiteUID(targetAsset.getSiteOrg().getSiteUID());
             item.setHospitalUID(targetAsset.getSiteOrg().getHospitalUID());
             item.setInstitutionUID(targetAsset.getSiteOrg().getInstitutionUID());
@@ -328,10 +334,12 @@ public class AssetInfoBulkEditService {
             item.setClinicalDeptUID(targetAsset.getClinicalDeptOrg().getUid());
             item.setClinicalDeptName(targetAsset.getClinicalDeptOrg().getName());
 
+            item.setHospitalId(targetAsset.getSiteOrg().getId());
+
             //clear asset dept
             item.setAssetDeptId(null);
             item.setAssetDeptUID(null);
-
+            assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, item, CustomConfigConstant.getAssetsImportantFieldsAll());
             if( !isAllTransfer){
                 item.setParentAssetId(null);
                 List<AssetInfo> childAssetInfos = assetInfoDao.findChildAssets(item.getId());
@@ -343,10 +351,26 @@ public class AssetInfoBulkEditService {
         }
 
         assetInfoDao.save(assets);
+
     }
 
+    public static <T> T depCopy(T srcList) {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(byteOut);
+            out.writeObject(srcList);
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+            ObjectInputStream inStream = new ObjectInputStream(byteIn);
+            T destList = (T) inStream.readObject();
+            return destList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     private void commitPmRule(List<AssetInfo> assets, AssetInfo targetAsset) {
-
         for (AssetInfo item: assets) {
 
             RelRuleAsset relRuleAsset = relRuleAssetDao.findByAssetUID(item.getUid());
@@ -369,7 +393,6 @@ public class AssetInfoBulkEditService {
      * correctvie maintenance
      */
     private void commitCorrectiveMaintenanceBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset) {
-
         for (AssetInfo assetInfo: assets) {
             List<V2_ServiceRequest> serviceRequests = serviceRequestDao.findByAssetId(assetInfo.getId());
 
@@ -401,7 +424,6 @@ public class AssetInfoBulkEditService {
      * preventative maintenance
      */
     private void commitPreventativeMaintenanceBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset) {
-
         for (AssetInfo assetInfo: assets) {
             List<V2_PmOrder> pmOrders = pmOrderDao.getByAssetUid(assetInfo.getUid());
 
@@ -421,7 +443,6 @@ public class AssetInfoBulkEditService {
     }
 
     private void commitQrCode(List<AssetInfo> assets, AssetInfo targetAsset) {
-
         for (AssetInfo assetInfo: assets) {
             if (null == assetInfo.getQrCode()) {
                 continue;
