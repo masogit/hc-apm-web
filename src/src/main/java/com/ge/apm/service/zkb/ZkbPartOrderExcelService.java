@@ -126,15 +126,19 @@ public class ZkbPartOrderExcelService {
         zkbPartOrderDataMap.put("申请人", p.getRequestUser());
         zkbPartOrderDataMap.put("申请人电话", p.getRequestPhone());
         zkbPartOrderDataMap.put("申请时间", DateFormatUtils.format(p.getRequestDate(),"yyyy-MM-dd"));
-        zkbPartOrderDataMap.put("设备类型（DI）", p.getRequestPhone());
+        zkbPartOrderDataMap.put("设备类型（DI）", p.getAssetTypeDi());
         zkbPartOrderDataMap.put("区域", p.getRegion());
         zkbPartOrderDataMap.put("医院名称", p.getHospitalName());
         zkbPartOrderDataMap.put("医院报修人姓名", p.getHospitalRepairer());
         zkbPartOrderDataMap.put("医院报修人电话", p.getHospitalRepairerPhone());
         zkbPartOrderDataMap.put("订单标注", p.getOrderAnnotation());
         zkbPartOrderDataMap.put("发生问题的order number", p.getProblemOrderNumber());
-        zkbPartOrderDataMap.put("是否为紧急订单", WebUtil.getFieldValueMessage("zkbUrgentType", p.getUrgentOrder()));
-        zkbPartOrderDataMap.put("订单紧急的原因", WebUtil.getFieldValueMessage("zkbUrgentReasonType", p.getUrgencyReasons()));
+        if(StringUtils.isNotEmpty(p.getUrgentOrder())){
+            zkbPartOrderDataMap.put("是否为紧急订单", WebUtil.getFieldValueMessage("zkbUrgentType", p.getUrgentOrder()));
+        }
+        if(StringUtils.isNotEmpty(p.getUrgencyReasons())){
+            zkbPartOrderDataMap.put("订单紧急的原因", WebUtil.getFieldValueMessage("zkbUrgentReasonType", p.getUrgencyReasons()));
+        }
         zkbPartOrderDataMap.put("订单数量", p.getQty());
         zkbPartOrderDataMap.put("收货人", p.getReceiver());
         zkbPartOrderDataMap.put("收货人电话", p.getReceiverPhone());

@@ -381,7 +381,7 @@
                             <p:inputTextarea id="techRemark" value="#{zkbPartOrderAuditController.selected.techRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending')}">
                             </p:inputTextarea>
                             <p:commandLink immediate="false" process="@this" id="historyData" update="growl zkbHistoryQueryDlg" action="#{zkbPartOrderAuditController.preHistoryData}" oncomplete="PF('zkbHistoryQueryDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'TechnicalPending' and zkbPartOrderAuditController.canEditFlag}">
-                                <h:outputText value="历史数据" />
+                                <h:outputText value="历史数据查询" />
                             </p:commandLink>
                         </h:panelGroup>
                         <!--<h:panelGroup >
