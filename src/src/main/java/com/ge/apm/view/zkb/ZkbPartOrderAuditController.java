@@ -632,6 +632,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void preHistoryData(){
         conditionMap = new HashMap<>();
+        zkbHistoryDataList = new ArrayList<>();
+        geHistoryDataList = new ArrayList<>();
     }
 
     public void queryHistoryData(){

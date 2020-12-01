@@ -104,7 +104,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     protected Page<ZkbPartOrder> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
-        searchFilters.clear();
+        //searchFilters.clear();
         return zkbContractPage;
     }
 
