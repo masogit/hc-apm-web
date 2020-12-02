@@ -537,7 +537,7 @@ public class ZkbKeyBehaviorIndexService {
             zkbKeyBehaviorIndex.setPartReturnScore(zkbKeyBehaviorIndex.getPartReturnFullScore());
             return ;
         }
-        Integer returnQty = zkbPartOrderList.stream().mapToInt(ZkbPartOrder::getReturnQty).sum();
+        Integer returnQty = zkbPartOrderList.stream().filter(p -> p.getReturnQty()!=null).mapToInt(ZkbPartOrder::getReturnQty).sum();
         if(returnQty==null)
         {
             returnQty = new Integer(0);
