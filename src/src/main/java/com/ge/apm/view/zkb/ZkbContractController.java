@@ -142,7 +142,7 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
             zkbContractService.exportData(doc, zkbContractDataList, zkbContractService.createZkbContractCourseData(zkbContractDataList), zkbContractService.createZkbContractAssetData(zkbContractDataList));
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZKBContractData.xlsx");
         } catch (IOException ex) {
-            Logger.getLogger(ZkbEngineerController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ZkbContractController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

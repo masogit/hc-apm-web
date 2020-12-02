@@ -52,6 +52,10 @@ public class ZkbAssetStatisticProvider {
             {
                 sb.append(" and ai.system_id like'%"+value.toString()+"%'");
             }
+            if("contractNo".equals(tempColumn))
+            {
+                sb.append(" and ac.contract_no like '%"+value.toString()+"%'");
+            }
         }
         return sb.toString();
     }

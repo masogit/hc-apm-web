@@ -26,6 +26,8 @@ import org.primefaces.event.*;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepository;
@@ -47,6 +49,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
+    private static final Logger logger = LoggerFactory.getLogger(AssetInfoBulkEditController.class);
 
     static PageRequest pageRequest = new PageRequest(0, 100);
 
@@ -953,15 +956,25 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private void prepareFilters() {
         searchFilters = new ArrayList<>();
         SearchFilter searchFilter;
-
-        searchFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID());
-        this.searchFilters.add(searchFilter);
+        this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 
         if (null != filter.getSiteOrg()) {
             List<String> orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(filter.getSiteOrg().getUid());
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID());
+            this.searchFilters.add(searchFilter);
+        }else {
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
 
         if (null != filter.getClinicalDeptOrg()) {
@@ -1150,10 +1163,11 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
             assets.setSource(new ArrayList<>());
             assets.setTarget(new ArrayList<>());
-
+            selected = new AssetInfo();
             WebUtil.addSuccessMessage("批量修改资产院区成功!");
         } catch(Exception e) {
             WebUtil.addErrorMessage(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
 
     }

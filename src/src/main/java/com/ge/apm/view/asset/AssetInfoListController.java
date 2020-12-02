@@ -222,6 +222,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
 
+        //设置OneQrCodeStatus
+        currentPageAssets.stream().forEach(item -> {
+            if(item.getQrCodeLib()!=null){
+                item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
+            }
+        });
+
         addMisingClinicalDeptOrg(currentPageAssets);
 
         setWarrantyAlerts(currentPageAssets);
