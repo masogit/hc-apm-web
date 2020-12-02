@@ -143,7 +143,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     AssetLifecyleService assetLifecyleService;
     private String qr_Code = null;
     private String siteUid = null;
-
+    //如果无图片 就显示请上传图片
+    private boolean uploadFlag;
+    @Getter
+    private String uploadUrl = "/portal/uploadPic.png";
     @Getter
     private List<JSONObject> changeHistoryList = new ArrayList<>();
 
@@ -250,7 +253,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             this.selected.setTags(existingTags);
 
             changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
-
+            uploadFlag = getAttachList(selected.getUid(), "1").size() ==0;
         }
         if(selected ==null){
             try {
@@ -576,7 +579,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (attachements == null) {
             attachements = blobService.findBlobObjectsByBoUid(assetuid);
         }
-        return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+        uploadFlag = collect.size() == 0;
+        return collect;
     }
 
     @Override
@@ -1403,4 +1408,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
         TreeNode treeNode = buildTree(orgList,loginUser.getSiteId());
     }
+
+    public boolean getUploadFlag() {
+        return uploadFlag;
+    }
+
 }

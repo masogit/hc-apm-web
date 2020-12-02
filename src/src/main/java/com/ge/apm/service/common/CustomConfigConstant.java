@@ -162,6 +162,7 @@ public class CustomConfigConstant {
             allFields.put("assetClass", WebUtil.getMessage("assetClass"));
          allFields.put("oneQrCode", WebUtil.getMessage("oneQrCode"));
          allFields.put("oneQrCodeStatus", WebUtil.getMessage("oneQrCodeStatus"));
+         allFields.put("installStatus", WebUtil.getMessage("installStatus"));
 //        }
         return allFields;
     }
