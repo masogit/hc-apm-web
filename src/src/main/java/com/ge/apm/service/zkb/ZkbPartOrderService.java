@@ -513,7 +513,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
 
         if(zkbPartOrder != null){
-            List<V2_BlobObject> v2_blobObjectList = blobObjectRepository.findByBoUuid(zkbPartOrder.getId());
+            List<V2_BlobObject> v2_blobObjectList = blobObjectRepository.fetchBlobObjectByUuidAndType(zkbPartOrder.getId(),V2_BlobObject.BO_TYPE_ZKB_PART_ORDER,V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
             map.put("v2_blobObjectList",v2_blobObjectList);
         }
 
@@ -1004,7 +1004,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }else if(CopyByInvok.EMAIL_URL_TYPE_LASTDAY.equals(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_LAST_DAY_EMAIL);
             }else if(CopyByInvok.EMAIL_URL_TYPE_UNORDER.equals(urlType)){
-                url = getGatewayURL(GatewayURL.PART_ORDER_SEND_LAST_DAY_EMAIL);
+                url = getGatewayURL(GatewayURL.PART_ORDER_SEND_UN_ORDER);
             }
             String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
@@ -1100,7 +1100,19 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     public boolean uploadFile(FileUploadEvent event, ZkbPartOrder zkbPartOrder){
         V2_BlobObject v2_blobObject = blobService.uploadFile(event);
-        if (null != v2_blobObject) {
+        return Optional.ofNullable(v2_blobObject).map(t ->{
+            v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
+            v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_LETTER);
+            v2_blobObject.setBoUuid(zkbPartOrder.getId());
+            blobObjectRepository.save(v2_blobObject);
+
+            zkbPartOrder.setUploadLetterFileName(v2_blobObject.getObjectName());
+            zkbPartOrder.setUploadLetterFlag("t");
+            zkbPartOrder.setUploadLetterFileId(v2_blobObject.getObjectStorageId());
+            zkbPartOrderRepository.save(zkbPartOrder);
+            return true;
+        }).isPresent();
+        /*if (null != v2_blobObject) {
             //blobObject.setBoId(selected.getId());
             v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
             v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_LETTER);
@@ -1109,10 +1121,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
             zkbPartOrder.setUploadLetterFileName(v2_blobObject.getObjectName());
             zkbPartOrder.setUploadLetterFlag("t");
+            zkbPartOrder.setUploadLetterFileId(v2_blobObject.getId());
             zkbPartOrderRepository.save(zkbPartOrder);
             return true;
         }
-        return false;
+        return false;*/
     }
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){

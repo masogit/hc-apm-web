@@ -27,7 +27,7 @@
                         </p:inputNumber>
                     </h:panelGroup>
 
-                    <h:panelGroup rendered="#{workOrderMgrController.itemDetail.detailReviewSignature != null}">
+                    <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
                         <img src="#{fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
                     </h:panelGroup>
 
@@ -179,6 +179,11 @@
 
                         </p:inputNumber>
                     </h:panelGroup>
+
+                    <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
+                        <img src="#{fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
+                    </h:panelGroup>
+
                     <h:panelGroup id="invoiceNum">
                         <label class="label">#{msg.invoiceNum}</label>
                         <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>

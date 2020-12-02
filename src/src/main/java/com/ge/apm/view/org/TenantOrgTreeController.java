@@ -36,6 +36,7 @@ public class TenantOrgTreeController {
     private OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
 
     private TreeNode tenantOrgTreePage;
+    private TreeNode tenantOrgTreeOtherPage;
 
     private boolean includeClinicalDeptInTree = false;
 
@@ -55,6 +56,12 @@ public class TenantOrgTreeController {
         }
         return tenantOrgTreePage;
     }
+    public TreeNode getTenantOrgTreeOther() {
+        if (null == tenantOrgTreeOtherPage) {
+            tenantOrgTreeOtherPage = createTenantOrgTreeOther();
+        }
+        return tenantOrgTreeOtherPage;
+    }
 
     public TreeNode createTenantOrgTree() {
         String tenantUid = UserContextService.getCurrentUserAccount().getTenantUID();
@@ -71,7 +78,21 @@ public class TenantOrgTreeController {
         } else {
             orgInfoList = orgDao.getSitesByTenantUID(tenantUid);
         }
+        TreeNode siteTree = buildTree(orgInfoList);
+        expandedByOrgType(siteTree, 2);
+        rootNode.getChildren().addAll(siteTree.getChildren());
+        return rootNode;
+    }
+    public TreeNode createTenantOrgTreeOther() {
 
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        rootNode.getChildren().add(new DefaultTreeNode("org", rootOrg, null));
+
+        List<OrgInfo> orgInfoList;
+        orgInfoList = orgDao.getOrgInfosByParentId(UserContextService.getCurrentUserAccount().getSiteUID());
         TreeNode siteTree = buildTree(orgInfoList);
         expandedByOrgType(siteTree, 2);
         rootNode.getChildren().addAll(siteTree.getChildren());

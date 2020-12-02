@@ -3653,8 +3653,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_pasteQuickResponseRateScore','二维码粘贴率得分','Paste quick response rate score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_apmBillingRateFullScore','APM开单率权重','Apm billing rate full score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_apmBillingRateScore','APM开单率得分','Apm billing rate score',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_satisfactoryDegreeFullScore','满意度回访权重','Satisfactory gegree full score',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_satisfactoryDegreeScore','满意度回访得分','Satisfactory degree score',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_satisfactoryDegreeFullScore','顾客满意度回访权重','Client satisfactory gegree full score',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_satisfactoryDegreeScore','顾客满意度回访得分','Client satisfactory degree score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_complianceFullScore','合规及健康安全权重','Compliance full score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_complianceScore','合规及健康安全得分','Compliance score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_engineerFullScore','工程师配置权重','Engineer full score',NULL,-1);
@@ -3698,10 +3698,10 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbAssetStatistic_countOfImage','图片个数','Count of image',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbAssetStatistic_contractNo','合同编号','contract no',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbAssetStatistic_qrCodeOfPaste','二维码是否已实施(粘贴及照片上传)','Qrcode of pasting',NULL,	-1	);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','MSARecommendExcel','MSA方案推荐','MSA Recommend',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','PromotionActivityExcel','促销活动','Promotion Activity',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','CarePackageExcel','关爱包','Care Package',NULL,-1);
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','MSARecommendExcel','MSA方案推荐','MSA Recommend',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','PromotionActivityExcel','促销活动','Promotion Activity',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','CarePackageExcel','关爱包','Care Package',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','GamePlanBatchFileImport','Game Plan数据导入','Game plan Batch Data Import',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','installStatus','装机状态','Install Status',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '0', '已装机', 'Installed', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '1', '未装机', 'Shipped', NULL, '-1');
