@@ -136,15 +136,17 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
     public void generateCharts()
     {
         Date date = new Date();
-        if(this.beginningTime==null)
+        Date beginningTimeTemp = this.beginningTime;
+        Date endingTimeTimeTemp = this.endingTime;
+        if(beginningTimeTemp==null)
         {
-            this.beginningTime=this.getFirstDay(date);
+            beginningTimeTemp=this.getFirstDay(date);
         }
-        if(this.endingTime==null)
+        if(endingTimeTimeTemp==null)
         {
-            this.endingTime=this.getLastDay(date);
+            endingTimeTimeTemp=this.getLastDay(date);
         }
-        this.lineModel = this.zkbKeyBehaviorIndexService.generateCharts(tenantUID,beginningTime,endingTime);
+        this.lineModel = this.zkbKeyBehaviorIndexService.generateCharts(tenantUID,beginningTimeTemp,endingTimeTimeTemp);
     }
 
 
@@ -367,6 +369,10 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             return;
         }
         super.save();
+        this.selected = null;
+    }
+
+    public void cancel() {
         this.selected = null;
     }
 

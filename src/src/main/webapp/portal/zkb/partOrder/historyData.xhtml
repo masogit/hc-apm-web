@@ -6,10 +6,14 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="zkbHistoryQueryDlg" widgetVar="zkbHistoryQueryDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="额度明细操作" width="70%" height="620">
+    <p:dialog id="zkbHistoryQueryDlg" widgetVar="zkbHistoryQueryDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="历史数据查询" width="70%" height="620">
         <h:form id="zkbHistoryQueryForm">
             <p:fieldset legend="查询条件">
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">代理商</label>
+                        <p:inputText id="tenantUid" value="#{zkbPartOrderAuditController.tenantInfo.name}" disabled="true"/>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">设备sysID</label>
                         <p:inputText id="qrCode" value="#{zkbPartOrderAuditController.conditionMap.sysId}" required="false"/>
@@ -55,7 +59,7 @@
                     <p:column headerText="备件描述（备注）">
                         <h:outputText value="#{item.partRemark}"/>
                     </p:column>
-                    <p:column headerText="当前步骤）">
+                    <p:column headerText="当前步骤">
                         <h:outputText value="#{fieldMsg.fieldValue('zkbPoSteps',item.currentStep)}"/>
                     </p:column>
                     <p:column headerText="申请状态">
@@ -69,9 +73,9 @@
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                              currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowsPerPageTemplate="20,50,100,500"
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" rows="20" emptyMessage="#{msg.noRecordFound}">
-                    <p:column headerText="申请单号">
+                  <!--  <p:column headerText="申请单号">
                         <h:outputText value="#{item.partOrderNo}"/>
-                    </p:column>
+                    </p:column>-->
                     <p:column headerText="sys ID">
                         <h:outputText value="#{item.systemId}"/>
                     </p:column>
