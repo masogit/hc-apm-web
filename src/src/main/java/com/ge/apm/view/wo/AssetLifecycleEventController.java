@@ -30,6 +30,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+
+
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -89,7 +92,7 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 	}
 
 	private PageRequest addRequiredSortById(PageRequest pageRequest) {
-		Iterator<Sort.Order> orders = pageRequest.getSort().iterator();
+		Iterator<Sort.Order> orders = pageRequest.getSort()!=null ? pageRequest.getSort().iterator() : new ArrayList<Sort.Order>().iterator();
 		boolean exists = false;
 		while(orders.hasNext()){
 			if(orders.next().getProperty().equals("createTime")){
@@ -101,7 +104,9 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 			return pageRequest;
 		} else {
 			Sort sortWithId = new Sort(Sort.DEFAULT_DIRECTION.DESC, "createTime");
-			pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortWithId));
+
+
+			pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sortWithId);
 		}
 		return pageRequest;
 	}
