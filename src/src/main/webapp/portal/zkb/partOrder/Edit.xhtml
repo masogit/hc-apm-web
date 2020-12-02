@@ -172,9 +172,6 @@
                             <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.partOrderDate}" required="true" requiredMessage="#{msg.zkbPartOrder_partOrderDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>-->
                         <h:panelGroup>
-                        </h:panelGroup>
-
-                        <h:panelGroup>
                             <label class="label">医院名称*</label>
                             <p:inputTextarea id="hospitalName" value="#{zkbPartOrderEditController.selected.hospitalName}"  required="true" requiredMessage="#{msg.zkbPartOrder_hospitalName} #{msg.ValidationRequire}" disabled="true"/>
                         </h:panelGroup>
@@ -366,8 +363,8 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">旧探头SN号输入框*</label>
-                            <p:inputText id="oldCatSn" value="#{zkbPartOrderEditController.selected.oldCatSn}" required="true" requiredMessage="旧探头SN号输入框 #{msg.ValidationRequire}"/>
+                            <label class="label">旧探头SN编号*</label>
+                            <p:inputText id="oldCatSn" value="#{zkbPartOrderEditController.selected.oldCatSn}" required="true" requiredMessage="旧探头SN编号 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
