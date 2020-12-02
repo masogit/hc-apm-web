@@ -155,17 +155,20 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             WebUtil.addErrorMessage("保存失败,不能保存空数据!");
             return;
         }
-        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = null;
-        if(StringUtils.isNotBlank(this.selected.getId())){
-            zkbPartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findByLoginNameAndIdNot(this.selected.getLoginName(),this.selected.getId());
-        }else
+        if(!("OrderExtraPending".equals(this.selected.getConfigType())||"OrderPending".equals(this.selected.getConfigType())))
+        {
+            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = null;
+            if(StringUtils.isNotBlank(this.selected.getId())){
+                zkbPartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findByLoginNameAndIdNot(this.selected.getLoginName(),this.selected.getId());
+            }else
             {
                 zkbPartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findByLoginName(this.selected.getLoginName());
             }
-        if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfigList))
-        {
-            WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
-            return;
+            if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfigList))
+            {
+                WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
+                return;
+            }
         }
         super.save();
         this.selected = null;
