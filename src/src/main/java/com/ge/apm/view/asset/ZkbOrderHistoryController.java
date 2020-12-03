@@ -260,7 +260,7 @@ public class ZkbOrderHistoryController extends GenericCRUDUUIDController<ZkbOrde
      * 数据导出
      */
     public void exportAll(){
-        List<Map<String, Object>> orderHistoryMapList = zkbOrderHistoryService.createExportOrderHistoryData(this.zkbOrderHistoryList);
+        List<Map<String, Object>> orderHistoryMapList = zkbOrderHistoryService.createExportOrderHistoryData(this.zkbOrderHistoryList,this.userContextService);
         try {
             UserContextService ucs = WebUtil.getBean(UserContextService.class);
             String fileName =  ucs.isLocale() == true ?ZkbOrderHistoryService.EXCEL_TEMPLATE_NAME:ZkbOrderHistoryService.EXCEL_TEMPLATE_EN_NAME;

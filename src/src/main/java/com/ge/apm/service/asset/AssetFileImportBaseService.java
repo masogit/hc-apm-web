@@ -55,6 +55,7 @@ public class AssetFileImportBaseService {
     protected String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
     public List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
     public List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
+    public List<I18nMessage> assetClassList = FieldValueMessageController.getFieldValueList("assetClass", siteId);
     public List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
     public List<I18nMessage> assetUsageList = FieldValueMessageController.getFieldValueList("assetUsage", siteId);
     public List<I18nMessage> capitalSourceList = FieldValueMessageController.getFieldValueList("capitalSource", siteId);

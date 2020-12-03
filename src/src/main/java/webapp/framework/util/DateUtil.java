@@ -2,9 +2,7 @@ package webapp.framework.util;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DateUtil {
 
@@ -51,4 +49,32 @@ public class DateUtil {
 			return newDay-lastDay;
     	}
     }
+	/**
+	 * 给日期加月份
+	 * @param date
+	 * @return
+	 */
+	public static Date addMonth(Date date,Integer month){
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.MONTH, month);
+		Date  time = cal.getTime();
+		return time;
+	}
+
+	/**
+	 * 判断两个日期是否是同年、同月
+	 * @param date1
+	 * @param date2
+	 * @return
+	 */
+	public static Boolean isSameMonth(Date date1,Date date2){
+
+		Calendar cal1 = Calendar.getInstance();
+		cal1.setTime(date1);
+		Calendar cal2 = Calendar.getInstance();
+		cal2.setTime(date2);
+		return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH);
+	}
 }

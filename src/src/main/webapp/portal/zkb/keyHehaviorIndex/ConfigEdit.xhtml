@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<ui:composition>
+
+    <h:form id="zkbKeyBehaviorIndexConfigEditForm">
+        <p:fieldset id="zkbFiledSet" legend="#{zkbKeyBehaviorIndexConfigController.CRUDActionName}" style="margin-bottom:20px" rendered="#{zkbKeyBehaviorIndexConfigController.selected != null}">
+            <h:panelGroup>
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup >
+                        <label class="label">#{msg.zkbHistory_agent}*</label>
+                        <p:selectOneMenu  value="#{zkbKeyBehaviorIndexConfigController.selected.tenantUID}" required="true" requiredMessage="#{msg.zkbHistory_agent}#{msg.ValidationRequire}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{zkbPartOrderController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbKeyBehaviorIndex_partReturnFullScore}*</label>
+                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" emptyValue="0" value="#{zkbKeyBehaviorIndexConfigController.selected.partReturnFullScore}" required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_partReturnFullScore}#{msg.ValidationRequire}">
+                            <p:ajax  update="zkbKeyBehaviorIndexConfigEditForm:totalFullStore"/>
+                        </p:inputNumber>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}*</label>
+                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" emptyValue="0" value="#{zkbKeyBehaviorIndexConfigController.selected.intactPartReturnRateFullScore}" required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}#{msg.ValidationRequire}">
+                            <p:ajax update="zkbKeyBehaviorIndexConfigEditForm:totalFullStore"/>
+                        </p:inputNumber>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore}*</label>
+                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" emptyValue="0" value="#{zkbKeyBehaviorIndexConfigController.selected.pasteQuickResponseRateFullScore}" required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore}#{msg.ValidationRequire}">
+                            <p:ajax update="zkbKeyBehaviorIndexConfigEditForm:totalFullStore"/>
+                        </p:inputNumber>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbKeyBehaviorIndex_apmBillingRateFullScore}*</label>
+                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" emptyValue="0" value="#{zkbKeyBehaviorIndexConfigController.selected.apmBillingRateFullScore}" required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_apmBillingRateFullScore}#{msg.ValidationRequire}">
+                            <p:ajax update="zkbKeyBehaviorIndexConfigEditForm:totalFullStore"/>
+                        </p:inputNumber>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeFullScore}*</label>
+                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" emptyValue="0" value="#{zkbKeyBehaviorIndexConfigController.selected.satisfactoryDegreeFullScore}" required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeFullScore}#{msg.ValidationRequire}">
+                            <p:ajax update="zkbKeyBehaviorIndexConfigEditForm:totalFullStore"/>
+                        </p:inputNumber>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbKeyBehaviorIndex_complianceFullScore}*</label>
+                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" emptyValue="0" value="#{zkbKeyBehaviorIndexConfigController.selected.complianceFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_complianceFullScore}#{msg.ValidationRequire}">
+                            <p:ajax update="zkbKeyBehaviorIndexConfigEditForm:totalFullStore"/>
+                        </p:inputNumber>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbKeyBehaviorIndex_engineerFullScore}*</label>
+                        <p:inputNumber  maxValue="100" minValue="0"  decimalPlaces="0" emptyValue="0" value="#{zkbKeyBehaviorIndexConfigController.selected.engineerFullScore}" required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_engineerFullScore}#{msg.ValidationRequire}">
+                            <p:ajax update="zkbKeyBehaviorIndexConfigEditForm:totalFullStore"/>
+                        </p:inputNumber>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbKeyBehaviorIndex_totalFullScore}*</label>
+                        <p:inputNumber id="totalFullStore" disabled="true" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexConfigController.selected.totalFullStore}" required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_engineerFullScore}#{msg.ValidationRequire}">
+                        </p:inputNumber>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <h:panelGroup>
+                    <p:commandButton validateClient="true" actionListener="#{zkbKeyBehaviorIndexConfigController.save}" update=":zkbKeyBehaviorIndexConfigListForm :zkbKeyBehaviorIndexConfigEditForm :growl" value="#{msg.Save}" icon="ui-icon-check"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" actionListener="#{zkbKeyBehaviorIndexConfigController.cancel}" update=":zkbKeyBehaviorIndexConfigEditForm :growl"/>
+                </h:panelGroup>
+
+            </h:panelGroup>
+        </p:fieldset>
+    </h:form>
+
+</ui:composition>
+</html>

@@ -27,6 +27,11 @@
                             </p:ajax>
                         </p:inputNumber>
                     </h:panelGroup>
+
+                    <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
+                        <img src="#{fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
+                    </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">#{msg.PartType}</label>
                         <p:selectOneMenu value="#{workOrderMgrController.itemDetail.partsType}">
@@ -34,6 +39,7 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">#{msg.invoiceNum}</label>
                         <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>
@@ -120,6 +126,11 @@
                             <p:ajax listener="#{workOrderMgrController.partsPriceUpdate()}" update="@(.contractPrice)"/>
                         </p:inputNumber>
                     </h:panelGroup>
+
+                    <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
+                        <img src="#{fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
+                    </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">#{msg.PartType}</label>
                         <p:selectOneMenu value="#{workOrderMgrController.itemDetail.partsType}">

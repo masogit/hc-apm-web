@@ -52,4 +52,13 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
 
     @Query(value="select vb from V2_BlobObject vb where vb.boUuid in (?1)")
     List<V2_BlobObject> getPartPictures(Set<String> ids);
+
+    @Query(value="select o from V2_BlobObject o,AssetInfo a where o.boUuid=a.uid and o.boType='AssetInfo' and  (a.siteUID in (?1) or a.clinicalDeptUID in (?1)"
+            + " or a.institutionUID in (?1) or a.hospitalUID in (?1) or a.tenantUID in (?1) ) and o.boSubType like ?2  and o.boSubType not in('1') and o.objectName like ?3 and a.name like ?4 and a.functionType like ?5")
+    public Page<V2_BlobObject> loadDataForPageYunNan(List<String> siteUidList, String boSubType, String boName,String assetName,String functionType,Pageable pageable);
+
+    @Query(value="select o from V2_BlobObject o,AssetInfo a where o.boUuid=a.uid and o.boType='AssetInfo' and  (a.siteUID in (?1) or a.clinicalDeptUID in (?1)"
+            + " or a.institutionUID in (?1) or a.hospitalUID in (?1) or a.tenantUID in (?1) ) and o.boSubType like ?2 and o.boSubType not in('1') and o.objectName like ?3 and a.name like ?4 and (a.functionType like ?5 or a.functionType is null)")
+    public Page<V2_BlobObject> loadDataForPageForFunctionTypeYunNan(List<String> siteUidList, String boSubType, String boName,String assetName,String functionType,Pageable pageable);
+
 }

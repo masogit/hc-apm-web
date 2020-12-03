@@ -43,10 +43,27 @@
 
                         <p:column headerText="#{msg.mainDirectory}" filterBy="#{item.mainDirectory}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.mainDirectory}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu value="#{zkbFileAttachmentController.mainDirectory}" onchange="PF('varDataList').filter()" >
+                                    <p:ajax update="fileSecondDirectoryList"/>
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <c:forEach items="#{zkbFileAttachmentController.findMainDirectory()}" var="v">
+                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                    </c:forEach>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
 
                         <p:column headerText="#{msg.secondDirectory}" filterBy="#{item.secondDirectory}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.secondDirectory}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu id="fileSecondDirectoryList"  onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <c:forEach items="#{zkbFileAttachmentController.getSubZkbFileDirectoryListByMainDirectory()}" var="v">
+                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                    </c:forEach>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
 
                         <p:column headerText="#{msg.name}" filterBy="#{item.objectName}" filterMatchMode="LIKE">

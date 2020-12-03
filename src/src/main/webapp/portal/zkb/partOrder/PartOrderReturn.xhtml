@@ -30,6 +30,13 @@
                         <f:selectItems value="#{zkbPartOrderAuditController.returnTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
+                <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}">
+                    <label class="label">Order#*</label>
+                    <p:selectOneMenu id="orderNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.orderNo}" required="true" requiredMessage="Order#不能为空" >
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{zkbPartOrderAuditController.orderNoList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
                 <h:panelGrid id="returnTypeGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" style="text-align: left">
                     <h:panelGroup rendered="#{(zkbPartOrderAuditController.zkbPartOrderReturn.returnType eq 'DOA')}" style="text-align: left">
                         <label class="label">Part Serial Number*</label>
