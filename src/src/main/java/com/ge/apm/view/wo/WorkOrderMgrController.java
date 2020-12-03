@@ -205,6 +205,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             aimService = WebUtil.getBean(AssetInfoMgrService.class);
             mvsAssetInfoRepository = WebUtil.getBean(MvsAssetInfoRepository.class);
             userOrgInfoRepository = WebUtil.getBean(UserOrgInfoRepository.class);
+            //orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
             token = UserContextService.getAccessToken();
             dao = WebUtil.getBean(V2_WorkOrderRepository.class);
             userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -312,6 +313,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         currentQuantity = 0;
         itemDetail.setParts(null);
         itemDetail.setPartsPrice(null);
+        itemDetail.setClosedPrice(null);
         if (itemDetail != null) {
             String partsType = itemDetail.getPartsType();
             if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
@@ -333,6 +335,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             itemDetail.setParts(partsItem.getName());
             SimplePartsItemValue partsItemValue = partsRequestService.getInventoryNumAndAvgPriceByPartsItem(partsItem.getId(),null).get();
             itemDetail.setPartsPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
+            itemDetail.setClosedPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
             itemDetail.setCurrentQuantity(partsItemValue.getInStockNum());
             itemDetail.setPartsItemId(partsItem.getId());
         }
@@ -1408,11 +1411,16 @@ public void test1(){
     }
 
     private void onSelectedAsset(AssetInfo asset) {
-            //报修时，无论资产是否有位置，都不看直接取当前登录人所在科室或院区代入到报修界面
-            final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-            String lName = orgDao.getByUid(orgInfoUID).getName();
-            asset.setLocationName(lName);
-            locationName = lName;
+        String lName ="";
+        final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+        OrgInfo org = orgDao.findByUid(orgInfoUID);
+        if(org.getOrgType()==4){
+             lName = org.getName();
+        }else{
+            lName= asset.getClinicalDeptName();
+        }
+        asset.setLocationName(lName);
+        locationName = lName;
     }
 
     @Override

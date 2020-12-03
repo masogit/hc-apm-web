@@ -1,14 +1,12 @@
 package com.ge.apm.view.measuring;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.MeasuringCertificateDetailRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.MeasureOrderActionForm;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -19,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -31,9 +30,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -64,6 +61,9 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     private OrgInfoTreeService orgInfoTreeService;
 
+    private int currentMonthCount = 0;
+    private int nextMonthCount = 0;
+
     @Override
     protected void init() {
 
@@ -79,6 +79,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
         attachements = new ArrayList<>();
 
+        totalMeasureExpireMonths();
     }
 
     @Override
@@ -156,9 +157,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
                 searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
             }
         }
-
         return dao.findBySearchFilter(searchFilters, pageRequest);
-
         /*Specification<AssetInfo> specification=new Specification<AssetInfo>() {
             @Override
             public Predicate toPredicate(Root<AssetInfo> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -280,4 +279,113 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         this.currentUser = currentUser;
     }
 
+    public void totalMeasureExpireMonths() {
+        List<SearchFilter> searchFilters = this.searchFilters;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+            this.searchFilters = searchFilters;
+        }
+
+        if (!this.hasFilterOnField("siteUID")) {
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
+
+        if(!this.hasFilterOnField("status")){
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4, "1*"));
+        }
+
+        if(!this.hasFilterOnField("isValid")){
+            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE, "1*"));
+        }
+
+        if(!this.hasFilterOnField("isDeleted")){
+            searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE, "1*"));
+        }
+
+        if(!this.hasFilterOnField("measureGrade")){
+            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*3+"));
+            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*3+"));
+        }else{
+            boolean hasNullMeasureGrade = false;
+            Integer measureGradeValue = null;
+            for (SearchFilter sf : this.searchFilters) {
+                //判断是否有计量等级的过滤条件
+                if(sf.fieldName.equals("measureGrade")){
+                    if(sf.value == null){
+                        hasNullMeasureGrade = true;
+                    }else {
+                        measureGradeValue = Integer.valueOf(sf.value.toString());
+                    }
+                }
+            }
+
+            //判断计量等级过滤条件是否为空
+            if(hasNullMeasureGrade){
+                this.removeFilterOnField("measureGrade");
+                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*3+"));
+                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*3+"));
+            }else {
+                this.updateSearchFilter(new SearchFilter("measureGrade", SearchFilter.Operator.EQ, measureGradeValue, "1*"));
+            }
+        }
+
+        if(null != fileterOrg){
+            if (selectedNode.isLeaf()) {
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
+            } else {
+                List<OrgInfo> allClinicals = orgInfoTreeService.collectChildClinicalDeptByParent(selectedNode);
+                List<String> clinicalUids = allClinicals.stream().map(OrgInfo::getUid).collect(Collectors.toList());
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalUids, "1*"));
+            }
+
+        }else{
+            if(this.hasFilterOnField("clinicalDeptUID")){
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+            }
+        }
+
+        searchFilters.add(new SearchFilter("nextMeteringDate", SearchFilter.Operator.IsNotNull, null, "1*"));
+
+        List<AssetInfo> assetInfoList = dao.findBySearchFilter(searchFilters);
+        if(assetInfoList == null || assetInfoList.isEmpty()){
+            return;
+        }
+
+        Date currentDate = new Date();
+        Map<String,Integer> totalMonthMap = new HashMap<>();
+        //统计计量到期本月、下月总台数
+        for(AssetInfo assetInfoTemp:assetInfoList){
+            Date nextMeteringDate = assetInfoTemp.getNextMeteringDate();
+            if(DateUtil.isSameMonth(currentDate,nextMeteringDate)){
+                currentMonthCount = currentMonthCount + 1;//统计本月总台数
+            }else if(DateUtil.isSameMonth(DateUtil.addMonth(currentDate,1),nextMeteringDate)){
+                nextMonthCount = nextMonthCount + 1;//统计下个月总台数
+            }
+        }
+
+        this.searchFilters.removeAll(searchFilters);
+    }
+
+    public int getCurrentMonthCount() {
+        return currentMonthCount;
+    }
+
+    public void setCurrentMonthCount(int currentMonthCount) {
+        this.currentMonthCount = currentMonthCount;
+    }
+
+    public int getNextMonthCount() {
+        return nextMonthCount;
+    }
+
+    public void setNextMonthCount(int nextMonthCount) {
+        this.nextMonthCount = nextMonthCount;
+    }
 }

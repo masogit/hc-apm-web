@@ -107,7 +107,7 @@
                                  selectionMode="single" scrollable="false" selection="#{assetInfoListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" 
                                  rowStyleClass="#{item.warrantyAlertStatus}"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.namePyCode}"
+                                 rowKey="#{item.id}" sortMode="single"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -169,6 +169,18 @@
                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                             <p:ajax listener="#{assetInfoListController.assetGroupChangeListener}" update="@(.assetGroupChange)" />
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'assetClass'}">
+                                <p:column  headerText="#{msg.assetClass}" sortBy="#{item.assetClass}" filterBy="#{item.assetClass}" filterMatchMode="EQ">
+                                    <h:outputText value="#{fieldMsg.fieldValue('assetClass',item.assetClass)}"/>
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="300" value="#{assetInfoListController.assetClass}">
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetClass')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <p:ajax listener="#{assetInfoListController.assetClassChangeListener}" update="@(.assetGroupChange)" />
                                         </p:selectOneMenu>
                                     </f:facet>
                                 </p:column>
@@ -246,6 +258,17 @@
                                         </p:selectOneMenu>
                                     </f:facet>
                                     <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'oneQrCodeStatus'}">
+                                <p:column headerText="#{msg.oneQrCodeStatus}" sortBy="#{item.qrCodeLib.status}" filterBy="#{item.oneQrCodeStatus}" filterMatchMode="EQ" rendered="#{!assetInfoListController.terminate}">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.oneQrCodeStatus}" >
+                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('qrCodeLibStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{fieldMsg.fieldValue('qrCodeLibStatus',item.oneQrCodeStatus)}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'warrantyDate'}">
@@ -650,6 +673,7 @@
                             </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}"/>
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoListController.exportExcel}" update=":growl"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >

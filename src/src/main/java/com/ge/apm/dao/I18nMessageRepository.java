@@ -56,4 +56,6 @@ public interface I18nMessageRepository extends GenericRepository<I18nMessage> {
 
     @Query(value = "select i18n.value_zh from I18n_Message i18n where msg_type=?1 and msg_key = ?2",nativeQuery = true)
     public String getByTypeAndKey(String msgType, String msgKey);
+
+    public List<I18nMessage> getByMsgTypeOrderByMsgKey(String msgType);
 }

@@ -40,16 +40,20 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     private boolean acShow = false;
     private boolean isShow = false;
+    private boolean isShjyDept = false;
 
     private String orgName;
     private String orgNameEn;
     private String retrieval;
     private UserAccount loginUser;
     private String hospitalUcmid;
+    private Integer status;
 
     private UserCommonService userCommonService;
 
     private OrgInfo currentOrg;
+
+    private static final Integer SHANGHAIJIUYUAN_SITEID = 112;
 
     @Override
     protected void init() {
@@ -327,6 +331,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         selected.setName(name);
         selected.setNameEn(orgNameEn);
         selected.setHospitalUcmid(hospitalUcmid);
+        selected.setStatus(status);
         //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
 
@@ -544,6 +549,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         orgName = selected.getShortName();
         orgNameEn = selected.getNameEn();
         hospitalUcmid = selected.getHospitalUcmid();
+        status = selected.getStatus();
         if (selected != null) {
             isShow = selected.getOrgType() == 2;
             acShow = selected.getOrgType() == 4;
@@ -566,6 +572,14 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
             }
         }
 
+        return false;
+    }
+
+    public boolean getIsShjyDept() {
+        //判断是否是九院科室
+        if (selected.getSiteId().equals(SHANGHAIJIUYUAN_SITEID)&&selected.getOrgType().equals(4)){
+            return true;
+        }
         return false;
     }
 
@@ -639,5 +653,21 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void setRetrieval(String retrieval) {
         this.retrieval = retrieval;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public boolean isShjyDept() {
+        return isShjyDept;
+    }
+
+    public void setShjyDept(boolean shjyDept) {
+        isShjyDept = shjyDept;
     }
 }
