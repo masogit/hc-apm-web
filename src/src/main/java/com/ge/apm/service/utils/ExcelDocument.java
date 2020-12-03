@@ -129,6 +129,10 @@ public class ExcelDocument implements AutoCloseable{
         if (row == null) {
             return false;
         }
+        Cell cell = row.getCell(1);
+        if (cell == null || StringUtils.isEmpty(cell.getStringCellValue())) {
+            return false;
+        }
         return true;
     }
 
