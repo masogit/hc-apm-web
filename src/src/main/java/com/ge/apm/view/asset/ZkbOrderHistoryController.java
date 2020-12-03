@@ -169,8 +169,8 @@ public class ZkbOrderHistoryController extends GenericCRUDUUIDController<ZkbOrde
         try {
             doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
             int maxRowNum = ZkbOrderHistoryService.EXCEL_ORDER_HISTORY_HEADER_ROW + ZkbOrderHistoryService.EXCEL_ORDER_HISTORY_IMPORT_MAX_ROW;
-            if(doc.exceedMaxRowNum(ZkbOrderHistoryService.SHEET_SERVICE_ORDER_HISTORY, maxRowNum)){
-                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
+            if(doc.checkMaxRowNumIsFull(ZkbOrderHistoryService.SHEET_SERVICE_ORDER_HISTORY, maxRowNum)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel10000"));
                 return;
             }
             List<Map<String, Object>> importDirectoryMapList = zkbOrderHistoryService.getOrderHistoryMapFromTemplate(doc);
