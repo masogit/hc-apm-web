@@ -409,6 +409,11 @@ public class UserContextService implements Serializable {
 
     WorkflowConfigRepository wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
 
+    /**
+     * 获取智康宝用户
+     */
+    ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+
     private Boolean flagIsHospitalUser = null;
     public boolean isHospitalUser(){
         if(flagIsHospitalUser!=null) return flagIsHospitalUser;
@@ -891,6 +896,23 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    public boolean isGeAdmin() {
+        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfig = this.zkbPartOrderUserConfigRepository.findByConfigType("ClosePending");
+        if(CollectionUtils.isEmpty(zkbPartOrderUserConfig))
+        {
+            return false;
+        }
+        Map<String, String> zkbPartOrderUserConfigMap = zkbPartOrderUserConfig.stream().filter(partOrderUserConfig -> partOrderUserConfig.getLoginName()!=null).collect(
+                Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getLoginName()))),
+                        ArrayList::new)).stream().collect(Collectors.toMap(ZkbPartOrderUserConfig::getLoginName,ZkbPartOrderUserConfig::getLoginName));
+        UserAccount user = getLoginUser();
+        if(zkbPartOrderUserConfigMap.containsKey(user.getLoginName()))
+        {
+          return true;
+        }
+        return false;
+    }
+
     public boolean isZtbTenant() {
         TenantInfo tenantInfo = getTenantInfo();
         if(tenantInfo.getType() != null && tenantInfo.getType() == 4){
@@ -1131,4 +1153,27 @@ public class UserContextService implements Serializable {
 
     }
 
+    /**
+     * 验证租户名称
+     * @param tenantName 非必填，如不填将默认验证指定的租户名称
+     * @return
+     */
+    public static Boolean hasCurrentTenantName(String tenantName){
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        TenantInfo currentTenantInfo = userContextService.getTenantInfo();
+        if(currentTenantInfo == null){
+            return Boolean.FALSE;
+        }
+        if(StringUtils.isBlank(tenantName)){
+            //tenantName为空则验证下面租户
+            if("云南省阜外心血管病医院".equals(currentTenantInfo.getName().trim())){
+                return Boolean.TRUE;
+            }
+        }else{
+            if(tenantName.equals(currentTenantInfo.getName().trim())){
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
 }

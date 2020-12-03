@@ -37,7 +37,7 @@
                                         <p:overlayPanel widgetVar="varPanelOrgFilter" for="btnOrgFilter" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
 
                                             <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                                <p:tree class="tree" style="width:98%;border:0;" value="#{tenantOrgTreeController.tenantOrgTree}" var="node" selectionMode="single">
+                                                <p:tree class="tree" style="width:98%;border:0;" value="#{tenantOrgTreeController.tenantOrgTreeOther}" var="node" selectionMode="single">
                                                     <p:ajax process="@this" event="select" update="@(.siteFilterChange) @(.pickList)"
                                                             listener="#{assetInfoBulkEditController.onSelectTreeNodeAsFilter}" oncomplete="PF('varPanelOrgFilter').hide();"/>
                                                     <p:ajax process="@this" event="expand"/>

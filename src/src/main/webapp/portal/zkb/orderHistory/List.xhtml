@@ -57,7 +57,10 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.zkbHistory_contractType}</label>
-                                <p:inputText id="contractType" value="#{zkbOrderHistoryController.contractType}" />
+                                <p:selectOneMenu id="contractType" value="#{zkbOrderHistoryController.contractType}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbHistory_contractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
                             </h:panelGroup>
                         </p:panelGrid>
 <!--                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
@@ -147,7 +150,7 @@
                         <p:column width="150" headerText="#{msg.zkbHistory_sparePartsNo}" >
                             <h:outputText value="#{item.sparePartsNo}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbHistory_sparePartsPrice}" >
+                        <p:column width="150" rendered="#{userContextService.zkbAdmin}" headerText="#{msg.zkbHistory_sparePartsPrice}" >
                             <h:outputText value="#{item.sparePartsPrice}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbHistory_description}" >
