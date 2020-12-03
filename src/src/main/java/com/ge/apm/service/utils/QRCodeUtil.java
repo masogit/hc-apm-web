@@ -11,6 +11,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -62,7 +63,7 @@ public class QRCodeUtil {
         }
     }
 
-    private static BufferedImage createImage(String content, String imgPath, boolean needCompress) throws Exception {
+    public static BufferedImage createImage(String content, String imgPath, boolean needCompress) throws Exception {
         Map<EncodeHintType, Object> hints = new HashMap();
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
         hints.put(EncodeHintType.CHARACTER_SET, CHARSET);
@@ -186,11 +187,12 @@ public class QRCodeUtil {
     }
 
     public static void main(String[] args) throws Exception {
-        batchCode();
-        String logoFile = "c:/Temp/logo2.jpg";//GE logo
-        String backGroundPath = "c:/Temp/background.png";//图片背景
-        String prefix = "http://apm.gehealthcloud.cn/r/"; //nCnx6dbEDItzrZKK93yO 公众号
-        String text = "1703307223655922";//qrCode
+        //batchCode();
+        insertSql();
+//        String logoFile = "c:/Temp/logo.jpg";//GE logo
+//        String backGroundPath = "c:/Temp/background.png";//图片背景
+//        String prefix = "http://weixin.qq.com/r/nCnx6dbEDItzrZKK93yO"; //nCnx6dbEDItzrZKK93yO 公众号
+//        String text = "1703307223655922";//qrCode
 //		QRCodeUtil.encode(text, logoFile, "c:/Temp", true);
 
         //    批量生成
@@ -200,11 +202,40 @@ public class QRCodeUtil {
 //            System.out.println(item);
 //            qrCodeBatchJob(srcFolder + File.separator + item, logoFile, backGroundPath, prefix,1000);
 //        }
-        BufferedImage image = QRCodeUtil.createImage(prefix + "1703307223655922", logoFile, true);
-        //BufferedImage img = addBackground(backGroundPath, image, 472, "1703307223655922");
-        ImageIO.write(image, FORMAT_NAME, new File("c:/Temp/" + text + ".jpg"));
+//        BufferedImage image = QRCodeUtil.createImage(prefix + "1703307223655922", logoFile, true);
+//        BufferedImage img = addBackground(backGroundPath, image, 472, "1703307223655922");
+//        ImageIO.write(img, FORMAT_NAME, new File("c:/Temp/" + text + ".jpg"));
 //        
 //        
+    }
+
+    public static void insertSql() throws Exception{
+        String fileName = "c:/Temp/qrCode_lib.sql";
+
+        BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
+        String srcFolder = "c:/Temp/qrCode-lib";
+        String[] files = new File(srcFolder).list();
+        for (String item : files) {
+            String qrCode = StringUtils.substringBeforeLast(item,".jpg");
+            Integer id = Integer.parseInt(StringUtils.substring(qrCode,5,qrCode.length()));
+            String uid = UUID.randomUUID().toString().replace("-", "");
+            StringBuffer sbf = new StringBuffer("INSERT INTO \"public\".\"qr_code_lib\"(\"id\",\"qr_code\", \"issue_date\", \"status\", " +
+                    "\"uid\", \"tenant_uid\", \"institution_uid\", \"hospital_uid\", \"site_uid\", \"type\") VALUES (");
+            sbf.append(id).append(",");
+            sbf.append("'").append(qrCode).append("',");
+            sbf.append("'").append("2020-10-26").append("',");
+            sbf.append(1).append(",");
+            sbf.append("'").append(uid).append("',");
+            sbf.append("'").append("26acd70242fd42f8b807cfcbf24a1877").append("',");
+            sbf.append("'").append("ba2439b62edf40dfaca0fdfd7a222ceb").append("',");
+            sbf.append("'").append("ba2439b62edf40dfaca0fdfd7a222ceb").append("',");
+            sbf.append("'").append("ba2439b62edf40dfaca0fdfd7a222ceb").append("',");
+            sbf.append(1).append(");");
+            System.out.println(sbf.toString());
+            out.write(sbf.toString());
+            out.newLine();
+        }
+        out.close();
     }
 
     public static void batchCode(){
@@ -212,10 +243,10 @@ public class QRCodeUtil {
         String prefix = "http://apm.gehealthcloud.cn/r/"; //nCnx6dbEDItzrZKK93yO 公众号
         String qrCodeFix = "202010";
 
-        int cycleTimes = 100;
+        int cycleTimes = 1000;
         int numLength = 10;
 
-        Stream.iterate(1000080000, item->item+1).limit(cycleTimes).map(item -> String.valueOf(item)).map(item -> {
+        Stream.iterate(1000080600, item->item+1).limit(cycleTimes).map(item -> String.valueOf(item)).map(item -> {
             while(item.length() < numLength) {
                 item = "0" + item;
             }
@@ -224,7 +255,7 @@ public class QRCodeUtil {
             try {
                 String qrCode = qrCodeFix + x;
                 BufferedImage image = QRCodeUtil.createImage(prefix + x, logoFile, true);
-                ImageIO.write(image, FORMAT_NAME, new File("c:/Temp/100/" + qrCode + ".jpg"));
+                ImageIO.write(image, FORMAT_NAME, new File("c:/Temp/1000/" + qrCode + ".jpg"));
             } catch (Exception e) {
                 e.printStackTrace();
             }

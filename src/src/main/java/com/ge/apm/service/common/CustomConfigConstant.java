@@ -160,13 +160,16 @@ public class CustomConfigConstant {
             allFields.put("connectToInsite", WebUtil.getMessage("connectToInsite"));
             allFields.put("createdBy", WebUtil.getMessage("createdBy"));
             allFields.put("assetClass", WebUtil.getMessage("assetClass"));
+         allFields.put("oneQrCode", WebUtil.getMessage("oneQrCode"));
+         allFields.put("oneQrCodeStatus", WebUtil.getMessage("oneQrCodeStatus"));
+         allFields.put("installStatus", WebUtil.getMessage("installStatus"));
 //        }
         return allFields;
     }
 
     public static List<String> getAssetsListPageFields() {
         return Arrays.asList("name", "functionType", "serialNum", "departNum", "assetGroup",
-                "clinicalDeptName", "manufacture", "vendor", "status", "warrantyDate", "financingNum", "qrCode");
+                "clinicalDeptName", "manufacture", "vendor", "status", "warrantyDate", "financingNum", "qrCode", "qrCode","oneQrCodeStatus");
     }
 
     public static List<String> getAssetsDetailpageBasicFields() {

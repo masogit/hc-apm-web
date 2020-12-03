@@ -115,14 +115,14 @@ public class SimplePartsRequestLineItemService {
     public synchronized void stockInOrOutParts(SimplePartsRequestLineItem partsRequestLineItem) throws SimplePartsInventoryNotEnoughException {
 
         SimplePartsRequest partsRequest = partsRequestRepository.findById(partsRequestLineItem.getPartsRequestId());
-
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         //处理交易记录
         SimplePartsTransaction partsTransaction = new SimplePartsTransaction();
         partsTransaction.setSourcSupplier(partsRequestLineItem.getPartsSupplier());
         partsTransaction.setRequestCode(partsRequestLineItem.getRequestCode());
         partsTransaction.setPartsRequestId(partsRequestLineItem.getPartsRequestId());
         partsTransaction.setPartsRequestLineItemId(partsRequestLineItem.getId());
-        partsTransaction.setCreatedBy(partsRequestLineItem.getCreatedBy());
+        partsTransaction.setCreatedBy(currentUserAccount.getLoginName());
         partsTransaction.setCreatedDate(new Date());
         partsTransaction.setTransactionQty(partsRequestLineItem.getNotTransactionQty());
         partsTransaction.setPartsItemId(partsRequestLineItem.getPartsItemId());
