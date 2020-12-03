@@ -121,6 +121,17 @@ public class ExcelDocument implements AutoCloseable{
 
     }
 
+    public boolean checkMaxRowNumIsFull(String sheetName, int maxRowNum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+
+        Row row = sheet.getRow(maxRowNum);
+
+        if (row == null) {
+            return false;
+        }
+        return true;
+    }
+
     public String[] getKeyRow(String sheetName, int keyRowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
         return getKeyRow(sheet, keyRowNum);
