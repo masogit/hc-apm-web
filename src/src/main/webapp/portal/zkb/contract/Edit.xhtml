@@ -208,7 +208,10 @@
                         <p:dataTable id="zkbContractAssetDatalist" value="#{zkbContractEditController.zkbContractAssetList}" var="zkbContractAssetItem"
                                      widgetVar="zkbContractAssetDatalist" selectionMode="single" selection="#{zkbContractEditController.zkbContractAssetSelected}"
                                      lazy="false" paginator="true" rowKey="#{zkbContractAssetItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{zkbContractAssetItem.contractId}"
-                                     paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     paginatorPosition="both" paginatorAlwaysVisible="true"
+                                     rowsPerPageTemplate="20,50,100,500">
 
                             <p:ajax event="rowSelect" update=":zkbContractEditForm:zkbContractAssetDatalist:deleteAssetButton"/>
                             <p:column headerText="二维码">

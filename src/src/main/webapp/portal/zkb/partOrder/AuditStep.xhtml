@@ -40,7 +40,7 @@
                         <p:inputText  value="#{zkbPartOrderAuditController.selected.assetInfo.systemId}" disabled="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">工单号</label>
+                        <label class="label">报修单号</label>
                         <p:inputText  value="#{zkbPartOrderAuditController.selected.srNum}" disabled="true"/>
                     </h:panelGroup>
                 </p:panelGrid>
@@ -57,7 +57,7 @@
                     <p:column headerText="sys ID">
                         <h:outputText value="#{item.systemId}"/>
                     </p:column>
-                    <p:column headerText="工单编号">
+                    <p:column headerText="报修单号">
                         <h:outputText value="#{item.srNum}"/>
                     </p:column>
                     <f:facet name="{Toolbar}">
@@ -702,7 +702,7 @@
                             </h:panelGroup>
                         </h:panelGroup>
 
-                        <h:panelGroup>
+                        <h:panelGroup rendered="false">
                             <label class="label">归还数量*</label>
                             <p:inputText id="returnQty" value="#{zkbPartOrderAuditController.selected.returnQty}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" />
                         </h:panelGroup>
