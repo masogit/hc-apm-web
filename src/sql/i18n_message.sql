@@ -2315,6 +2315,7 @@
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','ExportAllContractLists','合同列表全部导出','Export All Contract Lists',NULL,	-1	);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','SelectAndExportContractList','合同列表选择导出','Select and Export Contract List',NULL,	-1	);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MaximumFiveThDataLinesInTheExcel', '导入Excel中数据行数最多5000条，请分批导入！', 'Import into a maximum of 5000 data lines in the Excel, please import in batches', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MaximumFiveThDataLinesInTheExcel10000', '导入Excel中数据行数最多10000条，请分批导入！', 'Import into a maximum of 10000 data lines in the Excel, please import in batches', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ImportCompletedNoteFailureRecord', '导入完成，注意有导入失败的记录！', 'Import completed, Please note a record of import failure!', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ThereAreATotalOf', '总共有', 'There are a total of', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'RecordsOfFailure', '条记录处理失败', 'records of processing failure!', NULL, '-1');
@@ -3572,7 +3573,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_probeType','探头类型','探头类型',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_useStatus','是否使用名额Y/N','是否使用名额Y/N',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_callNo','CallNo','CallNo',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_rowner','Srowner','Srowner',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_rowner','SR Owner','SR Owner',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_ownerName','owner name','owner name',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_status','SR Status','SR Status',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbHistory_ErrorDataTypeIsEmpty', '错误：数据类型为空', 'Error: data type is empty', NULL, '-1');

@@ -49,7 +49,7 @@ public class ZkbOrderHistoryService {
     /**
      * 最大导入行数
      */
-    public static final int EXCEL_ORDER_HISTORY_IMPORT_MAX_ROW = 5000;
+    public static final int EXCEL_ORDER_HISTORY_IMPORT_MAX_ROW = 10000;
 
     /**
      * 模板数据起始行数
@@ -257,29 +257,29 @@ public class ZkbOrderHistoryService {
               }
         }
         //代理商字段是否为空
-        boolean isEmptyOfAgent = false;
+//        boolean isEmptyOfAgent = false;
         if(StringUtils.isBlank(orderHistoryVO.getAgent()))
         {
             item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorDataAgentIsEmpty"));
             isValidateData = false;
             //代理商字段为空
-            isEmptyOfAgent = true;
+//            isEmptyOfAgent = true;
         }
-        if(!isEmptyOfAgent)
-        {
-            List<TenantInfo> tenantInfoList = this.tenantInfoRepository.findByNameAndType(orderHistoryVO.getAgent(),ZkbOrderHistoryService.zkbTenantType);
-            if(CollectionUtils.isNotEmpty(tenantInfoList))
-            {
-                String tenantUid = tenantInfoList.get(0).getUid();
-                orderHistoryVO.setTenantUid(tenantUid);
-            }else
-                {
-                    item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
-                    AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorAgent"));
-                    isValidateData = false;
-                }
-        }
+//        if(!isEmptyOfAgent)
+//        {
+//            List<TenantInfo> tenantInfoList = this.tenantInfoRepository.findByNameAndType(orderHistoryVO.getAgent(),ZkbOrderHistoryService.zkbTenantType);
+//            if(CollectionUtils.isNotEmpty(tenantInfoList))
+//            {
+//                String tenantUid = tenantInfoList.get(0).getUid();
+//                orderHistoryVO.setTenantUid(tenantUid);
+//            }else
+//                {
+//                    item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+//                    AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_ErrorAgent"));
+//                    isValidateData = false;
+//                }
+//        }
         return isValidateData;
     }
 
