@@ -115,6 +115,7 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("备件+人工+保养总额", "setSpareArtificailTotal");
             contractRow.setFieldNumValue("备件+人工+保养剩余名额", "setSpareArtificail");
             contractRow.setFieldNumValue("备件+人工+保养已使用名额", "setSpareArtificailUse");
+            contractRow.setFieldNumValue("备注", "setRemark");
 
             if(contractInfoVO.isNull()){
                 break;

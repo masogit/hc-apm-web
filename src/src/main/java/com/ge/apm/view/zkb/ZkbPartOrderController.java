@@ -79,19 +79,22 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             if(zkbPartOrderUserConfigList != null && zkbPartOrderUserConfigList.size() >0){
                 ZkbPartOrderUserConfig zkbPartOrderUserConfig = zkbPartOrderUserConfigList.get(0);
                 if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) ||
-                    ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())
-                ){
+                    ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
                     showStatusBtn =false;
                 }
                 if(zkbPartOrderUserConfigList.size() == 2){
                     isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? "f" : zkbPartOrderUserConfig.getIsVacation();
                     vacationBtn = true;
+                }else if(zkbPartOrderUserConfigList.size() == 1){
+                    if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) && ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrderUserConfig.getOrderType())){
+                        isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? "f" : zkbPartOrderUserConfig.getIsVacation();
+                        vacationBtn = true;
+                    }
                 }
             }
         }
 
         tenantInfoList = zkbPartOrderService.getSourceTenantInfoList();
-
     }
 
 
