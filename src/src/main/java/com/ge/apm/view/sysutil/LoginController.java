@@ -62,7 +62,7 @@ public class LoginController extends LoginService {
             if(user != null) {
                 TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
                 if(tenantInfo != null && tenantInfo.getType() != null && tenantInfo.getType() != 3){
-                    WebUtil.addErrorMessage("此手机号非智康保用户!");
+                    WebUtil.addErrorMessage("此手机号非智康宝用户!");
                     return;
                 }
                 //发送手机验证码
