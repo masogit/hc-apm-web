@@ -476,7 +476,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         flag = false;
                         errorLog += "配件号不能为空,";
                     }
-                    Optional.ofNullable(zkbPartOrderItem.getPartNo()).ifPresent(zkbPartOrderItem :: setOrderNo);
                     if(StringUtils.isEmpty(zkbPartOrderItem.getPartName())){
                         flag = false;
                         errorLog += "配件名称不能为空,";
