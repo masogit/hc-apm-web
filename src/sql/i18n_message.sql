@@ -902,6 +902,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','dispatchUserName','派工人','Dispatcher',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','timeoutDispatch','派工超时时间(分钟)','Dispatch Timeout (Minutes)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','timeoutAccept','接单超时时间(分钟)','Accept Timeout (Minutes)',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','timeoutAcceptance','验收超时时间(分钟)','Acceptance Timeout (Minutes)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','timeoutRepair','维修超时时间(分钟)','Repair Timeout (Minutes)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','timeoutClose','关单超时时间(分钟)','Close Timeout (Minutes)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','orderReopenTimeframe','二次开单间隔(天)','Order Reopen Time Frame (Days)',NULL,-1);
