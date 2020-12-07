@@ -171,18 +171,33 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
-            ZkbContractAsset zkbContractAsset = contractAssetList.get(0);
-            String contractId = zkbContractAsset.getContractId();
-            ZkbContract zkbContract = zkbContractRepository.findById(contractId);
             Date now = new Date();
-            if(zkbContract !=null &&(now.getTime() >= getSomeDay(zkbContract.getEndDate(),"+").getTime() || now.getTime() <= getSomeDay(zkbContract.getStartDate(),"-").getTime())){
+            List<ZkbContract>  contractList =new ArrayList<>();
+            for(ZkbContractAsset zkbContractAsset : contractAssetList) {
+                String contractId = zkbContractAsset.getContractId();
+                ZkbContract zkbContract = zkbContractRepository.findById(contractId);
+                contractList.add(zkbContract);
+            }
+            Collections.sort(contractList, new Comparator<ZkbContract>() {
+                public int compare(ZkbContract arg0, ZkbContract arg1) {
+                    Date hits0 = arg0.getEndDate();
+                    Date hits1 = arg1.getEndDate();
+                    if (hits1.compareTo(hits0) > 0) {
+                        return 1;
+                    } else if (hits1.compareTo(hits0) == 0) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+            ZkbContract validZkbContract = contractList.get(0);
+            if(validZkbContract !=null &&(now.getTime() >= getSomeDay(validZkbContract.getEndDate(),"+").getTime() || now.getTime() <= getSomeDay(validZkbContract.getStartDate(),"-").getTime())){
                 WebUtil.addErrorMessageKey("对于智康宝设备，合同有效期内的设备才可以创建报修工单！");
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
-
         }
-
         if (this.selectedAsset == null) {
             WebUtil.addErrorMessageKey("noAssetSelected");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
