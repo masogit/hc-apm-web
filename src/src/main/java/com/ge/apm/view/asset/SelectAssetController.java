@@ -167,7 +167,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             //getzkb_contract
             List<ZkbContractAsset>  contractAssetList = zkbContractAssetRepository.findByAssetId(String.valueOf(selectedAsset.getUid()));
             if(CollectionUtils.isEmpty(contractAssetList)){
-                WebUtil.addErrorMessageKey("对于智康宝设备，设备有合同才可以创建报修工单！");
+                WebUtil.addErrorMessageKey("对于智康保设备，设备有合同才可以创建报修工单！");
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
@@ -193,7 +193,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             });
             ZkbContract validZkbContract = contractList.get(0);
             if(validZkbContract !=null &&(now.getTime() >= getSomeDay(validZkbContract.getEndDate(),"+").getTime() || now.getTime() <= getSomeDay(validZkbContract.getStartDate(),"-").getTime())){
-                WebUtil.addErrorMessageKey("对于智康宝设备，合同有效期内的设备才可以创建报修工单！");
+                WebUtil.addErrorMessageKey("对于智康保设备，合同有效期内的设备才可以创建报修工单！");
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }

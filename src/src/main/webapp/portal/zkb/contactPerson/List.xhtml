@@ -24,7 +24,7 @@
                                 <f:selectItem itemLabel="#{v.name}" itemValue="#{v.uid}"/>
                             </c:forEach>
                         </p:selectOneMenu>
-                        <p:outputLabel style="color: red" value="缺少“智康宝管理员”信息" rendered="#{not zkbContactPersonController.haveZKBAdmin}"/>
+                        <p:outputLabel style="color: red" value="缺少“智康保管理员”信息" rendered="#{not zkbContactPersonController.haveZKBAdmin}"/>
                         <p:outputLabel style="color: red" value="缺少“维修部经理”信息" rendered="#{not zkbContactPersonController.haveMaintenanceManager}"/>
                     </h:panelGrid>
 
