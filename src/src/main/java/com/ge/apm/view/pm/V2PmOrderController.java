@@ -821,8 +821,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         try {
             maintenanceReport = pmReportService.generate(selectedMap, isInsulate, user);
         } catch (BusinessException e) {
+            logger.error("downLoad pm_word BusinessException ",e);
             WebUtil.addErrorMessage(e.getMessage());
         } catch (Exception e) {
+            logger.error("downLoad pm_word Exception",e);
             Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
             WebUtil.addErrorMessage(WebUtil.getMessage("FailedToGenerateTheMaintenanceReport"));
         }
