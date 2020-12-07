@@ -171,6 +171,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
                 RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
                 return;
             }
+
             Date now = new Date();
             List<ZkbContract>  contractList =new ArrayList<>();
             for(ZkbContractAsset zkbContractAsset : contractAssetList) {
