@@ -3701,6 +3701,7 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','MSARecommendExcel','MSA方案推荐','MSA Recommend',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','PromotionActivityExcel','促销活动','Promotion Activity',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','CarePackageExcel','关爱包','Care Package',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','CoilOpportunityExcel','MR线圈','Coil Opportunity',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','GamePlanBatchFileImport','Game Plan数据导入','Game plan Batch Data Import',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','installStatus','装机状态','Install Status',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '0', '已装机', 'Installed', NULL, '-1');

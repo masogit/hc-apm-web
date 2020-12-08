@@ -69,7 +69,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     MicroServiceUtil microServiceUtil;
 
-    private List fileTypeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel");
+    private List fileTypeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel", "CoilOpportunityExcel");
 
     @Override
     protected void init() {

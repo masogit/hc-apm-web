@@ -30,7 +30,7 @@ import org.hibernate.annotations.Type;
 public class ImportFiles {
 
 
-    public enum ImportFileType {EEMonitorCSV, ColdHeaderExcel, PMScheduleExcel, PMResultExcel, UpTimeExcel, SrReportPdf, SrResetReport, SrExcel, UserAssetFeExcel, UserAssetOLEExcel, UserAssetSalesExcel,UserAccountSendMailExcel,AconnectPerformanceExcel,MSARecommendExcel,PromotionActivityExcel,CarePackageExcel}
+    public enum ImportFileType {EEMonitorCSV, ColdHeaderExcel, PMScheduleExcel, PMResultExcel, UpTimeExcel, SrReportPdf, SrResetReport, SrExcel, UserAssetFeExcel, UserAssetOLEExcel, UserAssetSalesExcel,UserAccountSendMailExcel,AconnectPerformanceExcel,MSARecommendExcel,PromotionActivityExcel,CarePackageExcel,CoilOpportunityExcel}
 
 
     public static final String STATUS_COMPLETED = "COMPLETED";
