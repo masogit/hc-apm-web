@@ -14,6 +14,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
@@ -248,11 +249,17 @@ public class AssetHistoryService {
     }
 
     private Optional<AssetHistory.AssetHistoryInfo> getSpecialFieldValue(String columnName, String oldName, String oldUID, String newName, String newUID) {
-        if (oldUID == null || newUID == null || oldUID.equals(newUID)) {
+
+        if (StringUtils.isEmpty(oldUID) && StringUtils.isEmpty(newUID)) {
             return Optional.empty();
         }
-        String pOldOrgName = orgDao.findParentNameByUid(oldUID);
-        String pNewOrgName = orgDao.findParentNameByUid(newUID);
+
+        if (StringUtils.hasLength(oldUID) && oldUID.equals(newUID)) {
+            return Optional.empty();
+        }
+
+        String pOldOrgName = this.findOrgInfoParentNameByUid(oldUID);
+        String pNewOrgName = this.findOrgInfoParentNameByUid(newUID);
 
         AssetHistory.AssetHistoryInfo assetHistoryInfo = new AssetHistory.AssetHistoryInfo();
         assetHistoryInfo.setColumnName(columnName);
@@ -261,6 +268,13 @@ public class AssetHistoryService {
         assetHistoryInfo.setNewColumnValue(StringUtil.joinNotEmpty("-", pNewOrgName, newName));
         assetHistoryInfo.setLabel(WebUtil.getMessage(columnName));
         return Optional.of(assetHistoryInfo);
+    }
+
+    private String findOrgInfoParentNameByUid(String uid) {
+        if (StringUtils.isEmpty(uid)) {
+            return null;
+        }
+       return orgDao.findParentNameByUid(uid);
     }
 
     public void saveAssetHistoryIfUpdated(AssetInfo oldAsset, AssetInfo newAsset, List<String> fieldNames) {
