@@ -1,9 +1,13 @@
 package com.ge.apm.domain;
 
+import com.ge.apm.service.zkb.ZkbPartOrderUserConfigService;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author : 503189362
@@ -95,7 +99,7 @@ public class ZkbPartOrderUserConfig implements Serializable {
     private String orderType;
 
     @Column(name = "is_vacation")
-    private String isVacation = "f";// 是否修改 t f
+    private String isVacation = "f";// 是否休假 t f
 
     public String getIsVacation() {
         return isVacation;
@@ -209,6 +213,23 @@ public class ZkbPartOrderUserConfig implements Serializable {
         this.assetType = assetType;
     }
 
+    public String getConfigTypeName()
+    {
+        Map<String, String> listI18nMessageMap =
+                ZkbPartOrderUserConfigService.listI18nMessage.stream().collect(Collectors.toMap(I18nMessage::getMsgKey,
+                        I18nMessage::getValueZh));
+        return listI18nMessageMap.get(this.configType);
+    }
+
+    public String getVacationText()
+    {
+        if("t".equals(this.isVacation))
+        {
+            return "是";
+        }else
+                return "否";
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -232,5 +253,21 @@ public class ZkbPartOrderUserConfig implements Serializable {
     @Override
     public String toString() {
         return "com.ge.apm.domain.ZkbPartOrderUserConfig[ id=" + id + " ]";
+    }
+    public boolean isNull() {
+        boolean flag = false;
+        if(StringUtils.isBlank(this.getLoginName())
+                &&StringUtils.isBlank(this.getName())
+                &&StringUtils.isBlank(this.getEmail())
+                &&StringUtils.isBlank(this.getPhone())
+                &&StringUtils.isBlank(this.getSso())
+                &&StringUtils.isBlank(this.getRegion())
+                &&StringUtils.isBlank(this.getConfigType())
+                &&StringUtils.isBlank(this.getAssetType())
+                &&StringUtils.isBlank(this.getRemark())
+                &&StringUtils.isBlank(this.getOrderType())){
+            flag = true;
+        }
+        return flag;
     }
 }

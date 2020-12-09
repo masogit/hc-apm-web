@@ -1,6 +1,8 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.TenantInfo;
+import org.apache.poi.ss.formula.functions.T;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepository;
 
@@ -37,4 +39,10 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
      * @return 返回租户列表
      */
     List<TenantInfo> findByType(Integer type);
+
+    TenantInfo findByUid(String uid);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "UPDATE tenant_info a SET qrcode_editable = ?1 WHERE a.uid = ?2")
+    void updateQrCodeEditable(boolean editable, String uid);
 }

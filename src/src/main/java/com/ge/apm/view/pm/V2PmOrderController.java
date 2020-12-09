@@ -599,7 +599,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         currentQuantity = 0;
         itemDetail.setParts(null);
         itemDetail.setPartsPrice(null);
-        itemDetail.setPartsPrice(null);
+        itemDetail.setClosedPrice(null);
         if (itemDetail != null) {
             String partsType = itemDetail.getPartsType();
             if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
@@ -635,6 +635,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             itemDetail.setParts(partsItem.getName());
             SimplePartsItemValue partsItemValue = partsRequestService.getInventoryNumAndAvgPriceByPartsItem(partsItem.getId(),null).get();
             itemDetail.setPartsPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
+            itemDetail.setClosedPrice(partsItemValue.getEstimatedUnitPrice().doubleValue());
             itemDetail.setCurrentQuantity(partsItemValue.getInStockNum());
             itemDetail.setPartsItemId(partsItem.getId());
         }
@@ -687,9 +688,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void partsPriceUpdate() {
-        if (itemDetail.getClosedPrice() == null || itemDetail.getClosedPrice() == 0.0) {
-            itemDetail.setClosedPrice(itemDetail.getPartsPrice());
-        }
+       itemDetail.setClosedPrice(itemDetail.getPartsPrice());
     }
 
     public void closePrcieUpdate() {
@@ -1768,6 +1767,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             pmIdList= new ArrayList<>();
 
         }
+        if(selectedMap.size() > 0){
+            selectedMap = new HashMap();
+        }
         return result;
     }
 
@@ -2214,6 +2216,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
     public void prepareEditAccDetail(String itemId) throws Exception{
+        statusFlag = WorkOrderConstant.STATUS_FLAG_OTHER;
         Object eval;
         if ("new".equals(itemId)) {
             switchTmp=true;

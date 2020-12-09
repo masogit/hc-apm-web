@@ -126,6 +126,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     @Setter
     @Getter
     private boolean isStatus;
+    private boolean isStatusAssetHistory;
     @Getter
     @Setter
     private List<V2_BlobObject> pictureList;
@@ -142,7 +143,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     AssetLifecyleService assetLifecyleService;
     private String qr_Code = null;
     private String siteUid = null;
-
+    //如果无图片 就显示请上传图片
+    private boolean uploadFlag;
+    @Getter
+    private String uploadUrl = "/portal/uploadPic.png";
     @Getter
     private List<JSONObject> changeHistoryList = new ArrayList<>();
 
@@ -226,6 +230,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
 
         if ("Create".equalsIgnoreCase(actionName)) {
+            isStatusAssetHistory = false;
             try {
                 prepareCreate();
                 selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
@@ -235,6 +240,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 Logger.getLogger(AssetInfoEditController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else if ("Edit".equalsIgnoreCase(actionName)) {
+            isStatusAssetHistory = true;
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             setSelected(Integer.parseInt(selectedId));
             String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
@@ -247,7 +253,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             this.selected.setTags(existingTags);
 
             changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
-
+            uploadFlag = getAttachList(selected.getUid(), "1").size() ==0;
         }
         if(selected ==null){
             try {
@@ -573,7 +579,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (attachements == null) {
             attachements = blobService.findBlobObjectsByBoUid(assetuid);
         }
-        return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+        uploadFlag = collect.size() == 0;
+        return collect;
     }
 
     @Override
@@ -680,7 +688,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-        if(!isStatus){
+        if(isStatusAssetHistory){
             this.saveAssetHistory();
         }
 
@@ -1153,6 +1161,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return false;
         }
 
+        if(selected.getSiteId()==46){
+            selected.setVisibleStatus(1);
+        }
         return true;
     }
 
@@ -1397,4 +1408,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         List<OrgInfo> orgList = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid(),treeNodeNameFilter,loginUser.getSiteId());
         TreeNode treeNode = buildTree(orgList,loginUser.getSiteId());
     }
+
+    public boolean getUploadFlag() {
+        return uploadFlag;
+    }
+
 }

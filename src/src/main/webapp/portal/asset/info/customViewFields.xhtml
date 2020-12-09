@@ -29,6 +29,12 @@
             <p:inputText id="assetGroup" value="#{fieldMsg.fieldValue('assetGroup', assetInfoDetailController.selected.assetGroup)}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetClass')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetClass}</label>
+            <p:inputText id="assetClass" value="#{fieldMsg.fieldValue('assetClass', assetInfoDetailController.selected.assetClass)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetGroupSecondary')}">
         <h:panelGroup >
             <label class="label">#{msg.assetGroupSecondary}</label>

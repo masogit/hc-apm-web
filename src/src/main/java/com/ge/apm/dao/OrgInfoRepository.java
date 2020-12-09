@@ -4,6 +4,7 @@ import com.ge.apm.domain.OrgInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import webapp.framework.dao.GenericRepository;
 
 import java.util.List;
@@ -139,6 +140,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
 	public int countByParentUIDAndOrgType(String parentUid, int orgType);
 
+	public OrgInfo findByHospitalUcmid(String ucmid);
+
 	@Query(value = "select o.* from org_info o ", nativeQuery = true)
 	public List<OrgInfo> findAllAsList();
 
@@ -223,7 +226,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 	String listOrgInfoNamePathInHierarchyWithSlash(String uid);
 
     //根据tenant_uid找出所有的集团
-	@Query(value = "select * from org_info where parent_uid=?1", nativeQuery = true)
+	@Query(value = "select * from org_info where parent_uid=?1 ", nativeQuery = true)
 	public List<OrgInfo> getHospitalByTenantUIDAndType(String tenantUID);
 
 	@Query(value = "select * from org_info where uid=?1", nativeQuery = true)
@@ -240,6 +243,24 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 			"    join cte_org cte on oi.parent_uid = cte.uid" +
 			") select * from cte_org", nativeQuery = true)
 	public List<OrgInfo> getHospitalChildrenByUids(List<String> uids);
-
+    @Query(value = "select *from org_info o where o.hospital_uid=?1  and o.org_type = 2 order by random() LIMIT 1", nativeQuery = true)
+    public OrgInfo findOrgCode(String hospitalUid);
+    @Query(value = "with recursive cte_org_info as (\n" +
+            "    select oi.*\n" +
+            "    from org_info oi join user_org uo on uo.org_uid = oi.uid\n" +
+            "    where uo.user_uid = :userUid \n" +
+            "    union\n" +
+            "    select oi.*\n" +
+            "    from org_info oi\n" +
+            "    inner join cte_org_info cte\n" +
+            "    on oi.parent_uid = cte.uid\n" +
+            "), cte_clinical_org as (\n" +
+            "    select oi.*\n" +
+            "    from org_info oi where oi.org_type = 4 and oi.site_uid = :siteUid \n" +
+            ")\n" +
+            "select * from cte_org_info where org_type = 4\n" +
+            "intersect\n" +
+            "select * from cte_clinical_org", nativeQuery = true)
+    public List<OrgInfo> getUserAccessibleClinicalDeptsBySelectedSite(@Param("siteUid") String siteUid, @Param("userUid") String userUid);
 
 }

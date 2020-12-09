@@ -46,7 +46,10 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.zkbHistory_region}</label>
-                                <p:inputText id="region" value="#{zkbOrderHistoryController.region}" />
+                                <p:selectOneMenu id="region" value="#{zkbOrderHistoryController.region}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbHistory_region')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.zkbHistory_contractNo}</label>
@@ -54,7 +57,10 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.zkbHistory_contractType}</label>
-                                <p:inputText id="contractType" value="#{zkbOrderHistoryController.contractType}" />
+                                <p:selectOneMenu id="contractType" value="#{zkbOrderHistoryController.contractType}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbHistory_contractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
                             </h:panelGroup>
                         </p:panelGrid>
 <!--                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
@@ -109,19 +115,25 @@
                         <p:column width="150" headerText="#{msg.zkbHistory_quantityIb}" >
                             <h:outputText value="#{item.quantityIb}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbHistory_sparePartsQuantity}" >
-                            <h:outputText value="#{item.sparePartsQuantity}"/>
+                        <p:column width="150" headerText="#{msg.zkbHistory_labourQuantity}" >
+                            <h:outputText value="#{item.labourQuantity}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbHistory_fw}" >
-                            <h:outputText value="#{item.fw}"/>
+                        <p:column width="150" headerText="#{msg.zkbHistory_partsQuantity}" >
+                            <h:outputText value="#{item.partsQuantity}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_probeQuantity}" >
+                            <h:outputText value="#{item.probeQuantity}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_countQuantity}" >
+                            <h:outputText value="#{item.countQuantity}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbHistory_eventDate}" >
                             <h:outputText value="#{item.eventDate}">
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbHistory_eventQuarter}" >
-                            <h:outputText value="#{item.eventQuarter}"/>
+                        <p:column width="150" headerText="#{msg.zkbHistory_type}" >
+                            <h:outputText value="#{item.type}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbHistory_systemNo}" >
                             <h:outputText value="#{item.systemNo}"/>
@@ -138,7 +150,7 @@
                         <p:column width="150" headerText="#{msg.zkbHistory_sparePartsNo}" >
                             <h:outputText value="#{item.sparePartsNo}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbHistory_sparePartsPrice}" >
+                        <p:column width="150" rendered="#{userContextService.zkbAdmin}" headerText="#{msg.zkbHistory_sparePartsPrice}" >
                             <h:outputText value="#{item.sparePartsPrice}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbHistory_description}" >
@@ -159,9 +171,6 @@
                         <p:column width="150" headerText="#{msg.zkbHistory_act}" >
                             <h:outputText value="#{item.act}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbHistory_sparePartsLeft}" >
-                            <h:outputText value="#{item.sparePartsLeft}"/>
-                        </p:column>
                         <p:column width="150" headerText="#{msg.zkbHistory_sparePartsReturn}" >
                             <h:outputText value="#{item.sparePartsReturn}"/>
                         </p:column>
@@ -171,8 +180,11 @@
                         <p:column width="150" headerText="#{msg.zkbHistory_insuranceDescription}" >
                             <h:outputText value="#{item.insuranceDescription}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbHistory_arrangement}" >
-                            <h:outputText value="#{item.arrangement}"/>
+                        <p:column width="150" headerText="#{msg.zkbHistory_probeType}" >
+                            <h:outputText value="#{item.probeType}"/>
+                        </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_useStatus}" >
+                            <h:outputText value="#{item.useStatus}"/>
                         </p:column>
                         <p:column width="150" headerText="#{msg.zkbHistory_callNo}" >
                             <h:outputText value="#{item.callNo}"/>
@@ -180,17 +192,11 @@
                         <p:column width="150" headerText="#{msg.zkbHistory_rowner}" >
                             <h:outputText value="#{item.rowner}"/>
                         </p:column>
+                        <p:column width="150" headerText="#{msg.zkbHistory_ownerName}" >
+                            <h:outputText value="#{item.ownerName}"/>
+                        </p:column>E
                         <p:column width="150" headerText="#{msg.zkbHistory_status}" >
                             <h:outputText value="#{item.status}"/>
-                        </p:column>
-                        <p:column width="150" headerText="#{msg.zkbHistory_owner}" >
-                            <h:outputText value="#{item.owner}"/>
-                        </p:column>
-                        <p:column width="150" headerText="#{msg.zkbHistory_zone}" >
-                            <h:outputText value="#{item.zone}"/>
-                        </p:column>
-                        <p:column width="150" headerText="#{msg.zkbHistory_source}" >
-                            <h:outputText value="#{item.source}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbOrderHistoryController.exportAll}" icon="ui-icon-arrowthick-1-s">

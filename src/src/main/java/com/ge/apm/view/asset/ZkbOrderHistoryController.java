@@ -169,8 +169,8 @@ public class ZkbOrderHistoryController extends GenericCRUDUUIDController<ZkbOrde
         try {
             doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
             int maxRowNum = ZkbOrderHistoryService.EXCEL_ORDER_HISTORY_HEADER_ROW + ZkbOrderHistoryService.EXCEL_ORDER_HISTORY_IMPORT_MAX_ROW;
-            if(doc.exceedMaxRowNum(ZkbOrderHistoryService.SHEET_SERVICE_ORDER_HISTORY, maxRowNum)){
-                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel"));
+            if(doc.checkMaxRowNumIsFull(ZkbOrderHistoryService.SHEET_SERVICE_ORDER_HISTORY, maxRowNum)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel10000"));
                 return;
             }
             List<Map<String, Object>> importDirectoryMapList = zkbOrderHistoryService.getOrderHistoryMapFromTemplate(doc);
@@ -260,7 +260,7 @@ public class ZkbOrderHistoryController extends GenericCRUDUUIDController<ZkbOrde
      * 数据导出
      */
     public void exportAll(){
-        List<Map<String, Object>> orderHistoryMapList = zkbOrderHistoryService.createExportOrderHistoryData(this.zkbOrderHistoryList);
+        List<Map<String, Object>> orderHistoryMapList = zkbOrderHistoryService.createExportOrderHistoryData(this.zkbOrderHistoryList,this.userContextService);
         try {
             UserContextService ucs = WebUtil.getBean(UserContextService.class);
             String fileName =  ucs.isLocale() == true ?ZkbOrderHistoryService.EXCEL_TEMPLATE_NAME:ZkbOrderHistoryService.EXCEL_TEMPLATE_EN_NAME;

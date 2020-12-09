@@ -45,6 +45,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private static final Logger logger = LoggerFactory.getLogger(AssetInfoListController.class);
 
     private static final long serialVersionUID = -1L;
+    static Map<String,List<AssetInfo>> resultAssetMap = null;
     private AssetInfoRepository dao = null;
     private AssetInfoMgrService aiMgrService;
     private AssetCreateService acService;
@@ -55,6 +56,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private CustomConfigService ccService;
     private OrgInfoTreeService orgInfoTreeService;
     private I18nMessageRepository i18nDao;
+    private TenantOptionConfigRepository tenantOptionConfigRepository;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -102,6 +104,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> clinicalDeptList;
 
     private Integer assetGroup;
+    private Integer assetClass;
     private Integer assetGroupSecondary;
 
     private List<I18nMessage> assetGroupSecondayList;
@@ -119,6 +122,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private SupplierRepository supplierDao;
     private UserAccountRepository userDao;
+    private String oneQrCodeStatus;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -140,6 +144,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
+        tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
 
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         this.filterBySite = false;
@@ -190,16 +195,39 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
-        lastPageSort = pageRequest.getSort(); //export excel use
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
         setUserSearchFilters();
         selected = null;
+            Optional<TenantOptionConfig> tenantOptionConfigOptional = tenantOptionConfigRepository.findByTenantUid(UserContextService.getCurrentUserAccount().getTenantUID());
+            if (tenantOptionConfigOptional.isPresent() && tenantOptionConfigOptional.get().getOrderByCreateTimeByDefault()) {
+                if(pageRequest.getSort() !=null){
+                    Sort sortCreatedDate = new Sort(Sort.Direction.DESC, "createdDate");
+                    pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortCreatedDate));
+                }else {
+                    pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"createdDate"));
+                }
+            }else {
+                if(pageRequest.getSort() !=null){
+                    Sort sortNamePyCode = new Sort(Sort.Direction.ASC, "namePyCode");
+                    pageRequest= new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort().and(sortNamePyCode));
+                }else {
+                    pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.ASC,"namePyCode"));
+                }
+            }
+            pageRequest =addRequiredSortById(pageRequest);
 
-        pageRequest =addRequiredSortById(pageRequest);
+        lastPageSort = pageRequest.getSort(); //export excel use
         Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPageAssets = res.getContent();
+
+        //设置OneQrCodeStatus
+        currentPageAssets.stream().forEach(item -> {
+            if(item.getQrCodeLib()!=null){
+                item.setOneQrCodeStatus(String.valueOf(item.getQrCodeLib().getStatus()));
+            }
+        });
 
         addMisingClinicalDeptOrg(currentPageAssets);
 
@@ -286,6 +314,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
                 this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             }
+        }
+
+        if (oneQrCodeStatus != null && !oneQrCodeStatus.isEmpty()) {
+            this.removeFilterOnField("oneQrCodeStatus");
+            searchFilters.add(new SearchFilter("qrCodeLib.status", SearchFilter.Operator.EQ, oneQrCodeStatus));
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
@@ -520,6 +553,25 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         return resultList;
     }
+    public void getAssetInfoBatchEdit() {
+        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+        List<AssetInfo> resultList;
+        if (assetUids.isEmpty()) {
+            resultList = dao.findBySearchFilter(searchFilters, lastPageSort);
+        } else {
+            resultList = dao.findByUidIn(assetUids, lastPageSort);
+        }
+        String verificationCode = "";
+        Random random = new Random();
+        for (int i = 0; i < 6; i++) {
+            int r = random.nextInt(10); //每次随机出一个数字（0-9）
+            verificationCode = verificationCode + r;  //把每次随机出的数字拼在一起
+        }
+        resultAssetMap = new HashMap<>();
+
+        resultAssetMap.put(verificationCode,resultList);
+        WebUtil.navigateTo("AssetInfoBatchEdit.xhtml?faces-redirect=true&uidList= "+ verificationCode);
+    }
 
     public String getParentAssetNameByAssetId(int assetId) {
         AssetInfo ai = dao.findById(assetId);
@@ -705,6 +757,16 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public void assetClassChangeListener() {
+
+        if (assetClass == null) {
+            assetGroupSecondayList = Collections.emptyList();
+        } else {
+            assetGroupSecondayList = i18nDao.getByMsgTypeAndSiteId("assetClassSecondary_" + String.valueOf(assetGroup.intValue()), userContextService.getLoginUser().getSiteId());
+        }
+
+    }
+
     public void assetGroupSecondaryChangeListener() {
 
     }
@@ -872,13 +934,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return t -> seen.add(keyExtractor.apply(t));
     }
 
-    public Integer getAssetGroup() {
-        return assetGroup;
-    }
+    public Integer getAssetGroup() { return assetGroup; }
 
     public void setAssetGroup(Integer assetGroup) {
         this.assetGroup = assetGroup;
     }
+
+    public Integer getAssetClass() { return assetClass; }
+
+    public void setAssetClass(Integer assetClass) { this.assetClass = assetClass; }
 
     public List<I18nMessage> getAssetGroupSecondayList() {
         return assetGroupSecondayList;
@@ -942,5 +1006,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setFactoryWarrantyDateFormatTime(String factoryWarrantyDateFormatTime) {
         this.factoryWarrantyDateFormatTime = factoryWarrantyDateFormatTime;
+    }
+
+    public String getOneQrCodeStatus() {
+        return oneQrCodeStatus;
+    }
+
+    public void setOneQrCodeStatus(String oneQrCodeStatus) {
+        this.oneQrCodeStatus = oneQrCodeStatus;
     }
 }

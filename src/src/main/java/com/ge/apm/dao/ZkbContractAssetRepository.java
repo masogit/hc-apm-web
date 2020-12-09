@@ -21,4 +21,12 @@ public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbCon
     List<String> findDistinctContractId(String assetId);
 
 
+    /**
+     * 根据多个合同ID获取合同列表
+     * @param contractIdList 合同ID集合
+     * @return
+     */
+    List<ZkbContractAsset> findByContractIdIn(List<String> contractIdList);
+
+
 }

@@ -6,6 +6,9 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -609,5 +612,23 @@ public class ZkbContract implements ChineseName, Serializable {
     @Override
     public String getPinYin() {
         return null;
+    }
+
+    public Integer getRemainDaysContract()
+    {
+        Integer zeroDay = new Integer(0);
+        if(this.endDate==null)
+        {
+            return zeroDay;
+        }
+        Date currentDate = new Date();
+        LocalDate startLocaleData = currentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocaleData = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        Integer days = (int)ChronoUnit.DAYS.between(startLocaleData,endLocaleData);
+        if(days<0)
+        {
+            return 0;
+        }
+        return days;
     }
 }

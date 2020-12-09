@@ -111,8 +111,8 @@ public class SupplierService {
     public void refuseByID(String id){
         SupplierUser supplierUser = supplierUserDao.findById(id);
         supplierUserDao.delete(id);
-        supplierUserDao.deleteUserWxApp(supplierUser.getUserAccount().getId());
-        userAccountDao.delete(supplierUser.getUserAccount());
+        //supplierUserDao.deleteUserWxApp(supplierUser.getUserAccount().getId());
+        //userAccountDao.delete(supplierUser.getUserAccount());
     }
 
     @Transactional
