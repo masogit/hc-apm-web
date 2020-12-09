@@ -222,6 +222,12 @@
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">#{msg.EmergencyWorkorder}#{msg.timeoutAcceptance}</label>
+                                <p:inputNumber id="emergencyTimeoutAcceptance" value="#{workflowConfigController.selected.emergencyTimeoutAcceptance}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.EmergencyWorkorder}#{msg.timeoutClose}</label>
                                 <p:inputNumber id="emergencyTimeoutClose" value="#{workflowConfigController.selected.emergencyTimeoutClose}" minValue="0" decimalPlaces="0">
