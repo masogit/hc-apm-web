@@ -36,7 +36,9 @@ public class ArrivalList implements Serializable {
     public enum ProcessType {
         Normal, Easy
     }
-
+    public enum SupplierStatus {
+        Saved, PendingInvoice
+    }
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -209,6 +211,13 @@ public class ArrivalList implements Serializable {
 
     @Transient
     private boolean cannotDeleted;
+
+    // 入库单号
+    @Column(name = "receipt_number")
+    private String receiptNumber;
+
+    @Column(name = "supplier_status", columnDefinition = "VARCHAR(60)")
+    private String supplierStatus;
 
     public String getId() {
         return id;
@@ -546,6 +555,21 @@ public class ArrivalList implements Serializable {
         this.contractDate = contractDate;
     }
 
+    public String getReceiptNumber() {
+        return receiptNumber;
+    }
+
+    public void setReceiptNumber(String receiptNumber) {
+        this.receiptNumber = receiptNumber;
+    }
+
+    public String getSupplierStatus() {
+        return supplierStatus;
+    }
+
+    public void setSupplierStatus(String supplierStatus) {
+        this.supplierStatus = supplierStatus;
+    }
     @Override
     public int hashCode() {
         Integer hash = 0;

@@ -12,7 +12,10 @@
             </div>
 
             <div class="ui-g-12 card">
-
+                <h:panelGrid columns="2" rendered="#{assetArrivedItemsController.activeSupplier()}" style="margin-bottom: 0px;">
+                    <h:outputText class="label" style="color: black!important;font-size: 16px!important;" value="待验收的到货单合同号："></h:outputText>
+                    <p:inputTextarea value="#{assetArrivedItemsController.mergeContractNum}" rows="1" cols="50" readonly="true" placeholder="#{empty assetArrivedItemsController.mergeContractNum?'没有待验收合同记录':''}"></p:inputTextarea>
+                </h:panelGrid>
                 <h:form id="AssetArrivalItemListForm">
                     <p:dataTable id="datalist" value="#{assetArrivedItemsController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{assetArrivedItemsController.selected}"
@@ -72,10 +75,13 @@
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
                         </p:column>
-                        <p:column width="90"  headerText="操作" exportable="false">
+                        <p:column headerText="操作" exportable="false">
                             
                             <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update=":AssetArrivalItemListForm:datalist" >接单
-                                <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
+                                <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
+                            </p:commandLink>
+                            <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedItemsController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and assetArrivedItemsController.activeSupplier()}"  update=":AssetArrivalItemListForm:datalist" >批量接单
+                                <p:confirm header="批量接单" message="确认批量接单?" icon="ui-icon-warning"/>
                             </p:commandLink>
                             <p:commandLink    action="#{assetArrivedItemsController.getInstallUrl(item.id,'List')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">安装
                             </p:commandLink >

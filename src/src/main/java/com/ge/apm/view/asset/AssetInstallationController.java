@@ -369,7 +369,6 @@ public class AssetInstallationController {
         return returnAction();
     }
     public String finishInstallBatch() {
-        Boolean isValidate = true;
         String contractNum = arrivalListItem.getArrivalList().getContractNum();
         String clinicalDeptUID = arrivalListItem.getClinicalDeptUID();
         if(StringUtils.isBlank(contractNum)){
@@ -381,6 +380,10 @@ public class AssetInstallationController {
             return null;
         }
         List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+        if(itemList.isEmpty()){
+            WebUtil.addErrorMessage(String.format("没有找到合同编号[%s]以及所属科室的到货单记录 .", contractNum));
+            return null;
+        }
         String errorMessage = "";
         for(ArrivalListItem arrivalListItem : itemList){
             String message = "";
@@ -388,7 +391,6 @@ public class AssetInstallationController {
                 GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
                 if (null == gbCode) {
                     message = WebUtil.getMessage("无效的国标码");
-                    isValidate = false;
                 }
                 arrivalListItem.setNationalStandardCode(selectedGb.getCode());
                 //更新资产国标码
@@ -397,24 +399,26 @@ public class AssetInstallationController {
             if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
                 message = message +"、"+ WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire");
                 RequestContext.getCurrentInstance().addCallbackParam("ClinicalDeptName", true);
-                isValidate = false;
             }
             if (arrivalListItem.getWorkHours() == null) {
                 message = message + "、安装工时" + WebUtil.getMessage("ValidationRequire");
                 RequestContext.getCurrentInstance().addCallbackParam("workHours", true);
-                isValidate = false;
             }
             if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getDepartNum())) {
                 message = message + "、设备编号（院方）不能为空";
-                isValidate = false;
             }
             if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getFinancingNum())) {
                 message = message + "、资产编号不能为空";
-                isValidate = false;
             }
-            if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getQrCode())) {
+            String qrCode = arrivalListItem.getQrCode();
+            if (needInstorageCheck && StringUtils.isEmpty(qrCode)) {
                 message = message + "、二维码不能为空";
-                isValidate = false;
+            }
+            if(StringUtils.isNotBlank(qrCode)){
+                String qrCodeStatus = qrCodeService.checkAvailableBeforeSaveJiuYuan(qrCode, arrivalListItem.getArrivalList().getSiteUID());
+                if (!"Normal".equals(qrCodeStatus)) {
+                    message = message + "、" + WebUtil.getMessage(qrCodeStatus);
+                }
             }
             if(arrivalListItem.getBusinessAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
                 arrivalListItem.setBusinessAckStatus(arrivalListItem.ACK_STATUS_PASS);
@@ -432,21 +436,13 @@ public class AssetInstallationController {
                 arrivalListItem.setFixassetAckStatus(arrivalListItem.ACK_STATUS_PASS);
                 arrivalListItem.setFixassetAckDate(new Date());
             }
-            if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-                String qrCodeStatus = qrCodeService.checkAvailableBeforeSave(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
-                if (!"Normal".equals(qrCodeStatus)) {
-                    message = message + "、" + WebUtil.getMessage(qrCodeStatus);
-                    isValidate = false;
-                }
-            }
 
             Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
             if (!isvalidDeptNum._1) {
-                isValidate = false;
                 message = message + "、" + isvalidDeptNum._2;
             }
 
-            if (!isValidate) {
+            if (StringUtils.isNotBlank(message)) {
                 String name = arrivalListItem.getArrivalList().getName();
                 String financingNumName = WebUtil.getMessage("financingNum");
                 String financingNum = arrivalListItem.getFinancingNum()==null?"不可为空！":arrivalListItem.getFinancingNum();
@@ -457,7 +453,6 @@ public class AssetInstallationController {
                     message = "到货单名称/编号：" + name +","+ financingNumName +"："+ financingNum +"---->" + message;
                     errorMessage = errorMessage + message ;
                 }
-                isValidate = true;
             }
 
             if (arrivalListItem.getWarrantyYear() != null) {
@@ -476,7 +471,7 @@ public class AssetInstallationController {
             }
         }
 
-        if(!errorMessage.equals("")){
+        if(StringUtils.isNotBlank(errorMessage)){
             WebUtil.addErrorMessage(errorMessage);
             return "";
         }
@@ -909,6 +904,10 @@ public class AssetInstallationController {
             return;
         }
         List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+        if(itemList == null || itemList.isEmpty()){
+            WebUtil.addErrorMessage("没有需要导出的验收报告");
+            return;
+        }
         try {
             Map<String, Object> data = assetInstallationReportService.createReportDataBatch(itemList);
             byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);
