@@ -25,6 +25,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import java.io.File;
@@ -58,11 +59,17 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     private String fileType;
 
+    private String gamePlanFileType;
+
     private List<I18nMessage> batchFileType;
+
+    private List<I18nMessage> gamePlanBatchFileType;
 
     private StreamedContent exportFile;
 
     MicroServiceUtil microServiceUtil;
+
+    private List fileTypeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel");
 
     @Override
     protected void init() {
@@ -75,9 +82,11 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         this.filterBySite = false;
         this.filterByHospital = false;
         fileType = ImportFiles.ImportFileType.ColdHeaderExcel.toString();
+        gamePlanFileType = ImportFiles.ImportFileType.CarePackageExcel.toString();
 
         FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
         batchFileType = fieldMsg.getFieldValueList("batchFileType");
+        gamePlanBatchFileType = fieldMsg.getFieldValueList("gamePlanBatchFileType");
         batchFileType.removeIf(i -> StringUtils.equalsIgnoreCase(i.getMsgKey(), "SrReportPdf"));
     }
 
@@ -89,10 +98,10 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
     @Override
     protected Page<ImportFiles> loadData(PageRequest pageRequest) {
         if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
-        } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
+            this.searchFilters = new ArrayList<>();
+            this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.NotIN, fileTypeList, "1*"));
         }
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
     public void uploadDataFile(FileUploadEvent event) {
@@ -219,5 +228,64 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     public void setExportFile(StreamedContent exportFile) {
         this.exportFile = exportFile;
+    }
+
+    public List<I18nMessage> getGamePlanBatchFileType() {
+        return gamePlanBatchFileType;
+    }
+
+    public void setGamePlanBatchFileType(List<I18nMessage> gamePlanBatchFileType) {
+        this.gamePlanBatchFileType = gamePlanBatchFileType;
+    }
+
+    @Override
+    protected Page<ImportFiles> gamePlanLoadData(PageRequest pageRequest) {
+        if (this.searchFilters == null) {
+            this.searchFilters = new ArrayList<>();
+            this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
+        }
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+
+    public String getGamePlanFileType() {
+        return gamePlanFileType;
+    }
+
+    public void setGamePlanFileType(String gamePlanFileType) {
+        this.gamePlanFileType = gamePlanFileType;
+    }
+
+    public void uploadGamePlanDataFile(FileUploadEvent event) {
+        if (StringUtils.equalsIgnoreCase(gamePlanFileType, ImportFiles.ImportFileType.SrReportPdf.toString())) {
+            WebUtil.addErrorMessage("不支持服务报告类型文件上传，保存失败!");
+            return;
+        }
+        if (this.fileList == null) {
+            fileList = new ArrayList();
+        }
+        ImportFiles itemFile = new ImportFiles();
+        itemFile.setFileName(event.getFile().getFileName());
+        itemFile.setFileType(gamePlanFileType);
+        itemFile.setUploadedTime(new Date());
+        itemFile.setStatus(ImportFiles.STATUS_STARTING);
+        itemFile.setCreatorUID(UserContextService.getCurrentUserAccount().getUid());
+        String savedFilePath = null;
+        try {
+            savedFilePath = fileService.saveBatchUploadedFile(event.getFile(), gamePlanFileType);
+        } catch (Exception ex) {
+            WebUtil.addErrorMessage(event.getFile().getFileName() + "上传失败!");
+        }
+        if (Strings.isNullOrEmpty(savedFilePath)) {
+            itemFile.setStatus("FAILEDUPLOAD");
+            WebUtil.addErrorMessage(event.getFile().getFileName() + "保存失败!");
+        } else {
+            itemFile.setFilePath(savedFilePath);
+        }
+        fileList.add(new Tuple2<>(itemFile, event.getFile()));
+        if (StringUtils.equals(gamePlanFileType, ImportFiles.ImportFileType.SrExcel.toString())
+                || StringUtils.equals(gamePlanFileType, ImportFiles.ImportFileType.SrResetReport.toString())
+                || StringUtils.equals(gamePlanFileType, ImportFiles.ImportFileType.PMScheduleExcel.toString())) {
+            microServiceUtil.synchBatchTask(new File(fileService.getUploadFileFullPath(savedFilePath)), gamePlanFileType);
+        }
     }
 }

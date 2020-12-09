@@ -7,20 +7,21 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author csh
@@ -30,8 +31,10 @@ import java.util.stream.Stream;
  * @package com.ge.apm.service.asset
  */
 @Component
+@Slf4j
 public class AssetHistoryService {
     public static final String FIELD_ASSET_DEPT_NAME = "assetDeptName";
+    public static final String FILED_CLINICAL_DEPT_NAME = "clinicalDeptName";
     public static final String FILED_DEVICE_STATUS = "deviceStatus";
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -84,6 +87,7 @@ public class AssetHistoryService {
         }*/
         return parseFieldsByJson(resultList);
     }
+
     /**
      * @return
      * @throws
@@ -129,31 +133,7 @@ public class AssetHistoryService {
         Object oldFieldValue = null;
         Object newFieldValue = null;
 
-        if (FIELD_ASSET_DEPT_NAME.equals(fieldName)) {
-            Field field = oldAsset.getClass().getDeclaredField("assetDeptUID");
-            field.setAccessible(true);
-
-            oldFieldValue = field.get(oldAsset);
-            newFieldValue = field.get(newAsset);
-
-            if (Objects.equals(oldFieldValue, newFieldValue)) {
-                return Optional.empty();
-            }
-
-            if (null != oldFieldValue) {
-                OrgInfo oldOrg = orgDao.findByUid((String) oldFieldValue);
-                if (null != oldOrg) {
-                    oldFieldValue = oldOrg.getName();
-                }
-            }
-            if (null != newFieldValue) {
-                OrgInfo newOrg = orgDao.findByUid((String) newFieldValue);
-                if (null != newOrg) {
-                    newFieldValue = newOrg.getName();
-                }
-            }
-
-        } else if (FILED_DEVICE_STATUS.equals(fieldName)){
+        if (FILED_DEVICE_STATUS.equals(fieldName)) {
             Field field = oldAsset.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
 
@@ -196,12 +176,12 @@ public class AssetHistoryService {
         if (Objects.equals(oldFieldValue, newFieldValue)) {
             return Optional.empty();
         }
-        if("purchasePrice".equals(fieldName)){
+        if ("purchasePrice".equals(fieldName)) {
             java.text.DecimalFormat df = new java.text.DecimalFormat("########.00");
-            if(oldFieldValue != null){
+            if (oldFieldValue != null) {
                 oldFieldValue = df.format(oldFieldValue);
             }
-            if(newFieldValue != null){
+            if (newFieldValue != null) {
                 newFieldValue = df.format(newFieldValue);
             }
         }
@@ -220,7 +200,7 @@ public class AssetHistoryService {
             return null;
         }
 
-        if(fieldValue instanceof Date) {
+        if (fieldValue instanceof Date) {
 
             return sdf.format(fieldValue);
         }
@@ -239,14 +219,17 @@ public class AssetHistoryService {
             try {
                 Optional<AssetHistory.AssetHistoryInfo> optionalResult;
                 switch (fieldName) {
-                    case FIELD_ASSET_DEPT_NAME:
-                        optionalResult = getSpecialFieldValue(oldAsset, newAsset, fieldName);
-                        break;
-
                     case FILED_DEVICE_STATUS:
                         optionalResult = getSpecialFieldValue(oldAsset, newAsset, fieldName);
                         break;
-
+                    case FIELD_ASSET_DEPT_NAME:
+                        String oldName = orgDao.findNameByUID(oldAsset.getAssetDeptUID());
+                        String newName = orgDao.findNameByUID(newAsset.getAssetDeptUID());
+                        optionalResult = getSpecialFieldValue(FIELD_ASSET_DEPT_NAME, oldName, oldAsset.getAssetDeptUID(), newName, newAsset.getAssetDeptUID());
+                        break;
+                    case FILED_CLINICAL_DEPT_NAME:
+                        optionalResult = getSpecialFieldValue(FILED_CLINICAL_DEPT_NAME, oldAsset.getClinicalDeptName(), oldAsset.getClinicalDeptUID(), newAsset.getClinicalDeptName(), newAsset.getClinicalDeptUID());
+                        break;
                     default:
                         optionalResult = getCommonFieldValue(oldAsset, newAsset, fieldName);
                         break;
@@ -257,11 +240,41 @@ public class AssetHistoryService {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("getAssetsHistoryModifiedFields[]error", e);
+                throw new RuntimeException("变更留痕保存失败");
             }
         });
 
         return resultList;
+    }
+
+    private Optional<AssetHistory.AssetHistoryInfo> getSpecialFieldValue(String columnName, String oldName, String oldUID, String newName, String newUID) {
+
+        if (StringUtils.isEmpty(oldUID) && StringUtils.isEmpty(newUID)) {
+            return Optional.empty();
+        }
+
+        if (StringUtils.hasLength(oldUID) && oldUID.equals(newUID)) {
+            return Optional.empty();
+        }
+
+        String pOldOrgName = this.findOrgInfoParentNameByUid(oldUID);
+        String pNewOrgName = this.findOrgInfoParentNameByUid(newUID);
+
+        AssetHistory.AssetHistoryInfo assetHistoryInfo = new AssetHistory.AssetHistoryInfo();
+        assetHistoryInfo.setColumnName(columnName);
+
+        assetHistoryInfo.setOldColumnValue(StringUtil.joinNotEmpty("-", pOldOrgName, oldName));
+        assetHistoryInfo.setNewColumnValue(StringUtil.joinNotEmpty("-", pNewOrgName, newName));
+        assetHistoryInfo.setLabel(WebUtil.getMessage(columnName));
+        return Optional.of(assetHistoryInfo);
+    }
+
+    private String findOrgInfoParentNameByUid(String uid) {
+        if (StringUtils.isEmpty(uid)) {
+            return null;
+        }
+       return orgDao.findParentNameByUid(uid);
     }
 
     public void saveAssetHistoryIfUpdated(AssetInfo oldAsset, AssetInfo newAsset, List<String> fieldNames) {

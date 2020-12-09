@@ -52,6 +52,11 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
     private String systemId;
 
     /**
+     * 合同编号
+     */
+    private String contractNo;
+
+    /**
      * 二维码个数
      */
     private String qrCodeCount;
@@ -98,7 +103,7 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
      * 根据页面条件查询
      */
     public void loadData() {
-        zkbAssetStatisticList=this.zkbAssetStatisticService.loadAllAsset(this.tenantUid,this.systemId,this.qrCodeCount,this.qrCodeCountState);
+        zkbAssetStatisticList=this.zkbAssetStatisticService.loadAllAsset(this.tenantUid,this.systemId,this.qrCodeCount,this.qrCodeCountState,this.contractNo);
     }
 
     public String getTenantUid() {
@@ -134,7 +139,12 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
      * 数据导出
      */
     public void exportAll(){
-        List<ZkbAssetStatistic> allZkbAssetStatisticList = this.zkbAssetStatisticService.loadAllAsset(null,null,null,null);
+        String tenantUid = null;
+        if(!userContextService.isZkbAdmin())
+        {
+            tenantUid=this.tenantUid;
+        }
+        List<ZkbAssetStatistic> allZkbAssetStatisticList = this.zkbAssetStatisticService.loadAllAsset(tenantUid,null,null,null,null);
         List<Map<String, Object>> zkbAssetStatisticMapList = zkbAssetStatisticService.createZkbAssetStatisticData(allZkbAssetStatisticList);
         try {
             UserContextService ucs = WebUtil.getBean(UserContextService.class);
@@ -170,5 +180,13 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
 
     public void setQrCodeCountState(String qrCodeCountState) {
         this.qrCodeCountState = qrCodeCountState;
+    }
+
+    public String getContractNo() {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
     }
 }

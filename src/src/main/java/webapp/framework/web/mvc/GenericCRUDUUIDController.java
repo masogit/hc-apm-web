@@ -207,15 +207,26 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
     protected Page<E> doLoadData(PageRequest pageRequest){
         setSiteFilter();
         setHospitalFilter();
-        
+
         return loadData(pageRequest);
+    }
+
+    protected Page<E> doGamePlanLoadData(PageRequest pageRequest){
+        setSiteFilter();
+        setHospitalFilter();
+        return gamePlanLoadData(pageRequest);
     }
 
     protected Page<E> loadData(PageRequest pageRequest){
         return getDAO().findBySearchFilter(this.searchFilters, pageRequest);
     }
+
+    protected Page<E> gamePlanLoadData(PageRequest pageRequest){
+        return getDAO().findBySearchFilter(this.searchFilters, pageRequest);
+    }
         
     protected LazyDataModel lazyModel;
+    protected LazyDataModel gamePlanLazyModel;
     protected E selected;
 
     protected void init(){};
@@ -238,6 +249,24 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
                     //select the last page, then filter using some column, the original pageNumber is still used, so sometimes no data displayed.
                     PageRequest newPageRequest = new PageRequest(0, pageRequest.getPageSize(), pageRequest.getSort());
                     pg = doLoadData(newPageRequest);
+                    rowCount = (int) pg.getTotalElements();
+                    this.setRowCount(rowCount);
+                    listObject = pg.getContent();
+                }
+                return listObject;
+            }
+        };
+
+        gamePlanLazyModel = new GenericDataTableModel<E>() {
+            @Override
+            protected List<E> load(PageRequest pageRequest) {
+                Page<E> pg = doGamePlanLoadData(pageRequest);
+                int rowCount = (int) pg.getTotalElements();
+                this.setRowCount(rowCount);
+                List<E> listObject = pg.getContent();
+                if (rowCount > 0 && listObject.size() == 0) {
+                    PageRequest newPageRequest = new PageRequest(0, pageRequest.getPageSize(), pageRequest.getSort());
+                    pg = doGamePlanLoadData(newPageRequest);
                     rowCount = (int) pg.getTotalElements();
                     this.setRowCount(rowCount);
                     listObject = pg.getContent();
@@ -431,5 +460,13 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
         
         if(warnOnEmptySearchFilters && (searchFilters==null || searchFilters.isEmpty()))
             WebUtil.addErrorMessageKey("noSearchCondition");
+    }
+
+    public LazyDataModel getGamePlanLazyModel() {
+        return gamePlanLazyModel;
+    }
+
+    public void setGamePlanLazyModel(LazyDataModel gamePlanLazyModel) {
+        this.gamePlanLazyModel = gamePlanLazyModel;
     }
 }

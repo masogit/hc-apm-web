@@ -54,7 +54,7 @@ public class OrderHistoryProvider {
             }
             if("tenantUid".equals(tempColumn))
             {
-                sb.append("and tenant_uid='"+value.toString()+"'");
+                sb.append(" and  contract_no in  (SELECT contract_no from zkb_contract where tenant_uid = '"+value.toString()+"')");
             }
             if("searchStrFilter".equals(tempColumn))
             {

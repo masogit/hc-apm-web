@@ -109,6 +109,12 @@
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">#{msg.timeoutAcceptance}</label>
+                                <p:inputNumber id="timeoutAcceptance" value="#{workflowConfigController.selected.timeoutAcceptance}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.timeoutClose}</label>
                                 <p:inputNumber id="timeoutClose" value="#{workflowConfigController.selected.timeoutClose}" minValue="0" decimalPlaces="0">
