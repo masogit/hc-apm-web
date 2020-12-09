@@ -409,6 +409,11 @@ public class UserContextService implements Serializable {
 
     WorkflowConfigRepository wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
 
+    /**
+     * 获取智康宝用户
+     */
+    ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+
     private Boolean flagIsHospitalUser = null;
     public boolean isHospitalUser(){
         if(flagIsHospitalUser!=null) return flagIsHospitalUser;
@@ -887,6 +892,23 @@ public class UserContextService implements Serializable {
         TenantInfo tenantInfo = getTenantInfo();
         if(tenantInfo.getType() != null && tenantInfo.getType() == 3){
             return true;
+        }
+        return false;
+    }
+
+    public boolean isGeAdmin() {
+        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfig = this.zkbPartOrderUserConfigRepository.findByConfigType("ClosePending");
+        if(CollectionUtils.isEmpty(zkbPartOrderUserConfig))
+        {
+            return false;
+        }
+        Map<String, String> zkbPartOrderUserConfigMap = zkbPartOrderUserConfig.stream().filter(partOrderUserConfig -> partOrderUserConfig.getLoginName()!=null).collect(
+                Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getLoginName()))),
+                        ArrayList::new)).stream().collect(Collectors.toMap(ZkbPartOrderUserConfig::getLoginName,ZkbPartOrderUserConfig::getLoginName));
+        UserAccount user = getLoginUser();
+        if(zkbPartOrderUserConfigMap.containsKey(user.getLoginName()))
+        {
+          return true;
         }
         return false;
     }

@@ -155,7 +155,7 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <p:commandButton validateClient="true" actionListener="#{zkbKeyBehaviorIndexController.save}" rendered="#{userContextService.zkbAdmin}"  update=":zkbKeyBehaviorIndexForm :zkbKeyBehaviorIndexEditForm :growl"  value="#{msg.Save}" icon="ui-icon-check"/>
-                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" rendered="#{userContextService.zkbAdmin}" actionListener="#{zkbKeyBehaviorIndexController.cancel}"  update=":zkbKeyBehaviorIndexEditForm :growl"/>
+                    <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" rendered="#{userContextService.zkbAdmin}" actionListener="#{zkbKeyBehaviorIndexController.cancel}"  update=":zkbKeyBehaviorIndexForm :zkbKeyBehaviorIndexEditForm :growl"/>
                 </h:panelGroup>
             </h:panelGroup>
         </p:fieldset>

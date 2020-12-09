@@ -1,4 +1,5 @@
 	  delete from i18n_message where site_id=-1;
+	  DELETE FROM i18n_message WHERE site_id = (SELECT "id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1);
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','cardsIsBlank','盘点卡片不能为空!','Cards cannot be null!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','RelMeasureRule','配置计量规则','Configure Measurement Rule',NULL,-1);
@@ -901,6 +902,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','dispatchUserName','派工人','Dispatcher',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','timeoutDispatch','派工超时时间(分钟)','Dispatch Timeout (Minutes)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','timeoutAccept','接单超时时间(分钟)','Accept Timeout (Minutes)',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','timeoutAcceptance','验收超时时间(分钟)','Acceptance Timeout (Minutes)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','timeoutRepair','维修超时时间(分钟)','Repair Timeout (Minutes)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','timeoutClose','关单超时时间(分钟)','Close Timeout (Minutes)',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','orderReopenTimeframe','二次开单间隔(天)','Order Reopen Time Frame (Days)',NULL,-1);
@@ -2314,6 +2316,7 @@
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','ExportAllContractLists','合同列表全部导出','Export All Contract Lists',NULL,	-1	);
     INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','SelectAndExportContractList','合同列表选择导出','Select and Export Contract List',NULL,	-1	);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MaximumFiveThDataLinesInTheExcel', '导入Excel中数据行数最多5000条，请分批导入！', 'Import into a maximum of 5000 data lines in the Excel, please import in batches', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MaximumFiveThDataLinesInTheExcel10000', '导入Excel中数据行数最多10000条，请分批导入！', 'Import into a maximum of 10000 data lines in the Excel, please import in batches', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ImportCompletedNoteFailureRecord', '导入完成，注意有导入失败的记录！', 'Import completed, Please note a record of import failure!', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ThereAreATotalOf', '总共有', 'There are a total of', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'RecordsOfFailure', '条记录处理失败', 'records of processing failure!', NULL, '-1');
@@ -3571,7 +3574,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_probeType','探头类型','探头类型',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_useStatus','是否使用名额Y/N','是否使用名额Y/N',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_callNo','CallNo','CallNo',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_rowner','Srowner','Srowner',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_rowner','SR Owner','SR Owner',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_ownerName','owner name','owner name',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbHistory_status','SR Status','SR Status',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'zkbHistory_ErrorDataTypeIsEmpty', '错误：数据类型为空', 'Error: data type is empty', NULL, '-1');
@@ -3653,8 +3656,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_pasteQuickResponseRateScore','二维码粘贴率得分','Paste quick response rate score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_apmBillingRateFullScore','APM开单率权重','Apm billing rate full score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_apmBillingRateScore','APM开单率得分','Apm billing rate score',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_satisfactoryDegreeFullScore','满意度回访权重','Satisfactory gegree full score',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_satisfactoryDegreeScore','满意度回访得分','Satisfactory degree score',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_satisfactoryDegreeFullScore','顾客满意度回访权重','Client satisfactory gegree full score',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_satisfactoryDegreeScore','顾客满意度回访得分','Client satisfactory degree score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_complianceFullScore','合规及健康安全权重','Compliance full score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_complianceScore','合规及健康安全得分','Compliance score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_engineerFullScore','工程师配置权重','Engineer full score',NULL,-1);
@@ -3698,23 +3701,94 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbAssetStatistic_countOfImage','图片个数','Count of image',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbAssetStatistic_contractNo','合同编号','contract no',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbAssetStatistic_qrCodeOfPaste','二维码是否已实施(粘贴及照片上传)','Qrcode of pasting',NULL,	-1	);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','MSARecommendExcel','MSA方案推荐','MSA Recommend',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','PromotionActivityExcel','促销活动','Promotion Activity',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','CarePackageExcel','关爱包','Care Package',NULL,-1);
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','MSARecommendExcel','MSA方案推荐','MSA Recommend',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','PromotionActivityExcel','促销活动','Promotion Activity',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','CarePackageExcel','关爱包','Care Package',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','GamePlanBatchFileImport','Game Plan数据导入','Game plan Batch Data Import',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','installStatus','装机状态','Install Status',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '0', '已装机', 'Installed', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '1', '未装机', 'Shipped', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '2', '拆机', 'Deinstalled', NULL, '-1');
 
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','1','科研','Research',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','2','教学','Teaching',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','3','医疗','Medical',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','4','干保','Cadre Heath Care',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','5','临床试验','Clinical Trial',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','6','自购','Self-purchase',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','7','租赁','Lease',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','8','投放','Launch',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','9','捐赠','Self-purchase',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','10','国家呼吸疾病区域医疗中心','National Regional Medical Center for Respiratory Diseases',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','11','国家综合类别区域医疗中心','National Comprehensive Category Regional Medical Center',NULL,"id" FROM tenant_info WHERE "name" = '邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','1','科研','Research',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','2','教学','Teaching',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','3','医疗','Medical',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','4','干保','Cadre Heath Care',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','5','临床试验','Clinical Trial',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','6','微创干保','Minimally Invasive Cadre Heath Care',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','7','自购','Self-purchase',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','8','租赁','Lease',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','9','投放','Launch',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','10','捐赠','Donate',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','11','国家呼吸疾病区域医疗中心','National Regional Medical Center for Respiratory Diseases',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','12','国家综合类别区域医疗中心','National Comprehensive Category Regional Medical Center',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsDeviceType','201','麻醉机','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsDeviceType','202','呼吸机','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsDeviceType','203','监护仪','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsDeviceType','204','MUSE网络','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsDeviceType','205','母婴产品','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsDeviceType','221','心电产品-心电图机','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsDeviceType','222','心电产品-运动心电','',NULL,-1);
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_221','无法打印心电图','无法打印心电图','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_221','打印心电图波形颜色较浅','打印心电图波形颜色较浅','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_221','做图干扰大','做图干扰大','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_221','卡纸','卡纸','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_221','打印机内部错误-无法打印','打印机内部错误-无法打印','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_221','无法采集心电图，采集到93%后停止','无法采集心电图，采集到93%后停止','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_221','纸盘打开','纸盘打开','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_221','客户端/服务器协议错误，要重试吗？','客户端/服务器协议错误，要重试吗？','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_221','无纸或夹纸','无纸或夹纸','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_221','其他','其他','',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_222','电极贴好后导联直线','电极贴好后导联直线','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_222','跑台噪音过大','跑台噪音过大','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_222','打印心电图过浅','打印心电图过浅','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_222','无法初始化采集模块','无法初始化采集模块','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_222','无法启动平板','无法启动平板','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_222','其他','其他','',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_204','WEB浏览只显示波形不显示字库','WEB浏览只显示波形不显示字库','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_204','无法登陆客户端','无法登陆客户端','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_204','没有患者信息','没有患者信息','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_204','医生工作站无法浏览报告','医生工作站无法浏览报告','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_204','其他','其他','',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','潮气量不准','潮气量不准','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','氧气浓度偏低','氧气浓度偏低','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','屏幕提示氧电池失效','屏幕提示氧电池失效','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','自检不通过','自检不通过','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','手控回路漏气','手控回路漏气','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','机控回路漏气','机控回路漏气','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','屏幕提示回路漏气？无法加压','屏幕提示回路漏气？无法加压','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','屏幕提示流量传感器失效','屏幕提示流量传感器失效','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','开机后黑屏','开机后黑屏','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','无法调节参数','无法调节参数','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','触摸屏失效','触摸屏失效','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','开机进入备用氧模式','开机进入备用氧模式','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','电源指示灯不亮','电源指示灯不亮','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','快捷键失效','快捷键失效','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','APL阀断裂','APL阀断裂','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','手控支臂断裂','手控支臂断裂','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_201','其他','其他','',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','无创血压测量不出值','无创血压测量不出值','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','袖带不能充满气体','袖带不能充满气体','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','袖带管漏气','袖带管漏气','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','心电波形杂乱','心电波形杂乱','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','屏幕提示心电导联脱落','屏幕提示心电导联脱落','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','无法识别模块','无法识别模块','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','开机后黑屏','开机后黑屏','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','电源指示灯不亮','电源指示灯不亮','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','开机后反复重启','开机后反复重启','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','呼末二氧化碳值不准确','呼末二氧化碳值不准确','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','氧浓度值不准确','氧浓度值不准确','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','麻醉气体MAC值不准','麻醉气体MAC值不准','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','肌松测试不出值','肌松测试不出值','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','提示“SRAM Error ”','提示“SRAM Error ”','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','调节时间不能保存','调节时间不能保存','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','体温测试值偏差大','体温测试值偏差大','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','其他','其他','',NULL,-1);
