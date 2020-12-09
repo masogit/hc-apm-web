@@ -69,8 +69,6 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     MicroServiceUtil microServiceUtil;
 
-    private List fileTypeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel", "CoilOpportunityExcel");
-
     @Override
     protected void init() {
         dao = WebUtil.getBean(ImportFilesRepository.class);
@@ -97,10 +95,24 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     @Override
     protected Page<ImportFiles> loadData(PageRequest pageRequest) {
+        List<String> fileTypeList=  gamePlanBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
         if (this.searchFilters == null) {
             this.searchFilters = new ArrayList<>();
             this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.NotIN, fileTypeList, "1*"));
+        } else {
+            Boolean  b  = false;
+            for (int i = 0;i< this.searchFilters.size();i++){
+                SearchFilter searchFilter = this.searchFilters.get(i);
+               if("fileType".equals(searchFilter.fieldName)) {
+                   b  = true;
+                   break;
+               }
+            }
+            if(!b){
+                this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.NotIN, fileTypeList, "1*"));
+            }
         }
+
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -240,9 +252,22 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     @Override
     protected Page<ImportFiles> gamePlanLoadData(PageRequest pageRequest) {
+        List<String> fileTypeList=  gamePlanBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
         if (this.searchFilters == null) {
             this.searchFilters = new ArrayList<>();
             this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
+        }else {
+            Boolean  b  = false;
+            for (int i = 0;i< this.searchFilters.size();i++){
+                SearchFilter searchFilter = this.searchFilters.get(i);
+                if("fileType".equals(searchFilter.fieldName)) {
+                    b  = true;
+                    break;
+                }
+            }
+            if(!b){
+                this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
+            }
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
