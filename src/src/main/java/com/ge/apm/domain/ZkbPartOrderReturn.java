@@ -81,6 +81,17 @@ public class ZkbPartOrderReturn implements Serializable {
     @Column(name = "data_satus")
     private String dataStatus= "New";
 
+    @Column(name = "order_no")
+    private String orderNo;
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
     public String getDataStatus() {
         return dataStatus;
     }

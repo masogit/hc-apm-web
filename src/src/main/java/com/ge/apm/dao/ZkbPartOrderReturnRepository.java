@@ -1,8 +1,10 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ZkbPartOrderReturn;
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,4 +22,20 @@ public interface ZkbPartOrderReturnRepository extends GenericRepositoryUUID<ZkbP
     List<ZkbPartOrderReturn> findByPartOrderIdAndPartNo(String partOrderId,String partNo);
 
     List<ZkbPartOrderReturn> findByPartOrderIdAndPartNoAndIdIsNot(String partOrderId,String partNo,String id);
+
+    /**
+     * 统计数量
+     * @param partOrderIdList 退还单ID
+     * @return
+     */
+    @Query(value = "SELECT sum(qty) from zkb_part_order_return where part_order_id in ?1 and return_date between ?2 and ?3", nativeQuery = true)
+    Integer fetchQty(List<String> partOrderIdList,Date firstday, Date lastday);
+
+    /**
+     * 统计数量
+     * @param partOrderIdList 退还单ID
+     * @return
+     */
+    @Query(value = "SELECT sum(qty) from zkb_part_order_return where part_order_id in ?1 and return_type='goodReturn'", nativeQuery = true)
+    Integer fetchReturnGoodQty(List<String> partOrderIdList);
 }

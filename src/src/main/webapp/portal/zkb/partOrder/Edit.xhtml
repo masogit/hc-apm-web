@@ -150,6 +150,15 @@
                             </h:panelGroup>
                         </h:panelGroup>
 
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' and zkbPartOrderEditController.assetInfo.assetGroup eq 2 }">
+                            <label class="label">机型*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="超声高端机" itemValue="2"/>
+                                <f:selectItem itemLabel="超声低端机" itemValue="3"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
                             <p:selectOneMenu id="region" value="#{zkbPartOrderEditController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}" disabled="true">
@@ -162,9 +171,6 @@
                             <label class="label">订单日期*</label>
                             <p:calendar timeZone="GMT+8"  id="startDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderEditController.selected.partOrderDate}" required="true" requiredMessage="#{msg.zkbPartOrder_partOrderDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>-->
-                        <h:panelGroup>
-                        </h:panelGroup>
-
                         <h:panelGroup>
                             <label class="label">医院名称*</label>
                             <p:inputTextarea id="hospitalName" value="#{zkbPartOrderEditController.selected.hospitalName}"  required="true" requiredMessage="#{msg.zkbPartOrder_hospitalName} #{msg.ValidationRequire}" disabled="true"/>
@@ -357,8 +363,8 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">旧探头SN号输入框*</label>
-                            <p:inputText id="oldCatSn" value="#{zkbPartOrderEditController.selected.oldCatSn}" required="true" requiredMessage="旧探头SN号输入框 #{msg.ValidationRequire}"/>
+                            <label class="label">旧探头SN编号*</label>
+                            <p:inputText id="oldCatSn" value="#{zkbPartOrderEditController.selected.oldCatSn}" required="true" requiredMessage="旧探头SN编号 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
 
                         <h:panelGroup>

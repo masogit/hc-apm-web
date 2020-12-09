@@ -222,7 +222,7 @@ public class ZkbPartOrder implements Serializable {
     private String returnType;
 
     @Column(name = "return_qty")
-    private int returnQty = 0;
+    private Integer returnQty = 0;
 
     /**
      * 运单号
@@ -472,6 +472,61 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "have_train_course_flag")
     private String haveTrainCourseFlag;
 
+    @Column(name = "need_letter_flag")
+    private String needLetterFlag = "f";
+
+    @Column(name = "upload_letter_flag")
+    private String uploadLetterFlag = "f";
+
+    @Column(name = "upload_letter_file_name")
+    private String uploadLetterFileName;
+
+    @Column(name = "upload_letter_file_Id")
+    private String uploadLetterFileId;
+
+    @Column(name = "check_apply_num_flag")
+    private String checkApplyNumFlag = "t";// t是校验通过 f：校验不通过
+
+    public String getUploadLetterFileId() {
+        return uploadLetterFileId;
+    }
+
+    public void setUploadLetterFileId(String uploadLetterFileId) {
+        this.uploadLetterFileId = uploadLetterFileId;
+    }
+
+    public String getCheckApplyNumFlag() {
+        return checkApplyNumFlag;
+    }
+
+    public void setCheckApplyNumFlag(String checkApplyNumFlag) {
+        this.checkApplyNumFlag = checkApplyNumFlag;
+    }
+
+    public String getUploadLetterFileName() {
+        return uploadLetterFileName;
+    }
+
+    public void setUploadLetterFileName(String uploadLetterFileName) {
+        this.uploadLetterFileName = uploadLetterFileName;
+    }
+
+    public String getNeedLetterFlag() {
+        return needLetterFlag;
+    }
+
+    public void setNeedLetterFlag(String needLetterFlag) {
+        this.needLetterFlag = needLetterFlag;
+    }
+
+    public String getUploadLetterFlag() {
+        return uploadLetterFlag;
+    }
+
+    public void setUploadLetterFlag(String uploadLetterFlag) {
+        this.uploadLetterFlag = uploadLetterFlag;
+    }
+
     public String getHaveTrainCourseFlag() {
         return haveTrainCourseFlag;
     }
@@ -712,11 +767,11 @@ public class ZkbPartOrder implements Serializable {
         this.catNum = catNum;
     }
 
-    public int getReturnQty() {
+    public Integer getReturnQty() {
         return returnQty;
     }
 
-    public void setReturnQty(int returnQty) {
+    public void setReturnQty(Integer returnQty) {
         this.returnQty = returnQty;
     }
 
