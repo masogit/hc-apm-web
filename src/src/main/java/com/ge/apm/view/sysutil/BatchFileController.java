@@ -15,32 +15,32 @@ import com.ge.apm.service.utils.FileScanExportService;
 import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.google.common.base.Strings;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-
+import javaslang.Tuple2;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import javaslang.Tuple2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author 212579464
