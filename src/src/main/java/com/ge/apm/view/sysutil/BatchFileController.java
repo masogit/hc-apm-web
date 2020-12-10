@@ -185,9 +185,9 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     public void restartBatchJob() {
         selected.setStatus(ImportFiles.STATUS_STARTING);
-        List<String> typeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel");
+        List<String> fileTypeList=  gamePlanBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
         // game plan数据导入，重试时重新添加任务
-        if (typeList.contains(selected.getFileType())) {
+        if (fileTypeList.contains(selected.getFileType())) {
             selected.setId(null);
         }
         dao.save(selected);
