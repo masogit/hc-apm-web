@@ -8,6 +8,9 @@
 
     <ui:define name="content">
         <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
+        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css"/>
         <style>
             div.ui-panelgrid-cell>label+div.ui-selectonemenu {
                 min-width: 75px !important;
@@ -48,6 +51,7 @@
             .demo-container p span.track-name {
                 color: #CC0090;
             }
+
         </style>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
@@ -124,15 +128,26 @@
                                     </div>
                                     <div class="ui-g-4">
                                         <h:panelGroup id="pict">
-                                            <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{assetInfoEditController.uploadFlag}" />
-                                            <p:galleria value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" panelWidth="320" panelHeight="260"
-                                                        showCaption="false"  autoPlay="false" rendered="#{!assetInfoEditController.uploadFlag}" >
-                                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"
-                                                                onclick="javascript:showthis(this);" />
-                                            </p:galleria>
+<!--                                            <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{assetInfoEditController.uploadFlag}" />-->
+<!--                                            <p:galleria value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" panelWidth="320" panelHeight="260"-->
+<!--                                                        showCaption="false"  autoPlay="false" rendered="#{!assetInfoEditController.uploadFlag}" >-->
+<!--                                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"-->
+<!--                                                                onclick="javascript:showthis(this);" />-->
+<!--                                            </p:galleria>-->
                                             <!--<h:inputText value="#{assetInfoEditController.uploadFlag}"></h:inputText>-->
+                                            <div class="container" >
+                                                <div class="row" id="picDiv">
+                                                    <c:forEach items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" >
+                                                        <div class="col-xs-6 col-lg-4">
+                                                            <img data-original="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                                 src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"/>
+                                                        </div>
+                                                    </c:forEach>
+                                                </div>
+                                            </div>
                                         </h:panelGroup>
                                     </div>
+
                                 </p:fieldset>
                             </c:if>
                             <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCodesFields}" >
@@ -431,6 +446,9 @@
 
             });
             //]]>
+        </script>
+        <script>
+            const gallery = new Viewer(document.getElementById('picDiv'));
         </script>
     </ui:define>
 </ui:composition>
