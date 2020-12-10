@@ -2,6 +2,7 @@ package webapp.framework.util;
 
 import java.util.Date;
 import java.util.Random;
+import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -51,6 +52,7 @@ public class StringUtil {
 
     /**
      * 手机号码前三后四脱敏
+     *
      * @param mobile
      * @return
      */
@@ -59,6 +61,24 @@ public class StringUtil {
             return mobile;
         }
         return mobile.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+    }
+
+    /**
+     * 拼接字符串,忽略空字符串
+     * @param delimiter 拼接符号
+     * @param strings   需要拼接的字符串
+     * @return
+     */
+    public static String joinNotEmpty(String delimiter, CharSequence... strings) {
+        StringJoiner joiner = new StringJoiner(delimiter);
+        for (CharSequence s : strings) {
+            boolean empty = org.springframework.util.StringUtils.isEmpty(s);
+            if (empty) {
+                continue;
+            }
+            joiner.add(s);
+        }
+        return joiner.toString();
     }
 
 }
