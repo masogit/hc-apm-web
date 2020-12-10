@@ -9,6 +9,8 @@ import com.ge.apm.service.orginfo.OrgInfoLocalCacheService;
 import com.ge.apm.service.orginfo.SiteOrgWithDeptOrg;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ import static com.ge.apm.service.utils.ApmConstant.CHILD_CLINICAL_DEPT_SEPARATOR
 
 @Service
 public class AssetFileImportSupportingService {
+    private static final Logger logger = LoggerFactory.getLogger(AssetFileImportSupportingService.class);
 
     public static final String ASSET_CODE_MERGE_THREE = "DFQ";
     public static final String ASSET_CODE_MERGE_TWO = "DF";
@@ -238,6 +241,7 @@ public class AssetFileImportSupportingService {
 
         List<AssetInfo> resultList = assetDao.findBySearchFilter(assetFilters);
         if (resultList.size() > 0) {
+            logger.info("check depart num duplicate: departNUm: {}, siteUid:{}, asset uid:{}", asset.getDepartNum(), siteUid, asset.getUid());
             return true;
         } else {
             return false;
