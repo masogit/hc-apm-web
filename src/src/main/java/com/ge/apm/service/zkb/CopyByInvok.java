@@ -13,6 +13,9 @@ public class CopyByInvok {
     public static String EMAIL_URL_TYPE_LASTDAY = "lastDay";
     public static String EMAIL_URL_TYPE_UNORDER = "unOrder";
 
+    public static String T = "t";
+    public static String F = "f";
+
     public static <T> T translateField(Object souce, Class<T> target) throws Exception {
         T tarObj = target.newInstance();
         Class tempClass = souce.getClass();
