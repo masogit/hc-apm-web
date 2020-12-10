@@ -28,7 +28,7 @@ public class ZkbPartOrder implements Serializable {
      * Returned：归还  Closed：关单
      */
     public enum PartOrderStatus {
-        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,UnOrdered,UnOrderedReject,Ordered,OrderedReject,PartReturned,Returned,Closed
+        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,UnOrdered,UnOrderedReject,Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject
     }
 
     /**
@@ -165,6 +165,20 @@ public class ZkbPartOrder implements Serializable {
     private String manageAuditer;
     @Column(name = "manage_auditer_uid")
     private String manageAuditerUid;
+
+    /**
+     * 销售总监审批备注
+     */
+    @Column(name = "director_remark")
+    private String directorRemark;
+
+    @Column(name = "director_audit_date")
+    private Date directorAuditDate;
+
+    @Column(name = "director_auditer")
+    private String directorAuditer;
+    @Column(name = "director_auditer_uid")
+    private String directorAuditerUid;
 
     /**
      *
@@ -573,6 +587,38 @@ public class ZkbPartOrder implements Serializable {
 
     public void setManageAuditerUid(String manageAuditerUid) {
         this.manageAuditerUid = manageAuditerUid;
+    }
+
+    public String getDirectorRemark() {
+        return directorRemark;
+    }
+
+    public void setDirectorRemark(String directorRemark) {
+        this.directorRemark = directorRemark;
+    }
+
+    public Date getDirectorAuditDate() {
+        return directorAuditDate;
+    }
+
+    public void setDirectorAuditDate(Date directorAuditDate) {
+        this.directorAuditDate = directorAuditDate;
+    }
+
+    public String getDirectorAuditer() {
+        return directorAuditer;
+    }
+
+    public void setDirectorAuditer(String directorAuditer) {
+        this.directorAuditer = directorAuditer;
+    }
+
+    public String getDirectorAuditerUid() {
+        return directorAuditerUid;
+    }
+
+    public void setDirectorAuditerUid(String directorAuditerUid) {
+        this.directorAuditerUid = directorAuditerUid;
     }
 
     public String getUnOrderAuditerUid() {
