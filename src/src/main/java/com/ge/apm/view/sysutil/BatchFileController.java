@@ -89,7 +89,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
         getI18nByBatchFileType = fieldMsg.getI18nByBatchFileType();
 //        batchFileType = fieldMsg.getFieldValueList("batchFileType");
-//        gamePlanBatchFileType = fieldMsg.getFieldValueList("gamePlanBatchFileType");
+        gamePlanBatchFileType = fieldMsg.getFieldValueList("gamePlanBatchFileType");
 //        batchFileType.removeIf(i -> StringUtils.equalsIgnoreCase(i.getMsgKey(), "SrReportPdf"));
     }
 
