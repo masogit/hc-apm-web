@@ -15,7 +15,8 @@
                             <label class="label">#{msg.fileType}*</label>
                             <p:selectOneMenu id="fileType" value="#{batchFileController.gamePlanFileType}"  required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
                                 <p:ajax process="@this"/>
-                                <f:selectItems value="#{batchFileController.gamePlanBatchFileType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                <f:selectItems value="#{batchFileController.getI18nByBatchFileType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+<!--                                <f:selectItems value="#{batchFileController.gamePlanBatchFileType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />-->
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <p:panel id="uploadPanel" styleClass="ui-panelgrid-blank" style=" border: 0">

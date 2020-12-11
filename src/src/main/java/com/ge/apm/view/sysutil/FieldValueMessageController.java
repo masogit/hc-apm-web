@@ -3,6 +3,9 @@ package com.ge.apm.view.sysutil;
 import com.ge.apm.dao.AssetFaultTypeRepository;
 import com.ge.apm.domain.AssetFaultType;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.RoleMsgRel;
+import com.ge.apm.domain.UserAccount;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.web.WebUtil;
@@ -57,7 +60,6 @@ public class FieldValueMessageController implements Serializable {
             instId = UserContextService.getCurrentUserAccount().getSiteId();
         } catch (Exception ex) {
         }
-
         return getFieldValueList(fieldName, instId);
     }
 
@@ -107,4 +109,58 @@ public class FieldValueMessageController implements Serializable {
         DbMessageSource.reLoadMessages();
         WebUtil.addSuccessMessage("Messages reloaded!");
     }
+
+
+    public static List<I18nMessage> getI18nByBatchFileType() {
+        UserContextService userService = WebUtil.getBean(UserContextService.class);
+        UserAccount ua = userService.getCurrentUserAccount();
+        List<RoleMsgRel> roleMsgRels = userService.getRoleMsgInfos(ua.getId());
+
+        boolean dataMainStaff = hasRole(roleMsgRels, "DataMaintainStaff");
+        boolean geInternalStaff = hasRole(roleMsgRels, "GEInternalStaff");
+
+        List<I18nMessage> allMsgList = new ArrayList<>();
+
+        if (ua.getIsGeOp()) {
+            List<I18nMessage> msgList1 = getI18nMsgList(userService, "GeOp");
+            allMsgList.addAll(msgList1);
+        }
+        if (geInternalStaff) {
+            List<I18nMessage> msgList2 = getI18nMsgList(userService, "GEInternalStaff");
+            allMsgList.addAll(msgList2);
+        }
+        if (dataMainStaff) {
+            List<I18nMessage> msgList3 = getI18nMsgList(userService, "DataMaintainStaff");
+            allMsgList.addAll(msgList3);
+        }
+        return allMsgList;
+    }
+
+
+    public static List<I18nMessage> getI18nMsgList(UserContextService service, String roleName) {
+        List<I18nMessage> msgList = null;
+        List<RoleMsgRel> roleMsgs = service.getRoleMsgInfosByRoleName(roleName);
+        if (CollectionUtils.isNotEmpty(roleMsgs)) {
+            msgList = new ArrayList<>();
+            for (RoleMsgRel r : roleMsgs) {
+                I18nMessage msg = service.getByMsgTypeAndMsgKey(r.getMsgType(), r.getMsgKey());
+                if (msg != null)
+                    msgList.add(msg);
+            }
+        }
+        return msgList;
+    }
+
+    public static boolean hasRole(List<RoleMsgRel> roleMsgRels, String roleName) {
+        if (CollectionUtils.isNotEmpty(roleMsgRels)) {
+            for (int i = 0; i < roleMsgRels.size(); i++) {
+                String name = roleMsgRels.get(i).getRoleName();
+                if (name.equals(roleName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }
