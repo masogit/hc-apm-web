@@ -25,11 +25,11 @@
                 <p:menuitem id="um495" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/qrCodeLibList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{userContextService.hasNotAnyRole('SuperAdmin') and userContextService.accessContains('config.qrCode')}"/>
             </p:submenu>
-            <p:submenu id="um4000" label="#{msg.APMPlatformManagement}" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin,GEInternalStaff')}">
+            <p:submenu id="um4000" label="#{msg.APMPlatformManagement}" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin,GEInternalStaff,DataMaintainStaff')}">
                 <p:menuitem id="um45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp') }"/>
-                <p:menuitem id="um471" value="#{msg.BatchFileImport}" outcome="/admin/batchFile/batchFileList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
-                <p:menuitem id="um4100" value="#{msg.SRReportList}" outcome="/portal/sr/opsreport/reportList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
-                <p:menuitem id="um4200" value="#{msg.AlertSettingsList}" outcome="/portal/fealert/report/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
+                <p:menuitem id="um471" value="#{msg.BatchFileImport}" outcome="/admin/batchFile/batchFileList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin,DataMaintainStaff,GEInternalStaff')}"/>
+                <p:menuitem id="um4100" value="#{msg.SRReportList}" outcome="/portal/sr/opsreport/reportList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DataMaintainStaff,SiteAdmin')}"/>
+                <p:menuitem id="um4200" value="#{msg.AlertSettingsList}" outcome="/portal/fealert/report/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DataMaintainStaff,SiteAdmin')}"/>
                 <p:menuitem id="um472" value="#{msg.GamePlanBatchFileImport}" outcome="/admin/batchFile/gamePlanBatchFileList.xhtml" rendered="#{userContextService.hasAnyRole('GEInternalStaff')}"/>
             </p:submenu>
             <p:submenu id="um25" label="#{msg.MyTrain}" icon="fa fa-check-square-o" rendered="#{userContextService.isAccessMyTrain()}">
