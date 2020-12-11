@@ -431,7 +431,6 @@
                             <label class="label">销售总监审批时间*</label>
                             <p:calendar timeZone="GMT+8" id="directorAuditDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.directorAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
-
                         <h:panelGroup>
                             <label class="label">销售总监审批备注</label>
                             <p:inputTextarea id="directorRemark" value="#{zkbPartOrderAuditController.selected.directorRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'DirectorPending')}">
