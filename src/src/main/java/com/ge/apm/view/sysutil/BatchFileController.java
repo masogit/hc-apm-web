@@ -183,6 +183,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         }
     }
 
+
     public void restartBatchJob() {
         selected.setStatus(ImportFiles.STATUS_STARTING);
         List<String> fileTypeList=  gamePlanBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
