@@ -69,6 +69,8 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     MicroServiceUtil microServiceUtil;
 
+    private List<I18nMessage> getI18nByBatchFileType;
+
     private List fileTypeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel");
 
     @Override
@@ -85,9 +87,10 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         gamePlanFileType = ImportFiles.ImportFileType.CarePackageExcel.toString();
 
         FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
-        batchFileType = fieldMsg.getFieldValueList("batchFileType");
-        gamePlanBatchFileType = fieldMsg.getFieldValueList("gamePlanBatchFileType");
-        batchFileType.removeIf(i -> StringUtils.equalsIgnoreCase(i.getMsgKey(), "SrReportPdf"));
+        getI18nByBatchFileType = fieldMsg.getI18nByBatchFileType();
+//        batchFileType = fieldMsg.getFieldValueList("batchFileType");
+//        gamePlanBatchFileType = fieldMsg.getFieldValueList("gamePlanBatchFileType");
+//        batchFileType.removeIf(i -> StringUtils.equalsIgnoreCase(i.getMsgKey(), "SrReportPdf"));
     }
 
     @Override
@@ -287,5 +290,13 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
                 || StringUtils.equals(gamePlanFileType, ImportFiles.ImportFileType.PMScheduleExcel.toString())) {
             microServiceUtil.synchBatchTask(new File(fileService.getUploadFileFullPath(savedFilePath)), gamePlanFileType);
         }
+    }
+
+    public List<I18nMessage> getGetI18nByBatchFileType() {
+        return getI18nByBatchFileType;
+    }
+
+    public void setGetI18nByBatchFileType(List<I18nMessage> getI18nByBatchFileType) {
+        this.getI18nByBatchFileType = getI18nByBatchFileType;
     }
 }
