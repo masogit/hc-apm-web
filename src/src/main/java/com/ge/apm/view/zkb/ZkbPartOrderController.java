@@ -84,11 +84,11 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     showStatusBtn =false;
                 }
                 if(zkbPartOrderUserConfigList.size() == 2){
-                    isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? "f" : zkbPartOrderUserConfig.getIsVacation();
+                    isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
                     vacationBtn = true;
                 }else if(zkbPartOrderUserConfigList.size() == 1){
                     if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) && ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrderUserConfig.getOrderType())){
-                        isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? "f" : zkbPartOrderUserConfig.getIsVacation();
+                        isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
                         vacationBtn = true;
                     }
                 }
@@ -119,6 +119,11 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
             searchFilters = new ArrayList<>();
         }
 
+        if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
+            searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.EQ, ZkbPartOrder.DATA_TYPE_TEST));
+        }else {
+            searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.IsNull, ""));
+        }
         if(userContextService.isZkbUser()) {
             if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
                 searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
