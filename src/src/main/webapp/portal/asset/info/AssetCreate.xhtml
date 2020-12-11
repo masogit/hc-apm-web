@@ -154,11 +154,6 @@
                                 </p:fieldset>
                             </c:if>
 
-                            <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" >
-
-
-                            </p:fieldset>
-
                             <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCodesFields}" >
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCodesFields}" var="fieldItem" >
