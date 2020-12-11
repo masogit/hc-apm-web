@@ -333,7 +333,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 selected.setFaultDescription("");
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending","CS");
+                if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) >-1){
+                    zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameContains("TechnicalPending","CS",ZkbPartOrder.DATA_TYPE_TEST);
+                }else{
+                    zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameIsNotContaining("TechnicalPending","CS",ZkbPartOrder.DATA_TYPE_TEST);
+                }
             }
             selected.setRegion(zkbContract.getRegion());
             initZknPartCat(zkbContract.getStartDate());
@@ -511,7 +515,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                flag=false;
+                //flag=false;
                 errorLog += "附件不能为空！";
             }
         }
@@ -574,7 +578,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
 
         this.selected.setOrderType(orderType);
-
+        if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
+            selected.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
+        }
         if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
             if(!r){

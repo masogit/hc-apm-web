@@ -22,6 +22,9 @@ public class ZkbPartOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Transient
+    public static String DATA_TYPE_TEST="test.";
+
     /**
      * Pending：申请 TechAccept：技术审批通过 TechReject：技术审批不通过 ManageAccept：区域经理审批通过
      * ManageReject：区域经理审批不通过 Ordered：发货 OrderedReject:发货取消
@@ -500,6 +503,21 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "check_apply_num_flag")
     private String checkApplyNumFlag = "t";// t是校验通过 f：校验不通过
+
+    /**
+     * 用于区分数据是真实数据还是测试数据
+     * 真实数据字段为空，测试数据值为test.
+     */
+    @Column(name = "data_type")
+    private String dataType;
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
+    }
 
     public String getUploadLetterFileId() {
         return uploadLetterFileId;
