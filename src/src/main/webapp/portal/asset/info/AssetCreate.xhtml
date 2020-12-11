@@ -135,7 +135,7 @@
 <!--                                                                onclick="javascript:showthis(this);" />-->
 <!--                                            </p:galleria>-->
                                             <!--<h:inputText value="#{assetInfoEditController.uploadFlag}"></h:inputText>-->
-                                            <div class="container" >
+                                            <div class="container-fluid" style="height: 400px; overflow: auto;">
                                                 <div class="row" id="picDiv">
                                                     <c:forEach items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" >
                                                         <div class="col-xs-6 col-lg-4">
@@ -150,6 +150,12 @@
 
                                 </p:fieldset>
                             </c:if>
+
+                            <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" >
+
+
+                            </p:fieldset>
+
                             <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCodesFields}" >
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCodesFields}" var="fieldItem" >
@@ -448,7 +454,7 @@
             //]]>
         </script>
         <script>
-            const gallery = new Viewer(document.getElementById('picDiv'));
+            const gallery = new Viewer(document.getElementById('picDiv'), {inline: true});
         </script>
     </ui:define>
 </ui:composition>
