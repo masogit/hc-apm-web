@@ -127,8 +127,8 @@
                                         </p:panelGrid>
                                     </div>
                                     <div class="ui-g-4">
+                                        <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{assetInfoEditController.uploadFlag}" />
                                         <h:panelGroup id="pict">
-                                            <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{assetInfoEditController.uploadFlag}" />
 <!--                                            <p:galleria value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" panelWidth="320" panelHeight="260"-->
 <!--                                                        showCaption="false"  autoPlay="false" rendered="#{!assetInfoEditController.uploadFlag}" >-->
 <!--                                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"-->
@@ -140,14 +140,17 @@
                                                     <c:forEach items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" >
                                                         <div class="col-xs-6 col-lg-4">
                                                             <img data-original="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
-                                                                 src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"/>
+                                                                 src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                                 style="opacity: 0"/>
                                                         </div>
                                                     </c:forEach>
                                                 </div>
+                                                <script>
+                                                    new Viewer(document.getElementById('picDiv'), {inline: true});
+                                                </script>
                                             </div>
                                         </h:panelGroup>
                                     </div>
-
                                 </p:fieldset>
                             </c:if>
 
@@ -453,8 +456,6 @@
             });
             //]]>
         </script>
-        <script>
-            const gallery = new Viewer(document.getElementById('picDiv'), {inline: true});
-        </script>
+
     </ui:define>
 </ui:composition>
