@@ -594,6 +594,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         newZkbPartOrderStep.setStepName("待下单");
                     }
                 }
+            }else if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(oldStep)){
+                if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+                    newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
+                    newZkbPartOrderStep.setStepName("待开单");
+                }else{
+                    newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                    newZkbPartOrderStep.setStepName("待下单");
+                }
             }
         }else{
             newZkbPartOrderStep.setStepKey("Complete");
