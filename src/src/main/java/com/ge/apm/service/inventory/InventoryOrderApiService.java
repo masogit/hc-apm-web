@@ -1,0 +1,94 @@
+package com.ge.apm.service.inventory;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.InventoryOrder;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.service.utils.PinYinComparator;
+import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import webapp.framework.dao.SearchFilter;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * Created by 503189824 on 2020/12/14.
+ */
+@Service
+public class InventoryOrderApiService extends MicroServiceInvoker {
+	private static final Logger LOGGER = LoggerFactory.getLogger(InventoryOrderApiService.class);
+
+	@Autowired
+	OrgInfoRepository orgDao;
+
+	//初始化创建工单科室列表
+	public List<OrgInfo> onCreateInventory(){
+
+		HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
+
+		String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER);
+
+		ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.GET,requestEntity,LinkedHashMap.class);
+
+		ArrayList<Map<String,Object>> data = (ArrayList)response.getBody().get("data");
+
+		return data.stream().map(item -> orgDao.findByUid((String) item.get("uid"))).collect(Collectors.toList());
+	}
+
+	// 创建盘点工单
+	public ResponseEntity<LinkedHashMap> doCreate(InventoryOrder selected, List<OrgInfo> selectedOrgs){
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Map map =new HashMap<String,Object>();
+
+		map.put("planStartTime",format.format(selected.getPlanStartTime()));
+		map.put("planEndTime",format.format(selected.getPlanEndTime()));
+
+		List<Map> list = new ArrayList<>();
+		selectedOrgs.stream().forEach(org -> {
+			Map p =new HashMap<String,Object>();
+			p.put("uid",org.getUid());
+			p.put("orgName",getNameWithParent(org));
+			p.put("id",org.getId());
+			p.put("selected", true);
+			list.add(p);
+		});
+		map.put("orgSelections",list);
+		HttpEntity<Map> requestEntity = new HttpEntity<>(map,createHttpHeaders(UserContextService.getAccessToken()));
+		String url = getGatewayURL(GatewayURL.SUMBIT_CREATE_INVENTORY_ORDER);
+		return template.exchange(url,HttpMethod.POST,requestEntity,LinkedHashMap.class);
+	}
+
+	//组织机构名称拼接
+	public String getNameWithParent(OrgInfo org){
+		if(org.getParentUID() == null){
+			return org.getName();
+		}
+		String pName = orgDao.findNameByUID(org.getParentUID());
+		return pName==null ? org.getName() : pName +"/" + org.getName();
+	}
+
+}
