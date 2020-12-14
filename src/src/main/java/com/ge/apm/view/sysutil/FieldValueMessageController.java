@@ -155,7 +155,7 @@ public class FieldValueMessageController implements Serializable {
         if (CollectionUtils.isNotEmpty(roleMsgRels)) {
             for (int i = 0; i < roleMsgRels.size(); i++) {
                 String name = roleMsgRels.get(i).getRoleName();
-                if (name.equals(roleName)) {
+                if (name.equalsIgnoreCase(roleName)) {
                     return true;
                 }
             }
