@@ -1,6 +1,8 @@
 package com.ge.apm.view.inventory;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.faces.bean.ManagedBean;
@@ -22,6 +24,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -42,7 +45,8 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
     List<OrgInfo> orgsForSelected = new ArrayList<>(); //待选科室
     @Setter @Getter
     List<OrgInfo> selectedOrgs; //勾选盘点科室
-
+    @Setter @Getter
+    private InventoryOrder inventoryOrder;
 	@Override
     protected void init() {
         dao = WebUtil.getBean(InventoryOrderRepository.class);
@@ -72,24 +76,59 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
     }
 
     //创建盘点工单 保存
-    public void save(){
+    public String saveCreate(){
         //时间校验
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String s = sdf.format(TimeUtil.now());
+        Date now = new Date();
+        try {
+            now =  sdf.parse(s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if(selected.getPlanStartTime().before(now)){
+            WebUtil.addErrorMessage("计划开始时间不得早于当前日期");
+            return "";
+        }
         if(selected.getPlanStartTime().after(selected.getPlanEndTime())){
-            WebUtil.addErrorMessage("结束时间不得早于开始时间");
-            return;
+            WebUtil.addErrorMessage("计划结束时间不得早于开始时间");
+            return "";
         }
 	    try{
             apiService.doCreate(selected, selectedOrgs);
             selectedOrgs.clear();
         }catch(Exception e){
             WebUtil.addErrorMessage("盘点工单新建失败");
+            return "";
         }
         WebUtil.addSuccessMessage("盘点工单新建成功");
+        return "inventoryOrder?faces-redirect=true";
+    }
+
+    public String finishOrder() {
+        //时间校验
+        if(inventoryOrder.getStartTime().after(inventoryOrder.getEndTime())){
+            WebUtil.addErrorMessage("实际结束时间不得早于开始时间");
+            return "";
+        }
+	    try{
+            apiService.doFinishOrder(inventoryOrder);
+        }catch(Exception e){
+            WebUtil.addErrorMessage("盘点工单关闭失败");
+            return "";
+        }
+        WebUtil.addSuccessMessage("盘点工单关闭成功");
+        return "inventoryOrder?faces-redirect=true";
     }
 
     public void onCreate() throws IllegalAccessException, InstantiationException {
         super.prepareCreate();
         orgsForSelected = apiService.onCreateInventory();
+    }
+
+    public void onFinishOrder(String id){
+        inventoryOrder = new InventoryOrder();
+        inventoryOrder.setId(id);
     }
 
     public String getNameWithParent(OrgInfo org){

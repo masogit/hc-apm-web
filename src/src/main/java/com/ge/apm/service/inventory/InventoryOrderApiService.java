@@ -45,25 +45,21 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 	@Autowired
 	OrgInfoRepository orgDao;
 
+	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
 	//初始化创建工单科室列表
 	public List<OrgInfo> onCreateInventory(){
 
 		HttpEntity<JSONObject> requestEntity = new HttpEntity<>(createHttpHeaders(UserContextService.getAccessToken()));
-
 		String url = getGatewayURL(GatewayURL.BEFORE_CREATE_INVENTORY_ORDER);
-
 		ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.GET,requestEntity,LinkedHashMap.class);
-
 		ArrayList<Map<String,Object>> data = (ArrayList)response.getBody().get("data");
-
 		return data.stream().map(item -> orgDao.findByUid((String) item.get("uid"))).collect(Collectors.toList());
 	}
 
 	// 创建盘点工单
 	public ResponseEntity<LinkedHashMap> doCreate(InventoryOrder selected, List<OrgInfo> selectedOrgs){
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		Map map =new HashMap<String,Object>();
-
 		map.put("planStartTime",format.format(selected.getPlanStartTime()));
 		map.put("planEndTime",format.format(selected.getPlanEndTime()));
 
@@ -80,6 +76,16 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 		HttpEntity<Map> requestEntity = new HttpEntity<>(map,createHttpHeaders(UserContextService.getAccessToken()));
 		String url = getGatewayURL(GatewayURL.SUMBIT_CREATE_INVENTORY_ORDER);
 		return template.exchange(url,HttpMethod.POST,requestEntity,LinkedHashMap.class);
+	}
+
+	// 关闭盘点工单
+	public ResponseEntity<LinkedHashMap> doFinishOrder(InventoryOrder order){
+		Map map =new HashMap<String,String>();
+		map.put("startTime",format.format(order.getStartTime()));
+		map.put("endTime",format.format(order.getEndTime()));
+		HttpEntity<Map> requestEntity = new HttpEntity<>(map,createHttpHeaders(UserContextService.getAccessToken()));
+		String url = getGatewayURL(GatewayURL.FINISH_INVENTORY_ORDER).replace("{orderId}", order.getId());;
+		return template.exchange(url,HttpMethod.PUT,requestEntity,LinkedHashMap.class);
 	}
 
 	//组织机构名称拼接
