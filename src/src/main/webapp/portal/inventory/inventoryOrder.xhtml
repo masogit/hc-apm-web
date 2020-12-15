@@ -71,6 +71,16 @@
 				            </f:facet>
 							<h:outputText value="#{item.isFinished?msg.Finished:msg.InProgress}"/>
 						</p:column>
+
+						<p:column headerText="关闭盘点工单" exportable="false" width="120" id="operatorColumn">
+							<h:panelGroup rendered="#{!item.isFinished}">
+								<p:commandLink id="deleteButton" title="关闭" oncomplete="PF('FinishOrderDialog').show()" action="#{inventoryOrderController.onFinishOrder(item.id)}">
+									<p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+									<!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>-->
+								</p:commandLink>
+							</h:panelGroup>
+						</p:column>
+
 						<f:facet name="{Toolbar}">
 							<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
 											 action = "#{inventoryOrderController.onCreate()}" update=":inventoryOrderEditForm" oncomplete="PF('inventoryOrderEditDlg').show()" />

@@ -282,21 +282,23 @@ public class InventoryOrderService {
 
 	public Page<InventoryOrder> getPageData(PageRequest pageRequest, String tenantUid, List<SearchFilter> listSearchFilter, List<String> listAccessClinical) {
 		Page<InventoryOrder> pageRe = null;
+		listUserInventoryOrder.clear();
 		int page = pageRequest.getPageNumber();
 		int pageSize = pageRequest.getPageSize();
 		List<InventoryOrder> listFilterInventoryOrder = new ArrayList<InventoryOrder>();
 		List<InventoryOrder> listSmallRe = new ArrayList<InventoryOrder>();
-		if (listUserInventoryOrder.size() > 0) {
+		/*if (listUserInventoryOrder.size() > 0) {
 		} else {
-			List<InventoryOrder> listInventoryOrder = inventoryOrderDao.findByTenantUid(tenantUid);
-			if (listInventoryOrder != null && listInventoryOrder.size() > 0) {
-				for (int i = 0; i < listInventoryOrder.size(); ++i) {
-					InventoryOrder tempOrder = listInventoryOrder.get(i);
-					for (String clinicalUid : listAccessClinical) {
-						if (tempOrder.getAssigneeOrg().contains(clinicalUid)) {
-							listUserInventoryOrder.add(tempOrder);
-							break;
-						}
+
+		}*/
+		List<InventoryOrder> listInventoryOrder = inventoryOrderDao.findByTenantUid(tenantUid);
+		if (listInventoryOrder != null && listInventoryOrder.size() > 0) {
+			for (int i = 0; i < listInventoryOrder.size(); ++i) {
+				InventoryOrder tempOrder = listInventoryOrder.get(i);
+				for (String clinicalUid : listAccessClinical) {
+					if (tempOrder.getAssigneeOrg().contains(clinicalUid)) {
+						listUserInventoryOrder.add(tempOrder);
+						break;
 					}
 				}
 			}

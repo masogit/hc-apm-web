@@ -15,12 +15,12 @@
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
                             <h:panelGroup>
                                 <label class="label">开始时间<span style="color: red">*</span></label>
-                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="startDate" pattern="#{userContextService.timeFormat()}" value="#{inventoryOrderController.selected.planStartTime}" mindate ="#{appContextService.curentDate}"  class="manufactDateChange"
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="startDate" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.selected.planStartTime}" class="manufactDateChange"
                                             showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">结束时间<span style="color: red">*</span></label>
-                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="endDate" pattern="#{userContextService.timeFormat()}" value="#{inventoryOrderController.selected.planEndTime}" mindate="#{appContextService.curentDate}"  class="manufactDateChange"
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="endDate" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.selected.planEndTime}"  class="manufactDateChange"
                                              showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                         </p:panelGrid>
@@ -44,8 +44,35 @@
                     </p:fieldset>
 
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{inventoryOrderController.save}" value="#{msg.Save}" update="inventoryOrderListForm" icon="ui-icon-check" oncomplete="PF('inventoryOrderEditDlg').hide()"/>
+                    <p:commandButton validateClient="true" action="#{inventoryOrderController.saveCreate}" value="#{msg.Save}" update=":inventoryOrderListForm:datalist" icon="ui-icon-check"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('inventoryOrderEditDlg').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="FinishOrderDialog" widgetVar="FinishOrderDialog" modal="true" width="600" height="130"  resizable="true" draggable="true" appendTo="@this" closable="false" header="盘点工单关闭">
+            <h:form id="FinishOrderForm" >
+                <p:messages id="messages" showDetail="true" closable="false" autoUpdate="true"></p:messages>
+                <h:panelGroup id="display22">
+                    <h:panelGrid columns="2" >
+                        <!--<h:outputText value="#{msg.NoAddableField}" rendered="#{empty customConfigController.addFieldsList}" />-->
+                        <h:panelGroup>
+                            <label class="label">实际开始时间<span style="color: red">*</span></label>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="startDatee" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.inventoryOrder.startTime}" maxdate ="#{appContextService.curentDate}"  class="manufactDateChange"
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">实际结束时间<span style="color: red">*</span></label>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="endDatee" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.inventoryOrder.endTime}" maxdate="#{appContextService.curentDate}"  class="manufactDateChange"
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="1" >
+                        <h:panelGroup style="align-content: flex-start">
+                            <p:commandButton action="#{inventoryOrderController.finishOrder}" value="#{msg.OK}" icon="ui-icon-check"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
