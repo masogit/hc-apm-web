@@ -626,3 +626,74 @@ insert into role_msg_rel(msg_type, msg_key, role_name,role_type) values ('batchF
 
 --处理基础互通错误数据
 update org_info set short_name = name,short_name_py_code=name_py_code,hospital_uid=uid,site_uid=uid,site_id=46,parent_id=hospital_id where institution_uid=(select uid from org_info where name = '基础互通' and org_type = 1) and org_type = 2 and site_id!=46;
+
+-- YHAAO-9906
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '49', '无创自动测量血压计', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '50', '无创非自动测量血压计', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '51', '眼压计', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '52', '纯音听力计', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '53', '阻抗听力计', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '54', '焦度计', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '55', '角膜曲率计', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '56', '放射治疗用电离室剂量计', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('measuringItemCategory', '57', '医用诊断X射线设备', '', NULL, '-1');
+
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '医用CT';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '普通X光机';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '磁共振类';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = 'B超';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = 'X线胃肠';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '医用DSA';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '乳腺X光机';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '医用直线加速器';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '射线骨密度仪';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '超声多普勒胎儿监护仪';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '超声多普勒胎心仪';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '血压计（表）';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '电子血压计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '心电图机';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '脑电图仪';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '听力计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '验光仪';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '验光镜片组';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '氧气吸入器';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '酸度计';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '分光光度计';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '天平';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '电子体重秤';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '指针式机械体重秤';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '温湿度计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '体温计';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '电导率仪';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '剂量仪';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '活度计';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '标准器';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '测试仪';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '移液器';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '婴儿培养箱';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '普通压力表';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '精密压力表';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '安全阀';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '压力容器';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '高压氧舱';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '血压计（电子）';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '血压计（水银）';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '流量计';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '超声诊断设备';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '数字心电图';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '放射类';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '监护仪';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '呼吸机';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '除颤仪';
+update i18n_message set value_zh =  value_zh || '(非强检)' where msg_type = 'measuringItemCategory' and value_zh = '生物安全柜';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '无创自动测量血压计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '无创非自动测量血压计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '眼压计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '纯音听力计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '阻抗听力计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '焦度计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '角膜曲率计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '放射治疗用电离室剂量计';
+update i18n_message set value_zh =  value_zh || '(强检)' where msg_type = 'measuringItemCategory' and value_zh = '医用诊断X射线设备';
+
+
