@@ -614,11 +614,11 @@ insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','TrainingQuotaExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
 
 --GEInternalStaff
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','DealerFEAndSalesExcel',45,'GEInternalStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserAccountSendMailExcel',45,'GEInternalStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserAssetCustomerExcel',45,'GEInternalStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserAssetFeExcel',45,'GEInternalStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserAssetOLEExcel',45,'GEInternalStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','DealerFEAndSalesExcel',(select id from sys_role where name = 'GEInternalStaff'),'GEInternalStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserAccountSendMailExcel',(select id from sys_role where name = 'GEInternalStaff'),'GEInternalStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserAssetCustomerExcel',(select id from sys_role where name = 'GEInternalStaff'),'GEInternalStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserAssetFeExcel',(select id from sys_role where name = 'GEInternalStaff'),'GEInternalStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserAssetOLEExcel',(select id from sys_role where name = 'GEInternalStaff'),'GEInternalStaff',0);
 
 -- geop
 insert into role_msg_rel(msg_type, msg_key, role_name,role_type) values ('batchFileType','AssetInfoImportExcel','GeOp',0);
