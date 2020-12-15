@@ -624,3 +624,5 @@ insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values
 insert into role_msg_rel(msg_type, msg_key, role_name,role_type) values ('batchFileType','AssetInfoImportExcel','GeOp',0);
 insert into role_msg_rel(msg_type, msg_key, role_name,role_type) values ('batchFileType','GEIBTableExcel','GeOp',0);
 
+--处理基础互通错误数据
+update org_info set short_name = name,short_name_py_code=name_py_code,hospital_uid=uid,site_uid=uid,site_id=46,parent_id=hospital_id where institution_uid=(select uid from org_info where name = '基础互通' and org_type = 1) and org_type = 2 and site_id!=46;

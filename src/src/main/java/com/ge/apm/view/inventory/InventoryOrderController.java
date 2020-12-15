@@ -1,21 +1,18 @@
 package com.ge.apm.view.inventory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import org.apache.commons.lang3.StringUtils;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.service.inventory.InventoryOrderApiService;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.UserAccount;
@@ -27,20 +24,24 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-import webapp.framework.web.mvc.ServerEventInterface;
 
 /**
  * Created by 503035627
  */
 @ManagedBean
 @ViewScoped
-public class InventoryOrderController extends GenericCRUDUUIDController<InventoryOrder> implements Serializable, ServerEventInterface{
+public class InventoryOrderController extends GenericCRUDUUIDController<InventoryOrder> implements Serializable{
 
 	private UserAccount currentUser;
 	private InventoryOrderRepository dao;
 	private List<String> listAccessClinical;
     private UaaService uaaService;
     private InventoryOrderService service;
+    private InventoryOrderApiService apiService;
+    @Getter @Setter
+    List<OrgInfo> orgsForSelected = new ArrayList<>(); //待选科室
+    @Setter @Getter
+    List<OrgInfo> selectedOrgs; //勾选盘点科室
 
 	@Override
     protected void init() {
@@ -48,13 +49,9 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         currentUser = UserContextService.getCurrentUserAccount();
         uaaService=WebUtil.getBean(UaaService.class);
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
+        apiService = WebUtil.getBean(InventoryOrderApiService.class);
         service=WebUtil.getBean(InventoryOrderService.class);
         service.init();
-    }
-
-    @Override
-    protected GenericRepositoryUUID<InventoryOrder> getDAO() {
-        return dao;
     }
 
     @Override
@@ -74,9 +71,29 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         return pageRe;
     }
 
-    @Override
-    public void onServerEvent(String eventName, Object eventObject) {
+    //创建盘点工单 保存
+    public void save(){
+        //时间校验
+        if(selected.getPlanStartTime().after(selected.getPlanEndTime())){
+            WebUtil.addErrorMessage("结束时间不得早于开始时间");
+            return;
+        }
+	    try{
+            apiService.doCreate(selected, selectedOrgs);
+            selectedOrgs.clear();
+        }catch(Exception e){
+            WebUtil.addErrorMessage("盘点工单新建失败");
+        }
+        WebUtil.addSuccessMessage("盘点工单新建成功");
+    }
 
+    public void onCreate() throws IllegalAccessException, InstantiationException {
+        super.prepareCreate();
+        orgsForSelected = apiService.onCreateInventory();
+    }
+
+    public String getNameWithParent(OrgInfo org){
+	    return apiService.getNameWithParent(org);
     }
 
     @Override
@@ -86,6 +103,12 @@ public class InventoryOrderController extends GenericCRUDUUIDController<Inventor
         object.setInstitutionUID(currentUser.getInstitutionUID());
         object.setHospitalUID(currentUser.getHospitalUID());
         object.setSiteUID(currentUser.getSiteUID());
+    }
+
+
+    @Override
+    protected GenericRepositoryUUID<InventoryOrder> getDAO() {
+        return dao;
     }
 	
 }
