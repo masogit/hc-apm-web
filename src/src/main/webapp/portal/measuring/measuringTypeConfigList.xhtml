@@ -25,7 +25,7 @@
                         <p:ajax event="rowSelect" update="editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{measuringTypeConfigController.onFilter}" />
 
-                        <p:column headerText="计量类别" filterBy="#{item.measuringItemCategoryName}" filterMatchMode="LIKE">
+                        <p:column headerText="计量项目类别" filterBy="#{item.measuringItemCategoryName}" filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
                         </p:column>
                         <p:column headerText="责任人" filterBy="#{item.measureOwner.name}" filterMatchMode="LIKE">
