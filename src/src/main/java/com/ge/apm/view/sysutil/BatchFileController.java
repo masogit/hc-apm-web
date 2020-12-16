@@ -70,9 +70,6 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
     MicroServiceUtil microServiceUtil;
 
     private List<I18nMessage> getI18nByBatchFileType;
-
-    private List fileTypeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel");
-
     @Override
     protected void init() {
         dao = WebUtil.getBean(ImportFilesRepository.class);
@@ -100,10 +97,24 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     @Override
     protected Page<ImportFiles> loadData(PageRequest pageRequest) {
+        List<String> fileTypeList=  gamePlanBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
         if (this.searchFilters == null) {
             this.searchFilters = new ArrayList<>();
             this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.NotIN, fileTypeList, "1*"));
+        } else {
+            Boolean  b  = false;
+            for (int i = 0;i< this.searchFilters.size();i++){
+                SearchFilter searchFilter = this.searchFilters.get(i);
+               if("fileType".equals(searchFilter.fieldName)) {
+                   b  = true;
+                   break;
+               }
+            }
+            if(!b){
+                this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.NotIN, fileTypeList, "1*"));
+            }
         }
+
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -174,11 +185,12 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         }
     }
 
+
     public void restartBatchJob() {
         selected.setStatus(ImportFiles.STATUS_STARTING);
-        List<String> typeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel");
+        List<String> fileTypeList=  gamePlanBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
         // game plan数据导入，重试时重新添加任务
-        if (typeList.contains(selected.getFileType())) {
+        if (fileTypeList.contains(selected.getFileType())) {
             selected.setId(null);
         }
         dao.save(selected);
@@ -243,9 +255,22 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     @Override
     protected Page<ImportFiles> gamePlanLoadData(PageRequest pageRequest) {
+        List<String> fileTypeList=  gamePlanBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
         if (this.searchFilters == null) {
             this.searchFilters = new ArrayList<>();
             this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
+        }else {
+            Boolean  b  = false;
+            for (int i = 0;i< this.searchFilters.size();i++){
+                SearchFilter searchFilter = this.searchFilters.get(i);
+                if("fileType".equals(searchFilter.fieldName)) {
+                    b  = true;
+                    break;
+                }
+            }
+            if(!b){
+                this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
+            }
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
