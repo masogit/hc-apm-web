@@ -73,9 +73,10 @@
 							<h:outputText value="#{item.isFinished?msg.Finished:msg.InProgress}"/>
 						</p:column>
 
-						<p:column headerText="关闭盘点工单" exportable="false" width="120" id="operatorColumn">
+						<p:column headerText="关闭盘点工单" exportable="false" width="120" id="operatorColumn" rendered="#{userContextService.hasCurrentTenantName('')}">
 							<h:panelGroup rendered="#{!item.isFinished}">
-								<p:commandLink id="deleteButton" title="关闭" oncomplete="PF('FinishOrderDialog').show()" action="#{inventoryOrderController.onFinishOrder(item.id)}">
+								<p:commandLink id="deleteButton" title="关闭" oncomplete="PF('FinishOrderDialog').show()"
+											   update="FinishOrderForm" action="#{inventoryOrderController.onFinishOrder(item.id)}">
 									<p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
 									<!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>-->
 								</p:commandLink>
@@ -83,7 +84,7 @@
 						</p:column>
 
 						<f:facet name="{Toolbar}">
-							<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
+							<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" rendered="#{userContextService.hasCurrentTenantName('')}"
 											 action = "#{inventoryOrderController.onCreate()}" update=":inventoryOrderEditForm" oncomplete="PF('inventoryOrderEditDlg').show()" />
 							<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 								<p:dataExporter type="xls" target="datalist" fileName="InventoryOrder_export" />

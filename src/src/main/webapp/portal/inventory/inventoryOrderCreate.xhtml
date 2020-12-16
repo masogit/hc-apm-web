@@ -8,18 +8,18 @@
 
     <ui:composition>
         <!--新增盘点工单-->
-        <p:dialog id="inventoryOrderEditDlg" width="1000" height="600" widgetVar="inventoryOrderEditDlg" modal="true" resizable="false" draggable="true" appendTo="@this" header="新增盘点工单" >
+        <p:dialog id="inventoryOrderEditDlg" width="980" height="500" widgetVar="inventoryOrderEditDlg" modal="true" resizable="false" draggable="true" appendTo="@this" header="新增盘点工单" >
             <h:form id="inventoryOrderEditForm">
                 <h:panelGroup id="display">
                     <p:fieldset legend="盘点时间设置">
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
                             <h:panelGroup>
-                                <label class="label">开始时间<span style="color: red">*</span></label>
+                                <label class="label">计划开始时间<span style="color: red">*</span></label>
                                 <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="startDate" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.selected.planStartTime}" class="manufactDateChange"
                                             showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">结束时间<span style="color: red">*</span></label>
+                                <label class="label">计划结束时间<span style="color: red">*</span></label>
                                 <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="endDate" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.selected.planEndTime}"  class="manufactDateChange"
                                              showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
@@ -71,6 +71,8 @@
                     <h:panelGrid columns="1" >
                         <h:panelGroup style="align-content: flex-start">
                             <p:commandButton action="#{inventoryOrderController.finishOrder}" value="#{msg.OK}" icon="ui-icon-check"/>
+                                &nbsp;
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('FinishOrderDialog').hide()"/>
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:panelGroup>
