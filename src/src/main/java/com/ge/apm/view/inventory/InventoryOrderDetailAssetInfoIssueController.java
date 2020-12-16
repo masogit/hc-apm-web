@@ -52,7 +52,12 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
-		listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
+		if (null == orderId){
+            listClinicalDeptName=service.getInventoryClinicalDeptUIDAll(true,0);
+        }else {
+            listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
+        }
+
 	}
 
 	@Override
@@ -68,7 +73,9 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 			searchFilters = new ArrayList<>();
 		}
 		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
-        searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
+		if(null != orderId){
+            searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
+        }
         searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));

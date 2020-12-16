@@ -411,4 +411,34 @@ public class InventoryOrderService {
 		return listClinicalDeptName;
 	}
 
+	public List<String> getInventoryClinicalDeptUIDAll( boolean sort, int type) {
+
+		List<String> listClinicalDeptName = new ArrayList<String>();
+        List<InventoryOrder> inventoryOrderList = inventoryOrderDao.find();
+		if(!inventoryOrderList .isEmpty()){
+            for ( InventoryOrder order:inventoryOrderList) {
+                String assignee_org = order.getAssigneeOrg();
+                JSONArray array = new JSONArray(assignee_org);
+                JSONObject obj = null;
+                String temp = "";
+                for (int i = 0; i < array.length(); ++i) {
+                    obj = array.getJSONObject(i);
+                    temp = obj.getString(ORG_NAME);
+                    if (type == 0) {
+                        temp = temp.substring(temp.lastIndexOf("/ ") + 1, temp.length()).trim();
+                    }
+
+                    if (!listClinicalDeptName.contains(temp)) {
+                        listClinicalDeptName.add(temp);
+                    }
+                }
+                if (sort) {
+                    listClinicalDeptName.sort(new PinYinComparator());
+                }
+            }
+        }
+
+		return listClinicalDeptName;
+	}
+
 }

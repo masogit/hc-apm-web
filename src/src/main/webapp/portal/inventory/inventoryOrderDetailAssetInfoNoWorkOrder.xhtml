@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:form id="inventoryOrderDetailAssetInfoListNoWorkOrderForm">
+	<p:dataTable id="datalistNoWorkOrder" value="#{inventoryOrderDetailAssetInfoNoWorkOrderController.lazyModel}" var="item" widgetVar="varDataListNoWorkOrder" selectionMode="single"
+		selection="#{inventoryOrderDetailAssetInfoNoWorkOrderController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoNoWorkOrderController.onFilter}" />
+		<p:column headerText="#{msg.EquipmentName}" filterBy="#{item.name}" filterMatchMode="LIKE" exportable="false" sortBy="#{item.namePyCode}">
+			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.id}" target="_Blank"><h:outputText value="#{item.name}" /></a>
+		</p:column>
+		<p:column headerText="#{msg.EquipmentName}" exportable="true" visible="false">
+			<h:outputText value="#{item.name}" />
+		</p:column>
+		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.clinicalDeptName}" filterMatchMode="EQ" sortBy="#{item.clinicalDeptNamePyCode}">
+			<f:facet name="filter">
+				<p:selectOneMenu onchange="PF('varDataListNoWorkOrder').filter()" autoWidth="false" style="max-width: 150px;">
+					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItems value="#{inventoryOrderDetailAssetInfoNoWorkOrderController.listClinicalDeptName}" />
+				</p:selectOneMenu>
+			</f:facet>
+			<h:outputText value="#{item.clinicalDeptName}" />
+		</p:column>
+		<p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE" sortBy="#{item.qrCode}">
+			<h:outputText value="#{item.qrCode}" />
+		</p:column>
+		<p:column headerText="#{msg.EquipmentID}" filterBy="#{item.departNum}" filterMatchMode="LIKE" sortBy="#{item.departNum}">
+			<h:outputText value="#{item.departNum}" />
+		</p:column>
+		<p:column headerText="#{msg.EquipmentModel}" filterBy="#{item.functionType}" filterMatchMode="LIKE" sortBy="#{item.functionType}">
+			<h:outputText value="#{item.functionType}" />
+		</p:column>
+		<p:column headerText="#{msg.EquipmentPropertyNumber}" filterBy="#{item.financingNum}" filterMatchMode="LIKE" sortBy="#{item.financingNum}">
+			<h:outputText value="#{item.financingNum}" />
+		</p:column>
+		<p:column headerText="#{msg.AssetStatus}" filterBy="#{item.status}" filterMatchMode="EQ">
+			<f:facet name="filter">
+				<p:selectOneMenu onchange="PF('varDataListNoWorkOrder').filter()" autoWidth="false" style="max-width: 150px;">
+					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItem itemLabel="#{msg.Normal}" itemValue="1" />
+					<f:selectItem itemLabel="#{msg.Stopped}" itemValue="2" />
+					<f:selectItem itemLabel="#{msg.PartialFunction}" itemValue="3" />
+					<f:selectItem itemLabel="#{msg.ToBeTerminated}" itemValue="4" />
+					<f:selectItem itemLabel="#{msg.terminated}" itemValue="5" />
+				</p:selectOneMenu>
+			</f:facet>
+			<h:outputText value="#{item.status==1?msg.Normal:item.status==2?msg.Stopped:item.status==3?msg.PartialFunction:item.status==4?msg.ToBeTerminated:item.status==5?msg.terminated:item.status}" />
+		</p:column>
+		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.locationName}" filterMatchMode="LIKE" sortBy="#{item.locationName}">
+			<h:outputText value="#{item.locationName}" />
+		</p:column>
+		
+		<f:facet name="{Toolbar}">
+			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+				<p:dataExporter type="xls" target="datalistNoWorkOrder" fileName="InventoryOrderDetailAssetInfo_export" />
+			</p:commandButton>
+		</f:facet>
+	</p:dataTable>
+</h:form>
+</html>
