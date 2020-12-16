@@ -119,7 +119,9 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         List<SearchFilter> searchFiltersList = new ArrayList(searchFilters);
         boolean isSolvedBoolean = searchFiltersList.removeIf(e -> e.fieldName.equals("isSolved"));
         if(!isSolvedBoolean){
-            searchFiltersList.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, AssetInfoIdList,"1*"));
+            if(!AssetInfoIdList.isEmpty()){
+                searchFiltersList.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, AssetInfoIdList,"1*"));
+            }
             Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFiltersList,pageRequest);
             List<InventoryOrderDetail> inventoryOrderDetails = pageAssetInfo.getContent();
             inventoryOrderDetailList.addAll(inventoryOrderDetails);
@@ -148,7 +150,9 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                 for (InventoryOrderDetail inventoryOrderDetail : List) {
                     idList.add(inventoryOrderDetail.getAssetInfo().getId());
                 }
-                searchFiltersListNew.add(new SearchFilter("id", SearchFilter.Operator.NotIN, idList,"1*"));
+                if(!idList.isEmpty()){
+                    searchFiltersListNew.add(new SearchFilter("id", SearchFilter.Operator.NotIN, idList,"1*"));
+                }
                 searchFiltersListNew.add(new SearchFilter("isChecked", SearchFilter.Operator.EQ, true,"1*"));
                 searchFiltersListNew.removeIf(e -> e.fieldName.equals("inventoryOrderId"));
                 searchFiltersListNew.removeIf(e -> e.fieldName.equals("assetInfo.isChecked"));

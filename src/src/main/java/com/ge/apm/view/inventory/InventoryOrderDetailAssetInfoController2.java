@@ -91,7 +91,9 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
                 for (InventoryIssue inventoryIssue : inventoryIssueList) {
                     idList.add(inventoryIssue.getAssetInfo().getId());
                 }
-                searchFilters.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, idList,"1*"));
+                if(!idList.isEmpty()){
+                    searchFilters.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, idList,"1*"));
+                }
             }
         }
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
