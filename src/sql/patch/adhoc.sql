@@ -840,30 +840,37 @@ select '9',FALSE, '12', false, false, 'DealerFe'
 where not exists (select 1 from user_subscription_push where menu_type=12 and role_position='DealerFe');--DealerFe
 -- 2020-12-10 end
 
+
+-- 先删除，再插入
+delete from role_msg_rel ;
+delete from sys_role where name = 'DataMaintainStaff';
+-- 新增一个 数据维护人员 角色
 insert into sys_role(id, home_page, name, role_desc, authorities, authorities_ch, cards, cards_ch, menus, role_desc_en)
 values ( (select max(id)+1 from sys_role) , '/homeHead.xhtml', 'DataMaintainStaff', '数据维护人员',  NULL, NULL, NULL, NULL, 'zkbBasicInfo,zkbBasicInfo.engineerMgt,config,config.accountdash,config.org,config.user,config.customRole', 'Data Maintain Staff');
 
 --DataMaintainStaff
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','AconnectPerformanceExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','AppTrainingExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','ColdHeaderExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','EEMonitorCSV',(select max(id) from sys_role),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','AconnectPerformanceExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','AppTrainingExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','ColdHeaderExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','EEMonitorCSV',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
 
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','OLERulesExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','PMResultExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','PMScheduleExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','SrExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','OLERulesExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','PMResultExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','PMScheduleExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','SrExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
 
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','SrResetReport',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UpTimeExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UsConnectStatusExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','ZkbAssetTransferExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','SrResetReport',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UpTimeExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UsConnectStatusExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','ZkbAssetTransferExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','SrReportPdf',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserAssetSalesExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
 
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','CarePackageExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','CoilOpportunityExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','MSARecommendExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','PromotionActivityExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','TrainingQuotaExcel',(select max(id) from sys_role),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','CarePackageExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','CoilOpportunityExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','MSARecommendExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','PromotionActivityExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','TrainingQuotaExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
 
 --GEInternalStaff
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','DealerFEAndSalesExcel',(select id from sys_role where name = 'GEInternalStaff'),'GEInternalStaff',0);
@@ -875,6 +882,7 @@ insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values
 -- geop
 insert into role_msg_rel(msg_type, msg_key, role_name,role_type) values ('batchFileType','AssetInfoImportExcel','GeOp',0);
 insert into role_msg_rel(msg_type, msg_key, role_name,role_type) values ('batchFileType','GEIBTableExcel','GeOp',0);
+
 
 --处理基础互通错误数据
 update org_info set short_name = name,short_name_py_code=name_py_code,hospital_uid=uid,site_uid=uid,site_id=46,parent_id=hospital_id where institution_uid=(select uid from org_info where name = '基础互通' and org_type = 1) and org_type = 2 and site_id!=46;
