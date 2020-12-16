@@ -72,18 +72,20 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     }
 	@Override
 	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
+        searchFilterList.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
+        searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
+
         //before
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<SearchFilter>();
 		}
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
-		searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
-		if(pageRequest.getSort().getOrderFor("id")!=null){
-            pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
-        }
+        searchFilters.addAll(searchFilterList);
+
         List<InventoryOrderDetail> inventoryOrderDetailList = new ArrayList<>();
-        List<Integer> AssetInfoIdList = new ArrayList<>();
         //获取有问题的工单
         List<SearchFilter> searchFiltersListIssue = new ArrayList(searchFilters);
         boolean lastModifiedByBoolean = searchFiltersListIssue.removeIf(e -> e.fieldName.equals("lastModifiedBy"));
@@ -97,33 +99,43 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                 }
             }
         }
-        if (!lastModifiedByBoolean && !lastModifiedDateBoolean && isStatus){
-            searchFiltersListIssue.removeIf(e -> e.fieldName.equals("status"));
-            Page<InventoryIssue> pageInventoryIssue = inventoryIssueRepository.findBySearchFilter(searchFiltersListIssue, pageRequest);
-            List<InventoryIssue> inventoryIssueList = pageInventoryIssue.getContent();
-            inventoryOrderDetailList = new ArrayList(inventoryOrderDetailList);
-            if (!inventoryIssueList.isEmpty()){
-                for (InventoryIssue inventoryIssue :inventoryIssueList) {
-                    InventoryOrderDetail inventoryOrderDetail = new InventoryOrderDetail();
-                    inventoryOrderDetail.setAssetInfo(inventoryIssue.getAssetInfo());
-                    inventoryOrderDetail.setComment(inventoryIssue.getComment());
-                    inventoryOrderDetail.setInventoryCheckListItems(inventoryIssue.getInventoryCheckListItems());
-                    inventoryOrderDetail.setIsSolved(inventoryIssue.getIsSolved() ? "是" : "否" );
-                    inventoryOrderDetail.setStatus(3);//有问题
-                    inventoryOrderDetailList.add(inventoryOrderDetail);
-                    AssetInfoIdList.add(inventoryIssue.getAssetInfo().getId());
-                }
+        searchFiltersListIssue.removeIf(e -> e.fieldName.equals("status"));
+        List<InventoryIssue> inventoryIssueList = inventoryIssueRepository.findBySearchFilter(searchFiltersListIssue);
+        List<Integer> AssetInfoIdList = new ArrayList<>();
+        List<InventoryOrderDetail> detailList = new ArrayList<>();
+        inventoryOrderDetailList = new ArrayList(inventoryOrderDetailList);
+        if (!inventoryIssueList.isEmpty()){
+            for (InventoryIssue inventoryIssue :inventoryIssueList) {
+                InventoryOrderDetail inventoryOrderDetail = new InventoryOrderDetail();
+                inventoryOrderDetail.setAssetInfo(inventoryIssue.getAssetInfo());
+                inventoryOrderDetail.setComment(inventoryIssue.getComment());
+                inventoryOrderDetail.setInventoryCheckListItems(inventoryIssue.getInventoryCheckListItems());
+                inventoryOrderDetail.setIsSolved(inventoryIssue.getIsSolved() ? "是" : "否" );
+                inventoryOrderDetail.setStatus(3);//有问题
+                detailList.add(inventoryOrderDetail);
+                AssetInfoIdList.add(inventoryIssue.getAssetInfo().getId());
             }
         }
+        if (!lastModifiedByBoolean && !lastModifiedDateBoolean && isStatus){
+            inventoryOrderDetailList.addAll(detailList);
+        }
         //已盘点/未盘点/无台账 工单
-        List<SearchFilter> searchFiltersList = new ArrayList(searchFilters);
-        boolean isSolvedBoolean = searchFiltersList.removeIf(e -> e.fieldName.equals("isSolved"));
+        List<SearchFilter> searchFiltersInventoryOrderDetailList = new ArrayList(searchFilters);
+        boolean isSolvedBoolean = searchFiltersInventoryOrderDetailList.removeIf(e -> e.fieldName.equals("isSolved"));
         if(!isSolvedBoolean){
             if(!AssetInfoIdList.isEmpty()){
-                searchFiltersList.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, AssetInfoIdList,"1*"));
+                searchFiltersInventoryOrderDetailList.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, AssetInfoIdList,"1*"));
             }
-            Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFiltersList,pageRequest);
-            List<InventoryOrderDetail> inventoryOrderDetails = pageAssetInfo.getContent();
+            List<InventoryOrderDetail> inventoryOrderDetails = dao.findBySearchFilter(searchFiltersInventoryOrderDetailList);
+            if(!inventoryOrderDetails.isEmpty()){
+                for ( InventoryOrderDetail inventoryOrderDetail: inventoryOrderDetails) {
+                    Integer status = inventoryOrderDetail.getStatus();
+                    if(status == 2 || status == 0){
+                        inventoryOrderDetail.setLastModifiedDate(null);
+                        inventoryOrderDetail.setLastModifiedBy(null);
+                    }
+                }
+            }
             inventoryOrderDetailList.addAll(inventoryOrderDetails);
         }
         boolean isAssetInfoStatus = true;
@@ -142,8 +154,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             searchFiltersListNew.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
             this.addSearchFiltersListNew(searchFilters,searchFiltersListNew);
             List<SearchFilter> InventoryOrderDetailSearchFilters = new ArrayList<>();
-            InventoryOrderDetailSearchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
-            InventoryOrderDetailSearchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
+            InventoryOrderDetailSearchFilters.addAll(searchFilterList);
             List<InventoryOrderDetail> List = dao.findBySearchFilter(InventoryOrderDetailSearchFilters);
             List<Integer> idList = new ArrayList<>();
             if(!List.isEmpty()) {
@@ -154,14 +165,10 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                     searchFiltersListNew.add(new SearchFilter("id", SearchFilter.Operator.NotIN, idList,"1*"));
                 }
                 searchFiltersListNew.add(new SearchFilter("isChecked", SearchFilter.Operator.EQ, true,"1*"));
-                searchFiltersListNew.removeIf(e -> e.fieldName.equals("inventoryOrderId"));
-                searchFiltersListNew.removeIf(e -> e.fieldName.equals("assetInfo.isChecked"));
+                searchFiltersListNew.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false,"1*"));
+                searchFiltersListNew.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true,"1*"));
             }
-            Iterator<Sort.Order> orders = pageRequest.getSort().iterator();
-            List<AssetInfo> infoList = assetInfoRepository.findBySearchFilter(searchFiltersListNew);
-            pageRequest = addRequiredSortById(pageRequest,infoList.size());
-            Page<AssetInfo> assetInfoPage = assetInfoRepository.findBySearchFilter(searchFiltersListNew,pageRequest);
-            List<AssetInfo> assetInfoList = assetInfoPage.getContent();
+            List<AssetInfo> assetInfoList = assetInfoRepository.findBySearchFilter(searchFiltersListNew);
             if (!assetInfoList.isEmpty()){
                 inventoryOrderDetailList = new ArrayList(inventoryOrderDetailList);
                 for (AssetInfo assetInfo:assetInfoList) {
@@ -207,48 +214,6 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         }
     }
 
-    private PageRequest addRequiredSortById(PageRequest pageRequest,int size) {
-        Iterator<Sort.Order> orders = pageRequest.getSort().iterator();
-        while(orders.hasNext()){
-            Sort.Order order = orders.next();
-            if(order.getProperty().equals("assetInfo.namePyCode")){
-                Sort.Direction direction = order.getDirection();
-                Sort sortWithId = new Sort(direction, "namePyCode");
-                pageRequest= new PageRequest(pageRequest.getPageNumber(), size, sortWithId);
-            }
-            if(order.getProperty().equals("assetInfo.clinicalDeptNamePyCode")){
-                Sort.Direction direction = order.getDirection();
-                Sort sortWithId = new Sort(direction, "clinicalDeptNamePyCode");
-                pageRequest= new PageRequest(pageRequest.getPageNumber(), size, sortWithId);
-            }
-            if(order.getProperty().equals("assetInfo.qrCode")){
-                Sort.Direction direction = order.getDirection();
-                Sort sortWithId = new Sort(direction, "qrCode");
-                pageRequest= new PageRequest(pageRequest.getPageNumber(), size, sortWithId);
-            }
-            if(order.getProperty().equals("assetInfo.departNum")){
-                Sort.Direction direction = order.getDirection();
-                Sort sortWithId = new Sort(direction, "departNum");
-                pageRequest= new PageRequest(pageRequest.getPageNumber(), size, sortWithId);
-            }
-            if(order.getProperty().equals("assetInfo.functionType")){
-                Sort.Direction direction = order.getDirection();
-                Sort sortWithId = new Sort(direction, "functionType");
-                pageRequest= new PageRequest(pageRequest.getPageNumber(), size, sortWithId);
-            }
-            if(order.getProperty().equals("assetInfo.financingNum")){
-                Sort.Direction direction = order.getDirection();
-                Sort sortWithId = new Sort(direction, "financingNum");
-                pageRequest= new PageRequest(pageRequest.getPageNumber(), size, sortWithId);
-            }
-            if(order.getProperty().equals("assetInfo.locationName")){
-                Sort.Direction direction = order.getDirection();
-                Sort sortWithId = new Sort(direction, "locationName");
-                pageRequest= new PageRequest(pageRequest.getPageNumber(), size, sortWithId);
-            }
-        }
-        return pageRequest;
-    }
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
 	}
