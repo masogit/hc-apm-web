@@ -10,6 +10,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
+import com.ge.apm.dao.InventoryIssueRepository;
+import com.ge.apm.domain.InventoryIssue;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -38,6 +40,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
 	private InventoryOrderRepository inventoryOrderRepository;
+    private InventoryIssueRepository inventoryIssueRepository;
 	private InventoryOrderService service;
 	private static final String ORG_NAME = "orgName";
 	private String orderId;
@@ -49,10 +52,15 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
 		service=WebUtil.getBean(InventoryOrderService.class);
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
+        inventoryIssueRepository = WebUtil.getBean(InventoryIssueRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
-		listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
+        if (null == orderId){
+            listClinicalDeptName=service.getInventoryClinicalDeptUIDAll(true,0);
+        }else {
+            listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
+        }
 	}
 
 	@Override
@@ -69,12 +77,24 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 			searchFilters = new ArrayList<SearchFilter>();
 		}
 		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
-        searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
-        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
+        if(null != orderId){
+            searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
+        }
         searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
 		}
+        if(UserContextService.hasCurrentTenantName("")){
+            List<InventoryIssue> inventoryIssueList = inventoryIssueRepository.findBySearchFilter(searchFilters);
+            if(!inventoryIssueList.isEmpty()) {
+                List<Integer> idList = new ArrayList<>();
+                for (InventoryIssue inventoryIssue : inventoryIssueList) {
+                    idList.add(inventoryIssue.getAssetInfo().getId());
+                }
+                searchFilters.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, idList,"1*"));
+            }
+        }
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
         Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters,pageRequest);
 		//after
 		return pageAssetInfo;

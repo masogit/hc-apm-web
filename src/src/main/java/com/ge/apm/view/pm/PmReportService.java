@@ -1,5 +1,6 @@
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.data.PictureRenderData;
@@ -349,16 +350,22 @@ public class PmReportService {
 
     public byte[] generate(V2_PmOrder pmOrder, byte[] activeTemplateBytes) throws IOException {
         PmOrderRule rule = this.pmOrderService.acqPmOrderRule(pmOrder);
-        if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
         List<UnstructuredDataCollection> reportList = pmOrderService.getReportList(pmOrder.getId());
         List<V2_WorkOrderCoworker> coWorkerList = getCoWorkerList(pmOrderService.getWorkOrderCoworker(pmOrder.getId()));
         List<V2_WorkOrder_Detail> accessoryList = getAccessoryList(pmOrderService.getWorkOrderDetails(pmOrder.getId()));
         List<PmOrderSteps> pmOrderSteps = pmOrderService.getPmOrderStep(pmOrder.getId());
-        // refer to V2PmOrderController.acPmOrderUleCheckList, when order.isFinished = true
-        List<PmOrderRuleCheckList> pmCheckItemList = pmOrderService.getPmOrderRuleCheckLists(pmOrder, rule);
-        Map<String, UnstructuredData> hmCheck = pmOrderService.fetchHmCheck(pmCheckItemList, pmOrder);
+
+         List<PmOrderRuleCheckList> pmCheckItemList = null;
+        Map<String, UnstructuredData> hmCheck = null;
+        //        if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
+        if(rule != null){
+            // refer to V2PmOrderController.acPmOrderUleCheckList, when order.isFinished = true
+            pmCheckItemList = pmOrderService.getPmOrderRuleCheckLists(pmOrder, rule);
+            hmCheck = pmOrderService.fetchHmCheck(pmCheckItemList, pmOrder);
+        }
+
         InputStream rawTemplate;
-        if (!Strings.isNullOrEmpty(rule.getReportStorageId())) {
+        if (rule != null && !Strings.isNullOrEmpty(rule.getReportStorageId())) {
             // get template if the report storage is set.
             StreamedContent template = this.blobService.getBlobObjectByStorageId(rule.getReportStorageId());
             rawTemplate = template.getStream();
