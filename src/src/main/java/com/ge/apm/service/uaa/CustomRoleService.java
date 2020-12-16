@@ -132,7 +132,7 @@ public class CustomRoleService {
 			}
 			else if(key.equals("asset.inventory")){
 				listNew.add(i18n);
-			}else if(key.equals("AssetScrapped.tobe")){
+			}else if(key.equals("asset.scrap")){
 				listNew.add(i18n);
 			}
 		}
