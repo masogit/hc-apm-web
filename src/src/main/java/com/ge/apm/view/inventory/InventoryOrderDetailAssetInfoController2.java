@@ -84,14 +84,15 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
 		}
-
-        List<InventoryIssue> inventoryIssueList = inventoryIssueRepository.findBySearchFilter(searchFilters);
-        if(!inventoryIssueList.isEmpty()) {
-            List<Integer> idList = new ArrayList<>();
-            for (InventoryIssue inventoryIssue : inventoryIssueList) {
-                idList.add(inventoryIssue.getAssetInfo().getId());
+        if(UserContextService.hasCurrentTenantName("")){
+            List<InventoryIssue> inventoryIssueList = inventoryIssueRepository.findBySearchFilter(searchFilters);
+            if(!inventoryIssueList.isEmpty()) {
+                List<Integer> idList = new ArrayList<>();
+                for (InventoryIssue inventoryIssue : inventoryIssueList) {
+                    idList.add(inventoryIssue.getAssetInfo().getId());
+                }
+                searchFilters.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, idList,"1*"));
             }
-            searchFilters.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, idList,"1*"));
         }
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
         Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters,pageRequest);
