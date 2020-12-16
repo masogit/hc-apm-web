@@ -18,14 +18,15 @@
                             <label class="label">#{msg.fileType}*</label>
                             <p:selectOneMenu id="fileType" value="#{batchFileController.fileType}"  required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
                                 <p:ajax process="@this"/>
-                                <f:selectItems value="#{batchFileController.batchFileType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+<!--                                <f:selectItems value="#{batchFileController.batchFileType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />-->
+                                <f:selectItems value="#{batchFileController.getI18nByBatchFileType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
                         </h:panelGroup>
 
                         <p:panel id="uploadPanel" styleClass="ui-panelgrid-blank" style=" border: 0">
                             <h:panelGroup>
                                 <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{batchFileController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this fileType"
-                                              multiple="true" sizeLimit="10000000" update="uploadedList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}"  />
+                                              multiple="true" sizeLimit="52428800" update="uploadedList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}50M"  label="#{msg.Add}"  />
                                 <!--<p:growl id="messages" showDetail="true" />-->
                             </h:panelGroup>
                             <p:dataList id="uploadedList" value="#{batchFileController.fileList}" var="item" varStatus="itemIndex" rowIndexVar="idx" emptyMessage="#{msg.noRecordFound}">

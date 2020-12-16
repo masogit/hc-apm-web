@@ -29,8 +29,13 @@ import org.hibernate.annotations.Type;
 @Table(name = "import_files")
 public class ImportFiles {
 
-
-    public enum ImportFileType {EEMonitorCSV, ColdHeaderExcel, PMScheduleExcel, PMResultExcel, UpTimeExcel, SrReportPdf, SrResetReport, SrExcel, UserAssetFeExcel, UserAssetOLEExcel, UserAssetSalesExcel,UserAccountSendMailExcel,AconnectPerformanceExcel,MSARecommendExcel,PromotionActivityExcel,CarePackageExcel,CoilOpportunityExcel,TrainingQuotaExcel}
+    public enum ImportFileType {
+        AconnectPerformanceExcel, AppTrainingExcel, AssetInfoImportExcel, ColdHeaderExcel, DealerFEAndSalesExcel,
+        EEMonitorCSV, GEIBTableExcel, OLERulesExcel, PMResultExcel, PMScheduleExcel,
+        SrExcel, SrReportPdf, SrResetReport, UpTimeExcel, UsConnectStatusExcel,
+        UserAccountSendMailExcel, UserAssetCustomerExcel, UserAssetFeExcel, UserAssetOLEExcel, UserAssetSalesExcel,
+        ZkbAssetTransferExcel, CarePackageExcel, MSARecommendExcel, PromotionActivityExcel, CoilOpportunityExcel,
+        TrainingQuotaExcel }
 
 
     public static final String STATUS_COMPLETED = "COMPLETED";
