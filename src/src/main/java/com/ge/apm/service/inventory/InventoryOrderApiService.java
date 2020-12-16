@@ -94,7 +94,7 @@ public class InventoryOrderApiService extends MicroServiceInvoker {
 			return org.getName();
 		}
 		String pName = orgDao.findNameByUID(org.getParentUID());
-		return pName==null ? org.getName() : pName +"/" + org.getName();
+		return pName==null ? org.getName() : pName + " / " + org.getName();
 	}
 
 }
