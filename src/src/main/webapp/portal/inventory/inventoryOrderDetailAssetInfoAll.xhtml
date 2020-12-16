@@ -11,13 +11,13 @@
 		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
 		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoAllController.onFilter}" />
         <p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController2.onFilter}" />
-		<p:column headerText="#{msg.EquipmentName}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false" sortBy="#{item.assetInfo.namePyCode}">
+		<p:column headerText="#{msg.EquipmentName}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false">
 			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetInfo.id}" target="_Blank"><h:outputText value="#{item.assetInfo.name}" /></a>
 		</p:column>
 		<p:column headerText="#{msg.EquipmentName}" exportable="true" visible="false">
 			<h:outputText value="#{item.assetInfo.name}" />
 		</p:column>
-		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}">
+		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ">
 			<f:facet name="filter">
 				<p:selectOneMenu onchange="PF('varDataListAll').filter()" autoWidth="false" style="max-width: 150px;">
 					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -26,16 +26,16 @@
 			</f:facet>
 			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 		</p:column>
-		<p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.qrCode}">
+		<p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.qrCode}" />
 		</p:column>
-		<p:column headerText="#{msg.EquipmentID}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.departNum}">
+		<p:column headerText="#{msg.EquipmentID}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.departNum}" />
 		</p:column>
-		<p:column headerText="#{msg.EquipmentModel}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.functionType}">
+		<p:column headerText="#{msg.EquipmentModel}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.functionType}" />
 		</p:column>
-		<p:column headerText="#{msg.EquipmentPropertyNumber}" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.financingNum}">
+		<p:column headerText="#{msg.EquipmentPropertyNumber}" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.financingNum}" />
 		</p:column>
 		<p:column headerText="#{msg.AssetStatus}" filterBy="#{item.assetInfo.status}" filterMatchMode="EQ">
@@ -51,7 +51,7 @@
 			</f:facet>
 			<h:outputText value="#{item.assetInfo.status==1?msg.Normal:item.assetInfo.status==2?msg.Stopped:item.assetInfo.status==3?msg.PartialFunction:item.assetInfo.status==4?msg.ToBeTerminated:item.assetInfo.status==5?msg.terminated:item.assetInfo.status}" />
 		</p:column>
-		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
+		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
         <p:column headerText="#{msg.ProblemDescription}">
