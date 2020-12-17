@@ -41,11 +41,14 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 	private InventoryOrderDetailAssetInfoRepository dao;
 	private InventoryOrderRepository inventoryOrderRepository;
     private InventoryIssueRepository inventoryIssueRepository;
+    private UaaService uaaService;
+    private InventoryOrderService inventoryOrderService;
 	private InventoryOrderService service;
 	private static final String ORG_NAME = "orgName";
 	private String orderId;
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 1;
+    private List<String> listAccessClinical;
 
 	@Override
 	protected void init() {
@@ -53,15 +56,19 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 		service=WebUtil.getBean(InventoryOrderService.class);
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
         inventoryIssueRepository = WebUtil.getBean(InventoryIssueRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
         if (null == orderId){
-            listClinicalDeptName=service.getInventoryClinicalDeptUIDAll(true,0);
+            listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         }else {
             listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
         }
-	}
+        listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
+
+    }
 
 	@Override
 	protected GenericRepositoryUUID<InventoryOrderDetail> getDAO() {
@@ -76,16 +83,34 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<SearchFilter>();
 		}
-		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
-        if(null != orderId){
+        List<SearchFilter> searchFilterList = new ArrayList<>();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        searchFilterList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
+        searchFilterList.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
+        searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
+        //全院视图
+        if(null == orderId){
+            List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
+            if(!orderIdList.isEmpty()){
+                searchFilterList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*2+"));
+            }
+        }else {
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
         }
-        searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         if(pageRequest.getSort().getOrderFor("id")!=null){
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
 		}
         if(UserContextService.hasCurrentTenantName("")){
-            List<InventoryIssue> inventoryIssueList = inventoryIssueRepository.findBySearchFilter(searchFilters);
+            List<SearchFilter> inventoryIssueSearchFilters = new ArrayList<>();
+            inventoryIssueSearchFilters.addAll(searchFilterList);
+            List<InventoryIssue> inventoryIssueList = inventoryIssueRepository.findBySearchFilter(inventoryIssueSearchFilters);
             if(!inventoryIssueList.isEmpty()) {
                 List<Integer> idList = new ArrayList<>();
                 for (InventoryIssue inventoryIssue : inventoryIssueList) {
@@ -97,6 +122,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
             }
         }
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
+        searchFilters.addAll(searchFilterList);
         Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters,pageRequest);
 		//after
 		return pageAssetInfo;
