@@ -99,7 +99,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         if(null == orderId){
             List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
             if(!orderIdList.isEmpty()){
-                searchFilterList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*2+"));
+                searchFilterList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
             }
         }else {
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));

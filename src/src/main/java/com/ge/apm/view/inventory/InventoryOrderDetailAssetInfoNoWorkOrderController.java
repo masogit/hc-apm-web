@@ -82,7 +82,7 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         //全院视图
         List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
         if(!orderIdList.isEmpty()){
-            InventoryOrderDetailSearchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*2+"));
+            InventoryOrderDetailSearchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
         }
         List<InventoryOrderDetail> inventoryOrderDetailList = dao.findBySearchFilter(InventoryOrderDetailSearchFilters);
         List<Integer> idList = new ArrayList<>();
