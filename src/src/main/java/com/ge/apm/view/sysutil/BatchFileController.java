@@ -85,9 +85,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
         FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
         getI18nByBatchFileType = fieldMsg.getI18nByBatchFileType();
-//        batchFileType = fieldMsg.getFieldValueList("batchFileType");
         gamePlanBatchFileType = fieldMsg.getFieldValueList("gamePlanBatchFileType");
-//        batchFileType.removeIf(i -> StringUtils.equalsIgnoreCase(i.getMsgKey(), "SrReportPdf"));
     }
 
     @Override
@@ -97,10 +95,10 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     @Override
     protected Page<ImportFiles> loadData(PageRequest pageRequest) {
-        List<String> fileTypeList=  gamePlanBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
+        List<String> fileTypeList = getI18nByBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
         if (this.searchFilters == null) {
             this.searchFilters = new ArrayList<>();
-            this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.NotIN, fileTypeList, "1*"));
+            this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
         } else {
             Boolean  b  = false;
             for (int i = 0;i< this.searchFilters.size();i++){
@@ -111,7 +109,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
                }
             }
             if(!b){
-                this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.NotIN, fileTypeList, "1*"));
+                this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
             }
         }
 
