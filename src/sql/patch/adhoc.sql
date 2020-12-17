@@ -39,6 +39,9 @@ where not exists (select 1 from user_subscription_push where menu_type=1 and rol
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8', FALSE, '1', true, true, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=1 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '1', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=1 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8', FALSE, '1', true, false, 'deviceDirector'
@@ -109,6 +112,9 @@ where not exists (select 1 from user_subscription_push where menu_type=2 and rol
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8', FALSE, '2', true, false, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=2 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '2', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=2 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8', FALSE, '2', true, false, 'deviceDirector'
@@ -179,6 +185,9 @@ where not exists (select 1 from user_subscription_push where menu_type=3 and rol
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8', FALSE, '3', true, false, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=3 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '3', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=3 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8', FALSE, '3', true, false, 'deviceDirector'
@@ -249,6 +258,9 @@ where not exists (select 1 from user_subscription_push where menu_type=4 and rol
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8', FALSE, '4', true, false, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=4 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '4', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=4 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8', FALSE, '4', true, false, 'deviceDirector'
@@ -319,6 +331,9 @@ where not exists (select 1 from user_subscription_push where menu_type=5 and rol
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '5', true, true, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=5 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '5', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=5 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '5', true, true, 'deviceDirector'
@@ -389,6 +404,9 @@ where not exists (select 1 from user_subscription_push where menu_type=6 and rol
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '6', true, false, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=6 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '6', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=6 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '6', true, false, 'deviceDirector'
@@ -459,6 +477,9 @@ where not exists (select 1 from user_subscription_push where menu_type=7 and rol
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '7', true, true, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=7 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '7', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=7 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '7', true, true, 'deviceDirector'
@@ -529,6 +550,9 @@ where not exists (select 1 from user_subscription_push where menu_type=8 and rol
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '8', true, true, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=8 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '8', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=8 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '8', true, false, 'deviceDirector'
@@ -599,6 +623,9 @@ where not exists (select 1 from user_subscription_push where menu_type=9 and rol
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '9', true, true, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=9 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '9', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=9 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '9', true, true, 'deviceDirector'
@@ -669,6 +696,9 @@ where not exists (select 1 from user_subscription_push where menu_type=10 and ro
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '10', true, false, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=10 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '10', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=10 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '10', true, false, 'deviceDirector'
@@ -739,6 +769,9 @@ where not exists (select 1 from user_subscription_push where menu_type=11 and ro
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '11', true, false, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=11 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '11', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=11 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '11', true, true, 'deviceDirector'
@@ -809,6 +842,9 @@ where not exists (select 1 from user_subscription_push where menu_type=12 and ro
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '12', true, false, 'otherDirector'
 where not exists (select 1 from user_subscription_push where menu_type=12 and role_position='otherDirector');--其他科室主任
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '12', true, false, 'other'
+where not exists (select 1 from user_subscription_push where menu_type=12 and role_position='other');--其他
  --设备科
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
 select '8',FALSE, '12', true, true, 'deviceDirector'
