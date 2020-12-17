@@ -1152,6 +1152,21 @@ public class UserContextService implements Serializable {
 
     }
 
+    /***
+     *  判断是否是云南阜外医院
+     * @param tenantName
+     * @return
+     */
+    public  Boolean isYunNanFuWai(String tenantName){
+        if(this.getTenantInfo().getName().equals("云南省阜外心血管病医院")){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+
+
     /**
      * 验证租户名称
      * @param tenantName 非必填，如不填将默认验证指定的租户名称
