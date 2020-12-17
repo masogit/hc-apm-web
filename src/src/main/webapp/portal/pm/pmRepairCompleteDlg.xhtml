@@ -231,7 +231,7 @@
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.submitAppvalPmOrder}" value="#{msg.Confirm}" icon="ui-icon-check" update="pmTab:pmOrderListForm:datalist" oncomplete="PF('pmrepairCompleteDialog').hide();handleSubmit(args, 'approveDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.submitAppvalPmOrder}" value="#{msg.Confirm}" rendered="#{!userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}" icon="ui-icon-check" update="pmTab:pmOrderListForm:datalist" oncomplete="PF('pmrepairCompleteDialog').hide();handleSubmit(args, 'approveDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('approveDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
