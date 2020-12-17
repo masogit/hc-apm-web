@@ -913,6 +913,16 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    public boolean isZkbConfigAdmin()
+    {
+        UserAccount user = getLoginUser();
+        if(user.getLoginName().contains("zkbConfigAdmin"))
+        {
+            return true;
+        }
+        return false;
+    }
+
     public boolean isZtbTenant() {
         TenantInfo tenantInfo = getTenantInfo();
         if(tenantInfo.getType() != null && tenantInfo.getType() == 4){
