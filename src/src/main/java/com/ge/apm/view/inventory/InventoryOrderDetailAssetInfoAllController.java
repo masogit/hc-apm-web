@@ -1,9 +1,6 @@
 package com.ge.apm.view.inventory;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.InventoryIssueRepository;
-import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
-import com.ge.apm.dao.InventoryOrderRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
@@ -37,6 +34,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 	private InventoryOrderRepository inventoryOrderRepository;
     private InventoryOrderService inventoryOrderService;
 	private AssetInfoRepository assetInfoRepository;
+    private UserAccountRepository userAccountRepository;
     private UaaService uaaService;
 	private InventoryOrderService service;
 	private List<String> listClinicalDeptName;
@@ -47,6 +45,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         inventoryIssueRepository = WebUtil.getBean(InventoryIssueRepository.class);
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
 		service=WebUtil.getBean(InventoryOrderService.class);
@@ -230,7 +229,16 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         //after
 		return inventoryOrderDetailPage;
 	}
-
+    public String  getUserName(String loginName){
+	    if( null == loginName){
+	        return null;
+        }
+        UserAccount userAccount = userAccountRepository.getByLoginName(loginName);
+        if (userAccount != null) {
+            return userAccount.getName();
+        }
+        return null;
+    }
 	private List<InventoryOrderDetail> pageNum(List<InventoryOrderDetail> inventoryOrderDetailList,PageRequest pageRequest){
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize() - 1;
