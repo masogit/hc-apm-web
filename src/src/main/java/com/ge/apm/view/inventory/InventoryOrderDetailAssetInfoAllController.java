@@ -224,10 +224,27 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                 }
             }
         }
-        Page<InventoryOrderDetail>  inventoryOrderDetailPage = new PageImpl<InventoryOrderDetail>(inventoryOrderDetailList, pageRequest, inventoryOrderDetailList.size());
+        int size = inventoryOrderDetailList.size();
+        inventoryOrderDetailList= this.pageNum(inventoryOrderDetailList, pageRequest);
+        Page<InventoryOrderDetail>  inventoryOrderDetailPage = new PageImpl<InventoryOrderDetail>(inventoryOrderDetailList, pageRequest, size);
         //after
 		return inventoryOrderDetailPage;
 	}
+
+	private List<InventoryOrderDetail> pageNum(List<InventoryOrderDetail> inventoryOrderDetailList,PageRequest pageRequest){
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize() - 1;
+        int numStart = pageNumber * pageSize;
+        numStart = numStart + pageNumber;
+        int numEnd = numStart + pageSize;
+        int size = inventoryOrderDetailList.size();
+        if(size > numEnd){
+            inventoryOrderDetailList = inventoryOrderDetailList.subList(numStart ,numEnd);
+        }else {
+            inventoryOrderDetailList = inventoryOrderDetailList.subList(numStart ,size);
+        }
+        return inventoryOrderDetailList;
+    }
 
 	private void addSearchFiltersListNew(List<SearchFilter> searchFilters,List<SearchFilter> searchFiltersListNew){
         for (SearchFilter searchFilter :searchFilters) {
