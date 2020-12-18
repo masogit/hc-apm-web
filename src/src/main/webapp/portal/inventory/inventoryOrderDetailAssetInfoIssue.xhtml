@@ -55,7 +55,7 @@
 		<p:column headerText="#{msg.ProblemDescription}">
 			<h:outputText value="#{item.comment}" />
 		</p:column>
-		<p:column headerText="#{msg.FailedItems}" sortBy="#{item.inventoryCheckListItems}">
+		<p:column headerText="#{msg.FailedItems}">
 			<h:outputText value="#{item.inventoryCheckListItems}" />
 		</p:column>
 		<p:column headerText="#{msg.Solved}" filterBy="#{item.isSolved}" filterMatchMode="EQ">
