@@ -11,8 +11,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -70,7 +68,6 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         return "inventoryOrderDetailAssetInfoMainAll?faces-redirect=true";
     }
 
-    @Async
 	@Override
 	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
         //before
@@ -92,12 +89,12 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             searchFilterNoLedgerList.addAll(searchFilters);
             boolean isClinicalDeptName = searchFilterNoLedgerList.removeIf(e -> e.fieldName.equals("assetInfo.clinicalDeptName"));
             boolean isQrCode = searchFilterNoLedgerList.removeIf(e -> e.fieldName.equals("assetInfo.qrCode"));
-            for (SearchFilter searchFilter :searchFilterNoLedgerList) {
-                if(isClinicalDeptName){
+            for (SearchFilter searchFilter :searchFilters) {
+                if(isClinicalDeptName && "assetInfo.clinicalDeptName".equals(searchFilter.fieldName)){
                     searchFilterNoLedgerList.add(new SearchFilter("orgName", SearchFilter.Operator.EQ, searchFilter.value,"1*"));
                 }
-                if(isQrCode){
-                    searchFilterNoLedgerList.add(new SearchFilter("", SearchFilter.Operator.LIKE, searchFilter.value,"1*"));
+                if(isQrCode && "assetInfo.qrCode".equals(searchFilter.fieldName)){
+                    searchFilterNoLedgerList.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, searchFilter.value,"1*"));
                 }
             }
             searchFilterNoLedgerList.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2,"1*"));
