@@ -6,6 +6,7 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.RoleMsgRel;
 import com.ge.apm.domain.UserAccount;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.web.WebUtil;
@@ -161,6 +162,16 @@ public class FieldValueMessageController implements Serializable {
             }
         }
         return false;
+    }
+
+    public static String fieldValues(String fieldNames, String msgKey){
+        String[] msgTypes = fieldNames.split(",");
+        for (String msgType: msgTypes) {
+            String msgKeyZh = fieldValue(msgType, msgKey);
+            if(StringUtils.isNotBlank(msgKeyZh))
+                return msgKeyZh;
+        }
+        return null;
     }
 
 }

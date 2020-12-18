@@ -279,7 +279,22 @@ public class InventoryOrderService {
 			return map;
 		}).collect(Collectors.toList());
 	}
-
+    public List<String> getInventoryOrderData(String tenantUid, List<String> listAccessClinical,Boolean isFinished) {
+        List<String> orderIdList = new ArrayList<>();
+        List<InventoryOrder> listInventoryOrder = inventoryOrderDao.findByTenantUIDAndIsFinished(tenantUid,isFinished);
+        if (listInventoryOrder != null && listInventoryOrder.size() > 0) {
+            for (int i = 0; i < listInventoryOrder.size(); ++i) {
+                InventoryOrder tempOrder = listInventoryOrder.get(i);
+                for (String clinicalUid : listAccessClinical) {
+                    if (tempOrder.getAssigneeOrg().contains(clinicalUid)) {
+                        orderIdList.add(tempOrder.getId());
+                        break;
+                    }
+                }
+            }
+        }
+        return orderIdList;
+    }
 	public Page<InventoryOrder> getPageData(PageRequest pageRequest, String tenantUid, List<SearchFilter> listSearchFilter, List<String> listAccessClinical) {
 		Page<InventoryOrder> pageRe = null;
 		listUserInventoryOrder.clear();
