@@ -11,6 +11,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
 import com.ge.apm.dao.InventoryIssueRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.InventoryIssue;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +41,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 	private InventoryOrderDetailAssetInfoRepository dao;
 	private InventoryOrderRepository inventoryOrderRepository;
     private InventoryIssueRepository inventoryIssueRepository;
+    private UserAccountRepository userAccountRepository;
     private UaaService uaaService;
     private InventoryOrderService inventoryOrderService;
 	private InventoryOrderService service;
@@ -55,6 +57,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 		service=WebUtil.getBean(InventoryOrderService.class);
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
         inventoryIssueRepository = WebUtil.getBean(InventoryIssueRepository.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -126,7 +129,16 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
 		//after
 		return pageAssetInfo;
 	}
-
+    public String  getUserName(String loginName){
+        if( null == loginName){
+            return null;
+        }
+        UserAccount userAccount = userAccountRepository.getByLoginName(loginName);
+        if (userAccount != null) {
+            return userAccount.getName();
+        }
+        return null;
+    }
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
 	}
