@@ -98,7 +98,7 @@ public class InventoryOrderDetailAssetInfoNoWorkOrderController extends JpaCRUDC
         searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false,"1*"));
+        searchFilters.add(new SearchFilter("isChecked", SearchFilter.Operator.EQ, true,"1*"));
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false,"1*"));
         searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true,"1*"));
         Page<AssetInfo> assetInfoList = assetInfoRepository.findBySearchFilter(searchFilters,pageRequest);
