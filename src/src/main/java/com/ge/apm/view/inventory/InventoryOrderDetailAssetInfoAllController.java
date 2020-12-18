@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -68,6 +69,8 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         }
         return "inventoryOrderDetailAssetInfoMainAll?faces-redirect=true";
     }
+
+    @Async
 	@Override
 	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
         //before
@@ -87,6 +90,16 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         boolean isSolvedBoolean = searchFilters.removeIf(e -> e.fieldName.equals("isSolved"));
         if(!isSolvedBoolean){
             searchFilterNoLedgerList.addAll(searchFilters);
+            boolean isClinicalDeptName = searchFilterNoLedgerList.removeIf(e -> e.fieldName.equals("assetInfo.clinicalDeptName"));
+            boolean isQrCode = searchFilterNoLedgerList.removeIf(e -> e.fieldName.equals("assetInfo.qrCode"));
+            for (SearchFilter searchFilter :searchFilterNoLedgerList) {
+                if(isClinicalDeptName){
+                    searchFilterNoLedgerList.add(new SearchFilter("orgName", SearchFilter.Operator.EQ, searchFilter.value,"1*"));
+                }
+                if(isQrCode){
+                    searchFilterNoLedgerList.add(new SearchFilter("", SearchFilter.Operator.LIKE, searchFilter.value,"1*"));
+                }
+            }
             searchFilterNoLedgerList.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2,"1*"));
             if(!orderIdList.isEmpty()){
                 searchFilterNoLedgerList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
@@ -95,8 +108,10 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             List<InventoryOrderDetail> inventoryOrderDetails = dao.findBySearchFilter(searchFilterNoLedgerList);
             if(!inventoryOrderDetails.isEmpty()){
                 for ( InventoryOrderDetail inventoryOrderDetail: inventoryOrderDetails) {
-                    inventoryOrderDetail.setLastModifiedDate(null);
-                    inventoryOrderDetail.setLastModifiedBy(null);
+                    AssetInfo assetInfo = new AssetInfo();
+                    assetInfo.setQrCode(inventoryOrderDetail.getQrCode());
+                    assetInfo.setClinicalDeptName(inventoryOrderDetail.getOrgName());
+                    inventoryOrderDetail.setAssetInfo(assetInfo);
                 }
             }
             inventoryOrderDetailList.addAll(inventoryOrderDetails);
@@ -212,7 +227,6 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                 }
             }
         }
-
         Page<InventoryOrderDetail>  inventoryOrderDetailPage = new PageImpl<InventoryOrderDetail>(inventoryOrderDetailList, pageRequest, inventoryOrderDetailList.size());
         //after
 		return inventoryOrderDetailPage;
