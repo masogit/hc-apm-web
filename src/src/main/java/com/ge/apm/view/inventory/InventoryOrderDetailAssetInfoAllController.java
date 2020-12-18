@@ -4,11 +4,9 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.InventoryIssueRepository;
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
 import com.ge.apm.dao.InventoryOrderRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.InventoryIssue;
-import com.ge.apm.domain.InventoryOrderDetail;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.inventory.InventoryOrderService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,6 +26,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -37,26 +36,25 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 	private InventoryOrderDetailAssetInfoRepository dao;
     private InventoryIssueRepository inventoryIssueRepository;
 	private InventoryOrderRepository inventoryOrderRepository;
+    private InventoryOrderService inventoryOrderService;
 	private AssetInfoRepository assetInfoRepository;
+    private UaaService uaaService;
 	private InventoryOrderService service;
-	private String orderId;
 	private List<String> listClinicalDeptName;
-
+    private List<String> listAccessClinical;
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
         inventoryIssueRepository = WebUtil.getBean(InventoryIssueRepository.class);
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
+        inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 		service=WebUtil.getBean(InventoryOrderService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-		orderId = request.getParameter("orderId");
-        if (null == orderId){
-            listClinicalDeptName=service.getInventoryClinicalDeptUIDAll(true,0);
-        }else {
-            listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
-        }
+        listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
+        listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 	}
 
 	@Override
@@ -73,11 +71,22 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 	@Override
 	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilterList = new ArrayList<>();
-        searchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
+        //全院视图
+            List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
+            if(!orderIdList.isEmpty()){
+                searchFilterList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+            }
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        searchFilterList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilterList.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilterList.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         searchFilterList.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
         searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
-
         //before
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
@@ -151,8 +160,6 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         // 获取无工单的设备
         if(!isSolvedBoolean && !lastModifiedByBoolean && !lastModifiedDateBoolean && isAssetInfoStatus){
             List<SearchFilter> searchFiltersListNew = new ArrayList();
-            searchFiltersListNew.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
-            this.addSearchFiltersListNew(searchFilters,searchFiltersListNew);
             List<SearchFilter> InventoryOrderDetailSearchFilters = new ArrayList<>();
             InventoryOrderDetailSearchFilters.addAll(searchFilterList);
             List<InventoryOrderDetail> List = dao.findBySearchFilter(InventoryOrderDetailSearchFilters);
@@ -164,10 +171,17 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                 if(!idList.isEmpty()){
                     searchFiltersListNew.add(new SearchFilter("id", SearchFilter.Operator.NotIN, idList,"1*"));
                 }
-                searchFiltersListNew.add(new SearchFilter("isChecked", SearchFilter.Operator.EQ, true,"1*"));
-                searchFiltersListNew.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false,"1*"));
-                searchFiltersListNew.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true,"1*"));
             }
+            this.addSearchFiltersListNew(searchFilters,searchFiltersListNew);
+            searchFiltersListNew.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFiltersListNew.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFiltersListNew.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFiltersListNew.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFiltersListNew.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFiltersListNew.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFiltersListNew.add(new SearchFilter("isChecked", SearchFilter.Operator.EQ, true,"1*"));
+            searchFiltersListNew.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false,"1*"));
+            searchFiltersListNew.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true,"1*"));
             List<AssetInfo> assetInfoList = assetInfoRepository.findBySearchFilter(searchFiltersListNew);
             if (!assetInfoList.isEmpty()){
                 inventoryOrderDetailList = new ArrayList(inventoryOrderDetailList);
@@ -235,12 +249,5 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 		this.listClinicalDeptName = listClinicalDeptName;
 	}
 
-	public String getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
 
 }
