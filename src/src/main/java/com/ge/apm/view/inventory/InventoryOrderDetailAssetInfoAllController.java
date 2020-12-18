@@ -70,12 +70,37 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
     }
 	@Override
 	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
+        //before
+        List<SearchFilter> searchFilters = this.searchFilters;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
         List<SearchFilter> searchFilterList = new ArrayList<>();
+        List<SearchFilter> searchFilterNoLedgerList = new ArrayList<>();
+        List<InventoryOrderDetail> inventoryOrderDetailList = new ArrayList<>();
         //全院视图
-            List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
+        List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
+        if(!orderIdList.isEmpty()){
+            searchFilterList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+        }
+        //无台账
+        boolean isSolvedBoolean = searchFilters.removeIf(e -> e.fieldName.equals("isSolved"));
+        if(!isSolvedBoolean){
+            searchFilterNoLedgerList.addAll(searchFilters);
+            searchFilterNoLedgerList.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2,"1*"));
             if(!orderIdList.isEmpty()){
-                searchFilterList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+                searchFilterNoLedgerList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
             }
+            searchFilterNoLedgerList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
+            List<InventoryOrderDetail> inventoryOrderDetails = dao.findBySearchFilter(searchFilterNoLedgerList);
+            if(!inventoryOrderDetails.isEmpty()){
+                for ( InventoryOrderDetail inventoryOrderDetail: inventoryOrderDetails) {
+                    inventoryOrderDetail.setLastModifiedDate(null);
+                    inventoryOrderDetail.setLastModifiedBy(null);
+                }
+            }
+            inventoryOrderDetailList.addAll(inventoryOrderDetails);
+        }
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         searchFilterList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -87,14 +112,8 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         searchFilterList.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         searchFilterList.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false,"1*"));
         searchFilterList.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true,"1*"));
-        //before
-		List<SearchFilter> searchFilters = this.searchFilters;
-		if (searchFilters == null) {
-			searchFilters = new ArrayList<SearchFilter>();
-		}
         searchFilters.addAll(searchFilterList);
 
-        List<InventoryOrderDetail> inventoryOrderDetailList = new ArrayList<>();
         //获取有问题的工单
         List<SearchFilter> searchFiltersListIssue = new ArrayList(searchFilters);
         boolean lastModifiedByBoolean = searchFiltersListIssue.removeIf(e -> e.fieldName.equals("lastModifiedBy"));
@@ -128,9 +147,8 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         if (!lastModifiedByBoolean && !lastModifiedDateBoolean && isStatus){
             inventoryOrderDetailList.addAll(detailList);
         }
-        //已盘点/未盘点/无台账 工单
+        //已盘点/未盘点 工单
         List<SearchFilter> searchFiltersInventoryOrderDetailList = new ArrayList(searchFilters);
-        boolean isSolvedBoolean = searchFiltersInventoryOrderDetailList.removeIf(e -> e.fieldName.equals("isSolved"));
         if(!isSolvedBoolean){
             if(!AssetInfoIdList.isEmpty()){
                 searchFiltersInventoryOrderDetailList.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, AssetInfoIdList,"1*"));
@@ -139,13 +157,14 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             if(!inventoryOrderDetails.isEmpty()){
                 for ( InventoryOrderDetail inventoryOrderDetail: inventoryOrderDetails) {
                     Integer status = inventoryOrderDetail.getStatus();
-                    if(status == 2 || status == 0){
+                    if(status == 0){
                         inventoryOrderDetail.setLastModifiedDate(null);
                         inventoryOrderDetail.setLastModifiedBy(null);
                     }
                 }
             }
             inventoryOrderDetailList.addAll(inventoryOrderDetails);
+
         }
         boolean isAssetInfoStatus = true;
         for (SearchFilter searchFilter :searchFilters) {
