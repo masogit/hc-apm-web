@@ -343,10 +343,10 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
     public void prepareDelete() {
         crudActionName = "Delete";
     }
-    
+
 //    public void setSelected(String id) {
 //        selected = getDAO().findById(id);
-//        
+//
 //    }
     
     public void create() {
