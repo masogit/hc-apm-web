@@ -12,7 +12,10 @@
             </div>
 
             <div class="ui-g-12 card">
-
+                <h:panelGrid columns="2" rendered="#{assetArrivedItemsController.activeSupplier()}" style="margin-bottom: 0px;">
+                    <h:outputText class="label" style="color: black!important;font-size: 16px!important;" value="待验收的到货单合同号："></h:outputText>
+                    <p:inputTextarea value="#{assetArrivedItemsController.mergeContractNum}" rows="1" cols="50" readonly="true" placeholder="#{empty assetArrivedItemsController.mergeContractNum?'没有待验收合同记录':''}"></p:inputTextarea>
+                </h:panelGrid>
                 <h:form id="AssetArrivalItemListForm">
                     <p:dataTable id="datalist" value="#{assetArrivedItemsController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{assetArrivedItemsController.selected}"

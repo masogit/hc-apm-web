@@ -15,32 +15,32 @@ import com.ge.apm.service.utils.FileScanExportService;
 import com.ge.apm.service.utils.FileScanService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.google.common.base.Strings;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-
+import javaslang.Tuple2;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import javaslang.Tuple2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author 212579464
@@ -69,8 +69,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     MicroServiceUtil microServiceUtil;
 
-    private List fileTypeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel");
-
+    private List<I18nMessage> getI18nByBatchFileType;
     @Override
     protected void init() {
         dao = WebUtil.getBean(ImportFilesRepository.class);
@@ -85,9 +84,8 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         gamePlanFileType = ImportFiles.ImportFileType.CarePackageExcel.toString();
 
         FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
-        batchFileType = fieldMsg.getFieldValueList("batchFileType");
+        getI18nByBatchFileType = fieldMsg.getI18nByBatchFileType();
         gamePlanBatchFileType = fieldMsg.getFieldValueList("gamePlanBatchFileType");
-        batchFileType.removeIf(i -> StringUtils.equalsIgnoreCase(i.getMsgKey(), "SrReportPdf"));
     }
 
     @Override
@@ -97,10 +95,24 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     @Override
     protected Page<ImportFiles> loadData(PageRequest pageRequest) {
+        List<String> fileTypeList = getI18nByBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
         if (this.searchFilters == null) {
             this.searchFilters = new ArrayList<>();
-            this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.NotIN, fileTypeList, "1*"));
+            this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
+        } else {
+            Boolean  b  = false;
+            for (int i = 0;i< this.searchFilters.size();i++){
+                SearchFilter searchFilter = this.searchFilters.get(i);
+               if("fileType".equals(searchFilter.fieldName)) {
+                   b  = true;
+                   break;
+               }
+            }
+            if(!b){
+                this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
+            }
         }
+
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -171,11 +183,12 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         }
     }
 
+
     public void restartBatchJob() {
         selected.setStatus(ImportFiles.STATUS_STARTING);
-        List<String> typeList = Arrays.asList("MSARecommendExcel", "PromotionActivityExcel", "CarePackageExcel");
+        List<String> fileTypeList=  gamePlanBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
         // game plan数据导入，重试时重新添加任务
-        if (typeList.contains(selected.getFileType())) {
+        if (fileTypeList.contains(selected.getFileType())) {
             selected.setId(null);
         }
         dao.save(selected);
@@ -240,9 +253,22 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     @Override
     protected Page<ImportFiles> gamePlanLoadData(PageRequest pageRequest) {
+        List<String> fileTypeList=  gamePlanBatchFileType.stream().map(I18nMessage::getMsgKey).collect(Collectors.toList());
         if (this.searchFilters == null) {
             this.searchFilters = new ArrayList<>();
             this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
+        }else {
+            Boolean  b  = false;
+            for (int i = 0;i< this.searchFilters.size();i++){
+                SearchFilter searchFilter = this.searchFilters.get(i);
+                if("fileType".equals(searchFilter.fieldName)) {
+                    b  = true;
+                    break;
+                }
+            }
+            if(!b){
+                this.searchFilters.add(new SearchFilter("fileType", SearchFilter.Operator.IN, fileTypeList, "1*"));
+            }
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
@@ -287,5 +313,13 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
                 || StringUtils.equals(gamePlanFileType, ImportFiles.ImportFileType.PMScheduleExcel.toString())) {
             microServiceUtil.synchBatchTask(new File(fileService.getUploadFileFullPath(savedFilePath)), gamePlanFileType);
         }
+    }
+
+    public List<I18nMessage> getGetI18nByBatchFileType() {
+        return getI18nByBatchFileType;
+    }
+
+    public void setGetI18nByBatchFileType(List<I18nMessage> getI18nByBatchFileType) {
+        this.getI18nByBatchFileType = getI18nByBatchFileType;
     }
 }

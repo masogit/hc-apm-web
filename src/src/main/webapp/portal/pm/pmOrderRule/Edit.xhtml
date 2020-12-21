@@ -85,14 +85,15 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.ruleLevel}*</label>
-                            <p:selectOneMenu value="#{pmOrderRuleController.selected.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <p:ajax listener="#{pmOrderRuleController.changeruleLevelTip()}" update=":PmOrderRuleEditForm:tipChange" />
                             </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>
                     
-                   <p:panelGrid id="report" columns="1"  styleClass="ui-panelgrid-blank form-group" layout="grid" rendered="#{pmOrderRuleController.selected != null}">
+                   <p:panelGrid id="report" columns="4"  styleClass="ui-panelgrid-blank form-group" layout="grid" rendered="#{pmOrderRuleController.selected != null}">
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
 		                   <p:selectOneMenu  value="#{pmOrderRuleController.selected.safetyReport}"  >
@@ -104,8 +105,16 @@
 	                        &nbsp;&nbsp;
 	                   <p:commandButton  rendered="#{not empty pmOrderRuleController.selected.safetyReport}" immediate="true" value="#{msg.preview}" onclick="preparePreview(1,'PmOrderRuleEditForm');" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                        </h:panelGroup>
-	                   
-	                  <h:panelGroup>
+                       <h:panelGroup></h:panelGroup>
+                       <h:panelGroup></h:panelGroup>
+                       <h:panelGroup>
+                           <p:outputLabel id="tipChange" style="color: red!important;font-size: smaller!important;" rendered="#{userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}">#{pmOrderRuleController.getRuleLevelTip()}</p:outputLabel>
+                       </h:panelGroup>
+                   </p:panelGrid>
+
+                    <p:panelGrid id="xnreport" columns="1"  styleClass="ui-panelgrid-blank form-group" layout="grid" rendered="#{pmOrderRuleController.selected != null}">
+
+                    <h:panelGroup>
 	                		<label class ="label">#{msg.performanceReport}</label>
 	                     <p:selectOneMenu  value="#{pmOrderRuleController.selected.performanceReport}"  >
 	                     		<p:ajax   update="report" />
