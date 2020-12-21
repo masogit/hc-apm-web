@@ -33,6 +33,7 @@
         </p:column>
         <p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE" sortBy="#{item.lastModifiedBy}">
             <h:outputText value="#{item.lastModifiedBy}" />
+            <h:outputText value="#{inventoryOrderDetailAssetInfoController3.getUserName(item.lastModifiedBy)}"/>
         </p:column>
         <p:column headerText="#{msg.InvnetoryTime}" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE" sortBy="#{item.lastModifiedDate}">
             <f:facet name="filter">
