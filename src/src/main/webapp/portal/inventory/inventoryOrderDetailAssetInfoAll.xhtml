@@ -72,7 +72,7 @@
             <h:outputText value="#{item.isSolved}"/>
         </p:column>
         <p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
-            <h:outputText value="#{item.lastModifiedBy}" />
+            <h:outputText value="#{inventoryOrderDetailAssetInfoAllController.getUserName(item.lastModifiedBy)}"/>
         </p:column>
         <p:column headerText="#{msg.InvnetoryTime}" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
             <f:facet name="filter">

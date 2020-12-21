@@ -33,8 +33,8 @@
         <intercept-url pattern="/admin/uaa/siteInfo/List.xhtml" access="hasAnyRole('SuperAdmin','GeOp')"/>
         <intercept-url pattern="/admin/batchFile/batchFileList.xhtml"
                        access="hasAnyRole('SuperAdmin','GeOp','SiteAdmin','DataMaintainStaff','GEInternalStaff')"/>
-        <intercept-url pattern="/admin/batchFile/gamePlanBatchFileList.xhtml"
-                       access="hasRole('GEInternalStaff')"/>
+<!--        <intercept-url pattern="/admin/batchFile/gamePlanBatchFileList.xhtml"-->
+<!--                       access="hasRole('GEInternalStaff')"/>-->
         <intercept-url pattern="/portal/sr/opsreport/reportList.xhtml"
                        access="hasAnyRole('SuperAdmin','SiteAdmin','DataMaintainStaff')"/>
         <intercept-url pattern="/portal/fealert/report/List.xhtml"
