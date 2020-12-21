@@ -1540,7 +1540,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','31','U/S LOGIQ E9','U/S LOGIQ E9',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','32','U/S VIVID E9','U/S VIVID E9',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','33','U/S VOLUSON E8','U/S VOLUSON E8',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('geDeviceType', '101', 'AW', 'AW', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('geDeviceType', '101', 'WS', 'WS', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('formatNum','1','0000','0000',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('formatNum','2','00000','00000',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('formatNum','3','000000','000000',NULL,-1);
