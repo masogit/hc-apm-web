@@ -462,6 +462,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "emergency_timeout_accept")
     private Integer emergencyTimeoutAccept;
 
+    @Column(name = "emergency_timeout_acceptance")
+    private Integer emergencyTimeoutAcceptance;
+
     @Column(name = "emergency_timeout_close")
     private Integer emergencyTimeoutClose;
 
@@ -552,6 +555,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setEmergencyTimeoutDispatch(Integer emergencyTimeoutDispatch) {
         this.emergencyTimeoutDispatch = emergencyTimeoutDispatch;
+    }
+
+    public Integer getEmergencyTimeoutAcceptance() {
+        return emergencyTimeoutAcceptance;
+    }
+
+    public void setEmergencyTimeoutAcceptance(Integer emergencyTimeoutAcceptance) {
+        this.emergencyTimeoutAcceptance = emergencyTimeoutAcceptance;
     }
 
     public Integer getEmergencyTimeoutAccept() {
