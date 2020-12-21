@@ -5,18 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Fetch;
@@ -71,7 +60,7 @@ public class InventoryOrderDetail implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "asset_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private AssetInfo assetInfo;
-    //0:未盘点，1：已盘点，2：无台账
+    //0:未盘点，1：已盘点，2：无台账, 3:有问题 ,4:无工单
     @Column(name = "status")
     private Integer status;
     
@@ -92,7 +81,29 @@ public class InventoryOrderDetail implements Serializable {
     private String lastModifiedBy;
 
     @Column(name = "last_modified_date")
-    private Date lastModifiedDate =new Date();
+    private Date lastModifiedDate ;
+
+    @Transient
+    private String inventoryCheckListItems;
+
+    @Transient
+    private String isSolved;
+
+    public String getInventoryCheckListItems() {
+        return inventoryCheckListItems;
+    }
+
+    public void setInventoryCheckListItems(String inventoryCheckListItems) {
+        this.inventoryCheckListItems = inventoryCheckListItems;
+    }
+
+    public String getIsSolved() {
+        return isSolved;
+    }
+
+    public void setIsSolved(String isSolved) {
+        this.isSolved = isSolved;
+    }
 
     public String getId() {
         return id;

@@ -904,6 +904,10 @@ public class AssetInstallationController {
             return;
         }
         List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+        if(itemList == null || itemList.isEmpty()){
+            WebUtil.addErrorMessage("没有需要导出的验收报告");
+            return;
+        }
         try {
             Map<String, Object> data = assetInstallationReportService.createReportDataBatch(itemList);
             byte[] templateBytes = assetInstallationReportService.buildReportTemplate(reportType);

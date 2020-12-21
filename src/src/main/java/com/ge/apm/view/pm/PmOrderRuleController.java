@@ -76,6 +76,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private SupplierService supplierService;
     private List<String> deletedCheckListIds = new ArrayList<>();
     private UserContextService userContextService;
+    private String ruleLevelTip;
 
     @Override
     protected void init() {
@@ -553,6 +554,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             this.uploadedFile = null;
             super.prepareCreate();
             initCheckItemLists();
+            ruleLevelTip ="";
             selectedUserOrg = orgInfoRepository.findByUid(selected.getSiteUID());
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -727,6 +729,18 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     }
 
 
+    public String changeruleLevelTip(){
+        if(selected.getLevel() != null){
+        if(selected.getLevel() == 2){
+            ruleLevelTip = WebUtil.getMessage("SecondaryMaintenanceTip");
+        }
+        if(selected.getLevel() == 3){
+            ruleLevelTip = WebUtil.getMessage("ThreelevelMaintenanceTip");
+        }
+        }
+        return ruleLevelTip;
+    }
+
     public boolean isDisable(){
         if(selected == null){
             return false;
@@ -845,5 +859,13 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public void setSelectedOrg(OrgInfo selectedOrg) {
         this.selectedOrg = selectedOrg;
+    }
+
+    public String getRuleLevelTip() {
+        return ruleLevelTip;
+    }
+
+    public void setRuleLevelTip(String ruleLevelTip) {
+        this.ruleLevelTip = ruleLevelTip;
     }
 }

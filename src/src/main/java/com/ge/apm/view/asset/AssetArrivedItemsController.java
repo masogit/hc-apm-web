@@ -7,6 +7,8 @@ import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.dao.ArrivalListRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import org.apache.commons.lang3.StringUtils;
@@ -16,13 +18,6 @@ import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeTemplate;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -65,6 +60,10 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private SupplierService supplierService;
 
+    private ArrivalListRepository arrivalListDao = null;
+
+    private String mergeContractNum;
+
     @Override
     protected void init() {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
@@ -74,6 +73,8 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         supplierService = WebUtil.getBean(SupplierService.class);
         addDateTimeFields("arrivalList.arrivalDate");
+        arrivalListDao = WebUtil.getBean(ArrivalListRepository.class);
+        getSavedArrivalContractNum();
     }
 
     @Override
@@ -311,5 +312,42 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     }
     public boolean activeSupplier(){
         return supplierService.activeSupplier();
+    }
+
+    public void getSavedArrivalContractNum(){
+//        List<SearchFilter> searchFilters = this.searchFilters;
+//        if (this.searchFilters == null) {
+//            searchFilters = new ArrayList();
+//            this.searchFilters = searchFilters;
+//        }
+//        List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
+//        searchFilters.add(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("arrivalList.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("arrivalList.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("arrivalList.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("currentPersonUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+//        searchFilters.add(new SearchFilter("arrivalList.processType", SearchFilter.Operator.EQ, "Normal"));
+//        searchFilters.add(new SearchFilter("arrivalList.contractNum", SearchFilter.Operator.IsNotNull, null));
+//        searchFilters.add(new SearchFilter("arrivalList.supplierStatus", SearchFilter.Operator.EQ, ArrivalList.SupplierStatus.Saved.toString()));
+//
+//        List<ArrivalListItem> ArrivalListItem = dao.findBySearchFilter(searchFilters);
+//        if(ArrivalListItem == null || ArrivalListItem.isEmpty()){
+//            return ;
+//        }
+//        List<String> contractNumList = new ArrayList<>();
+//        for(ArrivalListItem list : ArrivalListItem){
+//            contractNumList.add(list.getArrivalList().getContractNum());
+//        }
+//        mergeContractNum = contractNumList.stream().distinct().collect(Collectors.toList()).toString();
+        List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
+        List<String> arrivalListContractNum = dao.getArrivalListNotInstalledContractNum(orgUidList,UserContextService.getCurrentUserAccount().getUid(),ArrivalList.SupplierStatus.Saved.name());
+        mergeContractNum = arrivalListContractNum.toString().replace("[","").replace("]","");
+    }
+    public String getMergeContractNum() {
+        return mergeContractNum;
+    }
+
+    public void setMergeContractNum(String mergeContractNum) {
+        this.mergeContractNum = mergeContractNum;
     }
 }
