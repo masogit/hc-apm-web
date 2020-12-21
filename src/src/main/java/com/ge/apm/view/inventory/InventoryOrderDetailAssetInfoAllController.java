@@ -244,7 +244,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         int pageSize = pageRequest.getPageSize() - 1;
         int numStart = pageNumber * pageSize;
         numStart = numStart + pageNumber;
-        int numEnd = numStart + pageSize;
+        int numEnd = numStart + pageSize + 1;
         int size = inventoryOrderDetailList.size();
         if(size > numEnd){
             inventoryOrderDetailList = inventoryOrderDetailList.subList(numStart ,numEnd);
