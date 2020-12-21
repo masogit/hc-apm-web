@@ -52,9 +52,13 @@
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="#{!assetArrivedListEditController.activeSupplier()}">
                                         <label class="label">#{msg.arrivalDate}*</label>
                                         <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier()}">
+                                        <label class="label">#{msg.arrivalDate}</label>
+                                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListFunctionType}</label>
