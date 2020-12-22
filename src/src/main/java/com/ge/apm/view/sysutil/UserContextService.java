@@ -896,20 +896,23 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isGeAdmin() {
-        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfig = this.zkbPartOrderUserConfigRepository.findByConfigType("ClosePending");
-        if(CollectionUtils.isEmpty(zkbPartOrderUserConfig))
-        {
-            return false;
-        }
-        Map<String, String> zkbPartOrderUserConfigMap = zkbPartOrderUserConfig.stream().filter(partOrderUserConfig -> partOrderUserConfig.getLoginName()!=null).collect(
-                Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getLoginName()))),
-                        ArrayList::new)).stream().collect(Collectors.toMap(ZkbPartOrderUserConfig::getLoginName,ZkbPartOrderUserConfig::getLoginName));
         UserAccount user = getLoginUser();
-        if(zkbPartOrderUserConfigMap.containsKey(user.getLoginName()))
-        {
-          return true;
-        }
+        if(StringUtils.isBlank(user.getLoginName()))
+            return false;
+        List<ZkbPartOrderUserConfig>  zkbPartOrderUserConfig= this.zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(user.getLoginName(),"ClosePending");
+        if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfig))
+            return true;
         return false;
+    }
+
+    public boolean isZkbConfigAdmin()
+    {
+        UserAccount user = getLoginUser();
+        if(StringUtils.isBlank(user.getLoginName()))
+            return false;
+        if(user.getLoginName().contains("zkbConfigAdmin"))
+            return true;
+            return false;
     }
 
     public boolean isZtbTenant() {

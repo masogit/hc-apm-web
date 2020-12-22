@@ -83,7 +83,20 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             searchFilterList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
         }
         //无台账
-        boolean isSolvedBoolean = searchFilters.removeIf(e -> e.fieldName.equals("isSolved"));
+        boolean isSolvedBoolean = false;
+        boolean lastModifiedByBoolean = false;
+        boolean lastModifiedDateBoolean = false;
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("isSolved".equals(searchFilter.fieldName)) {
+                isSolvedBoolean = true;
+            }
+            if ("lastModifiedBy".equals(searchFilter.fieldName)) {
+                lastModifiedByBoolean = true;
+            }
+            if ("lastModifiedDate".equals(searchFilter.fieldName)) {
+                lastModifiedDateBoolean = true;
+            }
+        }
         if(!isSolvedBoolean){
             searchFilterNoLedgerList.addAll(searchFilters);
             boolean isClinicalDeptName = searchFilterNoLedgerList.removeIf(e -> e.fieldName.equals("assetInfo.clinicalDeptName"));
@@ -127,8 +140,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 
         //获取有问题的工单
         List<SearchFilter> searchFiltersListIssue = new ArrayList(searchFilters);
-        boolean lastModifiedByBoolean = searchFiltersListIssue.removeIf(e -> e.fieldName.equals("lastModifiedBy"));
-        boolean lastModifiedDateBoolean = searchFiltersListIssue.removeIf(e -> e.fieldName.equals("lastModifiedDate"));
+
         boolean isStatus = true;
         for (SearchFilter searchFilter :searchFiltersListIssue) {
             if("status".equals(searchFilter.fieldName)){
@@ -139,6 +151,8 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             }
         }
         searchFiltersListIssue.removeIf(e -> e.fieldName.equals("status"));
+        searchFiltersListIssue.removeIf(e -> e.fieldName.equals("lastModifiedBy"));
+        searchFiltersListIssue.removeIf(e -> e.fieldName.equals("lastModifiedDate"));
         List<InventoryIssue> inventoryIssueList = inventoryIssueRepository.findBySearchFilter(searchFiltersListIssue);
         List<Integer> AssetInfoIdList = new ArrayList<>();
         List<InventoryOrderDetail> detailList = new ArrayList<>();
@@ -164,8 +178,11 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             if(!AssetInfoIdList.isEmpty()){
                 searchFiltersInventoryOrderDetailList.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, AssetInfoIdList,"1*"));
             }
+            if(lastModifiedByBoolean || lastModifiedDateBoolean){
+                searchFiltersInventoryOrderDetailList.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2,"1*"));
+            }
             List<InventoryOrderDetail> inventoryOrderDetails = dao.findBySearchFilter(searchFiltersInventoryOrderDetailList);
-            if(!inventoryOrderDetails.isEmpty()){
+            if(!inventoryOrderDetails.isEmpty() && (!lastModifiedByBoolean || !lastModifiedByBoolean)){
                 for ( InventoryOrderDetail inventoryOrderDetail: inventoryOrderDetails) {
                     Integer status = inventoryOrderDetail.getStatus();
                     if(status == 0){
