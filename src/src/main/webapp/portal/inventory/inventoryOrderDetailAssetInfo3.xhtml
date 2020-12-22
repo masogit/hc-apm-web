@@ -31,7 +31,7 @@
         <p:column headerText="#{msg.feedbackComment}" filterBy="#{item.comment}" filterMatchMode="LIKE">
             <h:outputText value="#{item.comment}" />
         </p:column>
-        <p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE" sortBy="#{item.lastModifiedBy}">
+        <p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
             <h:outputText value="#{inventoryOrderDetailAssetInfoController3.getUserName(item.lastModifiedBy)}"/>
         </p:column>
         <p:column headerText="#{msg.InvnetoryTime}" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE" sortBy="#{item.lastModifiedDate}">
