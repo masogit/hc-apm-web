@@ -192,10 +192,10 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                 searchFiltersInventoryOrderDetailList.add(new SearchFilter("assetInfo.id", SearchFilter.Operator.NotIN, AssetInfoIdList,"1*"));
             }
             if(lastModifiedByBoolean || lastModifiedDateBoolean){
-                searchFiltersInventoryOrderDetailList.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2,"1*"));
+                searchFiltersInventoryOrderDetailList.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1,"1*"));
             }
             List<InventoryOrderDetail> inventoryOrderDetails = dao.findBySearchFilter(searchFiltersInventoryOrderDetailList);
-            if(!inventoryOrderDetails.isEmpty() && (!lastModifiedByBoolean || !lastModifiedByBoolean)){
+            if(!inventoryOrderDetails.isEmpty() && !lastModifiedByBoolean && !lastModifiedDateBoolean){
                 for ( InventoryOrderDetail inventoryOrderDetail: inventoryOrderDetails) {
                     Integer status = inventoryOrderDetail.getStatus();
                     if(status == 0){
