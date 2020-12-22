@@ -109,6 +109,12 @@
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">#{msg.timeoutAcceptance}</label>
+                                <p:inputNumber id="timeoutAcceptance" value="#{workflowConfigController.selected.timeoutAcceptance}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.timeoutClose}</label>
                                 <p:inputNumber id="timeoutClose" value="#{workflowConfigController.selected.timeoutClose}" minValue="0" decimalPlaces="0">
@@ -213,6 +219,12 @@
                             <h:panelGroup >
                                 <label class="label">#{msg.EmergencyWorkorder}#{msg.timeoutAccept}</label>
                                 <p:inputNumber id="emergencyTimeoutAccept" value="#{workflowConfigController.selected.emergencyTimeoutAccept}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">#{msg.EmergencyWorkorder}#{msg.timeoutAcceptance}</label>
+                                <p:inputNumber id="emergencyTimeoutAcceptance" value="#{workflowConfigController.selected.emergencyTimeoutAcceptance}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup>

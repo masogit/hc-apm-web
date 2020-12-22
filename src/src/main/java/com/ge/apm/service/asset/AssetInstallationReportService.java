@@ -67,9 +67,9 @@ public class AssetInstallationReportService {
         reportData.put("import_equipment", arrivalListItem.getImportEquipment()==null?"":FieldValueMessageController.doGetFieldValue("importEquipment",arrivalListItem.getImportEquipment()+""));//是否进口设备[1:进口,2:国产]
         reportData.put("item_num", 1);//数量
         reportData.put("guarantee", arrivalListItem.getGuarantee()==null?"":arrivalListItem.getGuarantee());
-        reportData.put("annual_maintenance_times", arrivalListItem.getAnnualMaintenanceTimes()==null?0:arrivalListItem.getAnnualMaintenanceTimes());//年保修次数
-        reportData.put("hospital_num", "");//医院编号
-
+        reportData.put("annual_maintenance_times", arrivalListItem.getAnnualMaintenanceTimes());//年保修次数
+        reportData.put("hospital_num", arrivalListItem.getDepartNum());//医院编号
+        reportData.put("receipt_number", arrivalListItem.getArrivalList().getReceiptNumber());//入库单号
         reportData.put("contract_num", arrivalListItem.getArrivalList().getContractNum());//合同号
         reportData.put("invoice_num", arrivalListItem.getArrivalList().getInvoiceNum());//发票号
         reportData.put("contract_price", arrivalListItem.getArrivalList().getContractPrice());//合同价格
@@ -120,18 +120,18 @@ public class AssetInstallationReportService {
             Map<String, Object> arrivalItemMap = new HashMap<>();
             ArrivalList arrivalList = arrivalListItem.getArrivalList();
             arrivalItemMap.put("asset_name", arrivalList.getAssetName());//设备名称
-            arrivalItemMap.put("brand", arrivalList.getBrand()==null?"":arrivalList.getBrand());//品牌
-            arrivalItemMap.put("function_type", arrivalList.getFunctionType()==null?"":arrivalList.getFunctionType());//型号规格
-            if(arrivalListItem.getImportEquipment() == null){
-                arrivalItemMap.put("import_equipment", "");//是否进口设备[1:进口,2:国产]
-            }else{
-                arrivalItemMap.put("import_equipment", FieldValueMessageController.doGetFieldValue("importEquipment",arrivalListItem.getImportEquipment()+""));//是否进口设备[1:进口,2:国产]
+            arrivalItemMap.put("brand", arrivalList.getBrand());//品牌
+            arrivalItemMap.put("function_type", arrivalList.getFunctionType());//型号规格
+            Integer importEquipment = arrivalListItem.getImportEquipment();
+            if(importEquipment == null || importEquipment !=1){
+                importEquipment = 2;//是否进口设备[1:进口,2:国产]
             }
+            arrivalItemMap.put("import_equipment", FieldValueMessageController.doGetFieldValue("importEquipment",importEquipment.toString()));//是否进口设备[1:进口,2:国产]
             arrivalItemMap.put("item_num", 1);//数量
-            arrivalItemMap.put("guarantee", arrivalListItem.getGuarantee()==null?"":arrivalListItem.getGuarantee());
-            arrivalItemMap.put("annual_maintenance_times", arrivalListItem.getAnnualMaintenanceTimes()==null?0:arrivalListItem.getAnnualMaintenanceTimes());//年保修次数
-            arrivalItemMap.put("manufact_num", arrivalListItem.getSerialNum()==null?"":arrivalListItem.getSerialNum());//出厂SN编号
-            arrivalItemMap.put("hospital_num", "");//医院编号
+            arrivalItemMap.put("guarantee", arrivalListItem.getGuarantee());
+            arrivalItemMap.put("annual_maintenance_times", arrivalListItem.getAnnualMaintenanceTimes());//年保修次数
+            arrivalItemMap.put("manufact_num", arrivalListItem.getSerialNum());//出厂SN编号
+            arrivalItemMap.put("hospital_num", arrivalListItem.getDepartNum());//医院编号
             // 安装位置
             String locationName = "";
             if(StringUtils.isNotBlank(arrivalListItem.getLocationName())){
@@ -150,6 +150,7 @@ public class AssetInstallationReportService {
 
         ArrivalListItem arrivalListItem = arrivalListItemList.get(0);
 
+        reportData.put("receipt_number", arrivalListItem.getArrivalList().getReceiptNumber());//入库单号
         reportData.put("asset_name", arrivalListItem.getArrivalList().getAssetName());//设备名称
         reportData.put("financing_num", arrivalListItem.getFinancingNum());//设备财产编号
         reportData.put("function_type", arrivalListItem.getArrivalList().getFunctionType());//型号规格
@@ -173,7 +174,7 @@ public class AssetInstallationReportService {
         reportData.put("supplier_name", arrivalListItem.getArrivalList().getVendor());//供应商
         reportData.put("contract_date", arrivalListItem.getArrivalList().getContractDate());//合同签订日期
         reportData.put("foreign_trade_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
-        reportData.put("box_installation_date", arrivalListItem.getArrivalList().getBoxInstallationDate());//开箱安装日期
+        reportData.put("box_installation_date", arrivalListItem.getArrivalList().getArrivalDate());//开箱安装日期改为到货安装日期
         reportData.put("using_date", arrivalListItem.getArrivalList().getUsingDate());//使用日期
         reportData.put("using_person", arrivalListItem.getArrivalList().getUsingPerson());//使用人
         reportData.put("using_person_tel", arrivalListItem.getArrivalList().getUsingPersonTel());//使用人电话
