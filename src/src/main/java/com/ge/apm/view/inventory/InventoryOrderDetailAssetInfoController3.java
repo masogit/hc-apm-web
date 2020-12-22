@@ -90,6 +90,23 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
         }else {
             searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
         }
+        String value = null;
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("lastModifiedBy".equals(searchFilter.fieldName)) {
+                value = (String)searchFilter.value;
+            }
+        }
+        if(searchFilters.removeIf(e -> e.fieldName.equals("lastModifiedBy"))){
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(user.getTenantUID(), value);
+            List<String> loginNamList = new ArrayList<>();
+            if(!userAccountList.isEmpty()){
+                for (UserAccount userAccount:userAccountList) {
+                    loginNamList.add(userAccount.getLoginName());
+                }
+            }
+            searchFilters.add(new SearchFilter("lastModifiedBy", SearchFilter.Operator.IN, loginNamList,"1*"));
+        }
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
         //无台账，status=2,没有assetInfo
 //        searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));

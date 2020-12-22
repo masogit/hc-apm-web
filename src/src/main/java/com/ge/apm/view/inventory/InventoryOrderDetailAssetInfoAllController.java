@@ -86,16 +86,30 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
         boolean isSolvedBoolean = false;
         boolean lastModifiedByBoolean = false;
         boolean lastModifiedDateBoolean = false;
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        String value = null;
         for (SearchFilter searchFilter :searchFilters) {
             if ("isSolved".equals(searchFilter.fieldName)) {
                 isSolvedBoolean = true;
             }
             if ("lastModifiedBy".equals(searchFilter.fieldName)) {
                 lastModifiedByBoolean = true;
+                value = (String)searchFilter.value;
             }
             if ("lastModifiedDate".equals(searchFilter.fieldName)) {
                 lastModifiedDateBoolean = true;
             }
+        }
+        if(lastModifiedByBoolean){
+            searchFilters.removeIf(e -> e.fieldName.equals("lastModifiedBy"));
+            List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(user.getTenantUID(), value);
+            List<String> loginNamList = new ArrayList<>();
+            if(!userAccountList.isEmpty()){
+                for (UserAccount userAccount:userAccountList) {
+                    loginNamList.add(userAccount.getLoginName());
+                }
+            }
+            searchFilters.add(new SearchFilter("lastModifiedBy", SearchFilter.Operator.IN, loginNamList,"1*"));
         }
         if(!isSolvedBoolean){
             searchFilterNoLedgerList.addAll(searchFilters);
@@ -125,7 +139,6 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
             }
             inventoryOrderDetailList.addAll(inventoryOrderDetails);
         }
-        UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         searchFilterList.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilterList.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));

@@ -123,6 +123,22 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
                 }
             }
         }
+        String value = null;
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("lastModifiedBy".equals(searchFilter.fieldName)) {
+                value = (String)searchFilter.value;
+            }
+        }
+        if(searchFilters.removeIf(e -> e.fieldName.equals("lastModifiedBy"))){
+            List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(user.getTenantUID(), value);
+            List<String> loginNamList = new ArrayList<>();
+            if(!userAccountList.isEmpty()){
+                for (UserAccount userAccount:userAccountList) {
+                    loginNamList.add(userAccount.getLoginName());
+                }
+            }
+            searchFilters.add(new SearchFilter("lastModifiedBy", SearchFilter.Operator.IN, loginNamList,"1*"));
+        }
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
         searchFilters.addAll(searchFilterList);
         Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters,pageRequest);
