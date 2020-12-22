@@ -12,6 +12,7 @@ import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
+import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.service.utils.ExcelDocumentStreamingWriter;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -603,7 +604,10 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
         map.put(WebUtil.getMessage("capitalSource"), "医疗");
         map.put(WebUtil.getMessage("riskGrade"), "二级");
         map.put(WebUtil.getMessage("MeasurementGrade"), "B类计量设备");
-        map.put(WebUtil.getMessage("measuringItemCategory"), "磁共振类");
+
+        List<I18nMessage> measuringItemCategory = I18nMessageService.getMessagesByType("measuringItemCategory", -1);
+        map.put(WebUtil.getMessage("measuringItemCategory"), measuringItemCategory.isEmpty() ? "" : measuringItemCategory.get(0).getValueZh());
+
         map.put(WebUtil.getMessage("emergencyEquipment"), "急救设备");
         map.put(WebUtil.getMessage("IsImportEquipment"), "进口");
         map.put(WebUtil.getMessage("CurrentStatus"), "正常");

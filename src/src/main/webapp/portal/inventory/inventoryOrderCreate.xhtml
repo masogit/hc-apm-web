@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <!--新增盘点工单-->
+        <p:dialog id="inventoryOrderEditDlg" width="980" height="500" widgetVar="inventoryOrderEditDlg" modal="true" resizable="false" draggable="true" appendTo="@this" header="新增盘点工单" >
+            <h:form id="inventoryOrderEditForm">
+                <h:panelGroup id="display">
+                    <p:fieldset legend="盘点时间设置">
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
+                            <h:panelGroup>
+                                <label class="label">计划开始时间<span style="color: red">*</span></label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="startDate" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.selected.planStartTime}" class="manufactDateChange"
+                                            showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">计划结束时间<span style="color: red">*</span></label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="endDate" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.selected.planEndTime}"  class="manufactDateChange"
+                                             showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+
+                    <p:fieldset legend="盘点科室选择">
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup id="approveuser">
+                                <label class="label"> 选择科室 </label>
+                                <p:selectCheckboxMenu
+                                        value="#{inventoryOrderController.selectedOrgs}"
+                                        panelStyle="width:280px" style="width:100%"
+                                        converter="orgInfoConverter" multiple="true" filter="true"
+                                        filterMatchMode="contains" required="true" requiredMessage="盘点科室不能为空">
+                                   <f:selectItems value="#{inventoryOrderController.orgsForSelected}" var="item"
+                                                   itemLabel="#{inventoryOrderController.getNameWithParent(item)}" itemValue="#{item}"/>
+                                    <p:ajax process="@this"/>
+                                </p:selectCheckboxMenu>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+
+                    <br/>
+                    <p:commandButton validateClient="true" action="#{inventoryOrderController.saveCreate}" value="#{msg.Save}" update=":inventoryOrderListForm:datalist" icon="ui-icon-check"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('inventoryOrderEditDlg').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="FinishOrderDialog" widgetVar="FinishOrderDialog" modal="true" width="600" height="130"  resizable="true" draggable="true" appendTo="@this" closable="false" header="盘点工单关闭">
+            <h:form id="FinishOrderForm" >
+                <p:messages id="messages" showDetail="true" closable="false" autoUpdate="true"></p:messages>
+                <h:panelGroup id="display22">
+                    <h:panelGrid columns="2" >
+                        <!--<h:outputText value="#{msg.NoAddableField}" rendered="#{empty customConfigController.addFieldsList}" />-->
+                        <h:panelGroup>
+                            <label class="label">实际开始时间<span style="color: red">*</span></label>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="startDatee" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.inventoryOrder.startTime}" maxdate ="#{appContextService.curentDate}"  class="manufactDateChange"
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">实际结束时间<span style="color: red">*</span></label>
+                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="endDatee" pattern="#{userContextService.timeFormat8()}" value="#{inventoryOrderController.inventoryOrder.endTime}" maxdate="#{appContextService.curentDate}"  class="manufactDateChange"
+                                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"   required="true" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="1" >
+                        <h:panelGroup style="align-content: flex-start">
+                            <p:commandButton action="#{inventoryOrderController.finishOrder}" value="#{msg.OK}" icon="ui-icon-check"/>
+                                &nbsp;
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('FinishOrderDialog').hide()"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:composition>
+
+</html>

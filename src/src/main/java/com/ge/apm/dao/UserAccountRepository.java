@@ -145,6 +145,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     UserAccount findFirstByTenantUIDAndName(String tenantUid, String name);
 
+    @Query(value = "select  u from UserAccount u where u.tenantUID = ?1 and u.name like concat('%',?2,'%') ")
+    List<UserAccount> findByTenantUIDAndNameList(String tenantUid, String name);
+
     List<UserAccount> findByTenantUIDAndName(String tenantUid, String name);
 
     List<UserAccount> findByTenantUID(String tenantUid);
