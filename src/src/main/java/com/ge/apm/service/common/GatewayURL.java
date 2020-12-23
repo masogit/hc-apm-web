@@ -34,6 +34,12 @@ public enum GatewayURL {
 
     GET_WORKFLOW_CONFIG("/hcapmassetservice/api/apm/asset/workflowConfig/{assetId}"),
 
+    BEFORE_CREATE_INVENTORY_ORDER("/hcapmassetservice/api/apm/asset/inventoryorders/orgSelection"),
+
+    SUMBIT_CREATE_INVENTORY_ORDER("/hcapmassetservice/api/apm/asset/inventoryorders"),
+
+    FINISH_INVENTORY_ORDER("/hcapmassetservice/api/apm/asset/inventoryorders/{orderId}"),
+
     // Send Message to Wechat
     SEND_WECHAT_MSG("/hcapmgateway/wechat/message"),
     // Asset Installation process
