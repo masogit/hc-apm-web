@@ -1,3 +1,8 @@
+-- 2020-12-21 九院物资系统'设备是否进口'字段值修复，国产设备为2 start
+update arrival_list_item set import_equipment=2 where import_equipment=0;
+update asset_info set import_equipment=2 where import_equipment=0;
+-- 2020-12-21 end
+
 -- 2020-12-10 微信消息推送角色订阅配置 start
 --menu_type:1,保养报告上传
  --放射科
