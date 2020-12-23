@@ -52,10 +52,10 @@
 		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
 			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
-		<p:column headerText="#{msg.ProblemDescription}" sortBy="#{item.comment}">
+		<p:column headerText="#{msg.ProblemDescription}">
 			<h:outputText value="#{item.comment}" />
 		</p:column>
-		<p:column headerText="#{msg.FailedItems}" sortBy="#{item.inventoryCheckListItems}">
+		<p:column headerText="#{msg.FailedItems}">
 			<h:outputText value="#{item.inventoryCheckListItems}" />
 		</p:column>
 		<p:column headerText="#{msg.Solved}" filterBy="#{item.isSolved}" filterMatchMode="EQ">

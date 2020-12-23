@@ -44,7 +44,9 @@ public class WorkflowConfig implements Serializable {
     private Integer timeoutRepair;
     @Column(name = "timeout_close")
     private Integer timeoutClose;
-    
+    @Column(name = "timeout_acceptance")
+    private Integer timeoutAcceptance;
+
     @Column(name="order_reopen_timeframe")
     private Integer orderReopenTimeframe;//二次开单的最大时间间隔
     
@@ -460,6 +462,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "emergency_timeout_accept")
     private Integer emergencyTimeoutAccept;
 
+    @Column(name = "emergency_timeout_acceptance")
+    private Integer emergencyTimeoutAcceptance;
+
     @Column(name = "emergency_timeout_close")
     private Integer emergencyTimeoutClose;
 
@@ -550,6 +555,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setEmergencyTimeoutDispatch(Integer emergencyTimeoutDispatch) {
         this.emergencyTimeoutDispatch = emergencyTimeoutDispatch;
+    }
+
+    public Integer getEmergencyTimeoutAcceptance() {
+        return emergencyTimeoutAcceptance;
+    }
+
+    public void setEmergencyTimeoutAcceptance(Integer emergencyTimeoutAcceptance) {
+        this.emergencyTimeoutAcceptance = emergencyTimeoutAcceptance;
     }
 
     public Integer getEmergencyTimeoutAccept() {
@@ -1040,6 +1053,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setActiveSupplier(Boolean activeSupplier) {
         isActiveSupplier = activeSupplier;
+    }
+
+    public Integer getTimeoutAcceptance() {
+        return timeoutAcceptance;
+    }
+
+    public void setTimeoutAcceptance(Integer timeoutAcceptance) {
+        this.timeoutAcceptance = timeoutAcceptance;
     }
 
     @Override
