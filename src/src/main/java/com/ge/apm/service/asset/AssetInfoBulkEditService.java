@@ -51,15 +51,15 @@ public class AssetInfoBulkEditService {
     private NurseSiteMaintainConfigItemRepository nurseSiteMaintainConfigItemRepository;
 
     @Autowired
-    private NurseSiteMaintainConfigRepository  nurseSiteMaintainConfigRepository;
+    private NurseSiteMaintainConfigRepository nurseSiteMaintainConfigRepository;
 
     @Autowired
-    private AssetTagRuleRepository  assetTagRuleRepository;
+    private AssetTagRuleRepository assetTagRuleRepository;
 
     @Autowired
     private AssetHistoryService assetHistoryService;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void commitBulkEditSite(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
         commitCorrectiveMaintenanceBulkEdit(assets, targetAsset);
         commitPreventativeMaintenanceBulkEdit(assets, targetAsset);
@@ -76,7 +76,7 @@ public class AssetInfoBulkEditService {
     @Transactional
     public void commitBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset, List<String> selectedColumns) {
 
-        for (AssetInfo item: assets) {
+        for (AssetInfo item : assets) {
             if (selectedColumns.contains("serialNum")) {
                 item.setSerialNum(targetAsset.getSerialNum());
             }
@@ -291,29 +291,28 @@ public class AssetInfoBulkEditService {
     }
 
 
-
-    public Boolean isAllParrentAssetAndChildAssetTransfer(List<String> parrentAssetUids, List<AssetInfo> assets){
+    public Boolean isAllParrentAssetAndChildAssetTransfer(List<String> parrentAssetUids, List<AssetInfo> assets) {
 
         List<Boolean> isAllTransferResult = new ArrayList<>();
 
-        for ( AssetInfo item :assets ) {
+        for (AssetInfo item : assets) {
             List<AssetInfo> assetInfos = null;
-            if(null == item.getParentAssetId()){
-                assetInfos = assetInfoDao.findByParentAssetIdOrId(item.getId(),item.getId());
-            }else {
-                assetInfos = assetInfoDao.findByParentAssetIdOrId(item.getParentAssetId(),item.getParentAssetId());
+            if (null == item.getParentAssetId()) {
+                assetInfos = assetInfoDao.findByParentAssetIdOrId(item.getId(), item.getId());
+            } else {
+                assetInfos = assetInfoDao.findByParentAssetIdOrId(item.getParentAssetId(), item.getParentAssetId());
             }
             List<String> assetUids = assetInfos.stream().map(AssetInfo::getUid).collect(Collectors.toList());
-            if(parrentAssetUids.containsAll(assetUids)){
+            if (parrentAssetUids.containsAll(assetUids)) {
                 isAllTransferResult.add(true);
-            }else {
+            } else {
                 isAllTransferResult.add(false);
             }
         }
 
-        for(Boolean result : isAllTransferResult){
-            if(result == false){
-                return  false;
+        for (Boolean result : isAllTransferResult) {
+            if (result == false) {
+                return false;
             }
         }
         return true;
@@ -323,7 +322,7 @@ public class AssetInfoBulkEditService {
         List<String> parrentAssetUids = assets.stream().map(AssetInfo::getUid).filter(item -> item != null).collect(Collectors.toList());
         Boolean isAllTransfer = isAllParrentAssetAndChildAssetTransfer(parrentAssetUids, assets);
 
-        for (AssetInfo item: assets) {
+        for (AssetInfo item : assets) {
             AssetInfo oldAssetInfo = depCopy(item);
             item.setSiteUID(targetAsset.getSiteOrg().getSiteUID());
             item.setHospitalUID(targetAsset.getSiteOrg().getHospitalUID());
@@ -340,11 +339,11 @@ public class AssetInfoBulkEditService {
             item.setAssetDeptId(null);
             item.setAssetDeptUID(null);
             assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, item, CustomConfigConstant.getAssetsImportantFieldsAll());
-            if( !isAllTransfer){
+            if (!isAllTransfer) {
                 item.setParentAssetId(null);
                 List<AssetInfo> childAssetInfos = assetInfoDao.findChildAssets(item.getId());
-                if(childAssetInfos.size() > 0){
-                    childAssetInfos.stream().forEach(childs ->childs.setParentAssetId(null));
+                if (childAssetInfos.size() > 0) {
+                    childAssetInfos.stream().forEach(childs -> childs.setParentAssetId(null));
                     assetInfoDao.save(childAssetInfos);
                 }
             }
@@ -365,13 +364,14 @@ public class AssetInfoBulkEditService {
             return destList;
         } catch (IOException e) {
             e.printStackTrace();
-        }catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;
     }
+
     private void commitPmRule(List<AssetInfo> assets, AssetInfo targetAsset) {
-        for (AssetInfo item: assets) {
+        for (AssetInfo item : assets) {
 
             RelRuleAsset relRuleAsset = relRuleAssetDao.findByAssetUID(item.getUid());
 
@@ -393,16 +393,16 @@ public class AssetInfoBulkEditService {
      * correctvie maintenance
      */
     private void commitCorrectiveMaintenanceBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset) {
-        for (AssetInfo assetInfo: assets) {
+        for (AssetInfo assetInfo : assets) {
             List<V2_ServiceRequest> serviceRequests = serviceRequestDao.findByAssetId(assetInfo.getId());
 
-            for (V2_ServiceRequest serviceRequest: serviceRequests) {
+            for (V2_ServiceRequest serviceRequest : serviceRequests) {
                 List<V2_WorkOrder> workOrders = serviceRequest.getV2_workOrder_List();
                 serviceRequest.setFromDeptId(targetAsset.getClinicalDeptOrg().getId());
                 serviceRequest.setFromDeptUID(targetAsset.getClinicalDeptOrg().getUid());
                 serviceRequest.setFromDeptName(targetAsset.getClinicalDeptOrg().getName());
 
-                for (V2_WorkOrder workOrder: workOrders) {
+                for (V2_WorkOrder workOrder : workOrders) {
                     List<V2_WorkOrder_Detail> details = workOrder.getV2_workOrder_detail_list();
                     List<V2_WorkOrderCoworker> coworkers = workOrder.getV2_workOrder_coworker_list();
 
@@ -424,10 +424,10 @@ public class AssetInfoBulkEditService {
      * preventative maintenance
      */
     private void commitPreventativeMaintenanceBulkEdit(List<AssetInfo> assets, AssetInfo targetAsset) {
-        for (AssetInfo assetInfo: assets) {
+        for (AssetInfo assetInfo : assets) {
             List<V2_PmOrder> pmOrders = pmOrderDao.getByAssetUid(assetInfo.getUid());
 
-            for (V2_PmOrder pmOrder: pmOrders) {
+            for (V2_PmOrder pmOrder : pmOrders) {
 
                 List<V2_WorkOrder_Detail> details = pmOrder.getDetails();
                 List<V2_WorkOrderCoworker> coworkers = pmOrder.getCoworkers();
@@ -443,7 +443,7 @@ public class AssetInfoBulkEditService {
     }
 
     private void commitQrCode(List<AssetInfo> assets, AssetInfo targetAsset) {
-        for (AssetInfo assetInfo: assets) {
+        for (AssetInfo assetInfo : assets) {
             if (null == assetInfo.getQrCode()) {
                 continue;
             }
@@ -466,29 +466,30 @@ public class AssetInfoBulkEditService {
     }
 
     public void commitNurseSiteConfig(List<AssetInfo> assets) {
-        if(assets != null && !assets.isEmpty()){
-            List<String> uids = assets.stream().map(p->p.getUid()).collect(Collectors.toList());
+        if (assets != null && !assets.isEmpty()) {
+            List<String> uids = assets.stream().map(p -> p.getUid()).collect(Collectors.toList());
             List<NurseSiteMaintainConfigItem> assetinfos = nurseSiteMaintainConfigItemRepository.findByAssetUid(uids);
-            if(assetinfos !=null && !assetinfos.isEmpty()){
+            if (assetinfos != null && !assetinfos.isEmpty()) {
                 Set<String> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
                 nurseSiteMaintainConfigItemRepository.deleteMaintainData(ids);
-                Set<String> parentIds = assetinfos.stream().map(p->p.getParentId()).collect(Collectors.toSet());
+                Set<String> parentIds = assetinfos.stream().map(p -> p.getParentId()).collect(Collectors.toSet());
                 List<NurseSiteMaintainConfigItem> items = nurseSiteMaintainConfigItemRepository.findByParentIds(parentIds);
-                if(items !=null && !items.isEmpty()){
-                    Set<String> temp = items.stream().map(u->u.getParentId()).collect(Collectors.toSet());
+                if (items != null && !items.isEmpty()) {
+                    Set<String> temp = items.stream().map(u -> u.getParentId()).collect(Collectors.toSet());
                     parentIds.removeAll(temp);
                 }
-                if(parentIds !=null && !parentIds.isEmpty()){
+                if (parentIds != null && !parentIds.isEmpty()) {
                     nurseSiteMaintainConfigRepository.deleteMaintainConfigData(parentIds);
                 }
             }
         }
     }
+
     public void commitAssetTagRule(List<AssetInfo> assets) {
-        if(assets != null && !assets.isEmpty()){
-            List<Integer> uids = assets.stream().map(p->p.getId()).collect(Collectors.toList());
+        if (assets != null && !assets.isEmpty()) {
+            List<Integer> uids = assets.stream().map(p -> p.getId()).collect(Collectors.toList());
             List<AssetTagRule> assetinfos = assetTagRuleRepository.findByAssetUid(uids);
-            if(assetinfos !=null && !assetinfos.isEmpty()){
+            if (assetinfos != null && !assetinfos.isEmpty()) {
                 Set<Integer> ids = assetinfos.stream().map(p -> p.getId()).collect(Collectors.toSet());
                 assetTagRuleRepository.deleteAssetTagRuleData(ids);
             }

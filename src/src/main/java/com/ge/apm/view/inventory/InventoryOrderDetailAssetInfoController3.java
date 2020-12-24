@@ -10,6 +10,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
+import com.ge.apm.dao.UserAccountRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,7 +22,6 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -38,21 +38,33 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
 	private InventoryOrderRepository inventoryOrderRepository;
+    private InventoryOrderService inventoryOrderService;
+    private UserAccountRepository userAccountRepository;
+    private UaaService uaaService;
 	private InventoryOrderService service;
 	private String orderId;
 	private List<String> listClinicalDeptName;
 	private static final String ORG_NAME = "orgName";
 	private int inventoryStatus = 2;
+    private List<String> listAccessClinical;
 
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
+        inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 		service=WebUtil.getBean(InventoryOrderService.class);
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
-		listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
+        if (null == orderId){
+            listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
+        }else {
+            listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
+        }
+        listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
 	}
 
 	@Override
@@ -68,8 +80,33 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<SearchFilter>();
 		}
-		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
-        searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*2+"));
+        //全院视图
+        if(null == orderId){
+            List<String> orderIdList = inventoryOrderService.getInventoryOrderData(currentUser.getTenantUID(), listAccessClinical,false);
+            if(!orderIdList.isEmpty()){
+                searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.IN, orderIdList, "1*"));
+            }
+        }else {
+            searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
+        }
+        String value = null;
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("lastModifiedBy".equals(searchFilter.fieldName)) {
+                value = (String)searchFilter.value;
+            }
+        }
+        if(searchFilters.removeIf(e -> e.fieldName.equals("lastModifiedBy"))){
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<UserAccount> userAccountList = userAccountRepository.findByTenantUIDAndNameList(user.getTenantUID(), value);
+            List<String> loginNamList = new ArrayList<>();
+            if(!userAccountList.isEmpty()){
+                for (UserAccount userAccount:userAccountList) {
+                    loginNamList.add(userAccount.getLoginName());
+                }
+            }
+            searchFilters.add(new SearchFilter("lastModifiedBy", SearchFilter.Operator.IN, loginNamList,"1*"));
+        }
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
         //无台账，status=2,没有assetInfo
 //        searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
@@ -81,7 +118,16 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 		//after
 		return pageAssetInfo;
 	}
-
+    public String  getUserName(String loginName){
+        if( null == loginName){
+            return null;
+        }
+        UserAccount userAccount = userAccountRepository.getByLoginName(loginName);
+        if (userAccount != null) {
+            return userAccount.getName();
+        }
+        return null;
+    }
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
 	}

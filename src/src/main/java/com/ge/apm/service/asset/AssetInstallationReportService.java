@@ -122,11 +122,11 @@ public class AssetInstallationReportService {
             arrivalItemMap.put("asset_name", arrivalList.getAssetName());//设备名称
             arrivalItemMap.put("brand", arrivalList.getBrand());//品牌
             arrivalItemMap.put("function_type", arrivalList.getFunctionType());//型号规格
-            if(arrivalListItem.getImportEquipment() == null){
-                arrivalItemMap.put("import_equipment", "");//是否进口设备[1:进口,2:国产]
-            }else{
-                arrivalItemMap.put("import_equipment", FieldValueMessageController.doGetFieldValue("importEquipment",arrivalListItem.getImportEquipment()+""));//是否进口设备[1:进口,2:国产]
+            Integer importEquipment = arrivalListItem.getImportEquipment();
+            if(importEquipment == null || importEquipment !=1){
+                importEquipment = 2;//是否进口设备[1:进口,2:国产]
             }
+            arrivalItemMap.put("import_equipment", FieldValueMessageController.doGetFieldValue("importEquipment",importEquipment.toString()));//是否进口设备[1:进口,2:国产]
             arrivalItemMap.put("item_num", 1);//数量
             arrivalItemMap.put("guarantee", arrivalListItem.getGuarantee());
             arrivalItemMap.put("annual_maintenance_times", arrivalListItem.getAnnualMaintenanceTimes());//年保修次数
@@ -174,7 +174,7 @@ public class AssetInstallationReportService {
         reportData.put("supplier_name", arrivalListItem.getArrivalList().getVendor());//供应商
         reportData.put("contract_date", arrivalListItem.getArrivalList().getContractDate());//合同签订日期
         reportData.put("foreign_trade_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
-        reportData.put("box_installation_date", arrivalListItem.getArrivalList().getBoxInstallationDate());//开箱安装日期
+        reportData.put("box_installation_date", arrivalListItem.getArrivalList().getArrivalDate());//开箱安装日期改为到货安装日期
         reportData.put("using_date", arrivalListItem.getArrivalList().getUsingDate());//使用日期
         reportData.put("using_person", arrivalListItem.getArrivalList().getUsingPerson());//使用人
         reportData.put("using_person_tel", arrivalListItem.getArrivalList().getUsingPersonTel());//使用人电话

@@ -865,7 +865,17 @@ public class UaaService {
         }
         return deptList;
     }
-
+    public List<String>  getAllAccessibleClinicalDeptStringList(){
+        List<OrgInfo> orgInfos = this.getAllAccessibleClinicalDeptList()
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+        List<String> list = new ArrayList<>();
+        if (!orgInfos.isEmpty()){
+            for ( OrgInfo orgInfo:orgInfos) {
+                list.add(orgInfo.getName());
+            }
+        }
+        return list;
+    }
     public List<OrgInfo> getAllAccessibleClinicalDeptList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         return this.getUserAccessibleSiteListWithClinicalDept(user.getUid());

@@ -12,7 +12,7 @@
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{measuringTypeConfigController.selected != null}">
 
                     <h:panelGroup>
-                        <label class="label">计量类别*</label>
+                        <label class="label">计量项目类别*</label>
                         <p:autoComplete dropdown="true" value="#{measuringTypeConfigController.i18nMessage}"  scrollHeight="300" forceSelection="true" required="true" disabled="#{not empty measuringTypeConfigController.selected.id}"
                                         completeMethod="#{measuringTypeConfigController.autoCompleteMeasuringItemCategory}" var="t" itemLabel="#{t.value}" itemValue="#{t}" converter="i18nMessageConverter">
                         </p:autoComplete>

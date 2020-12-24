@@ -72,8 +72,8 @@
                             <p:inputText value="#{workOrderMgrController.newServiceRequest.customerTel}" maxlength="256" required="true" requiredMessage="医院客户电话 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{userContextService.zkbAccount}">
-                            <label class="label">医院客户职务</label>
-                            <p:inputText value="#{workOrderMgrController.newServiceRequest.customerPosition}" maxlength="256"/>
+                            <label class="label">医院客户职务*</label>
+                            <p:inputText value="#{workOrderMgrController.newServiceRequest.customerPosition}" maxlength="256" required="true" requiredMessage="医院客户职务 #{msg.ValidationRequire}"/>
                         </h:panelGroup>
 
 
