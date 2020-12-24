@@ -6,12 +6,10 @@ import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import net.sf.json.util.WebUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -39,6 +37,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<V2_BlobObject> v2_blobObjectList;
     private boolean showTech=false;
     private boolean showManage=false;
+    private boolean showDirector = false;
     private boolean showUnOrder = false;
     private boolean showOrder=false;
     private boolean showReturn=false;
@@ -164,7 +163,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     if(StringUtils.isNotBlank(validString)){
                         WebUtil.addErrorMessage(validString,"");
                     }
-                    if(StringUtils.isNotEmpty(selected.getCheckApplyNumFlag()) && "f".equals(selected.getCheckApplyNumFlag())){
+                    if(StringUtils.isNotEmpty(selected.getCheckApplyNumFlag()) && CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
                         WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
                     }
                 }
@@ -287,12 +286,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
                 showManage = true;
                 if(canEditFlag){
-                    if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                    if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(selected.getCurrentStep())){
+                        showDirector = true;
+                        showBtn = "0";
+                    }else if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(selected.getCurrentStep())){
                         showUnOrder = true;
-                    }else {
+                        showBtn = "1";
+                    }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
                         showOrder = true;
+                        showBtn = "1";
                     }
-                    showBtn = "1";
                 }
             } else if(ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus())){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
@@ -302,7 +305,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
                 showManage = true;
-            }else if(ZkbPartOrder.PartOrderStatus.UnOrdered.toString().equals(selected.getStatus())) {
+            } else if(ZkbPartOrder.PartOrderStatus.DirectorAccept.toString().equals(selected.getStatus())){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
                     if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
                     }else {
@@ -310,6 +313,35 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
                 showManage = true;
+                showDirector = true;
+                if(canEditFlag){
+                    if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(selected.getCurrentStep())){
+                        showUnOrder = true;
+                    }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
+                        showOrder = true;
+                    }
+                    showBtn = "1";
+                }
+            } else if(ZkbPartOrder.PartOrderStatus.DirectorReject.toString().equals(selected.getStatus())){
+                if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
+                    if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
+                    }else {
+                        showTech= true;
+                    }
+                }
+                showManage = true;
+                showDirector = true;
+            }  else if(ZkbPartOrder.PartOrderStatus.UnOrdered.toString().equals(selected.getStatus())) {
+                if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
+                    if(selected.getAssetInfo().getFunctionGroup() != null && selected.getAssetInfo().getFunctionGroup() == 1){
+                    }else {
+                        showTech= true;
+                    }
+                }
+                showManage = true;
+                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                    showDirector = true;
+                }
                 showUnOrder = true;
                 if(canEditFlag){
                     showOrder = true;
@@ -323,6 +355,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
                 showManage = true;
+                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                    showDirector = true;
+                }
                 showRejectOrder = true;
                 showBtn="";
             }else if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
@@ -333,6 +368,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
                 showManage = true;
+                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                    showDirector = true;
+                }
                 showOrder = true;
                 if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                     showUnOrder = true;
@@ -349,6 +387,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
                 showManage = true;
+                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                    showDirector = true;
+                }
                 showRejectOrder = true;
                 if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                     showUnOrder = true;
@@ -361,6 +402,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
                 showManage = true;
+                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                    showDirector = true;
+                }
                 if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                     showUnOrder = true;
                 }
@@ -377,6 +421,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
                 showManage = true;
+                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                    showDirector = true;
+                }
                 if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                     showUnOrder = true;
                 }
@@ -394,6 +441,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
                 showManage = true;
+                if(CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
+                    showDirector = true;
+                }
                 if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
                     showUnOrder = true;
                 }
@@ -476,7 +526,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         flag = false;
                         errorLog += "配件号不能为空,";
                     }
-                    Optional.ofNullable(zkbPartOrderItem.getPartNo()).ifPresent(zkbPartOrderItem :: setOrderNo);
                     if(StringUtils.isEmpty(zkbPartOrderItem.getPartName())){
                         flag = false;
                         errorLog += "配件名称不能为空,";
@@ -939,6 +988,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setTenantInfo(TenantInfo tenantInfo) {
         this.tenantInfo = tenantInfo;
+    }
+
+    public boolean isShowDirector() {
+        return showDirector;
+    }
+
+    public void setShowDirector(boolean showDirector) {
+        this.showDirector = showDirector;
     }
 
     @Override

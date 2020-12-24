@@ -39,7 +39,7 @@
                     </p:panelGrid>
 
                     <p:dataTable id="datalist_measuringResult" rendered="#{not empty measureAssetListController.measuringCertificateList}" value="#{measureAssetListController.measuringCertificateList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="5" emptyMessage="#{msg.noRecordFound}">
 
 

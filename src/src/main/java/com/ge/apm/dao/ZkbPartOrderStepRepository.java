@@ -12,6 +12,7 @@ import java.util.List;
  */
 public interface ZkbPartOrderStepRepository extends GenericRepositoryUUID<ZkbPartOrderStep> {
     List<ZkbPartOrderStep> findByPartOrderId(String partOrderId);
+    List<ZkbPartOrderStep> findByPartOrderIdAndStepKey(String partOrderId,String stepKey);
 
     void deleteByPartOrderId(String partOrderId);
 }
