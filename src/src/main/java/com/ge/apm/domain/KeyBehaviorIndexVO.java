@@ -21,8 +21,8 @@ public class KeyBehaviorIndexVO extends ZkbKeyBehaviorIndex {
                 &&this.getKbiDate() == null
                 &&this.getPartReturnFullScore() == null
                 &&this.getPartReturnScore()==null
-                &&this.getIntactPartReturnRateFullScore()==null
-                &&this.getIntactPartReturnRateScore()==null
+//                &&this.getIntactPartReturnRateFullScore()==null
+//                &&this.getIntactPartReturnRateScore()==null
                 &&this.getPasteQuickResponseRateFullScore()==null
                 &&this.getPasteQuickResponseRateScore()==null
                 &&this.getApmBillingRateFullScore()==null
@@ -45,8 +45,8 @@ public class KeyBehaviorIndexVO extends ZkbKeyBehaviorIndex {
         stringBuffer=stringBuffer.append(this.getKbiDate() != null ? this.getKbiDate().toString() : "");
         stringBuffer=stringBuffer.append(this.getPartReturnFullScore() != null ? this.getPartReturnFullScore().toString() : "");
         stringBuffer=stringBuffer.append(this.getPartReturnScore() != null ? this.getPartReturnScore().toString() : "");
-        stringBuffer=stringBuffer.append(this.getIntactPartReturnRateFullScore() != null ? this.getIntactPartReturnRateFullScore().toString() : "");
-        stringBuffer=stringBuffer.append(this.getIntactPartReturnRateScore() != null ? this.getIntactPartReturnRateScore().toString() : "");
+//        stringBuffer=stringBuffer.append(this.getIntactPartReturnRateFullScore() != null ? this.getIntactPartReturnRateFullScore().toString() : "");
+//        stringBuffer=stringBuffer.append(this.getIntactPartReturnRateScore() != null ? this.getIntactPartReturnRateScore().toString() : "");
         stringBuffer=stringBuffer.append(this.getPasteQuickResponseRateFullScore() != null ? this.getPasteQuickResponseRateFullScore().toString() : "");
         stringBuffer=stringBuffer.append(this.getPasteQuickResponseRateScore() != null ? this.getPasteQuickResponseRateScore().toString() : "");
         stringBuffer=stringBuffer.append(this.getApmBillingRateFullScore() != null ? this.getApmBillingRateFullScore().toString() : "");
