@@ -1,0 +1,1 @@
+UPDATE zkb_key_behavior_index_config set paste_quick_response_rate_full_score = 20 where id = '1                               ';
