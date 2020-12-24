@@ -1,14 +1,12 @@
 package webapp.framework.web.mvc;
 
+import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
@@ -190,7 +188,9 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
                 if (values.length > 1) {
                     filterValue = TimeUtil.fromString(values[1]);
                     if (filterValue != null) {
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime) filterValue).toDate()));
+                        //结束时间是一天的最后一秒  YHAAO-4035
+                        Date toDate = TimeUtils.getDateFromStr(TimeUtils.getStrDate(((DateTime) filterValue).toDate(), "yyyyMMdd").concat("235959"), "yyyyMMddHHmmss");
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, toDate));
                     }
                 }
                 continue;
