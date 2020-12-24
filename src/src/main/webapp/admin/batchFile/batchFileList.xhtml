@@ -30,11 +30,11 @@
                             <h:outputText value="#{item.fileName}"/>
                         </p:column>
                         <p:column headerText="#{msg.BatchfileType}" sortBy="#{item.fileType}" filterBy="#{item.fileType}" filterMatchMode="EQ">
-                            <h:outputText value="#{fieldMsg.fieldValue('batchFileType', item.fileType)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValues('batchFileType,gamePlanBatchFileType', item.fileType)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('batchFileType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getI18nByBatchFileType()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>

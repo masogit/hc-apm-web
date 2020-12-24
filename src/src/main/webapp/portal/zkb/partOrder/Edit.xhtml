@@ -43,7 +43,7 @@
                             <p:inputText id="qrCode" value="#{zkbPartOrderEditController.queryWorkFlow.assetInfo.systemId}" maxlength="100" required="false"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">工单编号</label>
+                            <label class="label">报修单号</label>
                             <p:inputText id="assetName" value="#{zkbPartOrderEditController.queryWorkFlow.serviceRequest.srNum}" maxlength="100" required="false"/>
                         </h:panelGroup>
                         <p:commandButton validateClient="false"  actionListener="#{zkbPartOrderEditController.getQueryWorkFlowList()}" value="#{msg.Search}" update="zkbwkEditForm"/>
@@ -61,7 +61,7 @@
                         <p:column headerText="sys ID">
                             <h:outputText value="#{item.systemId}"/>
                         </p:column>
-                        <p:column headerText="工单编号">
+                        <p:column headerText="报修单号">
                             <h:outputText value="#{item.srNum}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">

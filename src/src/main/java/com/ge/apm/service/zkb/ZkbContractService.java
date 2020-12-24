@@ -91,6 +91,7 @@ public class ZkbContractService {
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail_total"), isEmptyInteger(zkbContract.getSpareArtificailTotal()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail_apply"), isEmptyInteger(zkbContract.getSpareArtificailApply()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail_use"), isEmptyInteger(zkbContract.getSpareArtificailUse()));
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_remark"), zkbContract.getRemark());
 
             zkbContract.setContractState(calcContractState(zkbContract.getStartDate(),zkbContract.getEndDate()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractState"),zkbContract.getContractState());

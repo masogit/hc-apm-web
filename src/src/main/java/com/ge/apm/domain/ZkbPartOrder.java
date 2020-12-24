@@ -22,13 +22,16 @@ public class ZkbPartOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Transient
+    public static String DATA_TYPE_TEST="test.";
+
     /**
      * Pending：申请 TechAccept：技术审批通过 TechReject：技术审批不通过 ManageAccept：区域经理审批通过
      * ManageReject：区域经理审批不通过 Ordered：发货 OrderedReject:发货取消
      * Returned：归还  Closed：关单
      */
     public enum PartOrderStatus {
-        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,UnOrdered,UnOrderedReject,Ordered,OrderedReject,PartReturned,Returned,Closed
+        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,UnOrdered,UnOrderedReject,Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject
     }
 
     /**
@@ -165,6 +168,20 @@ public class ZkbPartOrder implements Serializable {
     private String manageAuditer;
     @Column(name = "manage_auditer_uid")
     private String manageAuditerUid;
+
+    /**
+     * 销售总监审批备注
+     */
+    @Column(name = "director_remark")
+    private String directorRemark;
+
+    @Column(name = "director_audit_date")
+    private Date directorAuditDate;
+
+    @Column(name = "director_auditer")
+    private String directorAuditer;
+    @Column(name = "director_auditer_uid")
+    private String directorAuditerUid;
 
     /**
      *
@@ -487,6 +504,21 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "check_apply_num_flag")
     private String checkApplyNumFlag = "t";// t是校验通过 f：校验不通过
 
+    /**
+     * 用于区分数据是真实数据还是测试数据
+     * 真实数据字段为空，测试数据值为test.
+     */
+    @Column(name = "data_type")
+    private String dataType;
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
+    }
+
     public String getUploadLetterFileId() {
         return uploadLetterFileId;
     }
@@ -573,6 +605,38 @@ public class ZkbPartOrder implements Serializable {
 
     public void setManageAuditerUid(String manageAuditerUid) {
         this.manageAuditerUid = manageAuditerUid;
+    }
+
+    public String getDirectorRemark() {
+        return directorRemark;
+    }
+
+    public void setDirectorRemark(String directorRemark) {
+        this.directorRemark = directorRemark;
+    }
+
+    public Date getDirectorAuditDate() {
+        return directorAuditDate;
+    }
+
+    public void setDirectorAuditDate(Date directorAuditDate) {
+        this.directorAuditDate = directorAuditDate;
+    }
+
+    public String getDirectorAuditer() {
+        return directorAuditer;
+    }
+
+    public void setDirectorAuditer(String directorAuditer) {
+        this.directorAuditer = directorAuditer;
+    }
+
+    public String getDirectorAuditerUid() {
+        return directorAuditerUid;
+    }
+
+    public void setDirectorAuditerUid(String directorAuditerUid) {
+        this.directorAuditerUid = directorAuditerUid;
     }
 
     public String getUnOrderAuditerUid() {
