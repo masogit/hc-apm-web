@@ -54,7 +54,7 @@ public class ZkbKeyBehaviorIndexProvider {
                         "AVG(compliance_score) as compliance_score,"+
                         "AVG(engineer_score) as engineer_score,"+
                         "AVG(compliance_score) as compliance_score,"+
-                        "AVG(intact_part_return_rate_score) as intact_part_return_rate_score,"+
+//                        "AVG(intact_part_return_rate_score) as intact_part_return_rate_score,"+
                         "AVG(part_return_score) as part_return_score,"+
                         "AVG(paste_quick_response_rate_score) as paste_quick_response_rate_score,"+
                         "AVG(satisfactory_degree_score) as satisfactory_degree_score,kbi_date "+
