@@ -11,21 +11,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URLEncoder;
-import java.util.*;
-import java.util.stream.Collectors;
 import javaslang.control.Option;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.ConfigurableNavigationHandler;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +20,18 @@ import webapp.framework.context.LocaleHolder;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
+
+import javax.faces.application.ConfigurableNavigationHandler;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URLEncoder;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ManagedBean(name = "userContextService")
 @SessionScoped
@@ -54,6 +52,7 @@ public class UserContextService implements Serializable {
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
+//    private List<RoleMsgInfo> roleMsgInfoList = null;
 //    private  ZkbContractRepository zkbContractRepository;
 
 //    @PostConstruct
@@ -897,20 +896,23 @@ public class UserContextService implements Serializable {
     }
 
     public boolean isGeAdmin() {
-        List<ZkbPartOrderUserConfig> zkbPartOrderUserConfig = this.zkbPartOrderUserConfigRepository.findByConfigType("ClosePending");
-        if(CollectionUtils.isEmpty(zkbPartOrderUserConfig))
-        {
-            return false;
-        }
-        Map<String, String> zkbPartOrderUserConfigMap = zkbPartOrderUserConfig.stream().filter(partOrderUserConfig -> partOrderUserConfig.getLoginName()!=null).collect(
-                Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getLoginName()))),
-                        ArrayList::new)).stream().collect(Collectors.toMap(ZkbPartOrderUserConfig::getLoginName,ZkbPartOrderUserConfig::getLoginName));
         UserAccount user = getLoginUser();
-        if(zkbPartOrderUserConfigMap.containsKey(user.getLoginName()))
-        {
-          return true;
-        }
+        if(StringUtils.isBlank(user.getLoginName()))
+            return false;
+        List<ZkbPartOrderUserConfig>  zkbPartOrderUserConfig= this.zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(user.getLoginName(),"ClosePending");
+        if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfig))
+            return true;
         return false;
+    }
+
+    public boolean isZkbConfigAdmin()
+    {
+        UserAccount user = getLoginUser();
+        if(StringUtils.isBlank(user.getLoginName()))
+            return false;
+        if(user.getLoginName().contains("zkbConfigAdmin"))
+            return true;
+            return false;
     }
 
     public boolean isZtbTenant() {
@@ -1118,7 +1120,7 @@ public class UserContextService implements Serializable {
         List<UserRole> userRoleList = userRoleDao.findByUserIdAndRoleType(UserContextService.getCurrentUserAccount().getId(), ApmConstant.CUSTOME_ROLE_TYPE);
         for (UserRole userRole : userRoleList) {
             String menus = customeRoleDao.findById(userRole.getRoleId()).getMenus();
-            if(null != menus && menus.contains("AssetScrapped")){
+            if(null != menus && menus.contains("asset.scrap")){
                 return true;
             }
         }
@@ -1153,6 +1155,21 @@ public class UserContextService implements Serializable {
 
     }
 
+    /***
+     *  判断是否是云南阜外医院
+     * @param tenantName
+     * @return
+     */
+    public  Boolean isYunNanFuWai(String tenantName){
+        if(this.getTenantInfo().getName().equals("云南省阜外心血管病医院")){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+
+
     /**
      * 验证租户名称
      * @param tenantName 非必填，如不填将默认验证指定的租户名称
@@ -1175,5 +1192,21 @@ public class UserContextService implements Serializable {
             }
         }
         return Boolean.FALSE;
+    }
+
+
+    public List<RoleMsgRel> getRoleMsgInfos(Integer userId) {
+        RoleMsgRelRepository roleMsgRelRepository = WebUtil.getBean(RoleMsgRelRepository.class);
+        return roleMsgRelRepository.getRoleMsgRels(userId);
+    }
+
+    public List<RoleMsgRel> getRoleMsgInfosByRoleName(String roleName) {
+        RoleMsgRelRepository roleMsgRelRepository = WebUtil.getBean(RoleMsgRelRepository.class);
+        return roleMsgRelRepository.getRoleMsgByRoleName(roleName);
+    }
+
+    public I18nMessage getByMsgTypeAndMsgKey(String msgType, String msgKey) {
+        I18nMessageRepository msgRepo = WebUtil.getBean(I18nMessageRepository.class);
+        return msgRepo.getByMsgTypeAndMsgKey(msgType, msgKey);
     }
 }

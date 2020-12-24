@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:form id="inventoryOrderDetailAssetInfoAllListForm">
+	<p:dataTable id="datalistAll" value="#{inventoryOrderDetailAssetInfoAllController.lazyModel}" var="item" widgetVar="varDataListAll" selectionMode="single"
+		selection="#{inventoryOrderDetailAssetInfoAllController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoAllController.onFilter}" />
+        <p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController2.onFilter}" />
+		<p:column headerText="#{msg.EquipmentName}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false">
+			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetInfo.id}" target="_Blank"><h:outputText value="#{item.assetInfo.name}" /></a>
+		</p:column>
+		<p:column headerText="#{msg.EquipmentName}" exportable="true" visible="false">
+			<h:outputText value="#{item.assetInfo.name}" />
+		</p:column>
+		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ">
+			<f:facet name="filter">
+				<p:selectOneMenu onchange="PF('varDataListAll').filter()" autoWidth="false" style="max-width: 150px;">
+					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItems value="#{inventoryOrderDetailAssetInfoAllController.listClinicalDeptName}" />
+				</p:selectOneMenu>
+			</f:facet>
+			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+		</p:column>
+		<p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.qrCode}" />
+		</p:column>
+		<p:column headerText="#{msg.EquipmentID}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.departNum}" />
+		</p:column>
+		<p:column headerText="#{msg.EquipmentModel}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.functionType}" />
+		</p:column>
+		<p:column headerText="#{msg.EquipmentPropertyNumber}" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.financingNum}" />
+		</p:column>
+		<p:column headerText="#{msg.AssetStatus}" filterBy="#{item.assetInfo.status}" filterMatchMode="EQ">
+			<f:facet name="filter">
+				<p:selectOneMenu onchange="PF('varDataListAll').filter()" autoWidth="false" style="max-width: 150px;">
+					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItem itemLabel="#{msg.Normal}" itemValue="1" />
+					<f:selectItem itemLabel="#{msg.Stopped}" itemValue="2" />
+					<f:selectItem itemLabel="#{msg.PartialFunction}" itemValue="3" />
+					<f:selectItem itemLabel="#{msg.ToBeTerminated}" itemValue="4" />
+					<f:selectItem itemLabel="#{msg.terminated}" itemValue="5" />
+				</p:selectOneMenu>
+			</f:facet>
+			<h:outputText value="#{item.assetInfo.status==1?msg.Normal:item.assetInfo.status==2?msg.Stopped:item.assetInfo.status==3?msg.PartialFunction:item.assetInfo.status==4?msg.ToBeTerminated:item.assetInfo.status==5?msg.terminated:item.assetInfo.status}" />
+		</p:column>
+		<p:column headerText="#{msg.InstallationLocation}" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.locationName}" />
+		</p:column>
+        <p:column headerText="#{msg.ProblemDescription}">
+            <h:outputText value="#{item.comment}" />
+        </p:column>
+        <p:column headerText="#{msg.FailedItems}">
+            <h:outputText value="#{item.inventoryCheckListItems}" />
+        </p:column>
+        <p:column headerText="#{msg.Solved}" filterBy="#{item.isSolved}" filterMatchMode="EQ">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataListAll').filter()" autoWidth="false" style="max-width: 150px;">
+                    <f:converter converterId="javax.faces.Boolean" />
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="#{item.isSolved}"/>
+        </p:column>
+        <p:column headerText="#{msg.InventoryChecker}" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
+            <h:outputText value="#{inventoryOrderDetailAssetInfoAllController.getUserName(item.lastModifiedBy)}"/>
+        </p:column>
+        <p:column headerText="#{msg.InvnetoryTime}" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
+            <f:facet name="filter">
+                <p:inputText id="filterLastModifiedDateAll" widgetVar="varFilterLastModifiedDateAll" />
+            </f:facet>
+            <h:outputText value="#{item.lastModifiedDate}">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+            </h:outputText>
+        </p:column>
+        <p:column headerText="盘点状态" filterBy="#{item.status}" filterMatchMode="EQ">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataListAll').filter()" autoWidth="false" style="max-width: 150px;">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItem itemLabel="#{msg.NonInventory}" itemValue="0" />
+                    <f:selectItem itemLabel="#{msg.Inventorized}" itemValue="1" />
+                    <f:selectItem itemLabel="#{msg.NonLedger}" itemValue="2" />
+                    <f:selectItem itemLabel="#{msg.HasIssue}" itemValue="3" />
+                    <f:selectItem itemLabel="#{msg.NoWorkOrder}" itemValue="4" />
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="#{item.status==0?msg.NonInventory:item.status==1?msg.Inventorized:item.status==2?msg.NonLedger:item.status==3?msg.HasIssue:item.status==4?msg.NoWorkOrder:item.status}" />
+        </p:column>
+		<f:facet name="{Toolbar}">
+			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+				<p:dataExporter type="xls" target="datalistAll" fileName="InventoryOrderDetailAssetInfo_export" />
+			</p:commandButton>
+		</f:facet>
+	</p:dataTable>
+</h:form>
+<p:overlayPanel widgetVar="panelFilterLastModifiedDateAll" for=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfoAllListForm:datalistAll:filterLastModifiedDateAll" dismissable="false">
+    <h:panelGrid columns="2">
+        <p:outputLabel value="#{msg.From}" />
+        <p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_LastModifiedDateAll" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+                    mask="true" size="12" locale="zh" />
+        <p:outputLabel value="#{msg.To}" />
+        <p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_LastModifiedDateAll" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+                    mask="true" size="12" locale="zh" />
+    </h:panelGrid>
+    <p:commandButton
+            onclick="setDateFilter('varDataListAll','varFilterLastModifiedDateAll','varStartTimeFrom_LastModifiedDateAll','varStartTimeTo_LastModifiedDateAll'); PF('panelFilterLastModifiedDateAll').hide();"
+            title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+    <p:commandButton onclick="PF('panelFilterLastModifiedDateAll').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+</p:overlayPanel>
+</html>
