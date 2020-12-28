@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
@@ -657,6 +658,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setOrderedAuditerUid(userAccount.getUid());
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Ordered.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString());
+                if(CopyByInvok.T.equals(zkbPartOrder.getNewCatFlag())){
+                    zkbPartOrder.setQty(zkbPartOrder.getQty() * 2);
+                }
             }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString())) {
                 zkbPartOrder.setUnOrderDate(new Date());
                 zkbPartOrder.setUnOrderAuditer(userAccount.getName());
@@ -743,6 +747,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                     subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
                 }*/
+            }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
+                ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+                if(CopyByInvok.T.equals(zkbPartOrder.getNewCatFlag())){
+                    subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty() * 2);
+                }else {
+                    subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
+                }
             }else {
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
@@ -757,9 +768,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 /*ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subReturnQty(zkbContract,zkbPartOrder, zkbPartOrder.getReturnQty());*/
             }
-        }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString())){
-           /* ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-            subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());*/
         }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.ClosePending.toString())){
             if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
@@ -1014,6 +1022,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     /**
      * 发送邮件
      */
+    @Async
     public void sendEmail(ZkbPartOrder zkbPartOrder,String urlType){
         try {
             HashMap<String, String> emailWrapperMap = new HashMap<>();
@@ -1039,6 +1048,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
+    @Async
     public void sendMessage(ZkbPartOrder zkbPartOrder) {
         //如果是备件申请，并且在技术支持审批and放射类设备则不需要发短信
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
@@ -1072,6 +1082,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     /**
      * 发送微信消息
      */
+    @Async
     public void sendWeChatMessages(ZkbPartOrder zkbPartOrder){
         //if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
             if (ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) ||
@@ -1094,6 +1105,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //}
     }
 
+    @Async
     public void sendWeChatBackMessages(ZkbPartOrder zkbPartOrder){
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_BACK_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
@@ -1105,6 +1117,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             e.printStackTrace();
         }
     }
+
+    @Async
     public boolean sendWeChatRemindLetter(ZkbPartOrder zkbPartOrder){
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_REMIND_LETTER).concat("?id=").concat(zkbPartOrder.getId());

@@ -412,6 +412,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(canEditFlag){
                     showReturn = true;
                     showBtn = "1";
+                }else {
+                    List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                    if(zkbPartOrderUserConfigs.size() > 0){
+                        showReturn = true;
+                    }
                 }
             }else if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus()) ){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
