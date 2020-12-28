@@ -198,8 +198,21 @@
                 this.location.href = args.url;
             }
 
+            $(function () {
+                //解决两个时间选择样式问题
+                var removeUiDatepickerDivClipRect = function (i) {
+                    if(i &lt; 20){
+                        i++;
+                        $("#ui-datepicker-div").css("clip","");
+                        setTimeout(function (){removeUiDatepickerDivClipRect(i)}, 50);
+                    }
+                }
+                $("#IouListForm\\:datalist\\:cal1_input").click(function (){removeUiDatepickerDivClipRect(1);});
+                $("#IouListForm\\:datalist\\:cal2_input").click(function (){removeUiDatepickerDivClipRect(1);});
+            })
+
         </script>
     </ui:define>
 
 </ui:composition>
-    </html>
+</html>
