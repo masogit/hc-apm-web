@@ -3832,6 +3832,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_machineStatus','机器状态','Current status',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_position','医院职务','Position',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_urgencyStatus','紧急状态','Urgency status',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_currentStep','当前步骤','Current step',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_currentStatus','当前状态','Current status',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_hospitalName','医院名称','Hospital name',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_functionType','设备类型','Function type',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_reportUser','报修人','Report user',NULL,-1);
@@ -3849,6 +3851,7 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_notFindContractError','错误：未找到合同','Error:not find contract',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_contractCannotBeNull','错误：合同不可为空','Error:contract can not be null',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_contractSystemIdError','错误：SystemID/厂商报修ID和合同不一致','Error:SystemID/厂商报修ID and contract not consist',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_contractSupportTimesCannotBeZero','错误：合同剩余名额不足','Error:contract support times can not be zero',NULL,	-1	);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_fePartOrderType','ManMade','人工申请','manmade',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','WaitingAssignment','待租户审批','Waiting tenant assignment',NULL,-1);
