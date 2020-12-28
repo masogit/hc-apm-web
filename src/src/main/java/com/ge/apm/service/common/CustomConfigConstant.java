@@ -26,7 +26,7 @@ public class CustomConfigConstant {
     
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","oneQrCodeStatus","connectToInsite","oneQrCode","installStatus","assetClass");
     }
     
     //只读字段
@@ -157,8 +157,8 @@ public class CustomConfigConstant {
             allFields.put("assetLocation", WebUtil.getMessage("assetLocation"));
             allFields.put("UCMID", WebUtil.getMessage("UCMID"));
             allFields.put("assetTags", WebUtil.getMessage("assetTags"));
-            allFields.put("connectToInsite", WebUtil.getMessage("connectToInsite"));
             allFields.put("createdBy", WebUtil.getMessage("createdBy"));
+         allFields.put("connectToInsite", WebUtil.getMessage("connectToInsite"));
             allFields.put("assetClass", WebUtil.getMessage("assetClass"));
          allFields.put("oneQrCode", WebUtil.getMessage("oneQrCode"));
          allFields.put("oneQrCodeStatus", WebUtil.getMessage("oneQrCodeStatus"));
