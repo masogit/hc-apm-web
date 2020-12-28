@@ -96,6 +96,12 @@ public class ZkbFePartOrder {
     private Date reportDate;
 
     /**
+     * 供应商审批时间
+     */
+    @Column(name = "tenant_assign_date")
+    private Date tenantAssignDate;
+
+    /**
      * 现象
      */
     @Column(name = "phenomenon")
@@ -136,6 +142,12 @@ public class ZkbFePartOrder {
      */
     @Column(name = "report_user")
     private String reportUser;
+
+    /**
+     * 审批人
+     */
+    @Column(name = "tenant_assign_user")
+    private String tenantAssignUser;
 
     /**
      * 医院客户姓名
@@ -190,12 +202,6 @@ public class ZkbFePartOrder {
      */
     @Column(name = "ge_engineer_phone")
     private String geEngineerPhone;
-
-    /**
-     * 派工信息是否扣除名额
-     */
-    @Column(name = "subtract_total_statusApm")
-    private String subtractTotalStatusApm;
 
     /**
      * 派工备注
@@ -281,6 +287,14 @@ public class ZkbFePartOrder {
         this.reportDate = reportDate;
     }
 
+    public Date getTenantAssignDate() {
+        return tenantAssignDate;
+    }
+
+    public void setTenantAssignDate(Date tenantAssignDate) {
+        this.tenantAssignDate = tenantAssignDate;
+    }
+
     public String getPhenomenon() {
         return phenomenon;
     }
@@ -337,6 +351,14 @@ public class ZkbFePartOrder {
         this.reportUser = reportUser;
     }
 
+    public String getTenantAssignUser() {
+        return tenantAssignUser;
+    }
+
+    public void setTenantAssignUser(String tenantAssignUser) {
+        this.tenantAssignUser = tenantAssignUser;
+    }
+
     public String getHospitalClientName() {
         return hospitalClientName;
     }
@@ -391,14 +413,6 @@ public class ZkbFePartOrder {
 
     public void setGeEngineerPhone(String geEngineerPhone) {
         this.geEngineerPhone = geEngineerPhone;
-    }
-
-    public String getSubtractTotalStatusApm() {
-        return subtractTotalStatusApm;
-    }
-
-    public void setSubtractTotalStatusApm(String subtractTotalStatusApm) {
-        this.subtractTotalStatusApm = subtractTotalStatusApm;
     }
 
     public String getComment() {

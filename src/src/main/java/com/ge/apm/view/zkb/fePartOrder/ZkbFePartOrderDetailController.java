@@ -240,6 +240,31 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSystemIdError"));
             return "";
         }
+        if("true".equals(this.selected.getSubtractTotalStatus()))
+        {
+            ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+            if("DI".equals(zkbContract.getContractType())
+                    ||"PCB".equals(zkbContract.getContractType()))
+            {
+                if(zkbContract.getSpareArtificail()==null||zkbContract.getSpareArtificail()<=0)
+                {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
+                    return "";
+                }
+                zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()-1);
+                this.zkbContractRepository.save(zkbContract);
+            }else if("CCS".equals(zkbContract.getContractType())
+                    ||"Biomed".equals(zkbContract.getContractType()))
+            {
+                if(zkbContract.getGeArtificialSupportTimes()==null||zkbContract.getGeArtificialSupportTimes()<=0)
+                {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
+                    return "";
+                }
+                zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()-1);
+                this.zkbContractRepository.save(zkbContract);
+            }
+        }
         String url = this.wolkFlowToComplete(ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null,GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
@@ -254,6 +279,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     {
         Date date = new Date();
         this.selected.setComment(comment);
+        this.selected.setTenantAssignUser(this.userName);
+        this.selected.setTenantAssignDate(new Date());
         return this.wolkFlowToComplete(ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingApm.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
@@ -265,6 +292,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public String supplierReject()
     {
         Date date = new Date();
+        this.selected.setTenantAssignUser(this.userName);
+        this.selected.setTenantAssignDate(new Date());
         return this.wolkFlowToComplete(ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
@@ -320,9 +349,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             if(configTypeMap.containsKey(item.getConfigType())) continue;
             configTypeMap.put(item.getConfigType(),item.getConfigType());
         }
-//        configTypeMap =list.stream().collect(
-//                Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getConfigType()))),
-//                        ArrayList::new)).stream().collect(Collectors.toMap(ZkbFePartOrderUserConfig::getConfigType,ZkbFePartOrderUserConfig::getConfigType));
         return configTypeMap;
     }
 
@@ -379,6 +405,27 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         {
             return true;
 
+        }
+        return false;
+    }
+
+    /**
+     * 判断当前用户在当前流程是否可见AMP tap
+     * @return
+     */
+    public Boolean hasApmInfoRight()
+    {
+        if(!configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()))
+        {
+            return false;
+        }
+        if(this.workFlowInThirdStep())
+        {
+            return true;
+        }
+        if(this.workFlowInFourthStep()&&ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString().equals(this.selected.getStatus()))
+        {
+            return true;
         }
         return false;
     }
