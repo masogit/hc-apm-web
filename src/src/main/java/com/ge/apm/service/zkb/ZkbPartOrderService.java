@@ -1024,7 +1024,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     /**
      * 发送邮件
      */
-    @Async
     public void sendEmail(ZkbPartOrder zkbPartOrder,String urlType,String token){
         try {
             HashMap<String, String> emailWrapperMap = new HashMap<>();
