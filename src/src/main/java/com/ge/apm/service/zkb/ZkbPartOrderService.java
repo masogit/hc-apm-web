@@ -1049,7 +1049,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
-    @Async
     public void sendMessage(ZkbPartOrder zkbPartOrder,String token) {
         //如果是备件申请，并且在技术支持审批and放射类设备则不需要发短信
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
@@ -1083,7 +1082,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     /**
      * 发送微信消息
      */
-    @Async
     public void sendWeChatMessages(ZkbPartOrder zkbPartOrder,String token){
         //if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
             if (ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) ||
