@@ -645,6 +645,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Transactional(rollbackFor = Exception.class)
     public void normalNext(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
         String oldStep = zkbPartOrder.getCurrentStep();
+        Integer qty = zkbPartOrder.getQty();
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())){
             zkbPartOrder.setOrderedDate(new Date());
             zkbPartOrder.setOrderedAuditerUid(userAccount.getUid());
@@ -737,11 +738,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 //if("1".equals(zkbPartOrder.getArtificialType())){
                     if("t".equals(zkbPartOrder.getWhetherDeduct())){
                         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-                        subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
+                        subUseQty(zkbContract, zkbPartOrder, qty);
                     }else {
                         //不扣除名额，那么申请中-1，剩余+1
                         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-                        subApplyQty(zkbContract,zkbPartOrder, (0-zkbPartOrder.getQty()));
+                        subApplyQty(zkbContract,zkbPartOrder, (0- qty));
                     }
                 /*}else{
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
@@ -749,10 +750,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }*/
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-                subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
+                subUseQty(zkbContract, zkbPartOrder, qty);
             }else {
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-                subUseQty(zkbContract, zkbPartOrder, zkbPartOrder.getQty());
+                subUseQty(zkbContract, zkbPartOrder, qty);
             }
             if (ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
                 for (ZkbPartOrderItem i : zkbPartOrder.getZkbPartOrderItems()) {
@@ -1024,7 +1025,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      * 发送邮件
      */
     @Async
-    public void sendEmail(ZkbPartOrder zkbPartOrder,String urlType){
+    public void sendEmail(ZkbPartOrder zkbPartOrder,String urlType,String token){
         try {
             HashMap<String, String> emailWrapperMap = new HashMap<>();
             emailWrapperMap.put("configType", zkbPartOrder.getCurrentStep());
@@ -1040,7 +1041,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }else if(CopyByInvok.EMAIL_URL_TYPE_UNORDER.equals(urlType)){
                 url = getGatewayURL(GatewayURL.PART_ORDER_SEND_UN_ORDER);
             }
-            String token = UserContextService.getAccessToken();
+            //String token = UserContextService.getAccessToken();
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
             ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
@@ -1050,7 +1051,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     @Async
-    public void sendMessage(ZkbPartOrder zkbPartOrder) {
+    public void sendMessage(ZkbPartOrder zkbPartOrder,String token) {
         //如果是备件申请，并且在技术支持审批and放射类设备则不需要发短信
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
             if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep())){
@@ -1070,7 +1071,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 emailWrapperMap.put("url", "?id=" + zkbPartOrder.getId());
                 emailWrapperMap.put("subject", WebUtil.getFieldValueMessage("zkbPartOrderType",zkbPartOrder.getOrderType()));
                 String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_MESSAGE);
-                String token = UserContextService.getAccessToken();
+                //String token = UserContextService.getAccessToken();
                 HttpHeaders header = createHttpHeaders(token);
                 HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
                 ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
@@ -1084,7 +1085,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      * 发送微信消息
      */
     @Async
-    public void sendWeChatMessages(ZkbPartOrder zkbPartOrder){
+    public void sendWeChatMessages(ZkbPartOrder zkbPartOrder,String token){
         //if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
             if (ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(zkbPartOrder.getStatus()) ||
@@ -1095,7 +1096,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 ZkbPartOrder.PartOrderStatus.DirectorAccept.toString().equals(zkbPartOrder.getStatus())) {
                 try {
                     String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
-                    String token = UserContextService.getAccessToken();
+                    //String token = UserContextService.getAccessToken();
                     HttpHeaders header = createHttpHeaders(token);
                     HttpEntity<Map> requestEntity = new HttpEntity<>(header);
                     ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
@@ -1106,7 +1107,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //}
     }
 
-    @Async
     public void sendWeChatBackMessages(ZkbPartOrder zkbPartOrder){
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_BACK_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
@@ -1119,7 +1119,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
-    @Async
     public boolean sendWeChatRemindLetter(ZkbPartOrder zkbPartOrder){
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_REMIND_LETTER).concat("?id=").concat(zkbPartOrder.getId());

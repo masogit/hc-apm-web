@@ -490,16 +490,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public String acceptNext(){
         zkbPartOrderService.auditNext(this.selected,true,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendMessage(zkbPartOrder);
-        zkbPartOrderService.sendEmail(zkbPartOrder,"");
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendMessage(zkbPartOrder,UserContextService.getAccessToken());
+        zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public String rejectNext(){
         zkbPartOrderService.auditNext(this.selected,false,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
@@ -572,16 +572,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderService.normalNext(this.selected,currentUser);
         }
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){
             //归还时发送邮件
-            zkbPartOrderService.sendEmail(zkbPartOrder,"");
+            zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep())){
-            zkbPartOrderService.sendEmail(zkbPartOrder,"");
+            zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(zkbPartOrder.getCurrentStep())){
-            zkbPartOrderService.sendEmail(zkbPartOrder, CopyByInvok.EMAIL_URL_TYPE_UNORDER);
+            zkbPartOrderService.sendEmail(zkbPartOrder, CopyByInvok.EMAIL_URL_TYPE_UNORDER,UserContextService.getAccessToken());
         }
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
@@ -589,7 +589,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public String orderCancelNext(){
         zkbPartOrderService.orderCancelNext(this.selected,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 

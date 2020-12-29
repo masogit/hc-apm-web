@@ -515,7 +515,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                flag=false;
+                //flag=false;
                 errorLog += "附件不能为空！";
             }
         }
@@ -604,10 +604,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         HashMap m = v2_listHashMap.get(0);
         selected = zkbPartOrderService.create(m.get("id").toString(),m.get("assetId").toString(),zkbContract,this.selected,currentUser,selectionTenantInfo,m.get("srNum").toString());
         zkbPartOrderService.saveUploadFile(v2_blobObjectList,this.selected.getId());
-        zkbPartOrderService.sendEmail(selected,"");
-        zkbPartOrderService.sendMessage(selected);
+        zkbPartOrderService.sendEmail(selected,"",UserContextService.getAccessToken());
+        zkbPartOrderService.sendMessage(selected,UserContextService.getAccessToken());
         if(zkbPartOrderService.checkContractLastDay(zkbContract,orderType)){
-            zkbPartOrderService.sendEmail(selected, CopyByInvok.EMAIL_URL_TYPE_LASTDAY);
+            zkbPartOrderService.sendEmail(selected, CopyByInvok.EMAIL_URL_TYPE_LASTDAY,UserContextService.getAccessToken());
         }
         return "List?faces-redirect=true";
     }
