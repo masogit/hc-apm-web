@@ -958,7 +958,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
             if(CopyByInvok.T.equals(zkbPartOrder.getNewCatFlag())){
-                zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) + (qty * 2));
+                zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 00 : zkbContract.getProbeQuotaUse()) + (qty * 2));
+                zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 00 : zkbContract.getProbeQuota()) - qty);
             }else{
                 zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) + qty);
             }
