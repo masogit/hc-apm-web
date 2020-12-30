@@ -333,7 +333,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 selected.setFaultDescription("");
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending","CS");
+                if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) >-1){
+                    zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameContains("TechnicalPending","CS",ZkbPartOrder.DATA_TYPE_TEST);
+                }else{
+                    zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameIsNotContaining("TechnicalPending","CS",ZkbPartOrder.DATA_TYPE_TEST);
+                }
             }
             selected.setRegion(zkbContract.getRegion());
             initZknPartCat(zkbContract.getStartDate());
@@ -574,13 +578,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
 
         this.selected.setOrderType(orderType);
-
+        if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
+            selected.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
+        }
         if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
             if(!r){
                 //WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还,若场地有其他特殊情况请邮件申请。");
                 //return "";
-                this.selected.setCheckApplyNumFlag("f");
+                this.selected.setCheckApplyNumFlag(CopyByInvok.F);
             }
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
@@ -598,10 +604,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         HashMap m = v2_listHashMap.get(0);
         selected = zkbPartOrderService.create(m.get("id").toString(),m.get("assetId").toString(),zkbContract,this.selected,currentUser,selectionTenantInfo,m.get("srNum").toString());
         zkbPartOrderService.saveUploadFile(v2_blobObjectList,this.selected.getId());
-        zkbPartOrderService.sendEmail(selected,"");
-        zkbPartOrderService.sendMessage(selected);
+        zkbPartOrderService.sendEmail(selected,"",UserContextService.getAccessToken());
+        zkbPartOrderService.sendMessage(selected,UserContextService.getAccessToken());
         if(zkbPartOrderService.checkContractLastDay(zkbContract,orderType)){
-            zkbPartOrderService.sendEmail(selected, CopyByInvok.EMAIL_URL_TYPE_LASTDAY);
+            zkbPartOrderService.sendEmail(selected, CopyByInvok.EMAIL_URL_TYPE_LASTDAY,UserContextService.getAccessToken());
         }
         return "List?faces-redirect=true";
     }
