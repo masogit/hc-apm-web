@@ -138,11 +138,11 @@
                     <p:fieldset id="managementFieldset" legend="供应商审批" rendered="#{zkbFePartOrderDetailController.workFlowInSupplierStep() or zkbFePartOrderDetailController.workFlowInThirdStep() or zkbFePartOrderDetailController.workFlowInFourthStep()}">
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup rendered="#{zkbFePartOrderDetailController.workFlowInThirdStep() or zkbFePartOrderDetailController.workFlowInFourthStep()}">
-                                <label class="label">供应商审批人*：</label>
+                                <label class="label">代理商审批人名称*：</label>
                                 <p:inputText id="tenantAssignUser" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.tenantAssignUser}"  />
                             </h:panelGroup>
                             <h:panelGroup rendered="#{zkbFePartOrderDetailController.workFlowInThirdStep() or zkbFePartOrderDetailController.workFlowInFourthStep()}">
-                                <label class="label">供应商审批时间*：</label>
+                                <label class="label">代理商审批时间*：</label>
                                 <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderDetailController.selected.tenantAssignDate}"
                                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
