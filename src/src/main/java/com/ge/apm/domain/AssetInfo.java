@@ -569,7 +569,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     //全量IB客户可见性标记
     @Column(name = "visible_status")
-    private Integer visibleStatus;
+    private Integer visibleStatus = 1;
 
     @Transient
     private int lineNum;
