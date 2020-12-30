@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -107,6 +108,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      * 获取审批角色配置信息
      */
     private ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository;
+
+    /**
+     * 备件申请中的人工申请
+     */
+    private List<ZkbFePartOrder> sparePartsZkbFePartOrder = new LinkedList<>();
 
     @Override
     protected void init() {
@@ -251,8 +257,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                     WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
                     return "";
                 }
-                zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()-1);
-                this.zkbContractRepository.save(zkbContract);
             }else if("CCS".equals(zkbContract.getContractType())
                     ||"Biomed".equals(zkbContract.getContractType()))
             {
@@ -261,14 +265,57 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                     WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
                     return "";
                 }
-                zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()-1);
-                this.zkbContractRepository.save(zkbContract);
             }
+            this.moveRemianTimeOfContract(zkbContract,1);
         }
         String url = this.wolkFlowToComplete(ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null,GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
+    }
+
+    /**
+     * @param zkbContract 合同信息
+     * @param type 1.把剩余名额移入申请名额 2.把申请名额移入已使用名额 3.把申请名额移入剩余名额
+     */
+    private void moveRemianTimeOfContract(ZkbContract zkbContract,Integer type)
+    {
+        if("DI".equals(zkbContract.getContractType())
+                ||"PCB".equals(zkbContract.getContractType()))
+        {
+            switch(type){
+                case 1 :
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()-1);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()+1);
+                    break;
+                case 2 :
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-1);
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse()+1);
+                    break;
+                case 3:
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()+1);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-1);
+                    break;
+            }
+        }else if("CCS".equals(zkbContract.getContractType())
+                ||"Biomed".equals(zkbContract.getContractType()))
+        {
+            switch(type){
+                case 1 :
+                    zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()-1);
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()+1);
+                    break;
+                case 2 :
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()-1);
+                    zkbContract.setGeArtificialSupportTimesUse(zkbContract.getGeArtificialSupportTimesUse()+1);
+                    break;
+                case 3:
+                    zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()+1);
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()-1);
+                    break;
+            }
+        }
+        this.zkbContractRepository.save(zkbContract);
     }
 
     /**
@@ -294,6 +341,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         Date date = new Date();
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
+        ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+        this.moveRemianTimeOfContract(zkbContract,3);
         return this.wolkFlowToComplete(ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
@@ -304,6 +353,9 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      */
     public String fullApmInfo()
     {
+
+        ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+        this.moveRemianTimeOfContract(zkbContract,2);
         Date date = new Date();
         return this.wolkFlowToComplete(ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_WECHART);
@@ -463,5 +515,20 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 
     public void setContractError(Boolean contractError) {
         this.contractError = contractError;
+    }
+
+    public void getSparePartsZkbFePartOrder()
+    {
+
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        if(StringUtils.isNotBlank(this.selected.getSystemId()))
+        {
+            searchFilters.add(new SearchFilter("systemId", SearchFilter.Operator.LIKE,this.selected.getSystemId()));
+        }
+        if(StringUtils.isNotBlank(this.selected.getFatherPartOrderNo()))
+        {
+            searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.LIKE,this.selected.getFatherPartOrderNo()));
+        }
+        this.sparePartsZkbFePartOrder = this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
     }
 }
