@@ -26,9 +26,10 @@ public class ZkbFePartOrder {
 
     /**
      * ManMade:人工申请
+     * SpareParts：备件申请
      */
     public enum OrderType {
-        ManMade
+        ManMade,SpareParts
     }
 
     /**
