@@ -14,15 +14,14 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import webapp.framework.dao.GenericRepositoryUUID;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -31,8 +30,6 @@ import java.util.*;
 @ManagedBean
 @ViewScoped
 public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<ZkbFePartOrder> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ZkbFePartOrderDetailController.class);
 
     /**
      * 智康宝人工申请 service
@@ -118,6 +115,13 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 //     * 备件申请列表选中项
 //     */
 //    private ZkbFePartOrderAssetInfo selectZkbFePartOrderAssetInfo;
+
+    /**
+     * action动作名称
+     */
+    private String actionItemName;
+
+    private static final String dateFormat = "yyyyMMddHHmmss";
 
     @Override
     protected void init() {
@@ -212,11 +216,26 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         Date endDate = zkbContract.getEndDate();
         Date date = new Date();
         //合同过期
-        if(!(date.compareTo(startDate)>=0&&date.compareTo(endDate)<=0))
+        if(!(date.compareTo(startDate)>=0&&this.adjustDate(date).compareTo(endDate)<=0))
         {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractOverdueError"));
             this.contractError=true;
         }
+    }
+
+    private Date adjustDate(Date date)
+    {
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        String lastDay = format.format(date.getTime());
+        lastDay = lastDay+"000000";
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbFePartOrderDetailController.dateFormat);
+        Date date1 = null;
+        try {
+            date1 = formatter.parse(lastDay);
+        } catch (ParseException e) {
+            logger.info(e.getMessage());
+        }
+        return date1;
     }
 
     /**
@@ -535,5 +554,37 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 //            searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.LIKE,this.selected.getFatherPartOrderNo()));
 //        }
 //        this.sparePartsZkbFePartOrder = this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
+//    }
+//
+//    /**
+//     * 申请列表预添加
+//     */
+//    public void prepareItemCreate(){
+//        this.actionItemName = "Create";
+//        this.selectZkbFePartOrderAssetInfo = new ZkbFePartOrderAssetInfo();
+//    }
+//
+//    /**
+//     * 申请列表预编辑
+//     */
+//    public void prepareItemEdit(){
+//        this.actionItemName = "Edit";
+//    }
+//
+//    /**
+//     * 临时保存
+//     */
+//    public void saveZkbFePartOrderAssetInfoTemp()
+//    {
+//        if("Create".equals(this.actionItemName)){
+//            if(this.selected.getZkbFePartOrderAssetInfoList() ==null){
+//                this.selected.setZkbFePartOrderAssetInfoList(new ArrayList<>());
+//            }
+//            int i = this.selected.getZkbFePartOrderAssetInfoList().size();
+//            this.selectZkbFePartOrderAssetInfo.setIndex(i);
+//            this.selected.getZkbFePartOrderAssetInfoList().add(this.selectZkbFePartOrderAssetInfo);
+//        }else{
+//            this.selected.getZkbFePartOrderAssetInfoList().add(this.selectZkbFePartOrderAssetInfo.getIndex(),this.selectZkbFePartOrderAssetInfo);
+//        }
 //    }
 }
