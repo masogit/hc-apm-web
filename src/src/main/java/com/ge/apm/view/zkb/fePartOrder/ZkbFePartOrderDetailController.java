@@ -114,6 +114,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      */
     private List<ZkbFePartOrder> sparePartsZkbFePartOrder = new LinkedList<>();
 
+//    /**
+//     * 备件申请列表选中项
+//     */
+//    private ZkbFePartOrderAssetInfo selectZkbFePartOrderAssetInfo;
+
     @Override
     protected void init() {
         super.init();
@@ -517,18 +522,18 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.contractError = contractError;
     }
 
-    public void getSparePartsZkbFePartOrder()
-    {
-
-        List<SearchFilter> searchFilters = new ArrayList<>();
-        if(StringUtils.isNotBlank(this.selected.getSystemId()))
-        {
-            searchFilters.add(new SearchFilter("systemId", SearchFilter.Operator.LIKE,this.selected.getSystemId()));
-        }
-        if(StringUtils.isNotBlank(this.selected.getFatherPartOrderNo()))
-        {
-            searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.LIKE,this.selected.getFatherPartOrderNo()));
-        }
-        this.sparePartsZkbFePartOrder = this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
-    }
+//    public void getSparePartsZkbFePartOrder()
+//    {
+//
+//        List<SearchFilter> searchFilters = new ArrayList<>();
+//        if(StringUtils.isNotBlank(this.selected.getSystemId()))
+//        {
+//            searchFilters.add(new SearchFilter("systemId", SearchFilter.Operator.LIKE,this.selected.getSystemId()));
+//        }
+//        if(StringUtils.isNotBlank(this.selected.getFatherPartOrderNo()))
+//        {
+//            searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.LIKE,this.selected.getFatherPartOrderNo()));
+//        }
+//        this.sparePartsZkbFePartOrder = this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
+//    }
 }
