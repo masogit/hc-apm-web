@@ -68,6 +68,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<ZkbPoHistoryQueryVo> zkbHistoryDataList;
     private List<ZkbPoHistoryQueryVo> geHistoryDataList;
     private String remindLetterFlag = "0";
+    private ZkbContractRepository zkbContractRepository;
 
     @Override
     protected void init() {
@@ -77,6 +78,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturnRepository = WebUtil.getBean(ZkbPartOrderReturnRepository.class);
         zkbPartOrderRepository = WebUtil.getBean(ZkbPartOrderRepository.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+        zkbContractRepository = WebUtil.getBean(ZkbContractRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
@@ -412,6 +414,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(canEditFlag){
                     showReturn = true;
                     showBtn = "1";
+                }else {
+                    List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                    if(zkbPartOrderUserConfigs.size() > 0){
+                        showReturn = true;
+                    }
                 }
             }else if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus()) ){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
@@ -485,16 +492,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public String acceptNext(){
         zkbPartOrderService.auditNext(this.selected,true,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendMessage(zkbPartOrder);
-        zkbPartOrderService.sendEmail(zkbPartOrder,"");
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendMessage(zkbPartOrder,UserContextService.getAccessToken());
+        zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public String rejectNext(){
         zkbPartOrderService.auditNext(this.selected,false,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
@@ -511,6 +518,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(selected.getReturnQty() > selected.getQty()){
                     WebUtil.addErrorMessage("归还数量不能大于申请数量","");
                     return "";
+                }
+            }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
+                if(CopyByInvok.T.equals(selected.getNewCatFlag())){
+                    ZkbContract c = zkbContractRepository.findById(selected.getContractId());
+                    if(c.getProbeQuota() < selected.getQty()){
+                        WebUtil.addErrorMessage("探头剩余数量不足，请联系供应商！","");
+                        return "";
+                    }
                 }
             }
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
@@ -567,16 +582,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderService.normalNext(this.selected,currentUser);
         }
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){
             //归还时发送邮件
-            zkbPartOrderService.sendEmail(zkbPartOrder,"");
+            zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep())){
-            zkbPartOrderService.sendEmail(zkbPartOrder,"");
+            zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(zkbPartOrder.getCurrentStep())){
-            zkbPartOrderService.sendEmail(zkbPartOrder, CopyByInvok.EMAIL_URL_TYPE_UNORDER);
+            zkbPartOrderService.sendEmail(zkbPartOrder, CopyByInvok.EMAIL_URL_TYPE_UNORDER,UserContextService.getAccessToken());
         }
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
@@ -584,7 +599,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public String orderCancelNext(){
         zkbPartOrderService.orderCancelNext(this.selected,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
