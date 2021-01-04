@@ -154,14 +154,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenUId));
         filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, requestTime));
         filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(requestTime, -1)));
-       /* if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
-            filters.add(new SearchFilter("spareQuota", SearchFilter.Operator.GT,1));
-        } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-            filters.add(new SearchFilter("probeQuota", SearchFilter.Operator.GT,1));
-        } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-            filters.add(new SearchFilter("geArtificialSupportTimes", SearchFilter.Operator.GT,1,"1*2+"));
-            filters.add(new SearchFilter("spareArtificail", SearchFilter.Operator.GT,1,"1*2+"));
-        }*/
         Pageable pageable = new PageRequest(0, 5000);
         Page page = zkbContractRepository.findBySearchFilter(filters, pageable);
         List<ZkbContract> zkbContracts = new ArrayList(page.getContent());
