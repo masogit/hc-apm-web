@@ -77,7 +77,7 @@ public class InventoryOrderDetailAssetInfoListController extends GenericCRUDUUID
             List<SearchFilter> searchFilterNoLedgerList = new ArrayList<>();
 
             //全院视图
-            searchFilterList.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId, "1*"));
+            searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId, "1*"));
 
             //无台账
             boolean isSolvedBoolean = false;
