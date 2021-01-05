@@ -102,6 +102,13 @@ public class QrCodeLib implements Serializable {
     @Column(name = "registration_no")
     private String registrationNo;
 
+    /**
+     * 安装位置
+     */
+    @Size(max = 64)
+    @Column(name = "location_name")
+    private String locationName;
+
     public String getDepartNum() {
         return departNum;
     }
@@ -366,5 +373,13 @@ public class QrCodeLib implements Serializable {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 }
