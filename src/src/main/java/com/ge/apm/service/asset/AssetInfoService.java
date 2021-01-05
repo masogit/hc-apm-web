@@ -5,19 +5,13 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.AssetContractRepository;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.ContractInfoItemRepository;
-import com.ge.apm.domain.AssetContract;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.ContractInfoItem;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -26,9 +20,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import javax.faces.model.SelectItemGroup;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +35,7 @@ public class AssetInfoService {
     AssetContractRepository contractDao = WebUtil.getBean(AssetContractRepository.class);
     ContractInfoItemRepository contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
     OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
+    SysAuthGroupRepository authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
 
     UaaService uaaService = WebUtil.getBean(UaaService.class);
     V2_WorkOrderService woService = WebUtil.getBean(V2_WorkOrderService.class);
@@ -178,4 +171,34 @@ public class AssetInfoService {
         return sb.toString() + name;
     }
 
+    public TreeNode buildSysAuthGroupInTree() {
+
+        List<SysAuthGroup> groupList = authGroupDao.listSysAuthGroup();
+
+        TreeNode rootNode = new DefaultTreeNode("sysAuthGroup", null, null);
+        Map<String, TreeNode> treeMap = groupList.stream().collect(Collectors.toMap(SysAuthGroup::getUid, item -> new DefaultTreeNode("sysAuthGroup", item, null)));
+        for (SysAuthGroup org : groupList) {
+            if (treeMap.containsKey(org.getParentUid())) {
+                treeMap.get(org.getParentUid()).getChildren().add(treeMap.get(org.getUid()));
+            } else {
+                rootNode.getChildren().add(treeMap.get(org.getUid()));
+            }
+        }
+        sortSysAuthGroupNaturally(rootNode);
+        rootNode.setExpanded(true);
+        return rootNode;
+    }
+
+    public void sortSysAuthGroupNaturally(TreeNode root) {
+        root.getChildren().sort((TreeNode o1, TreeNode o2) -> {
+                    SysAuthGroup sag1 = (SysAuthGroup) o1.getData();
+                    SysAuthGroup sag2 = (SysAuthGroup) o2.getData();
+                    return sag1.getEncoded().compareTo(sag2.getEncoded());
+                }
+        );
+        for (TreeNode node: root.getChildren()) {
+            sortSysAuthGroupNaturally(node);
+        }
+
+    }
 }
