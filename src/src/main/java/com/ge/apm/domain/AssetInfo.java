@@ -57,7 +57,10 @@ public class AssetInfo implements ChineseName,Serializable {
     private String aliasName;//资产别名
 
     @Column(name = "function_group")
-    private Integer functionGroup;//功能分组   医疗器械分类
+    private Integer functionGroup;//功能分组   医疗器械分类(旧)
+
+    @Column(name = "medical_apparatus_classification")
+    private String medicalApparatusClassification; // 医疗器械分类
 
     @Column(name = "function_type")
     private String functionType;//设备型号
@@ -992,6 +995,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setFunctionGroup(Integer functionGroup) {
         this.functionGroup = functionGroup;
+    }
+
+    public String getMedicalApparatusClassification() {
+        return medicalApparatusClassification;
+    }
+
+    public void setMedicalApparatusClassification(String medicalApparatusClassification) {
+        this.medicalApparatusClassification = medicalApparatusClassification;
     }
 
     public String getFunctionType() {
