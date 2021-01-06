@@ -304,6 +304,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      */
     private void moveRemianTimeOfContract(ZkbContract zkbContract,Integer type)
     {
+
+        if(!"true".equals(this.selected.getSubtractTotalStatus())) return;
         if("DI".equals(zkbContract.getContractType())
                 ||"PCB".equals(zkbContract.getContractType()))
         {
