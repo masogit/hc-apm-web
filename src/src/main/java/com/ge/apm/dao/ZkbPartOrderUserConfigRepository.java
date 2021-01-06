@@ -1,6 +1,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ZkbPartOrderUserConfig;
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public interface ZkbPartOrderUserConfigRepository extends GenericRepositoryUUID<
 
     List<ZkbPartOrderUserConfig> findByConfigType(String configType);
     List<ZkbPartOrderUserConfig> findByConfigTypeAndOrderType(String configType,String orderType);
+
+    @Query("select c from ZkbPartOrderUserConfig  c where c.configType = ?1 and (c.orderType is null or c.orderType = '')")
     List<ZkbPartOrderUserConfig> findByConfigTypeAndOrderTypeNull(String configType);
 
 
