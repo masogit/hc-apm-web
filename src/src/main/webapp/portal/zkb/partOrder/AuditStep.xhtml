@@ -214,15 +214,14 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <c:choose>
-                                <c:if test="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                                <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
                                     <label class="label">订单名额*</label>
-                                    <p:inputText value="#{zkbPartOrderAuditController.selected.qty}" required="true" readonly="true" requiredMessage="订单名额 #{msg.ValidationRequire}" disabled="true" />
-                                </c:if>
+                                </c:when>
                                 <c:otherwise>
                                     <label class="label">订单数量*</label>
-                                    <p:inputText value="#{zkbPartOrderAuditController.selected.qty}" required="true" readonly="true" requiredMessage="订单数量 #{msg.ValidationRequire}" disabled="true" />
                                 </c:otherwise>
                             </c:choose>
+                            <p:inputText id="qty" value="#{zkbPartOrderAuditController.selected.qty}" required="true" readonly="true" requiredMessage="订单数量 #{msg.ValidationRequire}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">剩余数量</label>
@@ -842,7 +841,11 @@
                             <label class="label">关单备注</label>
                             <p:inputTextarea id="closedRemark" value="#{zkbPartOrderAuditController.selected.closedRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag)}">
                             </p:inputTextarea>
+                            <p:commandLink immediate="false" process="@this" update="growl zkbPartOrderReturnModifyDlg" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'Complete' and zkbPartOrderAuditController.choseAdmin}">
+                                <h:outputText value="归还数据修改" />
+                            </p:commandLink>
                         </h:panelGroup>
+
                     </p:panelGrid>
                 </p:fieldset>
                 <br/>
@@ -857,6 +860,7 @@
             </h:form>
             <ui:include src="PartOrderReturn.xhtml"/>
             <ui:include src="historyData.xhtml"/>
+            <ui:include src="PartOrderReturnModify.xhtml"/>
             <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
 
                 <h:form id="zkbConfigForm">

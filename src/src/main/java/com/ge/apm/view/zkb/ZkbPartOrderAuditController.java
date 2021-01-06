@@ -44,6 +44,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean showRejectOrder = false;
     private boolean showClosed=false;
     private boolean canEditFlag=false;
+    private boolean isChoseAdmin = false;
     private String showBtn = "";
     private ZkbPartOrderReturn zkbPartOrderReturn;
     private List<ZkbPartOrderReturn> zkbPartOrderReturnList;
@@ -69,6 +70,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<ZkbPoHistoryQueryVo> geHistoryDataList;
     private String remindLetterFlag = "0";
     private ZkbContractRepository zkbContractRepository;
+    private List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList;
+    private ZkbPartOrderReturn zkbPartOrderReturnModify;
+
 
     @Override
     protected void init() {
@@ -458,6 +462,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showReturn = true;
                 showClosed = true;
                 showBtn = "";
+                List<ZkbPartOrderUserConfig> closeUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                if(closeUserConfigs.size() > 0){
+                    isChoseAdmin = true;
+                }
             }
         }
     }
@@ -677,6 +685,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId());
             return;
         }
+        if(StringUtils.isEmpty(zkbPartOrderReturn.getId())){
+            zkbPartOrderReturn.setCreatedDate(new Date());
+        }else{
+            zkbPartOrderReturn.setUpdatedDate(new Date());
+        }
         zkbPartOrderReturn.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.New.toString());
         zkbPartOrderReturnRepository.save(zkbPartOrderReturn);
         zkbPartOrderReturn = null;
@@ -733,6 +746,74 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    //region 关单修改归还数据
+    public void preReturnModifyEdit(){
+        zkbPartOrderReturnModifyList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
+        partNoList = new ArrayList<>();
+        orderNoList = new ArrayList<>();
+        List<ZkbPartOrderItem> zkbPartOrderItemList = zkbPartOrderService.queryItemBuPartOrderId(selected.getId());
+        List<String> orderContains = new ArrayList<>();
+        for(ZkbPartOrderItem i :zkbPartOrderItemList){
+            HashMap<String, String> m = new HashMap<>();
+            m.put("text",i.getPartName());
+            m.put("value",i.getPartNo());
+            partNoList.add(m);
+            if(StringUtils.isNotEmpty(i.getOrderNo())){
+                if(!orderContains.contains(i.getOrderNo())){
+                    HashMap<String, String> mm = new HashMap<>();
+                    mm.put("text",i.getOrderNo());
+                    mm.put("value",i.getOrderNo());
+                    orderNoList.add(mm);
+                    orderContains.add(i.getOrderNo());
+                }
+            }
+        }
+    }
+
+    public void returnModifyCancel(){
+        zkbPartOrderReturnModify = null;
+    }
+
+    public void saveReturnModify(){
+        for(ZkbPartOrderReturn r : zkbPartOrderReturnModifyList){
+            if (r.getId().equals(zkbPartOrderReturnModify.getId())){
+                Collections.replaceAll(zkbPartOrderReturnModifyList,r,zkbPartOrderReturnModify);
+                break;
+            }
+        }
+        zkbPartOrderReturnModify = null;
+    }
+
+    public void submitCloseReturn(){
+        HashMap<String, Integer> returnMap = new HashMap<String, Integer>();
+        for(ZkbPartOrderReturn r : zkbPartOrderReturnModifyList){
+            if(returnMap.containsKey(r.getPartNo())){
+                Integer vv = returnMap.get(r.getPartNo());
+                vv += r.getQty();
+                returnMap.put(r.getPartNo(),vv);
+            }else{
+                returnMap.put(r.getPartNo(),r.getQty());
+            }
+        }
+        boolean flag = true;
+        for(ZkbPartOrderItem zkbPartOrderItem : selected.getZkbPartOrderItems()){
+            Integer returnQty = returnMap.get(zkbPartOrderItem.getPartNo());
+            if(returnQty == null){
+                flag = false;
+            }else if(returnQty != zkbPartOrderItem.getPartQty()){
+                flag = false;
+            }
+        }
+        if(!flag){
+            WebUtil.addErrorMessage("归还数量与申请不一致，请检查！");
+            return;
+        }
+        zkbPartOrderService.submitCloseReturn(zkbPartOrderReturnModifyList,selected,currentUser);
+        zkbPartOrderReturnList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
+    }
+    //endregion
+
+    //region get、set
     public boolean isHaveTrainCourseFlag() {
         return haveTrainCourseFlag;
     }
@@ -1012,6 +1093,32 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void setShowDirector(boolean showDirector) {
         this.showDirector = showDirector;
     }
+
+    public List<ZkbPartOrderReturn> getZkbPartOrderReturnModifyList() {
+        return zkbPartOrderReturnModifyList;
+    }
+
+    public void setZkbPartOrderReturnModifyList(List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList) {
+        this.zkbPartOrderReturnModifyList = zkbPartOrderReturnModifyList;
+    }
+
+    public ZkbPartOrderReturn getZkbPartOrderReturnModify() {
+        return zkbPartOrderReturnModify;
+    }
+
+    public void setZkbPartOrderReturnModify(ZkbPartOrderReturn zkbPartOrderReturnModify) {
+        this.zkbPartOrderReturnModify = zkbPartOrderReturnModify;
+    }
+
+    public boolean isChoseAdmin() {
+        return isChoseAdmin;
+    }
+
+    public void setChoseAdmin(boolean choseAdmin) {
+        isChoseAdmin = choseAdmin;
+    }
+
+    //endregion
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {
