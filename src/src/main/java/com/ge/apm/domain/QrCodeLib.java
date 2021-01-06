@@ -49,8 +49,13 @@ public class QrCodeLib implements Serializable {
     private Date submitDate;
     @Column(name = "submit_wechat_id")
     private String submitWechatId;
+
+    /**
+     * 同步 新增资产建档-文字表述
+     */
     @Column(name = "comment")
     private String comment;
+
     @Column(name = "feedback")
     private String feedback;
     @Basic(optional = false)
@@ -101,6 +106,21 @@ public class QrCodeLib implements Serializable {
 
     @Column(name = "registration_no")
     private String registrationNo;
+
+    /**
+     * 安装位置
+     */
+    @Size(max = 64)
+    @Column(name = "location_name")
+    private String locationName;
+
+    /**
+     * 备注- 同步 assetInfo.comments 字段
+     */
+    @Column(name = "comments")
+    @Size( max = 256)
+    private String comments;
+
 
     public String getDepartNum() {
         return departNum;
@@ -366,5 +386,21 @@ public class QrCodeLib implements Serializable {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 }
