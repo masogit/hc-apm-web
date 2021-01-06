@@ -1,4 +1,4 @@
-INSERT INTO sys_auth_group VALUES ('0490821da8a34708b3a3872470479aee', '医疗设备', '', '01', '01', '01');
+INSERT INTO sys_auth_group VALUES ('0490821da8a34708b3a3872470479aee', '医疗设备', null, '01', '01', '01');
 INSERT INTO sys_auth_group VALUES ('2208968c7cd947d2810f9a049472219e', '有源手术器械', '0490821da8a34708b3a3872470479aee', '01-01', '01', '01');
 INSERT INTO sys_auth_group VALUES ('5fc5b6fa57a946d389a90697c19dde70', '超声手术设备及附件', '2208968c7cd947d2810f9a049472219e', '01-01-0101', '01', '01');
 INSERT INTO sys_auth_group VALUES ('d4ca417c33b64095b1403632f3394480', '超声手术设备', '5fc5b6fa57a946d389a90697c19dde70', '01-01-0101-010101', '0101', '0101');
