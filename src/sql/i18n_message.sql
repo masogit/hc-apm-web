@@ -3875,3 +3875,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','调节时间不能保存','调节时间不能保存','',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','体温测试值偏差大','体温测试值偏差大','',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','其他','其他','',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','CoilOpportunityImage','MR线圈图片上传','Coil Opportunity Image',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','cataLog','货号','cata Log',NULL,-1);
