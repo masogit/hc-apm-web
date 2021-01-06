@@ -15,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
@@ -76,6 +75,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Autowired
     private BlobFileService blobService;
+
+    @Autowired
+    private ZkbPartOrderReturnHistoryRepository zkbPartOrderReturnHistoryRepository;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -1153,6 +1155,56 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             return true;
         }
         return false;*/
+    }
+
+    @Transactional
+    public void submitCloseReturn(List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList,ZkbPartOrder zkbPartOrder,UserAccount currentUser){
+
+        List<ZkbPartOrderReturn> oldZkbPartOrderReturnList = zkbPartOrderReturnRepository.findByPartOrderId(zkbPartOrder.getId());
+        List<ZkbPartOrderReturnHistory> zkbPartOrderReturnHistoryList = new ArrayList<>();
+
+        ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+        int oldBackTotal = 0;
+        for(ZkbPartOrderReturn r : oldZkbPartOrderReturnList){
+            ZkbPartOrderReturnHistory history = new ZkbPartOrderReturnHistory();
+            history.setPartNo(r.getPartNo());
+            history.setOrderNo(r.getOrderNo());
+            history.setPartOrderId(r.getPartOrderId());
+            history.setReturnType(r.getReturnType());
+            history.setReturnDate(r.getReturnDate());
+            history.setQty(r.getQty());
+            history.setPartSerialNumber(r.getPartSerialNumber());
+            history.setPartQualityIssue(r.getPartQualityIssue());
+            history.setRemark(r.getRemark());
+            history.setWaybillNo(r.getWaybillNo());
+            history.setDataStatus(r.getDataStatus());
+            history.setReturnCreatedDate(r.getCreatedDate());
+            history.setReturnUpdatedDate(r.getUpdatedDate());
+            history.setCreateDate(new Date());
+            history.setCreateUserId(currentUser.getUid());
+            history.setCreateUserName(currentUser.getName());
+            zkbPartOrderReturnHistoryList.add(history);
+            if("badReturn".equals(r.getReturnType())){
+                continue;
+            }
+            oldBackTotal += r.getQty();
+        }
+        int nowBackTotal = 0;
+        for(ZkbPartOrderReturn r : zkbPartOrderReturnModifyList){
+            if("badReturn".equals(r.getReturnType())){
+                continue;
+            }
+            nowBackTotal += r.getQty();
+        }
+        int ce =  nowBackTotal - oldBackTotal;
+        //1.保存历史数据
+        zkbPartOrderReturnHistoryRepository.save(zkbPartOrderReturnHistoryList);
+
+        //2.保存修改
+        zkbPartOrderReturnRepository.save(zkbPartOrderReturnModifyList);
+
+        //3.名额修改
+        subReturnQty(zkbContract,zkbPartOrder,ce);
     }
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){

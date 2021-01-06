@@ -221,15 +221,14 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <c:choose>
-                                <c:if test="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                                <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
                                     <label class="label">订单数量*</label>
-                                    <p:inputText value="#{zkbPartOrderEditController.selected.qty}" required="true"  requiredMessage="#{msg.zkbPartOrder_qty} #{msg.ValidationRequire}" disabled="true" />
-                                </c:if>
+                                </c:when>
                                 <c:otherwise>
                                     <label class="label">订单数量*</label>
-                                    <p:inputText value="#{zkbPartOrderEditController.selected.qty}" required="true"  requiredMessage="#{msg.zkbPartOrder_qty} #{msg.ValidationRequire}" disabled="true" />
                                 </c:otherwise>
                             </c:choose>
+                            <p:inputText id="qty" value="#{zkbPartOrderEditController.selected.qty}" required="true"  requiredMessage="#{msg.zkbPartOrder_qty} #{msg.ValidationRequire}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">剩余数量</label>
