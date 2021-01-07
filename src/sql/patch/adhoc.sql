@@ -1465,3 +1465,6 @@ INSERT INTO sys_auth_group VALUES ('a6d24ce1cda144ae9cd07e220c8547e0', '医用�
 INSERT INTO sys_auth_group VALUES ('9a4bb9dc01984fb3b7ee199ad82cb644', '生物安全柜', 'a6d24ce1cda144ae9cd07e220c8547e0', '01-22-2216-221601', '', '1601');
 INSERT INTO sys_auth_group VALUES ('f2c6080c832d47c49f645b35c171fee7', '洁净工作台', 'a6d24ce1cda144ae9cd07e220c8547e0', '01-22-2216-221602', '', '1602');
 -- 2021-01-06 医疗器械分类数据 end
+
+--2020-01-07 update sr file name history
+update service_request_report service set file_name = (case when trans.transfer_name is not null then trans.transfer_name else service.file_name end) from (select file.id, replace(file.file_name, file.sub_file, transfer.mapped_name) transfer_name  from (select sr.id, event.event_type, sr.file_name, substring(sr.file_name, position('_' in sr.file_name)+1) sub_file from service_request_report sr, asset_lifecycle_event event where sr.alce_id = event.id and position('_' in sr.file_name) > 0) file, sr_name_transfer_mapping transfer where file.event_type = transfer.sr_type and upper(file.sub_file) = upper(transfer.file_name)) trans where service.id = trans.id
