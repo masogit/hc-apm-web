@@ -1,3 +1,42 @@
+--2020-01-07 消息订阅 增加'设备维修人'配置 start
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '1', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=1 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '2', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=2 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '3', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=3 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '4', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=4 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '5', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=5 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '6', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=6 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '7', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=7 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '8', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=8 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
+select '8', FALSE, '9', true, true, true, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=9 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '10', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=10 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '11', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=11 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '12', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=12 and role_position='deviceRepairer');
+--2020-01-07 end
+
 --2020-01-05 消息推送配置表修改 start
 update user_subscription_push set sub_status=true where menu_type='2' and role_position='FeManager';
 --2020-01-05 end
