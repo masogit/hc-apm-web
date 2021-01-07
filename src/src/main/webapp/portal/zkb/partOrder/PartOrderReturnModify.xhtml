@@ -13,7 +13,7 @@
             <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-cancel" onclick="PF('zkbPartOrderReturnModifyDlg').hide()"/>
             <p:dataTable id="zkbPoReturnModifyList" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModifyList}" var="item"
                          widgetVar="zkbPoReturnModifyList" selectionMode="single"  selection="#{zkbPartOrderAuditController.zkbPartOrderReturnModify}"
-                         lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
+                         lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.returnDate}"
                          paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
                 <p:ajax event="rowSelect" update="editReturnButton :zkbModifyForm"/>
 
@@ -108,7 +108,9 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">归还日期*</label>
-                        <p:calendar timeZone="GMT+8"  mode="inline" id="returnDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModify.returnDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
+                        <!--<p:calendar timeZone="GMT+8"  mode="inline" id="returnDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModify.returnDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>-->
+                        <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModify.returnDate}" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">备注</label>

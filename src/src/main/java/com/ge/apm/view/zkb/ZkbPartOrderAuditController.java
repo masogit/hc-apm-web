@@ -748,6 +748,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     //region 关单修改归还数据
     public void preReturnModifyEdit(){
+        zkbPartOrderReturnModify = null;
         zkbPartOrderReturnModifyList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
         partNoList = new ArrayList<>();
         orderNoList = new ArrayList<>();
