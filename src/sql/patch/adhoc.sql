@@ -97,7 +97,8 @@ INSERT INTO "public"."zone_mgr_info" VALUES (3, '2020-12-24 15:58:30.137758', '�
 -- 2021-01-05 zone_manager数据 end
 
 -- 2021-01-06 医疗器械分类数据 start
-INSERT INTO "public"."sys_auth_group" ("uid", "name", "parent_uid", "encoded", "classification_code") VALUES ('0490821da8a34708b3a3872470479aee', '医疗设备', '', '01', '01');
+delete from "public"."sys_auth_group";
+INSERT INTO "public"."sys_auth_group" ("uid", "name", "parent_uid", "encoded", "classification_code") VALUES ('0490821da8a34708b3a3872470479aee', '医疗设备', null, '01', '01');
 INSERT INTO "public"."sys_auth_group" ("uid", "name", "parent_uid", "encoded", "classification_code") VALUES ('2208968c7cd947d2810f9a049472219e', '有源手术器械', '0490821da8a34708b3a3872470479aee', '01-01', '01');
 INSERT INTO "public"."sys_auth_group" ("uid", "name", "parent_uid", "encoded", "classification_code") VALUES ('5fc5b6fa57a946d389a90697c19dde70', '超声手术设备及附件', '2208968c7cd947d2810f9a049472219e', '01-01-0101', '01');
 INSERT INTO "public"."sys_auth_group" ("uid", "name", "parent_uid", "encoded", "classification_code") VALUES ('d4ca417c33b64095b1403632f3394480', '超声手术设备', '5fc5b6fa57a946d389a90697c19dde70', '01-01-0101-010101', '0101');
