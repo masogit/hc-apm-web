@@ -60,6 +60,14 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="#{msg.AssetArrivalListBusinessAckDate}" sortBy="#{item.businessAckDate}" filterBy="#{item.businessAckDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText widgetVar="varFilterBusinessAckDate" value="#{assetArrivedItemsController.arrivalFormatTime}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.businessAckDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
                         <p:column headerText="#{msg.functionType}" sortBy="#{item.arrivalList.functionType}" filterBy="#{item.arrivalList.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.functionType}"/>
                         </p:column>
