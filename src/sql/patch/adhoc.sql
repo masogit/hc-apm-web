@@ -1,3 +1,42 @@
+--2020-01-07 消息订阅 增加'设备维修人'配置 start
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '1', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=1 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '2', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=2 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '3', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=3 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '4', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=4 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '5', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=5 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '6', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=6 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '7', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=7 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '8', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=8 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
+select '8', FALSE, '9', true, true, true, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=9 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '10', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=10 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '11', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=11 and role_position='deviceRepairer');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '8', FALSE, '12', true, false, 'deviceRepairer'
+where not exists (select 1 from user_subscription_push where menu_type=12 and role_position='deviceRepairer');
+--2020-01-07 end
+
 --2020-01-05 消息推送配置表修改 start
 update user_subscription_push set sub_status=true where menu_type='2' and role_position='FeManager';
 --2020-01-05 end
@@ -1465,3 +1504,6 @@ INSERT INTO sys_auth_group VALUES ('a6d24ce1cda144ae9cd07e220c8547e0', '医用�
 INSERT INTO sys_auth_group VALUES ('9a4bb9dc01984fb3b7ee199ad82cb644', '生物安全柜', 'a6d24ce1cda144ae9cd07e220c8547e0', '01-22-2216-221601', '', '1601');
 INSERT INTO sys_auth_group VALUES ('f2c6080c832d47c49f645b35c171fee7', '洁净工作台', 'a6d24ce1cda144ae9cd07e220c8547e0', '01-22-2216-221602', '', '1602');
 -- 2021-01-06 医疗器械分类数据 end
+
+--2020-01-07 update sr file name history
+update service_request_report service set file_name = (case when trans.transfer_name is not null then trans.transfer_name else service.file_name end) from (select file.id, replace(file.file_name, file.sub_file, transfer.mapped_name) transfer_name  from (select sr.id, event.event_type, sr.file_name, substring(sr.file_name, position('_' in sr.file_name)+1) sub_file from service_request_report sr, asset_lifecycle_event event where sr.alce_id = event.id and position('_' in sr.file_name) > 0) file, sr_name_transfer_mapping transfer where file.event_type = transfer.sr_type and upper(file.sub_file) = upper(transfer.file_name)) trans where service.id = trans.id
