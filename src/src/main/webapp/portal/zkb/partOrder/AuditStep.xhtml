@@ -860,7 +860,9 @@
             </h:form>
             <ui:include src="PartOrderReturn.xhtml"/>
             <ui:include src="historyData.xhtml"/>
-            <ui:include src="PartOrderReturnModify.xhtml"/>
+            <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'Complete'}">
+                <ui:include src="PartOrderReturnModify.xhtml"/>
+            </c:if>
             <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
 
                 <h:form id="zkbConfigForm">
