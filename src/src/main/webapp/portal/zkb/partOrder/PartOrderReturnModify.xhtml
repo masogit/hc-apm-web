@@ -51,7 +51,7 @@
 
         <h:form id="zkbModifyForm">
             <p:fieldset legend="归还明细修改" rendered="#{not empty zkbPartOrderAuditController.zkbPartOrderReturnModify}">
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">运单号*</label>
                         <p:inputText id="waybillNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModify.waybillNo}" required="true" requiredMessage="#{msg.zkbPartOrder_waybillNo} #{msg.ValidationRequire}" />
@@ -64,6 +64,7 @@
                             <f:selectItems value="#{zkbPartOrderAuditController.partNoList}" var="item" itemLabel="#{item.text}" itemValue="#{item.value}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">归还类型*</label>
                         <p:selectOneMenu id="returnType" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModify.returnType}" required="true" requiredMessage="归还类型不能为空" >
@@ -108,9 +109,8 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">归还日期*</label>
-                        <!--<p:calendar timeZone="GMT+8"  mode="inline" id="returnDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModify.returnDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>-->
-                        <p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModify.returnDate}" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
-
+                        <p:calendar timeZone="GMT+8"  mode="inline" id="returnDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModify.returnDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
+                        <!--<p:calendar timeZone="GMT+8"  id="endDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModify.returnDate}" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>-->
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">备注</label>
