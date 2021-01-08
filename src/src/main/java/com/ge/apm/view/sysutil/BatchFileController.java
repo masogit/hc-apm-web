@@ -9,6 +9,7 @@ import com.ge.apm.dao.ImportFilesRepository;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.ImportFiles;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.FileScanExportService;
@@ -67,9 +68,18 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     private StreamedContent exportFile;
 
+    private StreamedContent exportTemplate;
+
     MicroServiceUtil microServiceUtil;
 
     private List<I18nMessage> getI18nByBatchFileType;
+
+    boolean templateDisabled = true;
+
+    public boolean isTemplateDisabled() {
+        return templateDisabled;
+    }
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ImportFilesRepository.class);
@@ -206,6 +216,10 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         this.fileType = ImportFiles.ImportFileType.ColdHeaderExcel.toString();
     }
 
+    public void exportTemplate() {
+        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/admin/batchFile/"+fileType+".xlsx");
+        exportTemplate = new DefaultStreamedContent(stream, "application/vnd.ms-excel", fileType+".xlsx");
+    }
     public void exportData() {
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/admin/batchFile/APM_ImportFiles_Template.xlsx");
@@ -232,6 +246,11 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
     }
 
     public void setFileType(String fileType) {
+        if(CustomConfigConstant.getTemplateEnableList().contains(fileType)){//全量ib台账信息导入
+            this.templateDisabled=false;
+        }else{
+            this.templateDisabled=true;
+        }
         this.fileType = fileType;
     }
 
@@ -241,6 +260,14 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     public void setExportFile(StreamedContent exportFile) {
         this.exportFile = exportFile;
+    }
+
+    public StreamedContent getExportTemplate() {
+        return exportTemplate;
+    }
+
+    public void setExportTemplate(StreamedContent exportTemplate) {
+        this.exportTemplate = exportTemplate;
     }
 
     public List<I18nMessage> getGamePlanBatchFileType() {
