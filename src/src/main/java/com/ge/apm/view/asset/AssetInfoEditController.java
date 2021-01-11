@@ -774,13 +774,13 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     private boolean checkDepartNumUniqueAssetInfo() {
-        List<Integer> hisData = dao.findIdByDepartNumAndTenantUID(selected.getDepartNum(), selected.getTenantUID());
+        List<String> hisData = dao.findIdByDepartNumAndTenantUID(selected.getDepartNum(), selected.getTenantUID());
         if(hisData.isEmpty()){
             return true;
         }
         //兼容老数据
-        for( Integer id:hisData){
-            if(id.equals(selected.getId())){
+        for( String uid:hisData){
+            if(uid.equals(selected.getUid())){
                 return true;
             }
         }
