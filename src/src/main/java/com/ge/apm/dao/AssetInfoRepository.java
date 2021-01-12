@@ -249,4 +249,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value="select *from asset_info where parent_asset_id = ?1",nativeQuery=true)
     List<AssetInfo> findChildAssets(Integer id);
+
+    @Query(value="select uid from asset_info where depart_num = ?1  and  tenant_uid = ?2  and is_deleted = false ",nativeQuery=true)
+    List<String> findIdByDepartNumAndTenantUID(String departNum,String tenantUID);
+
 }
