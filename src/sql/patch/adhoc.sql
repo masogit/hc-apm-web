@@ -1742,3 +1742,6 @@ INSERT INTO "public"."audit_default_link" ("id", "created_by", "created_date", "
 INSERT INTO "public"."audit_default_link" ("id", "created_by", "created_date", "hospital_uid", "institution_uid", "last_modified_by", "last_modified_date", "site_uid", "tenant_uid", "group_id", "link", "name", "order_num") VALUES ('93', 'superadmin', '0001-01-01 00:00:00', '', '', '', NULL, '', '', '73', '/geapm/portal/nurseSite/maintainExportMain.xhtml', '日常检查报表', '61');
 INSERT INTO "public"."audit_default_link" ("id", "created_by", "created_date", "hospital_uid", "institution_uid", "last_modified_by", "last_modified_date", "site_uid", "tenant_uid", "group_id", "link", "name", "order_num") VALUES ('94', 'superadmin', '0001-01-01 00:00:00', '', '', '', NULL, '', '', '73', '/geapm/portal/nurseSite/assetOptRecordList.xhtml', '开关机登记', '62');
 -- 2021-01-11 质控评审链接初始化 end
+
+-- 2021-01-13 更新权重
+UPDATE zkb_key_behavior_index_config set paste_quick_response_rate_full_score = 20 where id = '1                               ';
