@@ -37,12 +37,12 @@
                             <p:ajax update="zkbKeyBehaviorIndexEditForm" listener="#{zkbKeyBehaviorIndexController.calculateScore}"/>
                         </p:inputNumber>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}</label>
-                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}" maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.intactPartReturnRateFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}#{msg.ValidationRequire}">
-                            <p:ajax update="zkbKeyBehaviorIndexEditForm" listener="#{zkbKeyBehaviorIndexController.calculateScore}"/>
-                        </p:inputNumber>
-                    </h:panelGroup>
+<!--                    <h:panelGroup>-->
+<!--                        <label class="label">#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}</label>-->
+<!--                        <p:inputNumber disabled="#{!userContextService.zkbAdmin}" maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.intactPartReturnRateFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}#{msg.ValidationRequire}">-->
+<!--                            <p:ajax update="zkbKeyBehaviorIndexEditForm" listener="#{zkbKeyBehaviorIndexController.calculateScore}"/>-->
+<!--                        </p:inputNumber>-->
+<!--                    </h:panelGroup>-->
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore}</label>
                         <p:inputNumber disabled="#{!userContextService.zkbAdmin}"   maxValue="100" minValue="0" decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.pasteQuickResponseRateFullScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore}#{msg.ValidationRequire}">
@@ -80,17 +80,19 @@
                         </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
+                    </h:panelGroup>
+                    <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_partReturnScore}</label>
                         <p:inputNumber disabled="true" maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.partReturnScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_partReturnScore}#{msg.ValidationRequire}">
                             <p:ajax update="zkbKeyBehaviorIndexEditForm"/>
                         </p:inputNumber>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.zkbKeyBehaviorIndex_intactPartReturnRateScore}</label>
-                        <p:inputNumber disabled="true"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.intactPartReturnRateScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateScore}#{msg.ValidationRequire}">
-                            <p:ajax update="zkbKeyBehaviorIndexEditForm"/>
-                        </p:inputNumber>
-                    </h:panelGroup>
+<!--                    <h:panelGroup>-->
+<!--                        <label class="label">#{msg.zkbKeyBehaviorIndex_intactPartReturnRateScore}</label>-->
+<!--                        <p:inputNumber disabled="true"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.intactPartReturnRateScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateScore}#{msg.ValidationRequire}">-->
+<!--                            <p:ajax update="zkbKeyBehaviorIndexEditForm"/>-->
+<!--                        </p:inputNumber>-->
+<!--                    </h:panelGroup>-->
                     <h:panelGroup>
                         <label class="label">#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateScore}</label>
                         <p:inputNumber disabled="true"  maxValue="100" minValue="0"  decimalPlaces="0" value="#{zkbKeyBehaviorIndexController.selected.pasteQuickResponseRateScore}"  required="true" requiredMessage="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateScore}#{msg.ValidationRequire}">
