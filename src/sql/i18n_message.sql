@@ -3821,11 +3821,12 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType','FourHundredsTeam','400团队','Four hundreds team',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType','Supplier','供应商','Supplier',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType','GEAdmin','GEAdmin','GEAdmin',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_machineStatus','functionLimit','限制功能使用','Function limit',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_machineStatus','stopUsing','停机','Stop using',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_isSubtractTotalStatus','true','是','YES',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_isSubtractTotalStatus','false','否','NO',NULL,-1);
-INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_ZkbFePartOrder','GEFE维修申请','Apply manually',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_ZkbFePartOrder','GEFE 维修申请','Apply manually',NULL,	-1	);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_systemId','SystemID/厂商报修ID','SystemID/厂商报修ID',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_location','当前位置','Location',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_reportDate','报修时间','Report date',NULL,-1);
@@ -3858,7 +3859,12 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_assetNo','备件号','Asset no',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_assetDescription','备件描述','Asset description',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_assetQty','备件数量','Asset qty',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_orderAnnotation','订单标注','Order annotation',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_orderNoa','Order#','Order#',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_assetPrice','价格','Asset price',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_spareParts','备件','Asset parts',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_returnType','归还类型','Asset parts',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_returnDate','归还时间','Return time',NULL,-1);
+
 
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_systemIdError','错误：SystemID/厂商报修ID不能为空','错误：SystemID/厂商报修ID can not be null',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_contractOverdueError','错误：合同已到期','Error:Invalid contract',NULL,	-1	);
@@ -3866,10 +3872,13 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_contractCannotBeNull','错误：合同不可为空','Error:contract can not be null',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_contractSystemIdError','错误：SystemID/厂商报修ID和合同不一致','Error:SystemID/厂商报修ID and contract not consist',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_contractSupportTimesCannotBeZero','错误：合同剩余名额不足','Error:contract support times can not be zero',NULL,	-1	);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_fePartOrderType','ManMade','人工申请','manmade',NULL,-1);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_sparePartListError','错误：申请配件不能为空','Spare part list can not be null',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_assetFieldError','错误：申请列表信息不完整','Spare part list infomation not right',NULL,	-1	);
+
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','WaitingAssignment','待租户审批','Waiting tenant assignment',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','WaitingApm','待400团队回填APM','Waiting 400 team full apm',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','WaitingGEAdmin','待GE Admin归还','Waiting GE Admin return',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','Complete','完成','Complete',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_status','Requested','已申请','Requested',NULL,-1);
