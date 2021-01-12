@@ -1204,6 +1204,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderReturnRepository.save(zkbPartOrderReturnModifyList);
 
         //3.名额修改
+        System.out.println("===========================================");
+        System.out.println(nowBackTotal+"|"+oldBackTotal+"|"+ce);
         subReturnQty(zkbContract,zkbPartOrder,ce);
     }
 
