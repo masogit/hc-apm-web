@@ -1724,26 +1724,27 @@ UPDATE zkb_key_behavior_index_config set paste_quick_response_rate_full_score = 
 
 
 -- svc_engine_logistics_status
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('1', 'Order not booked', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('2', 'Pending CS', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('3', 'Warehouse denial', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('4', 'Manual Hold', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('5', 'OE Error', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('6', 'On Hold', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('7', 'ITC screening in progress', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('8', 'Pending IR completion', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('9', 'Pending Triage', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('10', 'Pick Release Pending', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('11', 'Release to Supplier', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('12', 'Awaiting Pick', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('16', 'Dropship complete', 'shipping', '发货中');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('17', 'Shipped', 'shipping', '发货中');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('18', 'Delivered', 'arrivaled', '送达');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('19', 'Closed', 'arrivaled', '送达');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('15', 'Shipped not consigned', 'shipping', '发货中');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('14', 'Ship from Oversea', 'shipping', '发货中');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('13', 'Part on shipping line', 'deliveredPending', '待发货');
-INSERT INTO svc_engine_logistics_status('id', 'decoded_status', 'local_status_code', 'local_status_name') VALUES ('21', 'Rsvd no pick', 'deliveredPending', '待发货');
+
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('1', 'Order not booked', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('2', 'Pending CS', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('3', 'Warehouse denial', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('4', 'Manual Hold', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('5', 'OE Error', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('6', 'On Hold', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('7', 'ITC screening in progress', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('8', 'Pending IR completion', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('9', 'Pending Triage', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('10', 'Pick Release Pending', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('11', 'Release to Supplier', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('12', 'Awaiting Pick', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('16', 'Dropship complete', 'shipping', '发货中');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('17', 'Shipped', 'shipping', '发货中');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('18', 'Delivered', 'arrivaled', '送达');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('19', 'Closed', 'arrivaled', '送达');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('15', 'Shipped not consigned', 'shipping', '发货中');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('14', 'Ship from Oversea', 'shipping', '发货中');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('13', 'Part on shipping line', 'deliveredPending', '待发货');
+INSERT INTO svc_engine_logistics_status(id, decoded_status, local_status_code, local_status_name) VALUES ('21', 'Rsvd no pick', 'deliveredPending', '待发货');
 
 -- org_info  是否显示物流信息
 update  org_info o set display_svc = '0';
