@@ -1952,3 +1952,7 @@ update org_info set display_svc = '1' where hospital_ucmid = 'U-1K7248';
 update org_info set display_svc = '1' where hospital_ucmid = 'CQ00131';
 update org_info set display_svc = '1' where hospital_ucmid = 'CQ00108';
 update org_info set display_svc = '1' where hospital_ucmid = 'CQ00140';
+
+-- 初始化 audit_file表新加字段by_admin
+update audit_file set by_admin= true where id in (select id from audit_default_file);
+update audit_file set by_admin= false where id not in (select id from audit_default_file);
