@@ -58,7 +58,7 @@ public class CustomConfigConstant {
                 "pmOwnerName", "pmOwnerTel", "measuringOwner",
                 "siteUID", "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "assetDeptName",
                 "manufacture", "makerShortName",
-                "deviceName", "registrationNo", "vendor", "vendorTel", " ", "assetCode68","medicalApparatusClassification","assetGroup",
+                "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","medicalApparatusClassification","assetGroup",
                 "assetGroupSecondary", "parentAssetId", "functionGrade", "repairForm", "functionType", "serialNum",
                 "systemId", "nationalStandardCode", "financingNum", "barcode", "modalityId", "purchasePrice",
                 "salvageValue", "lifecycle", "depreciationMethod", "manufactDate", "purchaseDate", "arriveDate",
@@ -242,7 +242,7 @@ public class CustomConfigConstant {
      * @return
      */
     public static List<String> getAssetsDisabledExportFields() {
-        return Arrays.asList("orgPath", "assetLocation");
+        return Arrays.asList("orgPath", "assetLocation" ,"medicalApparatusClassification");
     }
 
     public static List<String> getAssetsImportantFieldsAll() {
