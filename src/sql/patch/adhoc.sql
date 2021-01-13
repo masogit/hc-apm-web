@@ -55,7 +55,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('menuType','11','应用培训状态','AppliedTrainingStatus',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('menuType','12','应用培训报告上传','ApplicationTrainingReportUpload',NULL,-1);
 -- 2020-12-28 end
-da
+
 -- 2021-01-05 zone_manager数据 start
 INSERT INTO zone_mgr_info(region, igm, igm_sso, zone, zone_mgr, zone_mgr_sso,create_time, season_target) VALUES ( 'North', '张章', '305001795', '北京', '陈伟', '305010998',now(),null);
 INSERT INTO zone_mgr_info(region, igm, igm_sso, zone, zone_mgr, zone_mgr_sso,create_time, season_target) VALUES ( 'North', '张章', '305001795', '河北', '王冰', '305007584',now(),null);
