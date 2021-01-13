@@ -1659,6 +1659,7 @@ update service_request_report service set file_name = (case when trans.transfer_
 --2020-01-07 update sr file name history
 
 -- 2021-01-11 质控评审链接初始化 start
+delete from "public"."audit_default_link";
 INSERT INTO "public"."audit_default_link" ("id", "created_by", "created_date", "hospital_uid", "institution_uid", "last_modified_by", "last_modified_date", "site_uid", "tenant_uid", "group_id", "link", "name", "order_num") VALUES ('33', 'superadmin', '0001-01-01 00:00:00', '', '', '', NULL, '', '', '51', '/geapm/portal/asset/info/AssetList.xhtml', '设备档案基本信息', '1');
 INSERT INTO "public"."audit_default_link" ("id", "created_by", "created_date", "hospital_uid", "institution_uid", "last_modified_by", "last_modified_date", "site_uid", "tenant_uid", "group_id", "link", "name", "order_num") VALUES ('34', 'superadmin', '0001-01-01 00:00:00', '', '', '', NULL, '', '', '51', '/geapm/portal/asset/contract/ContractList.xhtml', '设备合同管理', '2');
 INSERT INTO "public"."audit_default_link" ("id", "created_by", "created_date", "hospital_uid", "institution_uid", "last_modified_by", "last_modified_date", "site_uid", "tenant_uid", "group_id", "link", "name", "order_num") VALUES ('35', 'superadmin', '0001-01-01 00:00:00', '', '', '', NULL, '', '', '51', '/geapm/portal/asset/info/AssetTerminateEntryList.xhtml', '报废资产管理', '3');
