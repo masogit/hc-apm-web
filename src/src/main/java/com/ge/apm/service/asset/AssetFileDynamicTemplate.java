@@ -337,7 +337,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     }
 
     private String getRangeName(String fieldName) {
-        String normalizedName = fieldName.replaceAll("[\\（\\）]", "_").replaceAll(" ","_").replaceAll("\\?","_") + WebUtil.getMessage("List");
+        String normalizedName = fieldName.replaceAll("[\\（\\）]", "_").replaceAll("[\\(\\)]", "_").replaceAll(" ","_").replaceAll("\\?","_") + WebUtil.getMessage("List");
         return normalizedName;
     }
 
