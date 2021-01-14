@@ -109,7 +109,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 initZknPartCat(c.getStartDate());
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending","CS");
+                zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending",ZkbPartOrder.CONFIG_US);
             }
             calcRemainQty();
             orderAnnotationChange();
@@ -334,9 +334,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) >-1){
-                    zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameContains("TechnicalPending","CS",ZkbPartOrder.DATA_TYPE_TEST);
+                    zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameContains("TechnicalPending",ZkbPartOrder.CONFIG_US,ZkbPartOrder.DATA_TYPE_TEST);
                 }else{
-                    zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameIsNotContaining("TechnicalPending","CS",ZkbPartOrder.DATA_TYPE_TEST);
+                    zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameIsNotContaining("TechnicalPending",ZkbPartOrder.CONFIG_US,ZkbPartOrder.DATA_TYPE_TEST);
                 }
             }
             selected.setRegion(zkbContract.getRegion());
