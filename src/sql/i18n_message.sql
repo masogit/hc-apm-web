@@ -3966,23 +3966,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_203','体温测试值偏差大','体温测试值偏差大','',NULL,-1,16);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_203','其他','其他','',NULL,-1,99);
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','无创血压测量不出值','无创血压测量不出值','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','袖带不能充满气体','袖带不能充满气体','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','袖带管漏气','袖带管漏气','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','心电波形杂乱','心电波形杂乱','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','屏幕提示心电导联脱落','屏幕提示心电导联脱落','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','无法识别模块','无法识别模块','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','开机后黑屏','开机后黑屏','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','电源指示灯不亮','电源指示灯不亮','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','开机后反复重启','开机后反复重启','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','呼末二氧化碳值不准确','呼末二氧化碳值不准确','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','氧浓度值不准确','氧浓度值不准确','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','麻醉气体MAC值不准','麻醉气体MAC值不准','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','肌松测试不出值','肌松测试不出值','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','提示“SRAM Error ”','提示“SRAM Error ”','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','调节时间不能保存','调节时间不能保存','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','体温测试值偏差大','体温测试值偏差大','',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('lcsFaultType_203','其他','其他','',NULL,-1);
-
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','CoilOpportunityImage','MR线圈图片上传','Coil Opportunity Image',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','cataLog','货号','cata Log',NULL,-1);
