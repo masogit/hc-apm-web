@@ -1,11 +1,6 @@
 package com.ge.apm.service.uaa;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -37,6 +32,8 @@ public class TenantInfoConfigService {
 	public static final String EXCELLENT_ENJOYMENT_B="excellentEnjoymentB";//优享B
 	public static final String OPS_VERSION ="opsVersion";//OPS版
 	public static final String ZKB_VERSION ="ZKBVersion";//智康宝版
+	public static final String AUDIT_VERSION ="audit";//质控评审版
+	public static final String SWAP_CENTER_VERSION ="swapCenter";//质控评审版
 	public static final String TREE_TYPE = "tenantConfigTree";
 	private static final String MSG_TYPE = "tenantVersionMenu";
 	private String edition;
@@ -153,7 +150,11 @@ public class TenantInfoConfigService {
 		}
 		for (int i = 0; i < menuList.size(); ++i) {
 			TenantInfoConfigItem tempItem = menuList.get(i);
-			tempItem.setValue(true);
+			if(edition.equals(AUDIT_VERSION)||edition.equals(SWAP_CENTER_VERSION)){
+				resetAuditOrSwapCenterVersion(tempItem);
+			}else{
+				tempItem.setValue(true);
+			}
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
 				//do nothing
@@ -308,8 +309,30 @@ public class TenantInfoConfigService {
 				}
 			}
 		}
+
 		if (root != null) {
 			buildRoot();
+		}
+	}
+
+	void resetAuditOrSwapCenterVersion(TenantInfoConfigItem item){
+		if(edition.equals(AUDIT_VERSION)){
+			if(Arrays.asList("audit","config","config.org","config.user").contains(item.getKey())){
+				item.setValue(true);
+			}else{
+				item.setValue(false);
+			}
+		}
+
+		if(edition.equals(SWAP_CENTER_VERSION)){
+			if(Arrays.asList("assetAdjust","assetAdjust.borrowApply","assetAdjust.borrowAccept","assetAdjust.returnApply","assetAdjust.returnAccept",
+					"assetAdjust.batch","assetAdjust.cost","assetAdjust.stock","assetAdjust.config","assetAdjust.nameConfig","asset","asset.create","asset.scrap",
+					"asset.info","asset.batchImportData","asset.inventory","asset.history","config","config.org","config.user","config.qrCode",
+						"config.qrCodeMgt","config.workFlow","config.custom").contains(item.getKey())){
+				item.setValue(true);
+			}else{
+				item.setValue(false);
+			}
 		}
 	}
 

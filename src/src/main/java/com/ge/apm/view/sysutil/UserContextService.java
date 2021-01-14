@@ -413,6 +413,11 @@ public class UserContextService implements Serializable {
      */
     ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
 
+    /**
+     * 获取 fe part order user config
+     */
+    ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
+
     private Boolean flagIsHospitalUser = null;
     public boolean isHospitalUser(){
         if(flagIsHospitalUser!=null) return flagIsHospitalUser;
@@ -901,6 +906,16 @@ public class UserContextService implements Serializable {
             return false;
         List<ZkbPartOrderUserConfig>  zkbPartOrderUserConfig= this.zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(user.getLoginName(),"ClosePending");
         if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfig))
+            return true;
+        return false;
+    }
+
+    public boolean isZkbFeUserConfig() {
+        UserAccount user = getLoginUser();
+        if(StringUtils.isBlank(user.getLoginName()))
+            return false;
+        List<ZkbFePartOrderUserConfig>  zkbFePartOrderUserConfig= this.zkbFePartOrderUserConfigRepository.findByLoginName(user.getLoginName());
+        if(CollectionUtils.isNotEmpty(zkbFePartOrderUserConfig))
             return true;
         return false;
     }
