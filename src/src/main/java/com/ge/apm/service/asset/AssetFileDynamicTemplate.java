@@ -50,7 +50,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     private static final String SHEET_DYNAMIC_LIST_NAME = WebUtil.getMessage("DynamicList");
     private static final String SHEET_STATIC_LIST_NAME = WebUtil.getMessage("StaticList");
     private static final String SHEET_ASSET_GROUP_SECONDAY_LEVEL_NAME = WebUtil.getMessage("EquipmentClassificationClassII");
-    private static final String SHEET_FUNCTION_TYPE_SECONDAY_LEVEL_NAME = WebUtil.getMessage("MedicalDeviceSubclassification");
+    private static final String SHEET_FUNCTION_TYPE_SECONDAY_LEVEL_NAME = "医疗器械子分类";
     public static final int ASSET_FORMULA_DEFAULT_MAX_ROWS = 20000;
 
 //    public static String[] columnTitles = {
@@ -71,7 +71,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
     {
         //we need to use formula for 2nd level dependant dropdown list, name range define is ok for others
         columnFormulas = new HashMap<>();
-        columnFormulas.put("医疗器械子分类", "=OFFSET(INDIRECT(\"医疗器械子分类!$C$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),医疗器械子分类!A:A,0)),0,0,1,INDIRECT(\"医疗器械子分类!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),医疗器械子分类!A:A,0)))");
+        columnFormulas.put("医疗器械子分类（旧）", "=OFFSET(INDIRECT(\"医疗器械子分类!$C$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),医疗器械子分类!A:A,0)),0,0,1,INDIRECT(\"医疗器械子分类!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),医疗器械子分类!A:A,0)))");
         columnFormulas.put("设备分类2级", "=OFFSET(INDIRECT(\"设备分类2级!$C$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),设备分类2级!A:A,0)),0,0,1,INDIRECT(\"设备分类2级!$B$\" & MATCH(OFFSET(INDIRECT(ADDRESS(ROW(), COLUMN())),0,-1),设备分类2级!A:A,0)))");
 
     }
