@@ -326,7 +326,7 @@ public class TenantInfoConfigService {
 
 		if(edition.equals(SWAP_CENTER_VERSION)){
 			if(Arrays.asList("assetAdjust","assetAdjust.borrowApply","assetAdjust.borrowAccept","assetAdjust.returnApply","assetAdjust.returnAccept",
-					"assetAdjust.batch","assetAdjust.cost","assetAdjust.stock","assetAdjust.config","assetAdjust.nameConfig","asset.create","asset.scrap",
+					"assetAdjust.batch","assetAdjust.cost","assetAdjust.stock","assetAdjust.config","assetAdjust.nameConfig","asset","asset.create","asset.scrap",
 					"asset.info","asset.batchImportData","asset.inventory","asset.history","config","config.org","config.user","config.qrCode",
 						"config.qrCodeMgt","config.workFlow","config.custom").contains(item.getKey())){
 				item.setValue(true);
