@@ -1430,10 +1430,10 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','newRepair','新增报修','New Repair',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','createrepair','新增报修','New Repair',NULL,-1);
 
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','functionGroup','医疗器械分类（旧）','Medical Device Classification',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','medicalInstrumentClassification','医疗器械分类（旧）','Medical Device Classification',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','assetCode68','医疗器械子分类（旧）','Medical Device Subclassification',NULL,-1);
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','medicalInstrumentSubclassification','医疗器械子分类（旧）','Medical Device Subclassification',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','functionGroup','医疗器械分类(旧)','Medical Device Classification',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','medicalInstrumentClassification','医疗器械分类(旧)','Medical Device Classification',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','assetCode68','医疗器械子分类(旧)','Medical Device Subclassification',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','medicalInstrumentSubclassification','医疗器械子分类(旧)','Medical Device Subclassification',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','parentAsset','主设备','Parent Equipment',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','PmOrderRule','保养规则','PM Rule',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','maintain.rule','保养规则','PM Rule',NULL,-1);
@@ -1977,8 +1977,8 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'RegistrationNumber', '注册证号', 'Registration Number ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Vendor', '供应商', 'Vendor ', NULL, '-1');
 
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MedicalDeviceClassification', '医疗器械分类（旧）', 'Medical Device Classification ', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MedicalDeviceSubclassification', '医疗器械子分类（旧）', 'Medical Device Subclassification ', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MedicalDeviceClassification', '医疗器械分类(旧)', 'Medical Device Classification ', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MedicalDeviceSubclassification', '医疗器械子分类(旧)', 'Medical Device Subclassification ', NULL, '-1');
    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'medicalApparatusClassification', '医疗器械分类', 'Medical Apparatus Classification ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentClassification', '设备分类', 'Equipment Classification ', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'FunctionGrade', '功能等级', 'Function Grade ', NULL, '-1');
@@ -2429,7 +2429,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'EquipmentStandardName', '设备标准名称', 'Equipment Standard Name', NULL, '-1');
     --INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'RegistrationNumber', '注册证号', 'Registration Number', NULL, '-1');
     --INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MedicalDeviceClassification', '医疗器械分类', 'Medical Device Classification', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MedicalDeviceSubclassification', '医疗器械子分类（旧）', 'Medical Device Subclassification', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MedicalDeviceSubclassification', '医疗器械子分类(旧)', 'Medical Device Subclassification', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'EquipmentClassificationClassII', '设备分类2级', 'Equipment Classification-Class II', NULL, '-1');
     --INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'FunctionGrade', '功能等级', 'Function Grade', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ManufacturerSerialNumber', '制造商序列号', 'Manufacturer Serial Number', NULL, '-1');
@@ -3163,8 +3163,8 @@
     --INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentSerialNumber_xlsx', '品牌', 'Brand', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentClassification_xlsx', '设备分类', 'EquipmentClassification', NULL, '-1');
 
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MedicalDeviceClassification_xlsx', '医疗器械分类（旧）', 'MedicalDeviceClassification', NULL, '-1');
-    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MedicalDeviceSubclassification_xlsx', '医疗器械子分类（旧）', 'MedicalDeviceSubclassification', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MedicalDeviceClassification_xlsx', '医疗器械分类(旧)', 'MedicalDeviceClassification', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MedicalDeviceSubclassification_xlsx', '医疗器械子分类(旧)', 'MedicalDeviceSubclassification', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EquipmentModel_xlsx', '设备型号', 'EquipmentModel', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CurrentOwner_xlsx', '当前责任人', 'CurrentOwner', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CurrentStep_xlsx', '当前步骤', 'CurrentStep', NULL, '-1');
