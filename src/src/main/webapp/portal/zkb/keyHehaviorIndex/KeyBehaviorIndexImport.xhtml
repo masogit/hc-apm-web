@@ -32,7 +32,7 @@
 
         <div class="ui-g-12 card">
             <h:form id="errorDataListForm">
-                <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false"></p:messages>
+                <p:messages id="messages" showDetail="false" closable="false" autoUpdate="false"></p:messages>
                 <p:fieldset  legend="#{msg.ImportFailureData}">
                     <p:dataTable id="errorDatalist" rendered="#{not empty zkbKeyBehaviorIndexController.errorKbiList}" value="#{zkbKeyBehaviorIndexController.errorKbiList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
