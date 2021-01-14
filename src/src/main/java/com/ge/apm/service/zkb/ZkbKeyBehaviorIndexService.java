@@ -27,7 +27,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author 503202755 2020/9/23
@@ -238,9 +237,13 @@ public class ZkbKeyBehaviorIndexService {
         if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
         {
             series1.setLabel(zkbKeyBehaviorIndexList.get(0).getTenantName());
-            zkbKeyBehaviorIndexList.forEach(item->{
+//            zkbKeyBehaviorIndexList.forEach(item->{
+//                series1.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
+//            });
+            for(ZkbKeyBehaviorIndex item:zkbKeyBehaviorIndexList)
+            {
                 series1.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
-            });
+            }
             showNonData=false;
         }else
             {
@@ -252,9 +255,13 @@ public class ZkbKeyBehaviorIndexService {
         series2.setLabel("平均分数");
         if(CollectionUtils.isNotEmpty(zkbAverageKeyBehaviorIndexList))
         {
-            zkbAverageKeyBehaviorIndexList.forEach(item->{
+//            zkbAverageKeyBehaviorIndexList.forEach(item->{
+//                series2.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
+//            });
+            for(ZkbKeyBehaviorIndex item:zkbAverageKeyBehaviorIndexList)
+            {
                 series2.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
-            });
+            }
             showNonData=false;
         }else
         {
@@ -312,8 +319,8 @@ public class ZkbKeyBehaviorIndexService {
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScore"),zeyBehaviorIndex.getTotalScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnFullScore"),zeyBehaviorIndex.getPartReturnFullScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnScore"),zeyBehaviorIndex.getPartReturnScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_intactPartReturnRateFullScore"),zeyBehaviorIndex.getIntactPartReturnRateFullScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_intactPartReturnRateScore"),zeyBehaviorIndex.getIntactPartReturnRateScore());
+//            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_intactPartReturnRateFullScore"),zeyBehaviorIndex.getIntactPartReturnRateFullScore());
+//            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_intactPartReturnRateScore"),zeyBehaviorIndex.getIntactPartReturnRateScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeFullScore"),zeyBehaviorIndex.getSatisfactoryDegreeFullScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeScore"),zeyBehaviorIndex.getSatisfactoryDegreeScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_apmBillingRateFullScore"),zeyBehaviorIndex.getApmBillingRateFullScore());
@@ -469,14 +476,19 @@ public class ZkbKeyBehaviorIndexService {
     public void calculateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<ZkbContract> zkbContractList)
     {
         //取合同ID
-        List<String> contractIdList = zkbContractList.stream().map(p -> p.getId()).collect(Collectors.toList());
+//        List<String> contractIdList = zkbContractList.stream().map(p -> p.getId()).collect(Collectors.toList());
+        List<String> contractIdList = new ArrayList<>();
+        for(ZkbContract item:zkbContractList)
+        {
+            contractIdList.add(item.getId());
+        }
         LocalDateTime localDateTime = zkbKeyBehaviorIndex.getKbiDate().toInstant()
                 .atZone( ZoneId.systemDefault() )
                 .toLocalDateTime();
         Date firstday = this.firstDayOnMonth(localDateTime);
         Date lastday = this.lastDayOnMonth(localDateTime);
         this.calculatePartReturnScore(zkbKeyBehaviorIndex,contractIdList,firstday,lastday);
-        this.calculateIntactPartReturnRateScore(zkbKeyBehaviorIndex,contractIdList);
+//        this.calculateIntactPartReturnRateScore(zkbKeyBehaviorIndex,contractIdList);
         Integer totalIbNumber = this.calculatePasteQuickResponseRateScore(zkbKeyBehaviorIndex,contractIdList);
         this.calculateApmBillingRateScore(zkbKeyBehaviorIndex,contractIdList,totalIbNumber,firstday,lastday);
     }
@@ -537,12 +549,23 @@ public class ZkbKeyBehaviorIndexService {
             zkbKeyBehaviorIndex.setPartReturnScore(zkbKeyBehaviorIndex.getPartReturnFullScore());
             return ;
         }
-        Integer returnQty = zkbPartOrderList.stream().filter(p -> p.getReturnQty()!=null).mapToInt(ZkbPartOrder::getReturnQty).sum();
-        if(returnQty==null)
+        Integer returnQty = new Integer(0);
+        for(ZkbPartOrder item:zkbPartOrderList)
         {
-            returnQty = new Integer(0);
+            if(item.getReturnQty()==null) continue;
+            returnQty=returnQty+item.getReturnQty();
         }
-        List<String> partOrderIdList = zkbPartOrderList.stream().map(p -> p.getId()).collect(Collectors.toList());
+//        Integer returnQty = zkbPartOrderList.stream().filter(p -> p.getReturnQty()!=null).mapToInt(ZkbPartOrder::getReturnQty).sum();
+//        if(returnQty==null)
+//        {
+//            returnQty = new Integer(0);
+//        }
+//        List<String> partOrderIdList = zkbPartOrderList.stream().map(p -> p.getId()).collect(Collectors.toList());
+        List<String> partOrderIdList = new ArrayList<>();
+        for(ZkbPartOrder item:zkbPartOrderList)
+        {
+            partOrderIdList.add(item.getId());
+        }
         Integer returnQty1 = this.zkbPartOrderReturnRepository.fetchQty(partOrderIdList,firstday,lastday1);
         if(returnQty1==null)
         {
@@ -560,42 +583,42 @@ public class ZkbKeyBehaviorIndexService {
         return;
     }
 
-    /**
-     * 计算配件好还率得分
-     * @param zkbKeyBehaviorIndex
-     * @param contractIdList 合同ID list
-     */
-    private void calculateIntactPartReturnRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,
-                                                    List<String> contractIdList)
-    {
-        Integer requireQty = this.zkbPartOrderRepository.fetchQty(contractIdList);
-        if(requireQty==null)
-        {
-            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(0);
-            return;
-        }
-        Integer goodReturnQty = this.zkbPartOrderRepository.fetchReturnGoodQty(contractIdList);
-        Integer goodReturnQty1 = this.zkbPartOrderReturnRepository.fetchReturnGoodQty(contractIdList);
-        if(goodReturnQty==null) goodReturnQty = new Integer(0);
-        if(goodReturnQty1==null) goodReturnQty1 = new Integer(0);
-        BigDecimal goodReturnRare = new BigDecimal(goodReturnQty+goodReturnQty1).divide(new BigDecimal(requireQty),2,BigDecimal.ROUND_HALF_DOWN).multiply(new BigDecimal(100));
-        goodReturnRare=goodReturnRare.subtract(new BigDecimal(30)).multiply(new BigDecimal(0.5)).setScale(0,BigDecimal.ROUND_HALF_DOWN);
-        BigDecimal intactPartReturnRateFullScoreBigDecimal = new BigDecimal(zkbKeyBehaviorIndex.getIntactPartReturnRateFullScore());
-        BigDecimal result =intactPartReturnRateFullScoreBigDecimal.subtract(goodReturnRare);
-        if(result.compareTo(intactPartReturnRateFullScoreBigDecimal)==1)
-        {
-            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(zkbKeyBehaviorIndex.getIntactPartReturnRateFullScore());
-            return;
-        }else if(result.compareTo(intactPartReturnRateFullScoreBigDecimal)==-1)
-        {
-            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(0);
-            return;
-        }else
-        {
-            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(result.intValue());
-            return;
-        }
-    }
+//    /**
+//     * 计算配件好还率得分
+//     * @param zkbKeyBehaviorIndex
+//     * @param contractIdList 合同ID list
+//     */
+//    private void calculateIntactPartReturnRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,
+//                                                    List<String> contractIdList)
+//    {
+//        Integer requireQty = this.zkbPartOrderRepository.fetchQty(contractIdList);
+//        if(requireQty==null)
+//        {
+//            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(0);
+//            return;
+//        }
+//        Integer goodReturnQty = this.zkbPartOrderRepository.fetchReturnGoodQty(contractIdList);
+//        Integer goodReturnQty1 = this.zkbPartOrderReturnRepository.fetchReturnGoodQty(contractIdList);
+//        if(goodReturnQty==null) goodReturnQty = new Integer(0);
+//        if(goodReturnQty1==null) goodReturnQty1 = new Integer(0);
+//        BigDecimal goodReturnRare = new BigDecimal(goodReturnQty+goodReturnQty1).divide(new BigDecimal(requireQty),2,BigDecimal.ROUND_HALF_DOWN).multiply(new BigDecimal(100));
+//        goodReturnRare=goodReturnRare.subtract(new BigDecimal(30)).multiply(new BigDecimal(0.5)).setScale(0,BigDecimal.ROUND_HALF_DOWN);
+//        BigDecimal intactPartReturnRateFullScoreBigDecimal = new BigDecimal(zkbKeyBehaviorIndex.getIntactPartReturnRateFullScore());
+//        BigDecimal result =intactPartReturnRateFullScoreBigDecimal.subtract(goodReturnRare);
+//        if(result.compareTo(intactPartReturnRateFullScoreBigDecimal)==1)
+//        {
+//            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(zkbKeyBehaviorIndex.getIntactPartReturnRateFullScore());
+//            return;
+//        }else if(result.compareTo(intactPartReturnRateFullScoreBigDecimal)==-1)
+//        {
+//            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(0);
+//            return;
+//        }else
+//        {
+//            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(result.intValue());
+//            return;
+//        }
+//    }
 
     /**
      * 计算二维码粘贴率得分
@@ -615,7 +638,12 @@ public class ZkbKeyBehaviorIndexService {
             zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
             return totalIbNumber;
         }
-        List<String> assetId = zkbContractAssetList.stream().map(p -> p.getAssetId()).collect(Collectors.toList());
+        List<String> assetId = new ArrayList<>();
+        for(ZkbContractAsset item:zkbContractAssetList)
+        {
+            assetId.add(item.getAssetId());
+        }
+//        List<String> assetId = zkbContractAssetList.stream().map(p -> p.getAssetId()).collect(Collectors.toList());
         Integer countAssetWithQRcode = this.assetInfoRepository.countAssetWithQRcode(assetId);
         Integer pasteQuickResponseRateScore = new BigDecimal(countAssetWithQRcode).
                 divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
@@ -681,9 +709,18 @@ public class ZkbKeyBehaviorIndexService {
             return zkbContractMapList;
         }
         //根据tenantUid去重zkbKeyBehaviorIndexList,并且把tenantUid组装到string list集合中
-        List<String> tenantUIDList =zkbKeyBehaviorIndexList.stream().collect(
-                Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getTenantUID()))),
-                        ArrayList::new)).stream().map(ZkbKeyBehaviorIndex::getTenantUID).collect(Collectors.toList());
+//        List<String> tenantUIDList =zkbKeyBehaviorIndexList.stream().collect(
+//                Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getTenantUID()))),
+//                        ArrayList::new)).stream().map(ZkbKeyBehaviorIndex::getTenantUID).collect(Collectors.toList());
+        Map tenantUIDMap = new HashMap();
+        List<String> tenantUIDList = new ArrayList<>();
+        for(ZkbKeyBehaviorIndex item:zkbKeyBehaviorIndexList)
+        {
+            if(tenantUIDMap.containsKey(item.getTenantUID())) continue;
+            tenantUIDList.add(item.getTenantUID());
+            tenantUIDMap.put(item.getTenantUID(),item.getTenantUID());
+        }
+
         List<ZkbContract> zkbContractList = this.zkbContractRepository.findByTenantUIDIn(tenantUIDList);
         for (ZkbContract zkbContract : zkbContractList) {
             Map<String, Object> zkbContractMap = new HashMap<>();

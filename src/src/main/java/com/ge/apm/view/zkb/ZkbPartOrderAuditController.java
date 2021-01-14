@@ -44,6 +44,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean showRejectOrder = false;
     private boolean showClosed=false;
     private boolean canEditFlag=false;
+    private boolean isChoseAdmin = false;
     private String showBtn = "";
     private ZkbPartOrderReturn zkbPartOrderReturn;
     private List<ZkbPartOrderReturn> zkbPartOrderReturnList;
@@ -68,6 +69,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<ZkbPoHistoryQueryVo> zkbHistoryDataList;
     private List<ZkbPoHistoryQueryVo> geHistoryDataList;
     private String remindLetterFlag = "0";
+    private ZkbContractRepository zkbContractRepository;
+    private List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList;
+    private ZkbPartOrderReturn zkbPartOrderReturnModify;
+
 
     @Override
     protected void init() {
@@ -77,6 +82,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturnRepository = WebUtil.getBean(ZkbPartOrderReturnRepository.class);
         zkbPartOrderRepository = WebUtil.getBean(ZkbPartOrderRepository.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+        zkbContractRepository = WebUtil.getBean(ZkbContractRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
@@ -412,6 +418,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(canEditFlag){
                     showReturn = true;
                     showBtn = "1";
+                }else {
+                    List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                    if(zkbPartOrderUserConfigs.size() > 0){
+                        showReturn = true;
+                    }
                 }
             }else if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus()) ){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
@@ -451,6 +462,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showReturn = true;
                 showClosed = true;
                 showBtn = "";
+                List<ZkbPartOrderUserConfig> closeUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                if(closeUserConfigs.size() > 0){
+                    isChoseAdmin = true;
+                }
             }
         }
     }
@@ -472,7 +487,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         if(ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
             List<I18nMessage> removeI18 = new ArrayList<>();
             for(I18nMessage i18nMessage : returnTypeList){
-                if(!"DOA".equals(i18nMessage.getMsgKey()) && !"goodReturn".equals(i18nMessage.getMsgKey())){
+                if(!"DOA".equals(i18nMessage.getMsgKey()) && !"goodReturn".equals(i18nMessage.getMsgKey()) && !"cancel".equals(i18nMessage.getMsgKey())){
                     removeI18.add(i18nMessage);
                 }
             }
@@ -485,16 +500,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public String acceptNext(){
         zkbPartOrderService.auditNext(this.selected,true,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendMessage(zkbPartOrder);
-        zkbPartOrderService.sendEmail(zkbPartOrder,"");
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendMessage(zkbPartOrder,UserContextService.getAccessToken());
+        zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
     public String rejectNext(){
         zkbPartOrderService.auditNext(this.selected,false,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
@@ -511,6 +526,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 if(selected.getReturnQty() > selected.getQty()){
                     WebUtil.addErrorMessage("归还数量不能大于申请数量","");
                     return "";
+                }
+            }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
+                if(CopyByInvok.T.equals(selected.getNewCatFlag())){
+                    ZkbContract c = zkbContractRepository.findById(selected.getContractId());
+                    if(c.getProbeQuota() < selected.getQty()){
+                        WebUtil.addErrorMessage("探头剩余数量不足，请联系供应商！","");
+                        return "";
+                    }
                 }
             }
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){
@@ -567,16 +590,16 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderService.normalNext(this.selected,currentUser);
         }
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(zkbPartOrder.getCurrentStep())){
             //归还时发送邮件
-            zkbPartOrderService.sendEmail(zkbPartOrder,"");
+            zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrder.getCurrentStep())){
-            zkbPartOrderService.sendEmail(zkbPartOrder,"");
+            zkbPartOrderService.sendEmail(zkbPartOrder,"",UserContextService.getAccessToken());
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.ReturnPending.toString().equals(zkbPartOrder.getCurrentStep())){
-            zkbPartOrderService.sendEmail(zkbPartOrder, CopyByInvok.EMAIL_URL_TYPE_UNORDER);
+            zkbPartOrderService.sendEmail(zkbPartOrder, CopyByInvok.EMAIL_URL_TYPE_UNORDER,UserContextService.getAccessToken());
         }
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
@@ -584,7 +607,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public String orderCancelNext(){
         zkbPartOrderService.orderCancelNext(this.selected,currentUser);
         ZkbPartOrder zkbPartOrder = zkbPartOrderRepository.findById(selected.getId());
-        zkbPartOrderService.sendWeChatMessages(zkbPartOrder);
+        zkbPartOrderService.sendWeChatMessages(zkbPartOrder,UserContextService.getAccessToken());
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
@@ -662,6 +685,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId());
             return;
         }
+        if(StringUtils.isEmpty(zkbPartOrderReturn.getId())){
+            zkbPartOrderReturn.setCreatedDate(new Date());
+        }else{
+            zkbPartOrderReturn.setUpdatedDate(new Date());
+        }
         zkbPartOrderReturn.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.New.toString());
         zkbPartOrderReturnRepository.save(zkbPartOrderReturn);
         zkbPartOrderReturn = null;
@@ -718,6 +746,75 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    //region 关单修改归还数据
+    public void preReturnModifyEdit(){
+        zkbPartOrderReturnModify = null;
+        zkbPartOrderReturnModifyList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
+        partNoList = new ArrayList<>();
+        orderNoList = new ArrayList<>();
+        List<ZkbPartOrderItem> zkbPartOrderItemList = zkbPartOrderService.queryItemBuPartOrderId(selected.getId());
+        List<String> orderContains = new ArrayList<>();
+        for(ZkbPartOrderItem i :zkbPartOrderItemList){
+            HashMap<String, String> m = new HashMap<>();
+            m.put("text",i.getPartName());
+            m.put("value",i.getPartNo());
+            partNoList.add(m);
+            if(StringUtils.isNotEmpty(i.getOrderNo())){
+                if(!orderContains.contains(i.getOrderNo())){
+                    HashMap<String, String> mm = new HashMap<>();
+                    mm.put("text",i.getOrderNo());
+                    mm.put("value",i.getOrderNo());
+                    orderNoList.add(mm);
+                    orderContains.add(i.getOrderNo());
+                }
+            }
+        }
+    }
+
+    public void returnModifyCancel(){
+        zkbPartOrderReturnModify = null;
+    }
+
+    public void saveReturnModify(){
+        for(ZkbPartOrderReturn r : zkbPartOrderReturnModifyList){
+            if (r.getId().equals(zkbPartOrderReturnModify.getId())){
+                Collections.replaceAll(zkbPartOrderReturnModifyList,r,zkbPartOrderReturnModify);
+                break;
+            }
+        }
+        zkbPartOrderReturnModify = null;
+    }
+
+    public void submitCloseReturn(){
+        HashMap<String, Integer> returnMap = new HashMap<String, Integer>();
+        for(ZkbPartOrderReturn r : zkbPartOrderReturnModifyList){
+            if(returnMap.containsKey(r.getPartNo())){
+                Integer vv = returnMap.get(r.getPartNo());
+                vv += r.getQty();
+                returnMap.put(r.getPartNo(),vv);
+            }else{
+                returnMap.put(r.getPartNo(),r.getQty());
+            }
+        }
+        boolean flag = true;
+        for(ZkbPartOrderItem zkbPartOrderItem : selected.getZkbPartOrderItems()){
+            Integer returnQty = returnMap.get(zkbPartOrderItem.getPartNo());
+            if(returnQty == null){
+                flag = false;
+            }else if(returnQty != zkbPartOrderItem.getPartQty()){
+                flag = false;
+            }
+        }
+        if(!flag){
+            WebUtil.addErrorMessage("归还数量与申请不一致，请检查！");
+            return;
+        }
+        zkbPartOrderService.submitCloseReturn(zkbPartOrderReturnModifyList,selected,currentUser);
+        zkbPartOrderReturnList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
+    }
+    //endregion
+
+    //region get、set
     public boolean isHaveTrainCourseFlag() {
         return haveTrainCourseFlag;
     }
@@ -997,6 +1094,32 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void setShowDirector(boolean showDirector) {
         this.showDirector = showDirector;
     }
+
+    public List<ZkbPartOrderReturn> getZkbPartOrderReturnModifyList() {
+        return zkbPartOrderReturnModifyList;
+    }
+
+    public void setZkbPartOrderReturnModifyList(List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList) {
+        this.zkbPartOrderReturnModifyList = zkbPartOrderReturnModifyList;
+    }
+
+    public ZkbPartOrderReturn getZkbPartOrderReturnModify() {
+        return zkbPartOrderReturnModify;
+    }
+
+    public void setZkbPartOrderReturnModify(ZkbPartOrderReturn zkbPartOrderReturnModify) {
+        this.zkbPartOrderReturnModify = zkbPartOrderReturnModify;
+    }
+
+    public boolean isChoseAdmin() {
+        return isChoseAdmin;
+    }
+
+    public void setChoseAdmin(boolean choseAdmin) {
+        isChoseAdmin = choseAdmin;
+    }
+
+    //endregion
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {

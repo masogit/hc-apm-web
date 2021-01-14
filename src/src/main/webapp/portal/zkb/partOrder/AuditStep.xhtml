@@ -127,7 +127,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">申请时间*</label>
-                            <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.selected.requestDate}" readonly="true" required="true" requiredMessage="#{msg.zkbPartOrder_requestDate} #{msg.ValidationRequire}" showOn="button" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.requestDate}" readonly="true" required="true" requiredMessage="#{msg.zkbPartOrder_requestDate} #{msg.ValidationRequire}" showOn="button" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 1}">
@@ -213,7 +213,14 @@
                             </h:panelGroup>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">订单数量*</label>
+                            <c:choose>
+                                <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                                    <label class="label">订单名额*</label>
+                                </c:when>
+                                <c:otherwise>
+                                    <label class="label">订单数量*</label>
+                                </c:otherwise>
+                            </c:choose>
                             <p:inputText id="qty" value="#{zkbPartOrderAuditController.selected.qty}" required="true" readonly="true" requiredMessage="订单数量 #{msg.ValidationRequire}" disabled="true" />
                         </h:panelGroup>
                         <h:panelGroup>
@@ -834,7 +841,11 @@
                             <label class="label">关单备注</label>
                             <p:inputTextarea id="closedRemark" value="#{zkbPartOrderAuditController.selected.closedRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag)}">
                             </p:inputTextarea>
+                            <p:commandLink immediate="false" process="@this" update="growl zkbPartOrderReturnModifyDlg" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'Complete' and zkbPartOrderAuditController.choseAdmin}">
+                                <h:outputText value="归还数据修改" />
+                            </p:commandLink>
                         </h:panelGroup>
+
                     </p:panelGrid>
                 </p:fieldset>
                 <br/>
@@ -849,6 +860,9 @@
             </h:form>
             <ui:include src="PartOrderReturn.xhtml"/>
             <ui:include src="historyData.xhtml"/>
+            <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'Complete'}">
+                <ui:include src="PartOrderReturnModify.xhtml"/>
+            </c:if>
             <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="拒绝原因" height="300">
 
                 <h:form id="zkbConfigForm">
