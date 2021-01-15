@@ -101,6 +101,7 @@ public enum GatewayURL {
     PART_ORDER_SEND_RETURN_EMAIL("/hcapmreportservice/api/apm/report/partOrder/sendHtmlForReturn"),
     PART_ORDER_SEND_UN_ORDER("/hcapmreportservice/api/apm/report/partOrder/sendHtmlForUnOrder"),
     PART_ORDER_SEND_MESSAGE("/hcapmreportservice/api/apm/report/partOrder/sendMessage"),
+    PART_ORDER_SEND_PROBE_LETTER_EMAIL("/hcapmreportservice/api/apm/report/partOrder/sendHtmlForProbeLetter"),
     PART_ORDER_SEND_WECHAT_MESSAGE("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatMessages"),
     PART_ORDER_SEND_WECHAT_BACK_MESSAGE("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatBackMessages"),
     PART_ORDER_SEND_WECHAT_REMIND_LETTER("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatRemindLetter"),
