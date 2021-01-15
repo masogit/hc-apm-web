@@ -9,9 +9,257 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition>
-    <h:form id="zkbFePartOrderSparePartsEditForm" >
+    <h:panelGroup id="zkbFePartOrderSparePartsEditpanelGroup">
         <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='SpareParts'}">
+            <p:fieldset id="zkbWorkFlowFieldset" legend="工单信息" >
+                <h:form id="searchForm">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbFePartOrder_systemId}*</label>
+                        <p:inputText  id="systemId" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"    />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbFePartOrder_orderNo}</label>
+                        <p:inputText id="fatherPartOrderNo" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  />
+                    </h:panelGroup>
+                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderSparePartDetailController.getSparePartsZkbFePartOrder(param['searchForm:systemId'],param['searchForm:fatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderForm:sparePartsZkbFePartOrder"/>
+                </p:panelGrid>
+                </h:form>
+                <h:form id="zkbFePartOrderForm">
+                <p:dataTable id="sparePartsZkbFePartOrder" value="#{zkbFePartOrderSparePartDetailController.sparePartsZkbFePartOrderList}" var="item"
+                             widgetVar="sparePartsZkbFePartOrder" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrder}"
+                             lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
+                             paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm" />
+                    <p:column headerText="#{msg.zkbFePartOrder_sr}">
+                        <h:outputText value="#{item.sr}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_functionType}">
+                        <h:outputText value="#{item.functionType}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_phenomenon}">
+                        <h:outputText value="#{item.phenomenon}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_reportUser}">
+                        <h:outputText value="#{item.reportUser}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_hospitalName}">
+                        <h:outputText value="#{item.hospitalName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_geEngineerName}">
+                        <h:outputText value="#{item.geEngineerName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_geEngineerPhone}">
+                        <h:outputText value="#{item.geEngineerPhone}"/>
+                    </p:column>
+                </p:dataTable>
+                </h:form>
+            </p:fieldset>
+            <h:form id="zkbFePartOrderSparePartsEditForm">
+            <p:fieldset id="zkbContractFieldset" legend="合同信息" >
+                <p:dataTable id="zkbContractDatalist_spareParts" value="#{zkbFePartOrderSparePartDetailController.contractList}" var="item"
+                             widgetVar="zkbContractDatalist_spareParts" selectionMode="single" disabledSelection="true"
+                             lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
+                             paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                    <p:column headerText="#{msg.zkbContact_tenant}">
+                        <h:outputText value="#{zkbContractController.getTenantInfo(item.tenantUID).name}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_contractNo}" >
+                        <h:outputText value="#{item.contractNo}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_region}">
+                        <h:outputText value="#{item.region}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_contractType}">
+                        <h:outputText value="#{item.contractType}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_ibNumber}">
+                        <h:outputText value="#{item.ibNumber}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_spareQuota}">
+                        <h:outputText value="#{item.spareQuota}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_probeQuota}" >
+                        <h:outputText value="#{item.probeQuota}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
+                        <h:outputText value="#{item.geArtificialSupportTimes}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_spareArtificail}">
+                        <h:outputText value="#{item.spareArtificail}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_startDate}">
+                        <h:outputText value="#{item.startDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbContract_endDate}">
+                        <h:outputText value="#{item.endDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                    </f:facet>
+                </p:dataTable>
+            </p:fieldset>
+            <p:fieldset id="basicInfoMation"  legend="基本信息" >
+                <p:panelGrid columns="3"  layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbFePartOrder_systemId}</label>
+                            <p:inputText   disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.systemId}"    />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">人工#{msg.zkbFePartOrder_orderNo}</label>
+                            <p:inputText  disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.fatherPartOrderNo}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{'2'.equals(zkbFePartOrderSparePartDetailController.selected.assetGroup)}">
+                            <label class="label">#{msg.zkbFePartOrder_assetTypeDi}*</label>
+                            <p:selectOneMenu id="assetTypeDi" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{zkbFePartOrderSparePartDetailController.selected.assetTypeDi}" required="true" requiredMessage="#{msg.zkbFePartOrder_assetTypeDi} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_assetTypeDi')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{'1'.equals(zkbFePartOrderSparePartDetailController.selected.assetGroup)}">
+                            <label class="label">#{msg.zkbFePartOrder_artificialType}*</label>
+                            <p:selectOneMenu id="artificialType" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{zkbFePartOrderSparePartDetailController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbFePartOrder_artificialType} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_artificialType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbFePartOrder_applyPerson}</label>
+                            <p:inputText id="applyPerson" disabled="true"   value="#{zkbFePartOrderSparePartDetailController.selected.reportUser}"  />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbFePartOrder_applyPersonPhone}</label>
+                            <p:inputText id="applyPersonPhone" value="#{zkbFePartOrderSparePartDetailController.selected.applyPersonPhone}" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbFePartOrder_reportDate}</label>
+                            <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.reportDate}"
+                                        showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbFePartOrder_orderNo}</label>
+                            <p:inputText id="orderNo" disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.partOrderNo}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbFePartOrder_phenomenon}*</label>
+                            <p:inputTextarea  id="phenomenon" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  value="#{zkbFePartOrderSparePartDetailController.selected.phenomenon}" required="true"
+                                              requiredMessage="#{msg.zkbFePartOrder_phenomenon} #{msg.ValidationRequire}" maxlength="100"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbFePartOrder_orderAnnotation}*</label>
+                            <p:selectOneMenu id="orderAnnotation" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{zkbFePartOrderSparePartDetailController.selected.orderAnnotation}" required="true" requiredMessage="#{msg.zkbFePartOrder_orderAnnotation} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_sparePartsOrderAnnotation')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbFePartOrder_productNumber}</label>
+                            <p:inputText id="productNumber"  disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.productNumber}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.zkbFePartOrder_softwareVersion}</label>
+                            <p:inputText id="softwareVersion" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  value="#{zkbFePartOrderSparePartDetailController.selected.softwareVersion}" />
+                        </h:panelGroup>
+                </p:panelGrid>
+                <p:dataTable id="zkbFePartOrderAssetInfoList" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item"
+                             widgetVar="zkbFePartOrderAssetInfoList" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderAssetInfo}"
+                             lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
+                             paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                    <p:ajax event="rowSelect" update=":zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList:editDetailButton :zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList:deleteDetailButton" />
+                    <p:column headerText="#{msg.zkbFePartOrder_assetNo}">
+                        <h:outputText value="#{item.assetNo}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_assetDescription}">
+                        <h:outputText value="#{item.assetDescription}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_assetQty}">
+                        <h:outputText value="#{item.assetQty}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_orderNoa}" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
+                        <h:outputText value="#{item.orderNo}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_assetPrice}" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
+                        <h:outputText value="#{item.price}" />
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_spareParts}" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
+                        <h:outputText value="#{item.sparePart}" />
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareItemCreate}"  update="zkbFePartOrderAssetInfoEditForm" oncomplete="PF('zkbFePartOrderAssetInfoEditDlg').show()" />
+                        <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested') or zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm') }"  immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareItemEdit}" disabled="#{zkbFePartOrderSparePartDetailController.itemDisabled}" update="zkbFePartOrderAssetInfoEditForm"  oncomplete="PF('zkbFePartOrderAssetInfoEditDlg').show()"  />
+                        <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  immediate="false" process="@this"  id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteItem}" disabled="#{zkbFePartOrderSparePartDetailController.itemDisabled}" update=":zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </p:fieldset>
+
+            <p:fieldset id="managementFieldset" legend="供应商审批" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingAssignment')}">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
+                        <label class="label">代理商审批人名称*：</label>
+                        <p:inputText  disabled="true"  value="#{zkbFePartOrderSparePartDetailController.selected.tenantAssignUser}"  />
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
+                        <label class="label">代理商审批时间*：</label>
+                        <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.tenantAssignDate}"
+                                    showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbFePartOrder_comment}</label>
+                        <p:inputTextarea  id="comment" required="true" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" requiredMessage="#{msg.zkbFePartOrder_comment} #{msg.ValidationRequire}" value="#{zkbFePartOrderSparePartDetailController.selected.comment}" rows="2" cols="20">
+                        </p:inputTextarea>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+
+            <p:fieldset id="geAdminFieldset" legend="GE Admin归还" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
+                <p:dataTable id="zkbFePartOrderReturnList" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderReturnList}" var="item"
+                             widgetVar="zkbFePartOrderReturnList" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn}"
+                             lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
+                             paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                    <p:ajax event="rowSelect" update=":zkbFePartOrderSparePartsEditForm:zkbFePartOrderReturnList:editReturnDetailButton :zkbFePartOrderSparePartsEditForm:zkbFePartOrderReturnList:deleteReturnDetailButton" />
+                    <p:column headerText="#{msg.zkbFePartOrder_assetNo}">
+                        <h:outputText value="#{item.assetNo}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_assetQty}">
+                        <h:outputText value="#{item.qty}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_orderNoa}">
+                        <h:outputText value="#{item.orderNo}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_returnType}">
+                        <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnType', item.returnType)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_returnDate}">
+                        <h:outputText value="#{item.returnDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin')}" immediate="false" process="@this" id="createReturnDetailButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemCreate}"  update="returnZkbFePartOrderAssetInfoEditForm" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" />
+                        <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin')}" immediate="false" process="@this" id="editReturnDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemEdit}" update="returnZkbFePartOrderAssetInfoEditForm"  oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" disabled="#{zkbFePartOrderSparePartDetailController.returnItemDisabled}" />
+                        <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin')}" immediate="false" process="@this"  id="deleteReturnDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteReturnItem}" update=":zkbFePartOrderSparePartsEditForm:zkbFePartOrderReturnList" disabled="#{zkbFePartOrderSparePartDetailController.returnItemDisabled}">
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </p:fieldset>
+
+            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{msg.save}" icon="ui-icon-check"  disabled="#{!zkbFePartOrderSparePartDetailController.checkFatherPartNo()}" validateClient="true" update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.saveAndToListPage}" style="float:left"/>
+            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="审批通过" icon="ui-icon-check"  process="@this"  action="#{zkbFePartOrderSparePartDetailController.supplierAccept(param['zkbFePartOrderSparePartsEditForm:comment'])}" style="float:left"/>
+            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}" value="审批不通过" icon="ui-icon-close"  update=":growl :zkbFePartOrderSparePartsEditForm" action="#{zkbFePartOrderSparePartDetailController.supplierReject}" style="float:left"/>
+            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{msg.save}" icon="ui-icon-check"  update=":growl :zkbFePartOrderSparePartsEditForm"  validateClient="true" action="#{zkbFePartOrderSparePartDetailController.fullApmInfo}" style="float:left"/>
+            <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin')}" value="#{msg.save}" icon="ui-icon-check"  update=":growl :zkbFePartOrderSparePartsEditForm"  validateClient="true" action="#{zkbFePartOrderSparePartDetailController.geAdminReturn}" style="float:left"/>
+            <p:commandButton  immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbFePartOrderSparePartDetailController.backList}" />
+            </h:form>
         </h:panelGroup>
-    </h:form>
+<!--    </h:form>-->
+    </h:panelGroup>
+    <ui:include src="ZkbFePartOrderAssetEdit.xhtml"/>
+    <ui:include src="returnZkbFePartOrderAssetEdit.xhtml"/>
 </ui:composition>
 </html>
