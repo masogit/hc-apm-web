@@ -730,6 +730,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         boolean b = zkbPartOrderService.uploadFile(event,selected);
         if(b){
             selected = zkbPartOrderRepository.findById(selected.getId());
+            zkbPartOrderService.sendEmailForProbeLetter(selected);
             WebUtil.addSuccessMessage(selected.getUploadLetterFileName() + WebUtil.getMessage("SuccessUploaded"));
         }else{
             WebUtil.addErrorMessage("fail to upload file");

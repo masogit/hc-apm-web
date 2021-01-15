@@ -10,6 +10,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +35,8 @@ import java.util.*;
  */
 @Service
 public class ZkbPartOrderService  extends MicroServiceInvoker {
+
+    Logger logger = LoggerFactory.getLogger(ZkbPartOrderService.class);
 
     @Autowired
     private TenantInfoRepository tenantInfoDao;
@@ -1003,7 +1007,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) + qty);
             zkbContractRepository.save(zkbContract);
         }else if(ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
-            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) ||
+                ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                 zkbContract.setSpareQuotaUse((zkbContract.getSpareQuotaUse() == null ? 0 : zkbContract.getSpareQuotaUse()) - qty);
                 zkbContract.setSpareQuota((zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota()) + qty);
                 zkbContractRepository.save(zkbContract);
@@ -1038,6 +1043,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
             ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(zkbPartOrder.getPartOrderNo()+" "+ url + " " +response.toString());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -1067,6 +1073,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 HttpHeaders header = createHttpHeaders(token);
                 HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
                 ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+                logger.info(zkbPartOrder.getPartOrderNo()+" sendMessage "+response.toString());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1091,6 +1098,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     HttpHeaders header = createHttpHeaders(token);
                     HttpEntity<Map> requestEntity = new HttpEntity<>(header);
                     ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+                    logger.info(zkbPartOrder.getPartOrderNo()+" sendWeChatMessages "+response.toString());
                 } catch (RestClientException e) {
                     e.printStackTrace();
                 }
@@ -1105,7 +1113,23 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             HttpHeaders header = createHttpHeaders(token);
             HttpEntity<Map> requestEntity = new HttpEntity<>(header);
             ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(zkbPartOrder.getPartOrderNo()+" sendWeChatBackMessages "+response.toString());
         } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendEmailForProbeLetter(ZkbPartOrder zkbPartOrder){
+        try {
+            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            emailWrapperMap.put("systemId", zkbPartOrder.getId());
+            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_PROBE_LETTER_EMAIL);
+            String token = UserContextService.getAccessToken();
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(zkbPartOrder.getPartOrderNo()+" 发送说明函邮件 "+response.toString());
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -1157,7 +1181,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return false;*/
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void submitCloseReturn(List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList,ZkbPartOrder zkbPartOrder,UserAccount currentUser){
 
         List<ZkbPartOrderReturn> oldZkbPartOrderReturnList = zkbPartOrderReturnRepository.findByPartOrderId(zkbPartOrder.getId());
@@ -1204,8 +1228,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderReturnRepository.save(zkbPartOrderReturnModifyList);
 
         //3.名额修改
-        System.out.println("===========================================");
-        System.out.println(nowBackTotal+"|"+oldBackTotal+"|"+ce);
         subReturnQty(zkbContract,zkbPartOrder,ce);
     }
 
