@@ -26,7 +26,7 @@ public class CustomConfigConstant {
     
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","oneQrCodeStatus","connectToInsite","oneQrCode","installStatus","assetClass");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","oneQrCodeStatus","connectToInsite","oneQrCode","installStatus","assetClass","geibTable.installedTime");
     }
     
     //只读字段
@@ -164,6 +164,7 @@ public class CustomConfigConstant {
          allFields.put("oneQrCode", WebUtil.getMessage("oneQrCode"));
          allFields.put("oneQrCodeStatus", WebUtil.getMessage("oneQrCodeStatus"));
          allFields.put("installStatus", WebUtil.getMessage("installStatus"));
+         allFields.put("geibTable.installedTime", WebUtil.getMessage("geibTable.installedTime"));
 //        }
         return allFields;
     }
