@@ -106,20 +106,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      */
     private ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository;
 
-    /**
-     * 备件申请中的人工申请
-     */
-    private List<ZkbFePartOrder> sparePartsZkbFePartOrder = new LinkedList<>();
-
-//    /**
-//     * 备件申请列表选中项
-//     */
-//    private ZkbFePartOrderAssetInfo selectZkbFePartOrderAssetInfo;
-
-    /**
-     * action动作名称
-     */
-    private String actionItemName;
 
     private static final String dateFormat = "yyyyMMddHHmmss";
 
@@ -179,6 +165,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.zkbFePartOrderService.initNewOrder(this.selected);
         this.selected.setReportUser(this.userName);
         this.selected.setOrderType(ZkbFePartOrder.OrderType.ManMade.toString());
+        this.selected.setCurrentStep(ZkbFePartOrder.workFlowSteps.Requested.toString());
     }
 
     /**
@@ -543,50 +530,4 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.contractError = contractError;
     }
 
-//    public void getSparePartsZkbFePartOrder()
-//    {
-//
-//        List<SearchFilter> searchFilters = new ArrayList<>();
-//        if(StringUtils.isNotBlank(this.selected.getSystemId()))
-//        {
-//            searchFilters.add(new SearchFilter("systemId", SearchFilter.Operator.LIKE,this.selected.getSystemId()));
-//        }
-//        if(StringUtils.isNotBlank(this.selected.getFatherPartOrderNo()))
-//        {
-//            searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.LIKE,this.selected.getFatherPartOrderNo()));
-//        }
-//        this.sparePartsZkbFePartOrder = this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
-//    }
-//
-//    /**
-//     * 申请列表预添加
-//     */
-//    public void prepareItemCreate(){
-//        this.actionItemName = "Create";
-//        this.selectZkbFePartOrderAssetInfo = new ZkbFePartOrderAssetInfo();
-//    }
-//
-//    /**
-//     * 申请列表预编辑
-//     */
-//    public void prepareItemEdit(){
-//        this.actionItemName = "Edit";
-//    }
-//
-//    /**
-//     * 临时保存
-//     */
-//    public void saveZkbFePartOrderAssetInfoTemp()
-//    {
-//        if("Create".equals(this.actionItemName)){
-//            if(this.selected.getZkbFePartOrderAssetInfoList() ==null){
-//                this.selected.setZkbFePartOrderAssetInfoList(new ArrayList<>());
-//            }
-//            int i = this.selected.getZkbFePartOrderAssetInfoList().size();
-//            this.selectZkbFePartOrderAssetInfo.setIndex(i);
-//            this.selected.getZkbFePartOrderAssetInfoList().add(this.selectZkbFePartOrderAssetInfo);
-//        }else{
-//            this.selected.getZkbFePartOrderAssetInfoList().add(this.selectZkbFePartOrderAssetInfo.getIndex(),this.selectZkbFePartOrderAssetInfo);
-//        }
-//    }
 }
