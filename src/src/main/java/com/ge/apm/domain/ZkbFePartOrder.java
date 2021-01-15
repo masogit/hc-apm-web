@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author : 503189362
@@ -19,9 +20,10 @@ public class ZkbFePartOrder {
      * TenantAccept:租户审批通过
      * TenantReject:租户批拒绝
      * FourHundredsAccept:400回填
+     * GEAdminAccept GEAdmin 填写归还信息
      */
     public enum workFlowStatus {
-        Requested,TenantAccept,TenantReject,FourHundredsAccept
+        Requested,TenantAccept,TenantReject,FourHundredsAccept,GEAdminAccept
     }
 
     /**
@@ -38,7 +40,7 @@ public class ZkbFePartOrder {
      * Complete:完成
      */
     public enum workFlowSteps {
-        WaitingAssignment,WaitingApm,Complete
+        Requested,WaitingAssignment,WaitingApm,WaitingGEAdmin,Complete
     }
 
     @Id
@@ -215,6 +217,65 @@ public class ZkbFePartOrder {
      */
     @Column(name = "tenant_uid")
     private String tenantUid;
+
+    /**
+     * 设备类型（DI）
+     */
+    @Column(name = "asset_type_di")
+    private String assetTypeDi;
+
+    /**
+     * 机型
+     */
+    @Column(name = "artificial_type")
+    private String artificialType;
+
+    /**
+     * 申请人电话
+     */
+    @Column(name = "apply_person_phone")
+    private String applyPersonPhone;
+
+    /**
+     * 订单标注
+     */
+    @Column(name = "order_annotation")
+    private String orderAnnotation;
+
+    /**
+     * 产品型号
+     */
+    @Column(name = "product_number")
+    private String productNumber;
+
+    /**
+     * 软件版本
+     */
+    @Column(name = "software_version")
+    private String softwareVersion;
+
+    /**
+     * 订单号
+     */
+    @Column(name = "father_part_order_no")
+    private String fatherPartOrderNo;
+
+    /**
+     * 设备分类 1.放射类 2.超声类
+     */
+    private String assetGroup;
+
+    /**
+     * 申请备件列表
+     */
+    @Transient
+    private List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList;
+
+    /**
+     * 申请备件归还列表
+     */
+    @Transient
+    private List<ZkbFePartOrderReturn> zkbFePartOrderReturnList;
 
     public String getId() {
         return id;
@@ -447,6 +508,39 @@ public class ZkbFePartOrder {
     public void setRemark(String remark) {
         this.remark = remark;
     }
+
+    public String getAssetTypeDi() {
+        return assetTypeDi;
+    }
+
+    public void setAssetTypeDi(String assetTypeDi) {
+        this.assetTypeDi = assetTypeDi;
+    }
+
+    public String getArtificialType() {
+        return artificialType;
+    }
+
+    public void setArtificialType(String artificialType) {
+        this.artificialType = artificialType;
+    }
+
+    public String getFatherPartOrderNo() {
+        return fatherPartOrderNo;
+    }
+
+    public void setFatherPartOrderNo(String fatherPartOrderNo) {
+        this.fatherPartOrderNo = fatherPartOrderNo;
+    }
+
+    public List<ZkbFePartOrderAssetInfo> getZkbFePartOrderAssetInfoList() {
+        return zkbFePartOrderAssetInfoList;
+    }
+
+    public void setZkbFePartOrderAssetInfoList(List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList) {
+        this.zkbFePartOrderAssetInfoList = zkbFePartOrderAssetInfoList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -470,5 +564,53 @@ public class ZkbFePartOrder {
     @Override
     public String toString() {
         return "com.ge.apm.domain.ZkbFePartOrder[ id=" + id + " ]";
+    }
+
+    public String getOrderAnnotation() {
+        return orderAnnotation;
+    }
+
+    public void setOrderAnnotation(String orderAnnotation) {
+        this.orderAnnotation = orderAnnotation;
+    }
+
+    public String getProductNumber() {
+        return productNumber;
+    }
+
+    public void setProductNumber(String productNumber) {
+        this.productNumber = productNumber;
+    }
+
+    public String getSoftwareVersion() {
+        return softwareVersion;
+    }
+
+    public void setSoftwareVersion(String softwareVersion) {
+        this.softwareVersion = softwareVersion;
+    }
+
+    public String getAssetGroup() {
+        return assetGroup;
+    }
+
+    public void setAssetGroup(String assetGroup) {
+        this.assetGroup = assetGroup;
+    }
+
+    public List<ZkbFePartOrderReturn> getZkbFePartOrderReturnList() {
+        return zkbFePartOrderReturnList;
+    }
+
+    public void setZkbFePartOrderReturnList(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList) {
+        this.zkbFePartOrderReturnList = zkbFePartOrderReturnList;
+    }
+
+    public String getApplyPersonPhone() {
+        return applyPersonPhone;
+    }
+
+    public void setApplyPersonPhone(String applyPersonPhone) {
+        this.applyPersonPhone = applyPersonPhone;
     }
 }

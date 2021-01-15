@@ -15,6 +15,9 @@
                 <h:form id="zkbFePartOrderListForm">
                     <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
                         <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
+                        <p:commandButton value="待租户审批"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'tenant'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('tenant')}" />
+                        <p:commandButton value="400团队回填"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'fourhundred'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('fourhundred')}" />
+                        <p:commandButton value="GEAdmin归还"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'GEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('GEAdmin')}" />
                         <p:commandButton value="全部"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('all')}" />
                     </h:panelGrid>
                     <p:dataTable id="datalist" value="#{zkbFePartOrderController.lazyModel}" var="item" widgetVar="varDataList"
@@ -69,6 +72,15 @@
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_orderTypeName}" filterBy="#{item.orderType}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_orderType', item.orderType)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_orderType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>

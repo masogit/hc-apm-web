@@ -2,14 +2,12 @@ package com.ge.apm.view.zkb.fePartOrder;
 
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbFePartOrderRepository;
-import com.ge.apm.dao.ZkbFePartOrderUserConfigRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.domain.ZkbFePartOrder;
 import com.ge.apm.domain.ZkbFePartOrderUserConfig;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
-import com.ge.apm.service.zkb.ZkbFePartOrderStepService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
@@ -45,11 +43,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      * 合同信息
      */
     private ZkbContractRepository zkbContractRepository;
-
-    /**
-     * 智康宝人工申请STEP service
-     */
-    private ZkbFePartOrderStepService zkbFePartOrderStepService;
 
     /**
      * 合同列表
@@ -101,11 +94,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      */
     private Map<String, String> configTypeMap = new HashMap<>();
 
-    /**
-     * 获取审批角色配置信息
-     */
-    private ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository;
-
 
     private static final String dateFormat = "yyyyMMddHHmmss";
 
@@ -113,12 +101,10 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     protected void init() {
         super.init();
         zkbFePartOrderService = WebUtil.getBean(ZkbFePartOrderService.class);
-        zkbFePartOrderStepService = WebUtil.getBean(ZkbFePartOrderStepService.class);
         zkbFePartOrderRepository = WebUtil.getBean(ZkbFePartOrderRepository.class);
         zkbContractRepository = WebUtil.getBean(ZkbContractRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         this.loginName=currentUser.getLoginName();
-        zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
         this.userName=currentUser.getName();
         this.userUid=currentUser.getUid();
         this.tenantUID=currentUser.getTenantUID();
@@ -138,7 +124,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        configTypeMap=this.getMapConfigByLoginName();
+        configTypeMap=this.zkbFePartOrderService.getMapConfigByLoginName(this.loginName);
     }
 
     @Override
@@ -175,7 +161,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     public void prepareEdit() {
         super.prepareEdit();
         this.selected=this.zkbFePartOrderRepository.findById(this.id);
-        this.loadZkbContractInfo();
+        this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
     }
 
     /**
@@ -189,7 +175,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return;
         }
         this.zkbFePartOrderService.fullInfoBySystemId(this.selected,systemId);
-        this.loadZkbContractInfo();
+        this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         this.contractError=false;
         //未匹配到合同
         if(CollectionUtils.isEmpty(this.contractList))
@@ -225,23 +211,9 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         return date1;
     }
 
-    /**
-     * 加载合同信息
-     */
-    public void loadZkbContractInfo()
-    {
-        List<ZkbContract> list = new ArrayList<>();
-        if(StringUtils.isBlank(this.selected.getContractId())) {
-            this.setContractList(null);
-            return;
-        }
-        ZkbContract item = this.zkbContractRepository.findById(this.selected.getContractId());
-        list.add(item);
-        this.setContractList(list);
-    }
 
     public String backList(){
-        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus;
+        return this.zkbFePartOrderService.backList(this.queryStatus);
     }
 
     public String saveAndToListPage()
@@ -279,7 +251,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             }
             this.moveRemianTimeOfContract(zkbContract,1);
         }
-        String url = this.wolkFlowToComplete(ZkbFePartOrder.workFlowStatus.Requested.toString(),
+        String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null,GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
@@ -341,7 +313,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.selected.setComment(comment);
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
-        return this.wolkFlowToComplete(ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
+        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingApm.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
 
@@ -356,7 +328,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.selected.setTenantAssignDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.moveRemianTimeOfContract(zkbContract,3);
-        return this.wolkFlowToComplete(ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
+        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
 
@@ -370,7 +342,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
         this.moveRemianTimeOfContract(zkbContract,2);
         Date date = new Date();
-        return this.wolkFlowToComplete(ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
+        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_WECHART);
     }
 
@@ -396,51 +368,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         }
         return false;
     }
-    /**
-     * 根据登录账户名获取当前账户名流程配置信息
-     * @return
-     */
-    private Map<String, String> getMapConfigByLoginName()
-    {
-        Map<String, String> configTypeMap = new HashMap<>();
-        List<ZkbFePartOrderUserConfig> list = this.zkbFePartOrderUserConfigRepository.findByLoginName(this.loginName);
-        if(CollectionUtils.isEmpty(list))
-        {
-            return configTypeMap;
-        }
-        for(ZkbFePartOrderUserConfig item:list)
-        {
-            if(item==null) continue;
-            if(configTypeMap.containsKey(item.getConfigType())) continue;
-            configTypeMap.put(item.getConfigType(),item.getConfigType());
-        }
-        return configTypeMap;
-    }
 
-    /**
-     * @param status 流程状态
-     * @param currentStep 当前流程节点
-     * @param startTime 开始时间
-     * @param endTime 结束事假
-     * @return
-     */
-    public String wolkFlowToComplete(String status,String currentStep,Date startTime,Date endTime,GatewayURL gatewayURL)
-    {
-        this.selected.setStatus(status);
-        this.selected.setCurrentStep(currentStep);
-        this.zkbFePartOrderRepository.save(this.selected);
-        this.zkbFePartOrderStepService.updateLatestStepEndTime(this.selected.getId(),startTime);
-        this.zkbFePartOrderStepService.addNewItem(
-                this.selected.getId(),
-                currentStep,
-                this.userUid,this.userName,
-                startTime,
-                endTime,
-                status,
-                this.tenantUID);
-        this.zkbFePartOrderService.sendMessage(this.selected.getId(),gatewayURL);
-        return this.backList();
-    }
 
     /**
      * 判断当前流程是否在APM回填步骤
