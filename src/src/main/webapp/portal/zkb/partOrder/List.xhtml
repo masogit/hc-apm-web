@@ -113,7 +113,8 @@
                         <p:column headerText="审批人" filterBy="#{item.techAuditer}"  filterMatchMode="LIKE">
                             <h:outputText value="#{zkbPartOrderController.techAuditField(item)}"/>
                         </p:column>
-                        <p:column headerText="当前步骤" filterBy="#{item.currentStep}"  filterMatchMode="EQ" rendered="#{!zkbPartOrderController.showStatusBtn}">
+                        <!--rendered="#{!zkbPartOrderController.showStatusBtn}"-->
+                        <p:column headerText="当前步骤" filterBy="#{item.currentStep}"  filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPoSteps',item.currentStep)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
