@@ -245,18 +245,17 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.ManageReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.OrderedReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString()));
+        int a = 0;
+        int b = 0;
         if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
             List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
             Integer qty = 0;
             for(ZkbPartOrder o : zkbPartOrders){
                 qty++;
             }
-            int a = 1 + qty ;
-            int b = zkbContract.getProbeQuotaTotal();
-            double d = new BigDecimal((float)a/b).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            if (d > 0.3){
-                return false;
-            }
+            a = 1 + qty ;
+            b = zkbContract.getProbeQuotaTotal();
+
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
             filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
             List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
@@ -285,19 +284,24 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
             unReturnQty += (partQty - partReturnQty);
             if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
-                int a = zkbPartOrder.getQty() + unReturnQty;
-                int b = zkbContract.getSpareQuotaTotal();
-                double d = new BigDecimal((float)a/b).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                if (d > 0.3){
-                    return false;
-                }
+                a = zkbPartOrder.getQty() + unReturnQty;
+                b = zkbContract.getSpareQuotaTotal();
             }else {
-                int a = zkbPartOrder.getQty() + unReturnQty;
-                int b = zkbContract.getSpareArtificailTotal();
-                double d =new BigDecimal((float)a/b).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                if (d > 0.3){
-                    return false;
-                }
+                a = zkbPartOrder.getQty() + unReturnQty;
+                b = zkbContract.getSpareArtificailTotal();
+            }
+        }
+        if(b <= 0){
+            return true;
+        }
+        if(b < 10){
+            if(a > 3){
+                return false;
+            }
+        }else{
+            double d = new BigDecimal((float)a/b).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            if (d > 0.3){
+                return false;
             }
         }
         return true;
