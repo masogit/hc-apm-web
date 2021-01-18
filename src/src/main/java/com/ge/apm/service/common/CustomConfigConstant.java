@@ -250,4 +250,8 @@ public class CustomConfigConstant {
         return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
                 ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum");
     }
+
+    public static List<String> getTemplateEnableList() {
+        return Arrays.asList("GEIBTableExcel", "AssetInfoImportExcel");
+    }
 }
