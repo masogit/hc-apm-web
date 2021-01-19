@@ -210,6 +210,18 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     }
 
     /**
+     * 判断流程是否在第一节点
+     * @param currentStep
+     * @return
+     */
+    public boolean workFlowInFistStep(String currentStep)
+    {
+        if(ZkbFePartOrder.workFlowSteps.Requested.toString().equals(currentStep))
+            return true;
+        return false;
+    }
+
+    /**
      * 回退列表
      * @param queryStatus 查询状态
      * @return

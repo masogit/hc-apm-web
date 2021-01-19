@@ -260,6 +260,19 @@ public class ZkbFePartOrder {
     @Column(name = "father_part_order_no")
     private String fatherPartOrderNo;
 
+
+    /**
+     * 填充APM信息人
+     */
+    @Column(name = "full_apm_info_user")
+    private String fullApmInfoUser;
+
+    /**
+     * 填充APM信息时间
+     */
+    @Column(name = "full_apm_info_date")
+    private Date fullApmInfoDate;
+
     /**
      * 设备分类 1.放射类 2.超声类
      */
@@ -612,5 +625,21 @@ public class ZkbFePartOrder {
 
     public void setApplyPersonPhone(String applyPersonPhone) {
         this.applyPersonPhone = applyPersonPhone;
+    }
+
+    public String getFullApmInfoUser() {
+        return fullApmInfoUser;
+    }
+
+    public void setFullApmInfoUser(String fullApmInfoUser) {
+        this.fullApmInfoUser = fullApmInfoUser;
+    }
+
+    public Date getFullApmInfoDate() {
+        return fullApmInfoDate;
+    }
+
+    public void setFullApmInfoDate(Date fullApmInfoDate) {
+        this.fullApmInfoDate = fullApmInfoDate;
     }
 }
