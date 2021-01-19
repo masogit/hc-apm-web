@@ -6,15 +6,20 @@
 package com.ge.apm.view;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.BlobObjectShareAssetTypeRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobSharedAssetTypeFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -32,15 +37,18 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author caoyong
  */
 @ManagedBean
 @ViewScoped
-public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedAssetType> {
+public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedAssetType>  {
 
     private UaaService uuaService;
+    private BlobSharedAssetTypeFileService blobSharedAssetTypeFileService;
+    private BlobObjectShareAssetTypeRepository blobObjectShareAssetTypeRepository;
     SharedAssetTypeRepository dao = null;
     AssetInfoRepository assetInfoDao = null;
     OrgInfoRepository orgInfoDao = null;
@@ -50,10 +58,15 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     private String filterUnitPrice;
     private Double filterUnitPriceFrom;
     private Double filterUnitPriceTo;
-
+    @Setter@Getter
+    private List<V2_BlobObjectSharedAssetType> attachements;
+    //如果无图片 就显示请上传图片
+    private boolean uploadFlag;
     @Override
     protected void init() {
         uuaService = WebUtil.getBean(UaaService.class);
+        blobSharedAssetTypeFileService = WebUtil.getBean(BlobSharedAssetTypeFileService.class);
+        blobObjectShareAssetTypeRepository = WebUtil.getBean(BlobObjectShareAssetTypeRepository.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
         dao = WebUtil.getBean(SharedAssetTypeRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -72,6 +85,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
 
             setSelected(dao.findById((String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid")));
             prepareEdit();
+            uploadFlag = getAttachList(selected.getId()).size() ==0;
         } else if ("Delete".equalsIgnoreCase(actionName)) {
             prepareDelete();
         }
@@ -128,7 +142,33 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
     }
+    public List<V2_BlobObjectSharedAssetType> getAttachList(String id) {
+        if (attachements == null) {
+            attachements = blobSharedAssetTypeFileService.findBlobObjectShareAssetTypesByBoUid(id);
+        }
+        uploadFlag = attachements.size() == 0;
+        return attachements;
+    }
 
+    public void removeAttachmentById(String blobId) {
+        blobSharedAssetTypeFileService.deleteBlobObjectShareAssetTypById(blobId);
+        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
+    }
+    public boolean getUploadFlag() {
+        return uploadFlag;
+    }
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObjectSharedAssetType v2_blobObjectSharedAssetType = blobSharedAssetTypeFileService.uploadFileShareAssetType(event);
+        if (null != v2_blobObjectSharedAssetType) {
+            attachements.add(v2_blobObjectSharedAssetType);
+            v2_blobObjectSharedAssetType.setBoType(v2_blobObjectSharedAssetType.BO_TYPE_ADJUST_EQUIPMENT);
+            v2_blobObjectSharedAssetType.setBoUuid(selected.getId());
+           blobObjectShareAssetTypeRepository.save(v2_blobObjectSharedAssetType);
+           WebUtil.addSuccessMessage(v2_blobObjectSharedAssetType.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
     public String getOperation() {
         return operation;
     }
