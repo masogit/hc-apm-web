@@ -445,9 +445,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      */
     public Boolean workFlowInFistStep()
     {
-        if(StringUtils.isBlank(this.selected.getCurrentStep()))
-            return true;
-        return false;
+       return this.zkbFePartOrderService.workFlowInFistStep(this.selected.getCurrentStep());
     }
 
     public Boolean getContractError() {

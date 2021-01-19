@@ -68,12 +68,12 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     /**
      * 备件申请列表单个保存
      */
-    private ZkbFePartOrderAssetInfo selectZkbFePartOrderAssetInfo = new ZkbFePartOrderAssetInfo();
+    private ZkbFePartOrderAssetInfo selectZkbFePartOrderAssetInfo = null;
 
     /**
      * 备件归还选中
      */
-    private ZkbFePartOrderReturn selectZkbFePartOrderReturn = new ZkbFePartOrderReturn();
+    private ZkbFePartOrderReturn selectZkbFePartOrderReturn = null;
 
     /**
      * action动作名称
@@ -301,7 +301,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     public boolean isReturnItemDisabled()
     {
-        if(!(this.selectZkbFePartOrderReturn != null&&StringUtils.isBlank(this.selectZkbFePartOrderReturn.getId()))){
+        if(this.selectZkbFePartOrderReturn == null){
             return true;
         }else{
             return false;
@@ -418,6 +418,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         {
             this.zkbFePartOrderAssetInfoRepository.save(item);
         }
+        this.selected.setFullApmInfoUser(this.userName);
+        this.selected.setFullApmInfoDate(new Date());
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
     }
@@ -521,6 +523,15 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             return true;
         }
         return false;
+    }
+
+    /**
+     * 判断当前流程是否在第一步
+     * @return
+     */
+    public Boolean workFlowInFistStep()
+    {
+        return this.zkbFePartOrderService.workFlowInFistStep(this.selected.getCurrentStep());
     }
 
     /**
@@ -635,5 +646,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     public void setSelectZkbFePartOrderReturn(ZkbFePartOrderReturn selectZkbFePartOrderReturn) {
         this.selectZkbFePartOrderReturn = selectZkbFePartOrderReturn;
+    }
+
+    public Map<String, String> getConfigTypeMap() {
+        return configTypeMap;
+    }
+
+    public void setConfigTypeMap(Map<String, String> configTypeMap) {
+        this.configTypeMap = configTypeMap;
     }
 }

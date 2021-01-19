@@ -13,13 +13,13 @@
         <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='SpareParts'}">
             <p:fieldset id="zkbWorkFlowFieldset" legend="工单信息" >
                 <h:form id="searchForm">
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbFePartOrderSparePartDetailController.workFlowInFistStep()}">
                     <h:panelGroup>
                         <label class="label">#{msg.zkbFePartOrder_systemId}*</label>
                         <p:inputText  id="systemId" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"    />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbFePartOrder_orderNo}</label>
+                        <label class="label">报修单号</label>
                         <p:inputText id="fatherPartOrderNo" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  />
                     </h:panelGroup>
                     <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderSparePartDetailController.getSparePartsZkbFePartOrder(param['searchForm:systemId'],param['searchForm:fatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderForm:sparePartsZkbFePartOrder"/>
@@ -109,17 +109,17 @@
                             <p:inputText   disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.systemId}"    />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">人工#{msg.zkbFePartOrder_orderNo}</label>
+                            <label class="label">报修单号</label>
                             <p:inputText  disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.fatherPartOrderNo}" />
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{'2'.equals(zkbFePartOrderSparePartDetailController.selected.assetGroup)}">
+                        <h:panelGroup rendered="#{'1'.equals(zkbFePartOrderSparePartDetailController.selected.assetGroup)}">
                             <label class="label">#{msg.zkbFePartOrder_assetTypeDi}*</label>
                             <p:selectOneMenu id="assetTypeDi" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{zkbFePartOrderSparePartDetailController.selected.assetTypeDi}" required="true" requiredMessage="#{msg.zkbFePartOrder_assetTypeDi} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_assetTypeDi')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{'1'.equals(zkbFePartOrderSparePartDetailController.selected.assetGroup)}">
+                        <h:panelGroup rendered="#{'2'.equals(zkbFePartOrderSparePartDetailController.selected.assetGroup)}">
                             <label class="label">#{msg.zkbFePartOrder_artificialType}*</label>
                             <p:selectOneMenu id="artificialType" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" value="#{zkbFePartOrderSparePartDetailController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbFePartOrder_artificialType} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -140,7 +140,7 @@
                                         showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.zkbFePartOrder_orderNo}</label>
+                            <label class="label">申请单号</label>
                             <p:inputText id="orderNo" disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.partOrderNo}" />
                         </h:panelGroup>
                         <h:panelGroup>
@@ -178,18 +178,9 @@
                     <p:column headerText="#{msg.zkbFePartOrder_assetQty}">
                         <h:outputText value="#{item.assetQty}"/>
                     </p:column>
-                    <p:column headerText="#{msg.zkbFePartOrder_orderNoa}" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
-                        <h:outputText value="#{item.orderNo}"/>
-                    </p:column>
-                    <p:column headerText="#{msg.zkbFePartOrder_assetPrice}" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
-                        <h:outputText value="#{item.price}" />
-                    </p:column>
-                    <p:column headerText="#{msg.zkbFePartOrder_spareParts}" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
-                        <h:outputText value="#{item.sparePart}" />
-                    </p:column>
                     <f:facet name="{Toolbar}">
                         <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareItemCreate}"  update="zkbFePartOrderAssetInfoEditForm" oncomplete="PF('zkbFePartOrderAssetInfoEditDlg').show()" />
-                        <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested') or zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm') }"  immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareItemEdit}" disabled="#{zkbFePartOrderSparePartDetailController.itemDisabled}" update="zkbFePartOrderAssetInfoEditForm"  oncomplete="PF('zkbFePartOrderAssetInfoEditDlg').show()"  />
+                        <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareItemEdit}" disabled="#{zkbFePartOrderSparePartDetailController.itemDisabled}" update="zkbFePartOrderAssetInfoEditForm"  oncomplete="PF('zkbFePartOrderAssetInfoEditDlg').show()"  />
                         <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  immediate="false" process="@this"  id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteItem}" disabled="#{zkbFePartOrderSparePartDetailController.itemDisabled}" update=":zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                         </p:commandButton>
@@ -215,8 +206,43 @@
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
-
-            <p:fieldset id="geAdminFieldset" legend="GE Admin归还" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
+            <p:fieldset id="apmFieldset" legend="回填APM" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
+                        <label class="label">回填人名称*：</label>
+                        <p:inputText  disabled="true"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoUser}"  />
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
+                        <label class="label">回填时间*：</label>
+                        <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoDate}"
+                                    showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:dataTable id="zkbFePartOrderAssetInfoList_APM" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item"
+                             widgetVar="zkbFePartOrderAssetInfoList_APM" selectionMode="single"
+                             lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
+                             paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                    <p:column headerText="#{msg.zkbFePartOrder_assetNo}">
+                        <h:outputText value="#{item.assetNo}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_assetDescription}">
+                        <h:outputText value="#{item.assetDescription}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_assetQty}">
+                        <h:outputText value="#{item.assetQty}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_orderNoa}">
+                        <p:inputText  disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.orderNo}"  />
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_assetPrice}">
+                        <p:inputNumber disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.price}" ></p:inputNumber>
+                    </p:column>
+                    <p:column headerText="#{msg.zkbFePartOrder_spareParts}">
+                        <p:inputText disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.sparePart}"  />
+                    </p:column>
+                </p:dataTable>
+            </p:fieldset>
+            <p:fieldset id="geAdminFieldset" legend="GE Admin归还" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin') and (zkbFePartOrderSparePartDetailController.configTypeMap.containsKey('Supplier')||zkbFePartOrderSparePartDetailController.configTypeMap.containsKey('GEAdmin'))}">
                 <p:dataTable id="zkbFePartOrderReturnList" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderReturnList}" var="item"
                              widgetVar="zkbFePartOrderReturnList" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn}"
                              lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"

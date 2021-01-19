@@ -17,7 +17,7 @@
                         <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
                         <p:commandButton value="待租户审批"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'tenant'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('tenant')}" />
                         <p:commandButton value="400团队回填"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'fourhundred'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('fourhundred')}" />
-                        <p:commandButton value="GEAdmin归还"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'GEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('GEAdmin')}" />
+                        <p:commandButton value="待GE Admin归还"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'GEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('GEAdmin')}" />
                         <p:commandButton value="全部"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('all')}" />
                     </h:panelGrid>
                     <p:dataTable id="datalist" value="#{zkbFePartOrderController.lazyModel}" var="item" widgetVar="varDataList"
@@ -40,7 +40,7 @@
                         <p:column headerText="#{msg.zkbFePartOrder_reportUser}" filterBy="#{item.reportUser}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.reportUser}"/>
                         </p:column>
-                        <p:column headerText="#{msg.zkbFePartOrder_reportDate}">
+                        <p:column headerText="申请时间">
                             <h:outputText value="#{item.reportDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
                             </h:outputText>
