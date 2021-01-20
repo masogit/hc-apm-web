@@ -6,11 +6,10 @@
 package com.ge.apm.view;
 
 import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BlobObjectShareAssetTypeRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.BlobSharedAssetTypeFileService;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -47,8 +46,7 @@ import java.util.stream.Collectors;
 public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedAssetType>  {
 
     private UaaService uuaService;
-    private BlobSharedAssetTypeFileService blobSharedAssetTypeFileService;
-    private BlobObjectShareAssetTypeRepository blobObjectShareAssetTypeRepository;
+    private BlobFileService blobFileService;
     SharedAssetTypeRepository dao = null;
     AssetInfoRepository assetInfoDao = null;
     OrgInfoRepository orgInfoDao = null;
@@ -59,14 +57,13 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     private Double filterUnitPriceFrom;
     private Double filterUnitPriceTo;
     @Setter@Getter
-    private List<V2_BlobObjectSharedAssetType> attachements;
+    private List<V2_BlobObject> attachements;
     //如果无图片 就显示请上传图片
     private boolean uploadFlag;
     @Override
     protected void init() {
         uuaService = WebUtil.getBean(UaaService.class);
-        blobSharedAssetTypeFileService = WebUtil.getBean(BlobSharedAssetTypeFileService.class);
-        blobObjectShareAssetTypeRepository = WebUtil.getBean(BlobObjectShareAssetTypeRepository.class);
+        blobFileService = WebUtil.getBean(BlobFileService.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
         dao = WebUtil.getBean(SharedAssetTypeRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -142,29 +139,29 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
     }
-    public List<V2_BlobObjectSharedAssetType> getAttachList(String id) {
+    public List<V2_BlobObject> getAttachList(String id) {
         if (attachements == null) {
-            attachements = blobSharedAssetTypeFileService.findBlobObjectShareAssetTypesByBoUid(id);
+            attachements = blobFileService.findBlobObjectsByBoUid(id);
         }
         uploadFlag = attachements.size() == 0;
         return attachements;
     }
 
     public void removeAttachmentById(String blobId) {
-        blobSharedAssetTypeFileService.deleteBlobObjectShareAssetTypById(blobId);
+        blobFileService.deleteBlobFileById(blobId);
         attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
     public boolean getUploadFlag() {
         return uploadFlag;
     }
     public void handleFileUpload(FileUploadEvent event) {
-        V2_BlobObjectSharedAssetType v2_blobObjectSharedAssetType = blobSharedAssetTypeFileService.uploadFileShareAssetType(event);
-        if (null != v2_blobObjectSharedAssetType) {
-            attachements.add(v2_blobObjectSharedAssetType);
-            v2_blobObjectSharedAssetType.setBoType(v2_blobObjectSharedAssetType.BO_TYPE_ADJUST_EQUIPMENT);
-            v2_blobObjectSharedAssetType.setBoUuid(selected.getId());
-           blobObjectShareAssetTypeRepository.save(v2_blobObjectSharedAssetType);
-           WebUtil.addSuccessMessage(v2_blobObjectSharedAssetType.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        V2_BlobObject blobObject = blobFileService.uploadFile(event);
+        if (null != blobObject) {
+            attachements.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_ADJUST_EQUIPMENT);
+            blobObject.setBoUuid(selected.getId());
+           blobFileService.saveBlobObject(blobObject);
+           WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
