@@ -56,7 +56,7 @@ public class ZkbFePartOrderAssetInfo {
      * 价格
      */
     @Column(name = "price")
-    private Double price;
+    private String price;
 
     /**
      * 备件（说明是否DOA或者short life
@@ -139,11 +139,11 @@ public class ZkbFePartOrderAssetInfo {
         this.orderNo = orderNo;
     }
 
-    public Double getPrice() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 

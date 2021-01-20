@@ -249,7 +249,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                     return "";
                 }
             }
-            this.moveRemianTimeOfContract(zkbContract,1);
+            this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,1,this.selected);
         }
         String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null,GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
@@ -257,51 +257,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         return url;
     }
 
-    /**
-     * @param zkbContract 合同信息
-     * @param type 1.把剩余名额移入申请名额 2.把申请名额移入已使用名额 3.把申请名额移入剩余名额
-     */
-    private void moveRemianTimeOfContract(ZkbContract zkbContract,Integer type)
-    {
 
-        if(!"true".equals(this.selected.getSubtractTotalStatus())) return;
-        if("DI".equals(zkbContract.getContractType())
-                ||"PCB".equals(zkbContract.getContractType()))
-        {
-            switch(type){
-                case 1 :
-                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()-1);
-                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()+1);
-                    break;
-                case 2 :
-                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-1);
-                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse()+1);
-                    break;
-                case 3:
-                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()+1);
-                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-1);
-                    break;
-            }
-        }else if("CCS".equals(zkbContract.getContractType())
-                ||"Biomed".equals(zkbContract.getContractType()))
-        {
-            switch(type){
-                case 1 :
-                    zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()-1);
-                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()+1);
-                    break;
-                case 2 :
-                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()-1);
-                    zkbContract.setGeArtificialSupportTimesUse(zkbContract.getGeArtificialSupportTimesUse()+1);
-                    break;
-                case 3:
-                    zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()+1);
-                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()-1);
-                    break;
-            }
-        }
-        this.zkbContractRepository.save(zkbContract);
-    }
 
     /**
      * 供应商同意
@@ -327,7 +283,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
-        this.moveRemianTimeOfContract(zkbContract,3);
+        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,3,this.selected);
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
@@ -340,7 +296,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     {
 
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
-        this.moveRemianTimeOfContract(zkbContract,2);
+        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,2,this.selected);
         Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_WECHART);
