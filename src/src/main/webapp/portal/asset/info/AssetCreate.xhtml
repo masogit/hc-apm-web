@@ -63,7 +63,7 @@
                         <div class="container-fluid" style="height: 400px; overflow: auto;">
                             <div class="row" id="picDiv">
                                 <c:forEach
-                                        items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}"
+                                        items="#{assetInfoEditController.pictureList}"
                                         var="attach">
                                     <div>
                                         <img data-original="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
