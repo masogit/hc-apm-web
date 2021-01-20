@@ -253,7 +253,8 @@
                         <p:inputText  disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.orderNo}"  />
                     </p:column>
                     <p:column headerText="#{msg.zkbFePartOrder_assetPrice}" rendered="#{!zkbFePartOrderSparePartDetailController.configTypeMap.containsKey('Supplier')}">
-                        <p:inputNumber disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.price}" ></p:inputNumber>
+<!--                        <p:inputNumber disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.price}" ></p:;>-->
+                        <p:inputText  disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.price}"  />
                     </p:column>
                     <p:column headerText="#{msg.zkbFePartOrder_spareParts}">
                         <p:inputText disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{item.sparePart}"  />

@@ -299,6 +299,76 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         list.add(item);
         return list;
     }
+    /**
+     * @param zkbContract 合同信息
+     * @param type 1.把剩余名额移入申请名额 2.把申请名额移入已使用名额 3.把申请名额移入剩余名额
+     * @param zkbFePartOrder 流程申请数据
+     */
+    public void moveRemianTimeOfContract(ZkbContract zkbContract,Integer type,ZkbFePartOrder zkbFePartOrder)
+    {
 
+        if(!"true".equals(zkbFePartOrder.getSubtractTotalStatus())) return;
+        if("DI".equals(zkbContract.getContractType())
+                ||"PCB".equals(zkbContract.getContractType()))
+        {
+            switch(type){
+                case 1 :
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()-1);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()+1);
+                    break;
+                case 2 :
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-1);
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse()+1);
+                    break;
+                case 3:
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()+1);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-1);
+                    break;
+            }
+        }else if("CCS".equals(zkbContract.getContractType())
+                ||"Biomed".equals(zkbContract.getContractType()))
+        {
+            switch(type){
+                case 1 :
+                    zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()-1);
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()+1);
+                    break;
+                case 2 :
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()-1);
+                    zkbContract.setGeArtificialSupportTimesUse(zkbContract.getGeArtificialSupportTimesUse()+1);
+                    break;
+                case 3:
+                    zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()+1);
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()-1);
+                    break;
+            }
+        }
+        this.zkbContractRepository.save(zkbContract);
+    }
+
+    /**
+     * 移动备件名额
+     * @param type 移动类型
+     * @param zkbContract 合同
+     * @param qty 数量
+     */
+    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty)
+    {
+        switch(type){
+            case 1 :
+                zkbContract.setSpareQuota(zkbContract.getSpareQuota()-qty);
+                zkbContract.setSpareQuotaApply(zkbContract.getSpareQuota()+qty);
+                break;
+            case 2 :
+                zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
+                zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()+qty);
+                break;
+            case 3:
+                zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()-qty);
+                zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
+                break;
+        }
+        this.zkbContractRepository.save(zkbContract);
+    }
 
 }
