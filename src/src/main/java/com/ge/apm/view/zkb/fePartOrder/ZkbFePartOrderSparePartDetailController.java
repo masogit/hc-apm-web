@@ -215,6 +215,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             }
         }
         this.selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnList);
+        this.orderAnnotationChange();
     }
 
     public void getSparePartsZkbFePartOrder(String systemId,String partOrderNo)
@@ -236,6 +237,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.LIKE,partOrderNo));
         }
         this.sparePartsZkbFePartOrderList = this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
+        if(CollectionUtils.isEmpty(this.sparePartsZkbFePartOrderList))
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_searchError"));
+        }
     }
 
     /**
@@ -314,7 +319,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     public void prepareItemCreate(){
         this.actionItemName = "Create";
         this.selectZkbFePartOrderAssetInfo = new ZkbFePartOrderAssetInfo();
-        super.create();
+        //super.create();
     }
 
     /**
@@ -357,15 +362,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_sparePartListError"));
             return "";
         }
-        this.zkbFePartOrderRepository.save(this.selected);
+        String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
+                ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null, GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
         for(ZkbFePartOrderAssetInfo item:zkbFePartOrderAssetInfoList )
         {
             item.setFePartOrderId(this.selected.getId());
             this.zkbFePartOrderAssetInfoRepository.save(item);
         }
-        String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
-                ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null, GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
     }
@@ -583,6 +587,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         return false;
     }
 
+    private boolean showProblemOrderNumber = false;
+    public void orderAnnotationChange(){
+        if("NormalOrder".equals(selected.getOrderAnnotation())){
+            showProblemOrderNumber = true;
+        }else{
+            showProblemOrderNumber = false;
+        }
+    }
 
     public List<ZkbFePartOrder> getSparePartsZkbFePartOrderList() {
         return sparePartsZkbFePartOrderList;
@@ -654,5 +666,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     public void setConfigTypeMap(Map<String, String> configTypeMap) {
         this.configTypeMap = configTypeMap;
+    }
+
+    public boolean isShowProblemOrderNumber() {
+        return showProblemOrderNumber;
+    }
+
+    public void setShowProblemOrderNumber(boolean showProblemOrderNumber) {
+        this.showProblemOrderNumber = showProblemOrderNumber;
     }
 }

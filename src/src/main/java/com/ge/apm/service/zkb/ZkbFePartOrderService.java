@@ -254,6 +254,22 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                                      Date endTime,
                                      GatewayURL gatewayURL)
     {
+        if(ZkbFePartOrder.workFlowSteps.Requested.toString().equals(zkbFePartOrder.getCurrentStep()))
+        {
+            List<ZkbFePartOrder> listZkbFePartOrder = this.zkbFePartOrderRepository.findByPartOrderNo(zkbFePartOrder.getPartOrderNo());
+            if( CollectionUtils.isNotEmpty(listZkbFePartOrder))
+            {
+                String orderPrefix = "";
+                if(zkbFePartOrder.getOrderType().equals(ZkbFePartOrder.OrderType.ManMade))
+                {
+                    orderPrefix=ORDER_PREFIX;
+                }else
+                {
+                    orderPrefix=SPARE_PARTS_ORDER_PREFIX;
+                }
+                this.fullOrderNo(zkbFePartOrder,orderPrefix);
+            }
+        }
         zkbFePartOrder.setStatus(status);
         zkbFePartOrder.setCurrentStep(currentStep);
         this.zkbFePartOrderRepository.save(zkbFePartOrder);
