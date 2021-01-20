@@ -243,6 +243,12 @@ public class ZkbFePartOrder {
     private String orderAnnotation;
 
     /**
+     * 发生问题的order number
+     */
+    @Column(name = "problem_order_number")
+    private String problemOrderNumber;
+
+    /**
      * 产品型号
      */
     @Column(name = "product_number")
@@ -277,6 +283,12 @@ public class ZkbFePartOrder {
      * 设备分类 1.放射类 2.超声类
      */
     private String assetGroup;
+
+    /**
+     * 供应商审批备注
+     */
+    @Column(name = "ge_admin_comment")
+    private String geAdminComment;
 
     /**
      * 申请备件列表
@@ -641,5 +653,21 @@ public class ZkbFePartOrder {
 
     public void setFullApmInfoDate(Date fullApmInfoDate) {
         this.fullApmInfoDate = fullApmInfoDate;
+    }
+
+    public String getProblemOrderNumber() {
+        return problemOrderNumber;
+    }
+
+    public void setProblemOrderNumber(String problemOrderNumber) {
+        this.problemOrderNumber = problemOrderNumber;
+    }
+
+    public String getGeAdminComment() {
+        return geAdminComment;
+    }
+
+    public void setGeAdminComment(String geAdminComment) {
+        this.geAdminComment = geAdminComment;
     }
 }

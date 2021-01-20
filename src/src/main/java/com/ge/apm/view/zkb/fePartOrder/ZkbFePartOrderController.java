@@ -78,24 +78,9 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     private static final String MY_WORK="myWork";
 
     /**
-     * 我的全部
+     * 全部
      */
-    private static final String MY_ALL="all";
-
-    /**
-     * 待租户审批
-     */
-    private static final String MY_TENANT="tenant";
-
-    /**
-     * 400团队回填
-     */
-    private static final String MY_FOURHUNDRED="fourhundred";
-
-    /**
-     * GEAdmin归还
-     */
-    private static final String MY_GEAdmin="GEAdmin";
+    private static final String ALL="all";
 
     /**
      * 没权限查看
@@ -174,17 +159,9 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             this.getSearchFilterByUserConfig(searchFilters);
         }else{
             this.getAllSearchFilterByUserConfig(searchFilters);
-            if(ZkbFePartOrderController.MY_TENANT.equals(this.queryStatus))
+            if(StringUtils.isNotBlank(this.queryStatus)&&!ALL.equals(this.queryStatus))
             {
-                searchFilters.add((new SearchFilter("currentStep", SearchFilter.Operator.EQ,ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString())));
-            }
-            if(ZkbFePartOrderController.MY_FOURHUNDRED.equals(this.queryStatus))
-            {
-                searchFilters.add((new SearchFilter("currentStep", SearchFilter.Operator.EQ,ZkbFePartOrder.workFlowSteps.WaitingApm.toString())));
-            }
-            if(ZkbFePartOrderController.MY_GEAdmin.equals(this.queryStatus))
-            {
-                searchFilters.add((new SearchFilter("currentStep", SearchFilter.Operator.EQ,ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString())));
+                searchFilters.add((new SearchFilter("currentStep", SearchFilter.Operator.EQ,queryStatus)));
             }
         }
         return searchFilters;
