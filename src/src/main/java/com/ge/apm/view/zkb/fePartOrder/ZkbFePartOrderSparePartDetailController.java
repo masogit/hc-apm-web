@@ -273,7 +273,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         AssetInfo assetInfo = this.assetInfoRepository.getBySystemId(this.selectZkbFePartOrder.getSystemId());
         if(assetInfo!=null)
         {
+            this.selected.setArtificialType("");
+            if(assetInfo.getAssetGroup()!=null&&"2".equals(assetInfo.getAssetGroup().toString()))
+            {
+                this.selected.setArtificialType(highArtificialTypeValue);
+            }
             this.selected.setAssetGroup(assetInfo.getAssetGroup().toString());
+
             this.selected.setProductNumber(assetInfo.getFunctionType());
         }
     }
@@ -380,7 +386,16 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         int applyCount = this.getApplyCount();
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        if(zkbContract.getIbNumber()==null||applyCount>zkbContract.getIbNumber())
+        Integer reaminApplyCount = null;
+        if(StringUtils.isNotBlank(this.selected.getAssetTypeDi()))
+        {
+            reaminApplyCount=zkbContract.getSpareArtificail();
+        }else if(StringUtils.isNotBlank(this.selected.getArtificialType()))
+        {
+            reaminApplyCount=zkbContract.getSpareQuota();
+        }
+
+        if(reaminApplyCount==null||applyCount>reaminApplyCount)
         {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
             return "";
@@ -395,7 +410,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         if(!highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
-            this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount);
+            this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount,this.selected);
         }
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
@@ -469,7 +484,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         {
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
             int applyCount = this.getApplyCount();
-            this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount);
+            this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount,this.selected);
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
@@ -513,7 +528,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
         if(!highArtificialTypeValue.equals(this.selected.getArtificialType())&&returnCount>0)
         {
-            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount);
+            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount,this.selected);
         }
         for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
         {
