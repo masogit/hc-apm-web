@@ -418,5 +418,66 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         return zkbFePartOrderReturnMap;
     }
+    /**
+     * 判断是否隐藏还是显示
+     * @param fieldsetType
+     * @return
+     */
+    public Boolean checkRendered(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap)
+    {
+        if(StringUtils.isBlank(fieldsetType))
+        {
+            return false;
+        }
+        Map<String,Integer> stepMap = this.stepAndRoleMap();
+        String currentStep = zkbFePartOrder.getCurrentStep();
+        Integer fieldsetTypeIndex = stepMap.get(fieldsetType);
+        Integer currentStepIndex = stepMap.get(currentStep);
+        if(fieldsetTypeIndex<currentStepIndex)
+        {
+            return true;
+        }
+        if(fieldsetTypeIndex==currentStepIndex)
+        {
+            String [] stepAndRole = ZkbFePartOrder.stepAndRoles[fieldsetTypeIndex].split(",");
+            if(configTypeMap.containsKey(stepAndRole[1]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Map<String,Integer> stepAndRoleMap()
+    {
+        Map<String,Integer> stepMap = new HashMap<>();
+        for(int i =0;i<ZkbFePartOrder.stepAndRoles.length;i++)
+        {
+            String [] stepAndRole =ZkbFePartOrder.stepAndRoles[i].split(",");
+            stepMap.put(stepAndRole[0],i);
+        }
+        return stepMap;
+    }
+
+    /**
+     * 判断是否隐藏还是显示
+     * @param fieldsetType
+     * @return
+     */
+    public Boolean hasEditRight(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap)
+    {
+        String currentStep = zkbFePartOrder.getCurrentStep();
+        if(!currentStep.equals(fieldsetType))
+        {
+            return false;
+        }
+        Map<String,Integer> stepMap = this.stepAndRoleMap();
+        String [] stepAndRole =ZkbFePartOrder.stepAndRoles[stepMap.get(fieldsetType)].split(",");
+        if(configTypeMap.containsKey(stepAndRole[1]))
+        {
+            return true;
+        }
+        return false;
+    }
 
 }

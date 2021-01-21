@@ -587,32 +587,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public Boolean hasEditRight(String fieldsetType)
     {
-        String currentStep = this.selected.getCurrentStep();
-        if(!currentStep.equals(fieldsetType))
-        {
-            return false;
-        }
-        if(ZkbFePartOrder.workFlowSteps.Requested.toString().equals(fieldsetType)&&
-                this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()))
-        {
-            return true;
-        }
-        if(ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString().equals(fieldsetType)
-                &&this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString()))
-        {
-            return true;
-        }
-        if(ZkbFePartOrder.workFlowSteps.WaitingApm.toString().equals(fieldsetType)
-                &&this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()))
-        {
-            return true;
-        }
-        if(ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString().equals(fieldsetType)
-                &&this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))
-        {
-            return true;
-        }
-        return false;
+        return this.zkbFePartOrderService.hasEditRight(fieldsetType,this.selected,this.configTypeMap);
     }
 
     /**
@@ -631,33 +606,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public Boolean checkRendered(String fieldsetType)
     {
-        String currentStep = this.selected.getCurrentStep();
-        if(ZkbFePartOrder.workFlowSteps.Complete.toString().equals(currentStep)) return true;
-        if(ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString().equals(currentStep)) return true;
-        if(ZkbFePartOrder.workFlowSteps.WaitingApm.toString().equals(currentStep))
-        {
-            if(fieldsetType.equals(ZkbFePartOrder.workFlowSteps.WaitingApm.toString()))
-            {
-                return true;
-            }else if(fieldsetType.equals(ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString()))
-            {
-                return true;
-            }else
-                {
-                    return false;
-                }
-        }
-        if(ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString().equals(currentStep))
-        {
-           if(fieldsetType.equals(ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString()))
-            {
-                return true;
-            }else
-            {
-                return false;
-            }
-        }
-        return false;
+       return this.zkbFePartOrderService.checkRendered(fieldsetType,this.selected,this.configTypeMap);
     }
 
     /**
