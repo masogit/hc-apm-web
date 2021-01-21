@@ -12,6 +12,7 @@
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_assetNo}*</label>
                     <p:selectOneMenu  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.assetNo}" required="true" requiredMessage="#{msg.zkbFePartOrder_assetNo} #{msg.ValidationRequire}">
+                        <p:ajax update="orderNoa"/>
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item" itemLabel="#{item.assetNo}" itemValue="#{item.assetNo}"/>
                     </p:selectOneMenu>
@@ -22,9 +23,9 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_orderNoa}*</label>
-                    <p:selectOneMenu  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.orderNo}" required="true" requiredMessage="#{msg.zkbFePartOrder_orderNoa} #{msg.ValidationRequire}">
+                    <p:selectOneMenu id="orderNoa"  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.orderNo}" required="true" requiredMessage="#{msg.zkbFePartOrder_orderNoa} #{msg.ValidationRequire}">
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItems value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item" itemLabel="#{item.orderNo}" itemValue="#{item.orderNo}"/>
+                        <f:selectItems value="#{zkbFePartOrderSparePartDetailController.subOrderNoList}" var="item" itemLabel="#{item.orderNo}" itemValue="#{item.orderNo}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>

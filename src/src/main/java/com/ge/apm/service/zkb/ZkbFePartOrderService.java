@@ -4,9 +4,7 @@ import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbFePartOrderRepository;
 import com.ge.apm.dao.ZkbFePartOrderUserConfigRepository;
 import com.ge.apm.dao.mapper.ZkbFePartOrderMapper;
-import com.ge.apm.domain.ZkbContract;
-import com.ge.apm.domain.ZkbFePartOrder;
-import com.ge.apm.domain.ZkbFePartOrderUserConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -282,7 +280,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 endTime,
                 status,
                 tenantUID);
-        this.sendMessage(zkbFePartOrder.getId(),gatewayURL);
+        if(gatewayURL!=null)
+        {
+            this.sendMessage(zkbFePartOrder.getId(),gatewayURL);
+        }
+
         return this.backList(queryStatus);
     }
 
@@ -357,7 +359,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         switch(type){
             case 1 :
                 zkbContract.setSpareQuota(zkbContract.getSpareQuota()-qty);
-                zkbContract.setSpareQuotaApply(zkbContract.getSpareQuota()+qty);
+                zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()+qty);
                 break;
             case 2 :
                 zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
@@ -369,6 +371,52 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 break;
         }
         this.zkbContractRepository.save(zkbContract);
+    }
+
+    /**
+     * 根据List获取map
+     * @param assetInfoList 申请设备列表
+     * @return
+     */
+    public Map<String,Integer> getAssetInfoMap(List<ZkbFePartOrderAssetInfo> assetInfoList)
+    {
+        Map<String,Integer> assetInfoMap = new HashMap<>();
+        for(ZkbFePartOrderAssetInfo item:assetInfoList)
+        {
+            String key = item.getAssetNo()+item.getOrderNo();
+            if(assetInfoMap.containsKey(key))
+            {
+                Integer qty = assetInfoMap.get(key);
+                assetInfoMap.put(key,qty+item.getAssetQty());
+                continue;
+            }
+            assetInfoMap.put(key,item.getAssetQty());
+        }
+        return assetInfoMap;
+    }
+
+    /**
+     * 根据List获取map
+     * @param zkbFePartOrderReturnList 返回设备列表
+     * @param zkbFePartOrder 流程主表数据
+     * @return
+     */
+    public Map<String,Integer> getZkbFePartOrderReturnMap(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList,ZkbFePartOrder zkbFePartOrder)
+    {
+        Map<String,Integer> zkbFePartOrderReturnMap = new HashMap<>();
+        for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
+        {
+            String key = item.getAssetNo()+item.getOrderNo();
+            if(zkbFePartOrderReturnMap.containsKey(key))
+            {
+                Integer qty = zkbFePartOrderReturnMap.get(key);
+                zkbFePartOrderReturnMap.put(key,qty+item.getQty());
+                continue;
+            }
+            zkbFePartOrderReturnMap.put(key,item.getQty());
+            item.setPartOrderId(zkbFePartOrder.getId());
+        }
+        return zkbFePartOrderReturnMap;
     }
 
 }
