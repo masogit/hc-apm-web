@@ -20,10 +20,11 @@ public class ZkbFePartOrder {
      * TenantAccept:租户审批通过
      * TenantReject:租户批拒绝
      * FourHundredsAccept:400回填
-     * GEAdminAccept GEAdmin 填写归还信息
+     * GEAdminAccept GEAdmin 全部归还
+     * GEAdminAcceptPart GEAdmin 部分归还
      */
     public enum workFlowStatus {
-        Requested,TenantAccept,TenantReject,FourHundredsAccept,GEAdminAccept
+        Requested,TenantAccept,TenantReject,FourHundredsAccept,GEAdminAccept,GEAdminAcceptPart
     }
 
     /**
