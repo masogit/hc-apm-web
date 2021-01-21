@@ -354,22 +354,41 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbContract 合同
      * @param qty 数量
      */
-    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty)
+    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty,ZkbFePartOrder zkbFePartOrder)
     {
-        switch(type){
-            case 1 :
-                zkbContract.setSpareQuota(zkbContract.getSpareQuota()-qty);
-                zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()+qty);
-                break;
-            case 2 :
-                zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
-                zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()+qty);
-                break;
-            case 3:
-                zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()-qty);
-                zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
-                break;
-        }
+        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetTypeDi()))
+        {
+            switch(type){
+                case 1 :
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()-qty);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()+qty);
+                    break;
+                case 2 :
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-qty);
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse()+qty);
+                    break;
+                case 3:
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()+qty);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-qty);
+                    break;
+            }
+        }else
+            {
+                switch(type){
+                    case 1 :
+                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()-qty);
+                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()+qty);
+                        break;
+                    case 2 :
+                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
+                        zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()+qty);
+                        break;
+                    case 3:
+                        zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()-qty);
+                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
+                        break;
+                }
+            }
         this.zkbContractRepository.save(zkbContract);
     }
 

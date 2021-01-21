@@ -172,6 +172,13 @@
                             <label class="label">#{msg.zkbFePartOrder_softwareVersion}*</label>
                             <p:inputText id="softwareVersion" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" required="true" requiredMessage="#{msg.zkbFePartOrder_softwareVersion} #{msg.ValidationRequire}"  value="#{zkbFePartOrderSparePartDetailController.selected.softwareVersion}" />
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingAssignment')}">
+                            <label class="label">#{msg.zkbFePartOrder_currentStatus}</label>
+                            <p:selectOneMenu id="status" disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.status}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_status')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                 </p:panelGrid>
                 <p:dataTable id="zkbFePartOrderAssetInfoList" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item"
                              widgetVar="zkbFePartOrderAssetInfoList" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderAssetInfo}"
