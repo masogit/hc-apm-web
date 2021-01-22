@@ -96,14 +96,16 @@
                                 <p:inputTextarea id="remark1" rows="1" cols="66" queryDelay="750" minQueryLength="4"
                                                  value="#{sharedAssetTypeController.selected.deviceDescription}"/>
                             </h:panelGroup>
+
+                        </p:panelGrid>
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{sharedAssetTypeController.selected != null}">
                             <h:panelGroup>
                                 <label class='label'>备注</label>
                                 <p:inputTextarea id="remark" rows="1" cols="66" queryDelay="750" minQueryLength="4"
                                                  value="#{sharedAssetTypeController.selected.remark}"/>
                             </h:panelGroup>
-
                         </p:panelGrid>
-
                     </p:fieldset>
                     <p:fieldset legend="图片" style="margin-bottom:20px" id="pict">
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
