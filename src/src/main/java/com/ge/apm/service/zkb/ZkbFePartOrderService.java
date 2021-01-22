@@ -368,6 +368,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse()+qty);
                     break;
                 case 3:
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse()-qty);
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()+qty);
+                    break;
+                case 4 :
                     zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()+qty);
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-qty);
                     break;
@@ -386,6 +390,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     case 3:
                         zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()-qty);
                         zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
+                        break;
+                    case 4 :
+                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
+                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
                         break;
                 }
             }
