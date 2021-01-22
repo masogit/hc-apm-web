@@ -17,7 +17,11 @@ public class ZkbPartOrderReturn implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum DataStatusEnum{
-        New,Old
+        Pending,Accept,Reject
+    }
+
+    public enum ModifyFlagEnum{
+        Y,N
     }
 
     @Id
@@ -75,11 +79,15 @@ public class ZkbPartOrderReturn implements Serializable {
     private Date returnDate;
 
     /**
-     * new 可以修改，删改
-     * old 不能操作，
+     * Pending 待审核
+     * Accept 审核通过
+     * Reject 审核不通过
      */
     @Column(name = "data_satus")
-    private String dataStatus= "New";
+    private String dataStatus= "Pending";
+
+    @Column(name = "modify_flag")
+    private String modifyFlag= "Y";
 
     @Column(name = "order_no")
     private String orderNo;
@@ -89,6 +97,58 @@ public class ZkbPartOrderReturn implements Serializable {
 
     @Column(name = "updated_date")
     private Date updatedDate;
+
+    @Column(name = "closed_remark")
+    private String closedRemark;
+
+    @Column(name = "closed_date")
+    private Date closedDate;
+
+    @Column(name = "closed_auditer")
+    private String closedAuditer;
+
+    @Column(name = "closed_auditer_uid")
+    private String closedAuditerUid;
+
+    public String getClosedRemark() {
+        return closedRemark;
+    }
+
+    public void setClosedRemark(String closedRemark) {
+        this.closedRemark = closedRemark;
+    }
+
+    public Date getClosedDate() {
+        return closedDate;
+    }
+
+    public void setClosedDate(Date closedDate) {
+        this.closedDate = closedDate;
+    }
+
+    public String getClosedAuditer() {
+        return closedAuditer;
+    }
+
+    public void setClosedAuditer(String closedAuditer) {
+        this.closedAuditer = closedAuditer;
+    }
+
+    public String getClosedAuditerUid() {
+        return closedAuditerUid;
+    }
+
+    public void setClosedAuditerUid(String closedAuditerUid) {
+        this.closedAuditerUid = closedAuditerUid;
+    }
+
+    public String getModifyFlag() {
+        return modifyFlag;
+    }
+
+    public void setModifyFlag(String modifyFlag) {
+        this.modifyFlag = modifyFlag;
+    }
 
     public Date getCreatedDate() {
         return createdDate;
