@@ -522,6 +522,30 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void saveArrivalList() {
         this.save();
+
+        saveRepairerAndRepairerTel();
+    }
+
+    public void saveRepairerAndRepairerTel(){
+        if(activeSupplier() && this.selected.getStatus() > 1) {
+            String arrivalListId = this.selected.getId();
+            List<ArrivalListItem> arrivalListItems = itemDao.findByArrivalListId(arrivalListId);
+            if(arrivalListItems.size() > 0){
+                String repairerInfo = selected.getRepairer();
+                if(StringUtils.isNotEmpty(repairerInfo) && StringUtils.isNotEmpty(selected.getRepairerTel())){
+                    repairerInfo = repairerInfo +"-"+ selected.getRepairerTel();
+                    String comments = arrivalListItems.get(0).getComments() == null ? "" : arrivalListItems.get(0).getComments();
+                    String[] commentsSplit = comments.split("\n");//保存规则：维修人-电话'\n'其他评论信息
+                    if(commentsSplit[0].contains("-")){
+                        comments = !repairerInfo.equals(commentsSplit[0]) ? comments.replaceFirst(commentsSplit[0],repairerInfo) : comments;
+                    }else{
+                        comments = repairerInfo +"\n"+ comments;
+                    }
+                    itemDao.updateComments(comments, arrivalListId);
+                    arrivalItemList = itemDao.findByArrivalListId(arrivalListId);
+                }
+            }
+        }
     }
 
     public List<Supplier> autoCompleteVendor(String query) {
@@ -814,5 +838,25 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setImageName(String imageName) {
         this.imageName = imageName;
+    }
+
+    public void updateInvoiceNum(){
+        if(selected != null && selected.getId() != null){
+            if(selected.getInvoiceNum() == null){
+                WebUtil.addErrorMessage("请输入发票号码");
+                return;
+            }
+            dao.updateInvoiceNum(selected.getInvoiceNum(),selected.getId());
+        }
+    }
+
+    public void updateSupplierUser(){
+        if(selected != null && selected.getId() != null){
+            if(selected.getSupplierUserId() == null){
+                WebUtil.addErrorMessage("请选择供应商责任人");
+                return;
+            }
+            dao.updateSupplierUser(selected.getVendor(),selected.getSupplierId(),selected.getSupplierUserId(),selected.getId(),3);
+        }
     }
 }
