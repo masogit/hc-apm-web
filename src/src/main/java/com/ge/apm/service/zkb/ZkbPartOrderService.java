@@ -519,9 +519,14 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return map;
     }
 
-    public List<ZkbPartOrderReturn> queryReturnListByPartOrderId(String id){
-        List<ZkbPartOrderReturn> zkbPartOrderReturnList = zkbPartOrderReturnRepository.findByPartOrderId(id);
-        return zkbPartOrderReturnList;
+    public List<ZkbPartOrderReturn> queryReturnListByPartOrderId(String id,boolean isCloseAdmin){
+        if(isCloseAdmin){
+            List<ZkbPartOrderReturn> zkbPartOrderReturnList = zkbPartOrderReturnRepository.findByPartOrderIdAndDataStatusNotNull(id);
+            return zkbPartOrderReturnList;
+        }else{
+            List<ZkbPartOrderReturn> zkbPartOrderReturnList = zkbPartOrderReturnRepository.findByPartOrderId(id);
+            return zkbPartOrderReturnList;
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -838,7 +843,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrderStepRepository.save(newZkbPartOrderStep);
 
             for(ZkbPartOrderReturn r : currentZkbPartOrderReturns){
-                r.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.Old.toString());
+                r.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.N.toString());
+                r.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.Pending.toString());
                 zkbPartOrderReturnRepository.save(r);
             }
         }else {
@@ -860,7 +866,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 e.printStackTrace();
             }
             for(ZkbPartOrderReturn r : currentZkbPartOrderReturns){
-                r.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.Old.toString());
+                r.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.N.toString());
+                r.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.Pending.toString());
                 zkbPartOrderReturnRepository.save(r);
             }
         }
@@ -1233,6 +1240,74 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         //3.名额修改
         subReturnQty(zkbContract,zkbPartOrder,ce);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void returnAudit(ZkbPartOrder zkbPartOrder,List<ZkbPartOrderReturn> zkbPartOrderReturnList,UserAccount userAccount){
+        for(ZkbPartOrderReturn r  : zkbPartOrderReturnList){
+            r.setModifyFlag("N");
+            r.setClosedDate(new Date());
+            r.setClosedAuditerUid(userAccount.getUid());
+            r.setClosedAuditer(userAccount.getName());
+        }
+        zkbPartOrderReturnRepository.save(zkbPartOrderReturnList);
+
+        //如果审批通过后则进行核算名额
+        int v = 0;
+        for (ZkbPartOrderReturn r : zkbPartOrderReturnList){
+            if(!"badReturn".equals(r.getReturnType())){
+                v += r.getQty();
+            }
+        }
+        if(v > 0){
+            ZkbContract contract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+            subReturnQty(contract,zkbPartOrder,v);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void partsClosed(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
+        HashMap<String, Integer> returnMap = new HashMap<String, Integer>();
+        List<ZkbPartOrderReturn> zkbPartOrderReturnAcceptList = zkbPartOrderReturnRepository.findByPartOrderIdAndDataStatus(zkbPartOrder.getId(),ZkbPartOrderReturn.DataStatusEnum.Accept.toString());
+        for(ZkbPartOrderReturn r : zkbPartOrderReturnAcceptList){
+            if(returnMap.containsKey(r.getPartNo())){
+                Integer vv = returnMap.get(r.getPartNo());
+                vv += r.getQty();
+                returnMap.put(r.getPartNo(),vv);
+            }else{
+                returnMap.put(r.getPartNo(),r.getQty());
+            }
+        }
+        boolean flag = true;
+        for(ZkbPartOrderItem zkbPartOrderItem : zkbPartOrder.getZkbPartOrderItems()){
+            Integer returnQty = returnMap.get(zkbPartOrderItem.getPartNo());
+            if(returnQty == null){
+                flag = false;
+            }else if(returnQty != zkbPartOrderItem.getPartQty()){
+                flag = false;
+            }
+        }
+
+        if(flag){
+            //审批完毕关单
+            zkbPartOrder.setClosedDate(new Date());
+            zkbPartOrder.setClosedAuditer(userAccount.getName());
+            zkbPartOrder.setClosedAuditerUid(userAccount.getUid());
+            zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
+            zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+            zkbPartOrderRepository.save(zkbPartOrder);
+
+            ZkbPartOrderStep newZkbPartOrderStep = new ZkbPartOrderStep();
+            newZkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+            newZkbPartOrderStep.setStepName(WebUtil.getFieldValueMessage("zkbPoSteps",newZkbPartOrderStep.getStepKey()));
+            newZkbPartOrderStep.setStartTime(new Date());
+            newZkbPartOrderStep.setOwnerId(userAccount.getUid());
+            newZkbPartOrderStep.setOwnerName(userAccount.getName());
+            newZkbPartOrderStep.setTenantUID(zkbPartOrder.getTenantUID());
+            newZkbPartOrderStep.setPartOrderId(zkbPartOrder.getId());
+            zkbPartOrderStepRepository.save(newZkbPartOrderStep);
+
+        }
     }
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
