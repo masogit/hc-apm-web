@@ -454,6 +454,12 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         Date date = new Date();
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
+        int applyCount = this.getApplyCount();
+        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        if(!highArtificialTypeValue.equals(this.selected.getArtificialType()))
+        {
+            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.selected);
+        }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
