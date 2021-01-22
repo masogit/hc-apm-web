@@ -479,10 +479,8 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'medicalApparatusClassification')}" >
         <h:panelGroup >
-            <label class="label">#{msg.medicalApparatusClassification}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['medicalApparatusClassification'].required? '*':''}</span></label>
-            <p:inputText id="selectedAuthGroupName" value="#{assetInfoEditController.selectedAuthGroupName}" required="true"
-                         requiredMessage="#{msg.authGroup} #{msg.ValidationRequire}"
-                         readonly="true" />
+            <label class="label">#{msg.medicalApparatusClassification}</label>
+            <p:inputText id="selectedAuthGroupName" value="#{assetInfoEditController.selectedAuthGroupName==null?'请选择...':assetInfoEditController.selectedAuthGroupName}"  readonly="true" />
             <p:commandButton id="btnAuthGroup" process="@this" icon="fa fa-angle-down"
                              class="btn btn-sm popupIconButton"
                              disabled="#{!assetInfoEditController.needEdit('medicalApparatusClassification')}"/>

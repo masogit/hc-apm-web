@@ -26,7 +26,7 @@ public class CustomConfigConstant {
     
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","oneQrCodeStatus","connectToInsite","oneQrCode","installStatus","assetClass");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","oneQrCodeStatus","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime");
     }
     
     //只读字段
@@ -58,7 +58,7 @@ public class CustomConfigConstant {
                 "pmOwnerName", "pmOwnerTel", "measuringOwner",
                 "siteUID", "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "assetDeptName",
                 "manufacture", "makerShortName",
-                "deviceName", "registrationNo", "vendor", "vendorTel", " ", "assetCode68","medicalApparatusClassification","assetGroup",
+                "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","medicalApparatusClassification","assetGroup",
                 "assetGroupSecondary", "parentAssetId", "functionGrade", "repairForm", "functionType", "serialNum",
                 "systemId", "nationalStandardCode", "financingNum", "barcode", "modalityId", "purchasePrice",
                 "salvageValue", "lifecycle", "depreciationMethod", "manufactDate", "purchaseDate", "arriveDate",
@@ -164,6 +164,7 @@ public class CustomConfigConstant {
          allFields.put("oneQrCode", WebUtil.getMessage("oneQrCode"));
          allFields.put("oneQrCodeStatus", WebUtil.getMessage("oneQrCodeStatus"));
          allFields.put("installStatus", WebUtil.getMessage("installStatus"));
+         allFields.put("geibTable_installedTime", WebUtil.getMessage("geibTable_installedTime"));
 //        }
         return allFields;
     }
@@ -242,11 +243,18 @@ public class CustomConfigConstant {
      * @return
      */
     public static List<String> getAssetsDisabledExportFields() {
-        return Arrays.asList("orgPath", "assetLocation");
+        return Arrays.asList("orgPath", "assetLocation" ,"medicalApparatusClassification");
     }
 
     public static List<String> getAssetsImportantFieldsAll() {
         return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
-                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum");
+                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes");
+    }
+
+    public static List<String> getTemplateEnableList() {
+        return Arrays.asList("GEIBTableExcel", "AssetInfoImportExcel");
+    }
+    public static List<String> ninthHospitalNineAuthority() {
+        return Arrays.asList("AssetHead","ITAdmin","DataMaintainStaff","AssetStaff","HospitalHead","DeptHead","GEInternalStaff");
     }
 }

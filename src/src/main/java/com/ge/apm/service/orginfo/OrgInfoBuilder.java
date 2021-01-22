@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 public class OrgInfoBuilder {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    public static OrgInfo buildOrgInstitution(TenantInfo tenantInfo, String name) {
+    public static OrgInfo buildOrgInstitution(TenantInfo tenantInfo, OrgInfo tenantOrg, String name) {
 
         OrgInfo orgInfo = new OrgInfo();
         orgInfo.initializeUid();
@@ -26,8 +26,8 @@ public class OrgInfoBuilder {
         orgInfo.setHospitalUID(orgInfo.getUid());
         orgInfo.setSiteUID(orgInfo.getUid());
 
-        orgInfo.setParentUID(tenantInfo.getUid());
-        orgInfo.setParentID(tenantInfo.getId());
+        orgInfo.setParentUID(tenantOrg.getUid());
+        orgInfo.setParentID(tenantOrg.getId());
 
         return orgInfo;
     }

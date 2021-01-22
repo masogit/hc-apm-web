@@ -662,6 +662,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return "";
         }
 
+        if(!checkDepartNumUnique()){
+            WebUtil.addErrorMessage("设备编号已被占用");
+            return "";
+        }
+
         //设置质保时间
         if (null == selected.getFactoryWarrantyDate()) {
             if (selected.getAcceptDate() != null && selected.getWarrantyMonth() != null) {
@@ -756,6 +761,30 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         } else {
             return "";
         }
+    }
+
+    public boolean checkDepartNumUnique() {
+
+        if(org.springframework.util.StringUtils.isEmpty(selected.getDepartNum())){
+            return true;
+        }
+
+        return checkDepartNumUniqueAssetInfo();
+
+    }
+
+    private boolean checkDepartNumUniqueAssetInfo() {
+        List<String> hisData = dao.findIdByDepartNumAndTenantUID(selected.getDepartNum(), selected.getTenantUID());
+        if(hisData.isEmpty()){
+            return true;
+        }
+        //兼容老数据
+        for( String uid:hisData){
+            if(uid.equals(selected.getUid())){
+                return true;
+            }
+        }
+        return false;
     }
 
     private void saveOrUpdateAssetTags() {
