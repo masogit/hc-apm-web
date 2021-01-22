@@ -583,7 +583,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         int qty = 0;
         for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
         {
-            if(badReturnValue.equals(item.getReturnType())&&StringUtils.isNotBlank(item.getId()))
+            if(badReturnValue.equals(item.getReturnType())||StringUtils.isNotBlank(item.getId()))
                 continue;
             qty=qty+item.getQty();
         }
