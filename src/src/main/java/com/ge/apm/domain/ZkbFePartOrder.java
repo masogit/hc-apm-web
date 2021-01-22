@@ -20,10 +20,11 @@ public class ZkbFePartOrder {
      * TenantAccept:租户审批通过
      * TenantReject:租户批拒绝
      * FourHundredsAccept:400回填
-     * GEAdminAccept GEAdmin 填写归还信息
+     * GEAdminAccept GEAdmin 全部归还
+     * GEAdminAcceptPart GEAdmin 部分归还
      */
     public enum workFlowStatus {
-        Requested,TenantAccept,TenantReject,FourHundredsAccept,GEAdminAccept
+        Requested,TenantAccept,TenantReject,FourHundredsAccept,GEAdminAccept,GEAdminAcceptPart
     }
 
     /**
@@ -42,6 +43,18 @@ public class ZkbFePartOrder {
     public enum workFlowSteps {
         Requested,WaitingAssignment,WaitingApm,WaitingGEAdmin,Complete
     }
+
+    /**
+     * 流程步骤
+     */
+    public static String[] stepAndRoles = new String[]
+            {
+                    workFlowSteps.Requested.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.WaitingAssignment.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingApm.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.WaitingGEAdmin.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
+                    workFlowSteps.Complete.toString()
+            };
 
     @Id
     @GeneratedValue(generator = "uuid")

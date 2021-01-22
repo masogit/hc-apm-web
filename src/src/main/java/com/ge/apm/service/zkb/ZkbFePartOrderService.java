@@ -4,9 +4,7 @@ import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbFePartOrderRepository;
 import com.ge.apm.dao.ZkbFePartOrderUserConfigRepository;
 import com.ge.apm.dao.mapper.ZkbFePartOrderMapper;
-import com.ge.apm.domain.ZkbContract;
-import com.ge.apm.domain.ZkbFePartOrder;
-import com.ge.apm.domain.ZkbFePartOrderUserConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -282,7 +280,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 endTime,
                 status,
                 tenantUID);
-        this.sendMessage(zkbFePartOrder.getId(),gatewayURL);
+        if(gatewayURL!=null)
+        {
+            this.sendMessage(zkbFePartOrder.getId(),gatewayURL);
+        }
+
         return this.backList(queryStatus);
     }
 
@@ -352,23 +354,149 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbContract 合同
      * @param qty 数量
      */
-    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty)
+    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty,ZkbFePartOrder zkbFePartOrder)
     {
-        switch(type){
-            case 1 :
-                zkbContract.setSpareQuota(zkbContract.getSpareQuota()-qty);
-                zkbContract.setSpareQuotaApply(zkbContract.getSpareQuota()+qty);
-                break;
-            case 2 :
-                zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
-                zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()+qty);
-                break;
-            case 3:
-                zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()-qty);
-                zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
-                break;
-        }
+        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetTypeDi()))
+        {
+            switch(type){
+                case 1 :
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()-qty);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()+qty);
+                    break;
+                case 2 :
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-qty);
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse()+qty);
+                    break;
+                case 3:
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()+qty);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-qty);
+                    break;
+            }
+        }else
+            {
+                switch(type){
+                    case 1 :
+                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()-qty);
+                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()+qty);
+                        break;
+                    case 2 :
+                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
+                        zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()+qty);
+                        break;
+                    case 3:
+                        zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()-qty);
+                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
+                        break;
+                }
+            }
         this.zkbContractRepository.save(zkbContract);
+    }
+
+    /**
+     * 根据List获取map
+     * @param assetInfoList 申请设备列表
+     * @return
+     */
+    public Map<String,Integer> getAssetInfoMap(List<ZkbFePartOrderAssetInfo> assetInfoList)
+    {
+        Map<String,Integer> assetInfoMap = new HashMap<>();
+        for(ZkbFePartOrderAssetInfo item:assetInfoList)
+        {
+            String key = item.getAssetNo()+item.getOrderNo();
+            if(assetInfoMap.containsKey(key))
+            {
+                Integer qty = assetInfoMap.get(key);
+                assetInfoMap.put(key,qty+item.getAssetQty());
+                continue;
+            }
+            assetInfoMap.put(key,item.getAssetQty());
+        }
+        return assetInfoMap;
+    }
+
+    /**
+     * 根据List获取map
+     * @param zkbFePartOrderReturnList 返回设备列表
+     * @param zkbFePartOrder 流程主表数据
+     * @return
+     */
+    public Map<String,Integer> getZkbFePartOrderReturnMap(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList,ZkbFePartOrder zkbFePartOrder)
+    {
+        Map<String,Integer> zkbFePartOrderReturnMap = new HashMap<>();
+        for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
+        {
+            String key = item.getAssetNo()+item.getOrderNo();
+            if(zkbFePartOrderReturnMap.containsKey(key))
+            {
+                Integer qty = zkbFePartOrderReturnMap.get(key);
+                zkbFePartOrderReturnMap.put(key,qty+item.getQty());
+                continue;
+            }
+            zkbFePartOrderReturnMap.put(key,item.getQty());
+            item.setPartOrderId(zkbFePartOrder.getId());
+        }
+        return zkbFePartOrderReturnMap;
+    }
+    /**
+     * 判断是否隐藏还是显示
+     * @param fieldsetType
+     * @return
+     */
+    public Boolean checkRendered(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap)
+    {
+        if(StringUtils.isBlank(fieldsetType))
+        {
+            return false;
+        }
+        Map<String,Integer> stepMap = this.stepAndRoleMap();
+        String currentStep = zkbFePartOrder.getCurrentStep();
+        Integer fieldsetTypeIndex = stepMap.get(fieldsetType);
+        Integer currentStepIndex = stepMap.get(currentStep);
+        if(fieldsetTypeIndex<currentStepIndex)
+        {
+            return true;
+        }
+        if(fieldsetTypeIndex==currentStepIndex)
+        {
+            String [] stepAndRole = ZkbFePartOrder.stepAndRoles[fieldsetTypeIndex].split(",");
+            if(configTypeMap.containsKey(stepAndRole[1]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Map<String,Integer> stepAndRoleMap()
+    {
+        Map<String,Integer> stepMap = new HashMap<>();
+        for(int i =0;i<ZkbFePartOrder.stepAndRoles.length;i++)
+        {
+            String [] stepAndRole =ZkbFePartOrder.stepAndRoles[i].split(",");
+            stepMap.put(stepAndRole[0],i);
+        }
+        return stepMap;
+    }
+
+    /**
+     * 判断是否隐藏还是显示
+     * @param fieldsetType
+     * @return
+     */
+    public Boolean hasEditRight(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap)
+    {
+        String currentStep = zkbFePartOrder.getCurrentStep();
+        if(!currentStep.equals(fieldsetType))
+        {
+            return false;
+        }
+        Map<String,Integer> stepMap = this.stepAndRoleMap();
+        String [] stepAndRole =ZkbFePartOrder.stepAndRoles[stepMap.get(fieldsetType)].split(",");
+        if(configTypeMap.containsKey(stepAndRole[1]))
+        {
+            return true;
+        }
+        return false;
     }
 
 }
