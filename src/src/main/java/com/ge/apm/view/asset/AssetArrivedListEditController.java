@@ -847,6 +847,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 return;
             }
             dao.updateInvoiceNum(selected.getInvoiceNum(),selected.getId());
+            arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         }
     }
 
@@ -857,6 +858,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 return;
             }
             dao.updateSupplierUser(selected.getVendor(),selected.getSupplierId(),selected.getSupplierUserId(),selected.getId(),3);
+            arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         }
     }
 }
