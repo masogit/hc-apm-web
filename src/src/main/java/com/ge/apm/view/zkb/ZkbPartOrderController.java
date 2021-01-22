@@ -144,7 +144,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                 //region 用户只有一种角色
                 ZkbPartOrderUserConfig zkbPartOrderUserConfig = zkbPartOrderUserConfigList.get(0);
                 if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType())){
-                    if("CS".equals(zkbPartOrderUserConfig.getAssetType())){
+                    if("US".equals(zkbPartOrderUserConfig.getAssetType())){
                         if(StringUtils.isEmpty(queryStatus)){
                             searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getId()));
                             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
