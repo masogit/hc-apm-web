@@ -16,4 +16,14 @@ public interface ZkbFePartOrderAssetInfoRepository extends GenericRepositoryUUID
      * @return
      */
     List<ZkbFePartOrderAssetInfo> findByFePartOrderId(String fePartOrderId);
+
+
+    /**
+     * 根据fepartOrderId和assetNo 查找数据
+     * @param fePartOrderId
+     * @param assetNo
+     * @return 归还列表
+     */
+    List<ZkbFePartOrderAssetInfo> findByFePartOrderIdAndAssetNo(String fePartOrderId,String assetNo);
+
 }
