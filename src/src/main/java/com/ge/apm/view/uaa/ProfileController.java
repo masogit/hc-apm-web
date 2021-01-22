@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
@@ -19,6 +20,7 @@ import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.Digests;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.util.TimeUtil;
 
 import webapp.framework.web.WebUtil;
@@ -45,6 +47,7 @@ public class ProfileController implements Serializable {
         if(myAccount != null && myAccount.getWeChatId() != null){
         	myAccount.setIsUnbunding(true);
         }
+        userAccountService = WebUtil.getBean(UserAccountService.class);
     }
     
     public UserAccount getMyAccount() {
@@ -85,8 +88,13 @@ public class ProfileController implements Serializable {
         if(!myAccount.getIsUnbunding()){
         	myAccount.setWeChatId(null);
         }
-        userAccountDao.save(myAccount);
-        WebUtil.addSuccessMessage(WebUtil.getMessage("UserAccount")+WebUtil.getMessage("Updated"));
+        boolean isRepeated = userAccountService.whetherTheCallIsRepeated(myAccount.getTelephone());
+        if(isRepeated){//重复
+            WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+WebUtil.getMessage("telephone"));
+        }else{
+            userAccountDao.save(myAccount);
+            WebUtil.addSuccessMessage(WebUtil.getMessage("UserAccount")+WebUtil.getMessage("Updated"));
+        }
     }
     
     public void resetPassword() throws NoSuchAlgorithmException, DecoderException {
