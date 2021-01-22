@@ -20,7 +20,7 @@
                     <p:dataTable id="datalist" value="#{zkbFePartOrderController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbFePartOrderController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.reportDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -69,6 +69,24 @@
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_currentStep}" filterBy="#{item.currentStep}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_steps', item.currentStep)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_steps')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_currentStatus}" filterBy="#{item.status}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_status', item.status)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_status')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>

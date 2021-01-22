@@ -6,6 +6,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
@@ -412,6 +413,11 @@ public class UserContextService implements Serializable {
      * 获取智康宝用户
      */
     ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+
+    /**
+     * 获取 fe part order user config
+     */
+    ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
 
     private Boolean flagIsHospitalUser = null;
     public boolean isHospitalUser(){
@@ -905,6 +911,16 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    public boolean isZkbFeUserConfig() {
+        UserAccount user = getLoginUser();
+        if(StringUtils.isBlank(user.getLoginName()))
+            return false;
+        List<ZkbFePartOrderUserConfig>  zkbFePartOrderUserConfig= this.zkbFePartOrderUserConfigRepository.findByLoginName(user.getLoginName());
+        if(CollectionUtils.isNotEmpty(zkbFePartOrderUserConfig))
+            return true;
+        return false;
+    }
+
     public boolean isZkbConfigAdmin()
     {
         UserAccount user = getLoginUser();
@@ -1094,12 +1110,23 @@ public class UserContextService implements Serializable {
 
     public boolean isNinth(){
         TenantInfo currentTenantInfo = this.getCurrentUserTenantInfo();
-
+        UserAccount user = getLoginUser();
+        List<String> userRoles = user.getRoleNames();
         if(currentTenantInfo.getName().contains("九") || currentTenantInfo.getId() == 112){
-            return Boolean.TRUE;
+            if (ninthHospitalNineJudgment(userRoles)) return Boolean.TRUE;
+            return Boolean.FALSE;
         }
 
         return Boolean.FALSE;
+    }
+
+    private boolean ninthHospitalNineJudgment(List<String> userRoles) {
+        for (int i = 0; i < userRoles.size(); i++) {
+            if(CustomConfigConstant.ninthHospitalNineAuthority().contains(userRoles.get(i))){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isPartsAdmin(){

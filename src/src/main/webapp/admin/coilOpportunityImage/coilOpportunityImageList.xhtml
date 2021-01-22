@@ -52,7 +52,7 @@
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
                                 <p:link target="_detail" title="#{msg.View}" outcome="#{coilOpportunityImageController.getDetailPage(item.id,item.cataLog)}" rendered="#{userContextService.hasRole('DataMaintainStaff')}">
-                                    <p:graphicImage name="icons/detail.png" style="width: 40px; height: 30px;"/>
+                                    <p:graphicImage name="icons/eye.png" style="width: 27px; height: 30px;"/>
                                 </p:link>
                                 <p:commandLink rendered="#{userContextService.hasRole('DataMaintainStaff')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{coilOpportunityImageController.deleteCoilOpportunityImage(item)}" update="datalist">
                                     <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>

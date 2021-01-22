@@ -48,6 +48,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_ZKB_PART_ORDER = "ZkbPartOrder";
     public static final String BO_TYPE_ZKB_PART_ORDER_LETTER = "ZkbPartOrderLetter";
     public static final String BO_TYPE_COIL_OPPORTUNITY = "CoilOpportunity";
+    public static final String BO_TYPE_ADJUST_EQUIPMENT = "AdjustEquipment";
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -106,10 +107,10 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "second_directory")
     private String secondDirectory;
 
-    @JoinColumn(insertable=false,updatable=false, name = "bo_uuid", referencedColumnName = "uid",nullable = true)
-    @ManyToOne(optional = true, fetch = FetchType.EAGER)
-    @JsonBackReference
-    private AssetInfo assetInfo;
+//    @JoinColumn(insertable=false,updatable=false, name = "bo_uuid", referencedColumnName = "uid",nullable = true)
+//    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+//    @JsonBackReference
+//    private AssetInfo assetInfo;
 
     public String getId() {
         return id;
@@ -191,13 +192,13 @@ public class V2_BlobObject implements Serializable {
         this.boSubType = boSubType;
     }
 
-    public AssetInfo getAssetInfo() {
-        return assetInfo;
-    }
-
-    public void setAssetInfo(AssetInfo assetInfo) {
-        this.assetInfo = assetInfo;
-    }
+//    public AssetInfo getAssetInfo() {
+//        return assetInfo;
+//    }
+//
+//    public void setAssetInfo(AssetInfo assetInfo) {
+//        this.assetInfo = assetInfo;
+//    }
 
     public String getCreatedBy() {
         return createdBy;
