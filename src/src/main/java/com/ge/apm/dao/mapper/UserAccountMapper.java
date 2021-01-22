@@ -49,6 +49,9 @@ public interface UserAccountMapper {
 	
 	@Select("select id from user_account where login_name =#{loginName}")
 	public UserAccount getUserByLoginName(String loginName);
+
+	@Select("select count(id) from user_account where telephone =#{telephone}")
+	Integer getUserCountByTelephone(String telephone);
 	
 	@Select("select id from user_account where uid =#{uid}")
 	public UserAccount getUserByUId(String uid);
