@@ -125,6 +125,7 @@ public class UserAccountImportService {
 	}
 	private boolean handleNewUser(UserAccount newUser,String institution,String hospital,String site,String department,String department2,String department3){
 		//get all user
+		telephoneValid(newUser);
 		checkLoginName(newUser);
 		if(!supplementUserRole(newUser)){
 			return false;
@@ -197,6 +198,20 @@ public class UserAccountImportService {
 		}
 		return newUser;
 	}
+
+
+	private boolean telephoneValid(UserAccount newUser) {
+		String telephone = newUser.getTelephone();
+		if (StringUtils.isNotEmpty(telephone)) {
+			int count = userAccountMapper.getUserCountByTelephone(telephone);
+			if (count > 0) {
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.DUPLICATE_TELEPHONE, "电话号码已存在");
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private OrgInfo getOrgInfoByMappingUid(String uid){
 		OrgInfo tempOrgInfo=null;
 		if(mapUidOrgInfo.containsKey(uid)){
