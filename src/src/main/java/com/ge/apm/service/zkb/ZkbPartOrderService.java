@@ -1255,7 +1255,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //如果审批通过后则进行核算名额
         int v = 0;
         for (ZkbPartOrderReturn r : zkbPartOrderReturnList){
-            if(!"badReturn".equals(r.getReturnType())){
+            if(!"badReturn".equals(r.getReturnType()) && ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
                 v += r.getQty();
             }
         }
