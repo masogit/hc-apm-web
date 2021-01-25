@@ -138,6 +138,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private List<String> unselectUidss = new ArrayList<String>();
 
+    private boolean userAccountEditFlag = true;
+
     private static org.slf4j.Logger log = LoggerFactory.getLogger(UserAccountController.class);
 
     TreeNode deleteTreeNode = new DefaultTreeNode("root", null, null);
@@ -147,6 +149,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public boolean isDeleteDisabled() {
         return deleteDisabled;
+    }
+
+    public boolean isUserAccountEditFlag() {
+        return userAccountEditFlag;
+    }
+
+    public void setUserAccountEditFlag(boolean userAccountEditFlag) {
+        this.userAccountEditFlag = userAccountEditFlag;
     }
 
     public List<String> getUnselectInstitutions() {
@@ -805,6 +815,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 }
 
             }
+
+            boolean isRepeated = userAccountService.whetherTheCallIsRepeated( selected.getTelephone());
+            if(isRepeated){//重复
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+WebUtil.getMessage("telephone"));
+                userAccountEditFlag = false;
+                return;
+            }
+            userAccountEditFlag = true;
             super.save();
             log.info("save/update user to user_account successful, id: {}",selected.getId());
 

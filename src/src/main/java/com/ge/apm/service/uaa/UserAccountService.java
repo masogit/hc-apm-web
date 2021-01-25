@@ -322,4 +322,13 @@ public class UserAccountService {
         userAccountRepository.deleteByUid(userUid);
 		log.info("delete userAccount , uid: {}",userAccount.getUid());
 	}
+
+	public boolean whetherTheCallIsRepeated(String telephone){
+		List<UserAccount> userAccounts = userAccountMapper.getUserAccountByTelephone(telephone);
+		if(userAccounts.size()>0){
+			return true;
+		}else{
+			return false;
+		}
+	}
 }
