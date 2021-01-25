@@ -18,4 +18,4 @@ create index ix_coil_opportunity_system_id on coil_opportunity (system_id);
 --2021-01-25 ignore sr report
 INSERT INTO sr_name_transfer_mapping (file_name,mapped_name,sr_type, is_upload) VALUES ('Demo Checklist.pdf','球管失效报告.pdf',3, 'N'), ('Demo Checklist.pdf','球管失效报告.pdf',6, 'N');
 
-update sr_name_transfer_mapping set is_upload = 'N' where id in (213, 214, 183, 184, 314,315, 306,307,256,257, 222,223, 243,244, 323,324);
+update sr_name_transfer_mapping set is_upload = 'N' where id in (213, 214, 183, 184, 314, 315, 306, 307, 256, 257, 222, 223, 243, 244, 323, 324);
