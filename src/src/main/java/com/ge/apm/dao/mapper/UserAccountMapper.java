@@ -49,6 +49,9 @@ public interface UserAccountMapper {
 	
 	@Select("select id from user_account where login_name =#{loginName}")
 	public UserAccount getUserByLoginName(String loginName);
+
+	@Select("select count(id) from user_account where telephone =#{telephone}")
+	Integer getUserCountByTelephone(String telephone);
 	
 	@Select("select id from user_account where uid =#{uid}")
 	public UserAccount getUserByUId(String uid);
@@ -88,5 +91,9 @@ public interface UserAccountMapper {
 					"</foreach>"+
 					"</script>"})
 	public List<UserAccount> getUserAccountByNameAndTenantUid(@Param("nameLists")List<String> nameLists, @Param("tenantUid")String tenantUid);
+
+
+	@Select("select * from user_account where telephone = #{telephone}")
+	public List<UserAccount> getUserAccountByTelephone( @Param("telephone")String telephone);
 
 }

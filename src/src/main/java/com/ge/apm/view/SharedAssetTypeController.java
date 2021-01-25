@@ -82,7 +82,6 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
 
             setSelected(dao.findById((String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid")));
             prepareEdit();
-            uploadFlag = getAttachList(selected.getId()).size() ==0;
         } else if ("Delete".equalsIgnoreCase(actionName)) {
             prepareDelete();
         }
