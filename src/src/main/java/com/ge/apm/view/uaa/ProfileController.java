@@ -39,11 +39,15 @@ public class ProfileController implements Serializable {
     private String newPassword;
     private String newPassword2;
     private String password;
+    private String originalTelephone=null;//原始
     UserAccountService userAccountService;
     
     @PostConstruct
     public void init(){
         myAccount = UserContextService.getCurrentUserAccount();
+        if(originalTelephone == null){
+            originalTelephone = myAccount.getTelephone();
+        }
         if(myAccount != null && myAccount.getWeChatId() != null){
         	myAccount.setIsUnbunding(true);
         }
@@ -88,8 +92,10 @@ public class ProfileController implements Serializable {
         if(!myAccount.getIsUnbunding()){
         	myAccount.setWeChatId(null);
         }
+
         boolean isRepeated = userAccountService.whetherTheCallIsRepeated(myAccount.getTelephone());
         if(isRepeated){//重复
+            myAccount.setTelephone(originalTelephone);
             WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+WebUtil.getMessage("telephone"));
         }else{
             userAccountDao.save(myAccount);
