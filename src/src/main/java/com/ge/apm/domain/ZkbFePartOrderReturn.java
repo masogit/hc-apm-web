@@ -61,6 +61,14 @@ public class ZkbFePartOrderReturn implements Serializable {
     @Column(name = "return_type")
     private String returnType;
 
+    @Column(name = "part_serial_number")
+    private String partSerialNumber;
+
+
+    @Column(name = "part_quality_issue")
+    private String partQualityIssue;
+
+
     /**
      * 归还日期
      */
@@ -161,5 +169,19 @@ public class ZkbFePartOrderReturn implements Serializable {
         this.index = index;
     }
 
+    public String getPartSerialNumber() {
+        return partSerialNumber;
+    }
 
+    public void setPartSerialNumber(String partSerialNumber) {
+        this.partSerialNumber = partSerialNumber;
+    }
+
+    public String getPartQualityIssue() {
+        return partQualityIssue;
+    }
+
+    public void setPartQualityIssue(String partQualityIssue) {
+        this.partQualityIssue = partQualityIssue;
+    }
 }
