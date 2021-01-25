@@ -83,7 +83,7 @@
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListInvoiceNum}</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.invoiceNum}" readonly="#{!assetArrivedListEditController.activeSupplier() and assetArrivedListEditController.getInstalledCount() gt 0}"/>
-                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新发票号" action="#{assetArrivedListEditController.updateInvoiceNum()}" update="@parent" rendered="#{assetArrivedListEditController.activeSupplier()}" disabled="#{empty assetArrivedListEditController.selected.id}" style="margin-left: 5px;"/>
+                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新发票号" action="#{assetArrivedListEditController.updateInvoiceNum()}" update="@parent" rendered="#{assetArrivedListEditController.activeSupplier() and assetArrivedListEditController.selected.status > 1}" disabled="#{empty assetArrivedListEditController.selected.id}" style="margin-left: 5px;"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">发票日期</label>
@@ -123,7 +123,7 @@
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{assetArrivedListEditController.supplierUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                         </p:selectOneMenu>
-                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新供应商责任人" action="#{assetArrivedListEditController.updateSupplierUser()}" update=":AssetArrivalEditForm:vendor" disabled="#{empty assetArrivedListEditController.selected.id and assetArrivedListEditController.selected.status eq 3}" style="margin-left: 5px;"/>
+                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新供应商责任人" action="#{assetArrivedListEditController.updateSupplierUser()}" update=":AssetArrivalEditForm:vendor" disabled="#{empty assetArrivedListEditController.selected.id and assetArrivedListEditController.selected.status eq 3}" style="margin-left: 5px;" rendered="#{assetArrivedListEditController.selected.status > 1}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.ArrivalProcessType}*</label>
