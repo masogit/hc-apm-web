@@ -462,7 +462,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         Integer currentStepIndex = stepMap.get(currentStep);
         if(fieldsetTypeIndex<currentStepIndex)
         {
-            return true;
+            List<ZkbFePartOrderStep> zkbFePartOrderStep = this.zkbFePartOrderStepService.findByPartOrderIdAndStepKey(zkbFePartOrder.getId(),fieldsetType);
+            if(CollectionUtils.isNotEmpty(zkbFePartOrderStep))
+            {
+                return true;
+            }
+
         }
         if(fieldsetTypeIndex==currentStepIndex)
         {
