@@ -4,6 +4,7 @@ delete from v2_blob_object where object_storage_id in (select storage_id from ib
 update zkb_part_order_user_config set asset_type = 'US' where asset_type = 'CS';
 
  -- 2021-01-15  导入ZoneMgrExcel配置权限  start
+ delete from role_msg_rel where msg_key = 'ZoneManagerInfoExcel';
  INSERT INTO "public"."role_msg_rel"("msg_key", "msg_type", "role_id", "role_name", "role_type") VALUES ('ZoneManagerInfoExcel', 'batchFileType', (select id from sys_role where name = 'DataMaintainStaff'), 'DataMaintainStaff', 0);
  -- end
 
