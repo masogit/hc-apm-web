@@ -1265,6 +1265,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
+
     @Transactional(rollbackFor = Exception.class)
     public void partsClosed(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
         HashMap<String, Integer> returnMap = new HashMap<String, Integer>();
