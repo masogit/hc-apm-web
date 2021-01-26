@@ -146,6 +146,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     boolean deleteDisabled = true;
     boolean  selectAllButton = false;
     private OrgInfo orgInfo46 = new OrgInfo();//初始化GE46号节点
+    private String originalTelephone=null;//原始
+
+    public String getOriginalTelephone() {
+        return originalTelephone;
+    }
+
+    public void setOriginalTelephone(String originalTelephone) {
+        this.originalTelephone = originalTelephone;
+    }
 
     public boolean isDeleteDisabled() {
         return deleteDisabled;
@@ -210,7 +219,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userTagsMapper = WebUtil.getBean(UserTagsMapper.class);
 
         loginUser = UserContextService.getCurrentUserAccount();
-
+        if(originalTelephone == null){
+            originalTelephone = loginUser.getTelephone();
+        }
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
@@ -779,8 +790,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
 
-    @Override
-    @Transactional
+    //@Override
+    //@Transactional
     public void save() {
         if (selectedUserOrg != null) {
             //判断操作权限
@@ -813,30 +824,34 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                         selected.setPwdSalt(selectedTenant.getInitialPasswordSalt());
                     }
                 }
-
             }
-
-            boolean isRepeated = userAccountService.whetherTheCallIsRepeated( selected.getTelephone());
+            boolean isRepeated = userAccountService.whetherTheCallIsRepeated(selected.getTelephone(),loginUser);
             if(isRepeated){//重复
+                selected.setTelephone(originalTelephone);
                 WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+WebUtil.getMessage("telephone"));
                 userAccountEditFlag = false;
+                isRepeatedAfter();
                 return;
             }
-            userAccountEditFlag = true;
-            super.save();
-            log.info("save/update user to user_account successful, id: {}",selected.getId());
-
-            saveTags();
-            log.info("add new tags to user_tags successful, uid: {}",selected.getUid());
-
-            if (this.crudActionName.equals("Create")) {
-                updateUserRole(loginUser.getType());
-            }
+            isRepeatedAfter();
         } catch(NoSuchAlgorithmException e) {
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
         }
 
 
+    }
+
+    private void isRepeatedAfter() {
+        userAccountEditFlag = true;
+        super.save();
+        log.info("save/update user to user_account successful, id: {}",selected.getId());
+
+        saveTags();
+        log.info("add new tags to user_tags successful, uid: {}",selected.getUid());
+
+        if (this.crudActionName.equals("Create")) {
+            updateUserRole(loginUser.getType());
+        }
     }
 
     private void saveTags() {
