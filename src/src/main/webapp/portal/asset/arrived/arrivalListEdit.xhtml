@@ -82,7 +82,8 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListInvoiceNum}</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.invoiceNum}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                        <p:inputText value="#{assetArrivedListEditController.selected.invoiceNum}" readonly="#{!assetArrivedListEditController.activeSupplier() and assetArrivedListEditController.getInstalledCount() gt 0}"/>
+                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新发票号" action="#{assetArrivedListEditController.updateInvoiceNum()}" update="@parent" rendered="#{assetArrivedListEditController.activeSupplier() and assetArrivedListEditController.selected.status > 1}" style="margin-left: 5px;"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">发票日期</label>
@@ -100,20 +101,29 @@
                                         <label class="label">#{msg.arrivalListAgent}</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.agent}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
-                                    <h:panelGroup>
+                                    <h:panelGroup rendered="#{!assetArrivedListEditController.activeSupplier()}">
                                         <label class="label">#{msg.vendor}</label>
-                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true" 
+                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true"
                                                         disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                             <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                         </p:autoComplete>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier()}">
+                                        <label class="label">#{msg.vendor}</label>
+                                        <p:autoComplete id="vendor" dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true"
+                                                        disabled="#{assetArrivedListEditController.selected.status eq 3}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
+                                            <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
+                                        </p:autoComplete>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier()}">
                                         <label class="label">供应商责任人</label>
-                                        <p:selectOneMenu id="supplierUser" value="#{assetArrivedListEditController.selected.supplierUserId}" style="width:125px" required="false" requiredMessage="#{msg.PersonnelCannotBeEmpty}" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}">
+                                        <p:selectOneMenu id="supplierUser" value="#{assetArrivedListEditController.selected.supplierUserId}" style="width:125px" required="false" requiredMessage="#{msg.PersonnelCannotBeEmpty}" disabled="#{assetArrivedListEditController.selected.status eq 3}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{assetArrivedListEditController.supplierUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                         </p:selectOneMenu>
+                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新供应商责任人" action="#{assetArrivedListEditController.updateSupplierUser()}" update=":AssetArrivalEditForm:vendor" disabled="#{assetArrivedListEditController.selected.status eq 3}" style="margin-left: 5px;" rendered="#{assetArrivedListEditController.selected.status > 1}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.ArrivalProcessType}*</label>
@@ -140,14 +150,14 @@
                                         <label class="label">使用日期</label>
                                         <p:calendar value="#{assetArrivedListEditController.selected.usingDate}" timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
-                                    <h:panelGroup >
-                                        <label class="label">使用人</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.usingPerson}" />
-                                    </h:panelGroup>
-                                    <h:panelGroup >
-                                        <label class="label">使用人电话</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.usingPersonTel}" />
-                                    </h:panelGroup>
+<!--                                    <h:panelGroup >-->
+<!--                                        <label class="label">使用人</label>-->
+<!--                                        <p:inputText value="#{assetArrivedListEditController.selected.usingPerson}" />-->
+<!--                                    </h:panelGroup>-->
+<!--                                    <h:panelGroup >-->
+<!--                                        <label class="label">使用人电话</label>-->
+<!--                                        <p:inputText value="#{assetArrivedListEditController.selected.usingPersonTel}" />-->
+<!--                                    </h:panelGroup>-->
                                     <h:panelGroup >
                                         <label class="label">联系人</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.contactPerson}" />

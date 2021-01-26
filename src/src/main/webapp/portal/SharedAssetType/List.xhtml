@@ -76,10 +76,13 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
+                    <p:column headerText="设备描述" sortBy="#{item.deviceDescription}" filterBy="#{item.deviceDescription}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.deviceDescription}"/>
+                    </p:column>
                     <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
-   
+
                        <f:facet name="{Toolbar}">
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="SwapType_export"/>

@@ -324,12 +324,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         return null;
     }
 
-
-
-
-
-
-
     /**
      * 复制对象属性：只复制需要的属性值，目标对象中原来的值不变
      * 只适用于2个相同对象
@@ -959,7 +953,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 
-        if (null != filter.getSiteOrg()) {
+        if (null != filter.getSiteOrg() && null != filter.getSiteOrg().getUid()) {
             List<String> orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(filter.getSiteOrg().getUid());
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -1017,10 +1011,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         Object obj;
         obj = getSameValue(assets.getTarget(), "siteUID");
-        if (null != obj) {
-            OrgInfo foundOrgInfo = orgInfoDao.findByUid((String)obj);
-            selected.setSiteOrg(foundOrgInfo);
-        }
+//        if (null != obj) {
+//            OrgInfo foundOrgInfo = orgInfoDao.findByUid((String)obj);
+//            selected.setSiteOrg(foundOrgInfo);
+//        }
 
         obj = getSameValue(assets.getTarget(), "clinicalDeptUID");
         if (null != obj) {
@@ -1136,19 +1130,19 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         for(AssetInfo as:selectedAssets){
             boolean assetFlag =true;
             List<V2_ServiceRequest> serviceRequestList =v2ServiceRequestRepository.findByAssetId(as.getId());
-                 if(CollectionUtils.isNotEmpty(serviceRequestList)){
-                        for(V2_ServiceRequest service: serviceRequestList){
-                            if(service.getCloseTime()==null){
-                                assetFlag=false;
-                            }
-                        }
-                        if(assetFlag){
-                            continue;
-                        }else{
-                            WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
-                            return;
-                        }
-                 }
+            if(CollectionUtils.isNotEmpty(serviceRequestList)){
+                for(V2_ServiceRequest service: serviceRequestList){
+                    if(service.getCloseTime()==null){
+                        assetFlag=false;
+                    }
+                }
+                if(assetFlag){
+                    continue;
+                }else{
+                    WebUtil.addErrorMessage("有设备正在维修中，不能更换院区!");
+                    return;
+                }
+            }
         }
 
         //临床助手检查进行中

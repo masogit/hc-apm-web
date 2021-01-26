@@ -26,7 +26,7 @@ public class CustomConfigConstant {
     
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","oneQrCodeStatus","connectToInsite","oneQrCode","installStatus","assetClass");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","oneQrCodeStatus","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime");
     }
     
     //只读字段
@@ -164,6 +164,7 @@ public class CustomConfigConstant {
          allFields.put("oneQrCode", WebUtil.getMessage("oneQrCode"));
          allFields.put("oneQrCodeStatus", WebUtil.getMessage("oneQrCodeStatus"));
          allFields.put("installStatus", WebUtil.getMessage("installStatus"));
+         allFields.put("geibTable_installedTime", WebUtil.getMessage("geibTable_installedTime"));
 //        }
         return allFields;
     }
@@ -247,6 +248,13 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsImportantFieldsAll() {
         return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
-                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum");
+                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes");
+    }
+
+    public static List<String> getTemplateEnableList() {
+        return Arrays.asList("GEIBTableExcel", "AssetInfoImportExcel");
+    }
+    public static List<String> ninthHospitalNineAuthority() {
+        return Arrays.asList("AssetHead","ITAdmin","DataMaintainStaff","AssetStaff","HospitalHead","DeptHead","GEInternalStaff");
     }
 }
