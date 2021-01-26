@@ -790,8 +790,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
 
-    //@Override
-    //@Transactional
+    @Override
+    @Transactional
     public void save() {
         if (selectedUserOrg != null) {
             //判断操作权限
