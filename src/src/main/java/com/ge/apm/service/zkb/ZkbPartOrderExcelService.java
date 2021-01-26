@@ -139,7 +139,7 @@ public class ZkbPartOrderExcelService {
         if(StringUtils.isNotEmpty(p.getUrgencyReasons())){
             zkbPartOrderDataMap.put("订单紧急的原因", WebUtil.getFieldValueMessage("zkbUrgentReasonType", p.getUrgencyReasons()));
         }
-        zkbPartOrderDataMap.put("订单数量", p.getQty());
+        zkbPartOrderDataMap.put("订单数量/订单名额", p.getQty());
         zkbPartOrderDataMap.put("收货人", p.getReceiver());
         zkbPartOrderDataMap.put("收货人电话", p.getReceiverPhone());
         zkbPartOrderDataMap.put("收货地址", p.getReceiverAddress());
