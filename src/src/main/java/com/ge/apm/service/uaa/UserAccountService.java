@@ -323,13 +323,13 @@ public class UserAccountService {
 		log.info("delete userAccount , uid: {}",userAccount.getUid());
 	}
 
-	public boolean whetherTheCallIsRepeated(String telephone,UserAccount loginUser){
-		if(telephone.equals(loginUser.getTelephone())){//如果跟登陆电话一样则直接放行
+	public boolean whetherTheCallIsRepeated(String telephone,String userTelephone,Integer userId){
+		if(telephone.equals(userTelephone)){//如果跟登陆电话一样则直接放行
 			return false;
 		}
 		List<UserAccount> userAccounts = userAccountMapper.getUserAccountByTelephone(telephone);
 		for (int i = 0; i < userAccounts.size(); i++) {
-			if(loginUser.getId().equals(userAccounts.get(i).getId())){
+			if(userId==userAccounts.get(i).getId()){
 				userAccounts.remove(i);//移除掉自己
 			}
 		}
