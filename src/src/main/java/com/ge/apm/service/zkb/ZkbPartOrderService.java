@@ -277,7 +277,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
             List<SearchFilter> returnFilters = new ArrayList<>();
             returnFilters.add(new SearchFilter("partOrderId", SearchFilter.Operator.IN, partReturnIds));
-            returnFilters.add(new SearchFilter("dataStatus", SearchFilter.Operator.IN, ZkbPartOrderReturn.DataStatusEnum.Accept.toString()));
+            returnFilters.add(new SearchFilter("dataStatus", SearchFilter.Operator.EQ, ZkbPartOrderReturn.DataStatusEnum.Accept.toString()));
             List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findBySearchFilter(returnFilters);
             Integer partReturnQty  = 0;
             for(ZkbPartOrderReturn r : zkbPartOrderReturns){
