@@ -488,7 +488,7 @@ public class ZkbKeyBehaviorIndexService {
                 .toLocalDateTime();
         Date firstday = this.firstDayOnMonth(localDateTime);
         Date lastday = this.lastDayOnMonth(localDateTime);
-        this.calculatePartReturnScore(zkbKeyBehaviorIndex,contractIdList,firstday,lastday);
+        this.calculatePartReturnScore(zkbKeyBehaviorIndex,contractIdList,lastday);
 //        this.calculateIntactPartReturnRateScore(zkbKeyBehaviorIndex,contractIdList);
         Integer totalIbNumber = this.calculatePasteQuickResponseRateScore(zkbKeyBehaviorIndex,contractIdList);
         this.calculateApmBillingRateScore(zkbKeyBehaviorIndex,tenantUid,totalIbNumber,firstday,lastday);
@@ -538,41 +538,42 @@ public class ZkbKeyBehaviorIndexService {
      * @param zkbKeyBehaviorIndex KPI
      * @param contractIdList 合同ID列表
      */
-    private void calculatePartReturnScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<String> contractIdList,Date firstday,Date lastday)
+    private void calculatePartReturnScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<String> contractIdList,Date now)
     {
         Calendar cd = Calendar.getInstance();
-        cd.setTime(lastday);
-        cd.add(Calendar.DATE,14);
-        Date lastday1 = cd.getTime();
-        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndOrderedDateGreaterThanEqualAndOrderedDateLessThanEqual(contractIdList,firstday,lastday1,firstday,lastday);
-        if(CollectionUtils.isEmpty(zkbPartOrderList))
+        cd.setTime(now);
+        cd.add(Calendar.DATE,-14);
+        Date nowBefore = cd.getTime();
+        Integer unReturnCount  = this.zkbPartOrderRepository.fetchUnReturnCount(contractIdList,nowBefore,ZkbPartOrder.OrderType.Probe.toString());
+        if(unReturnCount==null)
         {
-            zkbKeyBehaviorIndex.setPartReturnScore(zkbKeyBehaviorIndex.getPartReturnFullScore());
-            return ;
+            unReturnCount=0;
         }
-        Integer returnQty = new Integer(0);
-        for(ZkbPartOrder item:zkbPartOrderList)
+        List<ZkbPartOrder> zkbPartOrdersList = this.zkbPartOrderRepository.findByOrderedDateBeforeAndContractIdInAndOrderType(nowBefore,contractIdList,ZkbPartOrder.OrderType.Parts.toString());
+        Integer applyPartsCount = this.zkbPartOrderRepository.fetchApplyPartsQty(contractIdList,nowBefore,ZkbPartOrder.OrderType.Parts.toString());
+        if(applyPartsCount==null)
         {
-            if(item.getReturnQty()==null) continue;
-            returnQty=returnQty+item.getReturnQty();
+            applyPartsCount=0;
         }
-//        Integer returnQty = zkbPartOrderList.stream().filter(p -> p.getReturnQty()!=null).mapToInt(ZkbPartOrder::getReturnQty).sum();
-//        if(returnQty==null)
-//        {
-//            returnQty = new Integer(0);
-//        }
-//        List<String> partOrderIdList = zkbPartOrderList.stream().map(p -> p.getId()).collect(Collectors.toList());
         List<String> partOrderIdList = new ArrayList<>();
-        for(ZkbPartOrder item:zkbPartOrderList)
+        if(CollectionUtils.isNotEmpty(zkbPartOrdersList))
         {
-            partOrderIdList.add(item.getId());
+            for(ZkbPartOrder item:zkbPartOrdersList)
+            {
+                partOrderIdList.add(item.getId());
+            }
         }
-        Integer returnQty1 = this.zkbPartOrderReturnRepository.fetchQty(partOrderIdList,firstday,lastday1);
+        Integer returnQty1 = new Integer(0);
+        if(CollectionUtils.isNotEmpty(partOrderIdList))
+        {
+            returnQty1 = this.zkbPartOrderReturnRepository.fetchQty(partOrderIdList);
+        }
         if(returnQty1==null)
         {
             returnQty1 = new Integer(0);
         }
-        BigDecimal result = new BigDecimal(14).divide(new BigDecimal(5),2,BigDecimal.ROUND_HALF_DOWN).multiply(new BigDecimal(returnQty+returnQty1)).setScale(0,BigDecimal.ROUND_HALF_DOWN);
+        Integer unReturnApplyPartsCount = applyPartsCount-returnQty1;
+        BigDecimal result = new BigDecimal(14).divide(new BigDecimal(5),2,BigDecimal.ROUND_HALF_DOWN).multiply(new BigDecimal(unReturnApplyPartsCount+unReturnCount)).setScale(0,BigDecimal.ROUND_HALF_DOWN);
         BigDecimal partReturnFullScore = new BigDecimal(zkbKeyBehaviorIndex.getPartReturnFullScore());
         if(result.compareTo(partReturnFullScore)>0)
         {
