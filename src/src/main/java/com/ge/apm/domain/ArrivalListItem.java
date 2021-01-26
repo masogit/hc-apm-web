@@ -383,6 +383,13 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "floor_name")
     private String floorName;
 
+    //使用人
+    @Column(name = "using_person")
+    private String usingPerson;
+    //使用人电话
+    @Column(name = "using_person_tel")
+    private String usingPersonTel;
+
     public String getBuildingName() {
         return buildingName;
     }
@@ -1068,8 +1075,23 @@ public class ArrivalListItem implements Serializable {
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
-    
-    
+
+    public String getUsingPerson() {
+        return usingPerson;
+    }
+
+    public void setUsingPerson(String usingPerson) {
+        this.usingPerson = usingPerson;
+    }
+
+    public String getUsingPersonTel() {
+        return usingPersonTel;
+    }
+
+    public void setUsingPersonTel(String usingPersonTel) {
+        this.usingPersonTel = usingPersonTel;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;
