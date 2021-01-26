@@ -267,7 +267,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             List<SearchFilter> partFilters = new ArrayList<>();
             partFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,zkbPartOrder.getOrderType()));
             partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbPartOrder.getContractId()));
-            partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
+            //partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
             List<ZkbPartOrder> partReturnZkbPartOrders =  zkbPartOrderRepository.findBySearchFilter(partFilters);
             List<String> partReturnIds = new ArrayList<>();
             Integer partQty = 0;
@@ -1163,6 +1163,23 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return false;
     }
 
+    public boolean sendWeChatReturnAudit(ZkbPartOrder zkbPartOrder){
+        try {
+            String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_RETURN_AUDIT).concat("?id=").concat(zkbPartOrder.getId());
+            String token = UserContextService.getAccessToken();
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            if(response.getStatusCode() == HttpStatus.OK){
+                return true;
+            }
+        } catch (RestClientException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
     public boolean uploadFile(FileUploadEvent event, ZkbPartOrder zkbPartOrder){
         V2_BlobObject v2_blobObject = blobService.uploadFile(event);
         return Optional.ofNullable(v2_blobObject).map(t ->{
@@ -1252,6 +1269,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             r.setClosedAuditer(userAccount.getName());
         }
         zkbPartOrderReturnRepository.save(zkbPartOrderReturnList);
+        sendWeChatReturnAudit(zkbPartOrder);
 
         //如果审批通过后则进行核算名额
         int v = 0;
