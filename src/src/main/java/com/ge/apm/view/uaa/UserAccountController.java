@@ -147,6 +147,15 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     boolean  selectAllButton = false;
     private OrgInfo orgInfo46 = new OrgInfo();//初始化GE46号节点
     private String originalTelephone=null;//原始
+    private Integer originaSelectId;
+
+    public Integer getOriginaSelectId() {
+        return originaSelectId;
+    }
+
+    public void setOriginaSelectId(Integer originaSelectId) {
+        this.originaSelectId = originaSelectId;
+    }
 
     public String getOriginalTelephone() {
         return originalTelephone;
@@ -217,11 +226,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
         userTagsDao = WebUtil.getBean(UserTagsRepository.class);
         userTagsMapper = WebUtil.getBean(UserTagsMapper.class);
-
         loginUser = UserContextService.getCurrentUserAccount();
-        if(originalTelephone == null){
-            originalTelephone = loginUser.getTelephone();
-        }
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
         sysRoleRepository = WebUtil.getBean(SysRoleRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
@@ -416,7 +421,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
         this.selected = selectedObj;
-
+        originalTelephone = this.selected.getTelephone();
+        originaSelectId = this.selected.getId();
         //fetch tags before display
         List<String> existingTags = userTagsMapper.getTagsByUser(this.selected.getUid());
         this.selected.setTags(existingTags);
@@ -825,12 +831,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                     }
                 }
             }
-            boolean isRepeated = userAccountService.whetherTheCallIsRepeated(selected.getTelephone(),loginUser);
+            boolean isRepeated = userAccountService.whetherTheCallIsRepeated(selected.getTelephone(),originalTelephone,originaSelectId);
             if(isRepeated){//重复
                 selected.setTelephone(originalTelephone);
                 WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+WebUtil.getMessage("telephone"));
                 userAccountEditFlag = false;
-                isRepeatedAfter();
+                //isRepeatedAfter();
                 return;
             }
             isRepeatedAfter();
