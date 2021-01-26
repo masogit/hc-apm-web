@@ -14,8 +14,10 @@ import java.util.List;
  */
 public interface ZkbPartOrderReturnRepository extends GenericRepositoryUUID<ZkbPartOrderReturn> {
     List<ZkbPartOrderReturn> findByPartOrderId(String partOrderId);
+    List<ZkbPartOrderReturn> findByPartOrderIdAndDataStatusNotNull(String partOrderId);
+    List<ZkbPartOrderReturn> findByPartOrderIdAndDataStatus(String partOrderId,String dataStatus);
     List<ZkbPartOrderReturn> findByPartOrderIdAndReturnTypeIsNot(String partOrderId,String returnType);
-    List<ZkbPartOrderReturn> findByPartOrderIdAndDataStatus(String partOrderId,String DataStatus);
+    List<ZkbPartOrderReturn> findByPartOrderIdAndModifyFlag(String partOrderId,String modifyFlag);
 
     void deleteByPartOrderId(String partOrderId);
 

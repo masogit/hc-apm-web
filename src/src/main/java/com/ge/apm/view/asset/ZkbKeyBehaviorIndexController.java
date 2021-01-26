@@ -267,7 +267,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
 
     public void calculateScore()
     {
-      this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.zkbContractList);
+      this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.zkbContractList,this.selected.getTenantUID());
     }
 
     @Override

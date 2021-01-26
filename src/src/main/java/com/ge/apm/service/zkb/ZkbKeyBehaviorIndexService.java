@@ -472,8 +472,9 @@ public class ZkbKeyBehaviorIndexService {
      * 计算分数
      * @param zkbKeyBehaviorIndex kbi实体
      * @param zkbContractList 合同列表
+     * @param tenantUid
      */
-    public void calculateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<ZkbContract> zkbContractList)
+    public void calculateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<ZkbContract> zkbContractList,String tenantUid)
     {
         //取合同ID
 //        List<String> contractIdList = zkbContractList.stream().map(p -> p.getId()).collect(Collectors.toList());
@@ -490,7 +491,7 @@ public class ZkbKeyBehaviorIndexService {
         this.calculatePartReturnScore(zkbKeyBehaviorIndex,contractIdList,firstday,lastday);
 //        this.calculateIntactPartReturnRateScore(zkbKeyBehaviorIndex,contractIdList);
         Integer totalIbNumber = this.calculatePasteQuickResponseRateScore(zkbKeyBehaviorIndex,contractIdList);
-        this.calculateApmBillingRateScore(zkbKeyBehaviorIndex,contractIdList,totalIbNumber,firstday,lastday);
+        this.calculateApmBillingRateScore(zkbKeyBehaviorIndex,tenantUid,totalIbNumber,firstday,lastday);
     }
 
 
@@ -655,17 +656,22 @@ public class ZkbKeyBehaviorIndexService {
     /**
      * 计算APM开单率得分
      * @param zkbKeyBehaviorIndex
-     * @param contractIdList 合同列表
+     * @param tenantUid 合同列表
      * @param totalIbNumber ib 总量
      */
-    private void calculateApmBillingRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<String> contractIdList,Integer totalIbNumber,Date firstday,Date lastday)
+    private void calculateApmBillingRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUid,Integer totalIbNumber,Date firstday,Date lastday)
     {
         if(totalIbNumber==null||totalIbNumber==0)
         {
             zkbKeyBehaviorIndex.setApmBillingRateScore(0);
             return;
         }
-        Integer countWorkOrder = this.zkbPartOrderRepository.fetchCount(contractIdList,firstday,lastday);
+        Integer countWorkOrder = this.v2_WorkOrderRepository.fetchCount(tenantUid,firstday,lastday);
+        //Integer countWorkOrder = this.zkbPartOrderRepository.fetchCount(contractIdList,firstday,lastday);
+        if(countWorkOrder==null)
+        {
+            countWorkOrder=new Integer(0);
+        }
         Integer apmBillingRateScore = new BigDecimal(countWorkOrder).
                 divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
                 multiply(new BigDecimal(100)).

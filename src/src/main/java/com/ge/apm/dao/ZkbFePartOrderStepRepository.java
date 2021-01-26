@@ -31,4 +31,13 @@ public interface ZkbFePartOrderStepRepository extends GenericRepositoryUUID<ZkbF
     @Query(value = "update ZkbFePartOrderStep set endTime=?1 where id=?2")
     void updateEndDateById(Date endDate, String id);
 
+
+    /**
+     * 根据partOrder id 和step key 查找
+     * @param partOrderId 流程主ID
+     * @param stepKey 步骤名称
+     * @return
+     */
+    List<ZkbFePartOrderStep> findByPartOrderIdAndStepKey(String partOrderId,String stepKey);
+
 }
