@@ -323,9 +323,17 @@ public class UserAccountService {
 		log.info("delete userAccount , uid: {}",userAccount.getUid());
 	}
 
-	public boolean whetherTheCallIsRepeated(String telephone){
+	public boolean whetherTheCallIsRepeated(String telephone,UserAccount loginUser){
+		if(telephone.equals(loginUser.getTelephone())){//如果跟登陆电话一样则直接放行
+			return false;
+		}
 		List<UserAccount> userAccounts = userAccountMapper.getUserAccountByTelephone(telephone);
-		if(userAccounts.size()>0){
+		for (int i = 0; i < userAccounts.size(); i++) {
+			if(loginUser.getId().equals(userAccounts.get(i).getId())){
+				userAccounts.remove(i);//移除掉自己
+			}
+		}
+		if(userAccounts.size()>0){//如果还有大于1条的数据则说明该手机几号存在
 			return true;
 		}else{
 			return false;
