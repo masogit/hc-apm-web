@@ -41,6 +41,9 @@ public class SharedAssetType implements Serializable {
     @Column(name = "remark")
     private String remark;//备注
 
+    @Column(name = "device_description")
+    private String deviceDescription;//设备描述
+
     @Column(name = "create_by")
     private String createBy;//创建人
 
@@ -197,6 +200,14 @@ public class SharedAssetType implements Serializable {
 
     public void setStartingDuration(Double startingDuration) {
         this.startingDuration = startingDuration;
+    }
+
+    public String getDeviceDescription() {
+        return deviceDescription;
+    }
+
+    public void setDeviceDescription(String deviceDescription) {
+        this.deviceDescription = deviceDescription;
     }
 
     @Override

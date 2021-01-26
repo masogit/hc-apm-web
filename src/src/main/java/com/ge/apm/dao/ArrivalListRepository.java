@@ -7,6 +7,10 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.ArrivalList;
 import java.util.Collection;
+
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import java.util.List;
 /**
@@ -19,4 +23,14 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
     List<ArrivalList> findByContractItemIdIn(Collection<String> itemId);
 
     List<ArrivalList> findBySupplierId(Integer supplierId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE arrival_list SET invoice_num=?1 WHERE id=?2", nativeQuery = true)
+    public void updateInvoiceNum(String invoiceNum, String id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE arrival_list SET vendor=?1,supplier_id=?2,supplier_user_id=?3 WHERE id=?4 AND status!=?5", nativeQuery = true)
+    public void updateSupplierUser(String vendor, Integer supplierId, Integer SupplierUserId, String id,int status);
 }
