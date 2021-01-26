@@ -30,8 +30,8 @@ public interface ZkbPartOrderReturnRepository extends GenericRepositoryUUID<ZkbP
      * @param partOrderIdList 退还单ID
      * @return
      */
-    @Query(value = "SELECT sum(qty) from zkb_part_order_return where part_order_id in ?1 and return_date between ?2 and ?3", nativeQuery = true)
-    Integer fetchQty(List<String> partOrderIdList,Date firstday, Date lastday);
+    @Query(value = "SELECT sum(qty) from zkb_part_order_return where part_order_id in ?1", nativeQuery = true)
+    Integer fetchQty(List<String> partOrderIdList);
 
     /**
      * 统计数量
