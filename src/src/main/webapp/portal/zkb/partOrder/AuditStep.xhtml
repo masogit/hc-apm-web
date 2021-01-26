@@ -748,43 +748,70 @@
                             </p:inputTextarea>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:dataTable id="zkbReturnDatalist" value="#{zkbPartOrderAuditController.zkbPartOrderReturnList}" var="item" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Tool'}"
+                    <p:dataTable id="zkbReturnDatalist" value="#{zkbPartOrderAuditController.zkbPartOrderReturnList}" var="it" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Tool'}"
                                  widgetVar="zkbReturnDatalist" selectionMode="single" selection="#{zkbPartOrderAuditController.zkbPartOrderReturn}"
-                                 lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
-                                 paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}" >
+                                 lazy="false" paginator="true" rowKey="#{it.id}" sortMode="single" sortOrder="ascending" sortBy="#{it.id}"
+                                 paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}" editable="true" >
 
                         <p:ajax event="rowSelect" update=":zkbPartOrderEditForm:zkbReturnDatalist:editReturnButton :zkbPartOrderEditForm:zkbReturnDatalist:deleteReturnButton"/>
-
+                        <p:ajax event="rowEdit" listener="#{zkbPartOrderAuditController.onRowEditReturn}" />
                         <p:column headerText="运单号">
-                            <h:outputText value="#{item.waybillNo}"/>
+                            <h:outputText value="#{it.waybillNo}"/>
                         </p:column>
                         <p:column headerText="归还日期">
-                            <h:outputText value="#{item.returnDate}">
+                            <h:outputText value="#{it.returnDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="配件号">
-                            <h:outputText value="#{item.partNo}"/>
+                            <h:outputText value="#{it.partNo}"/>
                         </p:column>
                         <p:column headerText="归还类型">
-                            <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnType',item.returnType)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnType',it.returnType)}"/>
                         </p:column>
                         <p:column headerText="Part Serial Number" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
-                            <h:outputText value="#{item.partSerialNumber}"/>
+                            <h:outputText value="#{it.partSerialNumber}"/>
                         </p:column>
                         <p:column headerText="故障描述" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
-                            <h:outputText value="#{item.partQualityIssue}"/>
+                            <h:outputText value="#{it.partQualityIssue}"/>
                         </p:column>
                         <p:column headerText="归还数量">
-                            <h:outputText value="#{item.qty}"/>
+                            <h:outputText value="#{it.qty}"/>
                         </p:column>
                         <p:column headerText="备注">
-                            <h:outputText value="#{item.remark}"/>
+                            <h:outputText value="#{it.remark}"/>
                         </p:column>
-                        <f:facet name="{Toolbar}">
-                            <p:commandButton immediate="false" process="@this" id="createReturnButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbPartOrderAuditController.prepareReturnCreate}" update=":growl :zkbPartOrderReturnEditDlg" oncomplete="PF('zkbPartOrderReturnEditDlg').show()" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag}" />
-                            <p:commandButton immediate="false" process="@this" id="editReturnButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbPartOrderAuditController.prepareReturnEdit}" update=":growl :zkbPartOrderReturnEditDlg"  oncomplete="PF('zkbPartOrderReturnEditDlg').show()"  disabled="#{empty zkbPartOrderAuditController.zkbPartOrderReturn }" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag }"/>
-                            <p:commandButton immediate="false" process="@this"  id="deleteReturnButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbPartOrderAuditController.deleteReturn}" update=":growl :zkbPartOrderEditForm:zkbReturnDatalist" disabled="#{empty zkbPartOrderAuditController.zkbPartOrderReturn }" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag }">
+                        <p:column headerText="状态" rendered="#{!zkbPartOrderAuditController.choseAdmin}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnDataStatus',it.dataStatus)}"/>
+                        </p:column>
+                        <p:column headerText="状态" exportable="false" width="160" rendered="#{zkbPartOrderAuditController.choseAdmin}" >
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnDataStatus',it.dataStatus)}" /></f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu value="#{it.dataStatus}" style="width:100%">
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnDataStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="审批备注">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{it.closedRemark}" /></f:facet>
+                                <f:facet name="input">
+                                    <p:inputText value="#{it.closedRemark}" style="width:100%"/>
+                                </f:facet>
+                            </p:cellEditor>
+                            <!-- <p:inputText value="#{it.closedRemark}"  rendered="#{zkbPartOrderAuditController.choseAdmin and it.dataStatus eq 'Pending'}"/>
+                             <h:outputText value="#{it.closedRemark}" rendered="#{!(zkbPartOrderAuditController.choseAdmin and it.dataStatus eq 'Pending')}" />-->
+                        </p:column>
+                        <p:column headerText="操作" style="width:80px" rendered="#{zkbPartOrderAuditController.choseAdmin}">
+                            <p:rowEditor editTitle="审批" rendered="#{it.dataStatus eq 'Pending'}" />
+                        </p:column>
+                        <f:facet name="{Toolbar}" >
+                            <p:commandButton immediate="false" process="@this" id="createReturnButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbPartOrderAuditController.prepareReturnCreate}" update=":growl :zkbPartOrderReturnEditDlg" oncomplete="PF('zkbPartOrderReturnEditDlg').show()" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag and !zkbPartOrderAuditController.choseAdmin}" />
+                            <p:commandButton immediate="false" process="@this" id="editReturnButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbPartOrderAuditController.prepareReturnEdit}" update=":growl :zkbPartOrderReturnEditDlg"  oncomplete="PF('zkbPartOrderReturnEditDlg').show()"  disabled="#{empty zkbPartOrderAuditController.zkbPartOrderReturn or zkbPartOrderAuditController.zkbPartOrderReturn.dataStatus eq 'Accept' or zkbPartOrderAuditController.zkbPartOrderReturn.dataStatus eq 'Pending'}" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag and !zkbPartOrderAuditController.choseAdmin }"/>
+                            <p:commandButton immediate="false" process="@this"  id="deleteReturnButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbPartOrderAuditController.deleteReturn}" update=":growl :zkbPartOrderEditForm:zkbReturnDatalist" disabled="#{empty zkbPartOrderAuditController.zkbPartOrderReturn or zkbPartOrderAuditController.zkbPartOrderReturn.dataStatus eq 'Accept' or zkbPartOrderAuditController.zkbPartOrderReturn.dataStatus eq 'Pending'}" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag and !zkbPartOrderAuditController.choseAdmin}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
                         </f:facet>
@@ -837,7 +864,7 @@
                                 </c:otherwise>
                             </c:choose>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType != 'Parts'}">
                             <label class="label">关单备注</label>
                             <p:inputTextarea id="closedRemark" value="#{zkbPartOrderAuditController.selected.closedRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag)}">
                             </p:inputTextarea>
@@ -852,7 +879,7 @@
                 <p:commandButton validateClient="true" value="保存" action="#{zkbPartOrderAuditController.save}" update=":growl" icon="ui-icon-check" rendered="false" />
                 <p:commandButton validateClient="true" value="提交" action="#{zkbPartOrderAuditController.normalNext}" update=":growl" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.showBtn eq '1' and zkbPartOrderAuditController.canEditFlag}"/>
                 <p:commandButton immediate="false" process="@this" value="拒绝" update=":growl :zkbCancelReasonDlg" oncomplete="PF('zkbCancelReasonDlg').show()" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' or zkbPartOrderAuditController.selected.currentStep eq 'OrderExtraPending' ) and zkbPartOrderAuditController.canEditFlag}"/>
-                <p:commandButton immediate="false" process="@this" value="退回" action="#{zkbPartOrderAuditController.closedBack}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag}"/>
+                <!--<p:commandButton immediate="false" process="@this" value="退回" action="#{zkbPartOrderAuditController.closedBack}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag}"/>-->
                 <p:commandButton validateClient="true" value="审批通过" action="#{zkbPartOrderAuditController.acceptNext}" update=":growl" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.showBtn eq '0') and zkbPartOrderAuditController.canEditFlag}"/>
                 <p:commandButton validateClient="true" value="审批不通过" action="#{zkbPartOrderAuditController.rejectNext}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.showBtn eq '0' and zkbPartOrderAuditController.canEditFlag}"/>
                 <p:commandButton immediate="false"  process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbPartOrderAuditController.backList}" />

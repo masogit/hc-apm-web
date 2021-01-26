@@ -81,6 +81,17 @@ public class ZkbFePartOrderStepService {
         this.zkbFePartOrderStepRepository.updateEndDateById(endTime,latestStep.getId());
     }
 
+    /**
+     * 根据partOrder id 和step key 查找
+     * @param partOrderId 流程主ID
+     * @param stepKey 步骤名称
+     * @return
+     */
+    public List<ZkbFePartOrderStep> findByPartOrderIdAndStepKey(String partOrderId,String stepKey)
+    {
+        return this.zkbFePartOrderStepRepository.findByPartOrderIdAndStepKey(partOrderId,stepKey);
+    }
+
 
 
 
