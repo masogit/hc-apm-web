@@ -365,6 +365,20 @@
                                     </p:autoComplete>
                                 </h:panelGroup>
                             </c:if>
+                            <c:if test="#{assetInstallationController.activeSupplier()}">
+                                <h:panelGroup >
+                                    <label class="label">使用人</label>
+                                    <p:inputText value="#{assetInstallationController.arrivalListItem.usingPerson}">
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup >
+                                    <label class="label">使用人电话</label>
+                                    <p:inputText value="#{assetInstallationController.arrivalListItem.usingPersonTel}">
+                                        <p:ajax process="@this" update="@this"/>
+                                    </p:inputText>
+                                </h:panelGroup>
+                            </c:if>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['locationCode']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.locationCode}<span style="color:red">#{assetInstallationController.customConfig.assetFields['locationCode'].arrivalRequired? '*':''}</span></label>

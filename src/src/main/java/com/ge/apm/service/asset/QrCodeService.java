@@ -253,6 +253,7 @@ public class QrCodeService {
         asset.setDepartNum(WebUtil.getMessage("TBD"));
         asset.setModalityId(WebUtil.getMessage("TBD"));
         asset.setFunctionType(WebUtil.getMessage("TBD"));
+        asset.setLocationName(WebUtil.getMessage("TBD"));
         return asset;
     }
 
@@ -326,6 +327,9 @@ public class QrCodeService {
                         break;
                     case "installDate":
                         itemObject.put("TextShowValue", textValue.concat(asset.getInstallDate() == null ? "" : TimeUtils.getStrDate(asset.getInstallDate(), "yyyy-MM-dd")));
+                        break;
+                    case "locationName":
+                        itemObject.put("TextShowValue", textValue.concat(asset.getLocationName() == null ? "" : asset.getLocationName()));
                         break;
                 }
             }

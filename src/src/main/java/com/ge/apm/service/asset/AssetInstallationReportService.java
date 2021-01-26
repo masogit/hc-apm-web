@@ -89,8 +89,8 @@ public class AssetInstallationReportService {
         reportData.put("foreign_trade_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
         reportData.put("box_installation_date", arrivalListItem.getArrivalList().getBoxInstallationDate());//开箱安装日期
         reportData.put("using_date", arrivalListItem.getArrivalList().getUsingDate());//使用日期
-        reportData.put("using_person", arrivalListItem.getArrivalList().getUsingPerson());//使用人
-        reportData.put("using_person_tel", arrivalListItem.getArrivalList().getUsingPersonTel());//使用人电话
+        reportData.put("using_person", arrivalListItem.getUsingPerson());//使用人
+        reportData.put("using_person_tel", arrivalListItem.getUsingPersonTel());//使用人电话
         reportData.put("contact_person", arrivalListItem.getArrivalList().getContactPerson());//联系人
         reportData.put("contact_person_tel", arrivalListItem.getArrivalList().getContactPersonTel());//联系人电话
         reportData.put("repairer", arrivalListItem.getArrivalList().getRepairer());//维修联系人
@@ -176,8 +176,8 @@ public class AssetInstallationReportService {
         reportData.put("foreign_trade_agreements", arrivalListItem.getArrivalList().getForeignTradeAgreements());//外贸协议
         reportData.put("box_installation_date", arrivalListItem.getArrivalList().getArrivalDate());//开箱安装日期改为到货安装日期
         reportData.put("using_date", arrivalListItem.getArrivalList().getUsingDate());//使用日期
-        reportData.put("using_person", arrivalListItem.getArrivalList().getUsingPerson());//使用人
-        reportData.put("using_person_tel", arrivalListItem.getArrivalList().getUsingPersonTel());//使用人电话
+        reportData.put("using_person", arrivalListItem.getUsingPerson());//使用人
+        reportData.put("using_person_tel", arrivalListItem.getUsingPersonTel());//使用人电话
         reportData.put("contact_person", arrivalListItem.getArrivalList().getContactPerson());//联系人
         reportData.put("contact_person_tel", arrivalListItem.getArrivalList().getContactPersonTel());//联系人电话
         reportData.put("repairer", arrivalListItem.getArrivalList().getRepairer());//维修联系人
