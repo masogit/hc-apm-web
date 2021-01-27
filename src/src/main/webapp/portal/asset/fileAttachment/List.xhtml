@@ -41,11 +41,11 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetName}"/>
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
                         </p:column>
-                        <p:column headerText="设备型号" sortBy="#{item.assetFunctionType}" filterBy="#{item.assetFunctionType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetFunctionType}"/>
+                        <p:column headerText="设备型号" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.functionType}"/>
                         </p:column>
                         <p:column rendered="#{!userContextService.hasCurrentTenantName('')}" headerText="#{msg.fileType}" filterBy="#{item.boSubType}" filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('attachmentType', item.boSubType)}"/>
