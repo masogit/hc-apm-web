@@ -1164,6 +1164,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     public boolean sendWeChatReturnAudit(ZkbPartOrder zkbPartOrder){
+        System.out.println("---sendWeChatReturnAudit----");
         try {
             String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_RETURN_AUDIT).concat("?id=").concat(zkbPartOrder.getId());
             String token = UserContextService.getAccessToken();
