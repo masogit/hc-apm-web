@@ -18,14 +18,14 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query("select max(p.partOrderIndex) from ZkbPartOrder p where p.partOrderNo like ?1 ")
     Object getMaxIndex(String dateCondition);
 
-    /**
-     * 根据合同ID获取所有归还单
-     * @param contractIdList
-     * @param firstday 某月第一天
-     * @param lastday 某月最后一天
-     * @return
-     */
-    List<ZkbPartOrder> findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndOrderedDateGreaterThanEqualAndOrderedDateLessThanEqual(List<String> contractIdList, Date firstday, Date lastday, Date firstday1, Date lastday1);
+//    /**
+//     * 根据合同ID获取所有归还单
+//     * @param contractIdList
+//     * @param firstday 某月第一天
+//     * @param lastday 某月最后一天
+//     * @return
+//     */
+//    List<ZkbPartOrder> findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndOrderedDateGreaterThanEqualAndOrderedDateLessThanEqual(List<String> contractIdList, Date firstday, Date lastday, Date firstday1, Date lastday1);
 
     /**
      * 根据多个合同ID，获取总申请数
@@ -58,6 +58,30 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "select count(1) as totalTimes, ai.asset_owner_id,ai.asset_owner_id2,ai.asset_owner_id3 from asset_info ai where ai.asset_owner_id=:assetOwnerId and ai.site_uid=:siteUID "
             + "group by ai.asset_owner_id2,ai.asset_owner_id3,ai.asset_owner_id order by totalTimes desc limit 1",nativeQuery = true)
     public List<Object[]> queryZkbHistoryData(@Param("assetOwnerId") Integer assetOwnerId, @Param("siteUID") String siteUID);
+
+
+    /**
+     * 获取探头未归还
+     * @param contractIdList 合同列表
+     * @param orderedDate 时间
+     * @param orderType 订单类型
+     * @return
+     */
+    @Query(value = "SELECT count(id) from zkb_part_order where  order_type = ?3 and ordered_date< ?2 and return_auditer_uid is NULL and contract_id in ?1", nativeQuery = true)
+    Integer fetchUnReturnCount(List<String> contractIdList, Date orderedDate,String orderType);
+
+
+    @Query(value = "SELECT sum(qty) from zkb_part_order where order_type = ?3 and ordered_date< ?2  and contract_id in ?1", nativeQuery = true)
+    Integer fetchApplyPartsQty(List<String> contractIdList, Date orderedDate,String orderType);
+
+    /**
+     * 获取配件
+     * @param orderedDate 下单日期
+     * @param contractIdList 合同列表
+     * @param orderType 订单类型
+     * @return
+     */
+    List<ZkbPartOrder> findByOrderedDateBeforeAndContractIdInAndOrderType(Date orderedDate,List<String> contractIdList,String orderType);
 
 }
 
