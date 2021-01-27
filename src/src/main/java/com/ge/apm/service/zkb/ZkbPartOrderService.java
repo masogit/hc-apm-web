@@ -239,7 +239,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         List<SearchFilter> filters = new ArrayList<>();
         filters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,zkbPartOrder.getOrderType()));
         filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbContract.getId()));
-        filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Returned.toString()));
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+            filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Returned.toString()));
+            filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
+        }
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.Closed.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.TechnicalReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.ManageReject.toString()));
@@ -267,7 +270,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             List<SearchFilter> partFilters = new ArrayList<>();
             partFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,zkbPartOrder.getOrderType()));
             partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbPartOrder.getContractId()));
-            //partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
+            partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString(),"1*2+"));
+            partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Returned.toString(),"1*2+"));
             List<ZkbPartOrder> partReturnZkbPartOrders =  zkbPartOrderRepository.findBySearchFilter(partFilters);
             List<String> partReturnIds = new ArrayList<>();
             Integer partQty = 0;
@@ -514,6 +518,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(zkbPartOrder != null){
             //List<V2_BlobObject> v2_blobObjectList = blobObjectRepository.fetchBlobObjectByUuidAndType(zkbPartOrder.getId(),V2_BlobObject.BO_TYPE_ZKB_PART_ORDER,V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
             List<V2_BlobObject> v2_blobObjectList = new ArrayList<>();
+            List<SearchFilter> sfs = new ArrayList();
+            sfs.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, zkbPartOrder.getId()));
+            sfs.add(new SearchFilter("boType", SearchFilter.Operator.EQ, V2_BlobObject.BO_TYPE_ZKB_PART_ORDER));
+            sfs.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, V2_BlobObject.BO_TYPE_ZKB_PART_ORDER));
+            v2_blobObjectList = blobObjectRepository.findBySearchFilter(sfs);
             map.put("v2_blobObjectList",v2_blobObjectList);
         }
 
