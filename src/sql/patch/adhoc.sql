@@ -20,3 +20,36 @@ create index ix_coil_opportunity_system_id on coil_opportunity (system_id);
 INSERT INTO sr_name_transfer_mapping (file_name,mapped_name,sr_type, is_upload) VALUES ('Demo Checklist.pdf','球管失效报告.pdf',3, 'N'), ('Demo Checklist.pdf','球管失效报告.pdf',6, 'N');
 
 update sr_name_transfer_mapping set is_upload = 'N' where id in (213, 214, 183, 184, 314, 315, 306, 307, 256, 257, 222, 223, 243, 244, 323, 324);
+
+INSERT INTO zkb_fe_part_order_user_config (
+    ID,
+    config_type,
+    email,
+    login_name,
+    NAME,
+    phone,
+    remark,
+    sso,
+    tenant_uid
+) SELECT
+    ID,
+    'Supplier',
+    email,
+    login_name,
+    '',
+    telephone,
+    '',
+    '',
+    tenant_uid
+FROM
+    user_account
+WHERE
+    tenant_uid IN (
+        SELECT
+            uid
+        FROM
+            tenant_info
+        WHERE
+            TYPE = 3
+        AND uid != 'b0b889c38c6e4da48f91de9c8d50cc6b' and uid!='dc1fd473d1e14eb6b5e3644fc73b3690' and uid!='9d5d09bbc3184b73af45d07e26640fd4'
+    );
