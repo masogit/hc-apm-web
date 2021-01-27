@@ -53,3 +53,14 @@ WHERE
             TYPE = 3
         AND uid != 'b0b889c38c6e4da48f91de9c8d50cc6b' and uid!='dc1fd473d1e14eb6b5e3644fc73b3690' and uid!='9d5d09bbc3184b73af45d07e26640fd4'
     );
+
+
+-- 智康保归还数据
+update zkb_part_order_return set modify_flag = 'Y' where data_satus = 'New';
+update zkb_part_order_return set modify_flag = 'N' where data_satus = 'Old';
+update zkb_part_order_return set modify_flag = 'N' where data_satus is null;
+
+update zkb_part_order_return r set data_satus = 'Accept' where part_order_id in (select id from zkb_part_order where status ='Closed') and r.data_satus != 'Accept' and r.data_satus != 'Pending' and r.data_satus != 'Reject';
+update zkb_part_order_return r set data_satus = 'Accept' where part_order_id in (select id from zkb_part_order where status ='Closed') and r.data_satus is null;
+update zkb_part_order_return r set data_satus = 'Pending' where part_order_id in (select id from zkb_part_order where status !='Closed') and r.data_satus != 'Accept' and r.data_satus != 'Pending' and r.data_satus != 'Reject';
+update zkb_part_order_return r set data_satus = 'Pending' where part_order_id in (select id from zkb_part_order where status !='Closed') and r.data_satus is null;
