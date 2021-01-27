@@ -1,7 +1,6 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Where;
 
@@ -20,12 +19,13 @@ public class V2_BlobObject implements Serializable {
     public enum ZkbBoSubType {
         ServiceManual, OperationManual, MaintenanceList, Others
     }
+
     public enum ZkbOperationType {
         A, C
     }
 
     public static final String BO_TYPE_ServiceRequest = "ServiceRequest";
-    public static final String BO_TYPE_PCCReport="PccReport";
+    public static final String BO_TYPE_PCCReport = "PccReport";
     public static final String BO_TYPE_PmRequest = "PmRequest";
     public static final String BO_TYPE_WorkOrder = "WorkOrder";
     public static final String BO_TYPE_WorkOrderStep = "WorkOrderStep";
@@ -65,7 +65,7 @@ public class V2_BlobObject implements Serializable {
 
     @Column(name = "bo_type")
     private String boType;
-    
+
     @Column(name = "bo_sub_type")
     private String boSubType;
 
@@ -108,16 +108,11 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "second_directory")
     private String secondDirectory;
 
-//    @JoinColumn(insertable=false,updatable=false, name = "bo_uuid", referencedColumnName = "uid",nullable = true)
-//    @ManyToOne(optional = true, fetch = FetchType.EAGER)
-//    @JsonBackReference
-//    private AssetInfo assetInfo;
-
-    @Formula("(select a.name from asset_info a where bo_type = 'AssetInfo' and bo_uuid is not null and a.uid = bo_uuid)")
-    private String assetName;
-
-    @Formula("(select a.function_type from asset_info a where bo_type = 'AssetInfo' and bo_uuid is not null and a.uid = bo_uuid)")
-    private String assetFunctionType;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(insertable = false, updatable = false, name = "bo_uuid", referencedColumnName = "uid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'AssetInfo'")
+    @JsonBackReference
+    private AssetInfo assetInfo;
 
     public String getId() {
         return id;
@@ -199,13 +194,13 @@ public class V2_BlobObject implements Serializable {
         this.boSubType = boSubType;
     }
 
-//    public AssetInfo getAssetInfo() {
-//        return assetInfo;
-//    }
-//
-//    public void setAssetInfo(AssetInfo assetInfo) {
-//        this.assetInfo = assetInfo;
-//    }
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
+    }
 
     public String getCreatedBy() {
         return createdBy;
@@ -269,22 +264,6 @@ public class V2_BlobObject implements Serializable {
 
     public void setSecondDirectory(String secondDirectory) {
         this.secondDirectory = secondDirectory;
-    }
-
-    public String getAssetName() {
-        return assetName;
-    }
-
-    public void setAssetName(String assetName) {
-        this.assetName = assetName;
-    }
-
-    public String getAssetFunctionType() {
-        return assetFunctionType;
-    }
-
-    public void setAssetFunctionType(String assetFunctionType) {
-        this.assetFunctionType = assetFunctionType;
     }
 
     @Override
