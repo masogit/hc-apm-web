@@ -1,6 +1,7 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Where;
 
@@ -111,6 +112,12 @@ public class V2_BlobObject implements Serializable {
 //    @ManyToOne(optional = true, fetch = FetchType.EAGER)
 //    @JsonBackReference
 //    private AssetInfo assetInfo;
+
+    @Formula("(select a.name from asset_info a where bo_type = 'AssetInfo' and bo_uuid is not null and a.uid = bo_uuid)")
+    private String assetName;
+
+    @Formula("(select a.function_type from asset_info a where bo_type = 'AssetInfo' and bo_uuid is not null and a.uid = bo_uuid)")
+    private String assetFunctionType;
 
     public String getId() {
         return id;
@@ -262,6 +269,22 @@ public class V2_BlobObject implements Serializable {
 
     public void setSecondDirectory(String secondDirectory) {
         this.secondDirectory = secondDirectory;
+    }
+
+    public String getAssetName() {
+        return assetName;
+    }
+
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
+    }
+
+    public String getAssetFunctionType() {
+        return assetFunctionType;
+    }
+
+    public void setAssetFunctionType(String assetFunctionType) {
+        this.assetFunctionType = assetFunctionType;
     }
 
     @Override
