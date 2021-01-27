@@ -549,7 +549,7 @@ public class ZkbKeyBehaviorIndexService {
         {
             unReturnCount=0;
         }
-        List<ZkbPartOrder> zkbPartOrdersList = this.zkbPartOrderRepository.findByOrderedDateBeforeAndContractIdInAndOrderType(nowBefore,contractIdList,ZkbPartOrder.OrderType.Parts.toString());
+        List<ZkbPartOrder> zkbPartOrdersList = this.zkbPartOrderRepository.findReturnId(nowBefore,contractIdList,ZkbPartOrder.OrderType.Parts.toString());
         Integer applyPartsCount = this.zkbPartOrderRepository.fetchApplyPartsQty(contractIdList,nowBefore,ZkbPartOrder.OrderType.Parts.toString());
         if(applyPartsCount==null)
         {
