@@ -269,7 +269,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
             List<SearchFilter> partFilters = new ArrayList<>();
             partFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,zkbPartOrder.getOrderType()));
-            partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbPartOrder.getContractId()));
+            partFilters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbContract.getId()));
             partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.PartReturned.toString(),"1*2+"));
             partFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, ZkbPartOrder.PartOrderStatus.Returned.toString(),"1*2+"));
             List<ZkbPartOrder> partReturnZkbPartOrders =  zkbPartOrderRepository.findBySearchFilter(partFilters);
