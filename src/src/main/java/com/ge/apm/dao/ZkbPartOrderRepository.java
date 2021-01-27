@@ -74,14 +74,17 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "SELECT sum(qty) from zkb_part_order where order_type = ?3 and ordered_date< ?2  and contract_id in ?1", nativeQuery = true)
     Integer fetchApplyPartsQty(List<String> contractIdList, Date orderedDate,String orderType);
 
-    /**
-     * 获取配件
-     * @param orderedDate 下单日期
-     * @param contractIdList 合同列表
-     * @param orderType 订单类型
-     * @return
-     */
-    List<ZkbPartOrder> findByOrderedDateBeforeAndContractIdInAndOrderType(Date orderedDate,List<String> contractIdList,String orderType);
+//    /**
+//     * 获取配件
+//     * @param orderedDate 下单日期
+//     * @param contractIdList 合同列表
+//     * @param orderType 订单类型
+//     * @return
+//     */
+//    List<ZkbPartOrder> findByOrderedDateBeforeAndContractIdInAndOrderType(Date orderedDate,List<String> contractIdList,String orderType);
+
+    @Query(value = "SELECT * from zkb_part_order where order_type = ?3 and ordered_date< ?1  and contract_id in ?2 and (status = 'PartReturned' or status = 'Returned' or status = 'Closed')", nativeQuery = true)
+    List<ZkbPartOrder> findReturnId(Date orderedDate,List<String> contractIdList,String orderType);
 
 }
 
