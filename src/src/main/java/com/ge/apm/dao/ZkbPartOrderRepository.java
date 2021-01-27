@@ -67,7 +67,7 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @param orderType 订单类型
      * @return
      */
-    @Query(value = "SELECT count(id) from zkb_part_order where  order_type = ?3 and ordered_date< ?2 and return_auditer_uid is NULL and contract_id in ?1", nativeQuery = true)
+    @Query(value = "SELECT count(id) from zkb_part_order where  order_type = ?3 and ordered_date< ?2 AND (status!='PartReturned' and status!='Returned' and status!='Closed') and contract_id in ?1", nativeQuery = true)
     Integer fetchUnReturnCount(List<String> contractIdList, Date orderedDate,String orderType);
 
 
