@@ -831,7 +831,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                     }
                 }
             }
-            boolean isRepeated = userAccountService.whetherTheCallIsRepeated(selected.getTelephone(),originalTelephone,originaSelectId);
+            boolean isRepeated = userAccountService.whetherTheCallIsRepeated(selected.getTelephone(),originalTelephone,originaSelectId);//判断手机号码是否重复 true:重复 false:不重复
             if(isRepeated){//重复
                 selected.setTelephone(originalTelephone);
                 WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+WebUtil.getMessage("telephone"));
