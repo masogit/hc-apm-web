@@ -324,7 +324,7 @@ public class UserAccountService {
 	}
 
 	public boolean whetherTheCallIsRepeated(String telephone,String userTelephone,Integer userId){
-		if(telephone.equals(userTelephone)){//如果跟登陆电话一样则直接放行
+		if(null == telephone||telephone.equals(userTelephone)){//如果跟登陆电话一样则直接放行
 			return false;
 		}
 		List<UserAccount> userAccounts = userAccountMapper.getUserAccountByTelephone(telephone);
