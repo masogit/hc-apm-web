@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author : 503189362
@@ -19,9 +20,11 @@ public class ZkbFePartOrder {
      * TenantAccept:租户审批通过
      * TenantReject:租户批拒绝
      * FourHundredsAccept:400回填
+     * GEAdminAccept GEAdmin 全部归还
+     * GEAdminAcceptPart GEAdmin 部分归还
      */
     public enum workFlowStatus {
-        Requested,TenantAccept,TenantReject,FourHundredsAccept
+        Requested,TenantAccept,TenantReject,FourHundredsAccept,GEAdminAccept,GEAdminAcceptPart
     }
 
     /**
@@ -38,8 +41,20 @@ public class ZkbFePartOrder {
      * Complete:完成
      */
     public enum workFlowSteps {
-        WaitingAssignment,WaitingApm,Complete
+        Requested,WaitingAssignment,WaitingApm,WaitingGEAdmin,Complete
     }
+
+    /**
+     * 流程步骤
+     */
+    public static String[] stepAndRoles = new String[]
+            {
+                    workFlowSteps.Requested.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.WaitingAssignment.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingApm.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.WaitingGEAdmin.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
+                    workFlowSteps.Complete.toString()
+            };
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -215,6 +230,90 @@ public class ZkbFePartOrder {
      */
     @Column(name = "tenant_uid")
     private String tenantUid;
+
+    /**
+     * 设备类型（DI）
+     */
+    @Column(name = "asset_type_di")
+    private String assetTypeDi;
+
+    /**
+     * 机型
+     */
+    @Column(name = "artificial_type")
+    private String artificialType;
+
+    /**
+     * 申请人电话
+     */
+    @Column(name = "apply_person_phone")
+    private String applyPersonPhone;
+
+    /**
+     * 订单标注
+     */
+    @Column(name = "order_annotation")
+    private String orderAnnotation;
+
+    /**
+     * 发生问题的order number
+     */
+    @Column(name = "problem_order_number")
+    private String problemOrderNumber;
+
+    /**
+     * 产品型号
+     */
+    @Column(name = "product_number")
+    private String productNumber;
+
+    /**
+     * 软件版本
+     */
+    @Column(name = "software_version")
+    private String softwareVersion;
+
+    /**
+     * 订单号
+     */
+    @Column(name = "father_part_order_no")
+    private String fatherPartOrderNo;
+
+
+    /**
+     * 填充APM信息人
+     */
+    @Column(name = "full_apm_info_user")
+    private String fullApmInfoUser;
+
+    /**
+     * 填充APM信息时间
+     */
+    @Column(name = "full_apm_info_date")
+    private Date fullApmInfoDate;
+
+    /**
+     * 设备分类 1.放射类 2.超声类
+     */
+    private String assetGroup;
+
+    /**
+     * 供应商审批备注
+     */
+    @Column(name = "ge_admin_comment")
+    private String geAdminComment;
+
+    /**
+     * 申请备件列表
+     */
+    @Transient
+    private List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList;
+
+    /**
+     * 申请备件归还列表
+     */
+    @Transient
+    private List<ZkbFePartOrderReturn> zkbFePartOrderReturnList;
 
     public String getId() {
         return id;
@@ -447,6 +546,39 @@ public class ZkbFePartOrder {
     public void setRemark(String remark) {
         this.remark = remark;
     }
+
+    public String getAssetTypeDi() {
+        return assetTypeDi;
+    }
+
+    public void setAssetTypeDi(String assetTypeDi) {
+        this.assetTypeDi = assetTypeDi;
+    }
+
+    public String getArtificialType() {
+        return artificialType;
+    }
+
+    public void setArtificialType(String artificialType) {
+        this.artificialType = artificialType;
+    }
+
+    public String getFatherPartOrderNo() {
+        return fatherPartOrderNo;
+    }
+
+    public void setFatherPartOrderNo(String fatherPartOrderNo) {
+        this.fatherPartOrderNo = fatherPartOrderNo;
+    }
+
+    public List<ZkbFePartOrderAssetInfo> getZkbFePartOrderAssetInfoList() {
+        return zkbFePartOrderAssetInfoList;
+    }
+
+    public void setZkbFePartOrderAssetInfoList(List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList) {
+        this.zkbFePartOrderAssetInfoList = zkbFePartOrderAssetInfoList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -470,5 +602,85 @@ public class ZkbFePartOrder {
     @Override
     public String toString() {
         return "com.ge.apm.domain.ZkbFePartOrder[ id=" + id + " ]";
+    }
+
+    public String getOrderAnnotation() {
+        return orderAnnotation;
+    }
+
+    public void setOrderAnnotation(String orderAnnotation) {
+        this.orderAnnotation = orderAnnotation;
+    }
+
+    public String getProductNumber() {
+        return productNumber;
+    }
+
+    public void setProductNumber(String productNumber) {
+        this.productNumber = productNumber;
+    }
+
+    public String getSoftwareVersion() {
+        return softwareVersion;
+    }
+
+    public void setSoftwareVersion(String softwareVersion) {
+        this.softwareVersion = softwareVersion;
+    }
+
+    public String getAssetGroup() {
+        return assetGroup;
+    }
+
+    public void setAssetGroup(String assetGroup) {
+        this.assetGroup = assetGroup;
+    }
+
+    public List<ZkbFePartOrderReturn> getZkbFePartOrderReturnList() {
+        return zkbFePartOrderReturnList;
+    }
+
+    public void setZkbFePartOrderReturnList(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList) {
+        this.zkbFePartOrderReturnList = zkbFePartOrderReturnList;
+    }
+
+    public String getApplyPersonPhone() {
+        return applyPersonPhone;
+    }
+
+    public void setApplyPersonPhone(String applyPersonPhone) {
+        this.applyPersonPhone = applyPersonPhone;
+    }
+
+    public String getFullApmInfoUser() {
+        return fullApmInfoUser;
+    }
+
+    public void setFullApmInfoUser(String fullApmInfoUser) {
+        this.fullApmInfoUser = fullApmInfoUser;
+    }
+
+    public Date getFullApmInfoDate() {
+        return fullApmInfoDate;
+    }
+
+    public void setFullApmInfoDate(Date fullApmInfoDate) {
+        this.fullApmInfoDate = fullApmInfoDate;
+    }
+
+    public String getProblemOrderNumber() {
+        return problemOrderNumber;
+    }
+
+    public void setProblemOrderNumber(String problemOrderNumber) {
+        this.problemOrderNumber = problemOrderNumber;
+    }
+
+    public String getGeAdminComment() {
+        return geAdminComment;
+    }
+
+    public void setGeAdminComment(String geAdminComment) {
+        this.geAdminComment = geAdminComment;
     }
 }

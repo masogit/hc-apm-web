@@ -15,7 +15,7 @@ public class V2_BlobObjectProvider {
         String tenantUid = (String) param.get("tenantUid");
         String boType = (String) param.get("boType");
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT" +
+        sb.append(" SELECT * from ( SELECT" +
                 " bo.id," +
                 " bo.bo_id," +
                 " bo.bo_type," +
@@ -48,7 +48,28 @@ public class V2_BlobObjectProvider {
                 " main_directory," +
                 " second_directory) ai ON bo.main_directory = ai.main_directory" +
                 " AND bo.second_directory = ai.second_directory" +
-                " WHERE bo.bo_type ='"+boType+"'");
+                " WHERE bo.bo_type ='"+boType+"'"+
+                " UNION" +
+                        " SELECT" +
+                        " bo. ID," +
+                        " bo.bo_id," +
+                        " bo.bo_type," +
+                        " bo.bo_uuid, " +
+                        " bo.object_name, " +
+                        " bo.object_size, " +
+                        " bo.object_storage_id, " +
+                        " bo.object_type, " +
+                        " bo.created_by, " +
+                        " bo.created_date, " +
+                        " bo.last_modified_by, " +
+                        " bo.last_modified_date, " +
+                        " bo.bo_sub_type, " +
+                        " bo.ext_link, " +
+                        " bo.operation_type, " +
+                        " bo.main_directory, " +
+                        " bo.second_directory " +
+                        "FROM" +
+                        " v2_blob_object bo WHERE bo.bo_type = '"+boType+"' AND (bo.main_directory='ALL' AND bo.second_directory='ALL')) as bo where 1=1");
         String filter = buildFilter_V2_BlobObjectDetail(searchFilterList);
         sb.append(filter);
         return sb.toString();
@@ -79,10 +100,10 @@ public class V2_BlobObjectProvider {
             {
                 sb.append(" and bo.operation_type = '"+value.toString()+"'");
             }
-            if("tenantUid".equals(tempColumn))
-            {
-                sb.append(" and ai.tenant_uid = '"+value.toString()+"'");
-            }
+//            if("tenantUid".equals(tempColumn))
+//            {
+//                sb.append(" and ai.tenant_uid = '"+value.toString()+"'");
+//            }
         }
         return sb.toString();
     }
