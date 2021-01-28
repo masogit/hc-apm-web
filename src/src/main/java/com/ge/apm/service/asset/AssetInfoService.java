@@ -175,16 +175,20 @@ public class AssetInfoService {
 
         List<SysAuthGroup> groupList = authGroupDao.listSysAuthGroup();
 
-        TreeNode rootNode = new DefaultTreeNode("sysAuthGroup", null, null);
+        TreeNode tempNode = new DefaultTreeNode("sysAuthGroup", null, null);
         Map<String, TreeNode> treeMap = groupList.stream().collect(Collectors.toMap(SysAuthGroup::getUid, item -> new DefaultTreeNode("sysAuthGroup", item, null)));
         for (SysAuthGroup org : groupList) {
             if (treeMap.containsKey(org.getParentUid())) {
                 treeMap.get(org.getParentUid()).getChildren().add(treeMap.get(org.getUid()));
             } else {
-                rootNode.getChildren().add(treeMap.get(org.getUid()));
+                tempNode.getChildren().add(treeMap.get(org.getUid()));
             }
         }
-        sortSysAuthGroupNaturally(rootNode);
+        sortSysAuthGroupNaturally(tempNode);
+        TreeNode rootNode = new DefaultTreeNode("sysAuthGroup", null, null);
+        List<TreeNode> children = rootNode.getChildren();
+        children.add(new DefaultTreeNode("sysAuthGroup", new SysAuthGroup("请选择..."),null));
+        children.addAll(tempNode.getChildren());
         rootNode.setExpanded(true);
         return rootNode;
     }

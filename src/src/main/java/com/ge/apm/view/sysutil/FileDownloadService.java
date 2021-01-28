@@ -34,5 +34,9 @@ public class FileDownloadService {
     public String getFileUrl(String fileId){
         return msService.getUrl_downloadFile().concat("/").concat(fileId);
     }
+
+    public String getImgUrl(String fileId){
+        return msService.getImgUrl().concat("/").concat(fileId);
+    }
     
 }

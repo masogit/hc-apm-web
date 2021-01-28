@@ -47,6 +47,8 @@ public class I18nMessage implements Serializable, Comparable {
     private String valueTw;
     @Column(name = "site_id")
     private Integer siteId;
+    @Column(name = "order_by")
+    private Integer orderBy;
     @Transient
     private boolean editable;
 
@@ -226,5 +228,12 @@ public class I18nMessage implements Serializable, Comparable {
             return this.getMsgKey().compareTo(otherMsg.getMsgKey());
         }
     }
-    
+
+    public Integer getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(Integer orderBy) {
+        this.orderBy = orderBy;
+    }
 }
