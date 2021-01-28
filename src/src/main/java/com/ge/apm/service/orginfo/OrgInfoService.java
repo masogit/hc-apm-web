@@ -213,7 +213,7 @@ public class OrgInfoService {
                         if (!StringUtils.isEmpty(institutionName)) {
                             institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
                             if (institution == null) {
-                                institution = OrgInfoBuilder.buildOrgInstitution(tenantInfo, institutionName);
+                                institution = OrgInfoBuilder.buildOrgInstitution(tenantInfo, tenantOrgInfo, institutionName);
                                 orgDao.save(institution);
                                 institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
                                 message = "导入成功";

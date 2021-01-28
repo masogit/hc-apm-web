@@ -115,7 +115,7 @@
 
                                             <p:scrollPanel style="height:300px;border: 0" mode="native">
                                                 <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{tenantOrgTreeController.tenantOrgTree}" var="node" selectionMode="single">
-                                                    <p:ajax process="@this" event="select" update="@(.clsBtnChangeSite) @(.clsNewSiteName)"
+                                                    <p:ajax process="@this" event="select" update="@(.clsBtnChangeSite) @(.clsNewSiteName) bulkEditForm:tab:clinicalDeptName"
                                                             listener="#{assetInfoBulkEditController.onSelectTreeNodeAsNewValue}" oncomplete="PF('varPanelOrg').hide();"/>
                                                     <p:ajax process="@this" event="expand"/>
                                                     <p:ajax process="@this" event="collapse"/>

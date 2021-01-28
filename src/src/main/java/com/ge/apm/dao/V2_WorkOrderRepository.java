@@ -76,4 +76,14 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
      */
     @Query(value = "SELECT count(id)  from v2_work_order  where asset_id in ?1 and created_date between ?2 and ?3", nativeQuery = true)
     Integer fetchCount(List<Integer> assetIdList,Date firstday, Date lastday);
+
+    /**
+     * 获取个数
+     * @param tenantUid 供应商tenant uid
+     * @param firstday 开始时间
+     * @param lastday 结束时间
+     * @return
+     */
+    @Query(value = "SELECT count(id)  from v2_work_order  where tenant_uid = ?1 and created_date between ?2 and ?3", nativeQuery = true)
+    Integer fetchCount(String  tenantUid, Date firstday, Date lastday);
 }

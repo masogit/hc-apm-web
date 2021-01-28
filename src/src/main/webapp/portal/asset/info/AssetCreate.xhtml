@@ -60,9 +60,20 @@
             <div class="ui-g-12 card ">
                 <p:fieldset legend="#{msg.BasicInformation}" id="accordion" rendered="#{assetInfoEditController.isStatus()}">
                     <div class="ui-g-7">
-                        <p:galleria value="#{assetInfoEditController.pictureList}" var="attach" panelWidth="500" panelHeight="313" showCaption="false"  autoPlay="false">
-                            <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"  onclick="javascript:showthis(this);"/>
-                        </p:galleria>
+                        <div class="container-fluid" style="height: 400px; overflow: auto;">
+                            <div class="row" id="picDiv">
+                                <c:forEach
+                                        items="#{assetInfoEditController.pictureList}"
+                                        var="attach">
+                                    <div>
+                                        <img data-original="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
+                                             src="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
+                                             style="opacity:0; width:1px; height:1px"/>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                            <script>new Viewer(document.getElementById('picDiv'), {inline: true});</script>
+                        </div>
                     </div>
                     <div class="ui-g-5">
                         <p:fieldset legend="#{msg.VoiceDescription}" id="audioComment" >
@@ -127,8 +138,9 @@
                                         </p:panelGrid>
                                     </div>
                                     <div class="ui-g-4">
-                                        <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{assetInfoEditController.uploadFlag}" />
+
                                         <h:panelGroup id="pict">
+                                            <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{assetInfoEditController.uploadFlag}" />
 <!--                                            <p:galleria value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" panelWidth="320" panelHeight="260"-->
 <!--                                                        showCaption="false"  autoPlay="false" rendered="#{!assetInfoEditController.uploadFlag}" >-->
 <!--                                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"-->
@@ -139,8 +151,8 @@
                                                 <div class="row" id="picDiv">
                                                     <c:forEach items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" >
                                                         <div>
-                                                            <img data-original="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
-                                                                 src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                            <img data-original="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
+                                                                 src="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
                                                                  style="opacity:0; width:1px; height:1px"/>
                                                         </div>
                                                     </c:forEach>

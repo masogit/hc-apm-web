@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
+ * KPI
  * @author 503202755 2020/9/23
  */
 @ManagedBean
@@ -266,7 +267,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
 
     public void calculateScore()
     {
-      this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.zkbContractList);
+      this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.zkbContractList,this.selected.getTenantUID());
     }
 
     @Override

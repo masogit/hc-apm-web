@@ -242,6 +242,12 @@
             <p:inputText id="assetCode68" value="#{fieldMsg.fieldValue(assetInfoDetailController.selected.functionGroup, assetInfoDetailController.selected.assetCode68)}" readonly="true"/>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'medicalApparatusClassification')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.medicalApparatusClassification}<span style="color:red">#{assetInfoDetailController.customConfig.assetFields['medicalApparatusClassification'].required? '*':''}</span></label>
+            <p:inputText id="medicalApparatusClassification" value="#{assetInfoDetailController.selectedAuthGroupName}" readonly="true" />
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'functionGrade')}">
         <h:panelGroup >
             <label class="label">#{msg.functionGrade}</label>
