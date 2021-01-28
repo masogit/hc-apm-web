@@ -56,6 +56,7 @@ public class AssetInfoDetailController {
     private AssetTagsMapper assetTagsMapper;
     private UserAccountRepository userDao;
     private AssetHistoryService assetHistoryService;
+    private SysAuthGroupRepository sysAuthGroupDao;
 
     private Boolean terminate;
     private AssetInfo selected;
@@ -74,6 +75,7 @@ public class AssetInfoDetailController {
 
     @Getter
     private List<JSONObject> changeHistoryList = Collections.emptyList();
+    private SysAuthGroup selectedAuthGroup;
 
     @PostConstruct
     protected void init() {
@@ -91,6 +93,7 @@ public class AssetInfoDetailController {
         assetTagsMapper = WebUtil.getBean(AssetTagsMapper.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
+        sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
@@ -109,6 +112,10 @@ public class AssetInfoDetailController {
         
         maintanceType = aimService.getMaintanceType(selected);
         assetEvents  = aimService.getAssetEventsList(selected);
+
+        if (null != selected.getMedicalApparatusClassification()) {
+            selectedAuthGroup = sysAuthGroupDao.findByEncoded(selected.getMedicalApparatusClassification());
+        }
 
         //ge mvc data
         if (selected.getMvsEquip() != null && selected.getMvsEquip() == 1) {
@@ -257,6 +264,14 @@ public class AssetInfoDetailController {
             default:
         }
         return null;
+    }
+
+    public String getSelectedAuthGroupName() {
+        if (null == selectedAuthGroup) {
+            return null;
+        } else {
+            return selectedAuthGroup.getDisplayName();
+        }
     }
 
     //getter and setter

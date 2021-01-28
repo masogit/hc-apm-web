@@ -1,0 +1,139 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.zkbFePartOrder_ZkbFePartOrder}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="zkbFePartOrderListForm">
+                    <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
+                        <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
+                        <p:commandButton value="待租户审批"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingAssignment'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingAssignment')}" />
+                        <p:commandButton value="400团队回填"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingApm'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingApm')}" />
+                        <p:commandButton value="待GE Admin归还"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingGEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingGEAdmin')}" />
+                        <p:commandButton value="完成"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'Complete'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('Complete')}" />
+                        <p:commandButton value="全部"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('all')}" />
+                    </h:panelGrid>
+                    <p:dataTable id="datalist" value="#{zkbFePartOrderController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbFePartOrderController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.reportDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="rowSelect" listener="#{zkbFePartOrderController.prepareEdit}" update="editButton"/>
+                        <p:ajax event="rowDblselect" listener="#{zkbFePartOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
+                        <p:ajax event="filter" listener="#{zkbFePartOrderController.onFilter}" />
+                        <p:column headerText="#{msg.zkbFePartOrder_orderNo}" filterBy="#{item.partOrderNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.partOrderNo}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_systemId}" filterBy="#{item.systemId}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.systemId}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_reportUser}" filterBy="#{item.reportUser}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.reportUser}"/>
+                        </p:column>
+                        <p:column headerText="申请时间">
+                            <h:outputText value="#{item.reportDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_machineStatus}" filterBy="#{item.machineStatus}"  filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_machineStatus', item.machineStatus)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_machineStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_urgencyStatus}" filterBy="#{item.urgencyStatus}"  filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('casePriority', item.urgencyStatus)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_subtractTotalStatus}" filterBy="#{item.subtractTotalStatus}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_isSubtractTotalStatus', item.subtractTotalStatus)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_orderTypeName}" filterBy="#{item.orderType}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_orderType', item.orderType)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_orderType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_currentStep}" filterBy="#{item.currentStep}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_steps', item.currentStep)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_steps')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_currentStatus}" filterBy="#{item.status}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_status', item.status)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_status')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_hospitalName}" filterBy="#{item.hospitalName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.hospitalName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_hospitalClientName}" filterBy="#{item.hospitalClientName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.hospitalClientName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_hospitalClientPhone}" filterBy="#{item.hospitalClientPhone}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.hospitalClientPhone}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_position}" filterBy="#{item.position}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.position}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_location}" filterBy="#{item.location}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.location}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbFePartOrder_phenomenon}" filterBy="#{item.phenomenon}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.phenomenon}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" action="#{zkbFePartOrderController.intoCreateModel}" rendered="#{zkbFePartOrderController.fourHundredsTeam}"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" action="#{zkbFePartOrderController.intoEditModel}" disabled="#{zkbFePartOrderController.selected==null}"/>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+        </script>
+    </ui:define>
+</ui:composition>

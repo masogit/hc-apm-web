@@ -2,9 +2,7 @@ package com.ge.apm.domain;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -13,6 +11,8 @@ import java.util.Date;
  * @date : 2020/12/3
  * @description :
  */
+@Entity
+@Table(name = "zkb_fe_part_order_step")
 public class ZkbFePartOrderStep implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,6 +35,9 @@ public class ZkbFePartOrderStep implements Serializable {
     @Column(name = "step_key")
     private String stepKey;
 
+    /**
+     * 步骤名称
+     */
     @Column(name = "step_name")
     private String stepName;
 
@@ -44,6 +47,9 @@ public class ZkbFePartOrderStep implements Serializable {
     @Column(name = "owner_id")
     private String ownerId;
 
+    /**
+     * 操作人名称
+     */
     @Column(name = "owner_name")
     private String ownerName;
 
@@ -53,6 +59,9 @@ public class ZkbFePartOrderStep implements Serializable {
     @Column(name = "start_time")
     private Date startTime;
 
+    /**
+     * 结束时间
+     */
     @Column(name = "end_time")
     private Date endTime;
 
@@ -67,6 +76,12 @@ public class ZkbFePartOrderStep implements Serializable {
      */
     @Column(name = "tenant_uid")
     private String tenantUID;
+
+    /**
+     * 数据创建时间
+     */
+    @Column(name = "create_date")
+    private Date createDate;
 
     public String getId() {
         return id;
@@ -146,5 +161,36 @@ public class ZkbFePartOrderStep implements Serializable {
 
     public void setTenantUID(String tenantUID) {
         this.tenantUID = tenantUID;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof ZkbFePartOrderStep)) {
+            return false;
+        }
+        ZkbFePartOrderStep other = (ZkbFePartOrderStep) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "com.ge.apm.domain.ZkbFePartOrderStep[ id=" + id + " ]";
     }
 }

@@ -34,7 +34,7 @@
                     <label class="label">Order#*</label>
                     <p:selectOneMenu id="orderNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.orderNo}" required="true" requiredMessage="Order#不能为空" >
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItems value="#{zkbPartOrderAuditController.orderNoList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        <f:selectItems value="#{zkbPartOrderAuditController.orderNoList}" var="item" itemLabel="#{item.text}" itemValue="#{item.value}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGrid id="returnTypeGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" style="text-align: left">

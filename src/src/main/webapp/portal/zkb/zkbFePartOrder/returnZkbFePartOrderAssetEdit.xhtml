@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <p:dialog id="returnZkbFePartOrderAssetInfoEditDlg" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}" widgetVar="returnZkbFePartOrderAssetInfoEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="备件归还列表"  height="420">
+        <h:form id="returnZkbFePartOrderAssetInfoEditForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_assetNo}*</label>
+                    <p:selectOneMenu  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.assetNo}" required="true" requiredMessage="#{msg.zkbFePartOrder_assetNo} #{msg.ValidationRequire}">
+                        <p:ajax update="orderNoa"/>
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item" itemLabel="#{item.assetNo}" itemValue="#{item.assetNo}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_assetQty}*</label>
+                    <p:spinner  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.qty}" min="1" max="1000" required="true"  />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_orderNoa}*</label>
+                    <p:selectOneMenu id="orderNoa"  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.orderNo}" required="true" requiredMessage="#{msg.zkbFePartOrder_orderNoa} #{msg.ValidationRequire}">
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{zkbFePartOrderSparePartDetailController.subOrderNoList}" var="item" itemLabel="#{item.orderNo}" itemValue="#{item.orderNo}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_returnType}*</label>
+                    <p:selectOneMenu  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnType}" required="true" requiredMessage="#{msg.zkbFePartOrder_returnType} #{msg.ValidationRequire}">
+                        <p:ajax event="change" update="returnTypeGrid" />
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGrid id="returnTypeGrid" columns="1" layout="grid" style="text-align: left">
+                    <h:panelGroup style="text-align: left" rendered="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnType eq 'DOA'}">
+                        <label class="label">Part Serial Number*</label>
+                        <p:inputText id="partSerialNumber"  style="text-align: left" value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.partSerialNumber}" required="true" requiredMessage="Part Serial Number不能为空"/>
+                    </h:panelGroup>
+                    <h:panelGroup style="text-align: left" rendered="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnType eq 'DOA'}">
+                        <label class="label">故障描述*</label>
+                        <p:selectOneMenu  style="text-align: left"  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.partQualityIssue}" required="true" requiredMessage="故障描述 #{msg.ValidationRequire}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_partQualityIssue')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                </h:panelGrid>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_returnDate}*：</label>
+                    <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnDate}"
+                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
+            </p:panelGrid>
+            <br/>
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbFePartOrderSparePartDetailController.saveReturnZkbFePartOrderAssetInfoTemp()}" update=":growl :zkbFePartOrderSparePartsEditForm:zkbFePartOrderReturnList"
+                 icon="ui-icon-check" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').hide()" />
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('returnZkbFePartOrderAssetInfoEditDlg').hide()"/>
+        </h:form>
+    </p:dialog>
+    
+</ui:composition>
+</html>

@@ -199,6 +199,10 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return downLoadURL.concat(GatewayURL.DOWNLOAD_FILE.toString());
     }
 
+    public String getImgUrl() {
+        return downLoadURL.concat(GatewayURL.SEARCH_FILE.toString());
+    }
+
     public byte[] docxToPdf(byte[] content) {
 
         HttpHeaders headers = new HttpHeaders();

@@ -78,7 +78,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private AssetTagsMapper assetTagsMapper;
     private AssetTagsRepository assetTagsDao;
     private List<ZkbFileDirectory> subZkbFileDirectoryList=null;
-
+    SysAuthGroupRepository authGroupDao;
     @Getter
     @Setter
     private List<Supplier> supplierList = Collections.emptyList();
@@ -168,6 +168,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.treeNodeNameFilter = treeNodeNameFilter;
     }
 
+    @Getter
+    private TreeNode sysAuthGroupTree;
+
     @Override
     protected void init() {
         isStatus = false;
@@ -200,9 +203,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetTagsDao = WebUtil.getBean(AssetTagsRepository.class);
         zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
-
+        authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
+        sysAuthGroupTree = assetInfoService.buildSysAuthGroupInTree();
 
         qr_Code = WebUtil.getRequestParameter("qrCode");
         siteUid = WebUtil.getRequestParameter("siteUid");
@@ -344,6 +348,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setIsDeleted(Boolean.FALSE);
         selected.setName(createRequest.getAssetName());//名称
         selected.setAssetGroup(createRequest.getAssetGroup());//设备分类
+        selected.setLocationName(createRequest.getLocationName());//安装位置
+        selected.setComments(createRequest.getComments());//备注
+
         if(null != createRequest.getManufactureId()){
             Supplier supplier = supplierDao.getById(Integer.valueOf(createRequest.getManufactureId()));
             if (null != supplier){
@@ -430,6 +437,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("parentAsset", selected.getParentAssetId() == null ? null : dao.findById(selected.getParentAssetId()));
         selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
         qrCode = selected.getQrCode();
+        if (null != selected.getMedicalApparatusClassification()) {
+            SysAuthGroup selectedAuthGroup = authGroupDao.findByEncoded(selected.getMedicalApparatusClassification());
+            if (null != selectedAuthGroup) {
+                selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
+            }
+        }
         //parentAssetList = aimService.getParentsAssetsList(this.selected);
         getClinicalOwnerList();
 
@@ -467,6 +480,23 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("selectedOrg", orgInfo);
 
         changeAssetOrg(orgInfo);
+    }
+
+    public void onSelectSysAuthGroupTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        SysAuthGroup nodeData = (SysAuthGroup) node.getData();
+
+        selectedObjectMap.put("selectedAuthGroup", nodeData);
+//        authGroup = nodeData.getEncoded();
+    }
+
+    public String getSelectedAuthGroupName() {
+        SysAuthGroup selectedAuthGroup = (SysAuthGroup) selectedObjectMap.get("selectedAuthGroup");
+        if (null == selectedAuthGroup) {
+            return null;
+        } else {
+            return selectedAuthGroup.getDisplayName();
+        }
     }
 
     public List<UserAccount> completeOwnerList(String query) {
@@ -632,6 +662,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             return "";
         }
 
+        if(!checkDepartNumUnique()){
+            WebUtil.addErrorMessage("设备编号已被占用");
+            return "";
+        }
+
         //设置质保时间
         if (null == selected.getFactoryWarrantyDate()) {
             if (selected.getAcceptDate() != null && selected.getWarrantyMonth() != null) {
@@ -684,6 +719,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             selected.setNationalStandardCode(selectedGb.getCode());
         }
 
+        if (null != selectedObjectMap.get("selectedAuthGroup")) {
+            SysAuthGroup selectedAuthGroup = (SysAuthGroup) selectedObjectMap.get("selectedAuthGroup");
+            selected.setMedicalApparatusClassification(selectedAuthGroup.getEncoded());
+        }
+
         //when mvs user create a new record, mark this asset as mvs asset
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
@@ -721,6 +761,30 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         } else {
             return "";
         }
+    }
+
+    public boolean checkDepartNumUnique() {
+
+        if(org.springframework.util.StringUtils.isEmpty(selected.getDepartNum())){
+            return true;
+        }
+
+        return checkDepartNumUniqueAssetInfo();
+
+    }
+
+    private boolean checkDepartNumUniqueAssetInfo() {
+        List<String> hisData = dao.findIdByDepartNumAndTenantUID(selected.getDepartNum(), selected.getTenantUID());
+        if(hisData.isEmpty()){
+            return true;
+        }
+        //兼容老数据
+        for( String uid:hisData){
+            if(uid.equals(selected.getUid())){
+                return true;
+            }
+        }
+        return false;
     }
 
     private void saveOrUpdateAssetTags() {
