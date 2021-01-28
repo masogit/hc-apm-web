@@ -25,6 +25,9 @@ public class ZkbPartOrder implements Serializable {
     @Transient
     public static String DATA_TYPE_TEST="test.";
 
+    @Transient
+    public static String CONFIG_US = "US";
+
     /**
      * Pending：申请 TechAccept：技术审批通过 TechReject：技术审批不通过 ManageAccept：区域经理审批通过
      * ManageReject：区域经理审批不通过 Ordered：发货 OrderedReject:发货取消

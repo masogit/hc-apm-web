@@ -3,9 +3,12 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="/WEB-INF/template.xhtml">
     <ui:define name="head">
         <h:outputStylesheet name="css/inspection.css"/>
+        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
     </ui:define>
 
     <ui:define name="content">
@@ -89,13 +92,60 @@
                             <h:panelGroup>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class='label'>设备描述</label>
+                                <p:inputTextarea id="deviceDescription" rows="1" cols="66" queryDelay="750" minQueryLength="4"
+                                                 value="#{sharedAssetTypeController.selected.deviceDescription}"/>
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"
+                                     rendered="#{sharedAssetTypeController.selected != null}">
+                            <h:panelGroup>
                                 <label class='label'>备注</label>
                                 <p:inputTextarea id="remark" rows="1" cols="66" queryDelay="750" minQueryLength="4"
                                                  value="#{sharedAssetTypeController.selected.remark}"/>
                             </h:panelGroup>
-
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="图片" style="margin-bottom:20px" id="pict">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <div class="ui-g-6">
+                                    <h:panelGroup id="pict2" rendered="#{sharedAssetTypeController.uploadFlag}">
+                                    <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{sharedAssetTypeController.uploadFlag}"  />
+                                    </h:panelGroup>
+                                    <h:panelGroup id="pict1" rendered="#{!sharedAssetTypeController.uploadFlag}">
+                                        <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{sharedAssetTypeController.uploadFlag}"  />
+                                        <div class="container-fluid" style="height: 300px; overflow: auto;" >
+                                            <div class="row" id="picDiv">
+                                                <c:forEach items="#{sharedAssetTypeController.getAttachList(sharedAssetTypeController.selected.id)}" var="attach" >
+                                                    <div>
+                                                        <img data-original="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                             src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                             style="opacity:0; width:1px; height:1px"/>
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                            <script>
+                                                new Viewer(document.getElementById('picDiv'), {inline: true});
+                                            </script>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </h:panelGroup>
                         </p:panelGrid>
 
+                        <h:panelGroup >
+                            <p:dataList id="pictureList" value="#{sharedAssetTypeController.getAttachList(sharedAssetTypeController.selected.id)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
+                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <p:commandButton actionListener="#{sharedAssetTypeController.removeAttachmentById(fileitem.id)}" update="pictureList SwapTypeEditForm:pict" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
+                            <p:fileUpload id="type6" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{sharedAssetTypeController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                          multiple="true"  sizeLimit="500000000"  update="pictureList SwapTypeEditForm:pict"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="#{msg.Add}"/>
+                        </h:panelGroup>
                     </p:fieldset>
                     <p:fieldset legend="附件信息" style="margin-bottom:20px">
                         <p:dataTable id="dataAccessory" value="#{sharedAssetTypeController.selected.accessoryList}"
@@ -153,6 +203,67 @@
                 <ui:include src="EditAccessory.xhtml"/>
             </div>
         </div>
+        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: available;max-height:available;min-width:800px;min-height:600px;overflow: hidden">
+            <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
+                <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span>
+                <span>
+                    <p:commandButton id="spin" value="旋转" styleClass="anticon-plus"/>
+                    <p:commandButton id="enlarge" value="放大" onclick ="ImageSuofang(true)"/>
+                    <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
+                </span>
+                <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
+                    <span class="ui-icon ui-icon-closethick"></span></a>
+                <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
+            </div>
+            <div class="ui-dialog-content ui-widget-content"  style="max-width: 1000px;max-height:700px;min-width:800px;min-height:600px;height: available">
+
+                <p style="text-align: center; vertical-align: middle"><image id="shwoPicDialogImg" src="" style="max-width: 1000px; max-height: 700px"></image></p>
+            </div>
+        </div>
+        <script>
+            //<![CDATA[
+            function showthis(pic) {
+                var s = $('#shwoPicDialogImg')[0]
+                s.src = pic.src;
+                s.style.transform = 'rotate('+ 0 +'deg)';
+                s.width = pic.width * 1.8;
+                s.height = pic.height * 1.8;
+                PF('shwoPicDialog').show();
+                var dia = $("#shwoPicDialog")[0];
+                dia.style.top = '5px';
+                for (let i = 0; i < 10; i++) {
+                    ImageSuofang(true);
+                }
+            }
+            //旋转
+            var num = 0;
+            $("#spin").click(function () {
+                num++;
+                // $("#shwoPicDialogImg").style.rotate = num * 90;
+                var pic = $("#shwoPicDialogImg")[0];
+                pic.style.transform = 'rotate('+num * 90+'deg)';
+                if(pic.width > pic.height && num%2 ==1){
+                    pic.style.marginTop='140px';
+                }else{
+                    pic.style.marginTop='5px';
+                }
+            })
+            function ImageSuofang(args) {
+                var imgsrc =  $("#shwoPicDialogImg")[0];
+                if (args) {
+                    if(imgsrc.width * 1.1 > 1000 ||imgsrc.height * 1.1 > 700 ){
+                        return;
+                    }
+                    imgsrc.width = imgsrc.width * 1.1;
+                    imgsrc.height = imgsrc.height * 1.1;
+                }
+                else {
+                    imgsrc.width = imgsrc.width / 1.1;
+                    imgsrc.height = imgsrc.height / 1.1;
+                }
+            }
+            //]]>
+        </script>
     </ui:define>
 </ui:composition>
 

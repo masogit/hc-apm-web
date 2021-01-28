@@ -42,6 +42,13 @@ public class SysAuthGroup implements Serializable {
     @Transient
     private boolean accessible;
 
+    public SysAuthGroup() {
+    }
+
+    public SysAuthGroup(String name) {
+        this.name = name;
+    }
+
     @PrePersist
     public void initializeUid() {
         if (uid == null) {
