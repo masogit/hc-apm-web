@@ -322,4 +322,21 @@ public class UserAccountService {
         userAccountRepository.deleteByUid(userUid);
 		log.info("delete userAccount , uid: {}",userAccount.getUid());
 	}
+
+	public boolean whetherTheCallIsRepeated(String telephone,String userTelephone,Integer userId){
+		if(null == telephone||telephone.equals(userTelephone)){//如果跟登陆电话一样则直接放行
+			return false;
+		}
+		List<UserAccount> userAccounts = userAccountMapper.getUserAccountByTelephone(telephone);
+		for (int i = 0; i < userAccounts.size(); i++) {
+			if(userId==userAccounts.get(i).getId()){
+				userAccounts.remove(i);//移除掉自己
+			}
+		}
+		if(userAccounts.size()>0){//如果还有大于1条的数据则说明该手机几号存在
+			return true;
+		}else{
+			return false;
+		}
+	}
 }

@@ -1,12 +1,15 @@
 package com.ge.apm.service.zkb;
 
+import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbFePartOrderRepository;
+import com.ge.apm.dao.ZkbFePartOrderUserConfigRepository;
 import com.ge.apm.dao.mapper.ZkbFePartOrderMapper;
-import com.ge.apm.domain.ZkbFePartOrder;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author 503202755 2020/12/8
@@ -37,13 +37,31 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     private ZkbFePartOrderRepository zkbFePartOrderRepository;
 
     /**
+     * 获取审批角色配置信息
+     */
+    @Autowired
+    private ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository;
+
+    /**
+     * 合同信息
+     */
+    @Autowired
+    private ZkbContractRepository zkbContractRepository;
+
+    /**
      * 根据system_id和用户tenant_uid 查询设备信息
      */
     @Autowired
     private ZkbFePartOrderMapper zkbFePartOrderMapper;
 
+    /**
+     * 智康宝人工申请STEP service
+     */
+    @Autowired
+    private ZkbFePartOrderStepService zkbFePartOrderStepService;
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     /**
      * 单号前缀
@@ -51,16 +69,21 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     private static final String  ORDER_PREFIX = "FE";
 
     /**
+     * 单号前缀
+     */
+    private static final String  SPARE_PARTS_ORDER_PREFIX = "FEPO";
+
+    /**
      * 给申请单添加单号和索引
      * @param zkbFePartOrder
      * @return
      */
-    private ZkbFePartOrder fullOrderNo(ZkbFePartOrder zkbFePartOrder)
+    private ZkbFePartOrder fullOrderNo(ZkbFePartOrder zkbFePartOrder,String orderPrefix)
     {
-        Object o= zkbFePartOrderRepository.getMaxIndex(ORDER_PREFIX+simpleDateFormat.format(new Date())+"%") ;
+        Object o= zkbFePartOrderRepository.getMaxIndex(orderPrefix+simpleDateFormat.format(new Date())+"%") ;
         int index = o == null ? 0 : Integer.parseInt(o.toString());
         index++;
-        String partOrderNo = ORDER_PREFIX+simpleDateFormat.format(new Date())+String.format("%04d",index);
+        String partOrderNo = orderPrefix+simpleDateFormat.format(new Date())+String.format("%04d",index);
         zkbFePartOrder.setPartOrderNo(partOrderNo);
         zkbFePartOrder.setPartOrderIndex(index);
         return zkbFePartOrder;
@@ -75,7 +98,20 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     {
         Date date = new Date();
         zkbFePartOrder.setReportDate(date);
-        this.fullOrderNo(zkbFePartOrder);
+        this.fullOrderNo(zkbFePartOrder,ZkbFePartOrderService.ORDER_PREFIX);
+        return zkbFePartOrder;
+    }
+
+    /**
+     * 添加新申请单初始化数据
+     * @param zkbFePartOrder
+     * @return
+     */
+    public ZkbFePartOrder initNewSparePartsOrder(ZkbFePartOrder zkbFePartOrder)
+    {
+        Date date = new Date();
+        zkbFePartOrder.setReportDate(date);
+        this.fullOrderNo(zkbFePartOrder,ZkbFePartOrderService.SPARE_PARTS_ORDER_PREFIX);
         return zkbFePartOrder;
     }
 
@@ -150,5 +186,330 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         t.start();
     }
 
+    /**
+     * 根据登录账户名获取当前账户名流程配置信息
+     * @return
+     */
+    public Map<String, String> getMapConfigByLoginName(String loginName)
+    {
+        Map<String, String> configTypeMap = new HashMap<>();
+        List<ZkbFePartOrderUserConfig> list = this.zkbFePartOrderUserConfigRepository.findByLoginName(loginName);
+        if(CollectionUtils.isEmpty(list))
+        {
+            return configTypeMap;
+        }
+        for(ZkbFePartOrderUserConfig item:list)
+        {
+            if(item==null) continue;
+            if(configTypeMap.containsKey(item.getConfigType())) continue;
+            configTypeMap.put(item.getConfigType(),item.getConfigType());
+        }
+        return configTypeMap;
+    }
+
+    /**
+     * 判断流程是否在第一节点
+     * @param currentStep
+     * @return
+     */
+    public boolean workFlowInFistStep(String currentStep)
+    {
+        if(ZkbFePartOrder.workFlowSteps.Requested.toString().equals(currentStep))
+            return true;
+        return false;
+    }
+
+    /**
+     * 回退列表
+     * @param queryStatus 查询状态
+     * @return
+     */
+    public String backList(String queryStatus){
+        return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus;
+    }
+    /**
+     *
+     * @param zkbFePartOrder 当前数据
+     * @param userUid 用户UID
+     * @param userName 用户user name
+     * @param tenantUID 用户 tenant UID
+     * @param queryStatus 查询状态
+     * @param status 流程状态
+     * @param currentStep 流程节点
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @param gatewayURL 消息发送地址
+     * @return
+     */
+    public String wolkFlowToComplete(ZkbFePartOrder zkbFePartOrder,
+                                     String userUid,
+                                     String userName,
+                                     String tenantUID,
+                                     String queryStatus,
+                                     String status,
+                                     String currentStep,
+                                     Date startTime,
+                                     Date endTime,
+                                     GatewayURL gatewayURL)
+    {
+        if(ZkbFePartOrder.workFlowSteps.Requested.toString().equals(zkbFePartOrder.getCurrentStep()))
+        {
+            List<ZkbFePartOrder> listZkbFePartOrder = this.zkbFePartOrderRepository.findByPartOrderNo(zkbFePartOrder.getPartOrderNo());
+            if( CollectionUtils.isNotEmpty(listZkbFePartOrder))
+            {
+                String orderPrefix = "";
+                if(zkbFePartOrder.getOrderType().equals(ZkbFePartOrder.OrderType.ManMade))
+                {
+                    orderPrefix=ORDER_PREFIX;
+                }else
+                {
+                    orderPrefix=SPARE_PARTS_ORDER_PREFIX;
+                }
+                this.fullOrderNo(zkbFePartOrder,orderPrefix);
+            }
+        }
+        zkbFePartOrder.setStatus(status);
+        zkbFePartOrder.setCurrentStep(currentStep);
+        this.zkbFePartOrderRepository.save(zkbFePartOrder);
+        this.zkbFePartOrderStepService.updateLatestStepEndTime(zkbFePartOrder.getId(),startTime);
+        this.zkbFePartOrderStepService.addNewItem(
+                zkbFePartOrder.getId(),
+                currentStep,
+                userUid,userName,
+                startTime,
+                endTime,
+                status,
+                tenantUID);
+        if(gatewayURL!=null)
+        {
+            this.sendMessage(zkbFePartOrder.getId(),gatewayURL);
+        }
+
+        return this.backList(queryStatus);
+    }
+
+    /**
+     * 加载合同信息
+     */
+    public List<ZkbContract> loadZkbContractInfo(String contractId)
+    {
+        List<ZkbContract> list = new ArrayList<>();
+        if(StringUtils.isBlank(contractId)) {
+            return list;
+        }
+        ZkbContract item = this.zkbContractRepository.findById(contractId);
+        list.add(item);
+        return list;
+    }
+    /**
+     * @param zkbContract 合同信息
+     * @param type 1.把剩余名额移入申请名额 2.把申请名额移入已使用名额 3.把申请名额移入剩余名额
+     * @param zkbFePartOrder 流程申请数据
+     */
+    public void moveRemianTimeOfContract(ZkbContract zkbContract,Integer type,ZkbFePartOrder zkbFePartOrder)
+    {
+
+        if(!"true".equals(zkbFePartOrder.getSubtractTotalStatus())) return;
+        if("DI".equals(zkbContract.getContractType())
+                ||"PCB".equals(zkbContract.getContractType()))
+        {
+            switch(type){
+                case 1 :
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()-1);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()+1);
+                    break;
+                case 2 :
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-1);
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse()+1);
+                    break;
+                case 3:
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()+1);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-1);
+                    break;
+            }
+        }else if("CCS".equals(zkbContract.getContractType())
+                ||"Biomed".equals(zkbContract.getContractType()))
+        {
+            switch(type){
+                case 1 :
+                    zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()-1);
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()+1);
+                    break;
+                case 2 :
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()-1);
+                    zkbContract.setGeArtificialSupportTimesUse(zkbContract.getGeArtificialSupportTimesUse()+1);
+                    break;
+                case 3:
+                    zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()+1);
+                    zkbContract.setGeArtificialSupportTimesApply(zkbContract.getGeArtificialSupportTimesApply()-1);
+                    break;
+            }
+        }
+        this.zkbContractRepository.save(zkbContract);
+    }
+
+    /**
+     * 移动备件名额
+     * @param type 移动类型
+     * @param zkbContract 合同
+     * @param qty 数量
+     */
+    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty,ZkbFePartOrder zkbFePartOrder)
+    {
+        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetTypeDi()))
+        {
+            switch(type){
+                case 1 :
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()-qty);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()+qty);
+                    break;
+                case 2 :
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-qty);
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse()+qty);
+                    break;
+                case 3:
+                    zkbContract.setSpareArtificailUse(zkbContract.getSpareArtificailUse()-qty);
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()+qty);
+                    break;
+                case 4 :
+                    zkbContract.setSpareArtificail(zkbContract.getSpareArtificail()+qty);
+                    zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-qty);
+                    break;
+            }
+        }else
+            {
+                switch(type){
+                    case 1 :
+                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()-qty);
+                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()+qty);
+                        break;
+                    case 2 :
+                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
+                        zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()+qty);
+                        break;
+                    case 3:
+                        zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()-qty);
+                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
+                        break;
+                    case 4 :
+                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
+                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
+                        break;
+                }
+            }
+        this.zkbContractRepository.save(zkbContract);
+    }
+
+    /**
+     * 根据List获取map
+     * @param assetInfoList 申请设备列表
+     * @return
+     */
+    public Map<String,Integer> getAssetInfoMap(List<ZkbFePartOrderAssetInfo> assetInfoList)
+    {
+        Map<String,Integer> assetInfoMap = new HashMap<>();
+        for(ZkbFePartOrderAssetInfo item:assetInfoList)
+        {
+            String key = item.getAssetNo()+item.getOrderNo();
+            if(assetInfoMap.containsKey(key))
+            {
+                Integer qty = assetInfoMap.get(key);
+                assetInfoMap.put(key,qty+item.getAssetQty());
+                continue;
+            }
+            assetInfoMap.put(key,item.getAssetQty());
+        }
+        return assetInfoMap;
+    }
+
+    /**
+     * 根据List获取map
+     * @param zkbFePartOrderReturnList 返回设备列表
+     * @param zkbFePartOrder 流程主表数据
+     * @return
+     */
+    public Map<String,Integer> getZkbFePartOrderReturnMap(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList,ZkbFePartOrder zkbFePartOrder)
+    {
+        Map<String,Integer> zkbFePartOrderReturnMap = new HashMap<>();
+        for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
+        {
+            String key = item.getAssetNo()+item.getOrderNo();
+            if(zkbFePartOrderReturnMap.containsKey(key))
+            {
+                Integer qty = zkbFePartOrderReturnMap.get(key);
+                zkbFePartOrderReturnMap.put(key,qty+item.getQty());
+                continue;
+            }
+            zkbFePartOrderReturnMap.put(key,item.getQty());
+            item.setPartOrderId(zkbFePartOrder.getId());
+        }
+        return zkbFePartOrderReturnMap;
+    }
+    /**
+     * 判断是否隐藏还是显示
+     * @param fieldsetType
+     * @return
+     */
+    public Boolean checkRendered(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap)
+    {
+        if(StringUtils.isBlank(fieldsetType))
+        {
+            return false;
+        }
+        Map<String,Integer> stepMap = this.stepAndRoleMap();
+        String currentStep = zkbFePartOrder.getCurrentStep();
+        Integer fieldsetTypeIndex = stepMap.get(fieldsetType);
+        Integer currentStepIndex = stepMap.get(currentStep);
+        if(fieldsetTypeIndex<currentStepIndex)
+        {
+            List<ZkbFePartOrderStep> zkbFePartOrderStep = this.zkbFePartOrderStepService.findByPartOrderIdAndStepKey(zkbFePartOrder.getId(),fieldsetType);
+            if(CollectionUtils.isNotEmpty(zkbFePartOrderStep))
+            {
+                return true;
+            }
+
+        }
+        if(fieldsetTypeIndex==currentStepIndex)
+        {
+            String [] stepAndRole = ZkbFePartOrder.stepAndRoles[fieldsetTypeIndex].split(",");
+            if(configTypeMap.containsKey(stepAndRole[1]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Map<String,Integer> stepAndRoleMap()
+    {
+        Map<String,Integer> stepMap = new HashMap<>();
+        for(int i =0;i<ZkbFePartOrder.stepAndRoles.length;i++)
+        {
+            String [] stepAndRole =ZkbFePartOrder.stepAndRoles[i].split(",");
+            stepMap.put(stepAndRole[0],i);
+        }
+        return stepMap;
+    }
+
+    /**
+     * 判断是否隐藏还是显示
+     * @param fieldsetType
+     * @return
+     */
+    public Boolean hasEditRight(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap)
+    {
+        String currentStep = zkbFePartOrder.getCurrentStep();
+        if(!currentStep.equals(fieldsetType))
+        {
+            return false;
+        }
+        Map<String,Integer> stepMap = this.stepAndRoleMap();
+        String [] stepAndRole =ZkbFePartOrder.stepAndRoles[stepMap.get(fieldsetType)].split(",");
+        if(configTypeMap.containsKey(stepAndRole[1]))
+        {
+            return true;
+        }
+        return false;
+    }
 
 }

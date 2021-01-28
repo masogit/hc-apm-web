@@ -9,12 +9,16 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -32,15 +36,17 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author caoyong
  */
 @ManagedBean
 @ViewScoped
-public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedAssetType> {
+public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedAssetType>  {
 
     private UaaService uuaService;
+    private BlobFileService blobFileService;
     SharedAssetTypeRepository dao = null;
     AssetInfoRepository assetInfoDao = null;
     OrgInfoRepository orgInfoDao = null;
@@ -50,10 +56,14 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     private String filterUnitPrice;
     private Double filterUnitPriceFrom;
     private Double filterUnitPriceTo;
-
+    @Setter@Getter
+    private List<V2_BlobObject> attachements;
+    //如果无图片 就显示请上传图片
+    private boolean uploadFlag;
     @Override
     protected void init() {
         uuaService = WebUtil.getBean(UaaService.class);
+        blobFileService = WebUtil.getBean(BlobFileService.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
         dao = WebUtil.getBean(SharedAssetTypeRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -128,7 +138,33 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
     }
+    public List<V2_BlobObject> getAttachList(String id) {
+        if (attachements == null) {
+            attachements = blobFileService.findBlobObjectsByBoUid(id);
+        }
+        uploadFlag = attachements.size() == 0;
+        return attachements;
+    }
 
+    public void removeAttachmentById(String blobId) {
+        blobFileService.deleteBlobFileById(blobId);
+        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
+    }
+    public boolean getUploadFlag() {
+        return uploadFlag;
+    }
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobFileService.uploadFile(event);
+        if (null != blobObject) {
+            attachements.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_ADJUST_EQUIPMENT);
+            blobObject.setBoUuid(selected.getId());
+           blobFileService.saveBlobObject(blobObject);
+           WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
     public String getOperation() {
         return operation;
     }

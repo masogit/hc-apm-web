@@ -17,9 +17,13 @@
                         <h:panelGroup>
                             <label class="label">#{msg.fileType}*</label>
                             <p:selectOneMenu id="fileType" value="#{batchFileController.fileType}"  required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
-                                <p:ajax process="@this"/>
+                                <p:ajax process="@this" update=":growl :BatchFileImportEditForm"/>
                                 <f:selectItems value="#{batchFileController.getI18nByBatchFileType}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
+                            <!-- #{batchFileController.templateDisabled} -->
+                            <p:commandButton ajax="false" actionListener="#{batchFileController.exportTemplate()}" disabled="#{batchFileController.templateDisabled}" value="模板下载" styleClass="ui-priority-primary"   validateClient="true" update=":growl">
+                                <p:fileDownload value="#{batchFileController.exportTemplate}" />
+                            </p:commandButton>
                         </h:panelGroup>
 
                         <p:panel id="uploadPanel" styleClass="ui-panelgrid-blank" style=" border: 0">
