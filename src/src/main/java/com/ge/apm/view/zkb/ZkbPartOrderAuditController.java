@@ -482,6 +482,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public String closeFieldTitle(){
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            if(CopyByInvok.T.equals(selected.getNeedLetterFlag()) && CopyByInvok.T.equals(selected.getUploadLetterFlag())){
+                return "探头说明函";
+            }
+        }
+        return "关单信息";
+    }
+
     public void initRemindLetterFlag(){
         List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginName(currentUser.getLoginName());
         if(zkbPartOrderUserConfigs != null && zkbPartOrderUserConfigs.size() > 0){
