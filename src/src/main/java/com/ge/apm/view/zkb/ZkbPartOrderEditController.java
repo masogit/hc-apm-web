@@ -581,14 +581,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
             selected.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
         }
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-            boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
-            if(!r){
-                //WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还,若场地有其他特殊情况请邮件申请。");
-                //return "";
-                this.selected.setCheckApplyNumFlag(CopyByInvok.F);
-            }
-        }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
             if(this.selected.getOnlineEngine() != null){
