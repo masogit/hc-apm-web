@@ -304,8 +304,16 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 return false;
             }
         }else{
-            double d = new BigDecimal((float)a/b).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            /*double d = new BigDecimal((float)a/b).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
             if (d > 0.3){
+                return false;
+            }*/
+            double d = b * 0.3 ;
+            if((int)d != d){
+                d= (int) d;
+                d++;
+            }
+            if(a > d){
                 return false;
             }
         }
@@ -559,6 +567,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setManageAuditerUid(userAccount.getUid());
             zkbPartOrder.setManageAuditer(userAccount.getName());
             if(nextFlag){
+                ZkbContract c = zkbContractRepository.findById(zkbPartOrder.getContractId());
+                boolean r = checkApplyNumValid(zkbPartOrder,c);
+                if(!r){
+                    zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
+                }else{
+                    zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
+                }
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ManageAccept.toString());
                 if(CopyByInvok.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
