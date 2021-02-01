@@ -693,7 +693,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Ordered.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString());
                 if(CopyByInvok.T.equals(zkbPartOrder.getNewCatFlag())){
-                    zkbPartOrder.setQty(zkbPartOrder.getQty() * 2);
+                    ZkbContract c = zkbContractRepository.findById(zkbPartOrder.getContractId());
+                    if(getBetweenDay(new Date(2021,1,1),c.getStartDate()) < 0){
+                        zkbPartOrder.setQty(zkbPartOrder.getQty() * 2);
+                    }
                 }
             }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString())) {
                 zkbPartOrder.setUnOrderDate(new Date());
@@ -994,8 +997,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
             if(CopyByInvok.T.equals(zkbPartOrder.getNewCatFlag())){
-                zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 00 : zkbContract.getProbeQuotaUse()) + (qty * 2));
-                zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 00 : zkbContract.getProbeQuota()) - qty);
+                if(getBetweenDay(new Date(2021,1,1),zkbContract.getStartDate()) < 0){
+                    zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) + qty);
+                    zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) - qty);
+                }else{
+                    zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) + (qty * 2));
+                    zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) - qty);
+                }
             }else{
                 zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) + qty);
             }
