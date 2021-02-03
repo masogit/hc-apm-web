@@ -124,6 +124,19 @@
                             </p:selectOneRadio>
                       </h:panelGroup>
 
+                       <h:panelGroup>
+                           <label class="label">采购价格（最低）</label>
+                           <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePriceStart" value="#{relRuleAssetController.queryAsset.purchasePriceStart}" required="false" >
+                               <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
+                           </p:inputNumber>
+                       </h:panelGroup>
+                       <h:panelGroup>
+                           <label class="label">采购价格（最高）</label>
+                           <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePriceEnd" value="#{relRuleAssetController.queryAsset.purchasePriceEnd}" required="false" >
+                               <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" process="@this"/>
+                           </p:inputNumber>
+                       </h:panelGroup>
+
                        <h:panelGroup id="queryLevel" rendered="#{relRuleAssetController.queryAsset.ruleStatus != null}">
                            <label class="label">#{msg.RuleGrade}</label>
                            <p:selectOneMenu value="#{relRuleAssetController.queryAsset.queryLevel}">
