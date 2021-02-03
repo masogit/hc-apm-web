@@ -147,6 +147,26 @@ public class ZkbIntegralService {
         zkbIntegralRecordRepository.save(zkbIntegralRecord);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void save(ZkbIntegral zkbIntegral,UserAccount userAccount){
+        Integer score = 0;
+        if(StringUtils.isEmpty(zkbIntegral.getId())){
+            score = zkbIntegral.getIntegralTotal();
+            zkbIntegral = zkbIntegralRepository.save(zkbIntegral);
+        }else{
+            ZkbIntegral old = zkbIntegralRepository.findById(zkbIntegral.getId());
+            score = zkbIntegral.getIntegralTotal() - old.getIntegralTotal();
+            zkbIntegral = zkbIntegralRepository.save(zkbIntegral);
+        }
+        ZkbIntegralRecord zkbIntegralRecord = new ZkbIntegralRecord();
+        zkbIntegralRecord.setRecordType(ZkbIntegralRecord.RecordType.ScoreEdit.toString());
+        zkbIntegralRecord.setScore(score);
+        zkbIntegralRecord.setZkbIntegralId(zkbIntegral.getId());
+        zkbIntegralRecord.setCreatedBy(userAccount.getName());
+        zkbIntegralRecord.setCreatedDate(new Date());
+        zkbIntegralRecordRepository.save(zkbIntegralRecord);
+    }
+
     public Integer calcCoefficient(ZkbIntegral zkbIntegral){
         if(zkbIntegral.getValidityDate() == null){
             return initCoefficient;
