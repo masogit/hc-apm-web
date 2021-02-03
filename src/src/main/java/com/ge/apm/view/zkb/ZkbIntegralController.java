@@ -2,9 +2,11 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbIntegralRepository;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContactPerson;
 import com.ge.apm.domain.ZkbIntegral;
 import com.ge.apm.service.zkb.ZkbIntegralService;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +34,7 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
     private String selectionTenantInfo;
     private String actionName;
     private List<TenantInfo> tenantInfoList;
-
+    private UserAccount currentUser;
 
     @Override
     protected void init() {
@@ -40,7 +42,7 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
         zkbIntegralRepository = WebUtil.getBean(ZkbIntegralRepository.class);
         zkbIntegralService = WebUtil.getBean(ZkbIntegralService.class);
         tenantInfoList = zkbIntegralService.getSourceTenantInfoList();
-
+        currentUser = UserContextService.getCurrentUserAccount();
     }
 
     @Override
@@ -82,7 +84,7 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
                 return;
             }
         }
-        zkbIntegralRepository.save(selected);
+        zkbIntegralService.save(selected,currentUser);
         this.selected = null;
         this.actionName = "";
     }

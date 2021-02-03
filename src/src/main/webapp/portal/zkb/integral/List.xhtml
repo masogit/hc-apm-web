@@ -26,7 +26,7 @@
                         <p:ajax event="rowSelect" listener="#{zkbIntegralController.prepareEdit}" update="deleteButton :zkbIntegralEditForm"/>
                         <p:ajax event="filter" listener="#{zkbIntegralController.onFilter}" />
 
-                        <p:column headerText="#{msg.zkbContact_tenant}" filterBy="#{item.tenantUID}">
+                        <p:column headerText="#{msg.zkbContact_tenant}" filterBy="#{item.tenantUID}" filterMatchMode="EQ">
                             <h:outputText value="#{zkbIntegralController.getTenantInfo(item.tenantUID).name}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu style="transform: scale(1.2)"  onchange="PF('varDataList').filter()">
