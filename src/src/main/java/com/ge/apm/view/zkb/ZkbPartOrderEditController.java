@@ -6,6 +6,7 @@ import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.zkb.CopyByInvok;
+import com.ge.apm.service.zkb.ZkbIntegralService;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -38,6 +39,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private UserContextService userContextService;
     private UserAccount currentUser;
     private ZkbPartOrderService zkbPartOrderService;
+    private ZkbIntegralService zkbIntegralService;
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
     private AssetInfoRepository assetInfoRepository;
     private String actionName;
@@ -65,6 +67,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         dao = WebUtil.getBean(ZkbPartOrderRepository.class);
         zkbPartOrderService = WebUtil.getBean(ZkbPartOrderService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        zkbIntegralService = WebUtil.getBean(ZkbIntegralService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
@@ -445,28 +448,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
                 this.selected.setRemainQty(contractCount - this.selected.getQty());
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-                /*if("1".equals(artificialType)){
-                    Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
-                    this.selected.setRemainQty(contractCount - this.selected.getQty());
-                }else if("3".equals(artificialType)){
-                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
-                        Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }else if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+                if(CopyByInvok.T.equals(selected.getScoreFlag())){
+                    this.selected.setRemainQty(0);
+                }else {
+                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                         Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
                         this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    }else{
+                        Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                        this.selected.setRemainQty(contractCount - this.selected.getQty());
                     }
-                }else {
-                    Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
-                    this.selected.setRemainQty(contractCount - this.selected.getQty());
-                }*/
-                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                    Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
-                    this.selected.setRemainQty(contractCount - this.selected.getQty());
-                }else{
-                    Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
-                    this.selected.setRemainQty(contractCount - this.selected.getQty());
                 }
+
             }
         }
     }
@@ -517,6 +510,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
                 flag=false;
                 errorLog += "附件不能为空！";
+            }
+        }else{
+            if("t".equals(selected.getScoreFlag())){
+                boolean r = zkbIntegralService.checkScoreFlag(selectionTenantInfo,selected.getQty());
+                if(!r){
+                    flag=false;
+                    errorLog += "积分不够！";
+                }
             }
         }
         if(selected.getRemainQty() < 0){
@@ -619,6 +620,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         }
         calcRemainQty();
+    }
+
+    public void scoreFlagChange(){
+        if("t".equals(selected.getScoreFlag())){
+            boolean r = zkbIntegralService.checkScoreFlag(selectionTenantInfo,selected.getQty());
+            if(!r){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "积分不够", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
+        }
+
     }
 
     public void zkbPartOrderCatSelect(){

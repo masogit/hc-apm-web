@@ -512,15 +512,16 @@
                                     </p:selectOneMenu>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">是否需要探头说明函*</label>
                                     <c:choose>
                                         <c:when test="#{zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
-                                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.needLetterFlag}" style="color: red;font-weight:100;font-size:20 " required="true" requiredMessage="是否需要探头说明函 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
+                                            <label class="label" style="color: red!important;font-weight:100;font-size :xx-large ">是否需要探头说明函*</label>
+                                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.needLetterFlag}" style="color: red;font-weight:100;font-size:xx-large " required="true" requiredMessage="是否需要探头说明函 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
                                                 <f:selectItem itemLabel="不需要" itemValue="f"/>
                                                 <f:selectItem itemLabel="需要" itemValue="t"/>
                                             </p:selectOneMenu>
                                         </c:when>
                                         <c:otherwise>
+                                            <label class="label" >是否需要探头说明函*</label>
                                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.needLetterFlag}" required="true" requiredMessage="是否需要探头说明函 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
                                                 <f:selectItem itemLabel="不需要" itemValue="f"/>
                                                 <f:selectItem itemLabel="需要" itemValue="t"/>
