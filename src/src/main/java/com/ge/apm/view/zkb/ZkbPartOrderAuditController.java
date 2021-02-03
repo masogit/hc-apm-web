@@ -195,11 +195,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             if(currentUser.getTenantUID().equals(selected.getTenantUID())){
                 canEditFlag = true;
             }else{
-                List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
-                if(zkbPartOrderUserConfigs.size() > 0){
-                    for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
-                        if(currentUser.getLoginName().equals(c.getLoginName())){
-                            canEditFlag = true;
+                if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+                    List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                    if(zkbPartOrderUserConfigs.size() > 0){
+                        for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
+                            if(currentUser.getLoginName().equals(c.getLoginName())){
+                                canEditFlag = true;
+                            }
                         }
                     }
                 }
