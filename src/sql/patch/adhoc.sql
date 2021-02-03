@@ -1,5 +1,5 @@
 --2021-01-27 消息订阅 修改部分角色配置 start
-update user_subscription_push set sub_status=true,default_send_status=false,send_status=true where menu_type='6' and role_position='SalesManager';
+update user_subscription_push set sub_status=true,default_send_status=true, send_status=true where menu_type='6' and role_position='SalesManager';
 update user_subscription_push set sub_status=true,default_send_status=false,send_status=true where menu_type='1' and role_position='FE';
 update user_subscription_push set sub_status=true,default_send_status=false,send_status=true where menu_type='7' and role_position='FE';
 update user_subscription_push set sub_status=true,default_send_status=false,send_status=true where menu_type='8' and role_position='FE';
