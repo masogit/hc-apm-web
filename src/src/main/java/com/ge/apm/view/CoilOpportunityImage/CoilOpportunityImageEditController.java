@@ -150,27 +150,29 @@ public class CoilOpportunityImageEditController extends JpaCRUDController<CoilOp
     }
 
     public String getListPageLink() {
-        return "/admin/coilOpportunityImage/coilOpportunityImageList.xhtml";
+        return "coilOpportunityImageList?faces-redirect=true";
     }
 
     /**
      * 添加货号
      */
     @Transactional
-    public void applyChange() {
+    public String applyChange() {
         CoilOpportunityImage imageInfo = dao.findByCataLog(selected.getCataLog());
         if (null != imageInfo) {
             WebUtil.addErrorMessage("货号已存在！");
+            return "";
         } else {
             newAdd = true;
             blobDao.deleteByBoUuid(selected.getCataLog());
             // 货号不存在，则新增
             selected.setCreatorUID(UserContextService.getCurrentUserAccount().getUid());
             selected.setCreateTime(new Date());
-            this.save();
+            this.create();
             if (selected != null && selected.getId() != null && selectedPictures != null) {
                 createAttachments(selected, selectedPictures);
             }
+            return "coilOpportunityImageList?faces-redirect=true";
         }
     }
 
