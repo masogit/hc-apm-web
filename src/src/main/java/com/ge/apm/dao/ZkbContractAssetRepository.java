@@ -4,6 +4,7 @@ import com.ge.apm.domain.ZkbContractAsset;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
+import java.util.Date;
 import java.util.List;
 /**
  * @author : 503189362
@@ -27,6 +28,16 @@ public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbCon
      * @return
      */
     List<ZkbContractAsset> findByContractIdIn(List<String> contractIdList);
+
+
+    /**
+     * 统计数量
+     * @param tenantUID 租户tenantUID
+     * @param kpiDate 生成KPI时间
+     * @return
+     */
+    @Query(value = "SELECT zca.* from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id where zkbc.tenant_uid = ?1 and zkbc.start_date<=?2 and zkbc.end_date>=?2", nativeQuery = true)
+    List<ZkbContractAsset> findZkbContractAssetByTenantUID(String tenantUID,Date kpiDate);
 
 
 }

@@ -41,9 +41,10 @@ public interface ZkbContractRepository extends GenericRepositoryUUID<ZkbContract
 
     /**
      * 统计数量
-     * @param contractIdList 合同ID
+     * @param tenantUID 租户tenantUID
+     * @param kpiDate 生成KPI时间
      * @return
      */
-    @Query(value = "SELECT sum(ib_number)  from zkb_contract  where id in ?1", nativeQuery = true)
-    Integer fetchIbNumber(List<String> contractIdList);
+    @Query(value = "SELECT sum(ib_number)  from zkb_contract  where tenant_uid = ?1 and start_date<=?2 and end_date>=?2 ", nativeQuery = true)
+    Integer fetchIbNumber(String tenantUID,Date kpiDate);
 }
