@@ -206,6 +206,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             }
             this.zkbKeyBehaviorIndexRepository.save(zkbKeyBehaviorIndex);
         }
+        WebUtil.addSuccessMessage("生成成功");
     }
 
 
