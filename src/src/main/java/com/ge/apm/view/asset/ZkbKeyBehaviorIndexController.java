@@ -1,12 +1,12 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.ZkbKeyBehaviorIndexConfigRepository;
 import com.ge.apm.dao.ZkbKeyBehaviorIndexRepository;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbContract;
-import com.ge.apm.domain.ZkbKeyBehaviorIndex;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbKeyBehaviorIndexService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -16,6 +16,7 @@ import org.primefaces.model.chart.LineChartModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -27,10 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -54,6 +52,11 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
     private ZkbKeyBehaviorIndexRepository zkbKeyBehaviorIndexRepository;
 
     /**
+     * 获取配置KPI生成配置权重
+     */
+    private ZkbKeyBehaviorIndexConfigRepository zkbKeyBehaviorIndexConfigRepository;
+
+    /**
      * 租户UID
      */
     private String tenantUID;
@@ -62,10 +65,26 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      * 开始时间
      */
     private Date beginningTime;
+
     /**
      *结束时间
      */
     private Date endingTime;
+
+    /**
+     * 要生成KPI数据的月份
+     */
+    private Date kpiDate;
+
+    /**
+     * 生成kpiTenantUid
+     */
+    private String kpiTenantUID;
+
+    /**
+     * 生成所有字段数据
+     */
+    private String replaceAll;
 
     /**
      * 列表
@@ -104,6 +123,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         super.init();
         zkbKeyBehaviorIndexService = WebUtil.getBean(ZkbKeyBehaviorIndexService.class);
         zkbKeyBehaviorIndexRepository = WebUtil.getBean(ZkbKeyBehaviorIndexRepository.class);
+        zkbKeyBehaviorIndexConfigRepository= WebUtil.getBean(ZkbKeyBehaviorIndexConfigRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         if(!userContextService.isZkbAdmin())
@@ -148,6 +168,73 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             endingTimeTimeTemp=this.getLastDay(date);
         }
         this.lineModel = this.zkbKeyBehaviorIndexService.generateCharts(tenantUID,beginningTimeTemp,endingTimeTimeTemp);
+    }
+
+    /**
+     * 生成报表
+     */
+    public void generateKpiData()
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexService.monthDateFormat_two);
+        String dateStry = formatter.format(this.kpiDate);
+        ZkbKeyBehaviorIndexConfig defaultZkbKeyBehaviorIndexConfig = this.zkbKeyBehaviorIndexConfigRepository.getDefaultConfig();
+        List<TenantInfo> tenantInfoList = new ArrayList<>();
+        if(StringUtils.isNotBlank(this.kpiTenantUID)) {
+            TenantInfo tenantInfo = new TenantInfo();
+            tenantInfo.setUid(this.kpiTenantUID);
+            tenantInfoList.add(tenantInfo);
+        }else {
+            tenantInfoList = this.zkbKeyBehaviorIndexService.getSourceTenantInfoList();
+            if(CollectionUtils.isEmpty(tenantInfoList)) {
+                return;
+            }
+        }
+        for(TenantInfo item:tenantInfoList) {
+            ZkbKeyBehaviorIndex zkbKeyBehaviorIndex = this.generateSingleKpiData(item.getUid(),defaultZkbKeyBehaviorIndexConfig);
+            this.zkbKeyBehaviorIndexService.calculateScore(zkbKeyBehaviorIndex,item.getUid(),this.getLastDay(this.kpiDate));
+            List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexRepository.findByTenantUIDAndKbiDate(item.getUid(),ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry);
+            if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
+            {
+                ZkbKeyBehaviorIndex oldZkbKeyBehaviorIndex =zkbKeyBehaviorIndexList.get(0);
+                zkbKeyBehaviorIndex.setId(oldZkbKeyBehaviorIndex.getId());
+                if("f".equals(this.replaceAll))
+                {
+                    zkbKeyBehaviorIndex.setSatisfactoryDegreeScore(oldZkbKeyBehaviorIndex.getSatisfactoryDegreeScore());
+                    zkbKeyBehaviorIndex.setComplianceScore(oldZkbKeyBehaviorIndex.getComplianceScore());
+                    zkbKeyBehaviorIndex.setEngineerScore(oldZkbKeyBehaviorIndex.getEngineerScore());
+                }
+            }
+            this.zkbKeyBehaviorIndexRepository.save(zkbKeyBehaviorIndex);
+        }
+    }
+
+
+    /**
+     * 组装单个KPI
+     * @param tenantUID
+     * @param zkbKeyBehaviorIndexConfig
+     * @return
+     */
+    private ZkbKeyBehaviorIndex generateSingleKpiData(String tenantUID,ZkbKeyBehaviorIndexConfig zkbKeyBehaviorIndexConfig)
+    {
+        List<ZkbKeyBehaviorIndexConfig>  list = this.zkbKeyBehaviorIndexConfigRepository.findByTenantUID(tenantUID);
+        if(CollectionUtils.isNotEmpty(list))
+        {
+            zkbKeyBehaviorIndexConfig=list.get(0);
+        }
+        ZkbKeyBehaviorIndex zkbKeyBehaviorIndex = new ZkbKeyBehaviorIndex();
+        zkbKeyBehaviorIndex.setPartReturnFullScore(zkbKeyBehaviorIndexConfig.getPartReturnFullScore());
+        zkbKeyBehaviorIndex.setPasteQuickResponseRateFullScore(zkbKeyBehaviorIndexConfig.getPasteQuickResponseRateFullScore());
+        zkbKeyBehaviorIndex.setApmBillingRateFullScore(zkbKeyBehaviorIndexConfig.getApmBillingRateFullScore());
+        zkbKeyBehaviorIndex.setSatisfactoryDegreeFullScore(zkbKeyBehaviorIndexConfig.getSatisfactoryDegreeFullScore());
+        zkbKeyBehaviorIndex.setComplianceFullScore(zkbKeyBehaviorIndexConfig.getComplianceFullScore());
+        zkbKeyBehaviorIndex.setEngineerFullScore(zkbKeyBehaviorIndexConfig.getEngineerFullScore());
+        zkbKeyBehaviorIndex.setTenantUID(tenantUID);
+        zkbKeyBehaviorIndex.setSatisfactoryDegreeScore(0);
+        zkbKeyBehaviorIndex.setComplianceScore(zkbKeyBehaviorIndexConfig.getComplianceFullScore());
+        zkbKeyBehaviorIndex.setEngineerScore(zkbKeyBehaviorIndexConfig.getEngineerFullScore());
+        zkbKeyBehaviorIndex.setKbiDate(this.kpiDate);
+        return zkbKeyBehaviorIndex;
     }
 
 
@@ -265,9 +352,12 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
     }
 
 
+    /**
+     * 计算得分
+     */
     public void calculateScore()
     {
-      this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.zkbContractList,this.selected.getTenantUID());
+        this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.selected.getTenantUID(),this.getLastDay(this.selected.getKbiDate()));
     }
 
     @Override
@@ -334,6 +424,11 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
     public void save() {
         String fieldThanAnotherFieldErro = WebUtil.getMessage("zkbKeyBehaviorIndex_fieldThanAnotherFieldErro");
         boolean ok = true;
+        if(!this.compareDate())
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyBehaviorIndex_cannotChangeError"));
+            return;
+        }
         if(ZkbKeyBehaviorIndexService.totalFullScore!=this.selected.getTotalFullScore())
         {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyBehaviorIndex_totalFullScoreError"));
@@ -373,6 +468,19 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         this.selected = null;
     }
 
+    public boolean compareDate()
+    {
+        Calendar cd = Calendar.getInstance();
+        cd.setTime(this.selected.getKbiDate());
+        cd.add(Calendar.MONTH,1);
+        Date date = new Date();
+        if( DateUtil.isSameMonth(date,cd.getTime()))
+        {
+            return true;
+        }
+        return false;
+    }
+
     public void cancel() {
         this.selected = null;
     }
@@ -399,5 +507,29 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
 
     public void setFile(UploadedFile file) {
         this.file = file;
+    }
+
+    public Date getKpiDate() {
+        return kpiDate;
+    }
+
+    public void setKpiDate(Date kpiDate) {
+        this.kpiDate = kpiDate;
+    }
+
+    public String getReplaceAll() {
+        return replaceAll;
+    }
+
+    public void setReplaceAll(String replaceAll) {
+        this.replaceAll = replaceAll;
+    }
+
+    public String getKpiTenantUID() {
+        return kpiTenantUID;
+    }
+
+    public void setKpiTenantUID(String kpiTenantUID) {
+        this.kpiTenantUID = kpiTenantUID;
     }
 }
