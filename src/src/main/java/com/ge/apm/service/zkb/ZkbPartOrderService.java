@@ -696,7 +696,17 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString());
                 if(CopyByInvok.T.equals(zkbPartOrder.getNewCatFlag())){
                     ZkbContract c = zkbContractRepository.findById(zkbPartOrder.getContractId());
-                    if(getBetweenDay(new Date(2021,1,1),c.getStartDate()) < 0){
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    Date d = null;
+                    try {
+                        d = format.parse("2021-01-01");
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    if(d == null){
+                        d = new Date();
+                    }
+                    if(getBetweenDay(d,c.getStartDate()) < 0){
                         zkbPartOrder.setQty(zkbPartOrder.getQty() * 2);
                     }
                 }
@@ -1008,7 +1018,18 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
             if(CopyByInvok.T.equals(zkbPartOrder.getNewCatFlag())){
-                if(getBetweenDay(new Date(2021,1,1),zkbContract.getStartDate()) < 0){
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                Date d = null;
+                try {
+                    d = format.parse("2021-01-01");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if(d == null){
+                    d = new Date();
+                }
+
+                if(getBetweenDay(d,zkbContract.getStartDate()) < 0){
                     zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) + (qty * 2));
                     zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) - qty);
                 }else{
