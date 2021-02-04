@@ -10,6 +10,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
@@ -45,6 +46,8 @@ public class CoilOpportunityImageEditController extends JpaCRUDController<CoilOp
     @Setter
     @Getter
     private boolean newAdd;
+
+    private boolean uploadImage;
 
     @Override
     protected void init() {
@@ -111,31 +114,10 @@ public class CoilOpportunityImageEditController extends JpaCRUDController<CoilOp
      * @param event
      */
     public void handleFileUpload(FileUploadEvent event) {
-        if ("Create".equals(crudActionName)) {
-            // 新增
-            CoilOpportunityImage imageInfo = dao.findByCataLog(selected.getCataLog());
-            if (null == imageInfo) {
-                WebUtil.addErrorMessage("货号不存在，请先添加货号！");
-            } else {
-                if (newAdd) {
-                    // 当前页面新增的货号
-                    uploadImage(event);
-                } else {
-                    WebUtil.addErrorMessage("货号已存在，请前往编辑页面上传图片！");
-                }
-            }
-        } else if ("Edit".equals(crudActionName)) {
-            // 编辑
-            uploadImage(event);
+        if (StringUtils.isEmpty(selected.getCataLog())) {
+            WebUtil.addErrorMessage("请填写货号");
+            return;
         }
-    }
-
-    /**
-     * 上传图片
-     *
-     * @param event
-     */
-    private void uploadImage(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             attachements.add(blobObject);
@@ -143,6 +125,7 @@ public class CoilOpportunityImageEditController extends JpaCRUDController<CoilOp
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
             blobObject.setBoUuid(selected.getCataLog());
             blobService.saveBlobObject(blobObject);
+            uploadImage = true;
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
@@ -164,7 +147,10 @@ public class CoilOpportunityImageEditController extends JpaCRUDController<CoilOp
             return "";
         } else {
             newAdd = true;
-            blobDao.deleteByBoUuid(selected.getCataLog());
+            if (!uploadImage) {
+                // 新增货号时删除未保存货号时上传的图片
+                blobDao.deleteByBoUuid(selected.getCataLog());
+            }
             // 货号不存在，则新增
             selected.setCreatorUID(UserContextService.getCurrentUserAccount().getUid());
             selected.setCreateTime(new Date());
