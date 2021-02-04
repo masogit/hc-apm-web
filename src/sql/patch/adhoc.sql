@@ -47,3 +47,6 @@ INSERT INTO user_subscription_push (menu_type,is_deleted,send_status,sub_status,
 select '12', false, true, true, false, 'Super'
 where not exists (select 1 from user_subscription_push where menu_type=12 and tag='Super');
 --2020-01-27 end
+
+--2020-02-04 update sr name
+update service_request_report service set file_name = (case when trans.transfer_name is not null then trans.transfer_name else service.file_name end) from (select file.id, replace(file.file_name, file.sub_file, transfer.mapped_name) transfer_name  from (select sr.id, event.event_type, sr.file_name, substring(sr.file_name, position('_' in sr.file_name)+1) sub_file from service_request_report sr, asset_lifecycle_event event where sr.alce_id = event.id and position('_' in sr.file_name) > 0) file, sr_name_transfer_mapping transfer where file.event_type = transfer.sr_type and upper(file.sub_file) = upper(transfer.file_name)) trans where service.id = trans.id;
