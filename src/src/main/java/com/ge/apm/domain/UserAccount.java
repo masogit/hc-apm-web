@@ -312,6 +312,9 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public String getUserTagsView(){
 		String userTagsView = "";
+		if(userTags == null){
+			return userTagsView;
+		}
 		for(UserTags tag:userTags){
 			userTagsView += tag.getTag()+",";
 		}
