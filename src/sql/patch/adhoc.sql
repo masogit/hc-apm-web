@@ -53,3 +53,7 @@ update service_request_report service set file_name = (case when trans.transfer_
 
 --2020-02-04 update ct and petct alert config
 update asset_alert_config set label = '图像硬盘空间', pad_message = replace(pad_message, '磁盘空间', '图像硬盘空间'), wechat_message = replace(wechat_message, '磁盘空间', '图像硬盘空间') where config_type in (201, 501)
+
+--2020-02-04 game plan添加index
+create index asset_service_member_asset_uid on asset_service_member (asset_uid);
+
