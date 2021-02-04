@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private static final Logger logger = LoggerFactory.getLogger(AssetInfoBulkEditController.class);
+    private static final String TAB_SELECT_ASSETS = "SELECT_ASSETS";
 
     static PageRequest pageRequest = new PageRequest(0, 100);
 
@@ -993,7 +994,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public void onTabChange(TabChangeEvent event) {
-        if ("选择资产".equals(event.getTab().getTitle())) {
+        if (TAB_SELECT_ASSETS.equals(event.getTab().getId())) {
             return;
         }
 
@@ -1229,6 +1230,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
 
         return false;
+    }
+
+    public String getTabIDAsSelectAssets() {
+        return TAB_SELECT_ASSETS;
     }
 
 }
