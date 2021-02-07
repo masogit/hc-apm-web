@@ -1,9 +1,8 @@
 package com.ge.apm.service.zkb;
 
-import com.ge.apm.dao.ZkbContractRepository;
-import com.ge.apm.dao.ZkbFePartOrderRepository;
-import com.ge.apm.dao.ZkbFePartOrderUserConfigRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.ZkbFePartOrderMapper;
+import com.ge.apm.dao.mapper.ZkbPartOrderMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
@@ -18,6 +17,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -37,6 +38,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     private ZkbFePartOrderRepository zkbFePartOrderRepository;
 
     /**
+     * 获取FE订单
+     */
+    @Autowired
+    private ZkbPartOrderMapper zkbPartOrderMapper;
+
+    /**
      * 获取审批角色配置信息
      */
     @Autowired
@@ -47,6 +54,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      */
     @Autowired
     private ZkbContractRepository zkbContractRepository;
+
+    /**
+     * 获取资产信息
+     */
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
 
     /**
      * 根据system_id和用户tenant_uid 查询设备信息
@@ -72,6 +85,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 单号前缀
      */
     private static final String  SPARE_PARTS_ORDER_PREFIX = "FEPO";
+
+    /**
+     * 超声高端机
+     */
+    public static String highArtificialTypeValue = "High";
 
     /**
      * 给申请单添加单号和索引
@@ -510,6 +528,103 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 根据systemId和 报修单号检索
+     * @param systemId systemId
+     * @param sr 报修单号检索
+     * @param partOrderNo 订单编号
+     */
+    public List<ZkbFePartOrder> getSparePartsZkbFePartOrder(String systemId,String sr,String partOrderNo)
+    {
+        List<ZkbFePartOrder> sparePartsZkbFePartOrderList = null;
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ,ZkbFePartOrder.OrderType.ManMade.toString()));
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString()));
+        if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr)&&StringUtils.isBlank(partOrderNo))
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
+            return sparePartsZkbFePartOrderList;
+        }
+        if(StringUtils.isNotBlank(systemId))
+        {
+            searchFilters.add(new SearchFilter("systemId", SearchFilter.Operator.LIKE,systemId));
+        }
+        if(StringUtils.isNotBlank(sr))
+        {
+            searchFilters.add(new SearchFilter("sr", SearchFilter.Operator.LIKE,sr));
+        }
+        if(StringUtils.isNotBlank(partOrderNo))
+        {
+            searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.LIKE,partOrderNo));
+        }
+        sparePartsZkbFePartOrderList = this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
+        List<ZkbPartOrder> zkbPartOrderList =null;
+        zkbPartOrderList = this.zkbPartOrderMapper.queryBySystemIdAndSr(systemId,sr,partOrderNo);
+        if(CollectionUtils.isNotEmpty(zkbPartOrderList))
+        {
+            List<ZkbFePartOrder> list = new ArrayList<>();
+            for(ZkbPartOrder item:zkbPartOrderList)
+            {
+                ZkbFePartOrder zkbFePartOrder = new ZkbFePartOrder();
+                zkbFePartOrder.setPartOrderNo(item.getPartOrderNo());
+                zkbFePartOrder.setSr(item.getSrNum());
+                zkbFePartOrder.setFunctionType(item.getProductNumber());
+                zkbFePartOrder.setPhenomenon(item.getFaultDescription());
+                zkbFePartOrder.setReportUser(item.getRequestUser());
+                zkbFePartOrder.setHospitalName(item.getHospitalName());
+                zkbFePartOrder.setGeEngineerName(item.getGeEngineerName());
+                zkbFePartOrder.setGeEngineerPhone(item.getGeEngineerPhone());
+                zkbFePartOrder.setContractId(item.getContractId());
+                zkbFePartOrder.setSystemId(item.getSystemId());
+                zkbFePartOrder.setOrderType(item.getOrderType());
+                zkbFePartOrder.setId(item.getId());
+                zkbFePartOrder.setReportDate(item.getCreatedDate());
+                list.add(zkbFePartOrder);
+            }
+            if(CollectionUtils.isNotEmpty(sparePartsZkbFePartOrderList))
+            {
+                sparePartsZkbFePartOrderList.addAll(list);
+            }else
+                {
+                    sparePartsZkbFePartOrderList=list;
+                }
+        }
+        if(CollectionUtils.isEmpty(sparePartsZkbFePartOrderList))
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_searchError"));
+        }
+        return sparePartsZkbFePartOrderList;
+    }
+
+
+    /**
+     * 选择单据
+     * @param selected 当前流程数据
+     * @param selectZkbFePartOrder 选择的流程
+     * @return
+     */
+    public ZkbFePartOrder selectedWorkFlow(ZkbFePartOrder selected,ZkbFePartOrder selectZkbFePartOrder)
+    {
+        selected.setFatherPartOrderNo(selectZkbFePartOrder.getPartOrderNo());
+        selected.setSystemId(selectZkbFePartOrder.getSystemId());
+        selected.setContractId(selectZkbFePartOrder.getContractId());
+        selected.setPhenomenon(selectZkbFePartOrder.getPhenomenon());
+        ZkbContract zkbContract = this.zkbContractRepository.findById(selectZkbFePartOrder.getContractId());
+        selected.setTenantUid(zkbContract.getTenantUID());
+        AssetInfo assetInfo = this.assetInfoRepository.getBySystemId(selectZkbFePartOrder.getSystemId());
+        if(assetInfo!=null)
+        {
+            selected.setArtificialType("");
+            if(assetInfo.getAssetGroup()!=null&&"2".equals(assetInfo.getAssetGroup().toString()))
+            {
+                selected.setArtificialType(highArtificialTypeValue);
+            }
+            selected.setAssetGroup(assetInfo.getAssetGroup().toString());
+            selected.setProductNumber(assetInfo.getFunctionType());
+        }
+        return selected;
     }
 
 }

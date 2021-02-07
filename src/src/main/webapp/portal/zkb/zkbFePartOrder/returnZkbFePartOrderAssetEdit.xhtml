@@ -31,28 +31,32 @@
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_returnType}*</label>
                     <p:selectOneMenu  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnType}" required="true" requiredMessage="#{msg.zkbFePartOrder_returnType} #{msg.ValidationRequire}">
-                        <p:ajax event="change" update="returnTypeGrid" />
+<!--                        <p:ajax event="change" update="returnTypeGrid" />-->
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
-                <h:panelGrid id="returnTypeGrid" columns="1" layout="grid" style="text-align: left">
-                    <h:panelGroup style="text-align: left" rendered="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnType eq 'DOA'}">
-                        <label class="label">Part Serial Number*</label>
-                        <p:inputText id="partSerialNumber"  style="text-align: left" value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.partSerialNumber}" required="true" requiredMessage="Part Serial Number不能为空"/>
-                    </h:panelGroup>
-                    <h:panelGroup style="text-align: left" rendered="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnType eq 'DOA'}">
-                        <label class="label">故障描述*</label>
-                        <p:selectOneMenu  style="text-align: left"  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.partQualityIssue}" required="true" requiredMessage="故障描述 #{msg.ValidationRequire}">
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_partQualityIssue')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                        </p:selectOneMenu>
-                    </h:panelGroup>
-                </h:panelGrid>
+<!--                <h:panelGrid id="returnTypeGrid" columns="1" layout="grid" style="text-align: left">-->
+<!--                    <h:panelGroup style="text-align: left" rendered="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnType eq 'DOA'}">-->
+<!--                        <label class="label">Part Serial Number*</label>-->
+<!--                        <p:inputText id="partSerialNumber"  style="text-align: left" value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.partSerialNumber}" required="true" requiredMessage="Part Serial Number不能为空"/>-->
+<!--                    </h:panelGroup>-->
+<!--                    <h:panelGroup style="text-align: left" rendered="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnType eq 'DOA'}">-->
+<!--                        <label class="label">故障描述*</label>-->
+<!--                        <p:selectOneMenu  style="text-align: left"  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.partQualityIssue}" required="true" requiredMessage="故障描述 #{msg.ValidationRequire}">-->
+<!--                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
+<!--                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_partQualityIssue')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>-->
+<!--                        </p:selectOneMenu>-->
+<!--                    </h:panelGroup>-->
+<!--                </h:panelGrid>-->
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_returnDate}*：</label>
                     <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnDate}"
                                 showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">备注</label>
+                    <p:inputText value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.comment}" maxlength="100"/>
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
