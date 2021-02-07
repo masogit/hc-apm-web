@@ -69,6 +69,9 @@ public class ZkbFePartOrderAssetInfo {
     @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "comment")
+    private String comment;
+
     /**
      * 用于判断list中选中是哪个对象
      */
@@ -153,6 +156,14 @@ public class ZkbFePartOrderAssetInfo {
 
     public void setSparePart(String sparePart) {
         this.sparePart = sparePart;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override
