@@ -231,7 +231,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         zkbKeyBehaviorIndex.setComplianceFullScore(zkbKeyBehaviorIndexConfig.getComplianceFullScore());
         zkbKeyBehaviorIndex.setEngineerFullScore(zkbKeyBehaviorIndexConfig.getEngineerFullScore());
         zkbKeyBehaviorIndex.setTenantUID(tenantUID);
-        zkbKeyBehaviorIndex.setSatisfactoryDegreeScore(0);
+        zkbKeyBehaviorIndex.setSatisfactoryDegreeScore(zkbKeyBehaviorIndexConfig.getSatisfactoryDegreeFullScore());
         zkbKeyBehaviorIndex.setComplianceScore(zkbKeyBehaviorIndexConfig.getComplianceFullScore());
         zkbKeyBehaviorIndex.setEngineerScore(zkbKeyBehaviorIndexConfig.getEngineerFullScore());
         zkbKeyBehaviorIndex.setKbiDate(this.kpiDate);
