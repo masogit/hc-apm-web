@@ -48,12 +48,7 @@
         </style>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-                <c:if test="#{coilOpportunityImageEditController.CRUDActionName.equals('新增')}">
-                    <p:outputLabel class="pageTitle" value="#{coilOpportunityImageEditController.CRUDActionName} #{msg.cataLog}"/>
-                </c:if>
-                <c:if test="#{coilOpportunityImageEditController.CRUDActionName.equals('修改')}">
-                    <p:outputLabel class="pageTitle" value="#{msg.CoilOpportunityImage}"/>
-                </c:if>
+                <p:outputLabel class="pageTitle" value="#{coilOpportunityImageEditController.CRUDActionName} #{msg.CoilOpportunityImage}"/>
             </div>
             <div class="ui-g-12 card">
                 <p:tabView id="tab">
@@ -96,7 +91,7 @@
                                     </div>
                                 </p:fieldset>
                             </c:if>
-                            <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" rendered="#{coilOpportunityImageEditController.CRUDActionName.equals('修改')}">
+                            <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" >
                                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup >
                                         <p:dataList id="pictureList" value="#{coilOpportunityImageEditController.getAttachList(coilOpportunityImageEditController.selected.cataLog)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
