@@ -60,4 +60,5 @@ create index asset_service_member_user_uid on asset_service_member (user_uid);
 create index owoc_report_data_asset_uid on owoc_report_data (asset_uid);
 create index iwic_monthly_report_asset_uid on iwic_monthly_report (asset_uid);
 create index us_report_dept_data_asset_uid on us_report_dept_data (asset_uid);
+create index us_report_data_asset_uid on us_report_data (asset_uid);
 
