@@ -109,7 +109,7 @@ public class ZkbPartOrderProvider {
         }
         if(StringUtils.isNotBlank(partOrderNo))
         {
-            sb.append(" and o.part_order_no = '%"+partOrderNo+"%'");
+            sb.append(" and o.part_order_no = '"+partOrderNo+"'");
         }
         return sb.toString();
     }
