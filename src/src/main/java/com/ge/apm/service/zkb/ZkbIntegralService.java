@@ -4,19 +4,19 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbIntegralRecordRepository;
 import com.ge.apm.dao.ZkbIntegralRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author : 503189362
@@ -207,5 +207,101 @@ public class ZkbIntegralService {
             return false;
         }
         return true;
+    }
+
+    public List<ZkbIntegralRecord> queryRecordByIntegralId(String integralId){
+        List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findByZkbIntegralIdOrderByCreatedDateDesc(integralId);
+        return zkbIntegralRecords;
+    }
+
+    public HashMap<String,Object> createZkbPartOrderData(List<ZkbIntegral> zkbIntegralList){
+        List<Map<String, Object>> zkbIntegralDataList = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+        List<Map<String, Object>> zkbIntegralDataRecordList = new ArrayList<>();
+        HashMap<String, String> tenMap = new HashMap<>();
+        if(zkbIntegralList.size() > 0){
+            for(ZkbIntegral p : zkbIntegralList){
+                ids.add(p.getId());
+                Map<String, Object> zkbIntegralDataMap = new HashMap<>(4);
+                TenantInfo tenantInfo = tenantInfoDao.findByuid(p.getTenantUID());
+                if(tenantInfo != null){
+                    zkbIntegralDataMap.put("代理商", tenantInfo.getName());
+                }
+                zkbIntegralDataMap.put("总积分", p.getIntegralTotal());
+                zkbIntegralDataMap.put("系数", p.getCoefficient());
+                if(p.getValidityDate() != null){
+                    zkbIntegralDataMap.put("有效期", DateFormatUtils.format(p.getValidityDate(),"yyyy-MM-dd"));
+                }
+                tenMap.put(p.getId(),tenantInfo.getName());
+                zkbIntegralDataList.add(zkbIntegralDataMap);
+            }
+        }
+
+        if(zkbIntegralList.size() > 0 && ids.size() > 0){
+            zkbIntegralDataRecordList = createZkbIntegralRecordData(ids,tenMap);
+        }
+        HashMap<String,Object> map = new HashMap<>(2);
+        map.put("zkbIntegralDataList",zkbIntegralDataList);
+        map.put("zkbIntegralDataRecordList",zkbIntegralDataRecordList);
+        return map;
+    }
+
+
+
+    public List<Map<String, Object>> createZkbIntegralRecordData(List<String> ids,HashMap<String, String> tenMap){
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("zkbIntegralId", SearchFilter.Operator.IN, ids));
+        List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findBySearchFilter(searchFilters);
+        List<Map<String,Object>> zkbPartOrderItemDataList = new ArrayList<>();
+        for(ZkbIntegralRecord i : zkbIntegralRecords){
+            Map<String, Object> zkbIntegralRecordDataMap = new HashMap<>(10);
+            zkbIntegralRecordDataMap.put("代理商", tenMap.get(i.getZkbIntegralId()));
+            zkbIntegralRecordDataMap.put("类型", getRecordTypeName(i.getRecordType()));
+            zkbIntegralRecordDataMap.put("积分", i.getScore());
+            zkbIntegralRecordDataMap.put("KPI", i.getCurrentKpi());
+            zkbIntegralRecordDataMap.put("系数", i.getCurrentCoefficient());
+            zkbIntegralRecordDataMap.put("KPI月份", i.getKpiMonth());
+            zkbIntegralRecordDataMap.put("操作时间", DateFormatUtils.format(i.getCreatedDate(),"yyyy-MM-dd HH:mm:ss"));
+            zkbIntegralRecordDataMap.put("操作人", i.getCreatedBy());
+            zkbPartOrderItemDataList.add(zkbIntegralRecordDataMap);
+        }
+        return zkbPartOrderItemDataList;
+    }
+
+    public String getRecordTypeName(String ty){
+        switch (ty){
+            case "KpiAdd" :
+                return "KPI增加";
+            case "KpiModify" :
+                return "KPI修改";
+            case "KpiDelete" :
+                return "KPI删除";
+            case "QuotaDeduct" :
+                return "名额扣减";
+            case "QuotaReturn" :
+                return "名额返还";
+            case "ScoreEdit" :
+                return "编辑修改";
+            default:
+                return "";
+        }
+    }
+
+    public static final String SHEET_ZKB_PART_ORDER = "积分信息";
+    public static final String SHEET_ZKB_PART_ORDER_ITEM = "积分明细记录";
+    public void exportData(ExcelDocument doc, HashMap<String, Object> dataMap) {
+        Integer keyRow = 1;
+        Integer dataRow = 2;
+
+        List<Map<String, Object>> zkbIntegralDataList = (List<Map<String, Object>>) dataMap.get("zkbIntegralDataList");
+        List<Map<String, Object>> zkbIntegralDataRecordList = (List<Map<String, Object>>) dataMap.get("zkbIntegralDataRecordList");
+        for (Map<String, Object> item : zkbIntegralDataList) {
+            doc.writeRowData(SHEET_ZKB_PART_ORDER, keyRow, dataRow++, item);
+        }
+        dataRow = 2;
+        for (Map<String, Object> item : zkbIntegralDataRecordList) {
+            doc.writeRowData(SHEET_ZKB_PART_ORDER_ITEM, keyRow, dataRow++, item);
+        }
+
     }
 }
