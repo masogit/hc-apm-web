@@ -57,4 +57,7 @@ update asset_alert_config set label = '图像硬盘空间', pad_message = replac
 --2020-02-04 game plan添加index
 create index asset_service_member_asset_uid on asset_service_member (asset_uid);
 create index asset_service_member_user_uid on asset_service_member (user_uid);
+create index owoc_report_data_asset_uid on owoc_report_data (asset_uid);
+create index iwic_monthly_report_asset_uid on iwic_monthly_report (asset_uid);
+create index us_report_dept_data_asset_uid on us_report_dept_data (asset_uid);
 
