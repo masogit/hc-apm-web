@@ -14,6 +14,11 @@
 
             <div class="ui-g-12 card">
                 <h:form id="zkbIntegralListForm">
+                    <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
+                        <p:commandButton value="KPI增加"  process="@this" update="datalist" action="#{zkbIntegralController.kpiScoreOp('KpiAdd')}" />
+                        <p:commandButton value="KPI修改"  process="@this" update="datalist" action="#{zkbIntegralController.kpiScoreOp('KpiModify')}" />
+
+                    </h:panelGrid>
                     <p:dataTable id="datalist" value="#{zkbIntegralController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbIntegralController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -51,15 +56,22 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="操 作" exportable="false" >
+                            <h:panelGroup>
 
+                                <p:commandLink title="查询" update="zkbIntegralRecordQueryDlg" actionListener="#{zkbIntegralController.viewRecord(item.id)}" oncomplete="PF('zkbIntegralRecordQueryDlg').show()" >
+                                    <p:graphicImage name="icons/find.png" style="width: 20px; height: 20px;"/>
+                                </p:commandLink>
+                            </h:panelGroup>
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbIntegralController.prepareCreate}" update=":zkbIntegralEditForm"/>
                             <!--<p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbIntegralController.prepareEdit}" update=":zkbIntegralEditForm" disabled="#{empty zkbIntegralController.selected.id}"/>-->
                             <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbIntegralController.delete}" update=":zkbIntegralListForm :zkbIntegralEditForm" disabled="#{empty zkbIntegralController.selected.id}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="ZKB_Integral_Export"/>
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbIntegralController.exportAll}" icon="ui-icon-arrowstop-1-s">
+                                <p:fileDownload value="#{zkbIntegralController.exportFile}"/>
                             </p:commandButton>
                         </f:facet>
 
@@ -67,6 +79,7 @@
 
                 </h:form>
                 <ui:include src="Edit.xhtml"/>
+                <ui:include src="RecordList.xhtml"/>
             </div>
         </div>
     </ui:define>
