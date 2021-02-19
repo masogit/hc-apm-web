@@ -134,7 +134,6 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
         int y=100;
         java.util.Random random=new java.util.Random();
         int rn=random.nextInt(y-x+1)+x;
-        System.out.println(rn);
         zkbIntegralService.kpiScoreHandler(selected.getTenantUID(),rn,recordType,currentUser);
     }
 

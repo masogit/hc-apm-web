@@ -75,20 +75,25 @@ public class ZkbIntegralService {
         }
         ZkbIntegral zkbIntegral = zkbIntegralRepository.findFirstByTenantUID(tenantUID);
         Integer score = scoreCase(kpi);
+        int cof = 1;
         String kpiMonth = simpleDateFormat.format(new Date());
         if(zkbIntegral != null){
-            score = calcCoefficient(zkbIntegral) * score;
+            cof = calcCoefficient(zkbIntegral);
+            score = cof * score;
+            List<String> recordTypes = new ArrayList<>();
+            recordTypes.add(ZkbIntegralRecord.RecordType.KpiAdd.toString());
+            recordTypes.add(ZkbIntegralRecord.RecordType.KpiModify.toString());
             if(ZkbIntegralRecord.RecordType.KpiAdd.toString().equals(recordType)){
                 zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() + score);
             }else if(ZkbIntegralRecord.RecordType.KpiModify.toString().equals(recordType)){
-                ZkbIntegralRecord zkbIntegralRecord = zkbIntegralRecordRepository.findFirstByZkbIntegralIdAndRecordTypeAndKpiMonthOrderByCreatedDateDesc(zkbIntegral.getId(),ZkbIntegralRecord.RecordType.KpiAdd.toString(),kpiMonth);
+                ZkbIntegralRecord zkbIntegralRecord = zkbIntegralRecordRepository.findFirstByRecord(zkbIntegral.getId(),recordTypes,kpiMonth);
                 Integer oldScore = 0;
                 if(zkbIntegralRecord != null){
                     oldScore = zkbIntegralRecord.getScore();
                 }
                 zkbIntegral.setIntegralTotal(zkbIntegral.getIntegralTotal() + score - oldScore);
             }else if (ZkbIntegralRecord.RecordType.KpiDelete.toString().equals(recordType)){
-                ZkbIntegralRecord zkbIntegralRecord = zkbIntegralRecordRepository.findFirstByZkbIntegralIdAndRecordTypeAndKpiMonthOrderByCreatedDateDesc(zkbIntegral.getId(),ZkbIntegralRecord.RecordType.KpiAdd.toString(),kpiMonth);
+                ZkbIntegralRecord zkbIntegralRecord = zkbIntegralRecordRepository.findFirstByRecord(zkbIntegral.getId(),recordTypes,kpiMonth);
                 Integer oldScore = 0;
                 if(zkbIntegralRecord != null){
                     oldScore = zkbIntegralRecord.getScore();
@@ -114,7 +119,7 @@ public class ZkbIntegralService {
         zkbIntegralRecord.setRecordType(recordType);
         zkbIntegralRecord.setScore(score);
         zkbIntegralRecord.setCurrentKpi(kpi);
-        zkbIntegralRecord.setCurrentCoefficient(zkbIntegral.getCoefficient());
+        zkbIntegralRecord.setCurrentCoefficient(cof);
         zkbIntegralRecord.setKpiMonth(kpiMonth);
         zkbIntegralRecord.setZkbIntegralId(zkbIntegral.getId());
         zkbIntegralRecord.setCreatedBy(userAccount.getName());
@@ -188,7 +193,7 @@ public class ZkbIntegralService {
     public Integer scoreCase(Integer kpi){
         if(kpi > KPI_FIRST_LEVEL_SCORE){
             return 50;
-        }else if(kpi> KPI_SECOND_LEVEL_SCORE){
+        }else if(kpi>= KPI_SECOND_LEVEL_SCORE){
             return 10;
         }else{
             return 0;
