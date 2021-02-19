@@ -4,6 +4,7 @@ import com.ge.apm.dao.AssetFaultTypeRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.api.DeviceStatusMonitorService;
 import com.ge.apm.service.api.HealthService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -12,19 +13,16 @@ import org.simpleflatmapper.tuple.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rx.Observable;
-import webapp.framework.web.WebUtil;
 import webapp.framework.web.service.UserContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 @RestController
@@ -35,13 +33,15 @@ public class HealthApi {
 
   @Autowired
   private HealthService healthService;
-  
+  @Autowired
+  private DeviceStatusMonitorService deviceStatusMonitorService;
+
   @Autowired
   AssetFaultTypeRepository assetTypeRepository;
 
   @Autowired
   private TenantInfoRepository tenantInfoDao;
-  
+
   private static final String redirect_1 = "/portal/woMgr/workOrderList.xhtml";
   private static final String redirect_2 = "/portal/asset/info/AssetList.xhtml?assetStatus=2";
   private static final String redirect_3 = "/portal/asset/info/AssetList.xhtml?model=1";
@@ -80,13 +80,14 @@ public class HealthApi {
     switch (category) {
 
       case 0:
-        return createResponseBody(category, request,
-          healthService.queryForMaintain(tenantUID, siteUID),
-          healthService.queryForOutage(tenantUID, siteUID),
-          healthService.queryForWarranty(tenantUID, siteUID),
-          healthService.queryForPm(tenantUID, siteUID),
-          healthService.queryForMeterqa(site_id, hospital_id, 2),
-          healthService.queryForMeterqa(site_id, hospital_id, 1));
+//        return createResponseBody(category, request,
+//          healthService.queryForMaintain(tenantUID, siteUID),
+//          healthService.queryForOutage(tenantUID, siteUID),
+//          healthService.queryForWarranty(tenantUID, siteUID),
+//          healthService.queryForPm(tenantUID, siteUID),
+//          healthService.queryForMeterqa(site_id, hospital_id, 2),
+//          healthService.queryForMeterqa(site_id, hospital_id, 1));
+          return createDeviceStatusSummary(request, user);
       case 1:
         // return createResponseBody(category, request, healthService.queryForMaintain(site_id, hospital_id), start, limit);
 
@@ -101,13 +102,14 @@ public class HealthApi {
       case 4:
         return createResponseBody_s(healthService.queryForPm(tenantUID, siteUID), category, request, start, limit);
 
-      case 5:
-        return createResponseBody(healthService.queryForMeterqa(site_id, hospital_id, 2), category, request, start, limit);
+        case 5:
+//        return createResponseBody(healthService.queryForMeterqa(site_id, hospital_id, 2), category, request, start, limit);
+            return deviceStatusMonitorService.createResponseEntityForAssetMetering(user, start, limit, category, getDisplay(category), getRef("branch"), getHref(category * 10, request, 1));
+        case 6:
+//        return createResponseBody(healthService.queryForMeterqa(site_id, hospital_id, 1), category, request, start, limit);
+            return deviceStatusMonitorService.createResponseEntityForPmLv2(user, start, limit, category, getDisplay(category), getRef("branch"), getHref(category * 10, request, 1));
 
-      case 6:
-        return createResponseBody(healthService.queryForMeterqa(site_id, hospital_id, 1), category, request, start, limit);
-
-      default:
+        default:
         return ResponseEntity.badRequest().body(ImmutableMap.of("msg", "Bad Request"));
 
     }
@@ -321,6 +323,51 @@ public class HealthApi {
     return asset_health.filter(t5 -> t5.getElement2() == legend).count().toBlocking().single();
 
   }
+
+    private ResponseEntity<Map<String, Object>> createDeviceStatusSummary(HttpServletRequest request, UserAccount user) {
+        Integer countAssetsToMeter = deviceStatusMonitorService.countAssetsToMeter(user);
+        Integer countOpenIssues = deviceStatusMonitorService.countOpenIssues(user);
+        Integer countOutOfWarranty = deviceStatusMonitorService.countOutOfWarranty(user);
+        Integer countPmLv2 = deviceStatusMonitorService.countPmLv2(user);
+        Integer countPmLv3 = deviceStatusMonitorService.countPmLv3(user);
+
+        ImmutableList<ImmutableMap<String, Object>> items = new ImmutableList.Builder<ImmutableMap<String, Object>>()
+                .add(createSummaryItem(1, countOpenIssues, getHref(11, request, countOpenIssues)))
+                .add(createSummaryItem(3, countOutOfWarranty, getHref(13, request, countOutOfWarranty)))
+                .add(createSummaryItem(4, countPmLv3, getHref(14, request, countPmLv3)))
+                .add(createSummaryItem(5, countAssetsToMeter, getHref(15, request, countAssetsToMeter)))
+                .add(createSummaryItem(6, countPmLv2, getHref(16, request, countPmLv2)))
+                .build();
+
+        Map<String, Object> pages = new ImmutableMap.Builder<String, Object>()
+                .put("total", 6)
+                .build();
+
+        Map<String, Object> root = new ImmutableMap.Builder<String, Object>()
+                .put("category", 0)
+                .put("display", getDisplay(0))
+                .put("count", countAssetsToMeter)
+                .put("link", new ImmutableMap.Builder<String, Object>().put("ref", getRef("root")).put("href", getHref(0, request, 1)).build())
+                .build();
+
+        Map<String, Object> resultMap = new ImmutableMap.Builder<String, Object>()
+                .put("pages", pages)
+                .put("items", items)
+                .put("root", root)
+                .build();
+
+        return ResponseEntity.ok().body(resultMap);
+    }
+
+    private ImmutableMap<String, Object> createSummaryItem(Integer category, Integer count, String href) {
+      return new ImmutableMap.Builder<String, Object>()
+              .put("category", category)
+              .put("display", getDisplay(category))
+              .put("count", count)
+              .put("unit", getUnit())
+              .put("link", new ImmutableMap.Builder<String, Object>().put("ref", getRef("branch")).put("href", href).build())
+              .build();
+    }
 
   private ResponseEntity<Map<String, Object>> createResponseBody(Integer category, HttpServletRequest request,
                                                                  Observable<Tuple6<Integer, String, Integer, String, String, Integer>> asset_health_1,
