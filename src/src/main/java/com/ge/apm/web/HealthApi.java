@@ -249,13 +249,13 @@ public class HealthApi {
         return "保修期到期";
 
       case 4:
-        return "预防性维护";
+        return "三级保养";
 
       case 5:
         return "设备计量";
 
       case 6:
-        return "设备巡检";
+        return "二级保养";
 
       case 11:
         return "报修";
