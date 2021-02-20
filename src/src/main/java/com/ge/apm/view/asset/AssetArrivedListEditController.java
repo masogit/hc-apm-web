@@ -14,6 +14,8 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.view.SupplierController;
+import lombok.Setter;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -73,6 +75,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
+    private SupplierController supplierController;
+
     UserAccount currentUser;
 
     private List<V2_BlobObject> attachList;
@@ -101,6 +105,15 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private String imageZoom;
     private String imageName;
 
+
+    @Getter
+    @Setter
+    private Supplier newSupplier;
+
+    @Getter
+    @Setter
+    private String newSupplierTpye;
+
     @Override
     protected void init() {
 
@@ -124,6 +137,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         orgTree.getChildren().add(subTree);
         attachList = new ArrayList();
         currentUser=UserContextService.getCurrentUserAccount();
+        supplierController = WebUtil.getBean(SupplierController.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
@@ -860,5 +874,49 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             dao.updateSupplierUser(selected.getVendor(),selected.getSupplierId(),selected.getSupplierUserId(),selected.getId(),3);
             arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         }
+    }
+
+
+    public void saveNewSupplier() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        this.newSupplier.setSiteId(loginUser.getSiteId());
+        this.newSupplier.setHospitalId(loginUser.getHospitalId());
+        this.newSupplier.setTenantUID(loginUser.getTenantUID());
+        this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+        this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
+        this.newSupplier.setSiteUID(loginUser.getSiteUID());
+        this.newSupplier.setCreatedDate(new Date());
+        this.newSupplier.setCreatedBy(loginUser.getName());
+        supplierController.setSelected(newSupplier);
+        supplierController.saveSubmit();
+
+        if("manufacturer".equals(newSupplierTpye)){
+            manueList.add(newSupplier);
+        }else if("supplier".equals(newSupplierTpye)){
+            suppliersList.add(newSupplier);
+        }else if("maintainer".equals(newSupplierTpye)){
+            maintainerList.add(newSupplier);
+        }
+//        supplierList.add(newSupplier);
+//        if (org.apache.commons.lang.StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
+//            supplierList.add(newSupplier);
+//        }
+//        changeSelect(createTpye);
+
+    }
+
+    public void prepareCreateSupplier(String type) {
+        newSupplier = new Supplier();
+        newSupplierTpye = type;
+        if("manufacturer".equals(type)){
+            newSupplier.setManufacturerT(true);
+        }
+        if("supplier".equals(type)){
+            newSupplier.setSupplierT(true);
+        }
+        if("maintainer".equals(type)){
+            newSupplier.setMaintainerT(true);
+        }
+
     }
 }
