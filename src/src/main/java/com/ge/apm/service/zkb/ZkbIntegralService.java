@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -55,7 +54,7 @@ public class ZkbIntegralService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String kpiScoreHandler(String tenantUID, Integer kpi,String recordType, UserAccount userAccount){
+    public String kpiScoreHandler(String tenantUID, Integer kpi,String recordType, UserAccount userAccount,String kpiMonth){
         boolean flag = true;
         String errorLog = "";
         if (StringUtils.isEmpty(tenantUID)){
@@ -76,7 +75,9 @@ public class ZkbIntegralService {
         ZkbIntegral zkbIntegral = zkbIntegralRepository.findFirstByTenantUID(tenantUID);
         Integer score = scoreCase(kpi);
         int cof = 1;
-        String kpiMonth = simpleDateFormat.format(new Date());
+        if(StringUtils.isEmpty(kpiMonth)){
+            kpiMonth = simpleDateFormat.format(new Date());
+        }
         if(zkbIntegral != null){
             cof = calcCoefficient(zkbIntegral);
             score = cof * score;
@@ -191,7 +192,7 @@ public class ZkbIntegralService {
     }
 
     public Integer scoreCase(Integer kpi){
-        if(kpi > KPI_FIRST_LEVEL_SCORE){
+        if(kpi >= KPI_FIRST_LEVEL_SCORE){
             return 50;
         }else if(kpi>= KPI_SECOND_LEVEL_SCORE){
             return 10;
