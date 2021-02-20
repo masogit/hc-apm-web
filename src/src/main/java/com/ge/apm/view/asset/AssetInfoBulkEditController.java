@@ -52,7 +52,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private static final Logger logger = LoggerFactory.getLogger(AssetInfoBulkEditController.class);
     private static final String TAB_SELECT_ASSETS = "SELECT_ASSETS";
 
-    static PageRequest pageRequest = new PageRequest(0, 100);
+    static PageRequest pageRequest = new PageRequest(0, 1000);
 
     private AssetInfoRepository dao;
     private AssetInfoService assetInfoService;
