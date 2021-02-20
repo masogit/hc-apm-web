@@ -4,6 +4,7 @@ import com.ge.apm.dao.ZkbKeyBehaviorIndexConfigRepository;
 import com.ge.apm.dao.ZkbKeyBehaviorIndexRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.zkb.ZkbIntegralService;
 import com.ge.apm.service.zkb.ZkbKeyBehaviorIndexService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
@@ -55,6 +56,8 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      * 获取配置KPI生成配置权重
      */
     private ZkbKeyBehaviorIndexConfigRepository zkbKeyBehaviorIndexConfigRepository;
+
+    private ZkbIntegralService zkbIntegralService;
 
     /**
      * 租户UID
@@ -118,6 +121,18 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
 
     private static final String dateFormat = "yyyyMMddHHmmss";
 
+    private static final String dateFormat_month = "yyyy-MM";
+
+    /**
+     * kpi新增
+     */
+    private static final String kpi_add = "KpiAAd";
+
+    /**
+     * kpi修改
+     */
+    private static final String kpi_modify = "KpiModify";
+
     @Override
     protected void init() {
         super.init();
@@ -125,6 +140,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         zkbKeyBehaviorIndexRepository = WebUtil.getBean(ZkbKeyBehaviorIndexRepository.class);
         zkbKeyBehaviorIndexConfigRepository= WebUtil.getBean(ZkbKeyBehaviorIndexConfigRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        zkbIntegralService= WebUtil.getBean(ZkbIntegralService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         if(!userContextService.isZkbAdmin())
         {
@@ -193,10 +209,12 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             ZkbKeyBehaviorIndex zkbKeyBehaviorIndex = this.generateSingleKpiData(item.getUid(),defaultZkbKeyBehaviorIndexConfig);
             this.zkbKeyBehaviorIndexService.calculateScore(zkbKeyBehaviorIndex,item.getUid(),this.getLastDay(this.kpiDate));
             List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexRepository.findByTenantUIDAndKbiDate(item.getUid(),ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry);
+            boolean exist = false;
             if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
             {
                 ZkbKeyBehaviorIndex oldZkbKeyBehaviorIndex =zkbKeyBehaviorIndexList.get(0);
                 zkbKeyBehaviorIndex.setId(oldZkbKeyBehaviorIndex.getId());
+                exist=true;
                 if("f".equals(this.replaceAll))
                 {
                     zkbKeyBehaviorIndex.setSatisfactoryDegreeScore(oldZkbKeyBehaviorIndex.getSatisfactoryDegreeScore());
@@ -205,6 +223,15 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
                 }
             }
             this.zkbKeyBehaviorIndexRepository.save(zkbKeyBehaviorIndex);
+            String kpiDate = "";
+            if(!exist)
+            {
+                kpiDate=kpi_add;
+            }else
+                {
+                    kpiDate=kpi_modify;
+                }
+            zkbIntegralService.kpiScoreHandler(zkbKeyBehaviorIndex.getTenantUID(),zkbKeyBehaviorIndex.getTotalScore(),kpiDate,currentUser,this.getDateFormat(dateFormat_month,zkbKeyBehaviorIndex.getKbiDate()));
         }
         WebUtil.addSuccessMessage("生成成功");
     }
@@ -274,6 +301,11 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             LOGGER.info(e.getMessage());
         }
         return date1;
+    }
+    private String getDateFormat(String format,Date date)
+    {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        return simpleDateFormat.format(date);
     }
     /**
      * 图表
@@ -465,6 +497,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         {
             return;
         }
+        zkbIntegralService.kpiScoreHandler(selected.getTenantUID(),selected.getTotalScore(),kpi_modify,currentUser,this.getDateFormat(dateFormat_month,selected.getKbiDate()));
         super.save();
         this.selected = null;
     }
