@@ -112,7 +112,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     @Getter
     @Setter
-    private String newSupplierTpye;
+    private String newSupplierType;
 
     @Override
     protected void init() {
@@ -890,11 +890,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         supplierController.setSelected(newSupplier);
         supplierController.saveSubmit();
 
-        if("manufacturer".equals(newSupplierTpye)){
+        if("manufacturer".equals(newSupplierType)){
             manueList.add(newSupplier);
-        }else if("supplier".equals(newSupplierTpye)){
+        }else if("supplier".equals(newSupplierType)){
             suppliersList.add(newSupplier);
-        }else if("maintainer".equals(newSupplierTpye)){
+        }else if("maintainer".equals(newSupplierType)){
             maintainerList.add(newSupplier);
         }
 //        supplierList.add(newSupplier);
@@ -907,7 +907,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void prepareCreateSupplier(String type) {
         newSupplier = new Supplier();
-        newSupplierTpye = type;
+        newSupplierType = type;
         if("manufacturer".equals(type)){
             newSupplier.setManufacturerT(true);
         }
