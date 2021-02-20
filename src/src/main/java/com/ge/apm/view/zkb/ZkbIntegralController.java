@@ -42,8 +42,8 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
     private List<TenantInfo> tenantInfoList;
     private UserAccount currentUser;
     private List<ZkbIntegralRecord> zkbIntegralRecordList;
-    private String month = "";
-    private Integer kpi = 0;
+    private String cmonth = "";
+    private Integer ckpi = 0;
 
     @Override
     protected void init() {
@@ -136,23 +136,23 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
         int y=100;
         java.util.Random random=new java.util.Random();
         int rn=random.nextInt(y-x+1)+x;
-        zkbIntegralService.kpiScoreHandler(selected.getTenantUID(),kpi,recordType,currentUser,month);
+        zkbIntegralService.kpiScoreHandler(selected.getTenantUID(),ckpi,recordType,currentUser,cmonth);
     }
 
-    public String getMonth() {
-        return month;
+    public String getCmonth() {
+        return cmonth;
     }
 
-    public void setMonth(String month) {
-        this.month = month;
+    public void setCmonth(String cmonth) {
+        this.cmonth = cmonth;
     }
 
-    public Integer getKpi() {
-        return kpi;
+    public Integer getCkpi() {
+        return ckpi;
     }
 
-    public void setKpi(Integer kpi) {
-        this.kpi = kpi;
+    public void setCkpi(Integer ckpi) {
+        this.ckpi = ckpi;
     }
 
     public StreamedContent getExportFile() {
