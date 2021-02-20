@@ -346,7 +346,7 @@ public class HealthApi {
         Map<String, Object> root = new ImmutableMap.Builder<String, Object>()
                 .put("category", 0)
                 .put("display", getDisplay(0))
-                .put("count", countAssetsToMeter)
+                .put("count", countAssetsToMeter + countOpenIssues + countOutOfWarranty + countPmLv2 + countPmLv3)
                 .put("link", new ImmutableMap.Builder<String, Object>().put("ref", getRef("root")).put("href", getHref(0, request, 1)).build())
                 .build();
 
