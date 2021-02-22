@@ -542,7 +542,7 @@ public class ZkbKeyBehaviorIndexService {
         remark=remark.append("calculatePartReturnScore--");
         Calendar cd = Calendar.getInstance();
         cd.setTime(kpiDate);
-        cd.add(Calendar.DATE,-14);
+        cd.add(Calendar.DATE,-18);
         Date nowBefore = cd.getTime();
         Integer unReturnCount  = this.zkbPartOrderRepository.fetchUnReturnCount(nowBefore,ZkbPartOrder.OrderType.Probe.toString(),tenantUID,kpiDate);
         if(unReturnCount==null)
