@@ -5,17 +5,14 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.SharedAssetConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang.StringUtils;
 import webapp.framework.web.WebUtil;
-
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -62,7 +59,7 @@ public class SharedAssetConfigController {
             sharedAssetConfig.setHospitalUID(currentUser.getHospitalUID());
             sharedAssetConfig.setSiteUID(currentUser.getSiteUID());
         }
-
+        sharedAssetConfig.setOwner(StringUtils.join(sharedAssetConfig.getOwners().stream().map(UserAccount::getUid).collect(Collectors.toList()), ","));
         dao.save(sharedAssetConfig);
     }
 
@@ -75,6 +72,9 @@ public class SharedAssetConfigController {
             if(!sacList.isEmpty()) {
                 sharedAssetConfig = sacList.get(0);
 
+                if(sharedAssetConfig.getOwner() != null) {
+                    sharedAssetConfig.setOwners(Arrays.stream(sharedAssetConfig.getOwner().split(",")).map(uid -> userAccountDao.getByUid(uid)).collect(Collectors.toList()));
+                }
                 this.startTime = sharedAssetConfig.getStartTime() != null ? sdf.parse(currentDateStr.split(" ")[0] + " " + sharedAssetConfig.getStartTime()) : null;
                 this.endTime = sharedAssetConfig.getEndTime() != null ? sdf.parse(currentDateStr.split(" ")[0] + " " + sharedAssetConfig.getEndTime()) : null;
             }else {
