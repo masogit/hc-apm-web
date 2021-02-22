@@ -65,6 +65,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     WorkflowConfigRepository wfCfigDao = null;
     SharedAssetConfigRepository sharedAssetConfigDao = null;
     UserRoleRepository userRoleRepository = null;
+    SysRoleRepository sysRoleDao;
     String p=null;
     private String operation;
     
@@ -179,6 +180,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         asiDao = WebUtil.getBean(AssetInfoRepository.class);
         swapDao = WebUtil.getBean(SharedAssetTypeRepository.class);
         userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+        sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
         sharedAssetConfigDao = WebUtil.getBean(SharedAssetConfigRepository.class);
@@ -543,9 +545,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
             List<UserRole> userRoleList = userRoleRepository.findByUserId(UserContextService.getCurrentUserAccount().getId());
             //if current user has role like AssetHead(2), AssetStaff(3), SharedAssetMgmt(10), this user will be treated as allocation center admin
-            Boolean isAllocationCenterAdmin = userRoleList.stream().anyMatch(userRole -> userRole.getRoleId() == 2
-                                                                         || userRole.getRoleId() == 3
-                                                                         || userRole.getRoleId() == 10);
+            Boolean isAllocationCenterAdmin = userRoleList.stream().anyMatch(userRole ->
+                    "AssetHead,AssetStaff,SharedAssetMgmt".contains(sysRoleDao.findById(userRole.getRoleId())==null?"":sysRoleDao.findById(userRole.getRoleId()).getName()));
             if(infoList.size()==1){
                 infoVo = infoList.get(0);
                 String assetDeptUID = infoVo.getAssetDeptUID();
@@ -826,9 +827,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
             List<UserRole> userRoleList = userRoleRepository.findByUserId(UserContextService.getCurrentUserAccount().getId());
             //if current user has role like AssetHead(2), AssetStaff(3), SharedAssetMgmt(10), this user will be treated as allocation center admin
-            Boolean isAllocationCenterAdmin = userRoleList.stream().anyMatch(userRole -> userRole.getRoleId() == 2
-                                                                            || userRole.getRoleId() == 3
-                                                                            || userRole.getRoleId() == 10);
+            Boolean isAllocationCenterAdmin = userRoleList.stream().anyMatch(userRole ->
+                    "AssetHead,AssetStaff,SharedAssetMgmt".contains(sysRoleDao.findById(userRole.getRoleId())==null?"":sysRoleDao.findById(userRole.getRoleId()).getName()));
             if(infoList.size()==1){
                 infoVo = infoList.get(0);
                 String ClinicalDeptUID = infoVo.getAssetDeptUID();
