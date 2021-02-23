@@ -215,6 +215,17 @@ public class ZkbIntegralService {
         return true;
     }
 
+    public Integer queryScoreFlag(String tenantUID){
+        ZkbIntegral zkbIntegral = zkbIntegralRepository.findFirstByTenantUID(tenantUID);
+        if(zkbIntegral == null) {
+            return 0;
+        }
+        if(zkbIntegral.getIntegralTotal() == null){
+            return 0;
+        }
+        return zkbIntegral.getIntegralTotal();
+    }
+
     public List<ZkbIntegralRecord> queryRecordByIntegralId(String integralId){
         List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findByZkbIntegralIdOrderByCreatedDateDesc(integralId);
         return zkbIntegralRecords;
