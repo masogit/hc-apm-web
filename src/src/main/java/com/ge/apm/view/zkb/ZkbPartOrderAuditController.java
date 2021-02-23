@@ -493,7 +493,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public String closeFieldTitle(){
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-            if(CopyByInvok.T.equals(selected.getNeedLetterFlag()) && CopyByInvok.T.equals(selected.getUploadLetterFlag())){
+            if(CopyByInvok.T.equals(selected.getNeedLetterFlag()) ){
                 return "探头说明函";
             }
         }
