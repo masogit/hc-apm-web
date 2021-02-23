@@ -59,7 +59,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private AssetInfo assetInfo;
     private String valueTypeTips = "";
     private String queryStatus;
-    private Integer currentScore;
+    private String currentScore;
 
     @Override
     protected void init() {
@@ -624,9 +624,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void scoreFlagChange(){
         if("t".equals(selected.getScoreFlag())){
-            currentScore = zkbIntegralService.queryScoreFlag(selectionTenantInfo);
+            Integer s = zkbIntegralService.queryScoreFlag(selectionTenantInfo);
+            currentScore = "当前积分数量："+s;
             boolean r = true;
-            if(currentScore < selected.getQty() * ZkbIntegralService.unitScore){
+            if(s < selected.getQty() * ZkbIntegralService.unitScore){
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "积分不够", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }
@@ -831,11 +832,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.valueTypeTips = valueTypeTips;
     }
 
-    public Integer getCurrentScore() {
+    public String getCurrentScore() {
         return currentScore;
     }
 
-    public void setCurrentScore(Integer currentScore) {
+    public void setCurrentScore(String currentScore) {
         this.currentScore = currentScore;
     }
 
