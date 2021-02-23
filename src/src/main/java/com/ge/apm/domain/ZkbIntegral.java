@@ -1,6 +1,5 @@
 package com.ge.apm.domain;
 
-import com.ge.apm.service.utils.ChineseName;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
