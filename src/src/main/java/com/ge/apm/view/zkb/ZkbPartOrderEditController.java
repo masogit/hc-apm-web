@@ -59,7 +59,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private AssetInfo assetInfo;
     private String valueTypeTips = "";
     private String queryStatus;
-    private String currentScore;
+    private Integer currentScore = 0;
+    private String currentScoreText;
+    private boolean currentScoreFlag =false;
 
     @Override
     protected void init() {
@@ -353,6 +355,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) && assetInfo.getAssetGroup() == 2){
                 selected.setArtificialType("2");
             }
+            if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+                scoreFlagChange();
+            }
         }
         calcRemainQty();
 
@@ -623,16 +628,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void scoreFlagChange(){
-        if("t".equals(selected.getScoreFlag())){
-            Integer s = zkbIntegralService.queryScoreFlag(selectionTenantInfo);
-            currentScore = "当前积分数量："+s;
-            boolean r = true;
-            if(s < selected.getQty() * ZkbIntegralService.unitScore){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "积分不够", "");
-                FacesContext.getCurrentInstance().addMessage(null, message);
-            }
+        currentScore = zkbIntegralService.queryScoreFlag(selectionTenantInfo);
+        currentScoreText = "当前积分："+ currentScore;
+        boolean r = true;
+        if(currentScore < selected.getQty() * ZkbIntegralService.unitScore){
+            currentScoreFlag = true;
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "积分不够", "");
+            FacesContext.getCurrentInstance().addMessage(null, message);
         }
-
     }
 
     public void zkbPartOrderCatSelect(){
@@ -832,12 +835,28 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.valueTypeTips = valueTypeTips;
     }
 
-    public String getCurrentScore() {
+    public Integer getCurrentScore() {
         return currentScore;
     }
 
-    public void setCurrentScore(String currentScore) {
+    public void setCurrentScore(Integer currentScore) {
         this.currentScore = currentScore;
+    }
+
+    public String getCurrentScoreText() {
+        return currentScoreText;
+    }
+
+    public void setCurrentScoreText(String currentScoreText) {
+        this.currentScoreText = currentScoreText;
+    }
+
+    public boolean isCurrentScoreFlag() {
+        return currentScoreFlag;
+    }
+
+    public void setCurrentScoreFlag(boolean currentScoreFlag) {
+        this.currentScoreFlag = currentScoreFlag;
     }
 
     @Override
