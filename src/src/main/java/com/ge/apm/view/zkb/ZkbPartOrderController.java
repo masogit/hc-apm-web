@@ -293,6 +293,18 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         }
     }
 
+    public String scoreFlagField(String scoreFlag){
+        if(StringUtils.isEmpty(scoreFlag)){
+            return "名额申请";
+        }else if(CopyByInvok.T.equals(scoreFlag)){
+            return "积分申请";
+        }else if(CopyByInvok.F.equals(scoreFlag)){
+            return "名额申请";
+        }else{
+            return "名额申请";
+        }
+    }
+
     public String queryListByStatus(String status){
         queryStatus = status;
         return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus;
