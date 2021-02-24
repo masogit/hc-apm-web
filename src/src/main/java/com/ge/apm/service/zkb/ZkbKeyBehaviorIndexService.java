@@ -591,6 +591,11 @@ public class ZkbKeyBehaviorIndexService {
             totalIbNumber=new Integer(0);
         }
         remark=remark.append("totalIbNumber:").append(totalIbNumber).append(";");
+        if(totalIbNumber==0)
+        {
+            zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
+            return totalIbNumber;
+        }
         List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findZkbContractAssetByTenantUID(tenantUID,kpiDate);
         if(CollectionUtils.isEmpty(zkbContractAssetList))
         {
