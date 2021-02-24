@@ -321,4 +321,10 @@ public class ZkbIntegralService {
         }
 
     }
+
+
+    public String queryIntegralStatus(String tenantUid){
+
+        return "";
+    }
 }
