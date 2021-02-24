@@ -453,6 +453,21 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
                 return "icons/1.png";
         }
     }
+    public String getStepName(V2_WorkOrder v2_workOrder){
+        Integer stepId =v2_workOrder.getCurrentStepId();
+        switch(stepId){
+            case 2:
+                return "待接单";
+            case 3:
+                return "待接单";
+            case 4:
+                return "维修中";
+            case 7:
+                return "已关单";
+            default:
+                return "已关单";
+        }
+    }
 
     public List<String> autoCompleteDeptName(String query) {
         if (clinicalDeptList == null) {
