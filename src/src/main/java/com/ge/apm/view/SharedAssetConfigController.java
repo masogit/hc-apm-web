@@ -74,7 +74,7 @@ public class SharedAssetConfigController {
             List<SharedAssetConfig> sacList = dao.findBySiteUID(currentUser.getSiteUID());
             if(!sacList.isEmpty()) {
                 sharedAssetConfig = sacList.get(0);
-                sharedAssetConfig.setOwners(sacList.stream().map(config -> userAccountDao.getByUid(config.getOwner())).collect(Collectors.toList()));
+                sharedAssetConfig.setOwners(sacList.stream().map(config -> userAccountDao.getByUid(config.getOwner())).filter(con->userList.contains(con)).collect(Collectors.toList()));
                 this.startTime = sharedAssetConfig.getStartTime() != null ? sdf.parse(currentDateStr.split(" ")[0] + " " + sharedAssetConfig.getStartTime()) : null;
                 this.endTime = sharedAssetConfig.getEndTime() != null ? sdf.parse(currentDateStr.split(" ")[0] + " " + sharedAssetConfig.getEndTime()) : null;
             }else {
