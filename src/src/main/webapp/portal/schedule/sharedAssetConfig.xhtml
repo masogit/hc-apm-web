@@ -43,6 +43,7 @@
             <br/>
             <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{sharedAssetConfigController.saveSharedAssetConfig}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'sharedAssetConfigDialog');"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('sharedAssetConfigDialog').hide()"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Reset}" actionListener="#{sharedAssetConfigController.resetConfig}" update=":sharedAssetConfigForm" icon="ui-icon-alert" />
         </h:form>
     </p:dialog>
 </ui:composition>
