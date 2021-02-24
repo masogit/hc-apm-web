@@ -66,6 +66,13 @@ public class SharedAssetConfigController {
         });
     }
 
+    //置空配置
+    public void resetConfig(){
+        //删除已经保存配置
+        dao.deleteBySiteUid(currentUser.getSiteUID());
+        loadSharedAssetConfig();
+    }
+
     public void loadSharedAssetConfig() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentDateStr = sdf.format(new Date());
@@ -79,6 +86,8 @@ public class SharedAssetConfigController {
                 this.endTime = sharedAssetConfig.getEndTime() != null ? sdf.parse(currentDateStr.split(" ")[0] + " " + sharedAssetConfig.getEndTime()) : null;
             }else {
                 sharedAssetConfig = new SharedAssetConfig();
+                this.startTime = null;
+                this.endTime = null;
             }
         } catch (ParseException e) {
             e.printStackTrace();
