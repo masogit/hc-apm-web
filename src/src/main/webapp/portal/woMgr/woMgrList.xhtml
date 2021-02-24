@@ -175,7 +175,7 @@
                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 9)}" itemValue="#{fieldMsg.fieldValue('woSteps', 9)}" />
                         </p:selectOneMenu>
                     </f:facet>
-                    <h:outputText  value="#{item.currentStepName}"/>
+                    <h:outputText  value="#{workOrderMgrController.getStepName(item)}"/>
                 </p:column>
                 <p:column width="90" headerText="#{msg.intExtType}" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
