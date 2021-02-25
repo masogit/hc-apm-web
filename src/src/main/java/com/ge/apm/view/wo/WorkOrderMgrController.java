@@ -464,8 +464,10 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
                 return "维修中";
             case 7:
                 return "已关单";
-            default:
+            case 9:
                 return "已关单";
+            default:
+                return "";
         }
     }
 
@@ -841,9 +843,17 @@ public void test1(){
                 if(stepFileter!=null) {
                     fillterStepId = woStatus.get(stepFileter);
                     if (fillterStepId > 6) {
-                        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
+                        if(userContextService.hasCurrentTenantName("")) {
+                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(7,9)));
+                        }else {
+                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
+                        }
                     } else {
-                        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
+                        if(userContextService.hasCurrentTenantName("")) {
+                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+                        }else{
+                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
+                        }
                     }
                 }
 
