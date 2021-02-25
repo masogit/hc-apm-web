@@ -10,6 +10,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -42,8 +43,6 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
     private List<TenantInfo> tenantInfoList;
     private UserAccount currentUser;
     private List<ZkbIntegralRecord> zkbIntegralRecordList;
-    private String cmonth = "";
-    private Integer ckpi = 0;
 
     @Override
     protected void init() {
@@ -115,6 +114,7 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
+        Sort sort = new Sort(Sort.Direction.DESC, "");
         List<ZkbIntegral> zkbPartOrders =  zkbIntegralRepository.findBySearchFilter(searchFilters);
         HashMap<String, Object> dataMap = zkbIntegralService.createZkbPartOrderData(zkbPartOrders);
 
@@ -126,33 +126,6 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
         } catch (IOException ex) {
             Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    public void kpiScoreOp(String recordType){
-        if(selected == null){
-            return;
-        }
-        int x=60;
-        int y=100;
-        java.util.Random random=new java.util.Random();
-        int rn=random.nextInt(y-x+1)+x;
-        zkbIntegralService.kpiScoreHandler(selected.getTenantUID(),ckpi,recordType,currentUser,cmonth);
-    }
-
-    public String getCmonth() {
-        return cmonth;
-    }
-
-    public void setCmonth(String cmonth) {
-        this.cmonth = cmonth;
-    }
-
-    public Integer getCkpi() {
-        return ckpi;
-    }
-
-    public void setCkpi(Integer ckpi) {
-        this.ckpi = ckpi;
     }
 
     public StreamedContent getExportFile() {
