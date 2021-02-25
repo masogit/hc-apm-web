@@ -85,7 +85,7 @@
                                         filterMatchMode="contains" converter="assetInfoConverter" class="pickList">
                                 <f:facet name="sourceCaption">待选设备</f:facet>
                                 <f:facet name="targetCaption">已选设备</f:facet>
-                                <p:ajax event="transfer" listener="#{assetInfoBulkEditController.onTransfer}" update="btnBulkEditSite"/>
+                                <p:ajax event="transfer" listener="#{assetInfoBulkEditController.onTransfer}" update="btnBulkEditSite pickList"/>
                                 <p:column style="width:30%;">
                                     <h:outputText value="#{asset.name}" />
                                 </p:column>
