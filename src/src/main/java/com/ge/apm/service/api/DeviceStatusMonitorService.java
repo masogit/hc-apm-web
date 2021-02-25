@@ -30,7 +30,7 @@ public class DeviceStatusMonitorService {
     }
 
     public ResponseEntity<Map<String, Object>> createResponseEntityForPmLv2(UserAccount user, Integer offset, Integer limit, Integer category, String display, String ref, String href) {
-        String sql = " SELECT po.id as pm_order_id, po.asset_name, to_char(po.plan_time, 'YYYY-MM-DD'), po.clinical_dept_id FROM v2_pm_order po " +
+        String sql = " SELECT po.id as id, po.asset_name as name, to_char(po.plan_time, 'YYYY-MM-DD') as date FROM v2_pm_order po " +
                 " WHERE po.rule_level = 2 and po.is_finished = false AND po.plan_time < (NOW() + interval '1 weeks') "
                 + " AND (po.tenant_uid IN (?) OR po.institution_uid IN (?) OR po.hospital_uid IN (?) OR po.site_uid IN (?)) order by plan_time desc limit ? offset ?";
         List<Map<String, Object>> items = jdbcTemplate.queryForList(sql, user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), limit, offset);
