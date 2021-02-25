@@ -97,8 +97,8 @@ public class V2_WorkOrderService {
     public List<V2_WorkOrder_Step> getWorkOrderDetailResponsor(String woId, Integer step){
        return  stepDao.findResponsor(woId,step);
     }
-    public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName){
-       return  stepDao.getWorkOrderDetailByownerName(ownerName);
+    public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName ,List<Integer> steps){
+       return  stepDao.getWorkOrderDetailByownerName(ownerName,steps);
     }
 
     public List<String> getSRListByStatus(List<Integer> status) {
