@@ -633,8 +633,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         boolean r = true;
         if(currentScore < selected.getQty() * ZkbIntegralService.unitScore){
             currentScoreFlag = true;
-            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "积分不够", "");
-            FacesContext.getCurrentInstance().addMessage(null, message);
+            /*FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "积分不够", "");
+            FacesContext.getCurrentInstance().addMessage(null, message);*/
         }
     }
 

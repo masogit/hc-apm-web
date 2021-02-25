@@ -47,4 +47,5 @@ public interface ZkbContractRepository extends GenericRepositoryUUID<ZkbContract
      */
     @Query(value = "SELECT sum(ib_number)  from zkb_contract  where tenant_uid = ?1 and start_date<=?2 and end_date>=?2 ", nativeQuery = true)
     Integer fetchIbNumber(String tenantUID,Date kpiDate);
+
 }
