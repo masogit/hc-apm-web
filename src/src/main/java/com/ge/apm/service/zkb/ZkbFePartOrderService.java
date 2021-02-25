@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -30,6 +31,9 @@ import java.util.*;
 public class ZkbFePartOrderService extends MicroServiceInvoker {
 
     private static final Logger logger = LoggerFactory.getLogger(ZkbFePartOrderService.class);
+
+    @Autowired
+    BlobObjectRepository blobObjectRepository;
 
     /**
      * 人工申请主表repository
@@ -395,27 +399,70 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     break;
             }
         }else
-            {
-                switch(type){
-                    case 1 :
-                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()-qty);
-                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()+qty);
-                        break;
-                    case 2 :
-                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
-                        zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()+qty);
-                        break;
-                    case 3:
-                        zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()-qty);
-                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
-                        break;
-                    case 4 :
-                        zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
-                        zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
-                        break;
-                }
+        {
+            switch(type){
+                case 1 :
+                    zkbContract.setSpareQuota(zkbContract.getSpareQuota()-qty);
+                    zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()+qty);
+                    break;
+                case 2 :
+                    zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
+                    zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()+qty);
+                    break;
+                case 3:
+                    zkbContract.setSpareQuotaUse(zkbContract.getSpareQuotaUse()-qty);
+                    zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
+                    break;
+                case 4 :
+                    zkbContract.setSpareQuota(zkbContract.getSpareQuota()+qty);
+                    zkbContract.setSpareQuotaApply(zkbContract.getSpareQuotaApply()-qty);
+                    break;
             }
+        }
         this.zkbContractRepository.save(zkbContract);
+    }
+
+    /**
+     * 移动备件名额
+     * @param type 移动类型
+     * @param zkbContract 合同
+     * @param qty 数量
+     */
+    public void moveProbe(Integer type,ZkbContract zkbContract,Integer qty)
+    {
+
+            switch(type){
+                case 1 :
+                    //探头剩余名额-1，探头申请名额+1
+                    zkbContract.setProbeQuota(zkbContract.getProbeQuota()-qty);
+                    zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaApply()+qty);
+                    break;
+                case 2 :
+                    //探头申请名额-1，探头已使用名额+1
+                    zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaApply()-qty);
+                    zkbContract.setProbeQuotaUse(zkbContract.getProbeQuotaUse()+qty);
+                    break;
+                case 3 :
+                    //探头剩余名额-1 探头已使用名额+1
+                    zkbContract.setProbeQuota(zkbContract.getProbeQuota()-qty);
+                    zkbContract.setProbeQuotaUse(zkbContract.getProbeQuotaUse()+qty);
+                    break;
+                case 4 :
+                    //探头剩余名额+1，探头申请名额-1
+                    zkbContract.setProbeQuota(zkbContract.getProbeQuota()+qty);
+                    zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaApply()-qty);
+                    break;
+                case 5 :
+                    //探头已使用名额-1，探头剩余名额+1
+                    zkbContract.setProbeQuotaUse(zkbContract.getProbeQuotaUse()-qty);
+                    zkbContract.setProbeQuota(zkbContract.getProbeQuota()+qty);
+                    break;
+            }
+            this.zkbContractRepository.save(zkbContract);
+    }
+
+    public void sendWeChatRemindLetter(ZkbFePartOrder zkbFePartOrder){
+        this.sendMessage(zkbFePartOrder.getId(),GatewayURL.FE_PART_ORDER_SEND_WECHART_REMIND_LETTER);
     }
 
     /**
@@ -625,6 +672,18 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             selected.setProductNumber(assetInfo.getFunctionType());
         }
         return selected;
+    }
+    /**
+     * 保存附件
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void saveUploadFile(List<V2_BlobObject> v2_blobObjects,String id){
+        if(v2_blobObjects != null){
+            for (V2_BlobObject v : v2_blobObjects){
+                v.setBoUuid(id);
+                blobObjectRepository.save(v);
+            }
+        }
     }
 
 }

@@ -143,7 +143,7 @@
                             </p:fieldset>
                         </h:panelGroup>
                     </p:fieldset>
-                    <p:fieldset id="managementFieldset" legend="供应商审批" rendered="#{zkbFePartOrderDetailController.workFlowInSupplierStep() or zkbFePartOrderDetailController.workFlowInThirdStep() or zkbFePartOrderDetailController.workFlowInFourthStep()}">
+                    <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderDetailController.workFlowInSupplierStep() or zkbFePartOrderDetailController.workFlowInThirdStep() or zkbFePartOrderDetailController.workFlowInFourthStep()}">
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup rendered="#{zkbFePartOrderDetailController.workFlowInThirdStep() or zkbFePartOrderDetailController.workFlowInFourthStep()}">
                                 <label class="label">代理商审批人名称*：</label>
