@@ -849,7 +849,7 @@ public void test1(){
                             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
                         }
                     } else {
-                        if(userContextService.hasCurrentTenantName("")) {
+                        if( fillterStepId == 3 && userContextService.hasCurrentTenantName("")) {
                             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
                         }else{
                             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
@@ -882,7 +882,8 @@ public void test1(){
                 }
             }
             if(isId) {
-                List<V2_WorkOrder_Step> vs = woService.getWorkOrderDetailByownerName(value);
+                List<Integer> steps = Arrays.asList(7,9);
+                List<V2_WorkOrder_Step> vs = woService.getWorkOrderDetailByownerName(value,steps);
                 List<String> woIdList = new ArrayList<>();
                 if (!vs.isEmpty()) {
                     for (V2_WorkOrder_Step step : vs) {
