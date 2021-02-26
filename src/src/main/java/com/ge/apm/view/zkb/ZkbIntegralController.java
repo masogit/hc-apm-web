@@ -43,6 +43,7 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
     private List<TenantInfo> tenantInfoList;
     private UserAccount currentUser;
     private List<ZkbIntegralRecord> zkbIntegralRecordList;
+    private UserContextService userContextService;
 
     @Override
     protected void init() {
@@ -51,6 +52,10 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
         zkbIntegralService = WebUtil.getBean(ZkbIntegralService.class);
         tenantInfoList = zkbIntegralService.getSourceTenantInfoList();
         currentUser = UserContextService.getCurrentUserAccount();
+        userContextService = WebUtil.getBean(UserContextService.class);
+        if(userContextService.isZkbUser()) {
+            this.selectionTenantInfo = currentUser.getTenantUID();
+        }
     }
 
     @Override
@@ -64,6 +69,9 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
 
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
+        }
+        if(this.selectionTenantInfo != null){
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
         }
         return zkbIntegralRepository.findBySearchFilter(searchFilters, pageRequest);
     }
