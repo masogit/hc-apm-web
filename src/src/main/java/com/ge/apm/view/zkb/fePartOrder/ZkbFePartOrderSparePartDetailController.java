@@ -150,7 +150,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     /**
      * 正常订单
      */
-    private static String normalOrderValue = "NormalOrder";
+    public static String normalOrderValue = "NormalOrder";
 
     @Override
     protected void init() {
