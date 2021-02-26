@@ -105,7 +105,7 @@ public class ZkbPartOrderProvider {
         }
         if(StringUtils.isNotBlank(sr))
         {
-            sb.append(" and o.sr_num like '%"+sr+"%'");
+            sb.append(" and o.sr_no like '%"+sr+"%'");
         }
         if(StringUtils.isNotBlank(partOrderNo))
         {
