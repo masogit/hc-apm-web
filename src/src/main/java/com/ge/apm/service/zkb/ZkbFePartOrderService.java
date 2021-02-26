@@ -616,7 +616,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             {
                 ZkbFePartOrder zkbFePartOrder = new ZkbFePartOrder();
                 zkbFePartOrder.setPartOrderNo(item.getPartOrderNo());
-                zkbFePartOrder.setSr(item.getSrNum());
+                zkbFePartOrder.setSr(item.getSrNo());
                 zkbFePartOrder.setFunctionType(item.getProductNumber());
                 zkbFePartOrder.setPhenomenon(item.getFaultDescription());
                 zkbFePartOrder.setReportUser(item.getRequestUser());
