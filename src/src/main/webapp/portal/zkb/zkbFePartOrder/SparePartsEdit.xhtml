@@ -30,9 +30,9 @@
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
                     <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm" />
-<!--                    <p:column headerText="报修单号">-->
-<!--                        <h:outputText value="#{item.partOrderNo}"/>-->
-<!--                    </p:column>-->
+                    <p:column headerText="报修单号">
+                        <h:outputText value="#{item.partOrderNo}"/>
+                    </p:column>
                     <p:column headerText="#{msg.zkbFePartOrder_sr}">
                         <h:outputText value="#{item.sr}"/>
                     </p:column>
@@ -229,7 +229,7 @@
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
-            <p:fieldset id="apmFieldset" legend="400下单" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
+            <p:fieldset id="apmFieldset" legend="400下单信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingApm')}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 <!--                    <h:panelGroup >-->
 <!--                        <label class="label">#{msg.zkbFePartOrder_sr}*</label>-->
