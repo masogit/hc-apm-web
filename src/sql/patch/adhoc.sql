@@ -67,6 +67,8 @@ create index wechat_message_history_request_uid on wechat_message_history (reque
 create index ole_operate_log_system_id on ole_operate_log (system_id);
 create index ole_operate_log_user_id on ole_operate_log (user_id);
 create index ole_operate_log_request_uid on ole_operate_log (request_uid);
+create index user_activity_log_time on user_activity_log (time);
+create index user_activity_log_login_name on user_activity_log (login_name);
 
 --2020-02-19 update pad and wechat message
 update asset_alert_config set pad_message = '磁体压力异常，磁体压力过低，有磁体结冰风险；磁体压力过高，会影响图像质量。请关注设备是否有其他异常，若有进一步问题请与GE400热线联系。', wechat_message = '磁体压力异常，磁体压力过低，有磁体结冰风险；磁体压力过高，会影响图像质量。请关注设备是否有其他异常，若有进一步问题请与GE400热线联系。'  where config_type = 104;
