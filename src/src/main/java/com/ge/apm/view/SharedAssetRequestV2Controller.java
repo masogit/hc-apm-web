@@ -569,7 +569,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
                 // 核实借用科室
                 else if(selected.getClinicalDeptUid() == null || !selected.getClinicalDeptUid().equals(infoVo.getAssetDeptUID())) {
-                    WebUtil.addWarnMessage("该设备由" + infoVo.getAssetDeptName() + "借用");
+                    WebUtil.addWarnMessage("该设备由" + orgInfoDao.findNameByUID(infoVo.getAssetDeptUID()) + "借用");
                     return;
                 }
                
