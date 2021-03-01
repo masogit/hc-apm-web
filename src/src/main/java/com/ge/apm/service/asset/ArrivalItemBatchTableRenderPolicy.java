@@ -20,7 +20,7 @@ public class ArrivalItemBatchTableRenderPolicy extends AbstractWoTableRenderPoli
                 addCell(row, extractValue(arrivalItem, "function_type"));
                 addCell(row, extractValue(arrivalItem, "import_equipment"));
                 addCell(row, extractValue(arrivalItem, "item_num"));
-                addCell(row, extractValue(arrivalItem, "guarantee"));
+                addCell(row, extractValue(arrivalItem, "factory_warranty_date"));
                 addCell(row, extractValue(arrivalItem, "annual_maintenance_times"));
                 addCell(row, extractValue(arrivalItem, "manufact_num"));
                 addCell(row, extractValue(arrivalItem, "hospital_num"));
