@@ -1,10 +1,10 @@
 package com.ge.apm.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.List;
 
 /**
  * Created by 212605082 on 2018/7/12.
@@ -45,6 +45,10 @@ public class SharedAssetConfig implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    @Transient
+    @JSONField(serialize = false)
+    private List<UserAccount> owners; //审核人
+
     public String getId() {
         return id;
     }
@@ -75,6 +79,14 @@ public class SharedAssetConfig implements Serializable {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public List<UserAccount> getOwners() {
+        return owners;
+    }
+
+    public void setOwners(List<UserAccount> owners) {
+        this.owners = owners;
     }
 
     public String getTel() {

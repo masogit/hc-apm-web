@@ -62,7 +62,7 @@
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{coilOpportunityImageEditController.CRUDActionName.equals('修改')}">
-                                <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px">
+                                <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:-350px">
                                     <div class="ui-g-6">
                                         <h:panelGroup>
                                             <label class="label">#{msg.cataLog}<span style="color:red">*</span></label>
@@ -91,7 +91,7 @@
                                     </div>
                                 </p:fieldset>
                             </c:if>
-                            <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px">
+                            <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" >
                                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup >
                                         <p:dataList id="pictureList" value="#{coilOpportunityImageEditController.getAttachList(coilOpportunityImageEditController.selected.cataLog)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">

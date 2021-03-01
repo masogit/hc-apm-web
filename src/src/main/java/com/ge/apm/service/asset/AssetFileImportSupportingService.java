@@ -542,4 +542,12 @@ public class AssetFileImportSupportingService {
         }
     }
 
+    public boolean isClinicalDeptExists(String clinicalDeptName, List<Map<String, Object>> importOrgMap) {
+        boolean found = importOrgMap.stream().anyMatch(item -> {
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            return Objects.equals(clinicalDeptName, newOrgInfo.getName());
+        });
+
+        return found;
+    }
 }

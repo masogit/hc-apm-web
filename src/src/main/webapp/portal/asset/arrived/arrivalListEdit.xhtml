@@ -7,6 +7,9 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
+
+        <ui:include src="createSupplier.xhtml"/>
+
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{assetArrivedListEditController.CRUDActionName}#{msg.AssetArrivalListMgmt}"/>
@@ -65,12 +68,13 @@
                                         <p:inputText value="#{assetArrivedListEditController.selected.functionType}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{not assetArrivedListEditController.activeSupplier()}">
-                                        <label class="label">#{msg.arrivalListManufacture}</label>
-                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.manufacture}"  scrollHeight="300"  forceSelection="true" 
+                                        <label class="label">#{msg.manufacture}</label>
+                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.manufacture}"  scrollHeight="300"  forceSelection="true"
                                                         disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onManufactureChange}" />
                                             <p:ajax listener="#{assetArrivedListEditController.onManufactureChange}" />
                                         </p:autoComplete>
+                                        <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('manufacturer')}" update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.quantity}*</label>
@@ -108,6 +112,7 @@
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                             <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                         </p:autoComplete>
+                                        <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier()}">
                                         <label class="label">#{msg.vendor}</label>
@@ -246,6 +251,8 @@
                                                 <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onMaintainerChange}"/>
                                                 <p:ajax listener="#{assetArrivedListEditController.onMaintainerChange}"/>
                                             </p:autoComplete>
+                                            <p:commandButton id="createSupplierButton2" icon="ui-icon-plus" title="#{msg.Create}" process="@this"  actionListener="#{assetArrivedListEditController.prepareCreateSupplier('maintainer')}"   update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+
                                         </h:panelGroup>
                                     </c:if>
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['purchaseDate']}">

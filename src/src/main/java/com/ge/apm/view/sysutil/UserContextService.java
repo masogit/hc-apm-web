@@ -680,6 +680,20 @@ public class UserContextService implements Serializable {
         return "0";
     }
 
+    public String getSystemInMaintainConfigMessage() {
+        ApmConfigInfoRepository repository = WebUtil.getBean(ApmConfigInfoRepository.class);
+        try {
+            ApmConfigInfo info = repository.findByItem("system_maintain");
+            if (info == null || info.getExpireDate() != null && (new Date()).after(info.getExpireDate())) {
+                return null;
+            } else {
+                return info.getMessage();
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
     private Boolean isDispatcher = null;
     private Boolean isPmDispatcher = null;
     private Boolean isMeasuringDispatcher = null;
