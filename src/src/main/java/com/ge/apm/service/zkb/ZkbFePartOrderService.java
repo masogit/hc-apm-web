@@ -627,7 +627,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 zkbFePartOrder.setSystemId(item.getSystemId());
                 zkbFePartOrder.setOrderType(item.getOrderType());
                 zkbFePartOrder.setId(item.getId());
-                zkbFePartOrder.setReportDate(item.getCreatedDate());
+                zkbFePartOrder.setReportDate(item.getRequestDate());
                 list.add(zkbFePartOrder);
             }
             if(CollectionUtils.isNotEmpty(sparePartsZkbFePartOrderList))
