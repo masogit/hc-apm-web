@@ -61,6 +61,12 @@ create index owoc_report_data_asset_uid on owoc_report_data (asset_uid);
 create index iwic_monthly_report_asset_uid on iwic_monthly_report (asset_uid);
 create index us_report_dept_data_asset_uid on us_report_dept_data (asset_uid);
 create index us_report_data_asset_uid on us_report_data (asset_uid);
+create index wechat_message_history_user_id on wechat_message_history (user_id);
+create index wechat_message_history_system_id on wechat_message_history (system_id);
+create index wechat_message_history_request_uid on wechat_message_history (request_uid);
+create index ole_operate_log_system_id on ole_operate_log (system_id);
+create index ole_operate_log_user_id on ole_operate_log (user_id);
+create index ole_operate_log_request_uid on ole_operate_log (request_uid);
 
 --2020-02-19 update pad and wechat message
 update asset_alert_config set pad_message = '磁体压力异常，磁体压力过低，有磁体结冰风险；磁体压力过高，会影响图像质量。请关注设备是否有其他异常，若有进一步问题请与GE400热线联系。', wechat_message = '磁体压力异常，磁体压力过低，有磁体结冰风险；磁体压力过高，会影响图像质量。请关注设备是否有其他异常，若有进一步问题请与GE400热线联系。'  where config_type = 104;
