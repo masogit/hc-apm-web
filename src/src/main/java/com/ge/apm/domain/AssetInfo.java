@@ -621,6 +621,9 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public String getAssetTagsView() {
         String assetTagsView = "";
+        if(assetTags==null){
+            return assetTagsView;
+        }
         for(AssetTags tag:assetTags){
             assetTagsView += tag.getTag()+",";
         }

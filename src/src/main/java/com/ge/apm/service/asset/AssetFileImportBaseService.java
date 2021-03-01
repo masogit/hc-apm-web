@@ -576,6 +576,12 @@ public class AssetFileImportBaseService {
                             result.add(Boolean.FALSE);
                             AssetRow.addErrMessage(item, "错误: 所属科室没有找到! " + clinicalDeptName);
                         }
+                    } else {
+                        if (!supportingService.isClinicalDeptExists(clinicalDeptName, importOrgMap)) {
+                            item.put("status", ImportStatus.CheckFail);
+                            result.add(Boolean.FALSE);
+                            AssetRow.addErrMessage(item, "错误: 所属科室没有找到! " + clinicalDeptName + ",请添加到科室列表页");
+                        }
                     }
 
                 }
@@ -601,6 +607,12 @@ public class AssetFileImportBaseService {
                             item.put("status", ImportStatus.CheckFail);
                             result.add(Boolean.FALSE);
                             AssetRow.addErrMessage(item, "错误: 使用科室没有找到! " + assetDeptName);
+                        }
+                    } else {
+                        if (!supportingService.isClinicalDeptExists(assetDeptName, importOrgMap)) {
+                            item.put("status", ImportStatus.CheckFail);
+                            result.add(Boolean.FALSE);
+                            AssetRow.addErrMessage(item, "错误: 使用科室没有找到! " + assetDeptName + ",请添加到科室列表页");
                         }
                     }
                 }

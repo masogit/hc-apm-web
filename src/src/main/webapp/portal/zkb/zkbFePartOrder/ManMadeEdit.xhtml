@@ -88,7 +88,7 @@
                             </p:panelGrid>
                             <p:fieldset id="zkbContractFieldset" legend="合同信息" >
                                 <p:dataTable id="zkbContractDatalist" value="#{zkbFePartOrderDetailController.contractList}" var="item"
-                                             widgetVar="zkbWkDatalist" selectionMode="single" disabledSelection="true"
+                                             widgetVar="zkbContractDatalist" selectionMode="single" disabledSelection="true"
                                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
                                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.zkbContact_tenant}">

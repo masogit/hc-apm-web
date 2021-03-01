@@ -78,6 +78,11 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     private static final String MY_WORK="myWork";
 
     /**
+     * 全部
+     */
+    private static final String ALL="all";
+
+    /**
      * 没权限查看
      */
     private static final String NO_STEP="noStep";
@@ -152,8 +157,12 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         if(MY_WORK.equals(this.queryStatus))
         {
             this.getSearchFilterByUserConfig(searchFilters);
-        }else if("all".equals(queryStatus)){
+        }else{
             this.getAllSearchFilterByUserConfig(searchFilters);
+            if(StringUtils.isNotBlank(this.queryStatus)&&!ALL.equals(this.queryStatus))
+            {
+                searchFilters.add((new SearchFilter("currentStep", SearchFilter.Operator.EQ,queryStatus)));
+            }
         }
         return searchFilters;
     }
@@ -166,7 +175,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     private void getSearchFilterByUserConfig(List<SearchFilter> searchFilters)
     {
         if(!(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString())
-                ||configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())))
+                ||configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())
+                ||configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())))
         {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ,NO_STEP));
             return;
@@ -179,6 +189,9 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ,ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString()));
             searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ,this.tenantUID));
+        }else if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))
+        {
+            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ,ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString()));
         }
     }
 
@@ -211,7 +224,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     private void getAllSearchFilterByUserConfig(List<SearchFilter> searchFilters)
     {
         if(!(this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString())
-                ||configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())))
+                ||configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())
+                ||configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())))
         {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ,NO_STEP));
             return;
