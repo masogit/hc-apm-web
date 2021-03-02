@@ -125,7 +125,7 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
         if(this.selectionTenantInfo != null){
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
         }
-        Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
         List<ZkbIntegral> zkbPartOrders =  zkbIntegralRepository.findBySearchFilter(searchFilters,sort);
         HashMap<String, Object> dataMap = zkbIntegralService.createZkbPartOrderData(zkbPartOrders);
 
