@@ -161,7 +161,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private Map<String, Object> selectedObjectMap = new HashMap();
     private Map<String, Integer> woStatus = new HashMap<String, Integer>();
-
+    @Getter
+    @Setter
+    private String plannedCompletionTimeFormat = null;
     //选定科室过滤
     private String filterClinicalDeptOrg;
     private String filterAssetDeptOrg;
@@ -248,7 +250,11 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
                 }
             }
             if (Strings.isNullOrEmpty(query)) {
-                queryIndex = 0;
+                if(userContextService.hasCurrentTenantName("")){
+                    queryIndex = 11;
+                }else {
+                    queryIndex = 0;
+                }
             } else {
                 queryIndex = Integer.valueOf(query);
                 searchList(queryIndex);
@@ -445,6 +451,23 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
                 }
             default:
                 return "icons/1.png";
+        }
+    }
+    public String getStepName(V2_WorkOrder v2_workOrder){
+        Integer stepId =v2_workOrder.getCurrentStepId();
+        switch(stepId){
+            case 2:
+                return "待接单";
+            case 3:
+                return "待接单";
+            case 4:
+                return "维修中";
+            case 7:
+                return "已关单";
+            case 9:
+                return "已关单";
+            default:
+                return "";
         }
     }
 
@@ -820,9 +843,17 @@ public void test1(){
                 if(stepFileter!=null) {
                     fillterStepId = woStatus.get(stepFileter);
                     if (fillterStepId > 6) {
-                        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
+                        if(userContextService.hasCurrentTenantName("")) {
+                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(7,9)));
+                        }else {
+                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
+                        }
                     } else {
-                        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
+                        if( fillterStepId == 3 && userContextService.hasCurrentTenantName("")) {
+                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+                        }else{
+                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
+                        }
                     }
                 }
 
@@ -842,6 +873,26 @@ public void test1(){
                 }
             }
             this.selected = null;
+            String value = null;
+            boolean isId= false;
+            for (SearchFilter searchFilter :searchFilters) {
+                if ("id".equals(searchFilter.fieldName)) {
+                    value = (String)searchFilter.value;
+                    isId = true;
+                }
+            }
+            if(isId) {
+                List<Integer> steps = Arrays.asList(7,9);
+                List<V2_WorkOrder_Step> vs = woService.getWorkOrderDetailByownerName(value,steps);
+                List<String> woIdList = new ArrayList<>();
+                if (!vs.isEmpty()) {
+                    for (V2_WorkOrder_Step step : vs) {
+                        woIdList.add(step.getWoId());
+                    }
+                    searchFilters.removeIf(e -> e.fieldName.equals("id"));
+                    searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN, woIdList, "1*"));
+                }
+            }
             bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
         } catch (Exception e) {
             LOGGER.error("load data occur exception,{}", e.getMessage());
