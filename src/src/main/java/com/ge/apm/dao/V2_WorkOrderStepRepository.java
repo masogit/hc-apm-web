@@ -19,5 +19,8 @@ public interface V2_WorkOrderStepRepository extends GenericRepositoryUUID<V2_Wor
     @Query("select s from V2_WorkOrder_Step s where s.woId=?1 and s.stepId=?2")
     public List<V2_WorkOrder_Step> findResponsor(String woId,Integer stepId);
 
+    @Query("select s from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%') and s.stepId in ?2")
+    public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName,List<Integer> steps);
+
 //    public List<V2_WorkOrder_Step> findByWoIdAndStepIdOrderByCreatedDateDesc(String woId, int stepId);
 }

@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.CustomConfig;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SysRole;
@@ -438,11 +439,11 @@ public class CustomConfigController {
         }
         StringBuilder res = new StringBuilder();
         if (customConfig.getCreatedBy() != null) {
-            res.append("创建人:").append(userService.getUserByUid(customConfig.getCreatedBy()).getName());
+            res.append("创建人:").append(getUsernameFromUid(customConfig.getCreatedBy()));
             res.append(" 创建时间:").append(DateUtil.formatDate(customConfig.getCreatedDate(), "yyyy-MM-dd"));
         }
         if (customConfig.getLastModifiedBy() != null) {
-            res.append("; 修改人:").append(userService.getUserByUid(customConfig.getLastModifiedBy()).getName());
+            res.append("; 修改人:").append(getUsernameFromUid(customConfig.getLastModifiedBy()));
             res.append(" 修改时间:").append(DateUtil.formatDate(customConfig.getLastModifiedDate(), "yyyy-MM-dd"));
         }
         return res.toString();
@@ -450,9 +451,9 @@ public class CustomConfigController {
 
     private void updateConfigInfo() {
         if (null != customConfig) {
-            configInfo.put("CreatedBy", userService.getUserByUid(customConfig.getCreatedBy()).getName());
+            configInfo.put("CreatedBy", getUsernameFromUid(customConfig.getCreatedBy()));
             configInfo.put("CreatedDate", customConfig.getCreatedDate() == null ? "" : DateUtil.formatDate(customConfig.getCreatedDate(), "yyyy-MM-dd"));
-            configInfo.put("LastModifiedBy", userService.getUserByUid(customConfig.getLastModifiedBy()).getName());
+            configInfo.put("LastModifiedBy", getUsernameFromUid(customConfig.getLastModifiedBy()));
             configInfo.put("LastModifiedDate", customConfig.getLastModifiedDate() == null ? "" : DateUtil.formatDate(customConfig.getLastModifiedDate(), "yyyy-MM-dd"));
         }
     }
@@ -657,5 +658,10 @@ public class CustomConfigController {
                 customConfigObject.setAssetsImportantFields(assetsImportantFields);
             }
         }
+    }
+
+    private String getUsernameFromUid(String uid) {
+        UserAccount userAccount  = userService.getUserByUid(uid);
+        return userAccount == null ? "" : userAccount.getName();
     }
 }

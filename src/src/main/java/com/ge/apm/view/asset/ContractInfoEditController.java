@@ -10,6 +10,7 @@ import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -24,6 +25,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import lombok.Getter;
+import lombok.Setter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import java.util.Collections;
@@ -60,6 +64,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     private BlobFileService blobService;
     private AssetInfoService assetInfoService;
     private ContractInfoService contractService;
+    private SupplierController supplierController;
 
     private List<V2_BlobObject> attachements;
     private List<Supplier> supplierList = Collections.emptyList();
@@ -85,6 +90,14 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     
     private Boolean canBeEdit;
 
+    @Getter
+    @Setter
+    private Supplier newSupplier;
+
+    @Getter
+    @Setter
+    private String newSupplierType;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ContractInfoRepository.class);
@@ -99,6 +112,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
+        supplierController = WebUtil.getBean(SupplierController.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
@@ -568,7 +582,57 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
         return Boolean.FALSE;
     }
-    
+
+
+
+    public void prepareCreateSupplier(String type) {
+        newSupplier = new Supplier();
+        newSupplierType = type;
+        if("manufacturer".equals(type)){
+            newSupplier.setManufacturerT(true);
+        }
+        if("supplier".equals(type)){
+            newSupplier.setSupplierT(true);
+        }
+        if("maintainer".equals(type)){
+            newSupplier.setMaintainerT(true);
+        }
+
+    }
+
+
+
+
+    public void saveNewSupplier() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        this.newSupplier.setSiteId(loginUser.getSiteId());
+        this.newSupplier.setHospitalId(loginUser.getHospitalId());
+        this.newSupplier.setTenantUID(loginUser.getTenantUID());
+        this.newSupplier.setInstitutionUID(loginUser.getInstitutionUID());
+        this.newSupplier.setHospitalUID(loginUser.getHospitalUID());
+        this.newSupplier.setSiteUID(loginUser.getSiteUID());
+        this.newSupplier.setCreatedDate(new Date());
+        this.newSupplier.setCreatedBy(loginUser.getName());
+        supplierController.setSelected(newSupplier);
+        supplierController.saveSubmit();
+
+        if("manufacturer".equals(newSupplierType)){
+            manufactureList.add(newSupplier);
+        }else if("supplier".equals(newSupplierType)){
+            supplierList.add(newSupplier);
+        }
+
+//        supplierList.add(newSupplier);
+//        if (org.apache.commons.lang.StringUtils.isNotBlank(newSupplier.getUid()) && !supplierList.contains(newSupplier)) {
+//            supplierList.add(newSupplier);
+//        }
+//        changeSelect(createTpye);
+
+    }
+
+
+
+
 //    public void remomvePaymentInfo(ContractInfoItem item) {
 //        allItemList.remove(item);
 //        if (!Strings.isNullOrEmpty(item.getId())) {
