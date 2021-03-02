@@ -122,7 +122,7 @@ public class ZkbIntegralController extends GenericCRUDUUIDController<ZkbIntegral
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        Sort sort = new Sort(Sort.Direction.DESC, "");
+        Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
         List<ZkbIntegral> zkbPartOrders =  zkbIntegralRepository.findBySearchFilter(searchFilters);
         HashMap<String, Object> dataMap = zkbIntegralService.createZkbPartOrderData(zkbPartOrders);
 
