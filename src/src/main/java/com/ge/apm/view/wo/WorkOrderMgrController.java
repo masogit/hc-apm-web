@@ -882,8 +882,7 @@ public void test1(){
                 }
             }
             if(isId) {
-                List<Integer> steps = Arrays.asList(7,9);
-                List<V2_WorkOrder_Step> vs = woService.getWorkOrderDetailByownerName(value,steps);
+                List<V2_WorkOrder_Step> vs = woService.getWorkOrderDetailByownerName(value);
                 List<String> woIdList = new ArrayList<>();
                 if (!vs.isEmpty()) {
                     for (V2_WorkOrder_Step step : vs) {
