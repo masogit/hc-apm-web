@@ -172,8 +172,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     if(StringUtils.isNotBlank(validString)){
                         WebUtil.addErrorMessage(validString,"");
                     }
-                    if(StringUtils.isNotEmpty(selected.getCheckApplyNumFlag()) && CopyByInvok.F.equals(selected.getCheckApplyNumFlag())){
-                        WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
+                    if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(selected.getCurrentStep())){
+                        if(StringUtils.isNotEmpty(selected.getCheckApplyNumFlag()) && CopyByInvok.F.equals(selected.getCheckApplyNumFlag())) {
+                            boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
+                            if(r){
+                                WebUtil.addErrorMessage("代理商备件已完成归还，目前未超限，可直接批复。","");
+                            }else{
+                                WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
+                            }
+                        }
                     }
                 }
             }
@@ -188,11 +195,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             if(currentUser.getTenantUID().equals(selected.getTenantUID())){
                 canEditFlag = true;
             }else{
-                List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
-                if(zkbPartOrderUserConfigs.size() > 0){
-                    for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
-                        if(currentUser.getLoginName().equals(c.getLoginName())){
-                            canEditFlag = true;
+                if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+                    List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByConfigType(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+                    if(zkbPartOrderUserConfigs.size() > 0){
+                        for (ZkbPartOrderUserConfig c : zkbPartOrderUserConfigs){
+                            if(currentUser.getLoginName().equals(c.getLoginName())){
+                                canEditFlag = true;
+                            }
                         }
                     }
                 }
@@ -480,6 +489,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 isChoseAdmin = true;
             }
         }
+    }
+
+    public String closeFieldTitle(){
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            if(CopyByInvok.T.equals(selected.getNeedLetterFlag()) ){
+                return "探头说明函";
+            }
+        }
+        return "关单信息";
     }
 
     public void initRemindLetterFlag(){

@@ -37,6 +37,9 @@ public class ZkbKeyBehaviorIndexService {
     private static final Logger logger = LoggerFactory.getLogger(ZkbKeyBehaviorIndexService.class);
 
     @Autowired
+    private TenantInfoRepository tenantInfoDao;
+
+    @Autowired
     private ZkbKeyBehaviorIndexRepository zkbKeyBehaviorIndexRepository;
 
     /**
@@ -126,6 +129,12 @@ public class ZkbKeyBehaviorIndexService {
      */
     private static final String dateFormat = "yyyyMMddHHmmss";
 
+
+    /**
+     * 日期格式化
+     */
+    public static final String monthDateFormat_two = "yyyy-MM";
+
     /**
      * 日期格式化
      */
@@ -138,6 +147,13 @@ public class ZkbKeyBehaviorIndexService {
 
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
+    }
+
+    public List<TenantInfo> getSourceTenantInfoList(){
+
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, 3));
+        return tenantInfoDao.findBySearchFilter(searchFilters);
     }
 
     /**
@@ -237,9 +253,6 @@ public class ZkbKeyBehaviorIndexService {
         if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
         {
             series1.setLabel(zkbKeyBehaviorIndexList.get(0).getTenantName());
-//            zkbKeyBehaviorIndexList.forEach(item->{
-//                series1.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
-//            });
             for(ZkbKeyBehaviorIndex item:zkbKeyBehaviorIndexList)
             {
                 series1.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
@@ -255,9 +268,6 @@ public class ZkbKeyBehaviorIndexService {
         series2.setLabel("平均分数");
         if(CollectionUtils.isNotEmpty(zkbAverageKeyBehaviorIndexList))
         {
-//            zkbAverageKeyBehaviorIndexList.forEach(item->{
-//                series2.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
-//            });
             for(ZkbKeyBehaviorIndex item:zkbAverageKeyBehaviorIndexList)
             {
                 series2.set(DateFormatUtils.format(item.getKbiDate(),"yyyy-MM"), item.getTotalScore());
@@ -319,8 +329,6 @@ public class ZkbKeyBehaviorIndexService {
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScore"),zeyBehaviorIndex.getTotalScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnFullScore"),zeyBehaviorIndex.getPartReturnFullScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnScore"),zeyBehaviorIndex.getPartReturnScore());
-//            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_intactPartReturnRateFullScore"),zeyBehaviorIndex.getIntactPartReturnRateFullScore());
-//            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_intactPartReturnRateScore"),zeyBehaviorIndex.getIntactPartReturnRateScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeFullScore"),zeyBehaviorIndex.getSatisfactoryDegreeFullScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeScore"),zeyBehaviorIndex.getSatisfactoryDegreeScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_apmBillingRateFullScore"),zeyBehaviorIndex.getApmBillingRateFullScore());
@@ -459,7 +467,6 @@ public class ZkbKeyBehaviorIndexService {
         {
             StringBuffer errorMessage = new StringBuffer();
             errorMessage=errorMessage.append(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScoreError"));
-//            errorMessage=errorMessage.append(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScoreError"));
             item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
             AssetInfoRow.addErrMessage(item, errorMessage.toString());
             isValidateData = false;
@@ -471,27 +478,16 @@ public class ZkbKeyBehaviorIndexService {
     /**
      * 计算分数
      * @param zkbKeyBehaviorIndex kbi实体
-     * @param zkbContractList 合同列表
-     * @param tenantUid
+     * @param tenantUID 租户
+     * @param kpiDate 对应KPI时间
      */
-    public void calculateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<ZkbContract> zkbContractList,String tenantUid)
+    public void calculateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate)
     {
-        //取合同ID
-//        List<String> contractIdList = zkbContractList.stream().map(p -> p.getId()).collect(Collectors.toList());
-        List<String> contractIdList = new ArrayList<>();
-        for(ZkbContract item:zkbContractList)
-        {
-            contractIdList.add(item.getId());
-        }
-        LocalDateTime localDateTime = zkbKeyBehaviorIndex.getKbiDate().toInstant()
-                .atZone( ZoneId.systemDefault() )
-                .toLocalDateTime();
-        Date firstday = this.firstDayOnMonth(localDateTime);
-        Date lastday = this.lastDayOnMonth(localDateTime);
-        this.calculatePartReturnScore(zkbKeyBehaviorIndex,contractIdList,lastday);
-//        this.calculateIntactPartReturnRateScore(zkbKeyBehaviorIndex,contractIdList);
-        Integer totalIbNumber = this.calculatePasteQuickResponseRateScore(zkbKeyBehaviorIndex,contractIdList);
-        this.calculateApmBillingRateScore(zkbKeyBehaviorIndex,tenantUid,totalIbNumber,firstday,lastday);
+        StringBuffer remark = new StringBuffer();
+        this.calculatePartReturnScore(zkbKeyBehaviorIndex,tenantUID,kpiDate,remark);
+        Integer totalIbNumber = this.calculatePasteQuickResponseRateScore(zkbKeyBehaviorIndex,tenantUID,kpiDate,remark);
+        this.calculateApmBillingRateScore(zkbKeyBehaviorIndex,tenantUID,totalIbNumber,kpiDate,remark);
+        zkbKeyBehaviorIndex.setRemark(remark.toString());
     }
 
 
@@ -518,7 +514,7 @@ public class ZkbKeyBehaviorIndexService {
      * 获取某月最后一天
      * @return 返回某月最后一天时间
      */
-    private Date lastDayOnMonth(LocalDateTime date)
+    public Date lastDayOnMonth(LocalDateTime date)
     {
 
         LocalDateTime lasttday = date.with(TemporalAdjusters.lastDayOfMonth());
@@ -533,46 +529,40 @@ public class ZkbKeyBehaviorIndexService {
         return date1;
     }
 
+
     /**
      * 计算配件配件归还得分
      * @param zkbKeyBehaviorIndex KPI
-     * @param contractIdList 合同ID列表
+     * @param tenantUID 租户tenantUID
+     * @param kpiDate kpi时间
+     * @param remark 生成备注
      */
-    private void calculatePartReturnScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<String> contractIdList,Date now)
+    private void calculatePartReturnScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,StringBuffer remark)
     {
+        remark=remark.append("calculatePartReturnScore--");
         Calendar cd = Calendar.getInstance();
-        cd.setTime(now);
-        cd.add(Calendar.DATE,-14);
+        cd.setTime(kpiDate);
+        cd.add(Calendar.DATE,-18);
         Date nowBefore = cd.getTime();
-        Integer unReturnCount  = this.zkbPartOrderRepository.fetchUnReturnCount(contractIdList,nowBefore,ZkbPartOrder.OrderType.Probe.toString());
+        Integer unReturnCount  = this.zkbPartOrderRepository.fetchUnReturnCount(nowBefore,ZkbPartOrder.OrderType.Probe.toString(),tenantUID,kpiDate);
         if(unReturnCount==null)
         {
             unReturnCount=0;
         }
-        List<ZkbPartOrder> zkbPartOrdersList = this.zkbPartOrderRepository.findReturnId(nowBefore,contractIdList,ZkbPartOrder.OrderType.Parts.toString());
-        Integer applyPartsCount = this.zkbPartOrderRepository.fetchApplyPartsQty(contractIdList,nowBefore,ZkbPartOrder.OrderType.Parts.toString());
+        remark=remark.append("unReturnCount:").append(unReturnCount).append(";");
+        Integer applyPartsCount = this.zkbPartOrderRepository.fetchApplyPartsQty(nowBefore,ZkbPartOrder.OrderType.Parts.toString(),tenantUID,kpiDate);
         if(applyPartsCount==null)
         {
             applyPartsCount=0;
         }
-        List<String> partOrderIdList = new ArrayList<>();
-        if(CollectionUtils.isNotEmpty(zkbPartOrdersList))
+        remark=remark.append("applyPartsCount:").append(applyPartsCount).append(";");
+        Integer returnQty = this.zkbPartOrderReturnRepository.fetchQty(nowBefore,ZkbPartOrder.OrderType.Parts.toString(),tenantUID,kpiDate);
+        if(returnQty==null)
         {
-            for(ZkbPartOrder item:zkbPartOrdersList)
-            {
-                partOrderIdList.add(item.getId());
-            }
+            returnQty = new Integer(0);
         }
-        Integer returnQty1 = new Integer(0);
-        if(CollectionUtils.isNotEmpty(partOrderIdList))
-        {
-            returnQty1 = this.zkbPartOrderReturnRepository.fetchQty(partOrderIdList);
-        }
-        if(returnQty1==null)
-        {
-            returnQty1 = new Integer(0);
-        }
-        Integer unReturnApplyPartsCount = applyPartsCount-returnQty1;
+        remark=remark.append("returnQty:").append(returnQty).append(";");
+        Integer unReturnApplyPartsCount = applyPartsCount-returnQty;
         BigDecimal result = new BigDecimal(14).divide(new BigDecimal(5),2,BigDecimal.ROUND_HALF_DOWN).multiply(new BigDecimal(unReturnApplyPartsCount+unReturnCount)).setScale(0,BigDecimal.ROUND_HALF_DOWN);
         BigDecimal partReturnFullScore = new BigDecimal(zkbKeyBehaviorIndex.getPartReturnFullScore());
         if(result.compareTo(partReturnFullScore)>0)
@@ -585,56 +575,28 @@ public class ZkbKeyBehaviorIndexService {
         return;
     }
 
-//    /**
-//     * 计算配件好还率得分
-//     * @param zkbKeyBehaviorIndex
-//     * @param contractIdList 合同ID list
-//     */
-//    private void calculateIntactPartReturnRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,
-//                                                    List<String> contractIdList)
-//    {
-//        Integer requireQty = this.zkbPartOrderRepository.fetchQty(contractIdList);
-//        if(requireQty==null)
-//        {
-//            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(0);
-//            return;
-//        }
-//        Integer goodReturnQty = this.zkbPartOrderRepository.fetchReturnGoodQty(contractIdList);
-//        Integer goodReturnQty1 = this.zkbPartOrderReturnRepository.fetchReturnGoodQty(contractIdList);
-//        if(goodReturnQty==null) goodReturnQty = new Integer(0);
-//        if(goodReturnQty1==null) goodReturnQty1 = new Integer(0);
-//        BigDecimal goodReturnRare = new BigDecimal(goodReturnQty+goodReturnQty1).divide(new BigDecimal(requireQty),2,BigDecimal.ROUND_HALF_DOWN).multiply(new BigDecimal(100));
-//        goodReturnRare=goodReturnRare.subtract(new BigDecimal(30)).multiply(new BigDecimal(0.5)).setScale(0,BigDecimal.ROUND_HALF_DOWN);
-//        BigDecimal intactPartReturnRateFullScoreBigDecimal = new BigDecimal(zkbKeyBehaviorIndex.getIntactPartReturnRateFullScore());
-//        BigDecimal result =intactPartReturnRateFullScoreBigDecimal.subtract(goodReturnRare);
-//        if(result.compareTo(intactPartReturnRateFullScoreBigDecimal)==1)
-//        {
-//            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(zkbKeyBehaviorIndex.getIntactPartReturnRateFullScore());
-//            return;
-//        }else if(result.compareTo(intactPartReturnRateFullScoreBigDecimal)==-1)
-//        {
-//            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(0);
-//            return;
-//        }else
-//        {
-//            zkbKeyBehaviorIndex.setIntactPartReturnRateScore(result.intValue());
-//            return;
-//        }
-//    }
-
     /**
      * 计算二维码粘贴率得分
      * @param zkbKeyBehaviorIndex 当前用户得分
-     * @param contractIdList 合同ID list
+     * @param tenantUID 租户 tenantUID
+     * @param kpiDate 某月KPI
+     * @param remark 备注
      */
-    private Integer calculatePasteQuickResponseRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,List<String> contractIdList)
+    private Integer calculatePasteQuickResponseRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,StringBuffer remark)
     {
-        Integer totalIbNumber = this.zkbContractRepository.fetchIbNumber(contractIdList);
+        remark=remark.append("calculatePasteQuickResponseRateScore--");
+        Integer totalIbNumber = this.zkbContractRepository.fetchIbNumber(tenantUID,kpiDate);
         if(totalIbNumber==null)
         {
             totalIbNumber=new Integer(0);
         }
-        List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findByContractIdIn(contractIdList);
+        remark=remark.append("totalIbNumber:").append(totalIbNumber).append(";");
+        if(totalIbNumber==0)
+        {
+            zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
+            return totalIbNumber;
+        }
+        List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findZkbContractAssetByTenantUID(tenantUID,kpiDate);
         if(CollectionUtils.isEmpty(zkbContractAssetList))
         {
             zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
@@ -645,8 +607,8 @@ public class ZkbKeyBehaviorIndexService {
         {
             assetId.add(item.getAssetId());
         }
-//        List<String> assetId = zkbContractAssetList.stream().map(p -> p.getAssetId()).collect(Collectors.toList());
         Integer countAssetWithQRcode = this.assetInfoRepository.countAssetWithQRcode(assetId);
+        remark=remark.append("countAssetWithQRcode:").append(countAssetWithQRcode).append(";");
         Integer pasteQuickResponseRateScore = new BigDecimal(countAssetWithQRcode).
                 divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
                 multiply(new BigDecimal(zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore())).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
@@ -657,22 +619,27 @@ public class ZkbKeyBehaviorIndexService {
     /**
      * 计算APM开单率得分
      * @param zkbKeyBehaviorIndex
-     * @param tenantUid 合同列表
+     * @param tenantUID 合同列表
      * @param totalIbNumber ib 总量
+     * @param remark 备注
      */
-    private void calculateApmBillingRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUid,Integer totalIbNumber,Date firstday,Date lastday)
+    private void calculateApmBillingRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Integer totalIbNumber,Date kpiDate,StringBuffer remark)
     {
+        remark=remark.append("calculateApmBillingRateScore--");
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexService.monthDateFormat_two);
+        String dateStry = formatter.format(kpiDate);
         if(totalIbNumber==null||totalIbNumber==0)
         {
             zkbKeyBehaviorIndex.setApmBillingRateScore(0);
             return;
         }
-        Integer countWorkOrder = this.v2_WorkOrderRepository.fetchCount(tenantUid,firstday,lastday);
-        //Integer countWorkOrder = this.zkbPartOrderRepository.fetchCount(contractIdList,firstday,lastday);
+        Integer countWorkOrder = this.v2_WorkOrderRepository.fetchCount(ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry,tenantUID,kpiDate);
         if(countWorkOrder==null)
         {
             countWorkOrder=new Integer(0);
         }
+        remark=remark.append("countWorkOrder:").append(countWorkOrder).append(";");
+        remark=remark.append("totalIbNumber:").append(totalIbNumber).append(";");
         Integer apmBillingRateScore = new BigDecimal(countWorkOrder).
                 divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
                 multiply(new BigDecimal(100)).
@@ -715,10 +682,6 @@ public class ZkbKeyBehaviorIndexService {
         {
             return zkbContractMapList;
         }
-        //根据tenantUid去重zkbKeyBehaviorIndexList,并且把tenantUid组装到string list集合中
-//        List<String> tenantUIDList =zkbKeyBehaviorIndexList.stream().collect(
-//                Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getTenantUID()))),
-//                        ArrayList::new)).stream().map(ZkbKeyBehaviorIndex::getTenantUID).collect(Collectors.toList());
         Map tenantUIDMap = new HashMap();
         List<String> tenantUIDList = new ArrayList<>();
         for(ZkbKeyBehaviorIndex item:zkbKeyBehaviorIndexList)

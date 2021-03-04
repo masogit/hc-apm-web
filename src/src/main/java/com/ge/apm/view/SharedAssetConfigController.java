@@ -6,16 +6,12 @@ import com.ge.apm.domain.SharedAssetConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
-
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -53,17 +49,28 @@ public class SharedAssetConfigController {
     public void saveSharedAssetConfig() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        sharedAssetConfig.setStartTime(sdf.format(startTime).split(" ")[1]);
-        sharedAssetConfig.setEndTime(sdf.format(endTime).split(" ")[1]);
+        //先删除已经保存的user
+        dao.deleteBySiteUid(currentUser.getSiteUID());
+        //再重新保存新的user
+        sharedAssetConfig.getOwners().stream().forEach(user -> {
+            SharedAssetConfig config = new SharedAssetConfig();
+            config.setOwner(user.getUid());
+            config.setStartTime(sdf.format(startTime).split(" ")[1]);
+            config.setEndTime(sdf.format(endTime).split(" ")[1]);
+            config.setTel(sharedAssetConfig.getTel());
+            config.setTenantUID(currentUser.getTenantUID());
+            config.setInstitutionUID(currentUser.getInstitutionUID());
+            config.setHospitalUID(currentUser.getHospitalUID());
+            config.setSiteUID(currentUser.getSiteUID());
+            dao.save(config);
+        });
+    }
 
-        if(sharedAssetConfig.getId() == null){
-            sharedAssetConfig.setTenantUID(currentUser.getTenantUID());
-            sharedAssetConfig.setInstitutionUID(currentUser.getInstitutionUID());
-            sharedAssetConfig.setHospitalUID(currentUser.getHospitalUID());
-            sharedAssetConfig.setSiteUID(currentUser.getSiteUID());
-        }
-
-        dao.save(sharedAssetConfig);
+    //置空配置
+    public void resetConfig(){
+        //删除已经保存配置
+        dao.deleteBySiteUid(currentUser.getSiteUID());
+        loadSharedAssetConfig();
     }
 
     public void loadSharedAssetConfig() {
@@ -74,11 +81,13 @@ public class SharedAssetConfigController {
             List<SharedAssetConfig> sacList = dao.findBySiteUID(currentUser.getSiteUID());
             if(!sacList.isEmpty()) {
                 sharedAssetConfig = sacList.get(0);
-
+                sharedAssetConfig.setOwners(sacList.stream().map(config -> userAccountDao.getByUid(config.getOwner())).filter(con->userList.contains(con)).collect(Collectors.toList()));
                 this.startTime = sharedAssetConfig.getStartTime() != null ? sdf.parse(currentDateStr.split(" ")[0] + " " + sharedAssetConfig.getStartTime()) : null;
                 this.endTime = sharedAssetConfig.getEndTime() != null ? sdf.parse(currentDateStr.split(" ")[0] + " " + sharedAssetConfig.getEndTime()) : null;
             }else {
                 sharedAssetConfig = new SharedAssetConfig();
+                this.startTime = null;
+                this.endTime = null;
             }
         } catch (ParseException e) {
             e.printStackTrace();
