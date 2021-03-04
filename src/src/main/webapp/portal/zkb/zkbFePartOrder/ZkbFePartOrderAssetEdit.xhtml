@@ -3,7 +3,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
     <p:dialog id="zkbFePartOrderAssetInfoEditDlg" widgetVar="zkbFePartOrderAssetInfoEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="备件申请列表"  height="420">
@@ -20,6 +19,10 @@
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_assetQty}*</label>
                     <p:spinner value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderAssetInfo.assetQty}" required="true"  min="1" max="1000"  />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">备注</label>
+                    <p:inputTextarea value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderAssetInfo.comment}"  maxlength="100"/>
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
