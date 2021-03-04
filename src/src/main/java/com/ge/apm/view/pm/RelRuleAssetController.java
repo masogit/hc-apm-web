@@ -229,6 +229,12 @@ private Date endInstallDate;
         if (StringUtils.isNotEmpty(queryAsset.getName())) {
             assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
         }
+        if (null != queryAsset.getPurchasePriceStart()) {
+            assetFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.GTE, queryAsset.getPurchasePriceStart()));
+        }
+        if (null != queryAsset.getPurchasePriceEnd()) {
+            assetFilters.add(new SearchFilter("purchasePrice", SearchFilter.Operator.LTE, queryAsset.getPurchasePriceEnd()));
+        }
 		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
 		}
