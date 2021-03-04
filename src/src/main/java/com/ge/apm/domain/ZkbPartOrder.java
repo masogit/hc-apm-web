@@ -514,6 +514,23 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "data_type")
     private String dataType;
 
+    @Column(name = "score_flag")
+    private String scoreFlag = "f";
+
+    /**
+     * asset_info systemid
+     */
+    @Transient
+    private String systemId;
+
+    public String getScoreFlag() {
+        return scoreFlag;
+    }
+
+    public void setScoreFlag(String scoreFlag) {
+        this.scoreFlag = scoreFlag;
+    }
+
     public String getDataType() {
         return dataType;
     }
@@ -1320,6 +1337,14 @@ public class ZkbPartOrder implements Serializable {
 
     public void setOnlineEngine(ZkbPartOrderUserConfig onlineEngine) {
         this.onlineEngine = onlineEngine;
+    }
+
+    public String getSystemId() {
+        return systemId;
+    }
+
+    public void setSystemId(String systemId) {
+        this.systemId = systemId;
     }
 
     @Override
