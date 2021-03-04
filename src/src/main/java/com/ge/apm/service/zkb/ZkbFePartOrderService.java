@@ -81,12 +81,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     /**
-     * 单号前缀
+     * 人工申请单号前缀
      */
     private static final String  ORDER_PREFIX = "FE";
 
     /**
-     * 单号前缀
+     * 备件申请单号前缀
      */
     private static final String  SPARE_PARTS_ORDER_PREFIX = "FEPO";
 
@@ -515,13 +515,13 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param fieldsetType
      * @return
      */
-    public Boolean checkRendered(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap)
+    public Boolean checkRendered(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap,String[] stepAndRoles)
     {
         if(StringUtils.isBlank(fieldsetType))
         {
             return false;
         }
-        Map<String,Integer> stepMap = this.stepAndRoleMap();
+        Map<String,Integer> stepMap = this.stepAndRoleMap(stepAndRoles);
         String currentStep = zkbFePartOrder.getCurrentStep();
         Integer fieldsetTypeIndex = stepMap.get(fieldsetType);
         Integer currentStepIndex = stepMap.get(currentStep);
@@ -536,7 +536,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         if(fieldsetTypeIndex==currentStepIndex)
         {
-            String [] stepAndRole = ZkbFePartOrder.stepAndRoles[fieldsetTypeIndex].split(",");
+            String [] stepAndRole = stepAndRoles[fieldsetTypeIndex].split(",");
             if(configTypeMap.containsKey(stepAndRole[1]))
             {
                 return true;
@@ -545,12 +545,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         return false;
     }
 
-    private Map<String,Integer> stepAndRoleMap()
+    private Map<String,Integer> stepAndRoleMap(String[] stepAndRoles)
     {
         Map<String,Integer> stepMap = new HashMap<>();
-        for(int i =0;i<ZkbFePartOrder.stepAndRoles.length;i++)
+        for(int i =0;i<stepAndRoles.length;i++)
         {
-            String [] stepAndRole =ZkbFePartOrder.stepAndRoles[i].split(",");
+            String [] stepAndRole =stepAndRoles[i].split(",");
             stepMap.put(stepAndRole[0],i);
         }
         return stepMap;
@@ -561,15 +561,15 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param fieldsetType
      * @return
      */
-    public Boolean hasEditRight(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap)
+    public Boolean hasEditRight(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap,String[] stepAndRoles)
     {
         String currentStep = zkbFePartOrder.getCurrentStep();
         if(!currentStep.equals(fieldsetType))
         {
             return false;
         }
-        Map<String,Integer> stepMap = this.stepAndRoleMap();
-        String [] stepAndRole =ZkbFePartOrder.stepAndRoles[stepMap.get(fieldsetType)].split(",");
+        Map<String,Integer> stepMap = this.stepAndRoleMap(stepAndRoles);
+        String [] stepAndRole =stepAndRoles[stepMap.get(fieldsetType)].split(",");
         if(configTypeMap.containsKey(stepAndRole[1]))
         {
             return true;

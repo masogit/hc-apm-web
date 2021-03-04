@@ -144,7 +144,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     /**
      * 坏还
      */
-    private static String badReturnValue ="badReturn";
+    public static String badReturnValue ="badReturn";
 
 
     /**
@@ -573,7 +573,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public Boolean hasEditRight(String fieldsetType)
     {
-        return this.zkbFePartOrderService.hasEditRight(fieldsetType,this.selected,this.configTypeMap);
+        return this.zkbFePartOrderService.hasEditRight(fieldsetType,this.selected,this.configTypeMap,ZkbFePartOrder.stepAndRoles);
     }
 
     /**
@@ -592,7 +592,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public Boolean checkRendered(String fieldsetType)
     {
-       return this.zkbFePartOrderService.checkRendered(fieldsetType,this.selected,this.configTypeMap);
+       return this.zkbFePartOrderService.checkRendered(fieldsetType,this.selected,this.configTypeMap,ZkbFePartOrder.stepAndRoles);
     }
 
     /**
