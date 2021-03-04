@@ -72,14 +72,14 @@
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
-                                <h:panelGroup >
-                                    <label class="label">#{msg.zkbFePartOrder_sr}*</label>
-                                    <p:inputText disabled="#{!zkbFePartOrderDetailController.workFlowInFistStep() or !zkbFePartOrderDetailController.hasEditRight()}" value="#{zkbFePartOrderDetailController.selected.sr}"  required="true" requiredMessage="#{msg.zkbFePartOrder_sr} #{msg.ValidationRequire}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.zkbFePartOrder_act}*</label>
-                                    <p:inputText disabled="#{!zkbFePartOrderDetailController.workFlowInFistStep() or !zkbFePartOrderDetailController.hasEditRight()}" value="#{zkbFePartOrderDetailController.selected.act}"  required="true" requiredMessage="#{msg.zkbFePartOrder_act} #{msg.ValidationRequire}"/>
-                                </h:panelGroup>
+<!--                                <h:panelGroup >-->
+<!--                                    <label class="label">#{msg.zkbFePartOrder_sr}*</label>-->
+<!--                                    <p:inputText disabled="#{!zkbFePartOrderDetailController.workFlowInFistStep() or !zkbFePartOrderDetailController.hasEditRight()}" value="#{zkbFePartOrderDetailController.selected.sr}"  required="true" requiredMessage="#{msg.zkbFePartOrder_sr} #{msg.ValidationRequire}"/>-->
+<!--                                </h:panelGroup>-->
+<!--                                <h:panelGroup>-->
+<!--                                    <label class="label">#{msg.zkbFePartOrder_act}*</label>-->
+<!--                                    <p:inputText disabled="#{!zkbFePartOrderDetailController.workFlowInFistStep() or !zkbFePartOrderDetailController.hasEditRight()}" value="#{zkbFePartOrderDetailController.selected.act}"  required="true" requiredMessage="#{msg.zkbFePartOrder_act} #{msg.ValidationRequire}"/>-->
+<!--                                </h:panelGroup>-->
 <!--                                <h:panelGroup>-->
 <!--                                    <label class="label">#{msg.zkbFePartOrder_location}</label>-->
 <!--                                    <p:inputText maxlength="20" disabled="#{!zkbFePartOrderDetailController.workFlowInFistStep() or !zkbFePartOrderDetailController.hasEditRight()}" id="location" value="#{zkbFePartOrderDetailController.selected.location}" />-->
@@ -163,14 +163,14 @@
                     </p:fieldset>
                     <p:fieldset id="orderedFieldset" legend="派工信息" rendered="#{zkbFePartOrderDetailController.hasApmInfoRight()}">
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-<!--                                    <h:panelGroup >-->
-<!--                                        <label class="label">#{msg.zkbFePartOrder_sr}*</label>-->
-<!--                                        <p:inputText disabled="#{!zkbFePartOrderDetailController.workFlowInThirdStep() or !zkbFePartOrderDetailController.hasEditRight()}" value="#{zkbFePartOrderDetailController.selected.sr}"  required="true" requiredMessage="#{msg.zkbFePartOrder_sr} #{msg.ValidationRequire}"/>-->
-<!--                                    </h:panelGroup>-->
-<!--                                    <h:panelGroup>-->
-<!--                                        <label class="label">#{msg.zkbFePartOrder_act}*</label>-->
-<!--                                        <p:inputText disabled="#{!zkbFePartOrderDetailController.workFlowInThirdStep() or !zkbFePartOrderDetailController.hasEditRight()}" value="#{zkbFePartOrderDetailController.selected.act}"  required="true" requiredMessage="#{msg.zkbFePartOrder_act} #{msg.ValidationRequire}"/>-->
-<!--                                    </h:panelGroup>-->
+                                    <h:panelGroup >
+                                        <label class="label">#{msg.zkbFePartOrder_sr}*</label>
+                                        <p:inputText disabled="#{!zkbFePartOrderDetailController.workFlowInThirdStep() or !zkbFePartOrderDetailController.hasEditRight()}" value="#{zkbFePartOrderDetailController.selected.sr}"  required="true" requiredMessage="#{msg.zkbFePartOrder_sr} #{msg.ValidationRequire}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.zkbFePartOrder_act}*</label>
+                                        <p:inputText disabled="#{!zkbFePartOrderDetailController.workFlowInThirdStep() or !zkbFePartOrderDetailController.hasEditRight()}" value="#{zkbFePartOrderDetailController.selected.act}"  required="true" requiredMessage="#{msg.zkbFePartOrder_act} #{msg.ValidationRequire}"/>
+                                    </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.zkbFePartOrder_geEngineerName}*</label>
                                         <p:inputText disabled="#{!zkbFePartOrderDetailController.workFlowInThirdStep() or !zkbFePartOrderDetailController.hasEditRight()}" value="#{zkbFePartOrderDetailController.selected.geEngineerName}"  required="true" requiredMessage="#{msg.zkbFePartOrder_geEngineerName} #{msg.ValidationRequire}" />
