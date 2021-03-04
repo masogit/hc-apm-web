@@ -6,6 +6,9 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
+
+        <ui:include src="CreateSupplier.xhtml"/>
+
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{contractInfoEditController.CRUDActionName} #{msg.ContractInfo}"/>
@@ -71,6 +74,7 @@
                                     <p:ajax event="itemSelect" process="@this" listener="#{contractInfoEditController.onSelectedObjectChange('supplier')}" />
                                     <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('supplier')}" />
                                 </p:autoComplete>
+                                <p:commandButton id="createSupplierButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{contractInfoEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.AssetContractAmount}</label>
@@ -556,7 +560,7 @@
 
         </div>
         <ui:include src="/portal/asset/searchDialog.xhtml"/>
-        <p:dialog id="addPurchaseDlg" widgetVar="addPurchaseDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="#{msg.AddUpdatePurchasedEquipmment}">
+        <p:dialog id="addPurchaseDlg" widgetVar="addPurchaseDlg" modal="true" width="1000"  resizable="true" draggable="true" appendTo="@this" header="#{msg.AddUpdatePurchasedEquipmment}">
             <h:form id="addPurchaseForm" >
                 <h:panelGroup id="display" rendered="#{not empty contractInfoEditController.selectedContractItem}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -605,6 +609,7 @@
                                 <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('manufacture')}" />
                                 <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('manufacture')}"/>
                             </p:autoComplete>
+                            <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{contractInfoEditController.prepareCreateSupplier('manufacturer')}" update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.pattern}</label>

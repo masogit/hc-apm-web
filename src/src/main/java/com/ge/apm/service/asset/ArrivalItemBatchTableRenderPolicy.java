@@ -1,13 +1,23 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.service.wo.doctemplate.AbstractWoTableRenderPolicy;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.apache.poi.xwpf.usermodel.*;
 
 import java.util.List;
 import java.util.Map;
 
 public class ArrivalItemBatchTableRenderPolicy extends AbstractWoTableRenderPolicy {
+
+    protected void addCell(XWPFTableRow row, String textValue) {
+        XWPFTableCell xwpfTableCell = row.addNewTableCell();
+        xwpfTableCell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
+        XWPFParagraph paragraph = xwpfTableCell.getParagraphs().get(0);
+        paragraph.setAlignment(ParagraphAlignment.CENTER);
+        XWPFRun run = paragraph.createRun();
+        run.setFontFamily("Microsoft YaHei");
+        run.setFontSize(9);
+        run.setText(textValue);
+    }
 
     public void render(XWPFTable table, Object o) {
 
@@ -20,7 +30,7 @@ public class ArrivalItemBatchTableRenderPolicy extends AbstractWoTableRenderPoli
                 addCell(row, extractValue(arrivalItem, "function_type"));
                 addCell(row, extractValue(arrivalItem, "import_equipment"));
                 addCell(row, extractValue(arrivalItem, "item_num"));
-                addCell(row, extractValue(arrivalItem, "guarantee"));
+                addCell(row, extractValue(arrivalItem, "factory_warranty_date"));
                 addCell(row, extractValue(arrivalItem, "annual_maintenance_times"));
                 addCell(row, extractValue(arrivalItem, "manufact_num"));
                 addCell(row, extractValue(arrivalItem, "hospital_num"));

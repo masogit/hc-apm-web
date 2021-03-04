@@ -8,15 +8,14 @@ import java.util.Date;
 import javax.persistence.*;
 
 /**
- *
  * @author 212579464
  */
 @Entity
 @Table(name = "workflow_config")
 public class WorkflowConfig implements Serializable {
 
-    public enum AssetCodeConfigType { DFQ , DF} 
-    
+    public enum AssetCodeConfigType {DFQ, DF}
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,67 +46,67 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "timeout_acceptance")
     private Integer timeoutAcceptance;
 
-    @Column(name="order_reopen_timeframe")
+    @Column(name = "order_reopen_timeframe")
     private Integer orderReopenTimeframe;//二次开单的最大时间间隔
-    
-    @Column(name="max_message_count")
+
+    @Column(name = "max_message_count")
     private Integer maxMessageCount;//推送消息的次数上限
-    
+
     @Column(name = "dispatch_user_id2")
     private Integer dispatchUserId2;
-    
+
     @Column(name = "dispatch_user_name2")
     private String dispatchUserName2;
-     
+
     @Column(name = "is_take_order_enabled")
     private Boolean isTakeOrderEnabled; //是否允许抢单
-    
+
     @Column(name = "is_manual_enabled")
     private Boolean isManualEnabled; //是否人工派工
-    
+
     @Column(name = "is_auto_enabled")
     private Boolean isAutoEnabled; //是否自动派工
 
     @Column(name = "is_temp_user_report")
     private Boolean isTempUserReport;
-    
+
     @Column(name = "auto_ack")
     private Boolean autoAck;//是否需要验收
-    
+
     @Column(name = "auto_ack_days")
     private Integer autoAckDays;//系统自动验收时间,单位‘天’
 
     @Column(name = "auto_close")
     private Boolean autoClose;// 自动关单
-    
-    @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
+
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
-    
-    @Column(name="institution_uid",columnDefinition = "CHAR(32)")
+
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
     private String institutionUID;
-    
-    @Column(name="hospital_uid",columnDefinition = "CHAR(32)")
+
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
     private String hospitalUID;
-    
-    @Column(name="site_uid",columnDefinition = "CHAR(32)")
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
-    
+
     //扫码建档审核人UID, null 表示不需要审核
-    @Column(name="asset_approver" ,columnDefinition = "CHAR(32)")
+    @Column(name = "asset_approver", columnDefinition = "CHAR(32)")
     private String assetApprover;
-    
+
     //设备编码组合  [null:不需要, DFQ:资产编号,设备编号,二维码 ,DF:资产编号,设备编号]
-    @Column(name="asset_code_config")
+    @Column(name = "asset_code_config")
     private String assetCodeConfig;
-    
+
     @Column(name = "warranty_remind_days")
     private Integer warrantyRemindDays;//维保提前通知时间，单位：天
 
-    
+
     @Column(name = "warranty_remind_times")
     private Integer warrantyRemindTimes;//维保提醒次数
 
-    @Column(name = "dept_for_shared_asset",columnDefinition = "CHAR(32)")
+    @Column(name = "dept_for_shared_asset", columnDefinition = "CHAR(32)")
     private String deptForSharedAsset;
 
     @Column(name = "wo_manhour_price")
@@ -120,7 +119,7 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "pm_manhour_price")
     private Double pmManhourPrice;
 
-    @Column(name="pm_simplify")
+    @Column(name = "pm_simplify")
     private Boolean pmSimplify; // 简化保养
 
     @Column(name = "is_pm_take_order_enabled")
@@ -149,7 +148,7 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "pm_reminder_times")
     private Integer pmReminderTimes;//提醒次数
-    
+
     @Column(name = "need_instorage_check")
     private Boolean needInstorageCheck;//到货安装是否需要核对入库 null=false
 
@@ -221,6 +220,13 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "enable_scrapped_control")
     private Boolean enableScrappedControl;
+
+    /**
+     * 是否启用开关机时间修改(是否支持手动更改开关机时间)
+     */
+    @Column(name = "enable_update_switching_time",columnDefinition = "boolean default true")
+    private Boolean enableUpdateSwitchingTime;
+
     /***
      *
      * 备件审核人排列，保养、维修、计量都适用
@@ -250,7 +256,7 @@ public class WorkflowConfig implements Serializable {
     }
 
     public boolean getEnableScrappedControl() {
-        if(null == enableScrappedControl){
+        if (null == enableScrappedControl) {
             return false;
         }
         return enableScrappedControl;
@@ -357,7 +363,6 @@ public class WorkflowConfig implements Serializable {
     }
 
 
-
     public Double getMeasureManhourPrice() {
         return measureManhourPrice;
     }
@@ -428,7 +433,6 @@ public class WorkflowConfig implements Serializable {
      */
 
 
-
     /***
      * 资产编码配置
      */
@@ -436,7 +440,7 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "generate_method")
     private Integer generateMethod;//资产编码生成方式 1、国标码+设备数 2、
 
-    @Column(name="format")
+    @Column(name = "format")
     private String format;//初始流水号
 
     @Column(name = "asset_seria_num_level")
@@ -468,29 +472,29 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "emergency_timeout_close")
     private Integer emergencyTimeoutClose;
 
-    @Column(name="emergency_max_message_count")
+    @Column(name = "emergency_max_message_count")
     private Integer emergencyMaxMessageCount;//推送消息的次数上限
 
     /***
      * 计量提醒配置
      */
-    @Column(name="measuring_remind_days")
+    @Column(name = "measuring_remind_days")
     private Integer measuringRemindDays;//计量提前通知时间，单位：天
 
     @Column(name = "measuring_reminder_times")
     private Integer measuringReminderTimes;//提醒次数
 
 
-    @Column(name="parts_need_sign")
+    @Column(name = "parts_need_sign")
     private Boolean partsNeedSign; //备件审核是否需要签名
 
-    @Column(name="ack_need_sign")
+    @Column(name = "ack_need_sign")
     private Boolean ackNeedSign; //验收是否需要签名
 
-    @Column(name="close_without_parts")
+    @Column(name = "close_without_parts")
     private Boolean closeWithoutParts;  // 没有备件费用直接关单
 
-    @Column(name="share_auto_confirm")
+    @Column(name = "share_auto_confirm")
     private Integer shareAutoConfirm;//设备调剂系统确认系统确认时间
 
     /***
@@ -678,146 +682,146 @@ public class WorkflowConfig implements Serializable {
     }
 
     public Integer getAutoAckDays() {
-		return autoAckDays;
-	}
+        return autoAckDays;
+    }
 
-	public void setAutoAckDays(Integer autoAckDays) {
-		this.autoAckDays = autoAckDays;
-	}
+    public void setAutoAckDays(Integer autoAckDays) {
+        this.autoAckDays = autoAckDays;
+    }
 
-	public Integer getWarrantyRemindTimes() {
-		return warrantyRemindTimes;
-	}
+    public Integer getWarrantyRemindTimes() {
+        return warrantyRemindTimes;
+    }
 
-	public void setWarrantyRemindTimes(Integer warrantyRemindTimes) {
-		this.warrantyRemindTimes = warrantyRemindTimes;
-	}
+    public void setWarrantyRemindTimes(Integer warrantyRemindTimes) {
+        this.warrantyRemindTimes = warrantyRemindTimes;
+    }
 
-	public Integer getWarrantyRemindDays() {
-		return warrantyRemindDays;
-	}
+    public Integer getWarrantyRemindDays() {
+        return warrantyRemindDays;
+    }
 
-	public void setWarrantyRemindDays(Integer warrantyRemindDays) {
-		this.warrantyRemindDays = warrantyRemindDays;
-	}
+    public void setWarrantyRemindDays(Integer warrantyRemindDays) {
+        this.warrantyRemindDays = warrantyRemindDays;
+    }
 
-	public Integer getPmReminderTime() {
-		return pmReminderTime;
-	}
+    public Integer getPmReminderTime() {
+        return pmReminderTime;
+    }
 
-	public void setPmReminderTime(Integer pmReminderTime) {
-		this.pmReminderTime = pmReminderTime;
-	}
+    public void setPmReminderTime(Integer pmReminderTime) {
+        this.pmReminderTime = pmReminderTime;
+    }
 
-	public String getTenantUID() {
-		return tenantUID;
-	}
+    public String getTenantUID() {
+        return tenantUID;
+    }
 
-	public void setTenantUID(String tenantUID) {
-		this.tenantUID = tenantUID;
-	}
+    public void setTenantUID(String tenantUID) {
+        this.tenantUID = tenantUID;
+    }
 
-	public String getInstitutionUID() {
-		return institutionUID;
-	}
+    public String getInstitutionUID() {
+        return institutionUID;
+    }
 
-	public void setInstitutionUID(String institutionUID) {
-		this.institutionUID = institutionUID;
-	}
+    public void setInstitutionUID(String institutionUID) {
+        this.institutionUID = institutionUID;
+    }
 
-	public String getHospitalUID() {
-		return hospitalUID;
-	}
+    public String getHospitalUID() {
+        return hospitalUID;
+    }
 
-	public void setHospitalUID(String hospitalUID) {
-		this.hospitalUID = hospitalUID;
-	}
+    public void setHospitalUID(String hospitalUID) {
+        this.hospitalUID = hospitalUID;
+    }
 
-	public String getSiteUID() {
-		return siteUID;
-	}
+    public String getSiteUID() {
+        return siteUID;
+    }
 
-	public void setSiteUID(String siteUID) {
-		this.siteUID = siteUID;
-	}
+    public void setSiteUID(String siteUID) {
+        this.siteUID = siteUID;
+    }
 
-	public Boolean getIsManualEnabled() {
-		return isManualEnabled;
-	}
+    public Boolean getIsManualEnabled() {
+        return isManualEnabled;
+    }
 
-	public void setIsManualEnabled(Boolean isManualEnabled) {
-		this.isManualEnabled = isManualEnabled;
-	}
+    public void setIsManualEnabled(Boolean isManualEnabled) {
+        this.isManualEnabled = isManualEnabled;
+    }
 
-	public Boolean getIsAutoEnabled() {
-		return isAutoEnabled;
-	}
+    public Boolean getIsAutoEnabled() {
+        return isAutoEnabled;
+    }
 
-	public void setIsAutoEnabled(Boolean isAutoEnabled) {
-		this.isAutoEnabled = isAutoEnabled;
-	}
+    public void setIsAutoEnabled(Boolean isAutoEnabled) {
+        this.isAutoEnabled = isAutoEnabled;
+    }
 
-	public Boolean getAutoAck() {
-		return autoAck;
-	}
+    public Boolean getAutoAck() {
+        return autoAck;
+    }
 
-	public void setAutoAck(Boolean autoAck) {
-		this.autoAck = autoAck;
-	}
+    public void setAutoAck(Boolean autoAck) {
+        this.autoAck = autoAck;
+    }
 
-	public void setSiteId(Integer siteId) {
-		this.siteId = siteId;
-	}
+    public void setSiteId(Integer siteId) {
+        this.siteId = siteId;
+    }
 
-	public void setHospitalId(Integer hospitalId) {
-		this.hospitalId = hospitalId;
-	}
+    public void setHospitalId(Integer hospitalId) {
+        this.hospitalId = hospitalId;
+    }
 
-	public void setDispatchMode(Integer dispatchMode) {
-		this.dispatchMode = dispatchMode;
-	}
+    public void setDispatchMode(Integer dispatchMode) {
+        this.dispatchMode = dispatchMode;
+    }
 
-	public Boolean getIsTakeOrderEnabled() {
-		return isTakeOrderEnabled;
-	}
+    public Boolean getIsTakeOrderEnabled() {
+        return isTakeOrderEnabled;
+    }
 
-	public void setIsTakeOrderEnabled(Boolean isTakeOrderEnabled) {
-		this.isTakeOrderEnabled = isTakeOrderEnabled;
-	}
+    public void setIsTakeOrderEnabled(Boolean isTakeOrderEnabled) {
+        this.isTakeOrderEnabled = isTakeOrderEnabled;
+    }
 
-	public Integer getOrderReopenTimeframe() {
-		return orderReopenTimeframe;
-	}
+    public Integer getOrderReopenTimeframe() {
+        return orderReopenTimeframe;
+    }
 
-	public void setOrderReopenTimeframe(Integer orderReopenTimeframe) {
-		this.orderReopenTimeframe = orderReopenTimeframe;
-	}
+    public void setOrderReopenTimeframe(Integer orderReopenTimeframe) {
+        this.orderReopenTimeframe = orderReopenTimeframe;
+    }
 
-	public Integer getMaxMessageCount() {
-		return maxMessageCount;
-	}
+    public Integer getMaxMessageCount() {
+        return maxMessageCount;
+    }
 
-	public void setMaxMessageCount(Integer maxMessageCount) {
-		this.maxMessageCount = maxMessageCount;
-	}
+    public void setMaxMessageCount(Integer maxMessageCount) {
+        this.maxMessageCount = maxMessageCount;
+    }
 
-	public Integer getDispatchUserId2() {
-		return dispatchUserId2;
-	}
+    public Integer getDispatchUserId2() {
+        return dispatchUserId2;
+    }
 
-	public void setDispatchUserId2(Integer dispatchUserId2) {
-		this.dispatchUserId2 = dispatchUserId2;
-	}
+    public void setDispatchUserId2(Integer dispatchUserId2) {
+        this.dispatchUserId2 = dispatchUserId2;
+    }
 
-	public String getDispatchUserName2() {
-		return dispatchUserName2;
-	}
+    public String getDispatchUserName2() {
+        return dispatchUserName2;
+    }
 
-	public void setDispatchUserName2(String dispatchUserName2) {
-		this.dispatchUserName2 = dispatchUserName2;
-	}
+    public void setDispatchUserName2(String dispatchUserName2) {
+        this.dispatchUserName2 = dispatchUserName2;
+    }
 
-	public WorkflowConfig() {
+    public WorkflowConfig() {
     }
 
     public WorkflowConfig(Integer id) {
@@ -1063,6 +1067,14 @@ public class WorkflowConfig implements Serializable {
         this.timeoutAcceptance = timeoutAcceptance;
     }
 
+    public Boolean getEnableUpdateSwitchingTime() {
+        return enableUpdateSwitchingTime;
+    }
+
+    public void setEnableUpdateSwitchingTime(Boolean enableUpdateSwitchingTime) {
+        this.enableUpdateSwitchingTime = enableUpdateSwitchingTime;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -1087,5 +1099,5 @@ public class WorkflowConfig implements Serializable {
     public String toString() {
         return "com.ge.apm.domain.WorkflowConfig[ id=" + id + " ]";
     }
-    
+
 }

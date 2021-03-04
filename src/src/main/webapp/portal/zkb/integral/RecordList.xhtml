@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <p:dialog id="zkbIntegralRecordQueryDlg" widgetVar="zkbIntegralRecordQueryDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="积分明细查询" width="70%" height="620">
+        <h:form id="zkbIntegralRecordQueryForm">
+            <p:dataTable id="zkbIntegralRecordDataList" value="#{zkbIntegralController.zkbIntegralRecordList}" var="item"
+                         widgetVar="zkbIntegralRecordDataList" selectionMode="single" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowsPerPageTemplate="50,100,500"
+                         lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" rows="100" emptyMessage="#{msg.noRecordFound}">
+                <p:column headerText="类型">
+                    <h:outputText value="#{zkbIntegralController.getRecordTypeName(item.recordType)}"/>
+                </p:column>
+                <p:column headerText="积分">
+                    <h:outputText value="#{item.score}"/>
+                </p:column>
+                <p:column headerText="KPI">
+                    <h:outputText value="#{item.currentKpi}"/>
+                </p:column>
+                <p:column headerText="系数">
+                    <h:outputText value="#{item.currentCoefficient}"/>
+                </p:column>
+                <p:column headerText="KPI月份">
+                    <h:outputText value="#{item.kpiMonth}"/>
+                </p:column>
+                <p:column headerText="时间">
+                    <h:outputText value="#{item.createdDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+
+        </h:form>
+    </p:dialog>
+    
+</ui:composition>
+</html>

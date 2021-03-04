@@ -25,13 +25,23 @@ public interface ZkbPartOrderReturnRepository extends GenericRepositoryUUID<ZkbP
 
     List<ZkbPartOrderReturn> findByPartOrderIdAndPartNoAndIdIsNot(String partOrderId,String partNo,String id);
 
+
     /**
-     * 统计数量
-     * @param partOrderIdList 退还单ID
+     * 获取配件申请归还数量
+     * @param orderedDate
+     * @param orderType
+     * @param tenantUID
+     * @param kpiDate
      * @return
      */
-    @Query(value = "SELECT sum(qty) from zkb_part_order_return where part_order_id in ?1 and data_satus='Accept'", nativeQuery = true)
-    Integer fetchQty(List<String> partOrderIdList);
+    @Query(value = " SELECT sum(zpor.qty) from zkb_part_order_return zpor " +
+            " INNER JOIN zkb_part_order zkbp on zkbp.id = zpor.part_order_id " +
+            " INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id" +
+            " INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id " +
+            " where zpor.data_satus='Accept' " +
+            " and zkbp.order_type = ?2 and zkbp.ordered_date< ?1 " +
+            " and zkbc.tenant_uid = ?3 and zkbc.start_date<=?4 and zkbc.end_date>=?4", nativeQuery = true)
+    Integer fetchQty(Date orderedDate,String orderType,String tenantUID,Date kpiDate);
 
     /**
      * 统计数量
