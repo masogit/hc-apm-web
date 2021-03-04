@@ -75,6 +75,9 @@ public class ZkbFePartOrderReturn implements Serializable {
     @Column(name = "return_date")
     private Date returnDate;
 
+    @Column(name = "comment")
+    private String comment;
+
     @Transient
     private int index;
 
@@ -183,5 +186,13 @@ public class ZkbFePartOrderReturn implements Serializable {
 
     public void setPartQualityIssue(String partQualityIssue) {
         this.partQualityIssue = partQualityIssue;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }
