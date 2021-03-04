@@ -112,7 +112,6 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         return zkbContractPage;
     }
 
-
     public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters){
         List<SearchFilter> searchFilters = csearchFilters;
         if (searchFilters == null) {
@@ -124,7 +123,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         }else {
             searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.IsNull, ""));
         }
-        if(userContextService.isZkbUser()) {
+        if("letter".equals(queryStatus)){
+            if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
+            }
+            searchFilters.add(new SearchFilter("needLetterFlag", SearchFilter.Operator.EQ, "t"));
+            searchFilters.add(new SearchFilter("uploadLetterFlag", SearchFilter.Operator.EQ, "f"));
+        }else if(userContextService.isZkbUser()) {
             if(this.selectionTenantInfo != null && StringUtils.isNotEmpty(selectionTenantInfo)){
                 searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
             }
@@ -288,6 +293,18 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         }
     }
 
+    public String scoreFlagField(String scoreFlag){
+        if(StringUtils.isEmpty(scoreFlag)){
+            return "名额申请";
+        }else if(CopyByInvok.T.equals(scoreFlag)){
+            return "积分申请";
+        }else if(CopyByInvok.F.equals(scoreFlag)){
+            return "名额申请";
+        }else{
+            return "名额申请";
+        }
+    }
+
     public String queryListByStatus(String status){
         queryStatus = status;
         return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus;
@@ -343,7 +360,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     @Override
     public void delete() {
         if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus())){
-            zkbPartOrderService.delete(this.selected);
+            zkbPartOrderService.delete(this.selected,currentUser);
             this.selected= null;
         }else {
             WebUtil.addErrorMessage("数据已审批不能删除！","");

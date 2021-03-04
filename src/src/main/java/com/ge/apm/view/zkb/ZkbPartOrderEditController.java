@@ -6,6 +6,7 @@ import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.zkb.CopyByInvok;
+import com.ge.apm.service.zkb.ZkbIntegralService;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -21,7 +22,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +38,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private UserContextService userContextService;
     private UserAccount currentUser;
     private ZkbPartOrderService zkbPartOrderService;
+    private ZkbIntegralService zkbIntegralService;
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
     private AssetInfoRepository assetInfoRepository;
     private String actionName;
@@ -58,6 +59,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private AssetInfo assetInfo;
     private String valueTypeTips = "";
     private String queryStatus;
+    private Integer currentScore = 0;
+    private String currentScoreText;
+    private boolean currentScoreFlag =false;
 
     @Override
     protected void init() {
@@ -65,6 +69,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         dao = WebUtil.getBean(ZkbPartOrderRepository.class);
         zkbPartOrderService = WebUtil.getBean(ZkbPartOrderService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        zkbIntegralService = WebUtil.getBean(ZkbIntegralService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
@@ -350,6 +355,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) && assetInfo.getAssetGroup() == 2){
                 selected.setArtificialType("2");
             }
+            if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+                scoreFlagChange();
+            }
         }
         calcRemainQty();
 
@@ -445,28 +453,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
                 this.selected.setRemainQty(contractCount - this.selected.getQty());
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-                /*if("1".equals(artificialType)){
-                    Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
-                    this.selected.setRemainQty(contractCount - this.selected.getQty());
-                }else if("3".equals(artificialType)){
-                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
-                        Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }else if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
+                if(CopyByInvok.T.equals(selected.getScoreFlag())){
+                    this.selected.setRemainQty(0);
+                }else {
+                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                         Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
                         this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    }else{
+                        Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                        this.selected.setRemainQty(contractCount - this.selected.getQty());
                     }
-                }else {
-                    Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
-                    this.selected.setRemainQty(contractCount - this.selected.getQty());
-                }*/
-                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                    Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
-                    this.selected.setRemainQty(contractCount - this.selected.getQty());
-                }else{
-                    Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
-                    this.selected.setRemainQty(contractCount - this.selected.getQty());
                 }
+
             }
         }
     }
@@ -517,6 +515,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
                 flag=false;
                 errorLog += "附件不能为空！";
+            }
+        }else{
+            if("t".equals(selected.getScoreFlag())){
+                boolean r = zkbIntegralService.checkScoreFlag(selectionTenantInfo,selected.getQty());
+                if(!r){
+                    flag=false;
+                    errorLog += "积分不够！";
+                }
             }
         }
         if(selected.getRemainQty() < 0){
@@ -581,14 +587,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
             selected.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
         }
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-            boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
-            if(!r){
-                //WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还,若场地有其他特殊情况请邮件申请。");
-                //return "";
-                this.selected.setCheckApplyNumFlag(CopyByInvok.F);
-            }
-        }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
             if(this.selected.getOnlineEngine() != null){
@@ -627,6 +625,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         }
         calcRemainQty();
+    }
+
+    public void scoreFlagChange(){
+        currentScore = zkbIntegralService.queryScoreFlag(selectionTenantInfo);
+        currentScoreText = "当前积分："+ currentScore;
+        boolean r = true;
+        if(currentScore < selected.getQty() * ZkbIntegralService.unitScore){
+            currentScoreFlag = true;
+            /*FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "积分不够", "");
+            FacesContext.getCurrentInstance().addMessage(null, message);*/
+        }
     }
 
     public void zkbPartOrderCatSelect(){
@@ -826,6 +835,29 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.valueTypeTips = valueTypeTips;
     }
 
+    public Integer getCurrentScore() {
+        return currentScore;
+    }
+
+    public void setCurrentScore(Integer currentScore) {
+        this.currentScore = currentScore;
+    }
+
+    public String getCurrentScoreText() {
+        return currentScoreText;
+    }
+
+    public void setCurrentScoreText(String currentScoreText) {
+        this.currentScoreText = currentScoreText;
+    }
+
+    public boolean isCurrentScoreFlag() {
+        return currentScoreFlag;
+    }
+
+    public void setCurrentScoreFlag(boolean currentScoreFlag) {
+        this.currentScoreFlag = currentScoreFlag;
+    }
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {
