@@ -365,18 +365,22 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      */
     public Boolean hasApmInfoRight()
     {
-        if(!configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()))
-        {
-            return false;
-        }
-        if(this.workFlowInThirdStep())
-        {
-            return true;
-        }
         if(this.workFlowInFourthStep()&&ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString().equals(this.selected.getStatus()))
         {
             return true;
         }
+        if(this.workFlowInThirdStep()&&configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()))
+        {
+            return true;
+        }
+//        if(!configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()))
+//        {
+//            return false;
+//        }
+//        if(this.workFlowInThirdStep())
+//        {
+//            return true;
+//        }
         return false;
     }
 
