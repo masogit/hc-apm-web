@@ -21,6 +21,24 @@ public class QueryAsset {
 	private String brand;//品牌
     private String clinicalDeptUid;//使用科室uid
 	private String queryLevel;//查询规则级别
+    private Double purchasePriceStart;//采购价格(元)Start
+    private Double purchasePriceEnd;//采购价格(元)end
+
+    public Double getPurchasePriceStart() {
+        return purchasePriceStart;
+    }
+
+    public void setPurchasePriceStart(Double purchasePriceStart) {
+        this.purchasePriceStart = purchasePriceStart;
+    }
+
+    public Double getPurchasePriceEnd() {
+        return purchasePriceEnd;
+    }
+
+    public void setPurchasePriceEnd(Double purchasePriceEnd) {
+        this.purchasePriceEnd = purchasePriceEnd;
+    }
 
 	public String getQueryLevel() {
 		return queryLevel;

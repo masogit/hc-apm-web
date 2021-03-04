@@ -1,14 +1,13 @@
 package com.ge.apm.dao.mapper;
 
 import com.ge.apm.dao.mapper.provider.ZkbPartOrderProvider;
+import com.ge.apm.domain.ZkbPartOrder;
 import com.ge.apm.domain.ZkbPoHistoryQueryVo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
 import webapp.framework.dao.SearchFilter;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author : 503189362
@@ -23,6 +22,17 @@ public interface ZkbPartOrderMapper {
 
      @SelectProvider(type = ZkbPartOrderProvider.class, method = "queryGeHistory")
     List<ZkbPoHistoryQueryVo> queryGeHistory(@Param("filters") List<SearchFilter> filters, @Param("tenantUID") String tenantUID);
+
+
+    /**
+     * 获取FE 人工订单
+     * @param systemId 设备system id
+     * @param sr sr
+     * @return FE人工申请订单
+     */
+    @SelectProvider(type = ZkbPartOrderProvider.class, method = "queryBySystemIdAndSr")
+    List<ZkbPartOrder> queryBySystemIdAndSr(@Param("systemId") String systemId,@Param("sr") String sr,@Param("partOrderNo") String partOrderNo);
+
 
 
 }
