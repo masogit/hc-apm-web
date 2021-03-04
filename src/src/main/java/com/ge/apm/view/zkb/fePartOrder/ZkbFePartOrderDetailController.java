@@ -24,13 +24,14 @@ import java.util.*;
 
 /**
  * @author 503202755 2020/9/23
+ *
  */
 @ManagedBean
 @ViewScoped
 public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<ZkbFePartOrder> {
 
     /**
-     * 智康宝人工申请 service
+     * 智康宝liucheng service
      */
     private ZkbFePartOrderService zkbFePartOrderService;
 

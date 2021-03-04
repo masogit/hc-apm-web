@@ -79,11 +79,21 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
 
     /**
      * 获取个数
-     * @param tenantUid 供应商tenant uid
-     * @param firstday 开始时间
-     * @param lastday 结束时间
+     * @param dateFormat 日期格式
+     * @param date 开单月份
+     * @param tenantUID 租户 tenantUID
+     * @param kpiDate 生成指定时间的KPI
      * @return
      */
-    @Query(value = "SELECT count(id)  from v2_work_order  where tenant_uid = ?1 and created_date between ?2 and ?3", nativeQuery = true)
-    Integer fetchCount(String  tenantUid, Date firstday, Date lastday);
+    @Query(value = "SELECT count(id) from ( " +
+            " SELECT " +
+            " DISTINCT v2.id " +
+            " FROM " +
+            " v2_work_order v2 " +
+            " INNER JOIN asset_info a on v2.asset_id = a.id "+
+            " INNER JOIN zkb_contract_asset zca ON zca.asset_id = a.uid "+
+            " INNER JOIN zkb_contract zkbc ON zkbc.ID = zca.contract_id "+
+            " where to_char(v2.created_date, ?1)=?2 " +
+            " and zkbc.tenant_uid = ?3 and zkbc.start_date<=?4 and zkbc.end_date>=?4 ) T", nativeQuery = true)
+    Integer fetchCount(String dateFormat,String date,String tenantUID,Date kpiDate);
 }
