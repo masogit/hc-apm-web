@@ -2,28 +2,28 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.SqlExportQueueRepostitory;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.utils.MicroServiceUtil;
+import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.view.sysutil.AppContextService;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.apache.commons.io.IOUtils;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleEvent;
 import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.SortOrder;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.Visibility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.broker.SiBroker;
-import webapp.framework.dao.NativeSqlUtil;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.FieldInfo;
 import webapp.framework.web.mvc.JpaCRUDController;
-import webapp.framework.web.mvc.NativeSQLDataTableModel;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -40,8 +40,15 @@ import java.util.*;
 @ManagedBean
 @ViewScoped
 public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
+
     private static final long serialVersionUID = -1L;
-    final String excelExportDestfilepath = "C:/zk/test/export/excel/";
+    // final String excelExportDestfilepath = "C:/zk/test/export/excel/";
+    // final String excelExportDestfilepath = "/tmp/apm/export";
+    ConfigUtils configUtils;
+
+    //@Value("#{urlProperties.excelExportDestfilepath}")
+    //private String excelExportDestfilepath;
+
     private SqlExportQueue selectSqlExportQueue;
     SqlExportQueueRepostitory sqlDao = null;
     private SqlExportQueue selectedProduct;
@@ -96,6 +103,7 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
     @Override
     protected void init() {
         sqlDao = WebUtil.getBean(SqlExportQueueRepostitory.class);
+        configUtils = WebUtil.getBean(ConfigUtils.class);
         loginUser = UserContextService.getCurrentUserAccount();
 
         //判断是否是理想用户
@@ -261,7 +269,7 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
         System.out.println(d);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String dateNowStr = sdf.format(d);
-        String fileDir = excelExportDestfilepath+dateNowStr+"/"+selectedProduct.getId()+".xlsx";
+        String fileDir = configUtils.fetchProperties("excelExportDestfilepath")+dateNowStr+"/"+selectedProduct.getId()+".xlsx";
         File f= new File(fileDir) ;    // 声明File对象
         //InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(fileDir);
         // 第2步、通过子类实例化父类对象
@@ -278,7 +286,7 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
         Date d = selectedProduct.getUpdateTime();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String dateNowStr = sdf.format(d);
-        String fileDir = excelExportDestfilepath+dateNowStr+"/"+selectedProduct.getId()+".xlsx";
+        String fileDir = configUtils.fetchProperties("excelExportDestfilepath")+dateNowStr+"/"+selectedProduct.getId()+".xlsx";
         File f= new File(fileDir) ;    // 声明File对象
         //InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(fileDir);
         // 第2步、通过子类实例化父类对象
