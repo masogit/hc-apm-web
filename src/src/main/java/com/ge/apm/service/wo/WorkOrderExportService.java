@@ -170,6 +170,8 @@ public class WorkOrderExportService {
                 }else if(currentStepId == 2 || currentStepId == 3){//云阜用户 待接单
                     currentStepId = 3;
                     workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"),  FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
+                }else{
+                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"),  FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
                 }
             }else {
                 workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), currentStepId != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()) : "");
