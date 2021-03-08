@@ -19,16 +19,23 @@ public class ZkbAssetStatisticProvider {
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
         StringBuilder sb = new StringBuilder();
         sb.append(" SELECT DISTINCT " +
+                " ai.id,"+
+                " ai.clinical_dept_name as hospital_name, "+
+                " ai.function_type, "+
                 " ai.system_id," +
                 " ti.uid AS tenant_uid," +
                 " ti. NAME," +
                 " ai.uid AS asset_uid," +
-                " ac.contract_no"+
+                " ac.contract_no,"+
+                " qr_code_info.reason AS reason," +
+                " qr_code_info.can_not_past_qr_code AS can_not_past_qr_code"+
                 " FROM" +
                 " zkb_contract ac" +
                 " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
                 " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
-                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id where ac.contract_no is not null ");
+                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id" +
+                " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
+                " where ac.contract_no is not null and ai.system_id is not null");
         String filter = buildFilter_loadAllAsset(searchFilterList);
         sb.append(filter);
         return sb.toString();
@@ -55,6 +62,14 @@ public class ZkbAssetStatisticProvider {
             if("contractNo".equals(tempColumn))
             {
                 sb.append(" and ac.contract_no like '%"+value.toString()+"%'");
+            }
+            if("hospitalName".equals(tempColumn))
+            {
+                sb.append(" and ai.clinical_dept_name like'%"+value.toString()+"%'");
+            }
+            if("functionType".equals(tempColumn))
+            {
+                sb.append(" and ai.function_type like'%"+value.toString()+"%'");
             }
         }
         return sb.toString();
