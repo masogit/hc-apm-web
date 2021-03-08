@@ -1,0 +1,1 @@
+create index wechat_message_history_request_source on wechat_message_history (request_source);
