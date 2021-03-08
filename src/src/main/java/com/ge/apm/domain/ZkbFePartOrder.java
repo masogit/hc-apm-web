@@ -324,13 +324,13 @@ public class ZkbFePartOrder {
      * 剩余数量
      */
     @Transient
-    private int remainQty;
+    private Integer remainQty;
 
     /**
      * 数量
      */
     @Column(name = "qty")
-    private int qty;
+    private Integer qty;
 
     /**
      * 是否为紧急订单
@@ -874,19 +874,19 @@ public class ZkbFePartOrder {
         this.receiverAddress = receiverAddress;
     }
 
-    public int getRemainQty() {
+    public Integer getRemainQty() {
         return remainQty;
     }
 
-    public void setRemainQty(int remainQty) {
+    public void setRemainQty(Integer remainQty) {
         this.remainQty = remainQty;
     }
 
-    public int getQty() {
+    public Integer getQty() {
         return qty;
     }
 
-    public void setQty(int qty) {
+    public void setQty(Integer qty) {
         this.qty = qty;
     }
 
