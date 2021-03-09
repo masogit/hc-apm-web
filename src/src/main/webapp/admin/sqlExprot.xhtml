@@ -5,10 +5,9 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
 
-    <ui:define name="title">SQL</ui:define>
+    <ui:define name="title">SQLEXPORT</ui:define>
 
     <ui:define name="content">
-        <!--rendered="#{sqlDynaColumnController.show}"-->
         <h:form id="searchForm" rendered="#{sqlExportController.show}">
             <h:panelGrid id="searchPanel" columns="10">
                 <p:inputTextarea id="sql" placeholder="SQL here" cols="100" rows="3" value="#{sqlExportController.sql}"/>
@@ -28,7 +27,6 @@
                          rowsPerPageTemplate="10,20,30,90">
                 <p:ajax event="rowSelect" listener="#{sqlExportController.onRowSelect}" update=":woMgrListForm"/>
                 <p:ajax event="rowUnselect" listener="#{sqlExportController.onRowUnselect}" update=":woMgrListForm"/>
-                <!-- rendered="false" -->
                 <p:column headerText="id" sortBy="#{item.id}"  filterMatchMode="LIKE" rendered="false">
                     <h:outputText value="#{item.id}"/>
                 </p:column>
@@ -62,27 +60,18 @@
                                                      target="#{sqlExportController.selectedProduct}"/>
                     </p:commandButton>
 
-                    <!--<p:commandButton ajax="false"  actionListener="#{batchFileController.exportTemplate()}" disabled="#{batchFileController.templateDisabled}" value="模板下载" styleClass="ui-priority-primary"   validateClient="true" update=":growl">
-                        <p:fileDownload value="#{batchFileController.exportTemplate}" />
-                    </p:commandButton>-->
 
                     <p:commandButton ajax="false" actionListener="#{sqlExportController.exportTemplate2(item)}" update=":growl" validateClient="true" styleClass="ui-priority-primary" value="下载" disabled="#{item.taskStatus !=2}">
-                        <!--<f:setPropertyActionListener value="#{item}"
-                                                     target="#{sqlExportController.selectedDownProduct}"/>-->
                         <p:fileDownload value="#{sqlExportController.exportTemplate}"/>
                     </p:commandButton>
 
                     <p:commandButton ajax="false" actionListener="#{sqlExportController.exportGenerate(item)}" update=":growl" validateClient="true" styleClass="ui-priority-primary" value="#{msg.Generate}" disabled="#{item.taskStatus !=4}">
-                        <!--<f:setPropertyActionListener value="#{item}"
-                                                     target="#{sqlExportController.selectedProduct}"/>-->
                     </p:commandButton>
 
                 </p:column>
             </p:dataTable>
         </h:form>
 
-        <!--currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"-->
-        <!--paginatorTemplate="{CurrentPageReport} {Toolbar} #{msg.RowsPerPage}: {RowsPerPageDropdown}"-->
         <h:form id="listForm" rendered="#{sqlExportController.show}">
             <p:dataTable id="list2" value="#{sqlExportController.selectList}" var="item" widgetVar="varDataList2"
                          selectionMode="single" selection="#{sqlExportController.selected}"
@@ -94,12 +83,6 @@
 
                 <p:ajax event="rowSelect" update=":listForm:deltailInfo"/>
 
-                <!--<f:facet name="header">
-                    <p:commandButton rendered="true" id="toggler" value="Columns" style="float:right;top: -5px;height: 25px;" icon="ui-icon-calculator"/>
-                    <p:columnToggler datasource="list2" trigger="toggler" rendered="true">
-                        <p:ajax event="toggle" listener="#{sqlExportController.onToggleColumn}" />
-                    </p:columnToggler>
-                </f:facet>-->
 
                 <p:columns width="200" value="#{sqlExportController.fieldList}" var="column" visible="#{column.isVisible}">
                     <f:facet name="header">
@@ -128,10 +111,6 @@
                     <p:commandButton value="go" update=":listForm" actionListener="#{sqlExportController.gotoPageNumMethod}"/>
                 </f:facet>
 
-                <!--<f:facet name="goToPage" >
-&lt;!&ndash;                    <p:inputTextarea id="gotoPageNum" placeholder="PageNum here" cols="5"  value="#{sqlExportController.gotoPageNum}"/>&ndash;&gt;
-                    <p:commandButton value="queryPage" update=":listForm" actionListener="#{sqlExportController.gotoPageNumMethod}"/>
-                </f:facet>-->
             </p:dataTable>
             <p:panel id="deltailInfo" style="border: none; background: transparent;">
                 <p:inputTextarea  cols="50" autoResize="true" value="#{sqlExportController.selectedRowData}" rendered="#{sqlExportController.selected ne null}"/>
