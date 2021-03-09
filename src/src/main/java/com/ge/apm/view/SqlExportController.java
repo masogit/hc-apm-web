@@ -5,13 +5,13 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.view.sysutil.AppContextService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.log4j.Logger;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleEvent;
 import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.Visibility;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +42,7 @@ import java.util.*;
 public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
 
     private static final long serialVersionUID = -1L;
+    protected static final Logger logger = Logger.getLogger(SqlExportController.class);
     // final String excelExportDestfilepath = "C:/zk/test/export/excel/";
     // final String excelExportDestfilepath = "/tmp/apm/export";
     ConfigUtils configUtils;
@@ -243,20 +244,27 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
         System.out.println(selectedProduct);
     }
     public void exportTemplate2(SqlExportQueue selectedProduct){
+        logger.info("=========SqlExportController.exportTemplate2  start updateTime={"+selectedProduct.getUpdateTime()+"}==========");
         Date d = selectedProduct.getUpdateTime();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String dateNowStr = sdf.format(d);
         String fileDir = configUtils.fetchProperties("excelExportDestfilepath")+dateNowStr+"/"+selectedProduct.getId()+".xlsx";
+        logger.info("=========SqlExportController.exportTemplate2 fileDir={"+fileDir+"}==========");
         File f= new File(fileDir) ;    // 声明File对象
+        logger.info("=========SqlExportController.exportTemplate2 file={"+f.toString()+"}==========");
         //InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(fileDir);
         // 第2步、通过子类实例化父类对象
         InputStream input = null ;    // 准备好一个输入的对象
         try {
+            logger.info("=========SqlExportController.exportTemplate2 input = new FileInputStream(f)==========");
             input = new FileInputStream(f);
         } catch (FileNotFoundException e) {
+            logger.error("=========SqlExportController.exportTemplate2 input = new FileInputStream(f) Error==========");
             e.printStackTrace();
         }
+        logger.info("=========SqlExportController.exportTemplate2 exportTemplate==========");
         exportTemplate = new DefaultStreamedContent(input, "application/vnd.ms-excel", selectedProduct.getId()+".xlsx");
+        logger.info("=========SqlExportController.exportTemplate2 exportTemplate end==========");
     }
 
     public void exportGenerate(SqlExportQueue selectedProduct){
