@@ -200,6 +200,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     public void getSparePartsZkbFePartOrder(String systemId,String sr)
     {
+        if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr))
+        {
+             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
+            return;
+        }
         this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null);
     }
 

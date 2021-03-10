@@ -69,6 +69,17 @@ public class ZkbFePartOrder {
                     workFlowSteps.Complete.toString()
             };
 
+    /**
+     * 流程步骤
+     */
+    public static String[] manmadeStepAndRoles = new String[]
+            {
+                    workFlowSteps.Requested.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.WaitingAssignment.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingApm.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.Complete.toString()
+            };
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
