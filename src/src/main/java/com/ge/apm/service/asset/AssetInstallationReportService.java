@@ -37,18 +37,21 @@ public class AssetInstallationReportService {
     public static final String REPORT_CLINICAL_TEMPLATE = "/portal/asset/arrived/reportTemplate/ClinicalReportTemplate.docx";
     public static final String REPORT_ASSET_TEMPLATE = "/portal/asset/arrived/reportTemplate/AssetReportTemplate.docx";
     public static final String REPORT_ASSET_TEMPLATE_BATCH = "/portal/asset/arrived/reportTemplate/AssetReportTemplateBatch.docx";
+    public static final String REPORT_ASSET_TEMPLATE_BATCH_BOTTOM = "/portal/asset/arrived/reportTemplate/AssetReportTemplateBatchBottom.docx";
 
     public static final String REPORT_TECHNOLOGY_TITLE = "技术验收报告";
     public static final String REPORT_BUSINESS_TITLE = "商务验收报告";
     public static final String REPORT_CLINICAL_TITLE = "临床验收报告";
     public static final String REPORT_ASSET_TITLE = "固定资产验收单";
-    public static final String REPORT_ASSET_TITLE_BATCH = "固定资产验收单（批量）";
+    public static final String REPORT_ASSET_TITLE_BATCH = "固定资产验收单(面单)";
+    public static final String REPORT_ASSET_TITLE_BATCH_BOTTOM = "固定资产验收单(底单)";
 
     public static final String REPORT_TYPE_TECHNOLOGY = "technology";
     public static final String REPORT_TYPE_BUSINESS = "business";
     public static final String REPORT_TYPE_CLINICAL = "clinical";
     public static final String REPORT_TYPE_ASSET = "fixasset";
     public static final String REPORT_TYPE_ASSET_BATCH = "fixassetBatch";
+    public static final String REPORT_TYPE_ASSET_BATCH_BOTTOM = "fixassetBatchBottom";
 
     @Autowired
     private OrgInfoRepository orgInfoDao;
@@ -128,7 +131,8 @@ public class AssetInstallationReportService {
             }
             arrivalItemMap.put("import_equipment", FieldValueMessageController.doGetFieldValue("importEquipment",importEquipment.toString()));//是否进口设备[1:进口,2:国产]
             arrivalItemMap.put("item_num", 1);//数量
-            arrivalItemMap.put("guarantee", arrivalListItem.getGuarantee());
+//            arrivalItemMap.put("guarantee", arrivalListItem.getGuarantee());
+            arrivalItemMap.put("factory_warranty_date", arrivalListItem.getFactoryWarrantyDate());
             arrivalItemMap.put("annual_maintenance_times", arrivalListItem.getAnnualMaintenanceTimes());//年保修次数
             arrivalItemMap.put("manufact_num", arrivalListItem.getSerialNum());//出厂SN编号
             arrivalItemMap.put("hospital_num", arrivalListItem.getDepartNum());//医院编号
@@ -222,7 +226,7 @@ public class AssetInstallationReportService {
     //导出同一个合同和科室的记录
     public StreamedContent exportDocxBatch(Map<String, Object> data, byte[] templateBytes, String reportType) throws IOException {
 
-        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(this.renderDocxBatch(data, templateBytes))), "application/msword", this.buildFileName(data, reportType, false));
+        StreamedContent streamedContent = new DefaultStreamedContent((new ByteArrayInputStream(this.renderDocxBatch(data, templateBytes))), "application/msword", this.buildFileNameBatch(data, reportType, false));
 
         return streamedContent;
     }
@@ -250,6 +254,8 @@ public class AssetInstallationReportService {
             templatePath = REPORT_ASSET_TEMPLATE;
         }else if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
             templatePath = REPORT_ASSET_TEMPLATE_BATCH;
+        }else if(REPORT_TYPE_ASSET_BATCH_BOTTOM.equals(reportType)){
+            templatePath = REPORT_ASSET_TEMPLATE_BATCH_BOTTOM;
         }
 
         if(templatePath != null){
@@ -347,6 +353,29 @@ public class AssetInstallationReportService {
             return this.encoding(reportTypeTitle) + "-" + this.encoding(assetName) + "[" + this.encoding(financingNum) + "].docx";
         }else {
             return reportTypeTitle + "-" + assetName + "[" + financingNum + "].docx";
+        }
+    }
+
+    private String buildFileNameBatch(Map<String, Object> data, String reportType, boolean isEncoding){
+
+        String contractNum = "";
+        if(data.get("contract_num") != null){
+            contractNum = data.get("contract_num").toString();
+            contractNum = StringUtils.replace(contractNum, "\\", "_");
+            contractNum = StringUtils.replace(contractNum, "/", "_");
+        }
+
+        String reportTypeTitle = "";
+        if(REPORT_TYPE_ASSET_BATCH.equals(reportType)){
+            reportTypeTitle = REPORT_ASSET_TITLE_BATCH;
+        }else if(REPORT_TYPE_ASSET_BATCH_BOTTOM.equals(reportType)){
+            reportTypeTitle = REPORT_ASSET_TITLE_BATCH_BOTTOM;
+        }
+
+        if(isEncoding){
+            return contractNum +"-"+ this.encoding(reportTypeTitle) +".docx";
+        }else {
+            return contractNum +"-"+ reportTypeTitle +".docx";
         }
     }
 

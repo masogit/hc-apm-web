@@ -6,6 +6,8 @@ import org.simpleflatmapper.tuple.Tuple4;
 import org.simpleflatmapper.tuple.Tuple5;
 import org.simpleflatmapper.tuple.Tuple6;
 import org.simpleflatmapper.tuple.Tuple7;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import rx.Observable;
 
@@ -14,6 +16,8 @@ import javax.annotation.Resource;
 
 @Service
 public class HealthService {
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
 	private Database db;
 
@@ -556,7 +560,7 @@ public class HealthService {
 			+ " FROM v2_pm_order po "
 			+ " LEFT JOIN asset_info ai "
 			+ " ON po.asset_uid = ai.uid "
-			+ " WHERE po.is_finished=false AND po.plan_time<(NOW() + interval '1 weeks') AND (po.tenant_uid IN (:site_uid) OR po.institution_uid IN (:site_uid) OR po.hospital_uid IN (:site_uid) OR po.site_uid IN (:site_uid)) "
+			+ " WHERE po.rule_level = 3 and po.is_finished=false AND po.plan_time<(NOW() + interval '1 weeks') AND (po.tenant_uid IN (:site_uid) OR po.institution_uid IN (:site_uid) OR po.hospital_uid IN (:site_uid) OR po.site_uid IN (:site_uid)) "
 			+ " ORDER BY plan_time ";
 
 	/*private static final String asset_pm_all

@@ -50,8 +50,9 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private static final Logger logger = LoggerFactory.getLogger(AssetInfoBulkEditController.class);
+    private static final String TAB_SELECT_ASSETS = "SELECT_ASSETS";
 
-    static PageRequest pageRequest = new PageRequest(0, 100);
+    static PageRequest pageRequest = new PageRequest(0, 1000);
 
     private AssetInfoRepository dao;
     private AssetInfoService assetInfoService;
@@ -941,7 +942,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         Page<AssetInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
         List<AssetInfo> source = new ArrayList<>(page.getContent());
-        source.removeAll(assets.getTarget());
         assets.setSource(source);
 
         return assets;
@@ -949,35 +949,36 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
     private void prepareFilters() {
         searchFilters = new ArrayList<>();
-        SearchFilter searchFilter;
-        this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+
+        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+
+        if (assets.getTarget().size() > 0) {
+            List<String> assetUids = assets.getTarget().stream().map(AssetInfo::getUid).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("uid", SearchFilter.Operator.NotIN, assetUids));
+        }
+
+        List<String> orgUidList;
 
         if (null != filter.getSiteOrg() && null != filter.getSiteOrg().getUid()) {
-            List<String> orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(filter.getSiteOrg().getUid());
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID());
-            this.searchFilters.add(searchFilter);
+            orgUidList = orgInfoDao.getOrgInfoUidsByparentUid(filter.getSiteOrg().getUid());
         }else {
             UserAccount user = UserContextService.getCurrentUserAccount();
-            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         }
+
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 
         if (null != filter.getClinicalDeptOrg()) {
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, filter.getClinicalDeptOrg().getUid()));
         }
 
         if (null != this.filter.getAssetGroup()) {
-            searchFilter = new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.filter.getAssetGroup());
-            this.searchFilters.add(searchFilter);
+            searchFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.filter.getAssetGroup()));
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
@@ -986,6 +987,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             searchFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
+
+
     }
 
     public void onTransfer(TransferEvent event) {
@@ -993,7 +996,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     }
 
     public void onTabChange(TabChangeEvent event) {
-        if ("选择资产".equals(event.getTab().getTitle())) {
+        if (TAB_SELECT_ASSETS.equals(event.getTab().getId())) {
             return;
         }
 
@@ -1229,6 +1232,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
 
         return false;
+    }
+
+    public String getTabIDAsSelectAssets() {
+        return TAB_SELECT_ASSETS;
     }
 
 }
