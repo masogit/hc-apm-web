@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">SQLEXPORT</ui:define>
+
+    <ui:define name="content">
+        <h:form id="searchForm" rendered="#{sqlExportController.show}">
+            <h:panelGrid id="searchPanel" columns="10">
+                <p:inputTextarea id="sql" placeholder="SQL here" cols="100" rows="3" value="#{sqlExportController.sql}"/>
+                <p:commandButton value="Query" update=":woMgrListForm" actionListener="#{sqlExportController.addSelectSql}"/>
+                <p:commandButton value="Execute" rendered="false" update="woMgrListForm" actionListener="#{sqlExportController.executeSql}"/>
+            </h:panelGrid>
+
+        </h:form>
+        <h:form id="woMgrListForm" rendered="#{sqlExportController.show}">
+            <p:dataTable id="datalist" class="datalist" value="#{sqlExportController.lazyModel}" var="item" widgetVar="varDataList"
+                         selectionMode="single" selection="#{sqlExportController.selected}"
+                         lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                         rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.creationTime}"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                         rows="20" emptyMessage="#{msg.noRecordFound}"
+                         rowsPerPageTemplate="10,20,30,90">
+                <p:ajax event="rowSelect" listener="#{sqlExportController.onRowSelect}" update=":woMgrListForm"/>
+                <p:ajax event="rowUnselect" listener="#{sqlExportController.onRowUnselect}" update=":woMgrListForm"/>
+                <p:column headerText="id" sortBy="#{item.id}"  filterMatchMode="LIKE" rendered="false">
+                    <h:outputText value="#{item.id}"/>
+                </p:column>
+                <p:column headerText="#{msg.creatorUID}#{msg.userName}" sortBy="#{item.createrName}"  filterMatchMode="LIKE">
+                    <h:outputText value="#{item.createrName}"/>
+                </p:column>
+                <p:column headerText="#{msg.creatorUID}" sortBy="#{item.creater}"  filterMatchMode="LIKE">
+                    <h:outputText value="#{item.creater}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.createTime}" sortBy="#{item.creationTime}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.creationTime}"/>
+                </p:column>
+                <p:column headerText="#{msg.updateTime}" sortBy="#{item.updateTime}" filterMatchMode="LIKE">
+                    <h:outputText value="#{item.updateTime}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.Execute}sql" sortBy="#{item.executeStatement}"  filterMatchMode="LIKE">
+                    <h:outputText value="#{item.executeStatement}"/>
+                </p:column>
+
+                <!-- value="#{item.taskStatus}" -->
+                <p:column headerText="#{msg.status}" sortBy="#{item.taskStatus}"  filterMatchMode="LIKE">
+                    <h:outputText value="#{sqlExportController.fieldValue(item.taskStatus)}"/>
+                </p:column>
+
+                <p:column  headerText="#{msg.Operation}">
+                    <p:commandButton update=":listForm :woMgrListForm"
+                                      title="View" value="预览">
+                        <f:setPropertyActionListener value="#{item}"
+                                                     target="#{sqlExportController.selectedProduct}"/>
+                    </p:commandButton>
+
+
+                    <p:commandButton ajax="false" actionListener="#{sqlExportController.exportTemplate2(item)}" update=":growl" validateClient="true" styleClass="ui-priority-primary" value="下载" disabled="#{item.taskStatus !=2}">
+                        <p:fileDownload value="#{sqlExportController.exportTemplate}"/>
+                    </p:commandButton>
+
+                    <p:commandButton ajax="false" actionListener="#{sqlExportController.exportGenerate(item)}" update=":growl" validateClient="true" styleClass="ui-priority-primary" value="#{msg.Generate}" disabled="#{item.taskStatus !=4}">
+                    </p:commandButton>
+
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="listForm" rendered="#{sqlExportController.show}">
+            <p:dataTable id="list2" value="#{sqlExportController.selectList}" var="item" widgetVar="varDataList2"
+                         selectionMode="single" selection="#{sqlExportController.selected}"
+                         lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                         rowKey="#{item.hashCode()}" sortMode="single" sortOrder="descending"
+                         paginatorTemplate=" {Toolbar} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         rows="20" emptyMessage="#{msg.noRecordFound}" scrollable="true"  resizableColumns="false"
+                         rowsPerPageTemplate="20">
+
+                <p:ajax event="rowSelect" update=":listForm:deltailInfo"/>
+
+
+                <p:columns width="200" value="#{sqlExportController.fieldList}" var="column" visible="#{column.isVisible}">
+                    <f:facet name="header">
+                        <h:outputText value="#{column.headerName}"/>
+                    </f:facet>
+                    <h:outputText value="#{sqlExportController.getFieldValue2(item, column.fieldName)}"/>
+                </p:columns>
+
+
+
+                <f:facet name="{Toolbar}">
+                    总行数 :  #{sqlExportController.selectTotalPages}
+                </f:facet>
+                <f:facet name="{Toolbar}">
+                    页数 :  #{sqlExportController.selectPageSize}
+                </f:facet>
+                <f:facet name="footer">
+                    <p:outputLabel id="errorMsg" style="color: #ff0000" value="#{sqlExportController.errorMsg}" rendered="#{sqlExportController.errorMsg ne null}"/>
+                </f:facet>
+
+                <f:facet name="{Toolbar}">
+                    跳转至：<p:inputText id="gotoPageNum"  placeholder="PageNum" value="#{sqlExportController.gotoPageNum}"  maxlength="100" style="width: 40px"/>
+                </f:facet>
+
+                <f:facet name="{Toolbar}">
+                    <p:commandButton value="go" update=":listForm" actionListener="#{sqlExportController.gotoPageNumMethod}"/>
+                </f:facet>
+
+            </p:dataTable>
+            <p:panel id="deltailInfo" style="border: none; background: transparent;">
+                <p:inputTextarea  cols="50" autoResize="true" value="#{sqlExportController.selectedRowData}" rendered="#{sqlExportController.selected ne null}"/>
+            </p:panel>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
