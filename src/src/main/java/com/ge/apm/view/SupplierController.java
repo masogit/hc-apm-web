@@ -144,7 +144,7 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         selected.setLastModifiedDate(new Date());
         selected.setLastModifiedBy(currentUser.getLoginName());
 
-        super.save();
+        supplierService.saveSupplier(selected);
     }
 
     @Override
@@ -163,15 +163,6 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     @Override
     public void onAfterUpdateObject(Supplier object, boolean isOK) {
         super.onAfterUpdateObject(object, isOK);
-
-        Supplier supplier = getDAO().findByUid(selected.getUid());
-        if (supplier.getName().equals(selected.getName())) {
-            return;
-        }
-
-        assetInfoDao.updateSupplierName(selected.getName(), selected.getId(), selected.getTenantUID());
-        assetInfoDao.updateMaintainerName(selected.getName(), selected.getTel(), String.valueOf(selected.getId()), selected.getTenantUID());
-        assetInfoDao.updateManufactureName(selected.getName(), String.valueOf(selected.getId()), selected.getTenantUID());
     }
 
     public void deleteSupplier() {

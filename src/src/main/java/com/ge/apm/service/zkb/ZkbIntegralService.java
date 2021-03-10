@@ -12,6 +12,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -271,7 +272,9 @@ public class ZkbIntegralService {
     public List<Map<String, Object>> createZkbIntegralRecordData(List<String> ids,HashMap<String, String> tenMap){
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("zkbIntegralId", SearchFilter.Operator.IN, ids));
-        List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findBySearchFilter(searchFilters);
+        Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
+
+        List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findBySearchFilter(searchFilters,sort);
         List<Map<String,Object>> zkbPartOrderItemDataList = new ArrayList<>();
         for(ZkbIntegralRecord i : zkbIntegralRecords){
             Map<String, Object> zkbIntegralRecordDataMap = new HashMap<>(10);

@@ -33,6 +33,8 @@ public class SupplierService {
     private TenantInfoRepository tenantInfoDao;
     @Autowired
     private SupplierQrCodeRepository supplierQrCodeDao;
+    @Autowired
+    private AssetInfoRepository assetInfoDao;
 
     public List<String> getSupplier(String name) {
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -134,6 +136,16 @@ public class SupplierService {
         }
 
         supplierUserDao.deleteBySupplierIDAndStatusAndUserIDIn(supplier.getId(), SupplierUser.Status.PendingApproval.name(), userIDList);
+
+    }
+
+    @Transactional
+    public void saveSupplier(Supplier supplier) {
+        supplierDao.save(supplier);
+
+        assetInfoDao.updateSupplierName(supplier.getName(), supplier.getId(), supplier.getTenantUID());
+        assetInfoDao.updateMaintainerName(supplier.getName(), supplier.getTel(), String.valueOf(supplier.getId()), supplier.getTenantUID());
+        assetInfoDao.updateManufactureName(supplier.getName(), String.valueOf(supplier.getId()), supplier.getTenantUID());
 
     }
 
