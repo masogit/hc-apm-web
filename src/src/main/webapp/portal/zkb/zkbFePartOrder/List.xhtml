@@ -15,9 +15,9 @@
                 <h:form id="zkbFePartOrderListForm">
                     <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
                         <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
-                        <p:commandButton value="待租户审批"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingAssignment'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingAssignment')}" />
-                        <p:commandButton value="400团队回填"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingApm'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingApm')}" />
-                        <p:commandButton value="待GE Admin归还"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingGEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingGEAdmin')}" />
+                        <p:commandButton value="待代理商确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingAssignment'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingAssignment')}" />
+                        <p:commandButton value="待400开单/下单"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingApm'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingApm')}" />
+                        <p:commandButton value="待FE归还"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingGEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingGEAdmin')}" />
                         <p:commandButton value="完成"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'Complete'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('Complete')}" />
                         <p:commandButton value="全部"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('all')}" />
                     </h:panelGrid>
@@ -59,11 +59,11 @@
                             </f:facet>
                         </p:column>
                         <p:column headerText="#{msg.zkbFePartOrder_urgencyStatus}" filterBy="#{item.urgencyStatus}"  filterMatchMode="EQ">
-                            <h:outputText value="#{fieldMsg.fieldValue('casePriority', item.urgencyStatus)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_casePriority', item.urgencyStatus)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_casePriority')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
@@ -112,12 +112,12 @@
                         <p:column headerText="#{msg.zkbFePartOrder_hospitalClientPhone}" filterBy="#{item.hospitalClientPhone}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.hospitalClientPhone}"/>
                         </p:column>
-                        <p:column headerText="#{msg.zkbFePartOrder_position}" filterBy="#{item.position}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.position}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.zkbFePartOrder_location}" filterBy="#{item.location}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.location}"/>
-                        </p:column>
+<!--                        <p:column headerText="#{msg.zkbFePartOrder_position}" filterBy="#{item.position}" filterMatchMode="LIKE">-->
+<!--                            <h:outputText value="#{item.position}"/>-->
+<!--                        </p:column>-->
+<!--                        <p:column headerText="#{msg.zkbFePartOrder_location}" filterBy="#{item.location}" filterMatchMode="LIKE">-->
+<!--                            <h:outputText value="#{item.location}"/>-->
+<!--                        </p:column>-->
                         <p:column headerText="#{msg.zkbFePartOrder_phenomenon}" filterBy="#{item.phenomenon}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.phenomenon}"/>
                         </p:column>

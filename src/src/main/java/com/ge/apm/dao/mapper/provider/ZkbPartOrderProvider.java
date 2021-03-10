@@ -1,5 +1,6 @@
 package com.ge.apm.dao.mapper.provider;
 
+import com.ge.apm.domain.ZkbPartOrder;
 import org.apache.commons.lang.StringUtils;
 import webapp.framework.dao.SearchFilter;
 
@@ -75,6 +76,40 @@ public class ZkbPartOrderProvider {
             if("srNum".equals(tempColumn)) {
                 sb.append(" and sr like '%"+value+"%'");
             }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 根据systemId 和 sr查询FE人工订单
+     * @param params
+     * @return
+     */
+    public String queryBySystemIdAndSr(Map<String, Object> params){
+        String systemId = (String) params.get("systemId");
+        String sr = (String) params.get("sr");
+        String partOrderNo = (String) params.get("partOrderNo");
+        StringBuilder sb = new StringBuilder();
+        sb.append(" SELECT o.*,a.system_id from zkb_part_order o " +
+                " INNER JOIN asset_info a on o.asset_id = a.uid " +
+                " where o.status = '"+ ZkbPartOrder.PartOrderStatus.Ordered.toString()+"' " +
+                " and o.order_type='"+ZkbPartOrder.OrderType.Artificial.toString()+"' "+
+                " and o.current_step='Complete' ").append(this.buildFilter_queryBySystemIdAndSr(systemId,sr,partOrderNo));
+        return sb.toString();
+    }
+    public String buildFilter_queryBySystemIdAndSr(String systemId,String sr,String partOrderNo){
+        StringBuilder sb = new StringBuilder();
+        if(StringUtils.isNotBlank(systemId))
+        {
+            sb.append(" and a.system_id like '%"+systemId+"%'");
+        }
+        if(StringUtils.isNotBlank(sr))
+        {
+            sb.append(" and o.sr_no like '%"+sr+"%'");
+        }
+        if(StringUtils.isNotBlank(partOrderNo))
+        {
+            sb.append(" and o.part_order_no = '"+partOrderNo+"'");
         }
         return sb.toString();
     }
