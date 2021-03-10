@@ -49,18 +49,6 @@ public class ZkbKeyBehaviorIndex {
     @Column(name = "part_return_score")
     private Integer partReturnScore;
 
-//    /**
-//     * 备件好还率权重
-//     */
-//    @Column(name = "intact_part_return_rate_full_score")
-//    private Integer intactPartReturnRateFullScore;
-
-//    /**
-//     * 备件好还率得分
-//     */
-//    @Column(name = "intact_part_return_rate_score")
-//    private Integer intactPartReturnRateScore;
-
     /**
      * 二维码粘贴率权重
      */
@@ -120,6 +108,12 @@ public class ZkbKeyBehaviorIndex {
      */
     @Column(name = "engineer_score")
     private Integer engineerScore;
+
+    /**
+     * 备注
+     */
+    @Column(name = "remark")
+    private String remark;
 
     /**
      * 租户名称
@@ -208,10 +202,6 @@ public class ZkbKeyBehaviorIndex {
         {
             totalScore=totalScore+this.getPartReturnScore();
         }
-//        if(this.getIntactPartReturnRateScore()!=null)
-//        {
-//            totalScore=totalScore+this.getIntactPartReturnRateScore();
-//        }
         if(this.getPasteQuickResponseRateScore()!=null)
         {
             totalScore=totalScore+this.getPasteQuickResponseRateScore();
@@ -242,10 +232,6 @@ public class ZkbKeyBehaviorIndex {
         {
             totalFullScore=totalFullScore+this.getPartReturnFullScore();
         }
-//        if(this.getIntactPartReturnRateFullScore()!=null)
-//        {
-//            totalFullScore=totalFullScore+this.getIntactPartReturnRateFullScore();
-//        }
         if(this.getPasteQuickResponseRateFullScore()!=null)
         {
             totalFullScore=totalFullScore+this.getPasteQuickResponseRateFullScore();
@@ -290,28 +276,6 @@ public class ZkbKeyBehaviorIndex {
     public void setPartReturnScore(Integer partReturnScore) {
         this.partReturnScore = partReturnScore;
     }
-
-//    public Integer getIntactPartReturnRateFullScore() {
-//        if(intactPartReturnRateFullScore==null){
-//            return 0;
-//        }
-//        return intactPartReturnRateFullScore;
-//    }
-//
-//    public void setIntactPartReturnRateFullScore(Integer intactPartReturnRateFullScore) {
-//        this.intactPartReturnRateFullScore = intactPartReturnRateFullScore;
-//    }
-
-//    public Integer getIntactPartReturnRateScore() {
-//        if(intactPartReturnRateScore==null){
-//            return 0;
-//        }
-//        return intactPartReturnRateScore;
-//    }
-//
-//    public void setIntactPartReturnRateScore(Integer intactPartReturnRateScore) {
-//        this.intactPartReturnRateScore = intactPartReturnRateScore;
-//    }
 
     public Integer getPasteQuickResponseRateFullScore() {
         if(pasteQuickResponseRateFullScore==null){
@@ -437,5 +401,13 @@ public class ZkbKeyBehaviorIndex {
 
     public void setTotalFullScore(Integer totalFullScore) {
         this.totalFullScore = totalFullScore;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

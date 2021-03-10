@@ -64,13 +64,13 @@
                     <p:ajax event="rowSelect" listener="#{sharedAssetReqDetailV2Controller.onChanged}"  update=""/>-->
                     <p:ajax event="filter" listener="#{sharedAssetReqDetailForQueryController.onFilter}" update=""/>
                     <!--sharedId-->
-                    <p:column headerText="借用科室" sortBy="#{item.borrowId}" filterBy="#{item.clinicalDeptUid}" filterMatchMode="LIKE">
-                        <f:facet name="filter">
+                    <p:column headerText="借用科室" sortBy="#{item.borrowId}" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+<!--                        <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
                             </p:selectOneMenu>
-                        </f:facet>
+                        </f:facet>-->
 <!--                        <h:outputText value="#{sharedAssetReqDetailForQueryController.getclinicalDeptName(item.borrowId)}"/>-->
                              <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
