@@ -39,7 +39,6 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     protected static final Logger logger = Logger.getLogger(GenericCRUDController.class);
 
     abstract protected GenericRepository<E> getDAO();
-
     public Map<String, String> filterMatchModes;
     public List<SearchFilter> searchFilters;
     protected boolean warnOnEmptySearchFilters = false;
@@ -83,7 +82,6 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
             if (this.searchFilters == null) {
                 this.searchFilters = new ArrayList<SearchFilter>();
             }
-
             if (!hasFilterOnField("siteId")) {
                 UserContextService.setSiteFilter(searchFilters);
             }
@@ -246,7 +244,6 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     private void doPostConstruct() {
         init();
         onPrepareDataTableModel();
-
         lazyModel = new GenericDataTableModel<E>() {
             @Override
             protected List<E> load(PageRequest pageRequest) {
@@ -496,7 +493,8 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     }
 
     public String getColumnNameList() {
-        return null;
+        logger.error("************** WARNING: getColumnNameList() not overrided");
+        return "";
     }
 
     ;
@@ -547,6 +545,10 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
 
     public Object getFieldValue(Object entityBean, String fieldName) {
         return BeanUtils.getBeanProperty(entityBean, fieldName);
+    }
+
+    public Object getFieldValue2(Map<String, Object> rowData, String fieldName){
+        return rowData.get(fieldName);
     }
 
     protected boolean getFiltersFromDynaColumns() {

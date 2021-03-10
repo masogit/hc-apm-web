@@ -159,7 +159,24 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("brand"), workOrderExportPojo.getAssetMakerShortName());
             workOrderMap.put(WebUtil.getMessage("CurrentOwner_xlsx"), workOrderExportPojo.getCurrentPersonName());
             //workOrderMap.put("当前步骤", workOrderExportPojo.getCurrentStepName());
-            workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), workOrderExportPojo.getCurrentStepId() != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, workOrderExportPojo.getCurrentStepId().toString()) : "");
+            Integer currentStepId = workOrderExportPojo.getCurrentStepId();
+            UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+            if(userContextService.hasCurrentTenantName("")){
+                if (currentStepId == null) {
+                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), "");
+                }else if(currentStepId == 7 || currentStepId == 9){//云阜用户 已关单
+                    currentStepId = 9;
+                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"),  FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
+                }else if(currentStepId == 2 || currentStepId == 3){//云阜用户 待接单
+                    currentStepId = 3;
+                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"),  FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
+                }else{
+                    workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"),  FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()));
+                }
+            }else {
+                workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), currentStepId != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()) : "");
+            }
+
             workOrderMap.put(WebUtil.getMessage("requestorId"), workOrderExportPojo.getRequestorName());
             workOrderMap.put(WebUtil.getMessage("RequestTime_xlsx"), formatDate(workOrderExportPojo.getRequestTime()));
             workOrderMap.put(WebUtil.getMessage("FaultDescription_xlsx"), workOrderExportPojo.getRequestReason());

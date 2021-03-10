@@ -35,6 +35,8 @@
                         <p:commandButton value="待审核"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'ClosePending'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('ClosePending')}" />
                         <p:commandButton value="完成"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'Complete'}" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('Complete')}" />
                         <p:commandButton value="全部"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbPartOrderController.queryListByStatus('all')}" />
+                        <p:commandButton value="待上传探头说明函"  process="@this" update="datalist buttonSet" disabled="#{zkbPartOrderController.queryStatus eq 'letter'}" style="color: white ;font-weight: bolder;background: #088A29" rendered="#{zkbPartOrderController.showStatusBtn}" action="#{zkbPartOrderController.queryListByStatus('letter')}" />
+
                         <p:commandLink id="btnRemindLetter" immediate="false" process="@this" style="text-align: right" oncomplete="PF('zkbVacationDlg').show()" rendered="#{zkbPartOrderController.vacationBtn}">
                             <h:outputText value="是否休假" />
                         </p:commandLink>
@@ -59,6 +61,16 @@
 
                         <p:column headerText="申请编号" filterBy="#{item.partOrderNo}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.partOrderNo}"/>
+                        </p:column>
+                        <p:column headerText="申请类型" filterBy="#{item.scoreFlag}"  filterMatchMode="LIKE">
+                            <h:outputText value="#{zkbPartOrderController.scoreFlagField(item.scoreFlag)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="积分申请" itemValue="t"/>
+                                    <f:selectItem itemLabel="名额申请" itemValue="f"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                          <p:column headerText="订单类型" filterBy="#{item.orderType}"  filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbPartOrderType',item.orderType)}"/>
