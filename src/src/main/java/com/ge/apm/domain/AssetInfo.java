@@ -6,6 +6,8 @@ import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Formula;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.CreatedBy;
@@ -603,6 +605,11 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private Supplier supplier;
+
+    @Transient
+    @Getter
+    @Setter
+    private String errorMessage;
 
     @Transient
     private List<String> tags = new ArrayList<>();
