@@ -36,7 +36,7 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     protected boolean filterByLoginUser = false;
 
     protected static final String searchFilterPrefix = ":search_";
-    protected static final Logger logger = Logger.getLogger(GenericCRUDController.class);
+    protected static final Logger logger = Logger.getLogger(JpaCRUDController.class);
 
     abstract protected GenericRepository<E> getDAO();
     public Map<String, String> filterMatchModes;
@@ -494,7 +494,7 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
 
     public String getColumnNameList() {
         logger.error("************** WARNING: getColumnNameList() not overrided");
-        return "";
+        return null;
     }
 
     ;
