@@ -178,13 +178,13 @@
                                 <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
                                     <h:outputText value="#{item.name}"/>
                                 </p:column>
-                                <p:column  headerText="#{msg.functionType}">
-                                    <h:outputText value="#{item.functionType}"/>
+                                <p:column  headerText="#{msg.departNum}">
+                                    <h:outputText value="#{item.departNum}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.QRCode}">
                                     <h:outputText value="#{item.qrCode}"/>
                                 </p:column>
-                                <p:column headerText="#{assetFileImportController.isImported? msg.importStatus : msg.CheckResults}" >
+                                <p:column headerText="错误提示" >
                                      <h:outputText value="#{item.errorMessage}"/>
                                 </p:column>
                             </p:dataTable>
