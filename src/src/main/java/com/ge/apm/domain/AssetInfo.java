@@ -45,7 +45,7 @@ public class AssetInfo implements ChineseName,Serializable {
     private Integer siteId;
 
     @Basic(optional = false)
-    @Size(min = 1, max = 64)
+    @Size(min = 1, max = 128)
     @Column(name = "name")
     private String name;
 
