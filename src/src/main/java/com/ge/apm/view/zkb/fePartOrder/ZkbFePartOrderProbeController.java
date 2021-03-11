@@ -339,6 +339,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty());
             if("t".equals(this.selected.getNewCatFlag()))
             {
+                zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
                 this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty());
                 this.selected.setQty(this.getSelected().getQty()*2);
             }
@@ -357,7 +358,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(!ZkbFePartOrderSparePartDetailController.badReturnValue.equals(this.selected.getReturnType()))
         {
-            this.zkbFePartOrderService.moveProbe(5,zkbContract,this.selected.getQty()*2);
+            this.zkbFePartOrderService.moveProbe(5,zkbContract,this.selected.getQty());
         }
         Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(
