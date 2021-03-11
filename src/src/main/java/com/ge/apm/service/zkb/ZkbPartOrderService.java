@@ -222,7 +222,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
-    public int getBetweenDay(Date date1, Date date2) {
+    public static int getBetweenDay(Date date1, Date date2) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String sd1 = format.format(date1);
         String sd2 = format.format(date2);
