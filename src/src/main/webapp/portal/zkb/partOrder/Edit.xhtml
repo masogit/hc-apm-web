@@ -139,7 +139,8 @@
                             <p:calendar timeZone="GMT+8"  id="requestDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderEditController.selected.requestDate}" required="true" requiredMessage="#{msg.zkbPartOrder_requestDate} #{msg.ValidationRequire}" showOn="button" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
 
-                        <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
+                       <!-- <h:panelGroup rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">-->
+                        <h:panelGroup>
                             <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' and zkbPartOrderEditController.assetInfo.assetGroup eq 1}">
                                 <label class="label">设备类型（DI）*</label>
                                 <p:selectOneMenu id="assetTypeDi" value="#{zkbPartOrderEditController.selected.assetTypeDi}" required="true" requiredMessage="#设备类型（DI） #{msg.ValidationRequire}">
@@ -151,7 +152,7 @@
                         </h:panelGroup>
 
                         <!--<h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">-->
-                        <h:panelGroup rendered="true">
+                        <h:panelGroup rendered="false">
                             <label class="label">是否使用积分抵扣*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.scoreFlag}" required="true" requiredMessage="是否使用积分抵扣 #{msg.ValidationRequire}" disabled="#{zkbPartOrderEditController.currentScoreFlag}">
                                 <!--<p:ajax event="change"  listener="#{zkbPartOrderEditController.scoreFlagChange}" update="zkbwkEditForm cscore"/>-->
