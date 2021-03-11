@@ -87,6 +87,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     private ZkbIntegralService zkbIntegralService;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+    public static String NEW_CAT_END_DATE= "2021-03-01";
 
 
     public List<TenantInfo> getSourceTenantInfoList(){
@@ -221,7 +222,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
-    public static int getBetweenDay(Date date1, Date date2) {
+    public int getBetweenDay(Date date1, Date date2) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String sd1 = format.format(date1);
         String sd2 = format.format(date2);
@@ -236,6 +237,22 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             days++;
         }
         return (int)days;
+    }
+
+    public int getBetweenDay(String sd1, String sd2) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date1 = format.parse(sd1);
+            Date date2 = format.parse(sd2);
+            long days = (date2.getTime() - date1.getTime()) / (24*3600*1000);
+            if((date2.getTime() - date1.getTime())% (24*3600*1000) != 0){
+                days++;
+            }
+            return (int)days;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public boolean checkApplyNumValid(ZkbPartOrder zkbPartOrder,ZkbContract zkbContract){
@@ -699,7 +716,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                     Date d = null;
                     try {
-                        d = format.parse("2021-01-01");
+                        d = format.parse(NEW_CAT_END_DATE);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -1021,7 +1038,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 Date d = null;
                 try {
-                    d = format.parse("2021-01-01");
+                    d = format.parse(NEW_CAT_END_DATE);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -1399,6 +1416,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         }
     }
+
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
         List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
