@@ -160,7 +160,7 @@
                               </p:fieldset>
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup id="buttonGroup">
-                            <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoBulkEditController.applyChange()}"  update="AssetInfoEditForm importDataForm" auto="true"  style="float:left"  rendered="#{assetInfoBulkEditController.getFlag()}" />
+                            <p:commandButton value="批量修改" icon="ui-icon-check" action="#{assetInfoBulkEditController.applyChange()}"  update="AssetInfoEditForm importDataForm" auto="true"  style="float:left"  rendered="#{assetInfoBulkEditController.getFlag()}" />
                             <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoBulkEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
                              </h:panelGroup>
                             </p:panelGrid>
