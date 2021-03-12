@@ -209,6 +209,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (assetGroupSecondarySupport) {
             onAssetGroupChange();
         }
+        uidList = WebUtil.getRequestParameter("uidList");
+        if(AssetInfoListController.resultAssetMap!=null){
+            assetInfoList = AssetInfoListController.resultAssetMap.get(uidList);
+        }
         ownerList = ucService.getWorkerList(selected.getId(), "");
         selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
         changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
@@ -218,10 +222,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         initGbTree();
         qrCode = WebUtil.getRequestParameter("qrCode");
         updateAssetStatusList();
-        uidList = WebUtil.getRequestParameter("uidList");
-        if(AssetInfoListController.resultAssetMap!=null){
-            assetInfoList = AssetInfoListController.resultAssetMap.get(uidList);
-        }
+
 
     }
     public void saveNewSupplier() {
@@ -962,8 +963,22 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         changeAssetOrg(orgInfo);
     }
     private void updateClinicalDeptOnSiteChange() {
+        if(assetInfoList != null && !assetInfoList.isEmpty()){
+            String siteUID = assetInfoList.get(0).getSiteUID();
+            boolean isSiteUid = true;
+            for(AssetInfo assetInfo :assetInfoList){
+                if(!siteUID.equals(assetInfo.getSiteUID())){
+                    clinicalDeptList = null;
+                    isSiteUid = false;
+                }
+            }
+            if(isSiteUid){
+                clinicalDeptList = orgDao.getDeptListBySiteUid(selected.getSiteUID());
+            }
+        }else {
+            clinicalDeptList = clinicalDeptService.getUserAccessibleClinicalDeptsBySelectedSite(selected.getSiteUID());
+        }
 
-        clinicalDeptList = clinicalDeptService.getUserAccessibleClinicalDeptsBySelectedSite(selected.getSiteUID());
     }
     public void getClinicalOwnerList() {
         if (null != selected.getClinicalDeptUID()) {
