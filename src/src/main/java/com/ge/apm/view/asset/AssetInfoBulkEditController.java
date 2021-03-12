@@ -968,12 +968,12 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             boolean isSiteUid = true;
             for(AssetInfo assetInfo :assetInfoList){
                 if(!siteUID.equals(assetInfo.getSiteUID())){
-                    clinicalDeptList = null;
+                    clinicalDeptList = new ArrayList<>();
                     isSiteUid = false;
                 }
             }
             if(isSiteUid){
-                clinicalDeptList = orgDao.getDeptListBySiteUid(selected.getSiteUID());
+                clinicalDeptList = orgDao.getDeptListBySiteUid(siteUID);
             }
         }else {
             clinicalDeptList = clinicalDeptService.getUserAccessibleClinicalDeptsBySelectedSite(selected.getSiteUID());
