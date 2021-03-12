@@ -650,7 +650,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
                 ZkbContract c = contractList.get(0);
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                if(zkbPartOrderService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(new Date()))< 0){
+                if(zkbPartOrderService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(c.getStartDate()))< 0){
                     this.selected.setQty(1);
                 }else{
                     this.selected.setQty(2);
