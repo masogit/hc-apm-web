@@ -160,13 +160,38 @@
                               </p:fieldset>
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup id="buttonGroup">
-                            <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoBulkEditController.applyChange()}"  update=":growl" style="float:left" />
+                            <p:commandButton value="批量修改" icon="ui-icon-check" action="#{assetInfoBulkEditController.applyChange()}"  update="AssetInfoEditForm importDataForm" auto="true"  style="float:left"  rendered="#{assetInfoBulkEditController.getFlag()}" />
                             <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoBulkEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
                              </h:panelGroup>
                             </p:panelGrid>
                           </h:form>
 
                 <ui:include src="createSupplierBatchEdit.xhtml" />
+            </div>
+            <div class="ui-g-12 card ">
+
+                <h:form id="importDataForm">
+                    <p:tabView>
+                        <p:tab title="批量修改异常信息">
+                            <p:dataTable  value="#{assetInfoBulkEditController.assetInfos}" var="item" >
+
+                                <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
+                                    <h:outputText value="#{item.name}"/>
+                                </p:column>
+                                <p:column  headerText="#{msg.departNum}">
+                                    <h:outputText value="#{item.departNum}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.QRCode}">
+                                    <h:outputText value="#{item.qrCode}"/>
+                                </p:column>
+                                <p:column headerText="错误提示" >
+                                     <h:outputText value="#{item.errorMessage}"/>
+                                </p:column>
+                            </p:dataTable>
+
+                        </p:tab>
+                    </p:tabView>
+                </h:form>
             </div>
         </div>
         <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 900px;max-height:900px;min-width:800px;min-height:600px">
