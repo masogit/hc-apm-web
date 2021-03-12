@@ -63,7 +63,6 @@ create index owoc_report_data_asset_uid on owoc_report_data (asset_uid);
 create index iwic_monthly_report_asset_uid on iwic_monthly_report (asset_uid);
 create index us_report_dept_data_asset_uid on us_report_dept_data (asset_uid);
 create index us_report_data_asset_uid on us_report_data (asset_uid);
-create index wechat_message_history_request_source on wechat_message_history (request_source);
 
 --修改Asset_info.name字段长度，批量资产创建使用
 ALTER TABLE asset_info alter COLUMN name type character varying(128);
