@@ -19,7 +19,8 @@ public class DeviceStatusMonitorService {
     public ResponseEntity<Map<String, Object>> createResponseEntityForAssetMetering(UserAccount user, Integer offset, Integer limit, Integer category, String display, String ref, String href) {
         String sql = "select a.id, a.name, a.next_metering_date as date from asset_info a " +
                 " where (a.tenant_uid = ? OR a.institution_uid = ? OR a.hospital_uid = ? OR a.site_uid = ?) " +
-                " and a.next_metering_date between date_trunc('month', now()) and date_trunc('month', now() + interval '2 months')";
+                " and a.next_metering_date between date_trunc('month', now()) and date_trunc('month', now() + interval '2 months') " +
+                " limit ? offset ?";
 
         List<Map<String, Object>> items = jdbcTemplate.queryForList(sql, user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), limit, offset);
         Integer count = countAssetsToMeter(user);
