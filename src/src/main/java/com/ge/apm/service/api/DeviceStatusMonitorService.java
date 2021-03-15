@@ -17,10 +17,9 @@ public class DeviceStatusMonitorService {
     private JdbcTemplate jdbcTemplate;
 
     public ResponseEntity<Map<String, Object>> createResponseEntityForAssetMetering(UserAccount user, Integer offset, Integer limit, Integer category, String display, String ref, String href) {
-        String sql = "select a.id, a.name, m.next_metering_date as date from asset_info a inner join measuring_type_config m " +
-                " on a.measuring_item_category || '' = m.measuring_item_category and a.tenant_uid = m.tenant_uid " +
+        String sql = "select a.id, a.name, a.next_metering_date as date from asset_info a " +
                 " where (a.tenant_uid = ? OR a.institution_uid = ? OR a.hospital_uid = ? OR a.site_uid = ?) " +
-                " and now() between m.next_metering_date::date and m.next_metering_date::date - ?";
+                " and a.next_metering_date between date_trunc('month', now()) and date_trunc('month', now() + interval '2 months')";
 
         List<Map<String, Object>> items = jdbcTemplate.queryForList(sql, getMeteringRemindDays(user), user.getSiteUID(), user.getSiteUID(),
                 user.getSiteUID(), user.getSiteUID(), limit, offset);
@@ -40,11 +39,10 @@ public class DeviceStatusMonitorService {
     }
 
     public Integer countAssetsToMeter(UserAccount user) {
-        return jdbcTemplate.queryForObject("select count(*) from asset_info a inner join measuring_type_config m " +
-                        " on a.measuring_item_category || '' = m.measuring_item_category and a.tenant_uid = m.tenant_uid " +
+        return jdbcTemplate.queryForObject("select count(*) from asset_info a " +
                         " where (a.tenant_uid = ? OR a.institution_uid = ? OR a.hospital_uid = ? OR a.site_uid = ?) " +
-                        " and now() between m.next_metering_date::date and m.next_metering_date::date - ?",
-                Integer.class, user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), getMeteringRemindDays(user));
+                        " and a.next_metering_date between date_trunc('month', now()) and date_trunc('month', now() + interval '2 months')",
+                Integer.class, user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), user.getSiteUID());
     }
 
     public Integer countOpenIssues(UserAccount user) {
