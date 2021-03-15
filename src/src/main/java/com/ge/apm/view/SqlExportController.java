@@ -5,13 +5,13 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.view.sysutil.AppContextService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.log4j.Logger;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleEvent;
 import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.Visibility;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +42,7 @@ import java.util.*;
 public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
 
     private static final long serialVersionUID = -1L;
+    protected static final Logger logger = Logger.getLogger(SqlExportController.class);
     // final String excelExportDestfilepath = "C:/zk/test/export/excel/";
     // final String excelExportDestfilepath = "/tmp/apm/export";
     ConfigUtils configUtils;
@@ -71,8 +72,10 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
     public List<FieldInfo> getFieldList() {
         return fieldList;
     }
+
     @Override
     public String getColumnNameList() {
+        logger.error("=========SqlExportController.getColumnNameList");
         return sqlColumns;
     }
     protected void updateTableColumns() {
@@ -102,14 +105,17 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
     }
     @Override
     protected void init() {
+        logger.info("=========SqlExportController.init start===========");
         sqlDao = WebUtil.getBean(SqlExportQueueRepostitory.class);
         configUtils = WebUtil.getBean(ConfigUtils.class);
         loginUser = UserContextService.getCurrentUserAccount();
 
         //判断是否是理想用户
         if(!loginUser.getIsSuperAdmin()){
+            logger.info("=========SqlExportController.init this.isShow = FALSE===========");
             this.isShow = Boolean.FALSE;
         }else {
+            logger.info("=========SqlExportController.init this.isShow = TRUE===========");
             this.isShow = Boolean.TRUE;
         }
     }
@@ -129,58 +135,6 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
         return res;
     }
 
-    /*@Override
-    protected Page<Map<String, Object>> loadDataEnd(PageRequest pageRequest) {
-        if(selectedProduct.getExecuteStatement()==null){
-            return null;
-        }
-        sql = selectedProduct.getExecuteStatement();
-        sql = sql.trim();
-        if("".equals(sql)) return null ;
-
-        // remove the last ; if exists
-        if(sql.endsWith(";")) sql = sql.substring(0, sql.length()-1);
-        if(!sql.toLowerCase().startsWith("select ")){
-            executeSql();
-            return null;
-        }
-
-        this.countSql = "select count(*) from ("+sql+ ") tmp";
-
-        String theSQL = sql.replace(":#searchFilter", "").replace(":#orderBy", "");
-
-        //update countSQL: to fill in :#searchFilter part. there should be no :#orderBy in countSQL
-        String theCountSQL = (countSql == null) ? "select count(*) from (" + theSQL + ") _count" : countSql;
-        theCountSQL = theCountSQL.replace(":#searchFilter", "");
-        Map<String, Object> params = new HashMap<>();
-        params.put("_sql", theCountSQL);
-
-        //get count of rows: execute the countSQL
-        List<Map<String, Object>> result = (List<Map<String, Object>>) SiBroker.sendRequestWithHeaders("direct:executeNativeSQL", null, params);
-        int rowCount = Integer.parseInt(result.get(0).values().toArray()[0].toString());
-
-        // add Page limit to the sql
-        theSQL = theSQL + AppContextService.getSqlPagingTemplate();
-        params.put("_sql", theSQL);
-        params.put("_pageStart", 0 * 20);
-        params.put("_pageSize", 20);
-        result = (List<Map<String, Object>>) SiBroker.sendRequestWithHeaders("direct:executeNativeSQL", null, params);
-        selectList = new PageImpl<Map<String, Object>>(result, pageRequest, rowCount);
-        // updateTableColumns
-
-        sqlColumns = "";
-        List<Map<String, Object>> list = selectList.getContent();
-        if(list.size()>0){
-            Map<String, Object> row = list.get(0);
-
-            for(Object field: row.keySet().toArray()){
-                sqlColumns = sqlColumns + " " + field.toString();
-            }
-        }
-        sqlColumns = sqlColumns.trim();
-        updateTableColumns();
-        return selectList;
-    }*/
 
 
     @Override
@@ -217,18 +171,24 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
     //
     public void addSelectSql(){
         //1.判断是否有数据返回
+        logger.info("=========SqlExportController.addSelectSql start===========");
         Map<String, Object> params = new HashMap();
         this.countSql = "select count(*) from ("+sql+ ") tmp";
         String theCountSQL = (countSql == null) ? "select count(*) from (" + sql + ") _count" : countSql;
+        logger.info("=========SqlExportController.addSelectSql theCountSQL={"+theCountSQL+"}===========");
         theCountSQL = theCountSQL.replace(":#searchFilter", "");
         params.put("_sql", countSql);
         params.put("_pageStart", 0);
         params.put("_pageSize", 20);
         List<Map<String, Object>> result = (List<Map<String, Object>>) SiBroker.sendRequestWithHeaders("direct:executeNativeSQL", null, params);
+        logger.info("=========SqlExportController.addSelectSql result.size={"+result.size()+"}===========");
         int rowCount = Integer.parseInt(result.get(0).values().toArray()[0].toString());
+        logger.info("=========SqlExportController.addSelectSql rowCount={"+rowCount+"}===========");
         int sqlExportQueueCount = sqlDao.findSqlExportQueueByExecuteStatement(sql);
+        logger.info("=========SqlExportController.addSelectSql sqlExportQueueCount={"+sqlExportQueueCount+"}===========");
         if(rowCount > 0 && sqlExportQueueCount == 0 ){
             //2.插入任务列表
+            logger.info("=========SqlExportController.addSelectSql sqlDao.save(sqlExportQueue) start===========");
             SqlExportQueue sqlExportQueue = new SqlExportQueue();
             sqlExportQueue.setCreater(loginUser.getId());
             sqlExportQueue.setCreaterName(loginUser.getLoginName());
@@ -236,6 +196,7 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
             sqlExportQueue.setExecuteStatement(sql);
             sqlExportQueue.setTaskStatus(0);
             sqlDao.save(sqlExportQueue);
+            logger.info("=========SqlExportController.addSelectSql sqlDao.save(sqlExportQueue) end===========");
         }else{
             WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+"语句");//重复的语句
         }
@@ -283,20 +244,27 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
         System.out.println(selectedProduct);
     }
     public void exportTemplate2(SqlExportQueue selectedProduct){
+        logger.info("=========SqlExportController.exportTemplate2  start updateTime={"+selectedProduct.getUpdateTime()+"}==========");
         Date d = selectedProduct.getUpdateTime();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String dateNowStr = sdf.format(d);
         String fileDir = configUtils.fetchProperties("excelExportDestfilepath")+dateNowStr+"/"+selectedProduct.getId()+".xlsx";
+        logger.info("=========SqlExportController.exportTemplate2 fileDir={"+fileDir+"}==========");
         File f= new File(fileDir) ;    // 声明File对象
+        logger.info("=========SqlExportController.exportTemplate2 file={"+f.toString()+"}==========");
         //InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(fileDir);
         // 第2步、通过子类实例化父类对象
         InputStream input = null ;    // 准备好一个输入的对象
         try {
+            logger.info("=========SqlExportController.exportTemplate2 input = new FileInputStream(f)==========");
             input = new FileInputStream(f);
         } catch (FileNotFoundException e) {
+            logger.error("=========SqlExportController.exportTemplate2 input = new FileInputStream(f) Error==========");
             e.printStackTrace();
         }
+        logger.info("=========SqlExportController.exportTemplate2 exportTemplate==========");
         exportTemplate = new DefaultStreamedContent(input, "application/vnd.ms-excel", selectedProduct.getId()+".xlsx");
+        logger.info("=========SqlExportController.exportTemplate2 exportTemplate end==========");
     }
 
     public void exportGenerate(SqlExportQueue selectedProduct){
@@ -306,23 +274,32 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
     }
 
     public void setSelectedProduct(SqlExportQueue selectedProduct) {
+        logger.info("=========SqlExportController.setSelectedProduct  start===========");
         this.selectedProduct = selectedProduct;
         getPreviewData(1);
+        logger.info("=========SqlExportController.setSelectedProduct  end===========");
     }
     public void gotoPageNumMethod() {
+        logger.info("=========SqlExportController.gotoPageNumMethod  start===========");
         if(gotoPageNum<0){
+            logger.info("=========SqlExportController.gotoPageNumMethod gotoPageNum<0  ===========");
             gotoPageNum = 1;
         }else if(gotoPageNum>selectPageSize){
+            logger.info("=========SqlExportController.gotoPageNumMethod gotoPageNum>0  ===========");
             gotoPageNum = selectPageSize;
         }
         getPreviewData(gotoPageNum);
+        logger.info("=========SqlExportController.gotoPageNumMethod  end===========");
     }
     private void getPreviewData(int gotoPageNum){
+        logger.info("=========SqlExportController.getPreviewData  start===========");
         if(selectedProduct.getExecuteStatement()==null){
+            logger.info("=========SqlExportController.getPreviewData  selectedProduct.getExecuteStatement()==null===========");
             return;
         }
         sql = selectedProduct.getExecuteStatement();
         sql = sql.trim();
+        logger.info("=========SqlExportController.getPreviewData sql={"+sql+"}");
         if("".equals(sql)) return;
 
         // remove the last ; if exists
@@ -354,13 +331,16 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
         result = (List<Map<String, Object>>) SiBroker.sendRequestWithHeaders("direct:executeNativeSQL", null, params);
         PageRequest pageRequest = new PageRequest(gotoPageNum-1,20);
 
+        logger.info("=========SqlExportController.getPreviewData PageImpl start");
         selectList = new PageImpl<Map<String, Object>>(result, pageRequest, rowCount);
+        logger.info("=========SqlExportController.getPreviewData PageImpl end");
         // updateTableColumns
 
         sqlColumns = "";
         List<Map<String, Object>> list = selectList.getContent();
         selectTotalPages =  selectList.getTotalElements();
         selectPageSize = selectList.getTotalPages();
+        logger.info("=========SqlExportController.getPreviewData selectTotalPages={"+selectTotalPages+"}  selectPageSize={"+selectPageSize+"}");
         if(list.size()>0){
             Map<String, Object> row = list.get(0);
 
@@ -369,7 +349,9 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
             }
         }
         sqlColumns = sqlColumns.trim();
+        logger.info("=========SqlExportController.getPreviewData updateTableColumns start and sqlColumns={"+sqlColumns+"}");
         updateTableColumns();
+        logger.info("=========SqlExportController.getPreviewData  updateTableColumns end");
     }
     public String fieldValue(String msgKey) {
         switch(msgKey)

@@ -47,14 +47,17 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     public AssetInfo findByUid(String uid);
 
+    @Query("select ai from AssetInfo ai where ai.uid in ?1 and ai.sharedAssetTypeUid is not null ")
+    public List<AssetInfo> findBySharedAssetTypeUid(List<String> uids);
+
     @Query("select o from AssetInfo o where o.financingNum = ?1 and o.siteUID=?2 and o.isValid=true and o.isDeleted=false and o.status!=4")
     public List<AssetInfo> findByFinancingNum(String financingNum,String siteUID);
 
     public List<AssetInfo> getByQrCodeAndHospitalId(String qrCode, Integer hospitalId);
-    
+
     @Query(value="select o.* from asset_info o where o.site_uid=?1 and o.is_valid=true and o.is_deleted=false and o.status!=4",nativeQuery=true)
     public List<AssetInfo> findBySiteUid(String siteUid);
-    
+
     @Query(value="select o.* from asset_info o where o.is_valid=true and o.is_deleted=false and o.status!=4 and o.site_uid=?1 and o.clinical_dept_uid=?2",nativeQuery=true)
     public List<AssetInfo> findBySiteAndClinical(String siteUid,String departUid);
 
@@ -109,6 +112,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public void updateStandardCode(String name, String uid);
 
     public List<AssetInfo> findByUidIn(List<String> assetUids);
+
+    public List<AssetInfo> findByIdIn(List<Integer> assetIds);
 
     public List<AssetInfo> findByUidIn(List<String> assetUids, Sort sort);
 
@@ -167,16 +172,16 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value= "select u.* from asset_info u where u.uid in ?1 ",nativeQuery=true)
     public List<AssetInfo> getByUids(Set<String> setUids);
-    
+
     @Query(value= "select new com.ge.apm.domain.AssetInfo(name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation) from AssetInfo u where u.uid in ?1 ")
     public List<AssetInfo> getSimpleDataByUids(Set<String> setUids);
-    
+
     @Query(value= "select new com.ge.apm.domain.AssetInfo(name,uid,departNum,serialNum,functionType,clinicalDeptName,clinicalDeptUID,nurseLocation) from AssetInfo u where u.uid = ?1 ")
     public AssetInfo getSimpleDataByUids(String uid);
 
     @Query(value= "select exists(select 1 from asset_info where tenant_uid = ?1)",nativeQuery = true)
     boolean findRecordByTenantUid(String uid);
-    
+
     @Query(value= "select o.site_uid from asset_info o where o.mvs_equip=1",nativeQuery = true)
     public Set<String> findMVSSiteUid();
     @Query(value= "select o.tenant_uid from asset_info o where o.mvs_equip=1",nativeQuery = true)
@@ -249,6 +254,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value="select *from asset_info where parent_asset_id = ?1",nativeQuery=true)
     List<AssetInfo> findChildAssets(Integer id);
+
+    List<AssetInfo> findByParentAssetId(Integer parentAssetId);
 
     @Query(value="select uid from asset_info where depart_num = ?1  and  tenant_uid = ?2  and is_deleted = false ",nativeQuery=true)
     List<String> findIdByDepartNumAndTenantUID(String departNum,String tenantUID);

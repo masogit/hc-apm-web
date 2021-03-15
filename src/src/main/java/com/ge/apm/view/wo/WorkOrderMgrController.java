@@ -1183,7 +1183,14 @@ public void test1(){
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_DOCS);
+    }
 
+    //故障类型是否必填
+    public Boolean requireCaseType(){
+        ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
+                selectedWorkOrder.getAssetId());
+        return Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
+                .map(data -> (Boolean) data.get("isCasetypeRequired")).orElse(false);
     }
 
     //  提交审核前的计算
@@ -1315,7 +1322,7 @@ public void test1(){
             RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
             valid = false;
         }
-        if (null == selectedWorkOrder.getCaseType()) {
+        if (requireCaseType() && null == selectedWorkOrder.getCaseType()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("caseType") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
             valid = false;

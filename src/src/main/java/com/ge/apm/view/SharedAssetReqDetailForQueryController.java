@@ -7,14 +7,12 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.AllocationCenterUtils;
-import com.ge.apm.service.utils.SharedAssetInfoUtils;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import javaslang.Tuple2;
-import javaslang.Tuple3;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.component.datatable.DataTable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -24,13 +22,12 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author caoyong
  */
 @ManagedBean
@@ -39,7 +36,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
 
     SharedAssetReqDetailRepository dao = null;
     private String iouUid;
-   
+
     private Integer iouId = -1;
     private List<String> selectedBorrowAccessoryList = null;
     private List<String> selectedReturnAccessoryList = null;
@@ -47,6 +44,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     SharedAssetReqTypeRepository apdDao = null;
     SharedAssetRequestRepository sharedDao = null;
     OrgInfoRepository orgInfoDao = null;
+    AssetInfoService assetInfoService = null;
     WorkflowConfigRepository wfCfigDao = null;
     SharedAssetTypeRepository sharedAssetTypeRepository = null;
     private UaaService uuaService;
@@ -54,6 +52,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     private Date filterBeginTime;
     private Date filterEndTime;
     private String oneSearchStr;
+    private Object clinicalDeptName;
 
     public String getOneSearchStr() {
         return oneSearchStr;
@@ -101,20 +100,21 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
         sharedAssetTypeRepository = WebUtil.getBean(SharedAssetTypeRepository.class);
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
         String actionName = (String)UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         iouUid = (String)UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
         if ("Create".equalsIgnoreCase(actionName)) {
             iouId = -2 ;
-        }  
+        }
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-        
+
     }
-    
-    
+
+
     @Override
     protected SharedAssetReqDetailRepository getDAO() {
         return dao;
@@ -127,8 +127,8 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         }
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uuaService.getUserAccessibleSiteListWithClinicalDept(user.getUid()).stream()
-																					                .filter(item -> item.getOrgType() == 4)  
-																					                .map(item -> item.getUid())  
+																					                .filter(item -> item.getOrgType() == 4)
+																					                .map(item -> item.getUid())
 																					                .collect(Collectors.toList());
         this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -137,11 +137,36 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         this.updateSearchFilter(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 
     }
-    
+
+    @Override
+    public void getFilterMatchModes(DataTable table) {
+        super.getFilterMatchModes(table);
+        clinicalDeptNameParamInit(table);
+    }
+
+    private void clinicalDeptNameParamInit(DataTable table) {
+        Object clinicalDeptName = table.getFilters().remove("clinicalDeptName");
+        this.clinicalDeptName = clinicalDeptName;
+        }
+    private void addClinicalDeptNameSearchFilters() {
+        if(this.clinicalDeptName == null){
+            return;
+        }
+        String name = clinicalDeptName.toString();
+        if(name.length() == 0){
+            return;
+        }
+        List<SelectItem> orgInfo = assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel();
+        List<Object> orgUidList = orgInfo.stream().filter(item -> item.getLabel().contains(name)).map(SelectItem::getValue).collect(Collectors.toList());
+        this.searchFilters.add(0,new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList,"1*"));
+    }
+
     @Override
     protected Page<SharedAssetReqDetail> loadData(PageRequest pageRequest) {
 
         setUserSearchFilters();
+
+        addClinicalDeptNameSearchFilters();
 
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
         List<WorkflowConfig> wfCfigList = wfCfigDao.findByDeptForSharedAsset(orgUid);
@@ -174,6 +199,8 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
     }
+
+
 
     public void searchList(Long queryIndex){
         this.queryIndex = queryIndex;
@@ -237,7 +264,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         return number * unitPrice;
 
     }
-    
+
     public String getclinicalDeptName(String Uid){
         if(null == Uid||Uid.equalsIgnoreCase("")){
             return "";
@@ -287,7 +314,6 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         this.searchFilters.removeAll(existedFilters);
         searchFilters.add(searchFilter);
     }
-
 
 
 }
