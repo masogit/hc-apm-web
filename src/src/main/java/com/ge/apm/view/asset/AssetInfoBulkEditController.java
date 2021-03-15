@@ -372,36 +372,13 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-
-        List<AssetInfo> newList = new ArrayList<>();
-        newList= depCopy(assetInfoList);
-        Integer oldClinicalDeptId = null;
         List<Integer> idList =new ArrayList<>();
+        List<AssetInfo> newList = depCopy(assetInfoList);
         for (AssetInfo assetInfo : newList ) {
             idList.add(assetInfo.getId());
-            selected.setIsValid(assetInfo.getIsValid());
-            selected.setIbDeviceStatus(assetInfo.getIbDeviceStatus());
-            selected.setConnectToInsite(assetInfo.getConnectToInsite());
-            if(selected.getAssetDeptId()==0){
-                selected.setAssetDeptId(null);
-            }
-            selected.setSiteId(assetInfo.getSiteId());
-            selected.setSiteUID(assetInfo.getSiteUID());
-            selected.setHospitalId(assetInfo.getHospitalId());
-            selected.setTenantUID(assetInfo.getTenantUID());
-            selected.setHospitalUID(assetInfo.getHospitalUID());
-            selected.setInstitutionUID(assetInfo.getInstitutionUID());
-            oldClinicalDeptId = assetInfo.getClinicalDeptId();
-            copyPropertiesExclude(selected, assetInfo);
-
-        }
-        this.saveAssetHistory(assetInfoList,newList);
-        for (AssetInfo assetInfo: newList) {
-            dao.save(assetInfo);
-            onAfterNewObject(assetInfo);
         }
         for (AssetInfo assetInfo: newList) {
-            if(selected.getClinicalDeptId() != null && !selected.getClinicalDeptId().equals(oldClinicalDeptId) && selected.getParentAssetId() == null){
+            if(selected.getClinicalDeptId() != null && !selected.getClinicalDeptId().equals(assetInfo.getClinicalDeptId()) && selected.getParentAssetId() == null){
                 List<AssetInfo> assetInfoByParentAssetId = dao.findByParentAssetId(assetInfo.getId());
                 if(!assetInfoByParentAssetId.isEmpty()){
                     for(AssetInfo date:assetInfoByParentAssetId){
@@ -429,6 +406,28 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                     }
                 }
             }
+        }
+        for (AssetInfo assetInfo : newList ) {
+            idList.add(assetInfo.getId());
+            selected.setIsValid(assetInfo.getIsValid());
+            selected.setIbDeviceStatus(assetInfo.getIbDeviceStatus());
+            selected.setConnectToInsite(assetInfo.getConnectToInsite());
+            if(selected.getAssetDeptId()==0){
+                selected.setAssetDeptId(null);
+            }
+            selected.setSiteId(assetInfo.getSiteId());
+            selected.setSiteUID(assetInfo.getSiteUID());
+            selected.setHospitalId(assetInfo.getHospitalId());
+            selected.setTenantUID(assetInfo.getTenantUID());
+            selected.setHospitalUID(assetInfo.getHospitalUID());
+            selected.setInstitutionUID(assetInfo.getInstitutionUID());
+            copyPropertiesExclude(selected, assetInfo);
+        }
+
+        this.saveAssetHistory(assetInfoList,newList);
+        for (AssetInfo assetInfo: newList) {
+            dao.save(assetInfo);
+            onAfterNewObject(assetInfo);
         }
         AssetInfoListController.resultAssetMap.clear();
         if(assetInfos != null && !assetInfos.isEmpty()){
