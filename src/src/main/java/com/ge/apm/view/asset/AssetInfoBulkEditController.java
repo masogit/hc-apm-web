@@ -1029,14 +1029,29 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
     }
     private void changeAssetOrg(OrgInfo orgInfo) {
-        selected.setSiteId(orgInfo.getSiteId());
+        if(assetInfoList != null && !assetInfoList.isEmpty()){
+            String siteUID = assetInfoList.get(0).getSiteUID();
+            boolean isSiteUid = true;
+            for(AssetInfo assetInfo :assetInfoList){
+                if(!siteUID.equals(assetInfo.getSiteUID())){
+                    isSiteUid = false;
+                }
+            }
+            if(isSiteUid){
+                selected.setSiteId(assetInfoList.get(0).getSiteId());
+                selected.setSiteUID(siteUID);
+                config = configService.findConfigBySite(siteUID);
+            }
+        }else{
+            selected.setSiteId(orgInfo.getSiteId());
+            selected.setSiteUID(orgInfo.getSiteUID());
+            config = configService.findConfigBySite(selected.getSiteUID());
+        }
         selected.setHospitalId(orgInfo.getId());
 
         selected.setTenantUID(orgInfo.getTenantUID());
         selected.setHospitalUID(orgInfo.getHospitalUID());
         selected.setInstitutionUID(orgInfo.getInstitutionUID());
-        selected.setSiteUID(orgInfo.getSiteUID());
-        config = configService.findConfigBySite(selected.getSiteUID());
 
         updateClinicalDeptOnSiteChange();
 
