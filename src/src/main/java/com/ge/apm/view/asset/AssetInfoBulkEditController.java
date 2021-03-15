@@ -169,6 +169,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     @Getter
     private List<JSONObject> changeHistoryList = new ArrayList<>();
     private String uidList = null;
+    @Getter
+    private List<AssetInfo> assetInfoList = null;
+    public Set<AssetInfo> assetInfos = null;
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -206,6 +209,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (assetGroupSecondarySupport) {
             onAssetGroupChange();
         }
+        uidList = WebUtil.getRequestParameter("uidList");
+        if(AssetInfoListController.resultAssetMap!=null){
+            assetInfoList = AssetInfoListController.resultAssetMap.get(uidList);
+        }
         ownerList = ucService.getWorkerList(selected.getId(), "");
         selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
         changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
@@ -215,7 +222,8 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         initGbTree();
         qrCode = WebUtil.getRequestParameter("qrCode");
         updateAssetStatusList();
-        uidList = WebUtil.getRequestParameter("uidList");
+
+
     }
     public void saveNewSupplier() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -240,14 +248,111 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     public String getListPageLink() {
         return "AssetList.xhtml?faces-redirect=true";
     }
-    public String applyChange() throws Exception {
 
-        //check whether parent asset is valid when editing
+
+    public Set<AssetInfo> getAssetInfos() {
+        return assetInfos;
+    }
+    public boolean getFlag() {
+        if (assetInfos != null){
+            return false;
+        }
+        return true;
+    }
+
+    public String applyChange() throws Exception {
+        assetInfos = new HashSet<>();
         if (!isValidParentAsset()) {
             WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
             return "";
         }
+        String clinicalDeptUID = selected.getClinicalDeptUID();
+        if(clinicalDeptUID != null){
+            List<String> adjustByassetInfoUid = assetInfoBulkEditCheckService.verifyByBatchEdit(assetInfoList);
+            if(adjustByassetInfoUid != null && !adjustByassetInfoUid.isEmpty()){
+                List<AssetInfo> assets = dao.findByUidIn(adjustByassetInfoUid);
+                for ( AssetInfo a:assets) {
+                    a.setErrorMessage("正在调剂中，不能修改所属科室!");
+                }
+                assetInfos.addAll(assets);
+                assetInfoList.removeAll(assets);
+            }
+            List<String> maintainByassetInfoUid = assetInfoBulkEditCheckService.verifyForMaintainByBatchEdit(assetInfoList);
+            if(maintainByassetInfoUid != null && !maintainByassetInfoUid.isEmpty()){
+                List<AssetInfo> assets = dao.findByUidIn(maintainByassetInfoUid);
+                for ( AssetInfo a:assets) {
+                    a.setErrorMessage("正在保养中，不能修改所属科室!");
+                }
+                assetInfos.addAll(assets);
+                assetInfoList.removeAll(assets);
+            }
+            List<Integer> assetIds = assetInfoBulkEditCheckService.verifyForInventoryByBatchEdit(assetInfoList);
+            if(assetIds != null && !assetIds.isEmpty()){
+                List<AssetInfo> assets = dao.findByIdIn(assetIds);
+                for ( AssetInfo a:assets) {
+                    a.setErrorMessage("正在盘点中，不能修改所属科室!");
+                }
+                assetInfos.addAll(assets);
+                assetInfoList.removeAll(assets);
+            }
+            if(assetInfoList != null && !assetInfoList.isEmpty()){
+                for(AssetInfo as:assetInfoList){
+                    List<V2_ServiceRequest> serviceRequestList =v2ServiceRequestRepository.findByAssetId(as.getId());
+                    if(CollectionUtils.isNotEmpty(serviceRequestList)){
+                        List<Integer> repairByAssetIds = new ArrayList<>();
+                        for(V2_ServiceRequest service: serviceRequestList){
+                            if(service.getCloseTime()==null){
+                                repairByAssetIds.add(service.getAssetId());
+                            }
+                        }
+                        if(repairByAssetIds!= null && !repairByAssetIds.isEmpty()){
+                            List<AssetInfo> assets = dao.findByIdIn(repairByAssetIds);
+                            for ( AssetInfo a:assets) {
+                                a.setErrorMessage("正在维修中，不能修改所属科室!");
+                            }
+                            assetInfos.addAll(assets);
+                        }
+                    }
+                }
+                assetInfoList.removeAll(assetInfos);
+                List<String> assetUids = assetInfoList.stream().map(assetInfo -> assetInfo.getUid()).collect(Collectors.toList());
+                List<AssetInfo> assets = dao.findBySharedAssetTypeUid(assetUids);
+                if (assets != null && !assets.isEmpty()){
+                    for ( AssetInfo a:assets) {
+                        a.setErrorMessage("调剂设备，不能修改所属科室!");
+                    }
+                    assetInfos.addAll(assets);
+                    assetInfoList.removeAll(assets);
+                }
+                //临床助手检查进行中
+                List<AssetInfo> assetList = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assetInfoList);
+                if (assetList != null && !assetList.isEmpty()) {
+                    for ( AssetInfo a:assetList) {
+                        a.setErrorMessage("当前有未完成的日常检查工单无法迁移，不能修改所属科室!");
+                    }
+                    assetInfos.addAll(assetList);
+                    assetInfoList.removeAll(assetList);
+                }
+            }
+        }
+        String assetDeptUID = selected.getAssetDeptUID();
+        if(assetDeptUID != null){
+            if(assetInfoList != null && !assetInfoList.isEmpty()){
+                List<String> assetUids = assetInfoList.stream().map(assetInfo -> assetInfo.getUid()).collect(Collectors.toList());
+                List<AssetInfo> assets = dao.findBySharedAssetTypeUid(assetUids);
+                if (assets != null && !assets.isEmpty()){
+                    for ( AssetInfo a:assets) {
+                        a.setErrorMessage("调剂设备，不能修改使用科室!");
+                    }
+                    assetInfos.addAll(assets);
+                    assetInfoList.removeAll(assets);
+                }
 
+            }
+        }
+        if(assetInfoList == null && assetInfoList.isEmpty()){
+            return "";
+        }
         //设置质保时间
         if (null == selected.getFactoryWarrantyDate()) {
             if (selected.getAcceptDate() != null && selected.getWarrantyMonth() != null) {
@@ -267,10 +372,43 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (UserContextService.isMVSRole() && this.selected.getMvsEquip() == null) {
             this.selected.setMvsEquip(1);
         }
-        List<AssetInfo> assetInfoList = AssetInfoListController.resultAssetMap.get(uidList);
-        List<AssetInfo> newList = new ArrayList<>();
-        newList= depCopy(assetInfoList);
+        List<Integer> idList =new ArrayList<>();
+        List<AssetInfo> newList = depCopy(assetInfoList);
         for (AssetInfo assetInfo : newList ) {
+            idList.add(assetInfo.getId());
+        }
+        for (AssetInfo assetInfo: newList) {
+            if(selected.getClinicalDeptId() != null && !selected.getClinicalDeptId().equals(assetInfo.getClinicalDeptId()) && selected.getParentAssetId() == null){
+                List<AssetInfo> assetInfoByParentAssetId = dao.findByParentAssetId(assetInfo.getId());
+                if(!assetInfoByParentAssetId.isEmpty()){
+                    for(AssetInfo date:assetInfoByParentAssetId){
+                        if(!idList.contains(date.getId())){
+                            date.setParentAssetId(null);
+                            dao.save(date);
+                        }
+                    }
+                }else {
+                    Integer parentAssetId = assetInfo.getParentAssetId();
+                    if(!idList.contains(parentAssetId)){
+                        assetInfo.setParentAssetId(null);
+                        dao.save(assetInfo);
+                    }
+                }
+            }
+            if(selected.getParentAssetId() != null){
+                List<AssetInfo> assetInfoByParentAssetId = dao.findByParentAssetId(assetInfo.getId());
+                if(!assetInfoByParentAssetId.isEmpty()){
+                    for(AssetInfo date:assetInfoByParentAssetId){
+                        if(!idList.contains(date.getId())){
+                            date.setParentAssetId(null);
+                            dao.save(date);
+                        }
+                    }
+                }
+            }
+        }
+        for (AssetInfo assetInfo : newList ) {
+            idList.add(assetInfo.getId());
             selected.setIsValid(assetInfo.getIsValid());
             selected.setIbDeviceStatus(assetInfo.getIbDeviceStatus());
             selected.setConnectToInsite(assetInfo.getConnectToInsite());
@@ -285,12 +423,16 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             selected.setInstitutionUID(assetInfo.getInstitutionUID());
             copyPropertiesExclude(selected, assetInfo);
         }
+
         this.saveAssetHistory(assetInfoList,newList);
         for (AssetInfo assetInfo: newList) {
             dao.save(assetInfo);
             onAfterNewObject(assetInfo);
         }
         AssetInfoListController.resultAssetMap.clear();
+        if(assetInfos != null && !assetInfos.isEmpty()){
+            return "";
+        }
         return "AssetList.xhtml?faces-redirect=true";
     }
 
@@ -306,7 +448,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
 
     }
-
 
     public static <T> List<T> depCopy(List<T> srcList) {
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -429,14 +570,14 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             return false;
         }
 
-        if (StringUtils.isEmpty(selected.getClinicalDeptUID())) {
-            return false;
-        }
-
-        //parent asset and child asset will be in the same dept
-        if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
-            return false;
-        }
+//        if (StringUtils.isEmpty(selected.getClinicalDeptUID())) {
+//            return false;
+//        }
+//
+//        //parent asset and child asset will be in the same dept
+//        if (!selected.getClinicalDeptUID().equals(assetInfo.getClinicalDeptUID())) {
+//            return false;
+//        }
 
         return true;
     }
@@ -656,6 +797,50 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         AssetInfo selectedAsset = (AssetInfo) selectedObjectMap.get("parentAsset");
         selected.setParentAssetId(null == selectedAsset ? null : selectedAsset.getId());
     }
+    public List<AssetInfo> completeParentAssetIdList(String query) {
+        Integer clinicalDeptId = assetInfoList.get(0).getClinicalDeptId();
+        String clinicalDeptName = assetInfoList.get(0).getClinicalDeptName();
+        String clinicalDeptUID = assetInfoList.get(0).getClinicalDeptUID();
+        Integer clinicalDeptIdNew = selected.getClinicalDeptId();
+        String clinicalDeptNameNew = selected.getClinicalDeptName();
+        String clinicalDeptUIDNew = selected.getClinicalDeptUID();
+        selected.setClinicalDeptId(clinicalDeptId);
+        selected.setClinicalDeptName(clinicalDeptName);
+        selected.setClinicalDeptUID(clinicalDeptUID);
+        boolean b = true;
+        List<Integer> assetInfoIdList = new ArrayList<>();
+        for (AssetInfo assetInfo:assetInfoList) {
+            assetInfoIdList.add(assetInfo.getId());
+            if(clinicalDeptIdNew!=null){
+                b = true;
+                selected.setClinicalDeptId(clinicalDeptIdNew);
+                selected.setClinicalDeptName(clinicalDeptNameNew);
+                selected.setClinicalDeptUID(clinicalDeptUIDNew);
+                break;
+            }else {
+                if(!clinicalDeptId.equals(assetInfo.getClinicalDeptId())){
+                    b = false;
+                    break;
+                }
+            }
+
+        }
+        if (b){
+            parentAssetList = new ArrayList<>();
+            List<AssetInfo> parentsAssetInfoList = aimService.getParentsAssetsList(this.selected);
+            for(AssetInfo assetInfo :parentsAssetInfoList){
+                if(!assetInfoIdList.contains(assetInfo.getId())){
+                    parentAssetList.add(assetInfo);
+                }
+            }
+        }else {
+            parentAssetList = null;
+        }
+        selected.setClinicalDeptId(clinicalDeptIdNew);
+        selected.setClinicalDeptName(clinicalDeptNameNew);
+        selected.setClinicalDeptUID(clinicalDeptUIDNew);
+        return autoCompleteService.completeAssetInfoList(query, parentAssetList);
+    }
 
     public List<AssetInfo> completeParentAssetId(String query) {
         parentAssetList = aimService.getParentsAssetsList(this.selected);
@@ -777,8 +962,22 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         changeAssetOrg(orgInfo);
     }
     private void updateClinicalDeptOnSiteChange() {
+        if(assetInfoList != null && !assetInfoList.isEmpty()){
+            String siteUID = assetInfoList.get(0).getSiteUID();
+            boolean isSiteUid = true;
+            for(AssetInfo assetInfo :assetInfoList){
+                if(!siteUID.equals(assetInfo.getSiteUID())){
+                    clinicalDeptList = new ArrayList<>();
+                    isSiteUid = false;
+                }
+            }
+            if(isSiteUid){
+                clinicalDeptList = orgDao.getDeptListBySiteUid(siteUID);
+            }
+        }else {
+            clinicalDeptList = clinicalDeptService.getUserAccessibleClinicalDeptsBySelectedSite(selected.getSiteUID());
+        }
 
-        clinicalDeptList = clinicalDeptService.getUserAccessibleClinicalDeptsBySelectedSite(selected.getSiteUID());
     }
     public void getClinicalOwnerList() {
         if (null != selected.getClinicalDeptUID()) {
@@ -786,6 +985,28 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         } else {
             clinicalOwnerList = Collections.emptyList();
         }
+    }
+    public void onAssetDeptChangeEdit(String idx) {
+        OrgInfo clinicalDept = null;
+        switch (idx) {
+            case "clinicalDept":
+                clinicalDept = (OrgInfo) selectedObjectMap.get("clinicalDept");
+                selected.setClinicalDeptId(clinicalDept == null ? null : clinicalDept.getId());
+                selected.setClinicalDeptName(clinicalDept == null ? null : clinicalDept.getName());
+                selected.setClinicalDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
+                selectedObjectMap.put("clinicalOwner", null);
+                onOwnerChange("clinicalOwner");
+                getClinicalOwnerList();
+                selected.setParentAssetId(null);
+                selectedObjectMap.put("parentAsset",null);
+                break;
+            case "assetDept":
+                clinicalDept = (OrgInfo) selectedObjectMap.get("assetDept");
+                selected.setAssetDeptId(clinicalDept == null ? null : clinicalDept.getId());
+                selected.setAssetDeptUID(clinicalDept == null ? null : clinicalDept.getUid());
+                break;
+        }
+
     }
     public void onAssetDeptChange(String idx) {
         OrgInfo clinicalDept = null;
@@ -942,6 +1163,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
         Page<AssetInfo> page = dao.findBySearchFilter(this.searchFilters, pageRequest);
         List<AssetInfo> source = new ArrayList<>(page.getContent());
+        source.removeAll(assets.getTarget());
         assets.setSource(source);
 
         return assets;
@@ -987,8 +1209,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             searchFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
-
-
     }
 
     public void onTransfer(TransferEvent event) {

@@ -336,3 +336,68 @@ one_qr_code varchar(256),
 asset_class int4,
 bar_code varchar(256),
 install_status int4);
+
+DROP VIEW IF EXISTS acc_message_subscriber_dblink;
+CREATE VIEW acc_message_subscriber_dblink AS SELECT
+	*
+FROM
+	dblink (
+'hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
+'select
+t1.id,
+t1.site_id,
+t1.hospital_id,
+t1.asset_id,
+t1.subscribe_user_id,
+t1.receive_msg_mode,
+t1.is_receive_timeout_msg,
+t1.is_receive_chat_msg,
+t1.created_by,
+t1.created_date,
+t1.last_modified_by,
+t1.last_modified_date,
+t1.tenant_uid,
+t1.institution_uid,
+t1.hospital_uid,
+t1.site_uid,
+t1.level_0,
+t1.level_1,
+t1.level_2,
+t1.main_rep_hit,
+t1.quality_hit,
+t1.contract_due_hit,
+t1.meter_hit,
+t1.repair_hit,
+t1.select_type,
+t3.wechat_id,
+t2.system_id
+from message_subscriber t1,asset_info t2,user_account t3
+where t1.asset_id = t2.id and t1.subscribe_user_id = t3.id and t3.wechat_id is not null and t2.system_id is not null'
+	) AS T (
+id int4,
+site_id int4,
+hospital_id int4,
+asset_id int4,
+subscribe_user_id int4,
+receive_msg_mode int4,
+is_receive_timeout_msg bool,
+is_receive_chat_msg bool,
+created_by varchar(50),
+created_date timestamp(6),
+last_modified_by varchar(50),
+last_modified_date timestamp(6),
+tenant_uid char(32),
+institution_uid char(32),
+hospital_uid char(32),
+site_uid char(32),
+level_0 bool,
+level_1 bool,
+level_2 bool,
+main_rep_hit bool,
+quality_hit bool,
+contract_due_hit bool,
+meter_hit bool,
+repair_hit bool,
+select_type int4,
+wechat_id varchar(255),
+system_id varchar(255));
