@@ -108,6 +108,15 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="#{msg.arrivalListAgent}" visible="false" exportable="true">
+                            <h:outputText value="#{item.arrivalList.agent}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.currentPersonUID}" visible="false" exportable="true">
+                            <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(item.currentPersonUID).name}"/>
+                        </p:column>
+                        <p:column headerText="安装工时" visible="false" exportable="true">
+                            <h:outputText value="#{item.workHours}"/>
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" update=":ItemViewDlgForm" oncomplete="PF('ItemViewDlg').show()" disabled="#{empty assetArrivedItemsController.selected}"/>-->
                             <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetArrivedItemsController.prepareEdit}" disabled="#{empty assetArrivedItemsController.selected}"/>-->
