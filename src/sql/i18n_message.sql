@@ -2934,6 +2934,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'EmergencyWorkorder', '紧急工单', 'Emergency Workorder', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SignatureRequiredForAcceptance', '验收是否需要签名', 'Signature required for acceptance', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NoInformation', '抢单模式不发送消息', 'No information sent by the competion mode', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'CaseTypeRequired', '故障类型是否必填', 'is case type required', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MaintenanceConfiguration', '保养配置', 'Maintenance Configuration', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Level2SimplifiedMaintenance', '二级简化保养', 'Level 2 Simplified Maintenance', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PriorDaysOfMaintenanceReminder', '保养提醒提前天数', 'Prior Days of Maintenance Reminder', NULL, '-1');
