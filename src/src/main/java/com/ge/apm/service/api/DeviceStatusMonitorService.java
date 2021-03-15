@@ -21,9 +21,7 @@ public class DeviceStatusMonitorService {
                 " where (a.tenant_uid = ? OR a.institution_uid = ? OR a.hospital_uid = ? OR a.site_uid = ?) " +
                 " and a.next_metering_date between date_trunc('month', now()) and date_trunc('month', now() + interval '2 months')";
 
-        List<Map<String, Object>> items = jdbcTemplate.queryForList(sql, getMeteringRemindDays(user), user.getSiteUID(), user.getSiteUID(),
-                user.getSiteUID(), user.getSiteUID(), limit, offset);
-
+        List<Map<String, Object>> items = jdbcTemplate.queryForList(sql, user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), limit, offset);
         Integer count = countAssetsToMeter(user);
         return createResponseEntity(category, display, ref, href, items, count);
     }
