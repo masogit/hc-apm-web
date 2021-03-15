@@ -4,6 +4,7 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.ZkbFePartOrderUserConfigRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbFePartOrderUserConfig;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,6 +47,21 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
     private UserAccountRepository userAccountRepository;
 
     /**
+     * 判断用户
+     */
+    private UserContextService userContextService;
+
+    /**
+     * 当前用户tenantUID
+     */
+    private String tenantUID;
+
+    /**
+     * 当前登录用户信息service
+     */
+    private UserAccount currentUser;
+
+    /**
      * 初始化
      */
     @Override
@@ -52,6 +69,13 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
         super.init();
         zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
         userAccountRepository=WebUtil.getBean(UserAccountRepository.class);
+        userContextService=WebUtil.getBean(UserContextService.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        if(!userContextService.isZkbAdmin())
+        {
+            this.tenantUID=currentUser.getTenantUID();
+        }
+
     }
 
 
@@ -65,8 +89,18 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
      * @return
      */
     @Override
-    protected Page<ZkbFePartOrderUserConfig> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = this.searchFilters;
+    protected Page<ZkbFePartOrderUserConfig> loadData(PageRequest pageRequest) { List<SearchFilter> searchFilters = this.searchFilters;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+        if(!userContextService.isZkbAdmin())
+        {
+            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ,this.tenantUID));
+        }
+        if(userContextService.isZkbAdmin()&&StringUtils.isNotBlank(this.tenantUID))
+        {
+            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ,this.tenantUID));
+        }
         zkbFePartOrderUserConfig=zkbFePartOrderUserConfigRepository.findBySearchFilter(searchFilters, pageRequest);
         return zkbFePartOrderUserConfig;
     }
@@ -86,6 +120,15 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
         {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameNotExist"));
             return;
+        }
+        if(!userContextService.isZkbAdmin())
+        {
+
+            if(userAccount.getTenantUID()==null||!userAccount.getTenantUID().equals(this.tenantUID))
+            {
+                WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameNotExist"));
+                return;
+            }
         }
         if(StringUtils.isBlank(this.selected.getId()))
         {
@@ -107,5 +150,23 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
         this.selected.setTenantUid(userAccount.getTenantUID());
         super.save();
         this.selected=null;
+    }
+
+    @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        super.prepareCreate();
+        if(!userContextService.isZkbAdmin())
+        {
+            this.selected.setConfigType("Supplier");
+        }
+
+    }
+
+    public String getTenantUID() {
+        return tenantUID;
+    }
+
+    public void setTenantUID(String tenantUID) {
+        this.tenantUID = tenantUID;
     }
 }
