@@ -22,6 +22,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -647,7 +648,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 this.selected.setQty(0);
                 valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
             }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                this.selected.setQty(2);
+                ZkbContract c = contractList.get(0);
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                if(zkbPartOrderService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(c.getStartDate()))< 0){
+                    this.selected.setQty(2);
+                }else{
+                    this.selected.setQty(1);
+                }
                 valueTypeTips = "";
             }
         }

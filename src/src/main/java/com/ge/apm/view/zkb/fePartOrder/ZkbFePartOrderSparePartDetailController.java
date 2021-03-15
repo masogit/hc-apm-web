@@ -359,12 +359,15 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         {
             reaminApplyCount=zkbContract.getSpareQuota();
         }
-
-        if(reaminApplyCount==null||applyCount>reaminApplyCount)
+        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
-            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
-            return "";
+            if(reaminApplyCount==null||applyCount>reaminApplyCount)
+            {
+                WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
+                return "";
+            }
         }
+
         String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null, GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
