@@ -26,4 +26,7 @@ public class TenantOptionConfig implements Serializable {
 
     @Column(name = "tenant_uid")
     private String tenantUid;
+
+    @Column(name = "active_supplier")
+    private Boolean activeSupplier;
 }

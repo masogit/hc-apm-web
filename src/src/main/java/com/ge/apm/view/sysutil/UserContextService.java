@@ -1235,6 +1235,15 @@ public class UserContextService implements Serializable {
         return Boolean.FALSE;
     }
 
+    public Boolean isActiveSupplier(){
+        Boolean flag = Boolean.FALSE;
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(getCurrentUserTenantInfo().getUid());
+        if (tenantOptionConfigOptional.isPresent()) {
+            TenantOptionConfig tenantOptionConfig = tenantOptionConfigOptional.get();
+            flag = tenantOptionConfig.getActiveSupplier();
+        }
+        return flag;
+    }
 
     public List<RoleMsgRel> getRoleMsgInfos(Integer userId) {
         RoleMsgRelRepository roleMsgRelRepository = WebUtil.getBean(RoleMsgRelRepository.class);
