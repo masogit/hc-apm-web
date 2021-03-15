@@ -203,7 +203,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     public void prepareEdit() {
         super.prepareEdit();
         this.selected=this.zkbFePartOrderRepository.findById(this.id);
-        this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo());
+        this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo(),null);
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(this.id);
         if(CollectionUtils.isNotEmpty(zkbFePartOrderAssetInfoList))
@@ -242,7 +242,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
             return;
         }
-        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null);
+        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,null);
     }
 
     /**
@@ -474,9 +474,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     public String geAdminReturn()
     {
         List<ZkbFePartOrderReturn> zkbFePartOrderReturnList = this.selected.getZkbFePartOrderReturnList();
-        if(CollectionUtils.isEmpty(zkbFePartOrderReturnList))
+        if(CollectionUtils.isEmpty(zkbFePartOrderReturnList)||!this.checkHasNew(zkbFePartOrderReturnList))
         {
-            return this.backList();
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_returnListCannotBeNull"));
+            return "";
         }
         List<ZkbFePartOrderAssetInfo> assetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
         Map<String,Integer> assetInfoMap = this.zkbFePartOrderService.getAssetInfoMap(assetInfoList);
@@ -546,6 +547,24 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 this.queryStatus,
                 workFlowStatus,
                 workFlowSteps,startDate,endDate,gatewayURL);
+    }
+
+    /**
+     * 检查是否添加了新数据
+     * @param zkbFePartOrderReturnList
+     * @return
+     */
+    private Boolean checkHasNew(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList)
+    {
+        ListIterator<ZkbFePartOrderReturn> listIt = zkbFePartOrderReturnList.listIterator();
+        while (listIt.hasNext()) {
+            ZkbFePartOrderReturn item = listIt.next();
+            if(StringUtils.isBlank(item.getId()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

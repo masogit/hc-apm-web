@@ -19,8 +19,8 @@
                                     <p:inputText maxlength="20" disabled="#{!zkbFePartOrderDetailController.hasEditRight('Requested')}" id="systemId" value="#{zkbFePartOrderDetailController.selected.systemId}" required="true"  requiredMessage="#{msg.zkbFePartOrder_systemId} #{msg.ValidationRequire}" />
                                     <p:commandButton disabled="#{!zkbFePartOrderDetailController.hasEditRight('Requested')}" id="systemIdButton" actionListener="#{zkbFePartOrderDetailController.fullInfoBySystemId(param['zkbFePartOrderEditForm:systemId'])}" update=":zkbFePartOrderEditForm"  process="@this" value="#{msg.Search}"   />
                                 </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.zkbFePartOrder_orderNo}</label>
+                                <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.currentStep.equals('Requested')}">
+                                    <label  class="label">#{msg.zkbFePartOrder_orderNo}</label>
                                     <p:inputText id="orderNo" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.partOrderNo}" />
                                 </h:panelGroup>
                                 <h:panelGroup>
