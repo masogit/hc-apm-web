@@ -52,12 +52,12 @@ public class InspectionServiceController {
                 if(inventoryOrderDetail.getStatus() == 0){
                     inventoryOrderDetail.setLastModifiedDate(null);
                     inventoryOrderDetail.setLastModifiedBy(null);
-                    String inventoryOrderId = inventoryOrderDetail.getInventoryOrderId();
-                    if(inventoryOrderId != null){
-                        InventoryOrder inventoryOrder = inventoryOrderRepository.findById(inventoryOrderId);
-                        inventoryOrderDetail.setPlanEndTime(inventoryOrder.getPlanEndTime());
-                        inventoryOrderDetail.setPlanStartTime(inventoryOrder.getPlanStartTime());
-                    }
+                }
+                String inventoryOrderId = inventoryOrderDetail.getInventoryOrderId();
+                if(inventoryOrderId != null){
+                    InventoryOrder inventoryOrder = inventoryOrderRepository.findById(inventoryOrderId);
+                    inventoryOrderDetail.setPlanEndTime(inventoryOrder.getPlanEndTime());
+                    inventoryOrderDetail.setPlanStartTime(inventoryOrder.getPlanStartTime());
                 }
             }
         }
