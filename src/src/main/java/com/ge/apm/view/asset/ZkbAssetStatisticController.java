@@ -1,10 +1,13 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.ZkbAssetQrCodeInfoRepository;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.ZkbAssetQrCodeInfo;
 import com.ge.apm.domain.ZkbAssetStatistic;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbAssetStatisticService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -52,6 +55,16 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
     private String systemId;
 
     /**
+     * 医院名称
+     */
+    private String hospitalName;
+
+    /**
+     * 设备型号
+     */
+    private String functionType;
+
+    /**
      * 合同编号
      */
     private String contractNo;
@@ -67,6 +80,11 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
     private String qrCodeCountState;
 
     /**
+     * 二维码状态
+     */
+    private String canNotPastQrCode;
+
+    /**
      * 导出文件
      */
     private StreamedContent exportFile;
@@ -79,11 +97,14 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
      */
     private UserContextService userContextService;
 
+    private ZkbAssetQrCodeInfoRepository zkbAssetQrCodeInfoRepository;
+
     @Override
     protected void init() {
         super.init();
         zkbAssetStatisticService = WebUtil.getBean(ZkbAssetStatisticService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        zkbAssetQrCodeInfoRepository=WebUtil.getBean(ZkbAssetQrCodeInfoRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         if(!userContextService.isZkbAdmin())
         {
@@ -103,7 +124,7 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
      * 根据页面条件查询
      */
     public void loadData() {
-        zkbAssetStatisticList=this.zkbAssetStatisticService.loadAllAsset(this.tenantUid,this.systemId,this.qrCodeCount,this.qrCodeCountState,this.contractNo);
+        zkbAssetStatisticList=this.zkbAssetStatisticService.loadAllAsset(this.tenantUid,this.systemId,this.qrCodeCount,this.qrCodeCountState,this.contractNo,this.hospitalName,this.functionType,this.canNotPastQrCode);
     }
 
     public String getTenantUid() {
@@ -144,7 +165,7 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
         {
             tenantUid=this.tenantUid;
         }
-        List<ZkbAssetStatistic> allZkbAssetStatisticList = this.zkbAssetStatisticService.loadAllAsset(tenantUid,null,null,null,null);
+        List<ZkbAssetStatistic> allZkbAssetStatisticList = this.zkbAssetStatisticService.loadAllAsset(tenantUid,null,null,null,null,null,null,null);
         List<Map<String, Object>> zkbAssetStatisticMapList = zkbAssetStatisticService.createZkbAssetStatisticData(allZkbAssetStatisticList);
         try {
             UserContextService ucs = WebUtil.getBean(UserContextService.class);
@@ -157,6 +178,28 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
         } catch (IOException ex) {
             LOGGER.info(ex.getMessage());
         }
+    }
+
+    @Override
+    public void save() {
+        if(StringUtils.isBlank(this.selected.getSystemId()))
+        {
+            return;
+        }
+        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = this.zkbAssetQrCodeInfoRepository.findBySystemId(this.selected.getSystemId());
+        ZkbAssetQrCodeInfo zkbAssetQrCodeInfo = null;
+        if(CollectionUtils.isNotEmpty(zkbAssetQrCodeInfoList))
+        {
+            zkbAssetQrCodeInfo=zkbAssetQrCodeInfoList.get(0);
+        }else
+            {
+                zkbAssetQrCodeInfo = new ZkbAssetQrCodeInfo();
+            }
+        zkbAssetQrCodeInfo.setReason(this.selected.getReason());
+        zkbAssetQrCodeInfo.setSystemId(this.selected.getSystemId());
+        zkbAssetQrCodeInfo.setCanNotPastQrCode(this.selected.getCanNotPastQrCode());
+        zkbAssetQrCodeInfo.setTenantUID(this.selected.getTenantUid());
+        zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
     }
 
     public String getSystemId() {
@@ -188,5 +231,29 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
 
     public void setContractNo(String contractNo) {
         this.contractNo = contractNo;
+    }
+
+    public String getHospitalName() {
+        return hospitalName;
+    }
+
+    public void setHospitalName(String hospitalName) {
+        this.hospitalName = hospitalName;
+    }
+
+    public String getFunctionType() {
+        return functionType;
+    }
+
+    public void setFunctionType(String functionType) {
+        this.functionType = functionType;
+    }
+
+    public String getCanNotPastQrCode() {
+        return canNotPastQrCode;
+    }
+
+    public void setCanNotPastQrCode(String canNotPastQrCode) {
+        this.canNotPastQrCode = canNotPastQrCode;
     }
 }

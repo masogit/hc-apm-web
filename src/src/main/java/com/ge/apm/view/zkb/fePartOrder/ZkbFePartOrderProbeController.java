@@ -187,7 +187,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     public void prepareEdit() {
         super.prepareEdit();
         this.selected=this.zkbFePartOrderRepository.findById(this.id);
-        this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo());
+        this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo(),null);
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         this.initBlobObjectList(this.selected.getId());
         this.orderAnnotationChange();
@@ -200,7 +200,12 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     public void getSparePartsZkbFePartOrder(String systemId,String sr)
     {
-        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null);
+        if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr))
+        {
+             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
+            return;
+        }
+        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,ZkbFePartOrderService.assetGroup);
     }
 
     /**
@@ -334,6 +339,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty());
             if("t".equals(this.selected.getNewCatFlag()))
             {
+                zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
                 this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty());
                 this.selected.setQty(this.getSelected().getQty()*2);
             }
@@ -352,7 +358,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(!ZkbFePartOrderSparePartDetailController.badReturnValue.equals(this.selected.getReturnType()))
         {
-            this.zkbFePartOrderService.moveProbe(5,zkbContract,this.selected.getQty()*2);
+            this.zkbFePartOrderService.moveProbe(5,zkbContract,this.selected.getQty());
         }
         Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(

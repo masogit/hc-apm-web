@@ -57,9 +57,13 @@ public class ZkbAssetStatisticService {
      * @param qrCodeCount 二维码个数
      * @param qrCodeCountState 二维码状态
      * @param contractNo 合同编号
+     * @param hospitalName 医院名称
+     * @param functionType 设备型号
+     * @param canNotPastQrCode 无法粘贴二维码
      * @return
      */
-    public List<ZkbAssetStatistic> loadAllAsset(String tenantUid,String systemId,String qrCodeCount,String qrCodeCountState,String contractNo){
+    public List<ZkbAssetStatistic> loadAllAsset(String tenantUid,String systemId,String qrCodeCount,
+                                                String qrCodeCountState,String contractNo,String hospitalName,String functionType,String canNotPastQrCode){
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         if(tenantUid!=null)
         {
@@ -74,6 +78,21 @@ public class ZkbAssetStatisticService {
         if(contractNo!=null)
         {
             SearchFilter systemIdFilter = new SearchFilter("contractNo", SearchFilter.Operator.EQ, contractNo);
+            searchFilters.add(systemIdFilter);
+        }
+        if(StringUtils.isNotBlank(hospitalName))
+        {
+            SearchFilter systemIdFilter = new SearchFilter("hospitalName", SearchFilter.Operator.EQ, hospitalName);
+            searchFilters.add(systemIdFilter);
+        }
+        if(StringUtils.isNotBlank(functionType))
+        {
+            SearchFilter systemIdFilter = new SearchFilter("functionType", SearchFilter.Operator.EQ, functionType);
+            searchFilters.add(systemIdFilter);
+        }
+        if(StringUtils.isNotBlank(canNotPastQrCode))
+        {
+            SearchFilter systemIdFilter = new SearchFilter("canNotPastQrCode", SearchFilter.Operator.EQ, canNotPastQrCode);
             searchFilters.add(systemIdFilter);
         }
         List<ZkbAssetStatistic> assetList = zkbAssetStatisticMapper.loadAllAsset(searchFilters);
@@ -103,6 +122,10 @@ public class ZkbAssetStatisticService {
         if(StringUtils.isNotBlank(qrCodeCountState))
         {
             assetList=assetList.stream().filter(s->qrCodeCountState.equals(s.getQrCodeCountState())).collect(Collectors.toList());
+        }
+        if(StringUtils.isNotBlank(canNotPastQrCode))
+        {
+            assetList=assetList.stream().filter(s->canNotPastQrCode.equals(s.getCanNotPastQrCode())).collect(Collectors.toList());
         }
         return assetList;
     }

@@ -85,6 +85,12 @@ public class ZkbKeyBehaviorIndexService {
     private V2_WorkOrderRepository v2_WorkOrderRepository;
 
     /**
+     * 获取二维啊粘贴状态
+     */
+    @Autowired
+    private ZkbAssetQrCodeInfoRepository zkbAssetQrCodeInfoRepository;
+
+    /**
      * 导入模板头部行数
      */
     public static final int EXCEL_KBI_HEADER_ROW = 1;
@@ -597,6 +603,7 @@ public class ZkbKeyBehaviorIndexService {
             return totalIbNumber;
         }
         List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findZkbContractAssetByTenantUID(tenantUID,kpiDate);
+        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList =  this.zkbAssetQrCodeInfoRepository.findByTenantUIDAndCanNotPastQrCode(tenantUID,"Y");
         if(CollectionUtils.isEmpty(zkbContractAssetList))
         {
             zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
@@ -608,6 +615,14 @@ public class ZkbKeyBehaviorIndexService {
             assetId.add(item.getAssetId());
         }
         Integer countAssetWithQRcode = this.assetInfoRepository.countAssetWithQRcode(assetId);
+        if(countAssetWithQRcode==null)
+        {
+            countAssetWithQRcode=0;
+        }
+        if(CollectionUtils.isNotEmpty(zkbAssetQrCodeInfoList))
+        {
+            countAssetWithQRcode=countAssetWithQRcode+zkbAssetQrCodeInfoList.size();
+        }
         remark=remark.append("countAssetWithQRcode:").append(countAssetWithQRcode).append(";");
         Integer pasteQuickResponseRateScore = new BigDecimal(countAssetWithQRcode).
                 divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).

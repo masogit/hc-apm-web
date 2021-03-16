@@ -308,18 +308,24 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
      * 判断当前用户在当前节点是否有编辑权限
      * @return
      */
-    public Boolean hasEditRight()
+    public Boolean hasEditRight(String fieldsetType)
     {
-        if(StringUtils.isBlank(this.selected.getId()))
-        {
-            return true;
-        }
-        if(ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString().equals(this.selected.getCurrentStep())
-                &&this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString()))
-        {
-            return true;
-        }else if(ZkbFePartOrder.workFlowSteps.WaitingApm.toString().equals(this.selected.getCurrentStep())
-                &&this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()))
+        return this.zkbFePartOrderService.hasEditRight(fieldsetType,this.selected,this.configTypeMap,ZkbFePartOrder.manmadeStepAndRoles);
+    }
+
+    /**
+     * 判断是否隐藏还是显示
+     * @param fieldsetType
+     * @return
+     */
+    public Boolean checkRendered(String fieldsetType)
+    {
+        return this.zkbFePartOrderService.checkRendered(fieldsetType,this.selected,this.configTypeMap,ZkbFePartOrder.manmadeStepAndRoles);
+    }
+
+    public Boolean checkRendered()
+    {
+        if(StringUtils.isNotBlank(this.selected.getGeEngineerName())&&this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))
         {
             return true;
         }
@@ -327,52 +333,68 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     }
 
 
-    /**
-     * 判断当前流程是否在APM回填步骤
-     * @return
-     */
-    public Boolean workFlowInThirdStep()
-    {
-        if(StringUtils.isBlank(this.selected.getCurrentStep()))
-            return false;
-        if(ZkbFePartOrder.workFlowSteps.WaitingApm.toString().equals(this.selected.getCurrentStep()))
-        {
-            return true;
+//    /**
+//     *
+//     * 判断当前用户在当前节点是否有编辑权限
+//     * @return
+//     */
+//    public Boolean hasEditRight()
+//    {
+//        if(StringUtils.isBlank(this.selected.getId()))
+//        {
+//            return true;
+//        }
+//        if(ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString().equals(this.selected.getCurrentStep())
+//                &&this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString()))
+//        {
+//            return true;
+//        }else if(ZkbFePartOrder.workFlowSteps.WaitingApm.toString().equals(this.selected.getCurrentStep())
+//                &&this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()))
+//        {
+//            return true;
+//        }
+//        return false;
+//    }
 
-        }
-        return false;
-    }
 
-    /**
-     * 判断当前流程是否在完成步骤
-     * @return
-     */
-    public Boolean workFlowInFourthStep()
-    {
-        if(StringUtils.isBlank(this.selected.getCurrentStep()))
-            return false;
-        if(ZkbFePartOrder.workFlowSteps.Complete.toString().equals(this.selected.getCurrentStep()))
-        {
-            return true;
-
-        }
-        return false;
-    }
-
-    /**
-     * 判断当前用户在当前流程是否可见AMP tap
-     * @return
-     */
-    public Boolean hasApmInfoRight()
-    {
-        if(this.workFlowInFourthStep()&&ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString().equals(this.selected.getStatus()))
-        {
-            return true;
-        }
-        if(this.workFlowInThirdStep()&&configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()))
-        {
-            return true;
-        }
+//    /**
+//     * 判断当前流程是否在APM回填步骤
+//     * @return
+//     */
+//    public Boolean workFlowInThirdStep()
+//    {
+//        if(StringUtils.isBlank(this.selected.getCurrentStep()))
+//            return false;
+//        if(ZkbFePartOrder.workFlowSteps.WaitingApm.toString().equals(this.selected.getCurrentStep()))
+//        {
+//            return true;
+//
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     * 判断当前流程是否在完成步骤
+//     * @return
+//     */
+//    public Boolean workFlowInFourthStep()
+//    {
+//        if(StringUtils.isBlank(this.selected.getCurrentStep()))
+//            return false;
+//        if(ZkbFePartOrder.workFlowSteps.Complete.toString().equals(this.selected.getCurrentStep()))
+//        {
+//            return true;
+//
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     * 判断当前用户在当前流程是否可见AMP tap
+//     * @return
+//     */
+//    public Boolean hasApmInfoRight()
+//    {
 //        if(!configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString()))
 //        {
 //            return false;
@@ -381,33 +403,37 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 //        {
 //            return true;
 //        }
-        return false;
-    }
-
-    /**
-     * 判断当前流程是否在供应商步骤
-     * @return
-     */
-    public Boolean workFlowInSupplierStep()
-    {
-        if(StringUtils.isBlank(this.selected.getCurrentStep()))
-            return false;
-        if(ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString().equals(this.selected.getCurrentStep()))
-        {
-            return true;
-
-        }
-        return false;
-    }
-
-    /**
-     * 判断当前流程是否在第一步
-     * @return
-     */
-    public Boolean workFlowInFistStep()
-    {
-       return this.zkbFePartOrderService.workFlowInFistStep(this.selected.getCurrentStep());
-    }
+//        if(this.workFlowInFourthStep()&&ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString().equals(this.selected.getStatus()))
+//        {
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     * 判断当前流程是否在供应商步骤
+//     * @return
+//     */
+//    public Boolean workFlowInSupplierStep()
+//    {
+//        if(StringUtils.isBlank(this.selected.getCurrentStep()))
+//            return false;
+//        if(ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString().equals(this.selected.getCurrentStep()))
+//        {
+//            return true;
+//
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     * 判断当前流程是否在第一步
+//     * @return
+//     */
+//    public Boolean workFlowInFistStep()
+//    {
+//       return this.zkbFePartOrderService.workFlowInFistStep(this.selected.getCurrentStep());
+//    }
 
     public Boolean getContractError() {
         return contractError;
