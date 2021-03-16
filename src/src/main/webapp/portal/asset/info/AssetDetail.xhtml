@@ -159,7 +159,31 @@
                             </p:column>
                         </p:dataTable>
                     </p:panel>
-                    <p:panel  header="#{msg.ExternalMaintenanceRecord}" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
+                    <p:panel  header="盘点记录" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
+                        <f:facet name="actions">
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/inventory/inventoryOrderDetailAssetInfoMainAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                        </f:facet>
+                        <p:dataTable var="item" value="#{inspectionServiceController.getInventoryOrderDetailList(assetInfoDetailController.selected.id)}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="盘点状态" >
+                                <h:outputText value="#{item.status==0?msg.NonInventory:item.status==1?msg.Inventorized:item.status==2?msg.NonLedger:item.status==3?msg.HasIssue:item.status==4?msg.NoWorkOrder:item.status}" />
+
+                            </p:column>
+                            <p:column headerText="#{msg.InventoryChecker}" >
+                                <h:outputText value="#{assetInfoDetailController.getUserName(item.lastModifiedBy)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.InvnetoryTime}" >
+                                <h:outputText value="#{item.lastModifiedDate}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.plannedEndTime}" >
+                                <h:outputText value="#{item.planEndTime}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <p:panel  header="#{msg.ExternalMaintenanceRecord}4566" rendered="#{assetInfoDetailController.maintanceType eq 'external' or assetInfoDetailController.maintanceType eq 'both' }">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/pm/pmOrderListAll?faces-redirect=true&amp;queryTab=pmOrderListRemote&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                             <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>-->
