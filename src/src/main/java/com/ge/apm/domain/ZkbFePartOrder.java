@@ -69,6 +69,17 @@ public class ZkbFePartOrder {
                     workFlowSteps.Complete.toString()
             };
 
+    /**
+     * 流程步骤
+     */
+    public static String[] manmadeStepAndRoles = new String[]
+            {
+                    workFlowSteps.Requested.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.WaitingAssignment.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingApm.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.Complete.toString()
+            };
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -302,35 +313,35 @@ public class ZkbFePartOrder {
     @Column(name = "receiver_address")
     private String receiverAddress;
 
-    /**
-     * 区域
-     */
-    @Column(name = "region")
-    private String region;
+//    /**
+//     * 区域
+//     */
+//    @Column(name = "region")
+//    private String region;
 
-    /**
-     * 医院报修人姓名
-     */
-    @Column(name = "hospital_repairer")
-    private String hospitalRepairer;
+//    /**
+//     * 医院报修人姓名
+//     */
+//    @Column(name = "hospital_repairer")
+//    private String hospitalRepairer;
 
-    /**
-     * 医院报修人电话
-     */
-    @Column(name = "hospital_repairer_phone")
-    private String hospitalRepairerPhone;
+//    /**
+////     * 医院报修人电话
+////     */
+////    @Column(name = "hospital_repairer_phone")
+////    private String hospitalRepairerPhone;
 
     /**
      * 剩余数量
      */
     @Transient
-    private int remainQty;
+    private Integer remainQty;
 
     /**
      * 数量
      */
     @Column(name = "qty")
-    private int qty;
+    private Integer qty;
 
     /**
      * 是否为紧急订单
@@ -874,19 +885,19 @@ public class ZkbFePartOrder {
         this.receiverAddress = receiverAddress;
     }
 
-    public int getRemainQty() {
+    public Integer getRemainQty() {
         return remainQty;
     }
 
-    public void setRemainQty(int remainQty) {
+    public void setRemainQty(Integer remainQty) {
         this.remainQty = remainQty;
     }
 
-    public int getQty() {
+    public Integer getQty() {
         return qty;
     }
 
-    public void setQty(int qty) {
+    public void setQty(Integer qty) {
         this.qty = qty;
     }
 
@@ -1018,29 +1029,29 @@ public class ZkbFePartOrder {
         this.newCatSn = newCatSn;
     }
 
-    public String getRegion() {
-        return region;
-    }
+//    public String getRegion() {
+//        return region;
+//    }
+//
+//    public void setRegion(String region) {
+//        this.region = region;
+//    }
 
-    public void setRegion(String region) {
-        this.region = region;
-    }
-
-    public String getHospitalRepairer() {
-        return hospitalRepairer;
-    }
-
-    public void setHospitalRepairer(String hospitalRepairer) {
-        this.hospitalRepairer = hospitalRepairer;
-    }
-
-    public String getHospitalRepairerPhone() {
-        return hospitalRepairerPhone;
-    }
-
-    public void setHospitalRepairerPhone(String hospitalRepairerPhone) {
-        this.hospitalRepairerPhone = hospitalRepairerPhone;
-    }
+//    public String getHospitalRepairer() {
+//        return hospitalRepairer;
+//    }
+//
+//    public void setHospitalRepairer(String hospitalRepairer) {
+//        this.hospitalRepairer = hospitalRepairer;
+//    }
+//
+//    public String getHospitalRepairerPhone() {
+//        return hospitalRepairerPhone;
+//    }
+//
+//    public void setHospitalRepairerPhone(String hospitalRepairerPhone) {
+//        this.hospitalRepairerPhone = hospitalRepairerPhone;
+//    }
 
     public ZkbPartOrderCat getZkbPartOrderCat() {
         return zkbPartOrderCat;

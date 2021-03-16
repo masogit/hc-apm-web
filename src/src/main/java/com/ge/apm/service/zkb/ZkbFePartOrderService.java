@@ -96,6 +96,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public static String highArtificialTypeValue = "High";
 
     /**
+     * 超声类
+     */
+    public static final Integer assetGroup = 2;
+
+    /**
      * 给申请单添加单号和索引
      * @param zkbFePartOrder
      * @return
@@ -582,8 +587,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param systemId systemId
      * @param sr 报修单号检索
      * @param partOrderNo 订单编号
+     * @param assetGroup 设备类型
      */
-    public List<ZkbFePartOrder> getSparePartsZkbFePartOrder(String systemId,String sr,String partOrderNo)
+    public List<ZkbFePartOrder> getSparePartsZkbFePartOrder(String systemId,String sr,String partOrderNo,Integer assetGroup)
     {
         List<ZkbFePartOrder> sparePartsZkbFePartOrderList = null;
         List<SearchFilter> searchFilters = new ArrayList<>();
@@ -591,7 +597,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString()));
         if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr)&&StringUtils.isBlank(partOrderNo))
         {
-            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
             return sparePartsZkbFePartOrderList;
         }
         if(StringUtils.isNotBlank(systemId))
@@ -604,9 +609,13 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         if(StringUtils.isNotBlank(partOrderNo))
         {
-            searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.LIKE,partOrderNo));
+            searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.EQ,partOrderNo));
         }
-        sparePartsZkbFePartOrderList = this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
+        if(assetGroup!=null)
+        {
+            searchFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,assetGroup));
+        }
+        sparePartsZkbFePartOrderList=this.zkbFePartOrderMapper.queryZkbFePart(searchFilters);
         List<ZkbPartOrder> zkbPartOrderList =null;
         zkbPartOrderList = this.zkbPartOrderMapper.queryBySystemIdAndSr(systemId,sr,partOrderNo);
         if(CollectionUtils.isNotEmpty(zkbPartOrderList))
@@ -673,6 +682,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         return selected;
     }
+
     /**
      * 保存附件
      */
