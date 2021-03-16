@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class DeviceStatusMonitorService {
@@ -17,14 +16,12 @@ public class DeviceStatusMonitorService {
     private JdbcTemplate jdbcTemplate;
 
     public ResponseEntity<Map<String, Object>> createResponseEntityForAssetMetering(UserAccount user, Integer offset, Integer limit, Integer category, String display, String ref, String href) {
-        String sql = "select a.id, a.name, m.next_metering_date as date from asset_info a inner join measuring_type_config m " +
-                " on a.measuring_item_category || '' = m.measuring_item_category and a.tenant_uid = m.tenant_uid " +
+        String sql = "select a.id, a.name, a.next_metering_date as date from asset_info a " +
                 " where (a.tenant_uid = ? OR a.institution_uid = ? OR a.hospital_uid = ? OR a.site_uid = ?) " +
-                " and now() between m.next_metering_date::date and m.next_metering_date::date - ?";
+                " and a.next_metering_date between now() and date_trunc('month', now() + interval '2 months') " +
+                " limit ? offset ?";
 
-        List<Map<String, Object>> items = jdbcTemplate.queryForList(sql, getMeteringRemindDays(user), user.getSiteUID(), user.getSiteUID(),
-                user.getSiteUID(), user.getSiteUID(), limit, offset);
-
+        List<Map<String, Object>> items = jdbcTemplate.queryForList(sql, user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), limit, offset);
         Integer count = countAssetsToMeter(user);
         return createResponseEntity(category, display, ref, href, items, count);
     }
@@ -40,11 +37,10 @@ public class DeviceStatusMonitorService {
     }
 
     public Integer countAssetsToMeter(UserAccount user) {
-        return jdbcTemplate.queryForObject("select count(*) from asset_info a inner join measuring_type_config m " +
-                        " on a.measuring_item_category || '' = m.measuring_item_category and a.tenant_uid = m.tenant_uid " +
+        return jdbcTemplate.queryForObject("select count(*) from asset_info a " +
                         " where (a.tenant_uid = ? OR a.institution_uid = ? OR a.hospital_uid = ? OR a.site_uid = ?) " +
-                        " and now() between m.next_metering_date::date and m.next_metering_date::date - ?",
-                Integer.class, user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), getMeteringRemindDays(user));
+                        " and a.next_metering_date between now() and date_trunc('month', now() + interval '2 months')",
+                Integer.class, user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), user.getSiteUID());
     }
 
     public Integer countOpenIssues(UserAccount user) {
@@ -71,13 +67,6 @@ public class DeviceStatusMonitorService {
                 + " AND (po.tenant_uid IN (?) OR po.institution_uid IN (?) OR po.hospital_uid IN (?) OR po.site_uid IN (?)) ";
         return jdbcTemplate.queryForObject(sql, Integer.class, user.getSiteUID(), user.getSiteUID(), user.getSiteUID(), user.getSiteUID());
     }
-
-    private Integer getMeteringRemindDays(UserAccount user) {
-        String sql = "select measuring_remind_days from workflow_config w where w.site_id = ? and w.hospital_id = ? limit 1";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, Integer.class, user.getSiteId(), user.getHospitalId()))
-                .orElse(30);
-    }
-
 
     private ResponseEntity<Map<String, Object>> createResponseEntity(Integer category, String display, String ref, String href, List<Map<String, Object>> items, Integer count) {
         Map<String, Object> link = createLink(ref, href);

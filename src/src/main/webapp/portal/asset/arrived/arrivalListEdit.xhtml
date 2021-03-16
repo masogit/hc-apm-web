@@ -7,7 +7,9 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
-
+        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
+        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
         <ui:include src="createSupplier.xhtml"/>
 
         <div class="ui-g clearfix">
@@ -406,12 +408,17 @@
                                     </c:if>
 
                                 </p:panelGrid>
-                                <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px">
+                                <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" id="arrivalListAttachment">
                                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                         <h:panelGroup >
                                             <p:dataList id="pictureList" value="#{assetArrivedListEditController.getAttachList('asset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
                                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and (fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.png'))}">
+                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
@@ -423,6 +430,11 @@
                                             <p:dataList id="contractList" value="#{assetArrivedListEditController.getAttachList('asset2')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
                                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and (fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.png'))}">
+                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
@@ -434,6 +446,11 @@
                                             <p:dataList id="manualList" value="#{assetArrivedListEditController.getAttachList('asset3')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
                                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and (fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.png'))}">
+                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
@@ -445,6 +462,11 @@
                                             <p:dataList id="accessoryList" value="#{assetArrivedListEditController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
                                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and (fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.png'))}">
+                                                    <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                         src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                         style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                                </h:panelGroup>
                                                 <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
@@ -554,5 +576,8 @@
                 </h:panelGroup>
             </h:form>
         </p:dialog>
+        <script type="text/javascript">
+            var arrivalListViewer = new Viewer(document.getElementById('AssetArrivalEditForm:arrivalListAttachment'));
+        </script>
     </ui:define>
 </ui:composition>

@@ -85,11 +85,11 @@
                         </p:column>
                         <p:column headerText="操作" exportable="false">
                             
-                            <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update=":AssetArrivalItemListForm:datalist" >接单
+                            <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not assetArrivedItemsController.activeSupplier()}"  update=":AssetArrivalItemListForm:datalist" >接单
                                 <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
                             </p:commandLink>
-                            <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedItemsController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and assetArrivedItemsController.activeSupplier()}"  update=":AssetArrivalItemListForm:datalist" >批量接单
-                                <p:confirm header="批量接单" message="确认批量接单?" icon="ui-icon-warning"/>
+                            <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedItemsController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and assetArrivedItemsController.activeSupplier()}"  update=":AssetArrivalItemListForm:datalist" >接单
+                                <p:confirm header="接单" message="注意：同合同号同科室的会默认全部接单" icon="ui-icon-warning"/>
                             </p:commandLink>
                             <p:commandLink    action="#{assetArrivedItemsController.getInstallUrl(item.id,'List')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">安装
                             </p:commandLink >
@@ -107,6 +107,15 @@
                             <h:outputText value="#{item.purchaseDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.arrivalListAgent}" visible="false" exportable="true">
+                            <h:outputText value="#{item.arrivalList.agent}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.currentPersonUID}" visible="false" exportable="true">
+                            <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(item.currentPersonUID).name}"/>
+                        </p:column>
+                        <p:column headerText="安装工时" visible="false" exportable="true">
+                            <h:outputText value="#{item.workHours}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" update=":ItemViewDlgForm" oncomplete="PF('ItemViewDlg').show()" disabled="#{empty assetArrivedItemsController.selected}"/>-->
