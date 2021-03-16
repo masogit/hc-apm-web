@@ -2,7 +2,7 @@ package com.ge.apm.dao;
 
 
 import com.ge.apm.domain.InventoryIssue;
-
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 /**
@@ -12,6 +12,7 @@ public interface InventoryIssueRepository extends GenericRepositoryUUID<Inventor
 //    @Modifying
 //    @Query("update InventoryIssue i set i.isSolved = true, i.lastModifiedBy = ?2, i.lastModifiedDate = CURRENT_TIMESTAMP where i.id = ?1")
 //    void resolveInventoryIssue(String id, String username);
-	
-	
+
+    @Query(value = "SELECT * FROM inventory_issue   WHERE asset_id =?1 and inventory_order_id =?2 ORDER BY last_modified_date DESC LIMIT 1 ",nativeQuery = true)
+    InventoryIssue findProjectionByAssetIdAndInventoryOrderId(Integer assetId,String inventoryOrderId);
 }
