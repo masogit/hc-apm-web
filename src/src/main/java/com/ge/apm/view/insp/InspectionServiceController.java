@@ -24,6 +24,7 @@ public class InspectionServiceController {
     ServiceRequestRepository srDao = WebUtil.getBean(ServiceRequestRepository.class);
     InventoryOrderDetailAssetInfoRepository infoRepositoryDao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
     InventoryOrderRepository inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
+    InventoryIssueRepository inventoryIssueRepository = WebUtil.getBean(InventoryIssueRepository.class);
     V2_PmOrderRepository pmDao = WebUtil.getBean(V2_PmOrderRepository.class);
     UaaService uuaService = WebUtil.getBean(UaaService.class);
     
@@ -58,6 +59,12 @@ public class InspectionServiceController {
                     InventoryOrder inventoryOrder = inventoryOrderRepository.findById(inventoryOrderId);
                     inventoryOrderDetail.setPlanEndTime(inventoryOrder.getPlanEndTime());
                     inventoryOrderDetail.setPlanStartTime(inventoryOrder.getPlanStartTime());
+                    if(inventoryOrderDetail.getStatus() == 1){
+                        InventoryIssue inventoryIssue = inventoryIssueRepository.findProjectionByAssetIdAndInventoryOrderId(assetId, inventoryOrderId);
+                        if(inventoryIssue != null){
+                            inventoryOrderDetail.setStatus(3);
+                        }
+                    }
                 }
             }
         }
