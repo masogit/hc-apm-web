@@ -315,15 +315,18 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                     }
                 }
                 assetInfoList.removeAll(assetInfos);
-                List<String> assetUids = assetInfoList.stream().map(assetInfo -> assetInfo.getUid()).collect(Collectors.toList());
-                List<AssetInfo> assets = dao.findBySharedAssetTypeUid(assetUids);
-                if (assets != null && !assets.isEmpty()){
-                    for ( AssetInfo a:assets) {
-                        a.setErrorMessage("调剂设备，不能修改所属科室!");
+                if(assetInfoList != null && !assetInfoList.isEmpty()){
+                    List<String> assetUids = assetInfoList.stream().map(assetInfo -> assetInfo.getUid()).collect(Collectors.toList());
+                    List<AssetInfo> assets = dao.findBySharedAssetTypeUid(assetUids);
+                    if (assets != null && !assets.isEmpty()){
+                        for ( AssetInfo a:assets) {
+                            a.setErrorMessage("调剂设备，不能修改所属科室!");
+                        }
+                        assetInfos.addAll(assets);
+                        assetInfoList.removeAll(assets);
                     }
-                    assetInfos.addAll(assets);
-                    assetInfoList.removeAll(assets);
                 }
+
                 //临床助手检查进行中
                 List<AssetInfo> assetList = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchEdit(assetInfoList);
                 if (assetList != null && !assetList.isEmpty()) {
