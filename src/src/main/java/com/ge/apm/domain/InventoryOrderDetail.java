@@ -89,6 +89,28 @@ public class InventoryOrderDetail implements Serializable {
     @Transient
     private String isSolved;
 
+    @Transient
+    private Date planEndTime;
+
+    @Transient
+    private Date planStartTime;
+
+    public Date getPlanStartTime() {
+        return planStartTime;
+    }
+
+    public void setPlanStartTime(Date planStartTime) {
+        this.planStartTime = planStartTime;
+    }
+
+    public Date getPlanEndTime() {
+        return planEndTime;
+    }
+
+    public void setPlanEndTime(Date planEndTime) {
+        this.planEndTime = planEndTime;
+    }
+
     public String getInventoryCheckListItems() {
         return inventoryCheckListItems;
     }

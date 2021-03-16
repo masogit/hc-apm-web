@@ -105,6 +105,11 @@
                         <p:dataList id="licenseAttachements" value="#{supplierController.getAttachList('License')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">营业执照附件</f:facet>
                             <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <h:panelGroup rendered="#{fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.png')}">
+                                <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt=""
+                                     src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                            </h:panelGroup>
                             <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="licenseAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -128,6 +133,11 @@
                         <p:dataList id="permitAttachements" value="#{supplierController.getAttachList('Permit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">营业许可证附件</f:facet>
                             <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <h:panelGroup rendered="#{fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.png')}">
+                                <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt=""
+                                     src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                            </h:panelGroup>
                             <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="permitAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -140,6 +150,11 @@
                         <p:dataList id="afterServiceAttachements" value="#{supplierController.getAttachList('AfterService')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">售后服务承诺附件</f:facet>
                             <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <h:panelGroup rendered="#{fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.png')}">
+                                <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt=""
+                                     src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                            </h:panelGroup>
                             <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="afterServiceAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -152,6 +167,11 @@
                         <p:dataList id="authorizationAttachements" value="#{supplierController.getAttachList('Authorization')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">授权书附件</f:facet>
                             <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <h:panelGroup rendered="#{fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.png')}">
+                                <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt=""
+                                     src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                            </h:panelGroup>
                             <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="authorizationAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -175,6 +195,11 @@
                         <p:dataList id="manufacturingPermitAttachements" value="#{supplierController.getAttachList('ManufacturingPermit')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">生产许可证附件</f:facet>
                             <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <h:panelGroup rendered="#{fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.png')}">
+                                <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt=""
+                                     src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                            </h:panelGroup>
                             <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="manufacturingPermitAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -202,6 +227,11 @@
                         <p:dataList id="productRegistrationAttachements" value="#{supplierController.getAttachList('ProductRegistration')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">产品注册证附件</f:facet>
                             <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <h:panelGroup rendered="#{fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.png')}">
+                                <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}" alt=""
+                                     src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                     style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                            </h:panelGroup>
                             <p:commandButton actionListener="#{supplierController.removeAttachmentById(fileitem.id)}" update="productRegistrationAttachements" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
@@ -215,6 +245,8 @@
             </h:form>
         </p:dialog>
         <script>
+            var supplierEditFormViewer = new Viewer(document.getElementById('SupplierEditForm'));
+
             function  handleToSubmit(xhr,status,args) {
                 if(args.spType){
                     $('#SupplierEditForm\\:wxs').addClass("ui-state-error");

@@ -1,14 +1,7 @@
 package com.ge.apm.view.insp;
 
-import com.ge.apm.dao.InspectionOrderRepository;
-import com.ge.apm.dao.ServiceRequestRepository;
-import com.ge.apm.dao.V2_PmOrderRepository;
-import com.ge.apm.dao.WorkOrderRepository;
-import com.ge.apm.domain.InspectionOrder;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.V2_PmOrder;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.ServiceRequestProjection;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -29,6 +22,8 @@ public class InspectionServiceController {
     InspectionOrderRepository inspectionDao = WebUtil.getBean(InspectionOrderRepository.class);
     WorkOrderRepository workOrderDao = WebUtil.getBean(WorkOrderRepository.class);
     ServiceRequestRepository srDao = WebUtil.getBean(ServiceRequestRepository.class);
+    InventoryOrderDetailAssetInfoRepository infoRepositoryDao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
+    InventoryOrderRepository inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
     V2_PmOrderRepository pmDao = WebUtil.getBean(V2_PmOrderRepository.class);
     UaaService uuaService = WebUtil.getBean(UaaService.class);
     
@@ -50,7 +45,25 @@ public class InspectionServiceController {
         searchFilters.add(new SearchFilter("assetUid", SearchFilter.Operator.EQ, assetUid));
         return pmDao.findBySearchFilter(searchFilters, pr).getContent();
     }
-    
+    public List<InventoryOrderDetail> getInventoryOrderDetailList(Integer assetId){
+        List<InventoryOrderDetail> inventoryOrderDetails = infoRepositoryDao.findProjectionByAssetId(assetId);
+        if(inventoryOrderDetails != null && inventoryOrderDetails.size()>0){
+            for(InventoryOrderDetail inventoryOrderDetail:inventoryOrderDetails){
+                if(inventoryOrderDetail.getStatus() == 0){
+                    inventoryOrderDetail.setLastModifiedDate(null);
+                    inventoryOrderDetail.setLastModifiedBy(null);
+                }
+                String inventoryOrderId = inventoryOrderDetail.getInventoryOrderId();
+                if(inventoryOrderId != null){
+                    InventoryOrder inventoryOrder = inventoryOrderRepository.findById(inventoryOrderId);
+                    inventoryOrderDetail.setPlanEndTime(inventoryOrder.getPlanEndTime());
+                    inventoryOrderDetail.setPlanStartTime(inventoryOrder.getPlanStartTime());
+                }
+            }
+        }
+        return inventoryOrderDetails;
+    }
+
     public List<UserAccount> getOwnerList(){
         return getOwnerList(UserContextService.getCurrentUserAccount().getHospitalId());
     }
