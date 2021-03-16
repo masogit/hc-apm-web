@@ -413,7 +413,7 @@ public class V2_WorkOrderService {
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
         formData.setPatTests(selectedWorkOrder.getPatTests());
         formData.setConfirmedUpTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(confirmedUpTime));
-        formData.setCaseType(selectedWorkOrder.getCaseType().toString());
+        formData.setCaseType(selectedWorkOrder.getCaseType()==null?null:selectedWorkOrder.getCaseType().toString());
         formData.setAssetStatus(assetStatus.toString());
         formData.setStepDetail(accDetails);
         formData.setStepCoworker(coDetails);
