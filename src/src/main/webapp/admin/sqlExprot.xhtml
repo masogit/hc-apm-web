@@ -30,26 +30,26 @@
                 <p:column headerText="id" sortBy="#{item.id}"  filterMatchMode="LIKE" rendered="false">
                     <h:outputText value="#{item.id}"/>
                 </p:column>
-                <p:column headerText="#{msg.creatorUID}#{msg.userName}" sortBy="#{item.createrName}"  filterMatchMode="LIKE">
+                <p:column headerText="#{msg.creatorUID}#{msg.userName}"   filterMatchMode="LIKE">
                     <h:outputText value="#{item.createrName}"/>
                 </p:column>
-                <p:column headerText="#{msg.creatorUID}" sortBy="#{item.creater}"  filterMatchMode="LIKE">
+                <p:column headerText="#{msg.creatorUID}"   filterMatchMode="LIKE">
                     <h:outputText value="#{item.creater}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.createTime}" sortBy="#{item.creationTime}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.createTime}"  filterMatchMode="LIKE">
                     <h:outputText value="#{item.creationTime}"/>
                 </p:column>
-                <p:column headerText="#{msg.updateTime}" sortBy="#{item.updateTime}" filterMatchMode="LIKE">
+                <p:column headerText="#{msg.updateTime}"  filterMatchMode="LIKE">
                     <h:outputText value="#{item.updateTime}"/>
                 </p:column>
 
-                <p:column headerText="#{msg.Execute}sql" sortBy="#{item.executeStatement}"  filterMatchMode="LIKE">
+                <p:column headerText="#{msg.Execute}sql"   filterMatchMode="LIKE">
                     <h:outputText value="#{item.executeStatement}"/>
                 </p:column>
 
                 <!-- value="#{item.taskStatus}" -->
-                <p:column headerText="#{msg.status}" sortBy="#{item.taskStatus}"  filterMatchMode="LIKE">
+                <p:column headerText="#{msg.status}"   filterMatchMode="LIKE">
                     <h:outputText value="#{sqlExportController.fieldValue(item.taskStatus)}"/>
                 </p:column>
 
@@ -64,8 +64,8 @@
                     <p:commandButton ajax="false" actionListener="#{sqlExportController.exportTemplate2(item)}" update=":growl" validateClient="true" styleClass="ui-priority-primary" value="下载" disabled="#{item.taskStatus !=2}">
                         <p:fileDownload value="#{sqlExportController.exportTemplate}"/>
                     </p:commandButton>
-
-                    <p:commandButton ajax="false" actionListener="#{sqlExportController.exportGenerate(item)}" update=":growl" validateClient="true" styleClass="ui-priority-primary" value="#{msg.Generate}" disabled="#{item.taskStatus !=4}">
+                                                                                                                                                                            <!--  rendered="#{(item.status == 1 || item.status == 3) and (item.assetDeptUID.equals(item.clinicalDeptUID))}" -->
+                    <p:commandButton ajax="false" actionListener="#{sqlExportController.exportGenerate(item)}" update=":growl" validateClient="true" styleClass="ui-priority-primary" value="#{msg.Generate}" disabled="#{item.taskStatus !=4 and item.taskStatus !=3}">
                     </p:commandButton>
 
                 </p:column>
