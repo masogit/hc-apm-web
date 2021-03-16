@@ -182,6 +182,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             }
                         }
                     }
+                    if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString()) && "t".equals(selected.getNeedLetterFlag()) && "f".equals(selected.getUploadLetterFlag())){
+                        WebUtil.addErrorMessage("请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。","");
+                    }
                 }
             }
             if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
@@ -792,6 +795,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }else{
             WebUtil.addErrorMessage("fail to upload file");
         }
+    }
+
+    public void handleFileUpload2(){
+        selected.setUploadLetterFlag("t");
+        zkbPartOrderRepository.save(selected);
     }
 
     public void remindLetter(){

@@ -521,7 +521,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <c:choose>
-                                        <c:when test="#{zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
+                                        <c:when test="#{zkbPartOrderAuditController.selected.needLetterFlag eq 't' and (zkbPartOrderAuditController.selected.uploadLetterFlag eq 'f' or empty zkbPartOrderAuditController.selected.uploadLetterFlag)}">
                                             <label class="label" style="color: red!important;font-weight:100;font-size :xx-large ">是否需要探头说明函*</label>
                                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.needLetterFlag}" style="color: red;font-weight:100;font-size:xx-large " required="true" requiredMessage="是否需要探头说明函 #{msg.ValidationRequire}" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}">
                                                 <f:selectItem itemLabel="不需要" itemValue="f"/>
@@ -679,9 +679,9 @@
                     </p:panelGrid>
 
                 </p:fieldset>
-                <p:fieldset legend="探头说明函信息" rendered="#{zkbPartOrderAuditController.showReturn and zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
+                <p:fieldset legend="探头说明函信息" rendered="#{zkbPartOrderAuditController.showReturn and zkbPartOrderAuditController.selected.needLetterFlag eq 't' and (zkbPartOrderAuditController.selected.uploadLetterFlag eq 'f' or empty zkbPartOrderAuditController.selected.uploadLetterFlag)}">
                     <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">
-                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.uploadLetterFlag eq 't') and userContextService.zkbUser}">
+                        <!--<h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.uploadLetterFlag eq 't') and userContextService.zkbUser}">
                             <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|rar|zip|htm|html|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|RAR|ZIP|HTM|HTML)$/"
                                           fileUploadListener="#{zkbPartOrderAuditController.handleFileUpload}"
                                           mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
@@ -691,8 +691,13 @@
                         </h:panelGroup>
                         <h:panelGroup id="namepanel" rendered="#{zkbPartOrderAuditController.selected.uploadLetterFlag eq 't'}">
                             <label class="label">说明函</label>
-                            <!--<p:inputText id="name" value="#{zkbPartOrderAuditController.selected.uploadLetterFileName}" style="width: 400px;" disabled="true"/>-->
+                            &lt;!&ndash;<p:inputText id="name" value="#{zkbPartOrderAuditController.selected.uploadLetterFileName}" style="width: 400px;" disabled="true"/>&ndash;&gt;
                             <p:link href="#{fileDownloadService.getFileUrl(zkbPartOrderAuditController.selected.uploadLetterFileId)}">#{zkbPartOrderAuditController.selected.uploadLetterFileName}</p:link>
+                        </h:panelGroup>-->
+                        <h:panelGroup id="namepanel" rendered="#{(zkbPartOrderAuditController.selected.uploadLetterFlag eq 'f' or empty zkbPartOrderAuditController.selected.uploadLetterFlag) and zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
+                            <p:commandLink immediate="false" process="@this" update="growl zkbPartOrderEditForm"  action="#{zkbPartOrderAuditController.handleFileUpload2}" style="padding-left:30px;">
+                                <h:outputText value="已上传说明函" />
+                            </p:commandLink>
                         </h:panelGroup>
                     </p:panel>
                 </p:fieldset>
