@@ -835,12 +835,18 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subReturnQty(zkbContract,zkbPartOrder, zkbPartOrder.getReturnQty());
             }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
-                List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderIdAndReturnTypeIsNot(zkbPartOrder.getId(),"badReturn");
+                List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderId(zkbPartOrder.getId());
                 if(zkbPartOrderReturns != null && zkbPartOrderReturns.size() > 0){
                     int v = 0;
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                     for (ZkbPartOrderReturn r : zkbPartOrderReturns){
-                        v += r.getQty();
+                        if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
+                            continue;
+                        }else if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType())){
+                            continue;
+                        }else{
+                            v += r.getQty();
+                        }
                     }
                     subReturnQty(zkbContract,zkbPartOrder,v);
                 }
@@ -1324,14 +1330,18 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             history.setCreateUserId(currentUser.getUid());
             history.setCreateUserName(currentUser.getName());
             zkbPartOrderReturnHistoryList.add(history);
-            if("badReturn".equals(r.getReturnType())){
+            if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
+                continue;
+            }else if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType())){
                 continue;
             }
             oldBackTotal += r.getQty();
         }
         int nowBackTotal = 0;
         for(ZkbPartOrderReturn r : zkbPartOrderReturnModifyList){
-            if("badReturn".equals(r.getReturnType())){
+            if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
+                continue;
+            }else if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType())){
                 continue;
             }
             nowBackTotal += r.getQty();
@@ -1361,8 +1371,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //如果审批通过后则进行核算名额
         int v = 0;
         for (ZkbPartOrderReturn r : zkbPartOrderReturnList){
-            if(!"badReturn".equals(r.getReturnType()) && ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
-                v += r.getQty();
+            if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType()) && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
+                if(ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
+                    v += r.getQty();
+                }
             }
         }
         if(v > 0){
@@ -1370,7 +1382,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             subReturnQty(contract,zkbPartOrder,v);
         }
     }
-
 
     @Transactional(rollbackFor = Exception.class)
     public void partsClosed(ZkbPartOrder zkbPartOrder,UserAccount userAccount){

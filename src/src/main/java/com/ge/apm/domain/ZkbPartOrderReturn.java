@@ -24,6 +24,10 @@ public class ZkbPartOrderReturn implements Serializable {
         Y,N
     }
 
+    public enum ReturnTypeNoQuotaEnum{
+        badReturn,useNoReturn
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
