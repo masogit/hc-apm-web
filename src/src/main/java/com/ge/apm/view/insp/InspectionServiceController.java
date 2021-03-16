@@ -56,6 +56,7 @@ public class InspectionServiceController {
                     if(inventoryOrderId != null){
                         InventoryOrder inventoryOrder = inventoryOrderRepository.findById(inventoryOrderId);
                         inventoryOrderDetail.setPlanEndTime(inventoryOrder.getPlanEndTime());
+                        inventoryOrderDetail.setPlanStartTime(inventoryOrder.getPlanStartTime());
                     }
                 }
             }
