@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<ZkbFePartOrder> {
 
     /**
-     * 智康宝人工申请 service
+     * 智康宝人工申请 service service
      */
     private ZkbFePartOrderService zkbFePartOrderService;
 
