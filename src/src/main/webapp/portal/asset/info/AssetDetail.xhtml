@@ -159,7 +159,7 @@
                             </p:column>
                         </p:dataTable>
                     </p:panel>
-                    <p:panel  header="盘点记录" rendered="#{assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' }">
+                    <p:panel  header="盘点记录" rendered="#{(assetInfoDetailController.maintanceType eq 'internal' or assetInfoDetailController.maintanceType eq 'both' ) and userContextService.hasCurrentTenantName('')}">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/inventory/inventoryOrderDetailAssetInfoMainAll?faces-redirect=true&amp;query=100&amp;queryAssetUID='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         </f:facet>
@@ -173,6 +173,11 @@
                             </p:column>
                             <p:column headerText="#{msg.InvnetoryTime}" >
                                 <h:outputText value="#{item.lastModifiedDate}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.PlannedStartTime}" >
+                                <h:outputText value="#{item.planStartTime}" >
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm " />
                                 </h:outputText>
                             </p:column>
