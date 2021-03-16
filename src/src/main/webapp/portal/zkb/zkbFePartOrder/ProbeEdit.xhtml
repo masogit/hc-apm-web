@@ -197,17 +197,16 @@
                             <p:inputTextarea  disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.receiverAddress}" required="true" requiredMessage="#{msg.zkbPartOrder_receiverAddress} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">备注</label>
-                            <p:inputTextarea disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.remark}" maxlength="255" />
+                            <label class="label">#{msg.zkbFePartOrder_phenomenon}</label>
+                            <p:inputTextarea   disabled="true"  value="#{zkbFePartOrderProbeController.selected.phenomenon}"  maxlength="100"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbFePartOrder_productNumber}</label>
                             <p:inputText disabled="true" value="#{zkbFePartOrderProbeController.selected.productNumber}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.zkbFePartOrder_phenomenon}*</label>
-                            <p:inputTextarea   disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}"  value="#{zkbFePartOrderProbeController.selected.phenomenon}" required="true"
-                                               requiredMessage="#{msg.zkbFePartOrder_phenomenon} #{msg.ValidationRequire}" maxlength="100"/>
+                            <label class="label">备注</label>
+                            <p:inputTextarea disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.remark}" maxlength="255" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.currentStep.equals('Requested')}">
                             <label class="label">#{msg.zkbFePartOrder_currentStatus}</label>

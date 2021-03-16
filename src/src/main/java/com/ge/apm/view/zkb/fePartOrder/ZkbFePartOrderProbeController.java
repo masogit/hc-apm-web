@@ -19,6 +19,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -135,6 +137,18 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      * 价值类型提示
      */
     private String valueTypeTips = "";
+
+
+    /**
+     * 合同日期开始时间
+     */
+    private static final String contractStartDate = "2021-03-01 00:00:00";
+
+
+    /**
+     * 合同日期开始时间格式化
+     */
+    private static final String contractStartDateFormat = "yyyy-MM-dd HH:mm:ss";
 
     @Override
     protected void init() {
@@ -340,8 +354,12 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             if("t".equals(this.selected.getNewCatFlag()))
             {
                 zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-                this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty());
-                this.selected.setQty(this.getSelected().getQty()*2);
+                Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+                if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)==-1)
+                {
+                    this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty());
+                    this.selected.setQty(this.getSelected().getQty()*2);
+                }
             }
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
@@ -390,10 +408,30 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
             }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
                 this.selected.setQty(2);
+                if(CollectionUtils.isNotEmpty(this.contractList))
+                {
+                    ZkbContract zkbContract = this.contractList.get(0);
+                    Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+                    if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)>=0)
+                    {
+                        this.selected.setQty(1);
+                    }
+                }
                 valueTypeTips = "";
             }
         }
         calcRemainQty();
+    }
+
+    private Date getDateFormat(String format,String formatDate)
+    {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        try {
+            return simpleDateFormat.parse(formatDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void calcRemainQty(){
