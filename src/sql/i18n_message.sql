@@ -4050,7 +4050,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','母婴','母婴','',NULL,-1,'305010629');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','诊断心电','诊断心电','',NULL,-1,'305010629');
 
--- 问题类型 问题类型
+-- 问题类型 问题类型 问题类型
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('questionType','设备原理相关','设备原理相关','',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('questionType','常见故障相关','常见故障相关','',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('questionType','备件相关','备件相关','',NULL,-1);
