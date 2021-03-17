@@ -1124,7 +1124,13 @@ public void test1(){
     }
     
     public void saveEditedWorkOrder(){
-        
+        //故障类型必填校验
+        if (requireCaseType() && null == selectedWorkOrder.getCaseType()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("caseType") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
+            return;
+        }
+
         dao.save(selectedWorkOrder);
     }
 
@@ -1387,7 +1393,13 @@ public void test1(){
     }
 
     public void closeWorkOrder() {
-        Integer feedback = woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
+        //故障类型必填校验
+        if (requireCaseType() && null == selectedWorkOrder.getCaseType()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("caseType") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
+            return;
+        }
+//        Integer feedback = woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
 //           if(isRating && feedback<1){
 //               WebUtil.addErrorMessage("请务必给予评价");
 //               RequestContext.getCurrentInstance().addCallbackParam("isRate", true);
