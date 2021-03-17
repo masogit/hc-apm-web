@@ -3738,6 +3738,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_beginningTime','开始时间','Beginning Time',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_endingTime','结束时间','Ending Time',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_kbiDate','时间','Time',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_rank','名次','Rank',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_totalScore','总得分','Total Score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_totalFullScore','总权重','Total score',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbKeyBehaviorIndex_totalFullScoreConfig','权重配置','Config total full score',NULL,-1);
