@@ -181,14 +181,55 @@ public class ZkbKeyBehaviorIndexService {
      * @param tenantUID 租户UID
      * @param beginningTime 开始时间
      * @param endingTime 结束时间
+     * @param rankMap 排名
      * @return kpi 数据列表
      */
     public List<ZkbKeyBehaviorIndex> loadZkbKeyBehaviorIndex(String tenantUID,
                                                              Date beginningTime,
-                                                             Date endingTime)
+                                                             Date endingTime,
+                                                             Map<String,Map<String,Integer>> rankMap)
     {
         List<SearchFilter> searchFilters = this.generageSearchFilter(tenantUID,beginningTime,endingTime);
-        return this.zkbKeyBehaviorIndexMapper.loadZkbKeyBehaviorIndex(searchFilters);
+        List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexMapper.loadZkbKeyBehaviorIndex(searchFilters);
+        if(rankMap==null)
+        {
+            return zkbKeyBehaviorIndexList;
+        }
+        if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
+        {
+            for(ZkbKeyBehaviorIndex item:zkbKeyBehaviorIndexList)
+            {
+                Map<String,Integer> tenantRankMap = rankMap.get(DateFormatUtils.format(item.getKbiDate(),monthDateFormat_two));
+                if(tenantRankMap==null) continue;
+                item.setRank(tenantRankMap.get(item.getTenantUID()));
+            }
+        }
+        return zkbKeyBehaviorIndexList;
+    }
+
+    /**
+     * 初始化排名
+     * @return
+     */
+    public Map<String,Map<String,Integer>> initRankingMap() {
+        List<String> dateStrList = this.zkbKeyBehaviorIndexRepository.findKbiDate();
+        Map<String, Map<String, Integer>> rankMap = new HashMap<>();
+        if (CollectionUtils.isEmpty(dateStrList)) {
+            return rankMap;
+        }
+        for (String item : dateStrList) {
+            if (StringUtils.isEmpty(item)) continue;
+            List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexMapper.initRanking(item, monthDateFormat_two);
+            if (CollectionUtils.isEmpty(zkbKeyBehaviorIndexList)) continue;
+            Map<String,Integer> tenantRankMap = new HashMap<>();
+            for(ZkbKeyBehaviorIndex item1:zkbKeyBehaviorIndexList)
+            {
+                if(tenantRankMap.containsKey(item1.getTenantUID())) continue;
+                tenantRankMap.put(item1.getTenantUID(),item1.getRank());
+            }
+            rankMap.put(item,tenantRankMap);
+        }
+        return rankMap;
     }
 
     /**
@@ -252,7 +293,7 @@ public class ZkbKeyBehaviorIndexService {
     public LineChartModel generateCharts(String tenantUID,Date beginningTime,Date endingTime)
     {
         LineChartModel areaModel = new LineChartModel();
-        List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.loadZkbKeyBehaviorIndex(tenantUID,beginningTime,endingTime);
+        List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.loadZkbKeyBehaviorIndex(tenantUID,beginningTime,endingTime,null);
         List<ZkbKeyBehaviorIndex> zkbAverageKeyBehaviorIndexList = this.loadAverageZkbKeyBehaviorIndex(null,beginningTime,endingTime);
         LineChartSeries series1 = new LineChartSeries();
         boolean showNonData = true;
@@ -332,6 +373,7 @@ public class ZkbKeyBehaviorIndexService {
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_systemId"),zeyBehaviorIndex.getId());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_tenant"),zeyBehaviorIndex.getTenantName());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_kbiDate"),zeyBehaviorIndex.getKbiDateFormat());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_rank"),zeyBehaviorIndex.getRank());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScore"),zeyBehaviorIndex.getTotalScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnFullScore"),zeyBehaviorIndex.getPartReturnFullScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnScore"),zeyBehaviorIndex.getPartReturnScore());
