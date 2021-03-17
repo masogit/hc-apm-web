@@ -32,6 +32,9 @@
                         <p:ajax event="rowSelect" listener="#{zkbFePartOrderController.prepareEdit}" update="editButton"/>
                         <p:ajax event="rowDblselect" listener="#{zkbFePartOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
                         <p:ajax event="filter" listener="#{zkbFePartOrderController.onFilter}" />
+                        <p:column headerText="#{msg.zkbContact_tenant}">
+                            <h:outputText value="#{zkbContractController.getTenantInfo(item.tenantUid).name}"/>
+                        </p:column>
                         <p:column headerText="#{msg.zkbFePartOrder_orderNo}" filterBy="#{item.partOrderNo}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.partOrderNo}"/>
                         </p:column>
