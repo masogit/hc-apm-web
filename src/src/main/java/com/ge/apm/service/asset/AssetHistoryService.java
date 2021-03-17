@@ -119,8 +119,15 @@ public class AssetHistoryService {
                 }
                 String newColumnValue = ((JSONObject) item).getString("newColumnValue") != null ? ((JSONObject) item).getString("newColumnValue") : "";
                 //String columnValue = "新值：" + newColumnValue + " -> 旧值：" + oldColumnValue;
-                String columnValue = "旧值:" + oldColumnValue + " -> 新值:" + newColumnValue;
-                jsonObject.put(columnName, columnValue);
+                if("qrCode".equals(columnName)){
+                    jsonObject.put(columnName+"Old", oldColumnValue);
+                    jsonObject.put(columnName+"New", newColumnValue);
+                }else {
+
+                    String columnValue = "旧值:" + oldColumnValue + " -> 新值:" + newColumnValue;
+                    jsonObject.put(columnName, columnValue);
+                }
+
 
             });
 
