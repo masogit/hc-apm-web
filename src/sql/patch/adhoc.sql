@@ -17,6 +17,9 @@ create index asset_info_one_qr_code on asset_info (one_qr_code);
 
 
 --2021-03-17
+
+-- 重置sys_role表中序列为50
+alter sequence "sys_role_id_seq" restart with 60 ;
 --初始化zone_target_info表中数据 （start）
 delete from zone_target_info where quarter_start_date = '2020-10-01' and quarter_end_date = '2020-12-31';
 
