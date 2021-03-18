@@ -925,4 +925,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
 
     }
+
+    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
+        String[] fileSuffixNames = fileSuffixName.toUpperCase().split("\\|");
+        for(int i=0;i<fileSuffixNames.length;i++){
+            if(fileName.toUpperCase().endsWith(fileSuffixNames[i])){
+                return true;
+            }
+        }
+        return false;
+    }
 }

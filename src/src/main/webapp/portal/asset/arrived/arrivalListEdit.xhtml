@@ -414,64 +414,64 @@
                                             <p:dataList id="pictureList" value="#{assetArrivedListEditController.getAttachList('asset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
                                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and (fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.JPEG') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.JPG') or fileitem.objectName.endsWith('.png') or fileitem.objectName.endsWith('.PNG'))}">
+                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
                                                     <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
-                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg('pictureList');">
+                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="typeasset" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg('pictureList');"
+                                            <p:fileUpload id="typeasset" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                         <h:panelGroup >
                                             <p:dataList id="contractList" value="#{assetArrivedListEditController.getAttachList('asset2')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
                                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and (fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.JPEG') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.JPG') or fileitem.objectName.endsWith('.png') or fileitem.objectName.endsWith('.PNG'))}">
+                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
                                                     <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
-                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg('contractList');">
+                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="typeasset2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg('contractList');"
+                                            <p:fileUpload id="typeasset2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                         <h:panelGroup >
                                             <p:dataList id="manualList" value="#{assetArrivedListEditController.getAttachList('asset3')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
                                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and (fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.JPEG') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.JPG') or fileitem.objectName.endsWith('.png') or fileitem.objectName.endsWith('.PNG'))}">
+                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
                                                     <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
-                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg('manualList');">
+                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="typeasset3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg('manualList');"
+                                            <p:fileUpload id="typeasset3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                         <h:panelGroup >
                                             <p:dataList id="accessoryList" value="#{assetArrivedListEditController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                                 <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
                                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and (fileitem.objectName.endsWith('.jpeg') or fileitem.objectName.endsWith('.JPEG') or fileitem.objectName.endsWith('.jpg') or fileitem.objectName.endsWith('.JPG') or fileitem.objectName.endsWith('.png') or fileitem.objectName.endsWith('.PNG'))}">
+                                                <h:panelGroup rendered="#{assetArrivedListEditController.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
                                                     <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                                          style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
                                                 </h:panelGroup>
-                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg('accessoryList');">
+                                                <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg('accessoryList');"
+                                            <p:fileUpload id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="accessoryList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                     </p:panelGrid>
@@ -577,9 +577,19 @@
             </h:form>
         </p:dialog>
         <script type="text/javascript">
-            var arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm:arrivalListAttachment'));
+            var arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm:arrivalListAttachment'),{
+                // url:'data-original',
+                show: function() {
+                    arrivalListImg.update();
+                }
+            });
             function updatePreviewImg(id){
-                arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm:'+id));
+                arrivalListImg.update();
+                // arrivalListImg.show();
+                // if(#{assetArrivedListEditController.activeSupplier()}){
+                //     arrivalListImg = new Viewer(document.getElementById('AssetArrivalEditForm:'+id));
+                // }
+                // new Viewer(document.getElementById('AssetArrivalEditForm:'+id));
             }
         </script>
     </ui:define>
