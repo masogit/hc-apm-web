@@ -391,4 +391,14 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     public void setShowQrCode(boolean showQrCode) {
         isShowQrCode = showQrCode;
     }
+
+    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
+        String[] fileSuffixNames = fileSuffixName.toUpperCase().split("\\|");
+        for(int i=0;i<fileSuffixNames.length;i++){
+            if(fileName.toUpperCase().endsWith(fileSuffixNames[i])){
+                return true;
+            }
+        }
+        return false;
+    }
 }
