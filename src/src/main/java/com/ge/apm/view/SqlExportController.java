@@ -44,7 +44,7 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
     private static final long serialVersionUID = -1L;
     protected static final Logger logger = Logger.getLogger(SqlExportController.class);
     // final String excelExportDestfilepath = "C:/zk/test/export/excel/";
-    // final String excelExportDestfilepath = "/tmp/apm/export";
+     final String excelExportDestfilepath = "/tmp/apm/export";
     ConfigUtils configUtils;
 
     //@Value("#{urlProperties.excelExportDestfilepath}")
@@ -198,7 +198,11 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
             sqlDao.save(sqlExportQueue);
             logger.info("=========SqlExportController.addSelectSql sqlDao.save(sqlExportQueue) end===========");
         }else{
-            WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+"语句");//重复的语句
+            if(rowCount == 0){
+                WebUtil.addSuccessMessage(WebUtil.getMessage("NoCorrespondingDataFound"));//未查询到数据
+            }else{
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+"语句");//重复的语句
+            }
         }
 
     }
