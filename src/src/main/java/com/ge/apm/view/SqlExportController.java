@@ -328,7 +328,7 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
         int rowCount = Integer.parseInt(result.get(0).values().toArray()[0].toString());
 
         // add Page limit to the sql
-        theSQL = theSQL + AppContextService.getSqlPagingTemplate();
+        theSQL = "select * from (" + theSQL + ") _count" + AppContextService.getSqlPagingTemplate();
         params.put("_sql", theSQL);
         params.put("_pageStart", (gotoPageNum-1) * 20);
         params.put("_pageSize", 20);
