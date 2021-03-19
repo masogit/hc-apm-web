@@ -514,6 +514,9 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "data_type")
     private String dataType;
 
+    @Column(name = "data_flag")
+    private Integer dataFlag = 0;
+
     @Column(name = "score_flag")
     private String scoreFlag = "f";
 
@@ -525,6 +528,14 @@ public class ZkbPartOrder implements Serializable {
 
     public String getScoreFlag() {
         return scoreFlag;
+    }
+
+    public Integer getDataFlag() {
+        return dataFlag;
+    }
+
+    public void setDataFlag(Integer dataFlag) {
+        this.dataFlag = dataFlag;
     }
 
     public void setScoreFlag(String scoreFlag) {
