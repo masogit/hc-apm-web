@@ -74,7 +74,7 @@ public class ZkbFePartOrderProvider {
                 sb.append(" and fe.status = '"+value+"'");
             }
             if("systemId".equals(tempColumn)) {
-                sb.append(" and fe.system_id like '%"+value+"%'");
+                sb.append(" and fe.system_id = '"+value+"'");
             }
             if("sr".equals(tempColumn)) {
                 sb.append(" and fe.sr like '%"+value+"%'");
