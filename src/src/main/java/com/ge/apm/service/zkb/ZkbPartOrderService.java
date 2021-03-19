@@ -623,6 +623,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
             }
         }
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrderRepository.save(zkbPartOrder);
         List<ZkbPartOrderStep> zkbPartOrderStepList = zkbPartOrderStepRepository.findByPartOrderIdAndStepKey(zkbPartOrder.getId(), oldStep);
         for(ZkbPartOrderStep s : zkbPartOrderStepList){
@@ -678,6 +681,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     public void closedBack(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
         zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.PartReturned.toString());
         zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString());
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrderRepository.save(zkbPartOrder);
 
         ZkbPartOrderStep newZkbPartOrderStep = new ZkbPartOrderStep();
@@ -767,6 +773,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
             }
         }
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrder = zkbPartOrderRepository.save(zkbPartOrder);
 
         List<ZkbPartOrderStep> zkbPartOrderStepList = zkbPartOrderStepRepository.findByPartOrderId(zkbPartOrder.getId());
@@ -894,6 +903,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setReturnAuditerUid(userAccount.getUid());
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Returned.toString());
             zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+            Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+            dataFlag++;
+            zkbPartOrder.setDataFlag(dataFlag);
             zkbPartOrderRepository.save(zkbPartOrder);
 
             ZkbPartOrderStep newZkbPartOrderStep = new ZkbPartOrderStep();
@@ -913,6 +925,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }else {
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.PartReturned.toString());
+            Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+            dataFlag++;
+            zkbPartOrder.setDataFlag(dataFlag);
             zkbPartOrderRepository.save(zkbPartOrder);
 
             HashMap<String, String> emailWrapperMap = new HashMap<>();
@@ -1417,6 +1432,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setClosedAuditerUid(userAccount.getUid());
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
             zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+            Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+            dataFlag++;
+            zkbPartOrder.setDataFlag(dataFlag);
             zkbPartOrderRepository.save(zkbPartOrder);
 
             ZkbPartOrderStep newZkbPartOrderStep = new ZkbPartOrderStep();
@@ -1428,7 +1446,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             newZkbPartOrderStep.setTenantUID(zkbPartOrder.getTenantUID());
             newZkbPartOrderStep.setPartOrderId(zkbPartOrder.getId());
             zkbPartOrderStepRepository.save(newZkbPartOrderStep);
-
         }
     }
 
