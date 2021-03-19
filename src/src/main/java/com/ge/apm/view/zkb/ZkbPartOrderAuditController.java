@@ -75,7 +75,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList;
     private ZkbPartOrderReturn zkbPartOrderReturnModify;
     private String saveTips;
-
+    private String letterTips;
     @Override
     protected void init() {
         super.init();
@@ -182,9 +182,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             }
                         }
                     }
-                    if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString()) && "t".equals(selected.getNeedLetterFlag()) && "f".equals(selected.getUploadLetterFlag())){
-                        WebUtil.addErrorMessage("请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。","");
+                    if(userContextService.isZkbUser()) {
+                        if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())
+                                && "t".equals(selected.getNeedLetterFlag())
+                                && "f".equals(selected.getUploadLetterFlag())){
+                            //WebUtil.addErrorMessage("请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。","");
+                            letterTips = "请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。";
+                        }
                     }
+
                 }
             }
             if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
@@ -1205,7 +1211,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void setSaveTips(String saveTips) {
         this.saveTips = saveTips;
     }
-//endregion
+
+    public String getLetterTips() {
+        return letterTips;
+    }
+
+    public void setLetterTips(String letterTips) {
+        this.letterTips = letterTips;
+    }
+    //endregion
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {
