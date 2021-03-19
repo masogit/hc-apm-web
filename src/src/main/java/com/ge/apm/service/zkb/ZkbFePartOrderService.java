@@ -583,6 +583,39 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     }
 
     /**
+     * 根据角色判断是否有查看探头说明函条件
+     * @param configTypeMap 角色MAP
+     * @return
+     */
+    public boolean hasLetterViewRight(Map<String, String> configTypeMap)
+    {
+        boolean right = false;
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString()))
+        {
+            right=true;
+        }else if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))
+        {
+            right=true;
+        }
+        return right;
+    }
+
+    /**
+     * 根据角色判断是否有查看探头说明函条件
+     * @param configTypeMap 角色MAP
+     * @return
+     */
+    public boolean hasAdminRight(Map<String, String> configTypeMap)
+    {
+        boolean right = false;
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))
+        {
+            right=true;
+        }
+        return right;
+    }
+
+    /**
      * 根据systemId和 报修单号检索
      * @param systemId systemId
      * @param sr 报修单号检索

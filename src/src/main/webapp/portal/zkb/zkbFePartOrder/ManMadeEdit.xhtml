@@ -138,7 +138,7 @@
                     <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingAssignment')}">
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingAssignment')}">
-                                <label class="label">代理商审批人名称*：</label>
+                                <label class="label">代理商审批人*：</label>
                                 <p:inputText id="tenantAssignUser" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.tenantAssignUser}"  />
                             </h:panelGroup>
                             <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingAssignment')}">

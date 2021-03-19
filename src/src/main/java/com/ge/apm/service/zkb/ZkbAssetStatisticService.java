@@ -144,10 +144,14 @@ public class ZkbAssetStatisticService {
         for (ZkbAssetStatistic zkbAssetStatistic : zkbAssetStatisticList) {
             Map<String, Object> zkbAssetStatisticMap = new HashMap<>();
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbHistory_agent"),zkbAssetStatistic.getName());
+            zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_hospitalName"),zkbAssetStatistic.getHospitalName());
+            zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_functionType"),zkbAssetStatistic.getFunctionType());
             zkbAssetStatisticMap.put(WebUtil.getMessage("systemId"),zkbAssetStatistic.getSystemId());
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_countOfImage"),zkbAssetStatistic.getQrCodeCount());
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_contractNo"),zkbAssetStatistic.getContractNo());
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_qrCodeOfPaste"),zkbAssetStatistic.getQrCodeCountState());
+            zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_canNotPast"),zkbAssetStatistic.getCanNotPastQrCode());
+            zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_canNotPastReason"),zkbAssetStatistic.getReason());
             zkbAssetStatisticMapList.add(zkbAssetStatisticMap);
         }
         return zkbAssetStatisticMapList;

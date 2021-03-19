@@ -214,7 +214,7 @@
             <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingAssignment')}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingAssignment')}">
-                        <label class="label">代理商审批人名称*：</label>
+                        <label class="label">代理商审批人*：</label>
                         <p:inputText  disabled="true"  value="#{zkbFePartOrderSparePartDetailController.selected.tenantAssignUser}"  />
                     </h:panelGroup>
                     <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingAssignment')}">
@@ -240,11 +240,11 @@
 <!--                        <p:inputText disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderSparePartDetailController.selected.act}"  required="true" requiredMessage="#{msg.zkbFePartOrder_act} #{msg.ValidationRequire}"/>-->
 <!--                    </h:panelGroup>-->
                     <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
-                        <label class="label">回填人名称*：</label>
+                        <label class="label">下单人*：</label>
                         <p:inputText  disabled="true"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoUser}"  />
                     </h:panelGroup>
                     <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
-                        <label class="label">回填时间*：</label>
+                        <label class="label">下单时间*：</label>
                         <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoDate}"
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
