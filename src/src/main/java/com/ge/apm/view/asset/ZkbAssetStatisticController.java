@@ -99,6 +99,8 @@ public class ZkbAssetStatisticController extends GenericCRUDUUIDController<ZkbAs
 
     private ZkbAssetQrCodeInfoRepository zkbAssetQrCodeInfoRepository;
 
+    private static final String canNotPastQrCodeTrue = "Y";
+
     @Override
     protected void init() {
         super.init();

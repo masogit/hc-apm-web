@@ -150,6 +150,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     private static final String contractStartDateFormat = "yyyy-MM-dd HH:mm:ss";
 
+    private String remindLetterFlag = "0";
+
     @Override
     protected void init() {
         super.init();
@@ -235,6 +237,15 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         }
 
     }
+    public boolean hasLetterViewRight()
+    {
+        return this.zkbFePartOrderService.hasLetterViewRight(configTypeMap);
+    }
+
+    public boolean hasAdminRight()
+    {
+        return this.zkbFePartOrderService.hasAdminRight(configTypeMap);
+    }
 
     /**
      * 上传附件
@@ -276,6 +287,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     public void remindLetter(){
         zkbFePartOrderService.sendWeChatRemindLetter(selected);
         WebUtil.addSuccessMessage("催函成功！");
+        remindLetterFlag = "2";
     }
 
     /**
@@ -478,6 +490,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
        return this.zkbFePartOrderService.checkRendered(fieldsetType,this.selected,this.configTypeMap,ZkbFePartOrder.probeStepAndRoles);
     }
 
+    public void hasUploadLetter(){
+        this.selected.setHasUploadLetter(ZkbFePartOrderController.hasUploadLetterValue);
+        this.zkbFePartOrderRepository.save(selected);
+    }
+
     /**
      * 判断是否选中人工申请流程
      * @return
@@ -555,4 +572,13 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     public void setValueTypeTips(String valueTypeTips) {
         this.valueTypeTips = valueTypeTips;
     }
+
+    public String getRemindLetterFlag() {
+        return remindLetterFlag;
+    }
+
+    public void setRemindLetterFlag(String remindLetterFlag) {
+        this.remindLetterFlag = remindLetterFlag;
+    }
+
 }
