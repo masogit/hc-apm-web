@@ -381,9 +381,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbContract 合同
      * @param qty 数量
      */
-    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty,ZkbFePartOrder zkbFePartOrder)
+    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty)
     {
-        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetTypeDi()))
+        if("DI".equals(zkbContract.getContractType())
+                ||"PCB".equals(zkbContract.getContractType()))
         {
             switch(type){
                 case 1 :
@@ -403,7 +404,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-qty);
                     break;
             }
-        }else
+        }else if("CCS".equals(zkbContract.getContractType())
+                ||"Biomed".equals(zkbContract.getContractType()))
         {
             switch(type){
                 case 1 :
