@@ -83,6 +83,11 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     private static final String ALL="all";
 
     /**
+     * 待上传探头说明函
+     */
+    private static final String waitingUpload = "waitingUpload";
+
+    /**
      * 没权限查看
      */
     private static final String NO_STEP="noStep";
@@ -108,6 +113,21 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     private Boolean fourHundredsTeam = false;
 
     private List<String> orderTypeList = new ArrayList<>();
+
+    /**
+     * 需要上传探头说明函值
+     */
+    private static final String needUploadLetterValue = "t";
+
+    /**
+     * 没有上传探头说明函值
+     */
+    private static final String hasNotUploadLetterValue = "f";
+
+    /**
+     * 已经上传探头说明函值
+     */
+    public static final String hasUploadLetterValue = "t";
 
     /**
      * 初始化数据
@@ -164,6 +184,9 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         if(MY_WORK.equals(this.queryStatus))
         {
             this.getSearchFilterByUserConfig(searchFilters);
+        }else if(waitingUpload.equals(this.queryStatus))
+        {
+            this.getSearchFilterByUploadLetter(searchFilters);
         }else{
             this.getAllSearchFilterByUserConfig(searchFilters);
             if(StringUtils.isNotBlank(this.queryStatus)&&!ALL.equals(this.queryStatus))
@@ -172,6 +195,11 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             }
         }
         return searchFilters;
+    }
+
+    public boolean hasLetterViewRight()
+    {
+        return this.zkbFePartOrderService.hasLetterViewRight(configTypeMap);
     }
 
     /**
@@ -204,6 +232,21 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         }else if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))
         {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ,ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString()));
+        }
+    }
+
+    /**
+     *
+     * @param searchFilters
+     */
+    private void getSearchFilterByUploadLetter(List<SearchFilter> searchFilters)
+    {
+        searchFilters.add(new SearchFilter("needLetterFlag", SearchFilter.Operator.EQ,needUploadLetterValue));
+        searchFilters.add(new SearchFilter("hasUploadLetter", SearchFilter.Operator.EQ,hasNotUploadLetterValue));
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString()))
+        {
+            searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ,this.tenantUID));
+            return;
         }
     }
 

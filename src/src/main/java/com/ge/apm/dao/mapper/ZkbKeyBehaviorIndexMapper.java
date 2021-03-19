@@ -20,4 +20,13 @@ public interface ZkbKeyBehaviorIndexMapper {
 
     @SelectProvider(type = ZkbKeyBehaviorIndexProvider.class,method="loadAverageZkbKeyBehaviorIndex")
     List<ZkbKeyBehaviorIndex> loadAverageZkbKeyBehaviorIndex(@Param("filters") List<SearchFilter> filters);
+
+    /**
+     * 初始化供应商排名数据
+     * @param kpiDate
+     * @param dateFormat
+     * @return
+     */
+    @SelectProvider(type = ZkbKeyBehaviorIndexProvider.class,method="initRanking")
+    List<ZkbKeyBehaviorIndex> initRanking(@Param("kpiDate") String kpiDate,@Param("dateFormat") String dateFormat);
 }

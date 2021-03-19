@@ -38,7 +38,7 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.zkbAssetStatistic_canNotPast}</label>
-                    <p:selectOneMenu  value="#{zkbAssetStatisticController.selected.canNotPastQrCode}">
+                    <p:selectOneMenu  value="#{zkbAssetStatisticController.selected.canNotPastQrCode}" required="true" requiredMessage="#{msg.zkbAssetStatistic_canNotPast} #{msg.ValidationRequire}">
                         <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                         <f:selectItem itemLabel="Y" itemValue="Y"/>
                         <f:selectItem itemLabel="N" itemValue="N"/>

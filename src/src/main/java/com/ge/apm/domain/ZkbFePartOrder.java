@@ -313,24 +313,6 @@ public class ZkbFePartOrder {
     @Column(name = "receiver_address")
     private String receiverAddress;
 
-//    /**
-//     * 区域
-//     */
-//    @Column(name = "region")
-//    private String region;
-
-//    /**
-//     * 医院报修人姓名
-//     */
-//    @Column(name = "hospital_repairer")
-//    private String hospitalRepairer;
-
-//    /**
-////     * 医院报修人电话
-////     */
-////    @Column(name = "hospital_repairer_phone")
-////    private String hospitalRepairerPhone;
-
     /**
      * 剩余数量
      */
@@ -479,6 +461,12 @@ public class ZkbFePartOrder {
      */
     @Column(name = "ge_admin_comment")
     private String geAdminComment;
+
+    /**
+     * 是否已经上传催收函
+     */
+    @Column(name = "has_upload_letter")
+    private String hasUploadLetter = "f";
 
     /**
      * 申请备件列表
@@ -1029,30 +1017,6 @@ public class ZkbFePartOrder {
         this.newCatSn = newCatSn;
     }
 
-//    public String getRegion() {
-//        return region;
-//    }
-//
-//    public void setRegion(String region) {
-//        this.region = region;
-//    }
-
-//    public String getHospitalRepairer() {
-//        return hospitalRepairer;
-//    }
-//
-//    public void setHospitalRepairer(String hospitalRepairer) {
-//        this.hospitalRepairer = hospitalRepairer;
-//    }
-//
-//    public String getHospitalRepairerPhone() {
-//        return hospitalRepairerPhone;
-//    }
-//
-//    public void setHospitalRepairerPhone(String hospitalRepairerPhone) {
-//        this.hospitalRepairerPhone = hospitalRepairerPhone;
-//    }
-
     public ZkbPartOrderCat getZkbPartOrderCat() {
         return zkbPartOrderCat;
     }
@@ -1067,5 +1031,13 @@ public class ZkbFePartOrder {
 
     public void setNewCatFlag(String newCatFlag) {
         this.newCatFlag = newCatFlag;
+    }
+
+    public String getHasUploadLetter() {
+        return hasUploadLetter;
+    }
+
+    public void setHasUploadLetter(String hasUploadLetter) {
+        this.hasUploadLetter = hasUploadLetter;
     }
 }
