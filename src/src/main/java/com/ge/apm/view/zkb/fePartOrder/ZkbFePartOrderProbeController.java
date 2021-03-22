@@ -247,6 +247,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         return this.zkbFePartOrderService.hasAdminRight(configTypeMap);
     }
 
+    public boolean hasSupplierRight()
+    {
+        return this.zkbFePartOrderService.hasSupplierRight(configTypeMap);
+    }
+
     /**
      * 上传附件
      * @param event

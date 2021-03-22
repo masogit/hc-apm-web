@@ -303,7 +303,7 @@
                                     <f:selectItem itemLabel="不需要" itemValue="f"/>
                                     <f:selectItem itemLabel="需要" itemValue="t"/>
                                 </p:selectOneMenu>
-                                <p:commandLink immediate="false" process="@this" update="growl apmFieldset" disabled="#{zkbFePartOrderProbeController.remindLetterFlag eq '2' or !zkbFePartOrderProbeController.hasAdminRight()}"  action="#{zkbFePartOrderProbeController.remindLetter}" style="padding-left:30px;">
+                                <p:commandLink immediate="false" process="@this" update="growl apmFieldset" rendered="#{!zkbFePartOrderProbeController.hasAdminRight()}" disabled="#{zkbFePartOrderProbeController.remindLetterFlag eq '2' or !zkbFePartOrderProbeController.hasAdminRight()}"  action="#{zkbFePartOrderProbeController.remindLetter}" style="padding-left:30px;">
                                     <h:outputText value="催函" />
                                 </p:commandLink>
                             </c:when>
@@ -321,24 +321,60 @@
                         <p:inputTextarea disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.apmComment}" rows="2" cols="20">
                         </p:inputTextarea>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingGEAdmin')}">
+                    <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingApm')}">
                         <label class="label">下单人*：</label>
                         <p:inputText  disabled="true"  value="#{zkbFePartOrderProbeController.selected.fullApmInfoUser}"  />
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingGEAdmin')}">
+                    <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingApm')}">
                         <label class="label">下单时间*：</label>
                         <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderProbeController.selected.fullApmInfoDate}"
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
-            <p:fieldset legend="探头说明函信息" rendered="#{zkbFePartOrderProbeController.hasLetterViewRight() and 't' eq zkbFePartOrderProbeController.selected.needLetterFlag and 'f' eq zkbFePartOrderProbeController.selected.hasUploadLetter}">
+            <p:fieldset legend="探头说明函信息" rendered="#{'t' eq zkbFePartOrderProbeController.selected.needLetterFlag}">
+<!--                <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">-->
+<!--                    <h:panelGroup id="namepanel" >-->
+<!--                        <p:commandLink immediate="false" process="@this" update="growl zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.hasUploadLetter}" style="padding-left:30px;">-->
+<!--                            <h:outputText value="已上传说明函" />-->
+<!--                        </p:commandLink>-->
+<!--                    </h:panelGroup>-->
+<!--                </p:panel>-->
+
                 <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">
-                    <h:panelGroup id="namepanel" >
-                        <p:commandLink immediate="false" process="@this" update="growl zkbFePartOrderProbeEditForm"  action="#{zkbFePartOrderProbeController.hasUploadLetter}" style="padding-left:30px;">
-                            <h:outputText value="已上传说明函" />
-                        </p:commandLink>
+                    <!--<h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.uploadLetterFlag eq 't') and userContextService.zkbUser}">
+                        <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|rar|zip|htm|html|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|RAR|ZIP|HTM|HTML)$/"
+                                      fileUploadListener="#{zkbPartOrderAuditController.handleFileUpload}"
+                                      mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                      multiple="false" sizeLimit="500000000"
+                                      update=":zkbPartOrderEditForm:upload" auto="true"
+                                      invalidSizeMessage="#{msg.invalidSizeMessage}500M" label="上传"/>
                     </h:panelGroup>
+                    <h:panelGroup id="namepanel" rendered="#{zkbPartOrderAuditController.selected.uploadLetterFlag eq 't'}">
+                        <label class="label">说明函</label>
+                        &lt;!&ndash;<p:inputText id="name" value="#{zkbPartOrderAuditController.selected.uploadLetterFileName}" style="width: 400px;" disabled="true"/>&ndash;&gt;
+                        <p:link href="#{fileDownloadService.getFileUrl(zkbPartOrderAuditController.selected.uploadLetterFileId)}">#{zkbPartOrderAuditController.selected.uploadLetterFileName}</p:link>
+                    </h:panelGroup>-->
+                    <c:choose>
+                        <c:when test="#{zkbFePartOrderProbeController.hasSupplierRight()}">
+                            <h:panelGroup id="namepanel" >
+                                <p:commandButton immediate="false" process="@this" value="已上传说明函" update="growl zkbFePartOrderProbeEditForm" icon="fa fa-arrow-up" action="#{zkbFePartOrderProbeController.hasUploadLetter}" disabled="#{'t' eq zkbFePartOrderProbeController.selected.hasUploadLetter}" />
+                            </h:panelGroup>
+                        </c:when>
+                        <c:otherwise>
+                            <c:if test="#{zkbFePartOrderProbeController.selected.hasUploadLetter eq 'f'}">
+                                <h:panelGroup>
+                                    <p:outputLabel  style="color: red;font-weight:bold;font-size: larger" value="未上传说明函"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{zkbFePartOrderProbeController.selected.hasUploadLetter eq 't'}">
+                                <h:panelGroup>
+                                    <p:outputLabel  style="color: red;font-weight:bold;font-size: larger" value="已上传说明函"/>
+                                </h:panelGroup>
+                            </c:if>
+                        </c:otherwise>
+                    </c:choose>
+
                 </p:panel>
             </p:fieldset>
             <p:fieldset id="geAdminFieldset" legend="FE归还信息" rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingGEAdmin')}">

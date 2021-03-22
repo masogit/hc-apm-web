@@ -104,16 +104,15 @@ public class ZkbAssetStatisticService {
                 Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getAssetUid()))),
                         ArrayList::new)).stream().map(ZkbAssetStatistic::getAssetUid).collect(Collectors.toList());
         List<ZkbAssetStatistic> assetList1 = zkbAssetStatisticMapper.loadQrCount(assetUIDList);
-        if(CollectionUtils.isEmpty(assetList1))
+        if(CollectionUtils.isNotEmpty(assetList1))
         {
-            return assetList;
-        }
-        Map<String, ZkbAssetStatistic> map = assetList1.stream().collect(Collectors.toMap(ZkbAssetStatistic::getBoUuid, Function.identity()));
-        for(ZkbAssetStatistic zkbAssetStatistic:assetList)
-        {
-            ZkbAssetStatistic item=map.get(zkbAssetStatistic.getAssetUid());
-            if(item==null) continue;
-            zkbAssetStatistic.setQrCodeCount(item.getQrCodeCount());
+            Map<String, ZkbAssetStatistic> map = assetList1.stream().collect(Collectors.toMap(ZkbAssetStatistic::getBoUuid, Function.identity()));
+            for(ZkbAssetStatistic zkbAssetStatistic:assetList)
+            {
+                ZkbAssetStatistic item=map.get(zkbAssetStatistic.getAssetUid());
+                if(item==null) continue;
+                zkbAssetStatistic.setQrCodeCount(item.getQrCodeCount());
+            }
         }
         if(StringUtils.isNotBlank(qrCodeCount))
         {

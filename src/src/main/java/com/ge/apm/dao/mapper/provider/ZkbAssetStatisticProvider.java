@@ -2,6 +2,8 @@ package com.ge.apm.dao.mapper.provider;
 
 import webapp.framework.dao.SearchFilter;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +12,8 @@ import java.util.Map;
  */
 public class ZkbAssetStatisticProvider {
 
+    public static final String dateFormat = "yyyyMMdd";
+
     /**
      * 查出所有设备信息
      * @param param filter 过滤条件
@@ -17,6 +21,7 @@ public class ZkbAssetStatisticProvider {
      */
     public String loadAllAsset(Map<String,Object> param){
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
+        String currentDate = this.getDateStr();
         StringBuilder sb = new StringBuilder();
         sb.append(" SELECT DISTINCT " +
                 " ai.id,"+
@@ -35,10 +40,17 @@ public class ZkbAssetStatisticProvider {
                 " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
                 " INNER JOIN asset_info ai ON ai.uid= zca.asset_id" +
                 " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
-                " where ac.contract_no is not null and ai.system_id is not null");
+                " where ac.contract_no is not null and ai.system_id is not null"+
+                        " and to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date"
+                );
         String filter = buildFilter_loadAllAsset(searchFilterList);
         sb.append(filter);
         return sb.toString();
+    }
+    private String getDateStr()
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+        return formatter.format(new Date());
     }
 
     /**
