@@ -65,3 +65,8 @@ insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_ra
 insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('海南', 430.0, 138.0, 0.3209, '2020-10-01', '2020-12-31', now());
 
 --初始化zone_target_info表中数据 （end）
+
+
+-- 新增问答角色
+INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('OperationalRole', 'QA运营管理员', '/homeHead.xhtml');
+INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('BigCoffeeRole', 'QA大咖团队', '/homeHead.xhtml');
