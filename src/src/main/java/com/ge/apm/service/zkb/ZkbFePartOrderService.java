@@ -618,6 +618,21 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     }
 
     /**
+     * 根据角色判断是否是供应商权限
+     * @param configTypeMap 角色MAP
+     * @return
+     */
+    public boolean hasSupplierRight(Map<String, String> configTypeMap)
+    {
+        boolean right = false;
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString()))
+        {
+            right=true;
+        }
+        return right;
+    }
+
+    /**
      * 根据systemId和 报修单号检索
      * @param systemId systemId
      * @param sr 报修单号检索
@@ -652,7 +667,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         sparePartsZkbFePartOrderList=this.zkbFePartOrderMapper.queryZkbFePart(searchFilters);
         List<ZkbPartOrder> zkbPartOrderList =null;
-        zkbPartOrderList = this.zkbPartOrderMapper.queryBySystemIdAndSr(systemId,sr,partOrderNo);
+        zkbPartOrderList = this.zkbPartOrderMapper.queryBySystemIdAndSr(systemId,sr,partOrderNo,assetGroup);
         if(CollectionUtils.isNotEmpty(zkbPartOrderList))
         {
             List<ZkbFePartOrder> list = new ArrayList<>();
