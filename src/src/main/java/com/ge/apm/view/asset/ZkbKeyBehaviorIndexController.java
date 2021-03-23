@@ -133,6 +133,8 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      */
     private static final String kpi_modify = "KpiModify";
 
+    private Map<String,Map<String,Integer>> rankMap = null;
+
     @Override
     protected void init() {
         super.init();
@@ -153,6 +155,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
                 this.tenantUID="-";
             }
         }
+        this.rankMap = this.zkbKeyBehaviorIndexService.initRankingMap();
         loadData();
     }
     /**
@@ -164,7 +167,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      * 根据页面条件查询
      */
     public void loadData() {
-        this.zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexService.loadZkbKeyBehaviorIndex(this.tenantUID,this.beginningTime,this.endingTime);
+        this.zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexService.loadZkbKeyBehaviorIndex(this.tenantUID,this.beginningTime,this.endingTime,this.rankMap);
     }
 
     /**
