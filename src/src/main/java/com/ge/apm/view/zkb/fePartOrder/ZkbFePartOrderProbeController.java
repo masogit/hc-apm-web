@@ -203,7 +203,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     public void prepareEdit() {
         super.prepareEdit();
         this.selected=this.zkbFePartOrderRepository.findById(this.id);
-        this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo(),null);
+        this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo(),null,ZkbFePartOrder.OrderType.Probe.toString());
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         this.initBlobObjectList(this.selected.getId());
         this.orderAnnotationChange();
@@ -221,7 +221,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
              WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
             return;
         }
-        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,ZkbFePartOrderService.assetGroup);
+        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,ZkbFePartOrderService.assetGroup,ZkbFePartOrder.OrderType.Probe.toString());
     }
 
     /**
@@ -245,6 +245,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     public boolean hasAdminRight()
     {
         return this.zkbFePartOrderService.hasAdminRight(configTypeMap);
+    }
+
+    public boolean hasSupplierRight()
+    {
+        return this.zkbFePartOrderService.hasSupplierRight(configTypeMap);
     }
 
     /**
