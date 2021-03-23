@@ -71,3 +71,15 @@ insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_ra
 INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('OperationalRole', 'QA运营管理员', '/homeHead.xhtml');
 INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('BigCoffeeRole', 'QA大咖团队', '/homeHead.xhtml');
 
+
+-- zkb
+INSERT INTO msg_config ("id", "msg_name", "msg_bind_field", "msg_status", "msg_name_en") VALUES (10, '医院客户电话', 'requestorPhone', '0', 'requestor Phone');
+
+UPDATE zkb_contract cc
+SET probe_quota_use = probe_quota_use + o.qty,
+probe_quota = probe_quota - o.qty
+FROM
+	( SELECT * FROM zkb_part_order WHERE data_type IS NULL AND order_type = 'Probe' AND return_type = 'badReturn' and current_step = 'Complete') o
+WHERE
+	o.contract_id = cc.ID;
+
