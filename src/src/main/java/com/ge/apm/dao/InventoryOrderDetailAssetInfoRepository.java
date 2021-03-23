@@ -33,4 +33,10 @@ public interface InventoryOrderDetailAssetInfoRepository extends GenericReposito
     @Query(value = "SELECT count(1) FROM inventory_order_detail LEFT JOIN inventory_order ON inventory_order_detail.inventory_order_id = inventory_order.\"id\" WHERE asset_id IN (?1) AND status = 0 AND inventory_order.is_finished = FALSE",nativeQuery = true)
     int getInventoryingAssetCount(List<Integer> assetIds);
 
+    @Query(value = "SELECT asset_id FROM inventory_order_detail LEFT JOIN inventory_order ON inventory_order_detail.inventory_order_id = inventory_order.\"id\" WHERE asset_id IN (?1) AND status = 0 AND inventory_order.is_finished = FALSE",nativeQuery = true)
+    List<Integer> getInventoryingAssetCountByBatchEdit(List<Integer> assetIds);
+
+    @Query(value = "SELECT * FROM inventory_order_detail   WHERE asset_id =?1 ORDER BY last_modified_date DESC LIMIT 1 ",nativeQuery = true)
+    List<InventoryOrderDetail> findProjectionByAssetId(Integer assetId);
+
 }
