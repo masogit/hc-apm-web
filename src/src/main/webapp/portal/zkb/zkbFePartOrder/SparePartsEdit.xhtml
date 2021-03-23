@@ -239,11 +239,11 @@
 <!--                        <label class="label">#{msg.zkbFePartOrder_act}*</label>-->
 <!--                        <p:inputText disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderSparePartDetailController.selected.act}"  required="true" requiredMessage="#{msg.zkbFePartOrder_act} #{msg.ValidationRequire}"/>-->
 <!--                    </h:panelGroup>-->
-                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
+                    <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingApm')}">
                         <label class="label">下单人*：</label>
                         <p:inputText  disabled="true"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoUser}"  />
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
+                    <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingApm')}">
                         <label class="label">下单时间*：</label>
                         <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoDate}"
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>

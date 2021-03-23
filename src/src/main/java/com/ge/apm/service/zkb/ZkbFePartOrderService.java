@@ -381,9 +381,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbContract 合同
      * @param qty 数量
      */
-    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty,ZkbFePartOrder zkbFePartOrder)
+    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty)
     {
-        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetTypeDi()))
+        if("DI".equals(zkbContract.getContractType())
+                ||"PCB".equals(zkbContract.getContractType()))
         {
             switch(type){
                 case 1 :
@@ -403,7 +404,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-qty);
                     break;
             }
-        }else
+        }else if("CCS".equals(zkbContract.getContractType())
+                ||"Biomed".equals(zkbContract.getContractType()))
         {
             switch(type){
                 case 1 :
@@ -616,13 +618,28 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     }
 
     /**
+     * 根据角色判断是否是供应商权限
+     * @param configTypeMap 角色MAP
+     * @return
+     */
+    public boolean hasSupplierRight(Map<String, String> configTypeMap)
+    {
+        boolean right = false;
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString()))
+        {
+            right=true;
+        }
+        return right;
+    }
+
+    /**
      * 根据systemId和 报修单号检索
      * @param systemId systemId
      * @param sr 报修单号检索
      * @param partOrderNo 订单编号
      * @param assetGroup 设备类型
      */
-    public List<ZkbFePartOrder> getSparePartsZkbFePartOrder(String systemId,String sr,String partOrderNo,Integer assetGroup)
+    public List<ZkbFePartOrder> getSparePartsZkbFePartOrder(String systemId,String sr,String partOrderNo,Integer assetGroup,String orderType)
     {
         List<ZkbFePartOrder> sparePartsZkbFePartOrderList = null;
         List<SearchFilter> searchFilters = new ArrayList<>();
@@ -650,7 +667,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         sparePartsZkbFePartOrderList=this.zkbFePartOrderMapper.queryZkbFePart(searchFilters);
         List<ZkbPartOrder> zkbPartOrderList =null;
-        zkbPartOrderList = this.zkbPartOrderMapper.queryBySystemIdAndSr(systemId,sr,partOrderNo);
+        zkbPartOrderList = this.zkbPartOrderMapper.queryBySystemIdAndSr(systemId,sr,partOrderNo,assetGroup);
         if(CollectionUtils.isNotEmpty(zkbPartOrderList))
         {
             List<ZkbFePartOrder> list = new ArrayList<>();
@@ -682,7 +699,15 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         if(CollectionUtils.isEmpty(sparePartsZkbFePartOrderList))
         {
-            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_searchError"));
+            if(ZkbFePartOrder.OrderType.Probe.toString().equals(orderType))
+            {
+                WebUtil.addErrorMessage(WebUtil.getMessage("错误：暂未检索到超声类对应报修单"));
+
+            }else
+                {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_searchError"));
+                }
+
         }
         return sparePartsZkbFePartOrderList;
     }
