@@ -68,8 +68,9 @@ insert into zone_target_info(province, sum_target, paste_code, quarter_start_dat
 
 
 -- 新增问答角色
-INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('OperationalRole', 'QA运营管理员', '/homeHead.xhtml');
-INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('BigCoffeeRole', 'QA大咖团队', '/homeHead.xhtml');
+ALTER TABLE "public"."sys_role" ADD CONSTRAINT "union_name" UNIQUE ("name");
+INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('OperationalRole', 'QA运营管理员', '/homeHead.xhtml') ON conflict(name) do NOTHING;
+INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('BigCoffeeRole', 'QA大咖团队', '/homeHead.xhtml') ON conflict(name) do NOTHING;
 
 
 -- zkb
