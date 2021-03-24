@@ -384,7 +384,7 @@
                         <p:selectOneMenu  value="#{zkbFePartOrderProbeController.selected.returnType}" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" >
                             <p:ajax event="change" update="partSerialNumberGroup partQualityIssueGroup" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup id="partSerialNumberGroup" style="text-align: left">
