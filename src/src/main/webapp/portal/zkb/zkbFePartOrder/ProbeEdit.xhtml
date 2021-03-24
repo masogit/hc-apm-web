@@ -283,7 +283,7 @@
                         <label class="label">#{msg.zkbFePartOrder_orderNoa}*</label>
                         <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.orderNo}"  required="true" requiredMessage="#{msg.zkbFePartOrder_orderNoa} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
-                    <h:panelGroup >
+                    <h:panelGroup rendered="#{!zkbFePartOrderProbeController.configTypeMap.containsKey('Supplier')}" >
                         <label class="label">#{msg.zkbFePartOrder_assetPrice}*</label>
                         <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.price}"  required="true" requiredMessage="#{msg.zkbFePartOrder_assetPrice} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
