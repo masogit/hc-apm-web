@@ -33,7 +33,7 @@
                     <p:selectOneMenu  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.returnType}" required="true" requiredMessage="#{msg.zkbFePartOrder_returnType} #{msg.ValidationRequire}">
 <!--                        <p:ajax event="change" update="returnTypeGrid" />-->
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
 <!--                <h:panelGrid id="returnTypeGrid" columns="1" layout="grid" style="text-align: left">-->
