@@ -74,8 +74,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private ZkbContractRepository zkbContractRepository;
     private List<ZkbPartOrderReturn> zkbPartOrderReturnModifyList;
     private ZkbPartOrderReturn zkbPartOrderReturnModify;
-
-
+    private String saveTips;
+    private String letterTips;
     @Override
     protected void init() {
         super.init();
@@ -181,6 +181,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                                 WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
                             }
                         }
+                    }
+                }
+                if(userContextService.isZkbUser()) {
+                    if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())
+                            && "t".equals(selected.getNeedLetterFlag())
+                            && ("f".equals(selected.getUploadLetterFlag()) || StringUtils.isEmpty(selected.getUploadLetterFlag()))){
+                        //WebUtil.addErrorMessage("请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。","");
+                        letterTips = "请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。";
                     }
                 }
             }
@@ -751,6 +759,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         zkbPartOrderReturnRepository.save(zkbPartOrderReturn);
         zkbPartOrderReturn = null;
         zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selected.getId(),isChoseAdmin);
+        saveTips = "备件归还信息已添加，提交申请后流程才会进入Admin确认阶段，请在添加完需要已归还的备件信息后提交申请，以免影响您后续的进度，感谢您的配合！";
     }
 
     private boolean haveTrainCourseFlag = false;
@@ -792,6 +801,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }else{
             WebUtil.addErrorMessage("fail to upload file");
         }
+    }
+
+    public void handleFileUpload2(){
+        selected.setUploadLetterFlag("t");
+        zkbPartOrderRepository.save(selected);
     }
 
     public void remindLetter(){
@@ -1189,6 +1203,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         isChoseAdmin = choseAdmin;
     }
 
+    public String getSaveTips() {
+        return saveTips;
+    }
+
+    public void setSaveTips(String saveTips) {
+        this.saveTips = saveTips;
+    }
+
+    public String getLetterTips() {
+        return letterTips;
+    }
+
+    public void setLetterTips(String letterTips) {
+        this.letterTips = letterTips;
+    }
     //endregion
 
     @Override

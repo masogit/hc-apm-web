@@ -50,6 +50,9 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 
 	@Query(value = "select o.* from v2_pm_order o where o.asset_uid in ?1 and o.is_finished='false' order by o.plan_time ",nativeQuery = true)
 	public Set<V2_PmOrder> findV2PmOrderByAssetUids(Set<String> setAssetUids);
+
+	@Query(value = "select o.asset_uid from v2_pm_order o where o.asset_uid in ?1 and o.is_finished='false' order by o.plan_time ",nativeQuery = true)
+	public List<String> findV2PmOrderByAssetUidByBatchEdit(Set<String> setAssetUids);
 	@Query(value="select\n" +
 			"\t(\n" +
 			"\tselect\n" +

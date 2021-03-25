@@ -635,7 +635,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		selected.setPeriodStart(new DateTime().withMillisOfDay(0).toDate());
 		selected.setPeriodEnd(new DateTime().withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
 		selectedUserOrg = null;
-
+		selected.setEnableUpdateSwitchingTime(true);
 /*		updateDispater();
 		updateApproverList();*/
 	}

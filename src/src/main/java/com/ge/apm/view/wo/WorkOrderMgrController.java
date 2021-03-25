@@ -1124,7 +1124,13 @@ public void test1(){
     }
     
     public void saveEditedWorkOrder(){
-        
+        //故障类型必填校验
+        if (requireCaseType() && null == selectedWorkOrder.getCaseType()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("caseType") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
+            return;
+        }
+
         dao.save(selectedWorkOrder);
     }
 
@@ -1183,7 +1189,14 @@ public void test1(){
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
         attachList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_DOCS);
+    }
 
+    //故障类型是否必填
+    public Boolean requireCaseType(){
+        ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
+                selectedWorkOrder.getAssetId());
+        return Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
+                .map(data -> (Boolean) data.get("isCasetypeRequired")).orElse(false);
     }
 
     //  提交审核前的计算
@@ -1315,7 +1328,7 @@ public void test1(){
             RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
             valid = false;
         }
-        if (null == selectedWorkOrder.getCaseType()) {
+        if (requireCaseType() && null == selectedWorkOrder.getCaseType()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("caseType") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
             valid = false;
@@ -1380,7 +1393,13 @@ public void test1(){
     }
 
     public void closeWorkOrder() {
-        Integer feedback = woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
+        //故障类型必填校验
+        if (requireCaseType() && null == selectedWorkOrder.getCaseType()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("caseType") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
+            return;
+        }
+//        Integer feedback = woDao.findById(selectedWorkOrder.getId()).getFeedbackRating();
 //           if(isRating && feedback<1){
 //               WebUtil.addErrorMessage("请务必给予评价");
 //               RequestContext.getCurrentInstance().addCallbackParam("isRate", true);

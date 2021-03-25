@@ -144,7 +144,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     /**
      * 坏还
      */
-    private static String badReturnValue ="badReturn";
+    public static String badReturnValue ="badReturn";
 
 
     /**
@@ -203,7 +203,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     public void prepareEdit() {
         super.prepareEdit();
         this.selected=this.zkbFePartOrderRepository.findById(this.id);
-        this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo());
+        this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo(),null,null);
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(this.id);
         if(CollectionUtils.isNotEmpty(zkbFePartOrderAssetInfoList))
@@ -237,7 +237,12 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public void getSparePartsZkbFePartOrder(String systemId,String sr)
     {
-        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null);
+        if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr))
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
+            return;
+        }
+        this.sparePartsZkbFePartOrderList=this.zkbFePartOrderService.getSparePartsZkbFePartOrder(systemId,sr,null,null,null);
     }
 
     /**
@@ -352,10 +357,12 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         int applyCount = this.getApplyCount();
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         Integer reaminApplyCount = null;
-        if(StringUtils.isNotBlank(this.selected.getAssetTypeDi()))
+        if("DI".equals(zkbContract.getContractType())
+                ||"PCB".equals(zkbContract.getContractType()))
         {
             reaminApplyCount=zkbContract.getSpareArtificail();
-        }else if(StringUtils.isNotBlank(this.selected.getArtificialType()))
+        }else if("CCS".equals(zkbContract.getContractType())
+            ||"Biomed".equals(zkbContract.getContractType()))
         {
             reaminApplyCount=zkbContract.getSpareQuota();
         }
@@ -378,7 +385,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
-            this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount,this.selected);
+            this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount);
         }
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
@@ -426,7 +433,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
-            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.selected);
+            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount);
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
@@ -458,7 +465,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         {
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
             int applyCount = this.getApplyCount();
-            this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount,this.selected);
+            this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount);
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
@@ -472,9 +479,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     public String geAdminReturn()
     {
         List<ZkbFePartOrderReturn> zkbFePartOrderReturnList = this.selected.getZkbFePartOrderReturnList();
-        if(CollectionUtils.isEmpty(zkbFePartOrderReturnList))
+        if(CollectionUtils.isEmpty(zkbFePartOrderReturnList)||!this.checkHasNew(zkbFePartOrderReturnList))
         {
-            return this.backList();
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_returnListCannotBeNull"));
+            return "";
         }
         List<ZkbFePartOrderAssetInfo> assetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
         Map<String,Integer> assetInfoMap = this.zkbFePartOrderService.getAssetInfoMap(assetInfoList);
@@ -502,7 +510,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())&&returnCount>0)
         {
-            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount,this.selected);
+            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount);
         }
         for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
         {
@@ -547,6 +555,24 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     }
 
     /**
+     * 检查是否添加了新数据
+     * @param zkbFePartOrderReturnList
+     * @return
+     */
+    private Boolean checkHasNew(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList)
+    {
+        ListIterator<ZkbFePartOrderReturn> listIt = zkbFePartOrderReturnList.listIterator();
+        while (listIt.hasNext()) {
+            ZkbFePartOrderReturn item = listIt.next();
+            if(StringUtils.isBlank(item.getId()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 获取归还数量
      * @param zkbFePartOrderReturnList 归还列表
      * @return
@@ -576,7 +602,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public Boolean hasEditRight(String fieldsetType)
     {
-        return this.zkbFePartOrderService.hasEditRight(fieldsetType,this.selected,this.configTypeMap);
+        return this.zkbFePartOrderService.hasEditRight(fieldsetType,this.selected,this.configTypeMap,ZkbFePartOrder.stepAndRoles);
     }
 
     /**
@@ -595,7 +621,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public Boolean checkRendered(String fieldsetType)
     {
-       return this.zkbFePartOrderService.checkRendered(fieldsetType,this.selected,this.configTypeMap);
+       return this.zkbFePartOrderService.checkRendered(fieldsetType,this.selected,this.configTypeMap,ZkbFePartOrder.stepAndRoles);
     }
 
     /**
