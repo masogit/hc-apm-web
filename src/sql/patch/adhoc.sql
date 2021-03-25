@@ -23,63 +23,58 @@ alter sequence "sys_role_id_seq" restart with 100 ;
 --初始化zone_target_info表中数据 （start）
 delete from zone_target_info where quarter_start_date = '2020-10-01' and quarter_end_date = '2020-12-31';
 
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('安徽', 1586.0, 518.0, 0.3266, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('北京', 2546.0, 395.0, 0.1551, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('福建', 1615.0, 724.0, 0.4483, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('广西', 924.0, 106.0, 0.1147, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('贵州', 831.0, 72.0, 0.0866, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('安徽', 988.0, 482.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('北京', 2056.0, 388.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('福建', 1154.0, 666.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('广西', 735.0, 97.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('贵州', 608.0, 65.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('河北', 1592.0, 890.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('河南', 1948.0, 1112.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('黑龙江', 597.0, 247.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('湖北', 1599.0, 463.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('湖南', 1035.0, 215.0, '2020-10-01', '2020-12-31', now());
 
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('河北', 2004.0, 918.0, 0.4581, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('河南', 2757.0, 1165.0, 0.4226, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('黑龙江', 855.0, 255.0, 0.2982, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('湖北', 2076.0, 474.0, 0.2283, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('湖南', 1443.0, 227.0, 0.1573, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('吉林', 527.0, 205.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('江苏', 2393.0, 1392.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('江西', 701.0, 421.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('辽宁', 1099.0, 342.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('内蒙古', 704.0, 258.0 , '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('山东', 2869.0, 862.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('山西', 758.0, 496.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('陕西', 968.0, 480.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('上海', 1352.0, 724.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('天津', 513.0, 520.0, '2020-10-01', '2020-12-31', now());
 
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('外蒙古', 13.0, 0.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('新疆', 462.0, 100.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('云南', 892.0, 164.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('浙江', 2407.0, 954.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('重庆', 747.0, 223.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('四川', 1337.0, 194.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('西藏', 58.0, 10.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('甘肃', 437.0, 157.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('宁夏', 220.0, 135.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('青海', 157.0, 57.0, '2020-10-01', '2020-12-31', now());
 
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('吉林', 700.0, 206.0, 0.2943, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('江苏', 3691.0, 1466.0, 0.3972, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('江西', 1069.0, 460.0, 0.4303, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('辽宁', 1413.0, 345.0, 0.2442, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('内蒙古', 894.0, 262.0, 0.2931, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('广东', 3111.0, 822.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('海南', 296.0, 134.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('V2.0-E', 4664.0, 303.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('V2.0-N', 3170.0, 151.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('V2.0-S', 2655.0, 127.0, '2020-10-01', '2020-12-31', now());
+insert into zone_target_info(province, sum_target, paste_code, quarter_start_date, quarter_end_date, created_time) values('V2.0-W', 2291.0, 119.0, '2020-10-01', '2020-12-31', now());
 
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('山东', 3799.0, 935.0, 0.2461, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('山西', 1140.0, 501.0, 0.4395, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('陕西', 1353.0, 518.0, 0.3829, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('上海', 1900.0, 743.0, 0.3911, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('天津', 649.0, 562.0, 0.8659, '2020-10-01', '2020-12-31', now());
-
-
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('外蒙古', 19.0, 0.0, 0.0, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('新疆', 585.0, 109.0, 0.1863, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('云南', 1144.0, 173.0, 0.1512, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('浙江', 3329.0, 1016.0, 0.3052, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('重庆', 1000.0, 233.0, 0.2330, '2020-10-01', '2020-12-31', now());
-
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('四川', 2010.0, 203.0, 0.1010, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('西藏', 79.0, 10.0, 0.1266, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('甘肃', 632.0, 181.0, 0.2864, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('宁夏', 289.0, 144.0, 0.4983, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('青海', 254.0, 61.0, 0.2402, '2020-10-01', '2020-12-31', now());
-
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('广东', 4097.0, 855.0, 0.2087, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('海南', 430.0, 138.0, 0.3209, '2020-10-01', '2020-12-31', now());
 
 --初始化zone_target_info表中数据 （end）
 
 
 -- 新增问答角色
-INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('OperationalRole', 'QA运营管理员', '/homeHead.xhtml');
-INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('BigCoffeeRole', 'QA大咖团队', '/homeHead.xhtml');
+ALTER TABLE "public"."sys_role" ADD CONSTRAINT "union_name" UNIQUE ("name");
+INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('OperationalRole', 'QA运营管理员', '/homeHead.xhtml') ON conflict(name) do NOTHING;
+INSERT INTO sys_role("name", "role_desc", "home_page") VALUES ('BigCoffeeRole', 'QA大咖团队', '/homeHead.xhtml') ON conflict(name) do NOTHING;
 
 
 -- zkb
 INSERT INTO msg_config ("id", "msg_name", "msg_bind_field", "msg_status", "msg_name_en") VALUES (10, '医院客户电话', 'requestorPhone', '0', 'requestor Phone');
 
-UPDATE zkb_contract cc
-SET probe_quota_use = probe_quota_use + o.qty,
-probe_quota = probe_quota - o.qty
-FROM
-	( SELECT * FROM zkb_part_order WHERE data_type IS NULL AND order_type = 'Probe' AND return_type = 'badReturn' and current_step = 'Complete') o
-WHERE
-	o.contract_id = cc.ID;
+
 
