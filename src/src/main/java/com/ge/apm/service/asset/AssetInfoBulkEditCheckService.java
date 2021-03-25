@@ -57,6 +57,21 @@ public class AssetInfoBulkEditCheckService {
         }
         return true;
     }
+    public List<String> verifyByBatchEdit(List<AssetInfo> assets) {
+        if(assets != null && !assets.isEmpty()){
+           List<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toList());
+            List<Integer> status = new ArrayList<>();
+            status.add(ReceiveBorrowConstant.STATE_RENT_ACCEPTED);
+            status.add(ReceiveBorrowConstant.STATE_RENT_DELIVERED);
+            status.add(ReceiveBorrowConstant.STATE_RENT_SUSPENDED);
+            status.add(ReceiveBorrowConstant.STATE_RENT_CONFIRMED);
+            status.add(ReceiveBorrowConstant.STATE_RETURN_ACCEPTED);
+            status.add(ReceiveBorrowConstant.STATE_RETURN_DELIVERED);
+            status.add(ReceiveBorrowConstant.STATE_RETURN_SUSPENDED);
+            return sharedAssetReqDetailRepository.findCountByAssetInfoIdsAndStateByBatchEdit(assetUids,status);
+        }
+        return null;
+    }
     public boolean verifyForMaintain(List<AssetInfo> assets) {
         if(assets != null && !assets.isEmpty()){
             Set<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toSet());
@@ -88,6 +103,29 @@ public class AssetInfoBulkEditCheckService {
         return true;
     }
 
+    public List<String> verifyForMaintainByBatchEdit(List<AssetInfo> assets) {
+        if(assets != null && !assets.isEmpty()){
+            Set<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toSet());
+            List<String> status = new ArrayList<>();
+            status.add("assign");
+            status.add("accept");
+            status.add("reAssign");
+            status.add("tempRepair");
+            status.add("approval");
+            status.add("pass");
+            status.add("Maintain");
+            status.add("repair");
+            status.add("acceptNot");
+            status.add("simplify");
+            status.add("reject");
+            status.add("partial");
+            status.add("AcceptTance");
+            List<V2_PmOrder> v2_pmOrderList = new ArrayList<>();
+            return v2_PmOrderRepository.findV2PmOrderByAssetUidByBatchEdit(assetUids);
+        }
+        return null;
+    }
+
     //验证是否有正在盘点的设备
     public boolean verifyForInventory(List<AssetInfo> assets) {
         if(assets != null && !assets.isEmpty()){
@@ -97,6 +135,14 @@ public class AssetInfoBulkEditCheckService {
                 return false;
         }
         return true;
+    }
+    //验证是否有正在盘点的设备
+    public List<Integer> verifyForInventoryByBatchEdit(List<AssetInfo> assets) {
+        if(assets != null && !assets.isEmpty()){
+            List<Integer> assetIds = assets.stream().map(assetInfo -> assetInfo.getId()).collect(Collectors.toList());
+            return inventoryOrderDetailAssetInfoRepository.getInventoryingAssetCountByBatchEdit(assetIds);
+        }
+        return null;
     }
 
 
@@ -121,6 +167,29 @@ public class AssetInfoBulkEditCheckService {
         }
 
         return Optional.empty();
+    }
+    public List<AssetInfo>verifyForNurseSiteByBatchEdit(List<AssetInfo> assets) {
+        List<AssetInfo> list = new ArrayList<>();
+        for(AssetInfo as: assets){
+            //临床助手检查进行中
+            List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findByAssetUid(as.getUid());
+            if(!StringUtils.isEmpty(nurseSiteMaintainItemList) && nurseSiteMaintainItemList.size()>0){
+                Set<String> setMaintainIds = new HashSet<String>();
+                for (int i = 0; i < nurseSiteMaintainItemList.size(); i++) {
+                    setMaintainIds.add(nurseSiteMaintainItemList.get(i).getId());
+                }
+                Set<NurseSiteMaintainData> maintainDataByParentIds = nurseSiteMaintainDataRepository.findMaintainDataByParentIds(setMaintainIds);
+                for (NurseSiteMaintainData nurseSiteMaintainData : maintainDataByParentIds) {
+                    Boolean checkValue = nurseSiteMaintainData.getCheckValue() != null ? nurseSiteMaintainData.getCheckValue() :false;
+                    if(!checkValue){
+                        list.add(as);
+                    }
+                }
+                return list;
+            }
+        }
+
+        return null;
     }
 
 }

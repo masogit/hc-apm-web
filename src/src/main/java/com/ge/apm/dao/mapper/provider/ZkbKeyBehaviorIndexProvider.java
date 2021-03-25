@@ -54,7 +54,6 @@ public class ZkbKeyBehaviorIndexProvider {
                         "AVG(compliance_score) as compliance_score,"+
                         "AVG(engineer_score) as engineer_score,"+
                         "AVG(compliance_score) as compliance_score,"+
-//                        "AVG(intact_part_return_rate_score) as intact_part_return_rate_score,"+
                         "AVG(part_return_score) as part_return_score,"+
                         "AVG(paste_quick_response_rate_score) as paste_quick_response_rate_score,"+
                         "AVG(satisfactory_degree_score) as satisfactory_degree_score,kbi_date "+
@@ -62,6 +61,33 @@ public class ZkbKeyBehaviorIndexProvider {
         String filter = buildFilter_zkbOrderHistoryDetail(searchFilterList);
         sb.append(filter);
         sb.append("GROUP BY kbi_date ORDER BY kbi_date ASC");
+        return sb.toString();
+    }
+
+    /**
+     * 初始化排名信息
+     * @param param
+     * @return
+     */
+    public String initRanking(Map<String,Object> param)
+    {
+        String kpiDate = param.get("kpiDate").toString();//设备system id
+        String dateFormat = param.get("dateFormat").toString();//设备system id
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT " +
+                " RANK () OVER (ORDER BY total_score DESC), " +
+                " * " +
+                "FROM " +
+                " ( " +
+                " SELECT " +
+                " tenant_uid, ( " +
+                " apm_billing_rate_score + compliance_score + engineer_score + part_return_score + paste_quick_response_rate_score + satisfactory_degree_score\n" +
+                " ) AS total_score " +
+                " FROM " +
+                " zkb_key_behavior_index " +
+                " WHERE " +
+                " '"+kpiDate+"' = TO_CHAR(kbi_date, '"+dateFormat+"') " +
+                " ) T");
         return sb.toString();
     }
 }

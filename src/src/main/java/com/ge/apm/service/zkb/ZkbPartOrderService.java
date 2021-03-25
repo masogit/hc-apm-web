@@ -87,6 +87,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     private ZkbIntegralService zkbIntegralService;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+    public static String NEW_CAT_END_DATE= "2021-03-01";
 
 
     public List<TenantInfo> getSourceTenantInfoList(){
@@ -236,6 +237,22 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             days++;
         }
         return (int)days;
+    }
+
+    public int getBetweenDay(String sd1, String sd2) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date1 = format.parse(sd1);
+            Date date2 = format.parse(sd2);
+            long days = (date2.getTime() - date1.getTime()) / (24*3600*1000);
+            if((date2.getTime() - date1.getTime())% (24*3600*1000) != 0){
+                days++;
+            }
+            return (int)days;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public boolean checkApplyNumValid(ZkbPartOrder zkbPartOrder,ZkbContract zkbContract){
@@ -606,6 +623,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
             }
         }
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrderRepository.save(zkbPartOrder);
         List<ZkbPartOrderStep> zkbPartOrderStepList = zkbPartOrderStepRepository.findByPartOrderIdAndStepKey(zkbPartOrder.getId(), oldStep);
         for(ZkbPartOrderStep s : zkbPartOrderStepList){
@@ -661,6 +681,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     public void closedBack(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
         zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.PartReturned.toString());
         zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString());
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrderRepository.save(zkbPartOrder);
 
         ZkbPartOrderStep newZkbPartOrderStep = new ZkbPartOrderStep();
@@ -699,7 +722,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                     Date d = null;
                     try {
-                        d = format.parse("2021-01-01");
+                        d = format.parse(NEW_CAT_END_DATE);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -750,6 +773,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
             }
         }
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
         zkbPartOrder = zkbPartOrderRepository.save(zkbPartOrder);
 
         List<ZkbPartOrderStep> zkbPartOrderStepList = zkbPartOrderStepRepository.findByPartOrderId(zkbPartOrder.getId());
@@ -818,12 +844,18 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 subReturnQty(zkbContract,zkbPartOrder, zkbPartOrder.getReturnQty());
             }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
-                List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderIdAndReturnTypeIsNot(zkbPartOrder.getId(),"badReturn");
+                List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderId(zkbPartOrder.getId());
                 if(zkbPartOrderReturns != null && zkbPartOrderReturns.size() > 0){
                     int v = 0;
                     ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
                     for (ZkbPartOrderReturn r : zkbPartOrderReturns){
-                        v += r.getQty();
+                        if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
+                            continue;
+                        }else if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType())){
+                            continue;
+                        }else{
+                            v += r.getQty();
+                        }
                     }
                     subReturnQty(zkbContract,zkbPartOrder,v);
                 }
@@ -871,6 +903,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setReturnAuditerUid(userAccount.getUid());
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Returned.toString());
             zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+            Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+            dataFlag++;
+            zkbPartOrder.setDataFlag(dataFlag);
             zkbPartOrderRepository.save(zkbPartOrder);
 
             ZkbPartOrderStep newZkbPartOrderStep = new ZkbPartOrderStep();
@@ -890,6 +925,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }else {
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.PartReturned.toString());
+            Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+            dataFlag++;
+            zkbPartOrder.setDataFlag(dataFlag);
             zkbPartOrderRepository.save(zkbPartOrder);
 
             HashMap<String, String> emailWrapperMap = new HashMap<>();
@@ -1021,7 +1059,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 Date d = null;
                 try {
-                    d = format.parse("2021-01-01");
+                    d = format.parse(NEW_CAT_END_DATE);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -1073,7 +1111,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     public void subReturnQty(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder,int qty) {
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())) {
             if(!"2".equals(zkbPartOrder.getArtificialType())){
-                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())
+                    || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     zkbContract.setSpareQuotaUse((zkbContract.getSpareQuotaUse() == null ? 0 : zkbContract.getSpareQuotaUse()) - qty);
                     zkbContract.setSpareQuota((zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota()) + qty);
                     zkbContractRepository.save(zkbContract);
@@ -1084,12 +1123,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
-            zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
-            zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) + qty);
-            zkbContractRepository.save(zkbContract);
+            if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(zkbPartOrder.getReturnType())
+                && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(zkbPartOrder.getReturnType())) {
+                zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
+                zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) + qty);
+                zkbContractRepository.save(zkbContract);
+            }
         }else if(ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
-            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) ||
-                ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())
+                || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                 zkbContract.setSpareQuotaUse((zkbContract.getSpareQuotaUse() == null ? 0 : zkbContract.getSpareQuotaUse()) - qty);
                 zkbContract.setSpareQuota((zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota()) + qty);
                 zkbContractRepository.save(zkbContract);
@@ -1307,14 +1349,18 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             history.setCreateUserId(currentUser.getUid());
             history.setCreateUserName(currentUser.getName());
             zkbPartOrderReturnHistoryList.add(history);
-            if("badReturn".equals(r.getReturnType())){
+            if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
+                continue;
+            }else if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType())){
                 continue;
             }
             oldBackTotal += r.getQty();
         }
         int nowBackTotal = 0;
         for(ZkbPartOrderReturn r : zkbPartOrderReturnModifyList){
-            if("badReturn".equals(r.getReturnType())){
+            if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
+                continue;
+            }else if(ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType())){
                 continue;
             }
             nowBackTotal += r.getQty();
@@ -1344,8 +1390,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //如果审批通过后则进行核算名额
         int v = 0;
         for (ZkbPartOrderReturn r : zkbPartOrderReturnList){
-            if(!"badReturn".equals(r.getReturnType()) && ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
-                v += r.getQty();
+            if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType()) && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
+                if(ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
+                    v += r.getQty();
+                }
             }
         }
         if(v > 0){
@@ -1353,7 +1401,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             subReturnQty(contract,zkbPartOrder,v);
         }
     }
-
 
     @Transactional(rollbackFor = Exception.class)
     public void partsClosed(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
@@ -1385,6 +1432,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setClosedAuditerUid(userAccount.getUid());
             zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Closed.toString());
             zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+            Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+            dataFlag++;
+            zkbPartOrder.setDataFlag(dataFlag);
             zkbPartOrderRepository.save(zkbPartOrder);
 
             ZkbPartOrderStep newZkbPartOrderStep = new ZkbPartOrderStep();
@@ -1396,9 +1446,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             newZkbPartOrderStep.setTenantUID(zkbPartOrder.getTenantUID());
             newZkbPartOrderStep.setPartOrderId(zkbPartOrder.getId());
             zkbPartOrderStepRepository.save(newZkbPartOrderStep);
-
         }
     }
+
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
         List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);

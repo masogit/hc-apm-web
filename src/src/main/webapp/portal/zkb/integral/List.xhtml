@@ -29,16 +29,8 @@
                         </c:if>
                         <p:ajax event="filter" listener="#{zkbIntegralController.onFilter}" />
 
-                        <p:column headerText="#{msg.zkbContact_tenant}" filterBy="#{item.tenantUID}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.zkbContact_tenant}" >
                             <h:outputText value="#{zkbIntegralController.getTenantInfo(item.tenantUID).name}"/>
-                            <f:facet name="filter">
-                                <p:selectOneMenu style="transform: scale(1.2)"  onchange="PF('varDataList').filter()">
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <c:forEach items="#{zkbIntegralController.tenantInfoList}" var="v">
-                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.uid}"/>
-                                    </c:forEach>
-                                </p:selectOneMenu>
-                            </f:facet>
                         </p:column>
 
                         <p:column headerText="总积分" filterBy="#{item.integralTotal}" filterMatchMode="LIKE">

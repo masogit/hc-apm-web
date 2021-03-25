@@ -58,9 +58,9 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
 
     @Override
     protected Page<JSONObject> loadData(PageRequest pageRequest) {
-
-        searchFilters = new ArrayList<SearchFilter>();
-
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uuaService.getOrgListByUser(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
 
@@ -68,9 +68,8 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-
-        if (!StringUtils.isEmpty(oneSearchStr)) {
-            searchFilters.add(new SearchFilter("createdBy", SearchFilter.Operator.LIKE, oneSearchStr));
+        if(!StringUtils.isEmpty(oneSearchStr)) {
+            searchFilters.add(new SearchFilter("jsonData", SearchFilter.Operator.LIKE, oneSearchStr));
         }
 
         //convert to json data page
@@ -78,7 +77,7 @@ public class AssetHistoryController extends GenericCRUDUUIDController<JSONObject
         Page<AssetHistory> assetHistoryPage = assetHistoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
         List<JSONObject> dataLists = assetHistoryService.parseFieldsByJson(assetHistoryPage.getContent());
         Page<JSONObject> jsonPage = new PageImpl<>(dataLists, pageRequest, assetHistoryPage.getTotalElements());
-
+        searchFilters = new ArrayList<SearchFilter>();
         return jsonPage;
     }
 
