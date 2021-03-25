@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<ui:composition>
+    <p:dialog id="zkbAssetQrCodeInfo" widgetVar="zkbAssetQrCodeInfo" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbAssetStatisticController.CRUDActionName}" height="580px" width="350px">
+        <h:form id="zkbAssetQrCodeInfoEditForm">
+            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{not empty zkbFileDirectoryController.selected}">
+
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbHistory_agent}</label>
+                    <p:inputText id="name" value="#{zkbAssetStatisticController.selected.name}" disabled="true" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbAssetStatistic_hospitalName}</label>
+                    <p:inputText id="hospitalName" value="#{zkbAssetStatisticController.selected.hospitalName}" disabled="true" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbAssetStatistic_functionType}</label>
+                    <p:inputText id="functionType" value="#{zkbAssetStatisticController.selected.functionType}" disabled="true" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.systemId}</label>
+                    <p:inputText id="systemId" value="#{zkbAssetStatisticController.selected.systemId}" disabled="true" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbAssetStatistic_contractNo}</label>
+                    <p:inputText id="contractNo" value="#{zkbAssetStatisticController.selected.contractNo}" disabled="true" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbAssetStatistic_qrCodeOfPaste}</label>
+                    <p:inputText id="qrCodeCountState" value="#{zkbAssetStatisticController.selected.qrCodeCountState}" disabled="true" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbAssetStatistic_canNotPast}</label>
+                    <p:selectOneMenu  value="#{zkbAssetStatisticController.selected.canNotPastQrCode}" required="true" requiredMessage="#{msg.zkbAssetStatistic_canNotPast} #{msg.ValidationRequire}">
+                        <p:ajax event="change"  update=":zkbAssetQrCodeInfoEditForm" />
+                        <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItem itemLabel="Y" itemValue="Y"/>
+                        <f:selectItem itemLabel="N" itemValue="N"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{!(zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y')}">
+                    <label class="label">#{msg.zkbAssetStatistic_canNotPastReason}</label>
+                    <p:inputTextarea   value="#{zkbAssetStatisticController.selected.reason}"  maxlength="100"/>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{zkbAssetStatisticController.selected.canNotPastQrCode eq 'Y'}">
+                    <label class="label">#{msg.zkbAssetStatistic_canNotPastReason}</label>
+                    <p:inputTextarea   value="#{zkbAssetStatisticController.selected.reason}" required="true" requiredMessage="#{msg.zkbAssetStatistic_canNotPastReason} #{msg.ValidationRequire}"  maxlength="100"/>
+                </h:panelGroup>
+            </p:panelGrid>
+            <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbAssetStatisticController.save}" oncomplete="PF('zkbAssetQrCodeInfo').hide()" update=":growl :zkbAssetStatisticListForm "  style="float:left"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbAssetQrCodeInfo').hide()"/>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+
+</html>

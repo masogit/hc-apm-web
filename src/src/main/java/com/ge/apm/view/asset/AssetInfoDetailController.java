@@ -57,6 +57,7 @@ public class AssetInfoDetailController {
     private UserAccountRepository userDao;
     private AssetHistoryService assetHistoryService;
     private SysAuthGroupRepository sysAuthGroupDao;
+    private UserAccountRepository userAccountRepository;
 
     private Boolean terminate;
     private AssetInfo selected;
@@ -94,7 +95,7 @@ public class AssetInfoDetailController {
         userDao = WebUtil.getBean(UserAccountRepository.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
-
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
@@ -265,7 +266,16 @@ public class AssetInfoDetailController {
         }
         return null;
     }
-
+    public String  getUserName(String loginName){
+        if( null == loginName){
+            return null;
+        }
+        UserAccount userAccount = userAccountRepository.getByLoginName(loginName);
+        if (userAccount != null) {
+            return userAccount.getName();
+        }
+        return null;
+    }
     public String getSelectedAuthGroupName() {
         if (null == selectedAuthGroup) {
             return null;

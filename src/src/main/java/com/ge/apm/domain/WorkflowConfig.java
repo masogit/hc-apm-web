@@ -115,6 +115,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "not_send_msg_in_take_order_mode")
     private Boolean notSendMsgInTakeOrderMode;//抢单模式下不发消息 true:不发 false：发
 
+    @Column(name = "is_casetype_required")
+    private Boolean isCasetypeRequired;//故障类别是否必填
+
     /****for pm *****/
     @Column(name = "pm_manhour_price")
     private Double pmManhourPrice;
@@ -362,6 +365,16 @@ public class WorkflowConfig implements Serializable {
         this.notSendMsgInTakeOrderMode = notSendMsgInTakeOrderMode;
     }
 
+    public Boolean getIsCasetypeRequired() {
+        if(isCasetypeRequired ==null){
+            return false;
+        }
+        return isCasetypeRequired;
+    }
+
+    public void setIsCasetypeRequired(Boolean casetypeRequired) {
+        isCasetypeRequired = casetypeRequired;
+    }
 
     public Double getMeasureManhourPrice() {
         return measureManhourPrice;

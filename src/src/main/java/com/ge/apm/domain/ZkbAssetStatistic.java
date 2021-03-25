@@ -11,6 +11,21 @@ public class ZkbAssetStatistic {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 主键
+     */
+    private String id;
+
+    /**
+     * 医院名称
+     */
+    private String hospitalName;
+
+    /**
+     * 设备型号
+     */
+    private String functionType;
+
+    /**
      * 系统ID
      */
     private String systemId;
@@ -46,6 +61,16 @@ public class ZkbAssetStatistic {
      * 合同编号
      */
     private String contractNo;
+
+    /**
+     * 是否能粘贴二维啊
+     */
+    private String canNotPastQrCode;
+
+    /**
+     * 不能粘贴理由
+     */
+    private String reason;
 
     public String getSystemId() {
         return systemId;
@@ -122,5 +147,45 @@ public class ZkbAssetStatistic {
 
     public void setContractNo(String contractNo) {
         this.contractNo = contractNo;
+    }
+
+    public String getCanNotPastQrCode() {
+        return canNotPastQrCode;
+    }
+
+    public void setCanNotPastQrCode(String canNotPastQrCode) {
+        this.canNotPastQrCode = canNotPastQrCode;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getHospitalName() {
+        return hospitalName;
+    }
+
+    public void setHospitalName(String hospitalName) {
+        this.hospitalName = hospitalName;
+    }
+
+    public String getFunctionType() {
+        return functionType;
+    }
+
+    public void setFunctionType(String functionType) {
+        this.functionType = functionType;
     }
 }

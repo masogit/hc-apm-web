@@ -20,6 +20,7 @@
                         <p:commandButton value="待FE归还"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingGEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingGEAdmin')}" />
                         <p:commandButton value="完成"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'Complete'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('Complete')}" />
                         <p:commandButton value="全部"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('all')}" />
+                        <p:commandButton value="待上传探头说明函"  process="@this" disabled="#{zkbFePartOrderController.queryStatus eq 'waitingUpload'}" style="color: white ;font-weight: bolder;background: #088A29" rendered="#{zkbFePartOrderController.hasLetterViewRight()}" action="#{zkbFePartOrderController.queryListByStatus('waitingUpload')}" />
                     </h:panelGrid>
                     <p:dataTable id="datalist" value="#{zkbFePartOrderController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbFePartOrderController.selected}"
@@ -32,6 +33,9 @@
                         <p:ajax event="rowSelect" listener="#{zkbFePartOrderController.prepareEdit}" update="editButton"/>
                         <p:ajax event="rowDblselect" listener="#{zkbFePartOrderController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
                         <p:ajax event="filter" listener="#{zkbFePartOrderController.onFilter}" />
+                        <p:column headerText="#{msg.zkbContact_tenant}">
+                            <h:outputText value="#{zkbContractController.getTenantInfo(item.tenantUid).name}"/>
+                        </p:column>
                         <p:column headerText="#{msg.zkbFePartOrder_orderNo}" filterBy="#{item.partOrderNo}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.partOrderNo}"/>
                         </p:column>
