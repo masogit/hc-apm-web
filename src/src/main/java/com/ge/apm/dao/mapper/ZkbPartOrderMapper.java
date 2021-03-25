@@ -28,10 +28,12 @@ public interface ZkbPartOrderMapper {
      * 获取FE 人工订单
      * @param systemId 设备system id
      * @param sr sr
+     * @param partOrderNo 人工单号
+     * @param assetGroup 类型
      * @return FE人工申请订单
      */
     @SelectProvider(type = ZkbPartOrderProvider.class, method = "queryBySystemIdAndSr")
-    List<ZkbPartOrder> queryBySystemIdAndSr(@Param("systemId") String systemId,@Param("sr") String sr,@Param("partOrderNo") String partOrderNo);
+    List<ZkbPartOrder> queryBySystemIdAndSr(@Param("systemId") String systemId,@Param("sr") String sr,@Param("partOrderNo") String partOrderNo,@Param("assetGroup") Integer assetGroup);
 
 
 

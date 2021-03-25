@@ -133,6 +133,12 @@ public class ZkbKeyBehaviorIndex {
     @Transient
     private Integer totalFullScore;
 
+    /**
+     * 排名
+     */
+    @Transient
+    private Integer rank;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -410,4 +416,14 @@ public class ZkbKeyBehaviorIndex {
     public void setRemark(String remark) {
         this.remark = remark;
     }
+
+    public Integer getRank() {
+        return rank;
+    }
+
+    public void setRank(Integer rank) {
+        this.rank = rank;
+    }
+
+
 }

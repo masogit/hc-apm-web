@@ -4,7 +4,9 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +41,7 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 	private InventoryOrderService service;
 	private List<String> listClinicalDeptName;
     private List<String> listAccessClinical;
+    private String queryAssetUid;
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
@@ -53,6 +56,11 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         listClinicalDeptName= uaaService.getAllAccessibleClinicalDeptStringList();
         listAccessClinical=uaaService.findAccessClinicalUidByUserUid(currentUser.getUid());
+        String enCodeParameters = WebUtil.getRequestParameter("str");
+        if (!Strings.isNullOrEmpty(enCodeParameters)) {
+            queryAssetUid = (String) UrlEncryptController
+                    .getValueFromMap(enCodeParameters, "queryAssetUID");
+        }
 	}
 
 	@Override
@@ -252,6 +260,18 @@ public class InventoryOrderDetailAssetInfoAllController extends GenericCRUDUUIDC
                     inventoryOrderDetailList.add(inventoryOrderDetail);
                 }
             }
+        }
+        if (!Strings.isNullOrEmpty(queryAssetUid) && inventoryOrderDetailList.size()>0) {
+            List<InventoryOrderDetail> inventoryOrderDetails = new ArrayList<>();
+            for(InventoryOrderDetail inventoryOrderDetail :inventoryOrderDetailList){
+                if(queryAssetUid.equals(inventoryOrderDetail.getAssetInfo().getUid())){
+                    inventoryOrderDetails.add(inventoryOrderDetail);
+                }
+            }
+            int size = inventoryOrderDetails.size();
+            inventoryOrderDetails= this.pageNum(inventoryOrderDetails, pageRequest);
+            Page<InventoryOrderDetail>  inventoryOrderDetailPage = new PageImpl<InventoryOrderDetail>(inventoryOrderDetails, pageRequest, size);
+            return inventoryOrderDetailPage;
         }
         int size = inventoryOrderDetailList.size();
         inventoryOrderDetailList= this.pageNum(inventoryOrderDetailList, pageRequest);

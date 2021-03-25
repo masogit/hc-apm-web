@@ -4,6 +4,7 @@ import com.ge.apm.dao.mapper.provider.ZkbFePartOrderProvider;
 import com.ge.apm.domain.ZkbFePartOrder;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
+import webapp.framework.dao.SearchFilter;
 
 import java.util.List;
 
@@ -20,4 +21,8 @@ public interface ZkbFePartOrderMapper {
      */
     @SelectProvider(type = ZkbFePartOrderProvider.class,method="loadAssetInfo")
     List<ZkbFePartOrder> loadAssetInfo(@Param("systemId") String systemId);
+
+
+    @SelectProvider(type = ZkbFePartOrderProvider.class, method = "queryZkbFePart")
+    List<ZkbFePartOrder> queryZkbFePart(@Param("filters") List<SearchFilter> filters);
 }
