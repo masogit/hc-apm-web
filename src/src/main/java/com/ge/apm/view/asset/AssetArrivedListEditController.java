@@ -181,6 +181,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 //                this.changeFunctionGroup();
 //
 //            }
+            if(activeSupplier() && null == selected.getBoxInstallationDate()) {
+                selected.setBoxInstallationDate(selected.getArrivalDate());
+            }
             prepareEdit();
         }
 
@@ -207,6 +210,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 //        object.setProcessType(ArrivalList.ProcessType.Normal.toString());
         object.setAgent(user.getName());
         object.setArrivalDate(new Date());
+        if(activeSupplier() && null == object.getBoxInstallationDate()) {
+            object.setBoxInstallationDate(object.getArrivalDate());
+        }
         selectedOrg = aiService.getOrgInfoByUid(user.getSiteUID());
         object.setTenantUID(user.getTenantUID());
 
@@ -428,30 +434,30 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         ArrivalListItem item = itemDao.findById(itemId);
         String contractNum = item.getArrivalList().getContractNum();
         String clinicalDeptUID = item.getClinicalDeptUID();
-        if(StringUtils.isEmpty(contractNum)){
-            WebUtil.addErrorMessage("合同编号不能为空");
-            return ;
-        }
-        if(StringUtils.isEmpty(clinicalDeptUID)){
-            WebUtil.addErrorMessage("所属科室不能为空");
-            return ;
-        }
-        List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
         String errorMessage = "";
-        for(ArrivalListItem arrivalListItem:itemList){
-            arrivalListItem.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
-            Boolean responseStatus = aiService.reAssignWorkOrder(arrivalListItem);
+        if(StringUtils.isEmpty(contractNum) || StringUtils.isEmpty(clinicalDeptUID)){
+            item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+            Boolean responseStatus = aiService.reAssignWorkOrder(item);
             if(!responseStatus){
-                String name = arrivalListItem.getArrivalList().getName();
-                if(errorMessage.contains("到货单名称/编号："+name)){
-                    errorMessage = errorMessage + "、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
-                }else{
-                    errorMessage = errorMessage + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
+                errorMessage = "记录提交失败";
+            }
+        }else{
+            List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
+            for(ArrivalListItem arrivalListItem:itemList){
+                arrivalListItem.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+                Boolean responseStatus = aiService.reAssignWorkOrder(arrivalListItem);
+                if(!responseStatus){
+                    String name = arrivalListItem.getArrivalList().getName();
+                    if(errorMessage.contains("到货单名称/编号："+name)){
+                        errorMessage = errorMessage + "、"+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
+                    }else{
+                        errorMessage = errorMessage + "到货单名称/编号：" + name +","+ WebUtil.getMessage("financingNum")+"："+arrivalListItem.getFinancingNum()+"---->记录提交失败";
+                    }
                 }
             }
         }
         if(StringUtils.isEmpty(errorMessage)){
-            WebUtil.addSuccessMessage("批量提交成功");
+            WebUtil.addSuccessMessage("接单成功");
         }else{
             WebUtil.addErrorMessage(errorMessage);
         }
@@ -918,5 +924,15 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             newSupplier.setMaintainerT(true);
         }
 
+    }
+
+    public boolean verifyFileSuffixName(String fileName,String fileSuffixName){
+        String[] fileSuffixNames = fileSuffixName.toUpperCase().split("\\|");
+        for(int i=0;i<fileSuffixNames.length;i++){
+            if(fileName.toUpperCase().endsWith(fileSuffixNames[i])){
+                return true;
+            }
+        }
+        return false;
     }
 }

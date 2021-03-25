@@ -27,7 +27,7 @@
                 <h:form id="zkbFePartOrderForm">
                 <p:dataTable id="sparePartsZkbFePartOrder" value="#{zkbFePartOrderSparePartDetailController.sparePartsZkbFePartOrderList}" var="item"
                              widgetVar="sparePartsZkbFePartOrder" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrder}"
-                             lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.id}"
+                             lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.reportDate}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
                     <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm" />
                     <p:column headerText="报修单号">
@@ -139,8 +139,8 @@
                             <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.reportDate}"
                                         showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">申请单号</label>
+                        <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.currentStep.equals('Requested')}">
+                            <label  class="label">#{msg.zkbFePartOrder_orderNo}</label>
                             <p:inputText id="orderNo" disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.partOrderNo}" />
                         </h:panelGroup>
                         <h:panelGroup>
@@ -214,7 +214,7 @@
             <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingAssignment')}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingAssignment')}">
-                        <label class="label">代理商审批人名称*：</label>
+                        <label class="label">代理商审批人*：</label>
                         <p:inputText  disabled="true"  value="#{zkbFePartOrderSparePartDetailController.selected.tenantAssignUser}"  />
                     </h:panelGroup>
                     <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingAssignment')}">
@@ -239,12 +239,12 @@
 <!--                        <label class="label">#{msg.zkbFePartOrder_act}*</label>-->
 <!--                        <p:inputText disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderSparePartDetailController.selected.act}"  required="true" requiredMessage="#{msg.zkbFePartOrder_act} #{msg.ValidationRequire}"/>-->
 <!--                    </h:panelGroup>-->
-                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
-                        <label class="label">回填人名称*：</label>
+                    <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingApm')}">
+                        <label class="label">下单人*：</label>
                         <p:inputText  disabled="true"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoUser}"  />
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
-                        <label class="label">回填时间*：</label>
+                    <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingApm')}">
+                        <label class="label">下单时间*：</label>
                         <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoDate}"
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
@@ -296,7 +296,7 @@
                         <h:outputText value="#{item.orderNo}"/>
                     </p:column>
                     <p:column headerText="#{msg.zkbFePartOrder_returnType}">
-                        <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnType', item.returnType)}"/>
+                        <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_zkbPoReturnType', item.returnType)}"/>
                     </p:column>
                     <p:column headerText="#{msg.zkbFePartOrder_returnDate}">
                         <h:outputText value="#{item.returnDate}">

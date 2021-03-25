@@ -31,7 +31,7 @@
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbPartOrderEditController.saveItem}" update=":growl :zkbPartOrderEditForm:zkbDetailDatalist :zkbPartOrderEditForm:qty :zkbPartOrderEditForm:remainQty"
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbPartOrderEditController.saveItem}" update=":growl :zkbPartOrderEditForm:zkbDetailDatalist :zkbPartOrderEditForm:qty :zkbPartOrderEditForm:remainQty :zkbPartOrderEditForm:saveTips"
                  icon="ui-icon-check" oncomplete="PF('zkbPartOrderEditDlg').hide()" />
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbPartOrderEditDlg').hide()"/>
         </h:form>

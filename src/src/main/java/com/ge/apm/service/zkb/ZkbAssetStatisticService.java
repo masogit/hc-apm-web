@@ -57,9 +57,13 @@ public class ZkbAssetStatisticService {
      * @param qrCodeCount 二维码个数
      * @param qrCodeCountState 二维码状态
      * @param contractNo 合同编号
+     * @param hospitalName 医院名称
+     * @param functionType 设备型号
+     * @param canNotPastQrCode 无法粘贴二维码
      * @return
      */
-    public List<ZkbAssetStatistic> loadAllAsset(String tenantUid,String systemId,String qrCodeCount,String qrCodeCountState,String contractNo){
+    public List<ZkbAssetStatistic> loadAllAsset(String tenantUid,String systemId,String qrCodeCount,
+                                                String qrCodeCountState,String contractNo,String hospitalName,String functionType,String canNotPastQrCode){
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         if(tenantUid!=null)
         {
@@ -76,6 +80,21 @@ public class ZkbAssetStatisticService {
             SearchFilter systemIdFilter = new SearchFilter("contractNo", SearchFilter.Operator.EQ, contractNo);
             searchFilters.add(systemIdFilter);
         }
+        if(StringUtils.isNotBlank(hospitalName))
+        {
+            SearchFilter systemIdFilter = new SearchFilter("hospitalName", SearchFilter.Operator.EQ, hospitalName);
+            searchFilters.add(systemIdFilter);
+        }
+        if(StringUtils.isNotBlank(functionType))
+        {
+            SearchFilter systemIdFilter = new SearchFilter("functionType", SearchFilter.Operator.EQ, functionType);
+            searchFilters.add(systemIdFilter);
+        }
+        if(StringUtils.isNotBlank(canNotPastQrCode))
+        {
+            SearchFilter systemIdFilter = new SearchFilter("canNotPastQrCode", SearchFilter.Operator.EQ, canNotPastQrCode);
+            searchFilters.add(systemIdFilter);
+        }
         List<ZkbAssetStatistic> assetList = zkbAssetStatisticMapper.loadAllAsset(searchFilters);
         if(CollectionUtils.isEmpty(assetList))
         {
@@ -85,16 +104,15 @@ public class ZkbAssetStatisticService {
                 Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.getAssetUid()))),
                         ArrayList::new)).stream().map(ZkbAssetStatistic::getAssetUid).collect(Collectors.toList());
         List<ZkbAssetStatistic> assetList1 = zkbAssetStatisticMapper.loadQrCount(assetUIDList);
-        if(CollectionUtils.isEmpty(assetList1))
+        if(CollectionUtils.isNotEmpty(assetList1))
         {
-            return assetList;
-        }
-        Map<String, ZkbAssetStatistic> map = assetList1.stream().collect(Collectors.toMap(ZkbAssetStatistic::getBoUuid, Function.identity()));
-        for(ZkbAssetStatistic zkbAssetStatistic:assetList)
-        {
-            ZkbAssetStatistic item=map.get(zkbAssetStatistic.getAssetUid());
-            if(item==null) continue;
-            zkbAssetStatistic.setQrCodeCount(item.getQrCodeCount());
+            Map<String, ZkbAssetStatistic> map = assetList1.stream().collect(Collectors.toMap(ZkbAssetStatistic::getBoUuid, Function.identity()));
+            for(ZkbAssetStatistic zkbAssetStatistic:assetList)
+            {
+                ZkbAssetStatistic item=map.get(zkbAssetStatistic.getAssetUid());
+                if(item==null) continue;
+                zkbAssetStatistic.setQrCodeCount(item.getQrCodeCount());
+            }
         }
         if(StringUtils.isNotBlank(qrCodeCount))
         {
@@ -103,6 +121,10 @@ public class ZkbAssetStatisticService {
         if(StringUtils.isNotBlank(qrCodeCountState))
         {
             assetList=assetList.stream().filter(s->qrCodeCountState.equals(s.getQrCodeCountState())).collect(Collectors.toList());
+        }
+        if(StringUtils.isNotBlank(canNotPastQrCode))
+        {
+            assetList=assetList.stream().filter(s->canNotPastQrCode.equals(s.getCanNotPastQrCode())).collect(Collectors.toList());
         }
         return assetList;
     }
@@ -121,10 +143,14 @@ public class ZkbAssetStatisticService {
         for (ZkbAssetStatistic zkbAssetStatistic : zkbAssetStatisticList) {
             Map<String, Object> zkbAssetStatisticMap = new HashMap<>();
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbHistory_agent"),zkbAssetStatistic.getName());
+            zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_hospitalName"),zkbAssetStatistic.getHospitalName());
+            zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_functionType"),zkbAssetStatistic.getFunctionType());
             zkbAssetStatisticMap.put(WebUtil.getMessage("systemId"),zkbAssetStatistic.getSystemId());
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_countOfImage"),zkbAssetStatistic.getQrCodeCount());
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_contractNo"),zkbAssetStatistic.getContractNo());
             zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_qrCodeOfPaste"),zkbAssetStatistic.getQrCodeCountState());
+            zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_canNotPast"),zkbAssetStatistic.getCanNotPastQrCode());
+            zkbAssetStatisticMap.put(WebUtil.getMessage("zkbAssetStatistic_canNotPastReason"),zkbAssetStatistic.getReason());
             zkbAssetStatisticMapList.add(zkbAssetStatisticMap);
         }
         return zkbAssetStatisticMapList;
