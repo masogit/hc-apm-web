@@ -30,9 +30,10 @@ public class ZkbFePartOrder {
     /**
      * ManMade:人工申请
      * SpareParts：备件申请
+     * Probe:探头申请
      */
     public enum OrderType {
-        ManMade,SpareParts
+        ManMade,SpareParts,Probe
     }
 
     /**
@@ -48,11 +49,34 @@ public class ZkbFePartOrder {
      * 流程步骤
      */
     public static String[] stepAndRoles = new String[]
+    {
+            workFlowSteps.Requested.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+            workFlowSteps.WaitingAssignment.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+            workFlowSteps.WaitingApm.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+            workFlowSteps.WaitingGEAdmin.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
+            workFlowSteps.Complete.toString()
+    };
+
+    /**
+     * 流程步骤
+     */
+    public static String[] probeStepAndRoles = new String[]
+            {
+                    workFlowSteps.Requested.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString(),
+                    workFlowSteps.WaitingAssignment.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingApm.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString(),
+                    workFlowSteps.WaitingGEAdmin.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
+                    workFlowSteps.Complete.toString()
+            };
+
+    /**
+     * 流程步骤
+     */
+    public static String[] manmadeStepAndRoles = new String[]
             {
                     workFlowSteps.Requested.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
                     workFlowSteps.WaitingAssignment.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
                     workFlowSteps.WaitingApm.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
-                    workFlowSteps.WaitingGEAdmin.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
                     workFlowSteps.Complete.toString()
             };
 
@@ -112,12 +136,6 @@ public class ZkbFePartOrder {
     private Date reportDate;
 
     /**
-     * 供应商审批时间
-     */
-    @Column(name = "tenant_assign_date")
-    private Date tenantAssignDate;
-
-    /**
      * 现象
      */
     @Column(name = "phenomenon")
@@ -160,12 +178,6 @@ public class ZkbFePartOrder {
     private String reportUser;
 
     /**
-     * 审批人
-     */
-    @Column(name = "tenant_assign_user")
-    private String tenantAssignUser;
-
-    /**
      * 医院客户姓名
      */
     @Column(name = "hospital_client_name")
@@ -182,12 +194,6 @@ public class ZkbFePartOrder {
      */
     @Column(name = "subtract_total_status")
     private String subtractTotalStatus;
-
-    /**
-     * 供应商审批备注
-     */
-    @Column(name = "comment")
-    private String comment;
 
     /**
      * 合同ID
@@ -279,6 +285,128 @@ public class ZkbFePartOrder {
     @Column(name = "father_part_order_no")
     private String fatherPartOrderNo;
 
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @JoinColumn(insertable=false, updatable=false, name = "cat_id", referencedColumnName = "id")
+    private ZkbPartOrderCat zkbPartOrderCat;
+
+    /**
+     * 是否全新探头
+     */
+    @Column(name = "new_cat_flag")
+    private String newCatFlag;
+
+    /**
+     * 收货人
+     */
+    @Column(name = "receiver")
+    private String receiver;
+
+    /**
+     * 收货人电话
+     */
+    @Column(name = "receiver_phone")
+    private String receiverPhone;
+
+    /**
+     * 收货地址
+     */
+    @Column(name = "receiver_address")
+    private String receiverAddress;
+
+    /**
+     * 剩余数量
+     */
+    @Transient
+    private Integer remainQty;
+
+    /**
+     * 数量
+     */
+    @Column(name = "qty")
+    private Integer qty;
+
+    /**
+     * 是否为紧急订单
+     */
+    @Column(name = "urgent_order")
+    private String urgentOrder;
+
+    /**
+     * 订单紧急的原因
+     */
+    @Column(name = "urgency_reasons")
+    private String urgencyReasons;
+
+    /**
+     * 是否需要探头说明函
+     */
+    @Column(name = "need_letter_flag")
+    private String needLetterFlag = "f";
+
+    /**
+     * 设备分类 1.放射类 2.超声类
+     */
+    private String assetGroup;
+
+    /**
+     * 探头号
+     */
+    @Column(name = "cat_no")
+    private String catNo;
+
+    /**
+     * 探头型号
+     */
+    @Column(name = "cat_id")
+    private String catId;
+
+    /**
+     * 旧探头SN号
+     */
+    @Column(name = "old_cat_sn")
+    private String oldCatSn;
+
+    /**
+     * 数量
+     */
+    @Column(name = "cat_num")
+    private Integer catNum;
+
+    /**
+     * 供应商审批备注
+     */
+    @Column(name = "comment")
+    private String comment;
+
+    /**
+     * 审批人
+     */
+    @Column(name = "tenant_assign_user")
+    private String tenantAssignUser;
+
+    /**
+     * 供应商审批时间
+     */
+    @Column(name = "tenant_assign_date")
+    private Date tenantAssignDate;
+
+    /**
+     * Order#
+     */
+    @Column(name = "order_no")
+    private String orderNo;
+
+    /**
+     * 价格
+     */
+    @Column(name = "price")
+    private String price;
+
+    /**
+     * 回填APM备注
+     */
+    @Column(name = "apm_comment")
+    private String apmComment;
 
     /**
      * 填充APM信息人
@@ -293,15 +421,52 @@ public class ZkbFePartOrder {
     private Date fullApmInfoDate;
 
     /**
-     * 设备分类 1.放射类 2.超声类
+     * 归还类型
      */
-    private String assetGroup;
+    @Column(name = "return_type")
+    private String returnType;
 
     /**
-     * 供应商审批备注
+     * Part Serial Number*
+     */
+    @Column(name = "part_serial_number")
+    private String partSerialNumber;
+
+    /**
+     * 故障描述
+     */
+    @Column(name = "part_quality_issue")
+    private String partQualityIssue;
+
+    /**
+     * 运单号
+     */
+    @Column(name = "waybill_no")
+    private String waybillNo;
+
+    /**
+     * 归还日期
+     */
+    @Column(name = "return_date")
+    private Date returnDate;
+
+    /**
+     * 新探头SN编号
+     */
+    @Column(name = "new_cat_sn")
+    private String newCatSn;
+
+    /**
+     * GE Admin归还备注
      */
     @Column(name = "ge_admin_comment")
     private String geAdminComment;
+
+    /**
+     * 是否已经上传催收函
+     */
+    @Column(name = "has_upload_letter")
+    private String hasUploadLetter = "f";
 
     /**
      * 申请备件列表
@@ -682,5 +847,197 @@ public class ZkbFePartOrder {
 
     public void setGeAdminComment(String geAdminComment) {
         this.geAdminComment = geAdminComment;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
+    }
+
+    public String getReceiverPhone() {
+        return receiverPhone;
+    }
+
+    public void setReceiverPhone(String receiverPhone) {
+        this.receiverPhone = receiverPhone;
+    }
+
+    public String getReceiverAddress() {
+        return receiverAddress;
+    }
+
+    public void setReceiverAddress(String receiverAddress) {
+        this.receiverAddress = receiverAddress;
+    }
+
+    public Integer getRemainQty() {
+        return remainQty;
+    }
+
+    public void setRemainQty(Integer remainQty) {
+        this.remainQty = remainQty;
+    }
+
+    public Integer getQty() {
+        return qty;
+    }
+
+    public void setQty(Integer qty) {
+        this.qty = qty;
+    }
+
+    public String getUrgentOrder() {
+        return urgentOrder;
+    }
+
+    public void setUrgentOrder(String urgentOrder) {
+        this.urgentOrder = urgentOrder;
+    }
+
+    public String getUrgencyReasons() {
+        return urgencyReasons;
+    }
+
+    public void setUrgencyReasons(String urgencyReasons) {
+        this.urgencyReasons = urgencyReasons;
+    }
+
+    public String getNeedLetterFlag() {
+        return needLetterFlag;
+    }
+
+    public void setNeedLetterFlag(String needLetterFlag) {
+        this.needLetterFlag = needLetterFlag;
+    }
+
+    public String getCatNo() {
+        return catNo;
+    }
+
+    public void setCatNo(String catNo) {
+        this.catNo = catNo;
+    }
+
+    public String getCatId() {
+        return catId;
+    }
+
+    public void setCatId(String catId) {
+        this.catId = catId;
+    }
+
+    public String getOldCatSn() {
+        return oldCatSn;
+    }
+
+    public void setOldCatSn(String oldCatSn) {
+        this.oldCatSn = oldCatSn;
+    }
+
+    public Integer getCatNum() {
+        return catNum;
+    }
+
+    public void setCatNum(Integer catNum) {
+        this.catNum = catNum;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getApmComment() {
+        return apmComment;
+    }
+
+    public void setApmComment(String apmComment) {
+        this.apmComment = apmComment;
+    }
+
+    public String getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
+    }
+
+    public String getPartSerialNumber() {
+        return partSerialNumber;
+    }
+
+    public void setPartSerialNumber(String partSerialNumber) {
+        this.partSerialNumber = partSerialNumber;
+    }
+
+    public String getPartQualityIssue() {
+        return partQualityIssue;
+    }
+
+    public void setPartQualityIssue(String partQualityIssue) {
+        this.partQualityIssue = partQualityIssue;
+    }
+
+    public String getWaybillNo() {
+        return waybillNo;
+    }
+
+    public void setWaybillNo(String waybillNo) {
+        this.waybillNo = waybillNo;
+    }
+
+    public Date getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
+    }
+
+    public String getNewCatSn() {
+        return newCatSn;
+    }
+
+    public void setNewCatSn(String newCatSn) {
+        this.newCatSn = newCatSn;
+    }
+
+    public ZkbPartOrderCat getZkbPartOrderCat() {
+        return zkbPartOrderCat;
+    }
+
+    public void setZkbPartOrderCat(ZkbPartOrderCat zkbPartOrderCat) {
+        this.zkbPartOrderCat = zkbPartOrderCat;
+    }
+
+    public String getNewCatFlag() {
+        return newCatFlag;
+    }
+
+    public void setNewCatFlag(String newCatFlag) {
+        this.newCatFlag = newCatFlag;
+    }
+
+    public String getHasUploadLetter() {
+        return hasUploadLetter;
+    }
+
+    public void setHasUploadLetter(String hasUploadLetter) {
+        this.hasUploadLetter = hasUploadLetter;
     }
 }

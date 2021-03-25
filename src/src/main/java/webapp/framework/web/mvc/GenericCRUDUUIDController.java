@@ -203,6 +203,47 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
         setSiteFilter();
         setHospitalFilter();
     }
+    public void onFilterByAssetHistory(FilterEvent event){
+        if(searchFilters==null) searchFilters = new ArrayList<SearchFilter>();
+        searchFilters.clear();
+
+        if(getFiltersFromDynaColumns()) return;
+
+        getFilterMatchModes((DataTable)event.getComponent());
+        for(Map.Entry<String, Object> filter: event.getFilters().entrySet()){
+            String fieldName = filter.getKey();
+            Object filterValue = filter.getValue();
+            if(filterValue==null) continue;
+
+            if (isDateTimeField(fieldName)||"createdDate".equals(fieldName)) {
+                // support lte & gte for datetime field
+                String[] values = filterValue.toString().split("~");
+                if (values.length > 0) {
+                    filterValue = TimeUtil.fromString(values[0]);
+
+                    if (filterValue != null) {
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime) filterValue).toDate()));
+                    }
+                }
+
+                if (values.length > 1) {
+                    filterValue = TimeUtil.fromString(values[1]);
+                    if (filterValue != null) {
+                        //结束时间是一天的最后一秒  YHAAO-4035
+                        Date toDate = TimeUtils.getDateFromStr(TimeUtils.getStrDate(((DateTime) filterValue).toDate(), "yyyyMMdd").concat("235959"), "yyyyMMddHHmmss");
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, toDate));
+                    }
+                }
+                continue;
+            }
+
+            String matchMode = filterMatchModes.get(fieldName);
+            addFilter(fieldName, matchMode, filterValue);
+        }
+
+        setSiteFilter();
+        setHospitalFilter();
+    }
     public void onFilterWo(FilterEvent event){
         if(searchFilters==null) searchFilters = new ArrayList<SearchFilter>();
         searchFilters.clear();

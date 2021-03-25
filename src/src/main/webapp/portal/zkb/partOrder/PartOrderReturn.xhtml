@@ -73,7 +73,7 @@
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbPartOrderAuditController.saveReturn}" update=":growl :zkbPartOrderEditForm:zkbReturnDatalist"
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbPartOrderAuditController.saveReturn}" update=":growl :zkbPartOrderEditForm:zkbReturnDatalist :zkbPartOrderEditForm:saveTips"
                  icon="ui-icon-check" oncomplete="PF('zkbPartOrderReturnEditDlg').hide()" />
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbPartOrderReturnEditDlg').hide()"/>
         </h:form>

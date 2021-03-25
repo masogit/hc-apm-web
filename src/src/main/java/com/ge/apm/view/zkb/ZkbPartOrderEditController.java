@@ -59,6 +59,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList =new ArrayList<>();
     private AssetInfo assetInfo;
     private String valueTypeTips = "";
+    private String saveTips = "";
     private String queryStatus;
     private Integer currentScore = 0;
     private String currentScoreText;
@@ -419,6 +420,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.zkbPartOrderItem = null;
         this.selected.setQty(calcOrderQty());
         calcRemainQty();
+        saveTips = "备件申请信息已添加，提交申请后流程才会进入审批阶段，请在添加完需要审批的备件信息后提交申请，以免影响您的申请进度，感谢您的配合！";
     }
 
     public int calcOrderQty(){
@@ -514,7 +516,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                flag=false;
+                //flag=false;
                 errorLog += "附件不能为空！";
             }
         }else{
@@ -588,6 +590,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
             selected.setDataType(ZkbPartOrder.DATA_TYPE_TEST);
         }
+        selected.setDataFlag(0);
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
             if(this.selected.getOnlineEngine() != null){
@@ -864,6 +867,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setCurrentScoreFlag(boolean currentScoreFlag) {
         this.currentScoreFlag = currentScoreFlag;
+    }
+
+    public String getSaveTips() {
+        return saveTips;
+    }
+
+    public void setSaveTips(String saveTips) {
+        this.saveTips = saveTips;
     }
 
     @Override

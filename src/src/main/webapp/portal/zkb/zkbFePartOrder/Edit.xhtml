@@ -16,7 +16,7 @@
                     <h:panelGroup>
                         <label class="label">#{msg.zkbFePartOrder_orderTypeName}*</label>
                         <p:selectOneMenu id="orderType"  disabled="#{!zkbFePartOrderDetailController.selected.currentStep.equals('Requested')}" value="#{zkbFePartOrderDetailController.selected.orderType}">
-                            <p:ajax event="change"  update=":zkbFePartOrderEditForm :zkbFePartOrderSparePartsEditpanelGroup" />
+                            <p:ajax event="change"  update=":zkbFePartOrderEditForm :zkbFePartOrderSparePartsEditpanelGroup :zkbFePartOrderProbeEditPanelGroup" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_orderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
@@ -27,6 +27,7 @@
         <div class="ui-g-12 card">
             <ui:include src="ManMadeEdit.xhtml"/>
             <ui:include src="SparePartsEdit.xhtml"/>
+            <ui:include src="ProbeEdit.xhtml"/>
         </div>
     </ui:define>
 </ui:composition>

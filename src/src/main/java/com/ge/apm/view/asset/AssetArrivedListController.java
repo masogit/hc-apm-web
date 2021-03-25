@@ -2,12 +2,7 @@ package com.ge.apm.view.asset;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -23,6 +18,8 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
 import com.ge.apm.service.asset.ArrivalSupplierReportService;
+import com.ge.apm.service.asset.SupplierService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
@@ -65,6 +62,9 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     private StreamedContent exportDoc;
     private Date varArrivalDateTo = null;
     private String arrivalFormatTime = null;
+    private String supplierUserBind;
+    private SupplierService supplierService;
+    private Integer statusFlag;
 
     @Override
     protected void init() {
@@ -74,6 +74,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         arrivalSupplierReportService = WebUtil.getBean(ArrivalSupplierReportService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
+        supplierService = WebUtil.getBean(SupplierService.class);
     }
 
     @Override
@@ -93,11 +94,51 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
+
+        if(activeSupplier()){
+            if(supplierUserBind != null){
+                removeFilterOnField("supplierUserId");
+                searchFilters.add(new SearchFilter("supplierUserId", supplierUserBind.equals("1")?SearchFilter.Operator.IsNull:SearchFilter.Operator.IsNotNull, null));
+            }
+            if(statusFlag != null){
+                if(statusFlag < 3){
+                    List<String> idList = null;
+                    List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
+                    if(statusFlag == 1){
+                        idList = dao.getArrivalListNotFinishedIds(orgUidList);
+                    }else if(statusFlag == 2){
+                        idList = dao.getArrivalListPartiallyFinishedIds(orgUidList);
+                    }
+                    removeFilterOnField("id");
+                    searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN, idList));
+                }
+                removeFilterOnField("status");
+                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, statusFlag==1? Arrays.asList(1,2):Arrays.asList(statusFlag)));
+            }
+        }
+
         Page<ArrivalList> result=dao.findBySearchFilter(this.searchFilters, pageRequest);
         setCanDeleted(result);
         return result;
     }
-    
+
+    /**
+     * 页面未选择下拉框status值时，默认将column里status的等于2的进行判断，最终返回(1或2)
+     * @param id
+     * @param status
+     * @return
+     */
+    public String getArrivalListStatus(String id,String status){
+        if(statusFlag == null && status.equals("2")){
+            List<ArrivalListItem> arrivalListItem = aiService.getListItem(id);
+            int installNum = arrivalListItem.stream().filter(item -> ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getInstallStatus())
+                    || ArrivalListItem.INSTALL_STATUS_INSTORAGE.equals(item.getInstallStatus())).collect(Collectors.toList()).size();
+            status = installNum > 0 ? status : "1";
+        }
+
+        return FieldValueMessageController.fieldValue("arrivalListStatus", status);
+    }
+
     private void setCanDeleted(Page<ArrivalList> result){
     	if(result!=null){
     		for(ArrivalList arrivalList: result){
@@ -356,5 +397,25 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     public void setExportDoc(StreamedContent exportDoc) {
         this.exportDoc = exportDoc;
+    }
+
+    public boolean activeSupplier(){
+        return supplierService.activeSupplier();
+    }
+
+    public String getSupplierUserBind() {
+        return supplierUserBind;
+    }
+
+    public void setSupplierUserBind(String supplierUserBind) {
+        this.supplierUserBind = supplierUserBind;
+    }
+
+    public Integer getStatusFlag() {
+        return statusFlag;
+    }
+
+    public void setStatusFlag(Integer statusFlag) {
+        this.statusFlag = statusFlag;
     }
 }
