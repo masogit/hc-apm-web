@@ -586,4 +586,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.remindLetterFlag = remindLetterFlag;
     }
 
+    public Map<String, String> getConfigTypeMap() {
+        return configTypeMap;
+    }
+
+    public void setConfigTypeMap(Map<String, String> configTypeMap) {
+        this.configTypeMap = configTypeMap;
+    }
 }
