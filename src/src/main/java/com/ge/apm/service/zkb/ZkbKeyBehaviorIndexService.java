@@ -814,8 +814,9 @@ public class ZkbKeyBehaviorIndexService {
      * @param beginningTime 生效时间
      * @param tenantUID 哪些租户
      * @param currentUser 当前操作用户
+     * @param currentZkbKeyBehaviorIndexList 当前页面列表
      */
-    public void effect(Date beginningTime,String tenantUID,UserAccount currentUser)
+    public void effect(Date beginningTime,String tenantUID,UserAccount currentUser,List<ZkbKeyBehaviorIndex> currentZkbKeyBehaviorIndexList)
     {
         Date date = null;
         if(beginningTime!=null)
@@ -843,6 +844,17 @@ public class ZkbKeyBehaviorIndexService {
                 recordType=ZkbKeyBehaviorIndexController.kpi_modify;
             }
             this.changeScore(item,recordType,currentUser);
+            if(CollectionUtils.isEmpty(currentZkbKeyBehaviorIndexList))
+            {
+                continue;
+            }
+            for(ZkbKeyBehaviorIndex item1:currentZkbKeyBehaviorIndexList)
+            {
+                if(item1.getId().equals(item.getId()))
+                {
+                    item1.setEffect(yes);
+                }
+            }
         }
     }
 

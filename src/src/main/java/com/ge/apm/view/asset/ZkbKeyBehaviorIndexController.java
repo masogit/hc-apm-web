@@ -191,9 +191,8 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      */
     public void effect()
     {
-        this.zkbKeyBehaviorIndexService.effect(this.beginningTime,this.tenantUID,currentUser);
+        this.zkbKeyBehaviorIndexService.effect(this.beginningTime,this.tenantUID,currentUser,this.zkbKeyBehaviorIndexList);
         WebUtil.addSuccessMessage("生效成功！");
-        this.loadData();
     }
 
     /**

@@ -105,7 +105,11 @@ public class ZkbKeyBehaviorIndexProvider {
     {
         String kpiDate = param.get("kpiDate").toString();//kpi时间
         String dateFormat = param.get("dateFormat").toString();//日期格式
-        String tenantUID = param.get("tenantUID").toString();//租户UID
+        String tenantUID = "";
+        if(param.get("tenantUID")!=null)
+        {
+            tenantUID=param.get("tenantUID").toString();
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("UPDATE zkb_key_behavior_index set effect ='Y' where '"+kpiDate+"' = TO_CHAR(kbi_date, '"+dateFormat+"') ");
         sb.append(buildFilter_batchUpdate(tenantUID));
@@ -135,7 +139,11 @@ public class ZkbKeyBehaviorIndexProvider {
     {
         String kpiDate = param.get("kpiDate").toString();//kpi时间
         String dateFormat = param.get("dateFormat").toString();//日期格式
-        String tenantUID = param.get("tenantUID").toString();//租户UID
+        String tenantUID = "";
+        if(param.get("tenantUID")!=null)
+        {
+            tenantUID=param.get("tenantUID").toString();
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("select * from zkb_key_behavior_index where '"+kpiDate+"' = TO_CHAR(kbi_date, '"+dateFormat+"') ");
         sb.append(buildFilter_batchUpdate(tenantUID));
