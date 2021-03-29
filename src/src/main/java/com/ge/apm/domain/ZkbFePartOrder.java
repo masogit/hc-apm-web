@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -259,7 +260,8 @@ public class ZkbFePartOrder {
      * 订单标注
      */
     @Column(name = "order_annotation")
-    private String orderAnnotation;
+    private String orderAnnotation= ZkbFePartOrderService.normalOrderValue;
+
 
     /**
      * 发生问题的order number
@@ -329,7 +331,7 @@ public class ZkbFePartOrder {
      * 是否为紧急订单
      */
     @Column(name = "urgent_order")
-    private String urgentOrder;
+    private String urgentOrder=ZkbFePartOrderService.urgentOrderFalse;
 
     /**
      * 订单紧急的原因
