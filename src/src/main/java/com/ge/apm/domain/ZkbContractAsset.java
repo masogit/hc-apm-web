@@ -54,6 +54,22 @@ public class ZkbContractAsset {
     @JoinColumn(insertable=false, updatable=false, name = "asset_id", referencedColumnName = "uid")
     private AssetInfo assetInfo;
 
+    /**
+     * highMachine  超声高端机
+     * lowMachine   超声低端机
+     * empty   N/A
+     */
+    @Column(name = "asset_type")
+    private String assetType;
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
     public String getKa() {
         return ka;
     }

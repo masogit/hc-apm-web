@@ -48,6 +48,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private List<ZkbContractCourse> contractCourseList ;
     private List<ZkbContractAsset> zkbContractAssetList;
     private String reason;
+    private ZkbContractAsset selectedZkbContractAsset;
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -304,9 +305,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         availableAssets = new DualListModel<>(sourceAssets, targetAssets);
     }
 
-
-
-
     public void onAssetsTransfer(TransferEvent event) {
 
         for (Object item : event.getItems()) {
@@ -384,6 +382,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }else{
             return false;
         }
+    }
+
+    public ZkbContractAsset getSelectedZkbContractAsset() {
+        return selectedZkbContractAsset;
+    }
+
+    public void setSelectedZkbContractAsset(ZkbContractAsset selectedZkbContractAsset) {
+        this.selectedZkbContractAsset = selectedZkbContractAsset;
     }
 
     public DualListModel<AssetInfo> getAvailableAssets() {

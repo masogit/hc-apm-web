@@ -243,9 +243,7 @@
                             </p:column>
                             <f:facet name="{Toolbar}">
                                 <p:commandButton immediate="false"  process="@this" id="createAssetButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareAssetCreate}" update=":growl :zkbContractAssetEditDlg" oncomplete="PF('zkbContractAssetEditDlg').show()" disabled="#{userContextService.zkbUser}"/>
-                               <!-- <p:commandButton id="deleteAssetButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.deleteAsset}" update=":growl :zkbContractEditForm:zkbContractAssetDatalist" disabled="#{empty zkbContractEditController.zkbContractAssetSelected.id}">
-                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                                </p:commandButton>-->
+                                <p:commandButton id="editAssetButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareDetailEdit}" update=":growl :zkbContractAssetEditDlg" disabled="#{zkbContractEditController.courseCanOperate}" oncomplete="PF('zkbContractAssetModifyDlg').show()"/>
                                 <p:commandButton id="deleteAssetButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('assetDelete')}" update=":growl :zkbConfigDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbConfigDlg').show()" >
                                     <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
                                 </p:commandButton>
@@ -262,6 +260,7 @@
             </h:form>
             <ui:include src="ContractCourse.xhtml"/>
             <ui:include src="ContractAsset.xhtml"/>
+            <ui:include src="ContractAssetEdit.xhtml"/>
             <p:dialog id="zkbConfigDlg" widgetVar="zkbConfigDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="操作原因" height="300">
 
                 <h:form id="zkbConfigForm">
