@@ -197,6 +197,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setOrderType(ZkbFePartOrder.OrderType.Probe.toString());
         this.selected.setCurrentStep(ZkbFePartOrder.workFlowSteps.Requested.toString());
         this.selected.setCatNum(1);
+        this.orderAnnotationChange();
     }
 
     @Override
