@@ -36,6 +36,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private ZkbContractCourse zkbContractCourseSelected;
     private ZkbContractAsset zkbContractAssetSelected;
     private String actionDetailName;
+    private String actionAssetName;
     private ZkbContractService zkbContractService;
     private UserContextService userContextService;
     private AssetTagService assetTagService;
@@ -48,7 +49,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private List<ZkbContractCourse> contractCourseList ;
     private List<ZkbContractAsset> zkbContractAssetList;
     private String reason;
-    private ZkbContractAsset selectedZkbContractAsset;
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -267,6 +267,18 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         this.getQueryAssetsList();
     }
 
+    public void prepareAssetEdit(){
+        this.actionAssetName="Edit";
+        this.reason = "";
+    }
+
+    public void saveAssetEdit(){
+        zkbContractService.updateAsset(selected,zkbContractAssetSelected,reason,currentUser);
+        zkbContractAssetList = zkbContractService.queryAssetByContractId(this.selected.getId());
+        this.zkbContractAssetSelected = null;
+        this.reason= "";
+    }
+
    public void deleteAsset(){
         zkbContractService.deleteAsset(this.zkbContractAssetSelected,this.selected,currentUser,reason);
         this.zkbContractAssetList.remove(this.zkbContractAssetSelected);
@@ -384,12 +396,12 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }
     }
 
-    public ZkbContractAsset getSelectedZkbContractAsset() {
-        return selectedZkbContractAsset;
+    public String getActionAssetName() {
+        return actionAssetName;
     }
 
-    public void setSelectedZkbContractAsset(ZkbContractAsset selectedZkbContractAsset) {
-        this.selectedZkbContractAsset = selectedZkbContractAsset;
+    public void setActionAssetName(String actionAssetName) {
+        this.actionAssetName = actionAssetName;
     }
 
     public DualListModel<AssetInfo> getAvailableAssets() {
