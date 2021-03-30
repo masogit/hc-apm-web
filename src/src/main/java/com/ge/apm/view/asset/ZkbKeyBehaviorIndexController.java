@@ -121,7 +121,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
     /**
      * kpi新增
      */
-    public static final String kpi_add = "KpiAAd";
+    public static final String kpi_add = "KpiAdd";
 
     /**
      * kpi修改
