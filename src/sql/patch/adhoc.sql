@@ -3,8 +3,7 @@ UPDATE zkb_key_behavior_index set effect ='Y';
 
 --探头数据
 update zkb_part_order_cat set price = 0;
-delete from zkb_part_order_cat c where c.id='1_2                             ';
-INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('1_2                             ', 'H48681MJ', 'eM6C  矩阵曲面容积探头', '高值EM', 'HighValue', '0', '2099-12-31', '', '2020-09-30');
+update zkb_part_order_cat set cat_model = 'eM6C  矩阵曲面容积探头',cat_type='容积探头' where cat_no = 'H48681MJ';
 INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('301', 'H48701ES', 'eM6C G2第二代矩阵曲面容积探头(赠送H48691YA E4D advanced features)', '容积探头', 'HighValue', '0', '2099-12-31', '', '1900-01-20');
 INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('302', 'H44901AH', '10T-D小儿经食道探头（两年保修）', 'TEE', 'HighValue', '0', '2099-12-31', '', '1900-01-20');
 
