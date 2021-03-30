@@ -151,8 +151,7 @@
                             </h:panelGroup>
                         </h:panelGroup>
 
-                        <!--<h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">-->
-                        <h:panelGroup rendered="false">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and !(zkbPartOrderEditController.artificialType eq '2')}">
                             <label class="label">是否使用积分抵扣*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.scoreFlag}" required="true" requiredMessage="是否使用积分抵扣 #{msg.ValidationRequire}" disabled="#{zkbPartOrderEditController.currentScoreFlag}">
                                 <!--<p:ajax event="change"  listener="#{zkbPartOrderEditController.scoreFlagChange}" update="zkbwkEditForm cscore"/>-->
