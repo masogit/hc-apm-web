@@ -206,6 +206,17 @@ public class ZkbKeyBehaviorIndexService {
     {
         List<SearchFilter> searchFilters = this.generageSearchFilter(tenantUID,beginningTime,endingTime,isZkbadmin);
         List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexMapper.loadZkbKeyBehaviorIndex(searchFilters);
+        return this.rankZkbKeyBehaviorIndexList(zkbKeyBehaviorIndexList,rankMap);
+    }
+
+    /**
+     * 按分数排名
+     * @param zkbKeyBehaviorIndexList KPI LIST
+     * @param rankMap 名次MAP
+     * @return
+     */
+    public List<ZkbKeyBehaviorIndex> rankZkbKeyBehaviorIndexList(List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList, Map<String,Map<String,Integer>> rankMap)
+    {
         if(rankMap==null)
         {
             return zkbKeyBehaviorIndexList;

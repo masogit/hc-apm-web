@@ -498,6 +498,8 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             this.zkbKeyBehaviorIndexService.changeScore(this.selected,kpi_modify,this.currentUser);
         }
         this.selected = null;
+        this.rankMap = this.zkbKeyBehaviorIndexService.initRankingMap();
+        this.zkbKeyBehaviorIndexService.rankZkbKeyBehaviorIndexList(this.zkbKeyBehaviorIndexList,this.rankMap);
     }
 
     public boolean compareDate()
