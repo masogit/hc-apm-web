@@ -59,7 +59,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     private List<ZkbFePartOrder> sparePartsZkbFePartOrderList;
 
 //    /**
-//     * 故障图片上传列表
+//     * 故障图片上传列表暂时移除掉
 //     */
 //    private List<V2_BlobObject> v2_blobObjectList = new ArrayList<>();
 
