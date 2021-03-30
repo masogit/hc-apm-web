@@ -182,15 +182,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                             }
                         }
                     }
-                    if(userContextService.isZkbUser()) {
-                        if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())
-                                && "t".equals(selected.getNeedLetterFlag())
-                                && "f".equals(selected.getUploadLetterFlag())){
-                            //WebUtil.addErrorMessage("请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。","");
-                            letterTips = "请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。";
-                        }
+                }
+                if(userContextService.isZkbUser()) {
+                    if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())
+                            && "t".equals(selected.getNeedLetterFlag())
+                            && ("f".equals(selected.getUploadLetterFlag()) || StringUtils.isEmpty(selected.getUploadLetterFlag()))){
+                        //WebUtil.addErrorMessage("请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。","");
+                        letterTips = "请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。";
                     }
-
                 }
             }
             if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
