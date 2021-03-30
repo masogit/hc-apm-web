@@ -6,47 +6,53 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="zkbContractAssetModifyDlg" widgetVar="zkbContractAssetModifyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="课程操作"   height="380">
+    <p:dialog id="zkbContractAssetModifyDlg" widgetVar="zkbContractAssetModifyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="设备编辑操作" width="40%"  height="480">
 
         <h:form id="zkbContractAssetModifyForm">
-            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 100%;" >
                 <h:panelGroup>
                     <label class="label">二维码</label>
-                    <p:inputText value="#{zkbContractEditController.selectedZkbContractAsset.assetInfo.qrCode}" disabled="true" />
+                    <p:inputText value="#{zkbContractEditController.zkbContractAssetSelected.assetInfo.qrCode}" disabled="true" />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">设备名称</label>
-                    <p:inputText value="#{zkbContractEditController.selectedZkbContractAsset.assetInfo.name}" disabled="true" />
+                    <p:inputText value="#{zkbContractEditController.zkbContractAssetSelected.assetInfo.name}" disabled="true" />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">设备编号</label>
-                    <p:inputText value="#{zkbContractEditController.selectedZkbContractAsset.assetInfo.departNum}" disabled="true" />
+                    <p:inputText value="#{zkbContractEditController.zkbContractAssetSelected.assetInfo.departNum}" disabled="true" />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">所属科室</label>
-                    <p:inputText value="#{zkbContractEditController.selectedZkbContractAsset.assetInfo.clinicalDeptName}" disabled="true" />
+                    <p:inputText value="#{zkbContractEditController.zkbContractAssetSelected.assetInfo.clinicalDeptName}" disabled="true" />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">设备型号</label>
-                    <p:inputText value="#{zkbContractEditController.selectedZkbContractAsset.assetInfo.functionType}" disabled="true" />
+                    <p:inputText value="#{zkbContractEditController.zkbContractAssetSelected.assetInfo.functionType}" disabled="true" />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">Sys ID</label>
-                    <p:inputText value="#{zkbContractEditController.selectedZkbContractAsset.assetInfo.systemId}" disabled="true" />
+                    <p:inputText value="#{zkbContractEditController.zkbContractAssetSelected.assetInfo.systemId}" disabled="true" />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">维修类型</label>
-                    <p:inputText value="#{zkbContractEditController.getRepairForm(zkbContractEditController.selectedZkbContractAsset.assetInfo.repairForm)}" disabled="true" />
+                    <p:inputText value="#{zkbContractEditController.getRepairForm(zkbContractEditController.zkbContractAssetSelected.assetInfo.repairForm)}" disabled="true" />
                 </h:panelGroup>
-                
-                <h:panelGroup rendered="#{zkbContractEditController.actionDetailName eq 'Edit'}">
+                <h:panelGroup>
+                    <label class="label">是否超声高低机*</label>
+                    <p:selectOneMenu id="status" value="#{zkbContractEditController.zkbContractAssetSelected.assetType}" required="true" requiredMessage="是否超声高低机 #{msg.ValidationRequire}">
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractAssetType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{zkbContractEditController.actionAssetName eq 'Edit'}">
                     <label class="label">操作原因*</label>
                     <p:inputTextarea rows="5" cols="30" id="opRemark" value="#{zkbContractEditController.reason}" required="true" requiredMessage="原因不能为空">
                     </p:inputTextarea>
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbContractEditController.saveDetail}" update=":growl :zkbContractEditForm:zkbContractCourseDatalist"
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbContractEditController.saveAssetEdit}" update=":growl :zkbContractEditForm:zkbContractCourseDatalist"
                  icon="ui-icon-check" oncomplete="PF('zkbContractAssetModifyDlg').hide()" />
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbContractAssetModifyDlg').hide()"/>
         </h:form>

@@ -207,13 +207,13 @@
                     <p:fieldset id="zkbContractAssetFieldset" legend="相关设备" rendered="#{not empty zkbContractEditController.selected.id}">
                         <p:dataTable id="zkbContractAssetDatalist" value="#{zkbContractEditController.zkbContractAssetList}" var="zkbContractAssetItem"
                                      widgetVar="zkbContractAssetDatalist" selectionMode="single" selection="#{zkbContractEditController.zkbContractAssetSelected}"
-                                     lazy="false" paginator="true" rowKey="#{zkbContractAssetItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{zkbContractAssetItem.contractId}"
+                                     lazy="false" paginator="true" rowKey="#{zkbContractAssetItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{zkbContractAssetItem.id}"
                                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}"
                                      paginatorPosition="both" paginatorAlwaysVisible="true"
                                      rowsPerPageTemplate="20,50,100,500">
 
-                            <p:ajax event="rowSelect" update=":zkbContractEditForm:zkbContractAssetDatalist:deleteAssetButton"/>
+                            <p:ajax event="rowSelect" update=":zkbContractEditForm:zkbContractAssetDatalist:deleteAssetButton :zkbContractEditForm:zkbContractAssetDatalist:editAssetButton"/>
                             <p:column headerText="二维码">
                                 <h:outputText value="#{zkbContractAssetItem.assetInfo.qrCode}"/>
                             </p:column>
@@ -243,7 +243,7 @@
                             </p:column>
                             <f:facet name="{Toolbar}">
                                 <p:commandButton immediate="false"  process="@this" id="createAssetButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareAssetCreate}" update=":growl :zkbContractAssetEditDlg" oncomplete="PF('zkbContractAssetEditDlg').show()" disabled="#{userContextService.zkbUser}"/>
-                                <p:commandButton id="editAssetButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareDetailEdit}" update=":growl :zkbContractAssetEditDlg" disabled="#{zkbContractEditController.courseCanOperate}" oncomplete="PF('zkbContractAssetModifyDlg').show()"/>
+                                <p:commandButton id="editAssetButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareAssetEdit}" update=":growl :zkbContractAssetModifyDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbContractAssetModifyDlg').show()"/>
                                 <p:commandButton id="deleteAssetButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('assetDelete')}" update=":growl :zkbConfigDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbConfigDlg').show()" >
                                     <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
                                 </p:commandButton>
