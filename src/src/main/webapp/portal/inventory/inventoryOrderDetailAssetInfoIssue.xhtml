@@ -22,7 +22,7 @@
 					<f:selectItems value="#{inventoryOrderDetailAssetInfoIssueController.listClinicalDeptName}" />
 				</p:selectOneMenu>
 			</f:facet>
-			<h:outputText value="#{item.clinicalDeptName}" />
+			<h:outputText value="#{item.clinicalDept.name}" />
 		</p:column>
 		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}" rendered="#{!userContextService.hasCurrentTenantName('')}">
 			<f:facet name="filter">
