@@ -129,7 +129,7 @@ public class AssetFileImportStreamingService extends AssetFileImportBaseService 
 
                 assetRow.setFieldIntegerValue(trimMsgKey(WebUtil.getMessage("geDeviceType")), "setGeDeviceType");
 
-                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("medicalApparatusClassification")), "setMedicalApparatusClassification", true);
+                assetRow.setFieldStringValue(trimMsgKey(WebUtil.getMessage("medicalApparatusClassification") + "编码"), "setMedicalApparatusClassification", true);
 
 
 

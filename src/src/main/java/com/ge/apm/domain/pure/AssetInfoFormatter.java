@@ -918,8 +918,8 @@ public class AssetInfoFormatter {
         map.put(getMessage("warrantyMonth"), assetInfo.getWarrantyMonth());
         map.put(getMessage("proprietaryClass"), this.getProprietaryClassAsString());
 
-        map.put(getMessage("medicalApparatusClassification"), assetInfo.getMedicalApparatusClassification());
-        map.put(getMessage("medicalApparatusClassification") + "名称",this.getMedicalApparatusClassificationName(assetInfo.getMedicalApparatusClassification()));
+        map.put(getMessage("medicalApparatusClassification") + "编码", assetInfo.getMedicalApparatusClassification());
+        map.put(getMessage("medicalApparatusClassification"),this.getMedicalApparatusClassificationName(assetInfo.getMedicalApparatusClassification()));
 
         map.put(getMessage("createdBy"), this.selectCreatedBy(assetInfo.getCreatedBy()));
         map.put(getMessage("mainDirectory"), assetInfo.getMainDirectory());
