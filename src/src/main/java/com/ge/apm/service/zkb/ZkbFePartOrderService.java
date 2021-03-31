@@ -101,6 +101,16 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public static final Integer assetGroup = 2;
 
     /**
+     * 正常订单
+     */
+    public static String normalOrderValue = "NormalOrder";
+
+    /**
+     * 不紧急值
+     */
+    public static String urgentOrderFalse = "f";
+
+    /**
      * 给申请单添加单号和索引
      * @param zkbFePartOrder
      * @return
@@ -741,17 +751,17 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         return selected;
     }
 
-    /**
-     * 保存附件
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void saveUploadFile(List<V2_BlobObject> v2_blobObjects,String id){
-        if(v2_blobObjects != null){
-            for (V2_BlobObject v : v2_blobObjects){
-                v.setBoUuid(id);
-                blobObjectRepository.save(v);
-            }
-        }
-    }
+//    /**
+//     * 保存附件
+//     */
+//    @Transactional(rollbackFor = Exception.class)
+//    public void saveUploadFile(List<V2_BlobObject> v2_blobObjects,String id){
+//        if(v2_blobObjects != null){
+//            for (V2_BlobObject v : v2_blobObjects){
+//                v.setBoUuid(id);
+//                blobObjectRepository.save(v);
+//            }
+//        }
+//    }
 
 }
