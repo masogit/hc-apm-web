@@ -19,7 +19,16 @@
         <p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE" sortBy="#{item.qrCode}">
             <h:outputText value="#{item.qrCode}" />
         </p:column>
-        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.orgName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}">
+        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.orgName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}" rendered="#{userContextService.hasCurrentTenantName('')}">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{inventoryOrderDetailAssetInfoController3.listClinicalDeptName}" />
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="#{item.clinicalDeptName}" />
+        </p:column>
+        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.orgName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}" rendered="#{!userContextService.hasCurrentTenantName('')}">
             <f:facet name="filter">
                 <p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;">
                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
