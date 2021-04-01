@@ -4,6 +4,7 @@ import com.ge.apm.dao.mapper.provider.ZkbKeyBehaviorIndexProvider;
 import com.ge.apm.domain.ZkbKeyBehaviorIndex;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.List;
@@ -29,4 +30,27 @@ public interface ZkbKeyBehaviorIndexMapper {
      */
     @SelectProvider(type = ZkbKeyBehaviorIndexProvider.class,method="initRanking")
     List<ZkbKeyBehaviorIndex> initRanking(@Param("kpiDate") String kpiDate,@Param("dateFormat") String dateFormat);
+
+
+    /**
+     * 批量更新KPI剩下字段
+     * @param kpiDate  KPI时间
+     * @param dateFormat 日期格式
+     * @param tenantUID 租户UID
+     * @return
+     */
+    @UpdateProvider(type = ZkbKeyBehaviorIndexProvider.class,method = "batchUpdate")
+    Integer batchUpdate(@Param("kpiDate") String kpiDate,@Param("dateFormat") String dateFormat,@Param("tenantUID") String tenantUID);
+
+
+    /**
+     * 批量获取KPI
+     * @param kpiDate  KPI时间
+     * @param dateFormat 日期格式
+     * @param tenantUID 租户UID
+     * @return
+     */
+    @SelectProvider(type = ZkbKeyBehaviorIndexProvider.class,method = "findByDateAndTenantUID")
+    List<ZkbKeyBehaviorIndex>  findByDateAndTenantUID(@Param("kpiDate") String kpiDate,@Param("dateFormat") String dateFormat,@Param("tenantUID") String tenantUID);
+
 }
