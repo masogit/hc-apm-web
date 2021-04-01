@@ -29,6 +29,15 @@ public class ZkbContractAssetVO extends ZkbContractAsset {
     private String assetId;
 
     private String zkbContractAssetId;
+    private String repairForm;
+
+    public String getRepairForm() {
+        return repairForm;
+    }
+
+    public void setRepairForm(String repairForm) {
+        this.repairForm = repairForm;
+    }
 
     @Override
     public String getContractId() {

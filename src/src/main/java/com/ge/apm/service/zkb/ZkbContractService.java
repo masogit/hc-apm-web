@@ -47,6 +47,9 @@ public class ZkbContractService {
     @Autowired
     private ZkbContractLogService zkbContractLogService;
 
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
+
     public List<TenantInfo> getSourceTenantInfoList(){
 
         List<SearchFilter> searchFilters = new ArrayList<>();
@@ -458,6 +461,10 @@ public class ZkbContractService {
     public void updateAsset(ZkbContract zkbContract,ZkbContractAsset zkbContractAsset,String reason,UserAccount currentUser){
         zkbContractAssetRepository.save(zkbContractAsset);
         zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetEdit","",zkbContractAsset.getAssetInfo().getQrCode(),reason,currentUser);
+
+        AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
+        assetInfo.setRepairForm(zkbContractAsset.getAssetInfo().getRepairForm());
+        assetInfoRepository.save(assetInfo);
     }
 
     @Transactional(rollbackFor = Exception.class)
