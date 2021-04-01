@@ -53,6 +53,7 @@ public class ZkbFePartOrderProvider {
         StringBuilder sb = new StringBuilder();
         sb=sb.append(" SELECT fe.* from zkb_fe_part_order fe " +
                 " INNER JOIN asset_info ass on fe.system_id = ass.system_id " +
+                " INNER JOIN tenant_info tenant ON tenant.uid = ass.tenant_uid and tenant.TYPE = 3 " +
                 " where 1=1");
         String filter = buildFilter_queryZkbFePartDetail(filters);
         sb=sb.append(filter);

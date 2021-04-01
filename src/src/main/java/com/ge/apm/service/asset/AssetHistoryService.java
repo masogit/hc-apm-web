@@ -9,6 +9,7 @@ import com.ge.apm.domain.AssetHistory;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.I18nMessageService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.extern.slf4j.Slf4j;
@@ -217,11 +218,11 @@ public class AssetHistoryService {
         return result;
     }
 
-    public List<AssetHistory.AssetHistoryInfo> getAssetsHistoryModifiedFields(AssetInfo oldAsset, AssetInfo newAsset, List<String> fieldNames) {
+    public List<AssetHistory.AssetHistoryInfo> getAssetsHistoryModifiedFields(AssetInfo oldAsset, AssetInfo newAsset) {
 
         List<AssetHistory.AssetHistoryInfo> resultList = new ArrayList<>();
 
-        fieldNames.stream().forEach(fieldName -> {
+        CustomConfigConstant.getAssetsImportantFieldsAll().stream().forEach(fieldName -> {
 
             try {
                 Optional<AssetHistory.AssetHistoryInfo> optionalResult;
@@ -284,9 +285,9 @@ public class AssetHistoryService {
        return orgDao.findParentNameByUid(uid);
     }
 
-    public void saveAssetHistoryIfUpdated(AssetInfo oldAsset, AssetInfo newAsset, List<String> fieldNames) {
+    public void saveAssetHistoryIfUpdated(AssetInfo oldAsset, AssetInfo newAsset) {
 
-        List<AssetHistory.AssetHistoryInfo> resultList = getAssetsHistoryModifiedFields(oldAsset, newAsset, fieldNames);
+        List<AssetHistory.AssetHistoryInfo> resultList = getAssetsHistoryModifiedFields(oldAsset, newAsset);
 
         //no change, just return
         if (resultList.isEmpty()) {
