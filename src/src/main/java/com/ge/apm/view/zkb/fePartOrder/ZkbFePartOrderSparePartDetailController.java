@@ -147,10 +147,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     public static String badReturnValue ="badReturn";
 
 
-    /**
-     * 正常订单
-     */
-    public static String normalOrderValue = "NormalOrder";
+
 
     @Override
     protected void init() {
@@ -639,7 +636,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     private boolean showProblemOrderNumber = false;
     public void orderAnnotationChange(){
-        if(normalOrderValue.equals(selected.getOrderAnnotation())){
+        if(ZkbFePartOrderService.normalOrderValue.equals(selected.getOrderAnnotation())){
             showProblemOrderNumber = true;
         }else{
             showProblemOrderNumber = false;
