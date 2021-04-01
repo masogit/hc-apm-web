@@ -331,7 +331,7 @@
                         <h:panelGroup>
                             <label class="label">探头型号*</label>
                             <p:autoComplete dropdown="true" value="#{zkbPartOrderAuditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" disabled="true"
-                                            completeMethod="#{zkbPartOrderAuditController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
+                                            completeMethod="#{zkbPartOrderAuditController.autoCompleteCat}" var="t" itemLabel="#{t.catText}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
                             </p:autoComplete>
                         </h:panelGroup>
 
