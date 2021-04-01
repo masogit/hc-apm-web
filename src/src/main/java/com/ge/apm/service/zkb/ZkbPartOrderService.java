@@ -426,7 +426,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderStepRepository.save(zkbPartOrderStep);
 
         subApplyQty(zkbContract,zkbPartOrder,zkbPartOrder.getQty(),userAccount);
-
         return zkbPartOrder;
     }
 
