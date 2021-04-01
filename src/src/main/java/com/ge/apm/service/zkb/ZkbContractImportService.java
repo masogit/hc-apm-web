@@ -480,6 +480,7 @@ public class ZkbContractImportService {
             zkbContractAssetRow.setFieldStringValue("Modality","setModality");
             zkbContractAssetRow.setFieldStringValue("责任工程师","setResponsiblEngineer");
             zkbContractAssetRow.setFieldStringValue("KA","setKa");
+            zkbContractAssetRow.setFieldStringValue("维修类型","setRepairForm");
 
             map.put("zkbContractAssetVO", zkbContractAssetVO);
             map.put("rowData", rowMap);
@@ -580,6 +581,17 @@ public class ZkbContractImportService {
                 }
                 zkbContractAssetRepository.save(zkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetEdit","",zkbContractAssetVO.getQrCode(),"导入设备编辑",currentUser);
+
+                if(StringUtils.isNotEmpty(zkbContractAssetVO.getRepairForm())){
+                    Integer repairForm = getRepairFormFromCh(zkbContractAssetVO.getRepairForm());
+                    AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
+                    if(assetInfo != null && repairForm != null){
+                        if(!repairForm.equals(assetInfo.getRepairForm())){
+                            assetInfo.setRepairForm(repairForm);
+                            assetInfoRepository.save(assetInfo);
+                        }
+                    }
+                }
             }else{
                 ZkbContractAsset newZkbContractAsset = new ZkbContractAsset();
                 newZkbContractAsset.setContractId(zkbContractAssetVO.getContractId());
@@ -594,6 +606,16 @@ public class ZkbContractImportService {
                 newZkbContractAsset.setKa(zkbContractAssetVO.getKa());
                 zkbContractAssetRepository.save(newZkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetAdd","",zkbContractAssetVO.getQrCode(),"导入新增",currentUser);
+                if(StringUtils.isNotEmpty(zkbContractAssetVO.getRepairForm())){
+                    Integer repairForm = getRepairFormFromCh(zkbContractAssetVO.getRepairForm());
+                    AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
+                    if(assetInfo != null && repairForm != null){
+                        if(!repairForm.equals(assetInfo.getRepairForm())){
+                            assetInfo.setRepairForm(repairForm);
+                            assetInfoRepository.save(assetInfo);
+                        }
+                    }
+                }
             }
         }else if("Y".equals(zkbContractAssetVO.getFlag())){
             zkbContractAssetRepository.delete(zkbContractAssetVO.getZkbContractAssetId());
@@ -610,6 +632,19 @@ public class ZkbContractImportService {
                 return "empty";
             default:
                 return "";
+        }
+    }
+
+    public Integer getRepairFormFromCh(String va){
+        switch (va){
+            case "内修":
+                return 1;
+            case "外修":
+                return 2;
+            case "内外修可选":
+                return 3;
+            default:
+                return null;
         }
     }
     //endregion
