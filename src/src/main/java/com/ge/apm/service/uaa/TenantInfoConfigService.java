@@ -157,9 +157,15 @@ public class TenantInfoConfigService {
 			}
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
-				//do nothing
+				//默认不勾选”质控评审“菜单
+				if (key.equals("audit")) {
+					tempItem.setValue(false);
+				}
 			}else if(edition.equals(EXCELLENT_ENJOYMENT_A)){
-				//do nothing
+				//默认不勾选”质控评审“菜单
+				if (key.equals("audit")) {
+					tempItem.setValue(false);
+				}
 			} else if (edition.equals(VERSION_ULTRASOUND)) {
 				if (key.equals("repair.workSchedule")) {
 					tempItem.setValue(false);
@@ -167,7 +173,9 @@ public class TenantInfoConfigService {
 					tempItem.setValue(false);
 				} else if (key.contains("assetAdjust.")) {
 					tempItem.setValue(false);
-				} else if (key.equals("nurseSite")) {
+				} else if (key.contains("audit")) {
+					tempItem.setValue(false);
+				}else if (key.equals("nurseSite")) {
 					tempItem.setValue(false);
 				} else if (key.contains("nurseSite.")) {
 					tempItem.setValue(false);
@@ -213,6 +221,8 @@ public class TenantInfoConfigService {
 				}else if(key.equals("assetAdjust")) {
 					tempItem.setValue(false);
 				} else if(key.contains("assetAdjust.")) {
+					tempItem.setValue(false);
+				}else if(key.contains("audit")) {
 					tempItem.setValue(false);
 				}else if(key.equals("repair.count")) {
 					tempItem.setValue(false);
