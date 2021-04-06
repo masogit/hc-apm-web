@@ -6,6 +6,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoRow;
 import com.ge.apm.service.asset.KeyBehaviorIndexRow;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.asset.ZkbKeyBehaviorIndexController;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -85,6 +86,15 @@ public class ZkbKeyBehaviorIndexService {
     private V2_WorkOrderRepository v2_WorkOrderRepository;
 
     /**
+     * 获取二维啊粘贴状态
+     */
+    @Autowired
+    private ZkbAssetQrCodeInfoRepository zkbAssetQrCodeInfoRepository;
+
+    @Autowired
+    private ZkbIntegralService zkbIntegralService;
+
+    /**
      * 导入模板头部行数
      */
     public static final int EXCEL_KBI_HEADER_ROW = 1;
@@ -145,6 +155,16 @@ public class ZkbKeyBehaviorIndexService {
      */
     public static final int  totalFullScore = 100;
 
+    /**
+     * yes
+     */
+    public static final String yes ="Y";
+
+    /**
+     * no
+     */
+    public static final String no ="N";
+
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
     }
@@ -175,14 +195,67 @@ public class ZkbKeyBehaviorIndexService {
      * @param tenantUID 租户UID
      * @param beginningTime 开始时间
      * @param endingTime 结束时间
+     * @param rankMap 排名
+     * @param isZkbadmin 是否管理员
      * @return kpi 数据列表
      */
     public List<ZkbKeyBehaviorIndex> loadZkbKeyBehaviorIndex(String tenantUID,
                                                              Date beginningTime,
-                                                             Date endingTime)
+                                                             Date endingTime,
+                                                             Map<String,Map<String,Integer>> rankMap,String isZkbadmin)
     {
-        List<SearchFilter> searchFilters = this.generageSearchFilter(tenantUID,beginningTime,endingTime);
-        return this.zkbKeyBehaviorIndexMapper.loadZkbKeyBehaviorIndex(searchFilters);
+        List<SearchFilter> searchFilters = this.generageSearchFilter(tenantUID,beginningTime,endingTime,isZkbadmin);
+        List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexMapper.loadZkbKeyBehaviorIndex(searchFilters);
+        return this.rankZkbKeyBehaviorIndexList(zkbKeyBehaviorIndexList,rankMap);
+    }
+
+    /**
+     * 按分数排名
+     * @param zkbKeyBehaviorIndexList KPI LIST
+     * @param rankMap 名次MAP
+     * @return
+     */
+    public List<ZkbKeyBehaviorIndex> rankZkbKeyBehaviorIndexList(List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList, Map<String,Map<String,Integer>> rankMap)
+    {
+        if(rankMap==null)
+        {
+            return zkbKeyBehaviorIndexList;
+        }
+        if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
+        {
+            for(ZkbKeyBehaviorIndex item:zkbKeyBehaviorIndexList)
+            {
+                Map<String,Integer> tenantRankMap = rankMap.get(DateFormatUtils.format(item.getKbiDate(),monthDateFormat_two));
+                if(tenantRankMap==null) continue;
+                item.setRank(tenantRankMap.get(item.getTenantUID()));
+            }
+        }
+        return zkbKeyBehaviorIndexList;
+    }
+
+    /**
+     * 初始化排名
+     * @return
+     */
+    public Map<String,Map<String,Integer>> initRankingMap() {
+        List<String> dateStrList = this.zkbKeyBehaviorIndexRepository.findKbiDate();
+        Map<String, Map<String, Integer>> rankMap = new HashMap<>();
+        if (CollectionUtils.isEmpty(dateStrList)) {
+            return rankMap;
+        }
+        for (String item : dateStrList) {
+            if (StringUtils.isEmpty(item)) continue;
+            List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexMapper.initRanking(item, monthDateFormat_two);
+            if (CollectionUtils.isEmpty(zkbKeyBehaviorIndexList)) continue;
+            Map<String,Integer> tenantRankMap = new HashMap<>();
+            for(ZkbKeyBehaviorIndex item1:zkbKeyBehaviorIndexList)
+            {
+                if(tenantRankMap.containsKey(item1.getTenantUID())) continue;
+                tenantRankMap.put(item1.getTenantUID(),item1.getRank());
+            }
+            rankMap.put(item,tenantRankMap);
+        }
+        return rankMap;
     }
 
     /**
@@ -194,7 +267,8 @@ public class ZkbKeyBehaviorIndexService {
      */
     private List<SearchFilter> generageSearchFilter(String tenantUID,
                                                     Date beginningTime,
-                                                    Date endingTime)
+                                                    Date endingTime,
+                                                    String isZkbAdmin)
     {
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         if(StringUtils.isNotBlank(tenantUID))
@@ -220,6 +294,10 @@ public class ZkbKeyBehaviorIndexService {
             SearchFilter endingTimeFilter = new SearchFilter("endingTime", SearchFilter.Operator.LT, lastday);
             searchFilters.add(endingTimeFilter);
         }
+        if(!ZkbKeyBehaviorIndexService.yes.equals(isZkbAdmin))
+        {
+            searchFilters.add(new SearchFilter("effect", SearchFilter.Operator.EQ, yes));
+        }
         return searchFilters;
     }
     /**
@@ -227,13 +305,15 @@ public class ZkbKeyBehaviorIndexService {
      * @param tenantUID 租户UID
      * @param beginningTime 开始时间
      * @param endingTime 结束时间
+     * @param isZkbAdmin 智康宝admin
      * @return kpi 数据列表
      */
     public List<ZkbKeyBehaviorIndex> loadAverageZkbKeyBehaviorIndex(String tenantUID,
                                                              Date beginningTime,
-                                                             Date endingTime)
+                                                             Date endingTime,
+                                                             String isZkbAdmin)
     {
-        List<SearchFilter> searchFilters = this.generageSearchFilter(tenantUID,beginningTime,endingTime);
+        List<SearchFilter> searchFilters = this.generageSearchFilter(tenantUID,beginningTime,endingTime,isZkbAdmin);
         return this.zkbKeyBehaviorIndexMapper.loadAverageZkbKeyBehaviorIndex(searchFilters);
     }
 
@@ -243,11 +323,11 @@ public class ZkbKeyBehaviorIndexService {
      * @param beginningTime 开始时间
      * @param endingTime 结束时间
      */
-    public LineChartModel generateCharts(String tenantUID,Date beginningTime,Date endingTime)
+    public LineChartModel generateCharts(String tenantUID,Date beginningTime,Date endingTime,String isZkbadmin)
     {
         LineChartModel areaModel = new LineChartModel();
-        List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.loadZkbKeyBehaviorIndex(tenantUID,beginningTime,endingTime);
-        List<ZkbKeyBehaviorIndex> zkbAverageKeyBehaviorIndexList = this.loadAverageZkbKeyBehaviorIndex(null,beginningTime,endingTime);
+        List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.loadZkbKeyBehaviorIndex(tenantUID,beginningTime,endingTime,null,isZkbadmin);
+        List<ZkbKeyBehaviorIndex> zkbAverageKeyBehaviorIndexList = this.loadAverageZkbKeyBehaviorIndex(null,beginningTime,endingTime,isZkbadmin);
         LineChartSeries series1 = new LineChartSeries();
         boolean showNonData = true;
         if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
@@ -305,13 +385,20 @@ public class ZkbKeyBehaviorIndexService {
      */
     private String getTitle(Date beginningTime,Date endingTime)
     {
-       String beginningTimeString =  this.getDateFormat(beginningTime);
-       String endingTimeString =  this.getDateFormat(endingTime);
+       String beginningTimeString =  this.getDateFormat(beginningTime,ZkbKeyBehaviorIndexService.monthDateFormat);
+       String endingTimeString =  this.getDateFormat(endingTime,ZkbKeyBehaviorIndexService.monthDateFormat);
        return "KPI"+"("+beginningTimeString+"至"+endingTimeString+")";
     }
-    private String getDateFormat(Date date)
+
+    /**
+     * 日期格式化
+     * @param date 时间
+     * @param dateFormat 时间格式
+     * @return
+     */
+    private String getDateFormat(Date date,String dateFormat)
     {
-        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexService.monthDateFormat);
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
         return formatter.format(date);
     }
     /**
@@ -326,6 +413,7 @@ public class ZkbKeyBehaviorIndexService {
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_systemId"),zeyBehaviorIndex.getId());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_tenant"),zeyBehaviorIndex.getTenantName());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_kbiDate"),zeyBehaviorIndex.getKbiDateFormat());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_rank"),zeyBehaviorIndex.getRank());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScore"),zeyBehaviorIndex.getTotalScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnFullScore"),zeyBehaviorIndex.getPartReturnFullScore());
             orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnScore"),zeyBehaviorIndex.getPartReturnScore());
@@ -597,6 +685,7 @@ public class ZkbKeyBehaviorIndexService {
             return totalIbNumber;
         }
         List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findZkbContractAssetByTenantUID(tenantUID,kpiDate);
+        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList =  this.zkbAssetQrCodeInfoRepository.findByTenantUIDAndCanNotPastQrCode(tenantUID,yes);
         if(CollectionUtils.isEmpty(zkbContractAssetList))
         {
             zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
@@ -608,6 +697,14 @@ public class ZkbKeyBehaviorIndexService {
             assetId.add(item.getAssetId());
         }
         Integer countAssetWithQRcode = this.assetInfoRepository.countAssetWithQRcode(assetId);
+        if(countAssetWithQRcode==null)
+        {
+            countAssetWithQRcode=0;
+        }
+        if(CollectionUtils.isNotEmpty(zkbAssetQrCodeInfoList))
+        {
+            countAssetWithQRcode=countAssetWithQRcode+zkbAssetQrCodeInfoList.size();
+        }
         remark=remark.append("countAssetWithQRcode:").append(countAssetWithQRcode).append(";");
         Integer pasteQuickResponseRateScore = new BigDecimal(countAssetWithQRcode).
                 divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
@@ -721,6 +818,75 @@ public class ZkbKeyBehaviorIndexService {
         for (Map<String, Object> item : zkbContractMapList) {
             doc.writeRowData(SHEET_SERVICE_CONTRACT_LIST, 1, dataRow++, item);
         }
+    }
+
+    /**
+     * 生效
+     * @param beginningTime 生效时间
+     * @param tenantUID 哪些租户
+     * @param currentUser 当前操作用户
+     * @param currentZkbKeyBehaviorIndexList 当前页面列表
+     */
+    public void effect(Date beginningTime,String tenantUID,UserAccount currentUser,List<ZkbKeyBehaviorIndex> currentZkbKeyBehaviorIndexList)
+    {
+        Date date = null;
+        if(beginningTime!=null)
+        {
+            date=beginningTime;
+        }else
+            {
+                date=getPreviousMonth();
+            }
+        String dateStr = this.getDateFormat(date,monthDateFormat_two);
+        List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexMapper.findByDateAndTenantUID(dateStr,monthDateFormat_two,tenantUID);
+        this.zkbKeyBehaviorIndexMapper.batchUpdate(dateStr,monthDateFormat_two,tenantUID);
+        if(CollectionUtils.isEmpty(zkbKeyBehaviorIndexList))
+        {
+            return;
+        }
+        for(ZkbKeyBehaviorIndex item:zkbKeyBehaviorIndexList)
+        {
+            String recordType = "";
+            if(no.equals(item.getEffect()))
+            {
+                recordType= ZkbKeyBehaviorIndexController.kpi_add;
+            }else
+            {
+                recordType=ZkbKeyBehaviorIndexController.kpi_modify;
+            }
+            this.changeScore(item,recordType,currentUser);
+            if(CollectionUtils.isEmpty(currentZkbKeyBehaviorIndexList))
+            {
+                continue;
+            }
+            for(ZkbKeyBehaviorIndex item1:currentZkbKeyBehaviorIndexList)
+            {
+                if(item1.getId().equals(item.getId()))
+                {
+                    item1.setEffect(yes);
+                }
+            }
+        }
+    }
+
+    /**
+     * 改变积分
+     * @param item kpi数据
+     * @param recordType kpi单挑记录
+     * @param currentUser 当前用户
+     */
+    public void changeScore(ZkbKeyBehaviorIndex item,String recordType,UserAccount currentUser)
+    {
+        zkbIntegralService.kpiScoreHandler(item.getTenantUID(),item.getTotalScore(),recordType,currentUser,this.getDateFormat(item.getKbiDate(),monthDateFormat_two));
+    }
+
+    public Date getPreviousMonth()
+    {
+        Date now = new Date();
+        Calendar cd = Calendar.getInstance();
+        cd.setTime(now);
+        cd.add(Calendar.MONTH,-1);
+        return cd.getTime();
     }
 
 }

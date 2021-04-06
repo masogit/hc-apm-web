@@ -7,7 +7,6 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.KeyLabel;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.uaa.UaaService;
@@ -532,7 +531,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 int oldId = oldAssetInfo.getId();
                 int newId =assetInfoList.get(i).getId();
                 if( oldId == newId ){
-                    assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, assetInfoList.get(i), CustomConfigConstant.getAssetsImportantFieldsAll());
+                    assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, assetInfoList.get(i));
                 }
             }
         }

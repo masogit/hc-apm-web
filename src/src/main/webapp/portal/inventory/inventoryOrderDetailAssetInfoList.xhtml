@@ -17,15 +17,24 @@
 		<p:column headerText="#{msg.EquipmentName}" exportable="true" visible="false">
 			<h:outputText value="#{item.assetInfo.name}" />
 		</p:column>
-		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ">
+		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ" rendered="#{userContextService.hasCurrentTenantName('')}">
 			<f:facet name="filter">
 				<p:selectOneMenu onchange="PF('varDataListAll').filter()" autoWidth="false" style="max-width: 150px;">
 					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 					<f:selectItems value="#{inventoryOrderDetailAssetInfoListController.listClinicalDeptName}" />
 				</p:selectOneMenu>
 			</f:facet>
-			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+			<h:outputText value="#{item.clinicalDeptName}" />
 		</p:column>
+        <p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ" rendered="#{!userContextService.hasCurrentTenantName('')}">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataListAll').filter()" autoWidth="false" style="max-width: 150px;">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{inventoryOrderDetailAssetInfoListController.listClinicalDeptName}" />
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+        </p:column>
 		<p:column headerText="#{msg.EquipmentQRCode}" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.qrCode}" />
 		</p:column>

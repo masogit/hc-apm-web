@@ -58,7 +58,7 @@ public class CustomConfigConstant {
                 "pmOwnerName", "pmOwnerTel", "measuringOwner",
                 "siteUID", "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "assetDeptName",
                 "manufacture", "makerShortName",
-                "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","medicalApparatusClassification","assetGroup",
+                "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","medicalApparatusClassificationName","medicalApparatusClassification","assetGroup",
                 "assetGroupSecondary", "parentAssetId", "functionGrade", "repairForm", "functionType", "serialNum",
                 "systemId", "nationalStandardCode", "financingNum", "barcode", "modalityId", "purchasePrice",
                 "salvageValue", "lifecycle", "depreciationMethod", "manufactDate", "purchaseDate", "arriveDate",
@@ -110,7 +110,8 @@ public class CustomConfigConstant {
             allFields.put("functionType", WebUtil.getMessage("functionType"));
             allFields.put("functionGroup", WebUtil.getMessage("functionGroup"));
             allFields.put("assetCode68", WebUtil.getMessage("assetCode68"));
-            allFields.put("medicalApparatusClassification", WebUtil.getMessage("medicalApparatusClassification"));
+            allFields.put("medicalApparatusClassification", WebUtil.getMessage("medicalApparatusClassification")+ "编码");
+            allFields.put("medicalApparatusClassificationName", WebUtil.getMessage("medicalApparatusClassification"));
             allFields.put("functionGrade", WebUtil.getMessage("functionGrade"));
             allFields.put("repairForm", WebUtil.getMessage("repairForm"));
             allFields.put("locationCode", WebUtil.getMessage("locationCode"));
@@ -243,12 +244,12 @@ public class CustomConfigConstant {
      * @return
      */
     public static List<String> getAssetsDisabledExportFields() {
-        return Arrays.asList("orgPath", "assetLocation" ,"medicalApparatusClassification");
+        return Arrays.asList("orgPath", "assetLocation");
     }
 
     public static List<String> getAssetsImportantFieldsAll() {
         return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
-                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes");
+                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType");
     }
 
     public static List<String> getTemplateEnableList() {

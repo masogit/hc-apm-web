@@ -81,12 +81,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
     /**
-     * 单号前缀
+     * 人工申请单号前缀
      */
     private static final String  ORDER_PREFIX = "FE";
 
     /**
-     * 单号前缀
+     * 备件申请单号前缀
      */
     private static final String  SPARE_PARTS_ORDER_PREFIX = "FEPO";
 
@@ -94,6 +94,21 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 超声高端机
      */
     public static String highArtificialTypeValue = "High";
+
+    /**
+     * 超声类
+     */
+    public static final Integer assetGroup = 2;
+
+    /**
+     * 正常订单
+     */
+    public static String normalOrderValue = "NormalOrder";
+
+    /**
+     * 不紧急值
+     */
+    public static String urgentOrderFalse = "f";
 
     /**
      * 给申请单添加单号和索引
@@ -376,9 +391,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbContract 合同
      * @param qty 数量
      */
-    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty,ZkbFePartOrder zkbFePartOrder)
+    public void moveSpareQuota(Integer type,ZkbContract zkbContract,Integer qty)
     {
-        if(StringUtils.isNotBlank(zkbFePartOrder.getAssetTypeDi()))
+        if("DI".equals(zkbContract.getContractType())
+                ||"PCB".equals(zkbContract.getContractType()))
         {
             switch(type){
                 case 1 :
@@ -398,7 +414,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbContract.setSpareArtificailApply(zkbContract.getSpareArtificailApply()-qty);
                     break;
             }
-        }else
+        }else if("CCS".equals(zkbContract.getContractType())
+                ||"Biomed".equals(zkbContract.getContractType()))
         {
             switch(type){
                 case 1 :
@@ -515,13 +532,13 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param fieldsetType
      * @return
      */
-    public Boolean checkRendered(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap)
+    public Boolean checkRendered(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap,String[] stepAndRoles)
     {
         if(StringUtils.isBlank(fieldsetType))
         {
             return false;
         }
-        Map<String,Integer> stepMap = this.stepAndRoleMap();
+        Map<String,Integer> stepMap = this.stepAndRoleMap(stepAndRoles);
         String currentStep = zkbFePartOrder.getCurrentStep();
         Integer fieldsetTypeIndex = stepMap.get(fieldsetType);
         Integer currentStepIndex = stepMap.get(currentStep);
@@ -536,7 +553,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         if(fieldsetTypeIndex==currentStepIndex)
         {
-            String [] stepAndRole = ZkbFePartOrder.stepAndRoles[fieldsetTypeIndex].split(",");
+            String [] stepAndRole = stepAndRoles[fieldsetTypeIndex].split(",");
             if(configTypeMap.containsKey(stepAndRole[1]))
             {
                 return true;
@@ -545,12 +562,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         return false;
     }
 
-    private Map<String,Integer> stepAndRoleMap()
+    private Map<String,Integer> stepAndRoleMap(String[] stepAndRoles)
     {
         Map<String,Integer> stepMap = new HashMap<>();
-        for(int i =0;i<ZkbFePartOrder.stepAndRoles.length;i++)
+        for(int i =0;i<stepAndRoles.length;i++)
         {
-            String [] stepAndRole =ZkbFePartOrder.stepAndRoles[i].split(",");
+            String [] stepAndRole =stepAndRoles[i].split(",");
             stepMap.put(stepAndRole[0],i);
         }
         return stepMap;
@@ -561,15 +578,15 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param fieldsetType
      * @return
      */
-    public Boolean hasEditRight(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap)
+    public Boolean hasEditRight(String fieldsetType,ZkbFePartOrder zkbFePartOrder,Map<String, String> configTypeMap,String[] stepAndRoles)
     {
         String currentStep = zkbFePartOrder.getCurrentStep();
         if(!currentStep.equals(fieldsetType))
         {
             return false;
         }
-        Map<String,Integer> stepMap = this.stepAndRoleMap();
-        String [] stepAndRole =ZkbFePartOrder.stepAndRoles[stepMap.get(fieldsetType)].split(",");
+        Map<String,Integer> stepMap = this.stepAndRoleMap(stepAndRoles);
+        String [] stepAndRole =stepAndRoles[stepMap.get(fieldsetType)].split(",");
         if(configTypeMap.containsKey(stepAndRole[1]))
         {
             return true;
@@ -578,12 +595,61 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     }
 
     /**
+     * 根据角色判断是否有查看探头说明函条件
+     * @param configTypeMap 角色MAP
+     * @return
+     */
+    public boolean hasLetterViewRight(Map<String, String> configTypeMap)
+    {
+        boolean right = false;
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString()))
+        {
+            right=true;
+        }else if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))
+        {
+            right=true;
+        }
+        return right;
+    }
+
+    /**
+     * 根据角色判断是否有查看探头说明函条件
+     * @param configTypeMap 角色MAP
+     * @return
+     */
+    public boolean hasAdminRight(Map<String, String> configTypeMap)
+    {
+        boolean right = false;
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))
+        {
+            right=true;
+        }
+        return right;
+    }
+
+    /**
+     * 根据角色判断是否是供应商权限
+     * @param configTypeMap 角色MAP
+     * @return
+     */
+    public boolean hasSupplierRight(Map<String, String> configTypeMap)
+    {
+        boolean right = false;
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString()))
+        {
+            right=true;
+        }
+        return right;
+    }
+
+    /**
      * 根据systemId和 报修单号检索
      * @param systemId systemId
      * @param sr 报修单号检索
      * @param partOrderNo 订单编号
+     * @param assetGroup 设备类型
      */
-    public List<ZkbFePartOrder> getSparePartsZkbFePartOrder(String systemId,String sr,String partOrderNo)
+    public List<ZkbFePartOrder> getSparePartsZkbFePartOrder(String systemId,String sr,String partOrderNo,Integer assetGroup,String orderType)
     {
         List<ZkbFePartOrder> sparePartsZkbFePartOrderList = null;
         List<SearchFilter> searchFilters = new ArrayList<>();
@@ -591,7 +657,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString()));
         if(StringUtils.isBlank(systemId)&&StringUtils.isBlank(sr)&&StringUtils.isBlank(partOrderNo))
         {
-            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_systemIdAndFatherPartOrderNoError"));
             return sparePartsZkbFePartOrderList;
         }
         if(StringUtils.isNotBlank(systemId))
@@ -604,11 +669,15 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         if(StringUtils.isNotBlank(partOrderNo))
         {
-            searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.LIKE,partOrderNo));
+            searchFilters.add(new SearchFilter("partOrderNo", SearchFilter.Operator.EQ,partOrderNo));
         }
-        sparePartsZkbFePartOrderList = this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
+        if(assetGroup!=null)
+        {
+            searchFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ,assetGroup));
+        }
+        sparePartsZkbFePartOrderList=this.zkbFePartOrderMapper.queryZkbFePart(searchFilters);
         List<ZkbPartOrder> zkbPartOrderList =null;
-        zkbPartOrderList = this.zkbPartOrderMapper.queryBySystemIdAndSr(systemId,sr,partOrderNo);
+        zkbPartOrderList = this.zkbPartOrderMapper.queryBySystemIdAndSr(systemId,sr,partOrderNo,assetGroup);
         if(CollectionUtils.isNotEmpty(zkbPartOrderList))
         {
             List<ZkbFePartOrder> list = new ArrayList<>();
@@ -640,7 +709,15 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         if(CollectionUtils.isEmpty(sparePartsZkbFePartOrderList))
         {
-            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_searchError"));
+            if(ZkbFePartOrder.OrderType.Probe.toString().equals(orderType))
+            {
+                WebUtil.addErrorMessage(WebUtil.getMessage("错误：暂未检索到超声类对应报修单"));
+
+            }else
+                {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_searchError"));
+                }
+
         }
         return sparePartsZkbFePartOrderList;
     }
@@ -673,17 +750,18 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         return selected;
     }
-    /**
-     * 保存附件
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void saveUploadFile(List<V2_BlobObject> v2_blobObjects,String id){
-        if(v2_blobObjects != null){
-            for (V2_BlobObject v : v2_blobObjects){
-                v.setBoUuid(id);
-                blobObjectRepository.save(v);
-            }
-        }
-    }
+
+//    /**
+//     * 保存附件
+//     */
+//    @Transactional(rollbackFor = Exception.class)
+//    public void saveUploadFile(List<V2_BlobObject> v2_blobObjects,String id){
+//        if(v2_blobObjects != null){
+//            for (V2_BlobObject v : v2_blobObjects){
+//                v.setBoUuid(id);
+//                blobObjectRepository.save(v);
+//            }
+//        }
+//    }
 
 }

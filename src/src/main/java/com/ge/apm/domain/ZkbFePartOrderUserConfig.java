@@ -17,12 +17,13 @@ public class ZkbFePartOrderUserConfig implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * FourHundredsTeam 400团队
+     * FourHundredsTeam 400团队备件
      * Supplier 供应商
      * GEAdmin GEAdmin
+     * FourHundredsTeam_Probe 400团队探头
      */
     public enum ConfigTypeEnum {
-        FourHundredsTeam,Supplier,GEAdmin
+        FourHundredsTeam,Supplier,FourHundredsTeam_Probe,GEAdmin,PublicEmail
     }
 
     @Id

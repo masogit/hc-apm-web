@@ -82,6 +82,12 @@
         <h:outputText value="#{item.installDate}" />
     </p:column>
 
+    <!-- 设备型号 -->
+    <p:column headerText="#{msg.functionType}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('functionType')}">
+        <h:outputText value="#{item.functionType}" />
+    </p:column>
+
     <!-- 修改人 contains-->
     <p:column headerText="#{msg.ModifiedBy}" width="80" filterBy="#{item.createdBy}" filterMatchMode="LIKE">
         <h:outputText value="#{item.createdBy}"/>
@@ -93,7 +99,7 @@
             <p:inputText id="filterLastModifiedDateAll" widgetVar="varFilterLastModifiedDateAll" />
         </f:facet>
         <h:outputText value="#{item.createdDate}">
-            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd:HH:mm" />
+            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
         </h:outputText>
     </p:column>
 
