@@ -4071,3 +4071,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('questionType','备件相关','备件相关','',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('questionType','保养相关','保养相关','',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('questionType','其他','其他','',NULL,-1);
+
+-- 云上大咖modality及大咖对应表
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','UserQAExcel','云上大咖modality及大咖对应表','Environmental Status Monitor',NULL,-1);
