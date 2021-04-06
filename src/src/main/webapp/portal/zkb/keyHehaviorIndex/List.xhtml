@@ -43,6 +43,18 @@
                                 <p:commandButton value="#{msg.zkbKeyBehaviorIndex_charts}" actionListener="#{zkbKeyBehaviorIndexController.generateCharts}" disabled="#{zkbKeyBehaviorIndexController.tenantUID==null}" update=":dialogCharts :charts"  oncomplete="PF('dialogCharts').show()">
                                 </p:commandButton>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <p:commandButton value="生效"  rendered="#{userContextService.zkbAdmin}" actionListener="#{zkbKeyBehaviorIndexController.effect}"  update=":growl :zkbKeyBehaviorIndexForm:datalist">
+                                </p:commandButton>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{userContextService.zkbAdmin}">
+                                <label style="color: red">1.未选择租户时,给所有租户生效KPI<br/>2.开始时间为空时,生效上月KPI<br/>
+                                </label>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
                 </h:form>
@@ -64,6 +76,12 @@
                                 <f:convertDateTime pattern="yyyy-MM" />
                             </h:outputText>
                         </p:column>
+                        <p:column width="150"  headerText="#{msg.zkbKeyBehaviorIndex_rank}" >
+                            <h:outputText value="#{item.rank}"/>
+                        </p:column>
+                        <p:column width="150"  headerText="是否生效" >
+                            <h:outputText value="#{item.effect}"/>
+                        </p:column>
                         <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_totalScore}" >
                             <h:outputText value="#{item.totalScore}"/>
                         </p:column>
@@ -73,12 +91,6 @@
                         <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_partReturnScore}" >
                             <h:outputText value="#{item.partReturnScore}"/>
                         </p:column>
-<!--                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateFullScore}" >-->
-<!--                            <h:outputText value="#{item.intactPartReturnRateFullScore}"/>-->
-<!--                        </p:column>-->
-<!--                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_intactPartReturnRateScore}" >-->
-<!--                            <h:outputText value="#{item.intactPartReturnRateScore}"/>-->
-<!--                        </p:column>-->
                         <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeFullScore}" >
                             <h:outputText value="#{item.satisfactoryDegreeFullScore}"/>
                         </p:column>

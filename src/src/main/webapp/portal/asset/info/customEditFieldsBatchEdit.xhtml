@@ -235,7 +235,7 @@
 
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'clinicalDeptName')}" >
-        <h:panelGroup rendered="#{userContextService.hasCurrentTenantName('')}">
+        <h:panelGroup rendered="#{userContextService.hasCurrentTenantName('') }">
             <label class="label">#{msg.clinicalDeptName}</label>
             <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['clinicalDept']}"
                             scrollHeight="300"  forceSelection="true"

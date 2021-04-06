@@ -1,64 +1,161 @@
-create index wechat_message_history_request_source on wechat_message_history (request_source);
-
---修改Asset_info.name字段长度，批量资产创建使用
-ALTER TABLE asset_info alter COLUMN name type character varying(128);
-
--- game plan添加文件上传类型
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','SparePartExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','MVSControlExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','MVSMatrixExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','IBReportExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
-
-create index asset_info_connect_to_insite on asset_info (connect_to_insite);
-create index asset_info_ib_device_status on asset_info (ib_device_status);
-create index asset_info_one_qr_code on asset_info (one_qr_code);
+UPDATE zkb_key_behavior_index set effect ='Y';
 
 
+--探头数据
+update zkb_part_order_cat set price = 0;
+update zkb_part_order_cat set cat_model = 'eM6C  矩阵曲面容积探头',cat_type='容积探头' where cat_no = 'H48681MJ';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('301', 'H48701ES', 'eM6C G2第二代矩阵曲面容积探头(赠送H48691YA E4D advanced features)', '容积探头', 'HighValue', '0', '2099-12-31', '', '1900-01-20');
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('302', 'H44901AH', '10T-D小儿经食道探头（两年保修）', 'TEE', 'HighValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = '3V 矩阵容积探头',cat_type='容积探头' where cat_no='H4900PC';
+update zkb_part_order_cat set cat_model = '6VT-D 成人经食道容积探头（两年保修）',cat_type='TEE' where cat_no='H45581BJ';
+update zkb_part_order_cat set cat_model = '3V-D 矩阵容积探头',cat_type='容积探头' where cat_no='H4001BJ';
+update zkb_part_order_cat set cat_model = '9T 小儿经食道探头（两年保修）',cat_type='TEE' where cat_no='H45521DY';
+update zkb_part_order_cat set cat_model = '9T-RS 小儿经食道食道探头（两年保修）',cat_type='TEE' where cat_no='H45531YM';
+update zkb_part_order_cat set cat_model = '4V-D 心脏矩阵容积探头（同时需选H45561RJ  4V Enable）',cat_type='容积探头' where cat_no='H4001BT';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('332', 'H40482LS', '4Vc-D心脏矩阵容积探头（同时需选H45591PA  4Vc Enable）', '容积探头', 'HighValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = '6Tc-RS 成人经食道探头（两年保修）',cat_type='TEE' where cat_no='H45551ZE';
+update zkb_part_order_cat set cat_model = '6TC成人经食道探头',cat_type='TEE' where cat_no='H45551ZD';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('303', 'H44901AJ', 'L2-9VN-D容积导航线阵探头', '线阵', 'SpecialValue', '0', '2099-12-31', '', '1900-01-20');
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('304', 'H44901AI', 'L2-9-D冰晶线阵探头', '线阵', 'SpecialValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = 'RNA5-9-D小凸阵容积探头',cat_type='容积探头' where cat_no='H48651MY';
+update zkb_part_order_cat set cat_model = 'RIC6-12 腔内容积探头',cat_type='容积探头' where cat_no='H48651NA';
+update zkb_part_order_cat set cat_model = 'RM6C 面阵曲面容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H48671ZG';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('305', 'H48701EJ', 'RIC5-9A-RS 腔内容积探头', '容积探头', 'SpecialValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = 'RNA5-9-RS 小凸容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H45021LA';
+update zkb_part_order_cat set cat_model = '4D3C-L腹部凸阵容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H44801G';
+update zkb_part_order_cat set cat_model = 'RAB2-5-D腹部凸阵容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H48651MN';
+update zkb_part_order_cat set cat_model = 'RAB2-5-RS   腹部凸阵容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H46701NA';
+update zkb_part_order_cat set cat_model = 'RSP6-16-D线阵容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H48651MR';
+update zkb_part_order_cat set cat_model = 'BE9CS双微凸平面腔内探头',cat_type='双平面',value_type='SpecialValue' where cat_no='H40452LF';
+update zkb_part_order_cat set cat_model = 'M7C腹部面阵探头',cat_type='面阵',value_type='SpecialValue' where cat_no='H40412LC';
+update zkb_part_order_cat set cat_model = 'M6C-D腹部面阵探头',cat_type='面阵',value_type='SpecialValue' where cat_no='H40432LM';
+update zkb_part_order_cat set cat_model = 'M4S-D面阵心脏探头',cat_type='面阵',value_type='SpecialValue' where cat_no='H40442LN';
+update zkb_part_order_cat set cat_model = 'M4S 心脏面阵探头',cat_type='面阵',value_type='SpecialValue' where cat_no='H4000PA';
+update zkb_part_order_cat set cat_model = '4DE7C腔内容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H44801GA';
+update zkb_part_order_cat set cat_model = 'M4S-RS心脏面阵相控阵探头',cat_type='面阵',value_type='SpecialValue' where cat_no='H40452LH';
+update zkb_part_order_cat set cat_model = 'RIC5-9-RS 腔内容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H46701RA';
+update zkb_part_order_cat set cat_model = 'ML6-15小器官面阵探头',cat_type='面阵',value_type='SpecialValue' where cat_no='H40452LY';
+update zkb_part_order_cat set cat_model = 'RIC5-9W- RS腔内容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H48661EF';
+update zkb_part_order_cat set cat_model = 'C2-6b-D介入专用大凸探头',cat_type='介入凸阵',value_type='SpecialValue' where cat_no='H46332LW';
+update zkb_part_order_cat set cat_model = 'RAB4-8-D腹部凸阵容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H48651MP';
 
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('306', 'H40482LE', 'BE9CS-D双微凸平面腔内探头', '双平面', 'SpecialValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = 'C2-7VN-D容积导航小凸探头',cat_type='VN凸阵',value_type='SpecialValue' where cat_no='H46422LN';
+update zkb_part_order_cat set cat_model = 'C2-9VN-D容积导航中凸探头',cat_type='VN凸阵',value_type='SpecialValue' where cat_no='H40472LY';
+update zkb_part_order_cat set cat_model = 'C3-10-D冰晶小凸阵探头',cat_type='凸阵',value_type='SpecialValue' where cat_no='H40482LB';
+update zkb_part_order_cat set cat_model = 'RAB6-D 腹部凸阵容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H48681XX';
+update zkb_part_order_cat set cat_model = 'M5S-D心脏面阵相控阵探头',cat_type='面阵',value_type='SpecialValue' where cat_no='H45551NH';
+update zkb_part_order_cat set cat_model = 'C1-6VN-D 容积导航大凸探头',cat_type='VN凸阵',value_type='SpecialValue' where cat_no='H40472LW';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('307', 'H48701WL', 'C2-9-RS腹部凸阵探头', '凸阵', 'SpecialValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = 'C2-9-D冰晶凸阵探头',cat_type='凸阵',value_type='SpecialValue' where cat_no='H40462LN';
+update zkb_part_order_cat set cat_model = 'ML6-15-RS小器官面阵探头',cat_type='面阵',value_type='SpecialValue' where cat_no='H40462LM';
+update zkb_part_order_cat set cat_model = 'RIC5-9-D腔内容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H48651MS';
+update zkb_part_order_cat set cat_model = 'C1-6-D冰晶大凸阵探头',cat_type='凸阵',value_type='SpecialValue' where cat_no='H40472LT';
+update zkb_part_order_cat set cat_model = 'ML6-15-D小器官面阵探头',cat_type='面阵',value_type='SpecialValue' where cat_no='H40452LG';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('308', 'H44901AG', 'M5Sc-RS冰晶面阵心脏探头', '面阵', 'SpecialValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = 'M5SC-D冰晶心脏面阵相控阵探头',cat_type='面阵',value_type='SpecialValue' where cat_no='H44901AE';
+update zkb_part_order_cat set cat_model = 'RAB6-RS腹部凸阵容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H48691LP';
+update zkb_part_order_cat set cat_model = 'RAB6-D腹部凸阵容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H48681MG';
+update zkb_part_order_cat set cat_model = 'L8-18i-D小器官探头（L型）',cat_type='线阵',value_type='SpecialValue' where cat_no='H40452LL';
+update zkb_part_order_cat set cat_model = 'RAB2-6-RS腹部凸阵容积探头',cat_type='容积探头',value_type='SpecialValue' where cat_no='H48681WR';
+update zkb_part_order_cat set cat_model = 'S4-10新生儿心脏探头',cat_type='相控阵',value_type='SpecialValue' where cat_no='H4908SN';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('309', 'H40482LN', 'BE9CS-RS双微凸平面腔内探头', '双平面', 'SpecialValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = '4S心脏探头',cat_type='相控阵',value_type='NormalValue' where cat_no='H4901PB';
+update zkb_part_order_cat set cat_model = '3.5C腹部凸阵探头',cat_type='凸阵',value_type='NormalValue' where cat_no='H4901PE';
+update zkb_part_order_cat set cat_model = '5CS腹部凸阵探头',cat_type='凸阵',value_type='NormalValue' where cat_no='H47072LT';
+update zkb_part_order_cat set cat_model = '5C腹部凸阵探头',cat_type='凸阵',value_type='NormalValue' where cat_no='H40412LA';
+update zkb_part_order_cat set cat_model = 'L10-22-RS小器官探头',cat_type='线阵',value_type='NormalValue' where cat_no='H48312AH';
+update zkb_part_order_cat set cat_model = '3CRF介入专用小凸探头',cat_type='凸阵',value_type='NormalValue' where cat_no='H40442LP';
+update zkb_part_order_cat set cat_model = '3CRF-D介入专用小凸探头',cat_type='凸阵',value_type='NormalValue' where cat_no='H40462LK';
+update zkb_part_order_cat set cat_model = '8L小器官探头',cat_type='线阵',value_type='NormalValue' where cat_no='H4001DB';
+update zkb_part_order_cat set cat_model = 'S4-10-D新生儿心脏探头',cat_type='相控阵',value_type='NormalValue' where cat_no='H45302LA';
 
---2021-03-17
---初始化zone_target_info表中数据 （start）
-delete from zone_target_info where quarter_start_date = '2020-10-01' and quarter_end_date = '2020-12-31';
+delete from zkb_part_order_cat c where c.cat_no='H40422LB';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('212', 'H40422LB', '7S 小儿心脏探头', '相控阵', 'NormalValue', '0', '2099-12-31', '', '1900-01-20');
 
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('安徽', 1586.0, 518.0, 0.3266, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('北京', 2546.0, 395.0, 0.1551, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('福建', 1615.0, 724.0, 0.4483, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('广西', 924.0, 106.0, 0.1147, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('贵州', 831.0, 72.0, 0.0866, '2020-10-01', '2020-12-31', now());
-
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('河北', 2004.0, 918.0, 0.4581, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('河南', 2757.0, 1165.0, 0.4226, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('黑龙江', 855.0, 255.0, 0.2982, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('湖北', 2076.0, 474.0, 0.2283, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('湖南', 1443.0, 227.0, 0.1573, '2020-10-01', '2020-12-31', now());
-
-
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('吉林', 700.0, 206.0, 0.2943, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('江苏', 3691.0, 1466.0, 0.3972, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('江西', 1069.0, 460.0, 0.4303, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('辽宁', 1413.0, 345.0, 0.2442, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('内蒙古', 894.0, 262.0, 0.2931, '2020-10-01', '2020-12-31', now());
-
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('山东', 3799.0, 935.0, 0.2461, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('山西', 1140.0, 501.0, 0.4395, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('陕西', 1353.0, 518.0, 0.3829, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('上海', 1900.0, 743.0, 0.3911, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('天津', 649.0, 562.0, 0.8659, '2020-10-01', '2020-12-31', now());
-
-
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('外蒙古', 19.0, 0.0, 0.0, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('新疆', 585.0, 109.0, 0.1863, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('云南', 1144.0, 173.0, 0.1512, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('浙江', 3329.0, 1016.0, 0.3052, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('重庆', 1000.0, 233.0, 0.2330, '2020-10-01', '2020-12-31', now());
-
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('四川', 2010.0, 203.0, 0.1010, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('西藏', 79.0, 10.0, 0.1266, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('甘肃', 632.0, 181.0, 0.2864, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('宁夏', 289.0, 144.0, 0.4983, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('青海', 254.0, 61.0, 0.2402, '2020-10-01', '2020-12-31', now());
-
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('广东', 4097.0, 855.0, 0.2087, '2020-10-01', '2020-12-31', now());
-insert into zone_target_info(province, sum_target, paste_code, sum_paste_code_rate, quarter_start_date, quarter_end_date, created_time) values('海南', 430.0, 138.0, 0.3209, '2020-10-01', '2020-12-31', now());
-
---初始化zone_target_info表中数据 （end）
+update zkb_part_order_cat set cat_model = '12S-D新生儿心脏探头',cat_type='相控阵',value_type='NormalValue' where cat_no='H45021RT';
+update zkb_part_order_cat set cat_model = '6S-D小儿心脏探头',cat_type='相控阵',value_type='NormalValue' where cat_no='H45021RR';
+update zkb_part_order_cat set cat_model = '8L-RS 小器官探头',cat_type='线阵',value_type='NormalValue' where cat_no='H40402LT';
+update zkb_part_order_cat set cat_model = '3.5CS腹部凸阵探头',cat_type='凸阵',value_type='NormalValue' where cat_no='H40412LK';
+update zkb_part_order_cat set cat_model = 'L8-18i-SC 小器官探头（L型）',cat_type='线阵',value_type='NormalValue' where cat_no='H40452LZ';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('312', 'H48702AG', 'L12n-SC 小器官探头','线阵', 'NormalValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = 'L4-12t-RS四驱线阵探头',cat_type='线阵',value_type='NormalValue' where cat_no='H48062AB';
+update zkb_part_order_cat set cat_model = 'E8C-RS腔内微凸阵探头',cat_type='腔内',value_type='NormalValue' where cat_no='H40402LN';
+update zkb_part_order_cat set cat_model = '10L小器官探头',cat_type='线阵',value_type='NormalValue' where cat_no='H40412LG';
+update zkb_part_order_cat set cat_model = '12L小器官探头',cat_type='线阵',value_type='NormalValue' where cat_no='H41762LL';
+update zkb_part_order_cat set cat_model = '12L小器官探头',cat_type='线阵',value_type='NormalValue' where cat_no='H40412LH';
+update zkb_part_order_cat set cat_model = 'C4-8-D腹部凸阵探头',cat_type='凸阵',value_type='NormalValue' where cat_no='H48681AS';
+update zkb_part_order_cat set cat_model = '7S-RS 小儿心脏探头',cat_type='相控阵',value_type='NormalValue' where cat_no='H4000PE';
+update zkb_part_order_cat set cat_model = 'SP10-16-RS 小器官探头' where cat_no='H48661NJ';
+update zkb_part_order_cat set cat_model = '5S-RS 心脏探头' where cat_no='H4000PC';
+update zkb_part_order_cat set cat_model = '10S-RS 小儿心脏探头' where cat_no='H4000PF';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('313', 'H46442LK', 'L3-9i-RS术中探头', '术中', 'NormalValue', '0', '2099-12-31', '', '1900-01-20');
+delete from zkb_part_order_cat c where c.cat_no='H4901RA';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('208', 'H4901RA', '5S心脏探头 (旧)', '相控阵', 'NormalValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = 'IC5-9W-RS 腔内探头' where cat_no='H44901AC';
+update zkb_part_order_cat set cat_model = '8C小凸探头' where cat_no='H41762LM';
+update zkb_part_order_cat set cat_model = '8C小凸阵探头' where cat_no='H40412LJ';
+update zkb_part_order_cat set cat_model = '5SP单晶体心脏探头' where cat_no='H46222LF';
+update zkb_part_order_cat set cat_model = '3C腹部凸阵探头' where cat_no='H40412LB';
+update zkb_part_order_cat set cat_model = 'E8C腔内微凸阵探头' where cat_no='H40412LE';
+update zkb_part_order_cat set cat_model = '3SP单晶体心脏探头' where cat_no='H46222LE';
+update zkb_part_order_cat set cat_model = '11L小器官探头' where cat_no='H47072LW';
+update zkb_part_order_cat set cat_model = '11L小器官探头' where cat_no='H40412LY';
+update zkb_part_order_cat set cat_model = '9L小器官探头' where cat_no='H40412LT';
+update zkb_part_order_cat set cat_model = 'E8CS腔内微凸阵探头' where cat_no='H47072LS';
+update zkb_part_order_cat set cat_model = '3S-D 心脏探头' where cat_no='H48661LG';
+update zkb_part_order_cat set cat_model = 'E8CS腔内微凸阵探头' where cat_no='H44801HR';
+update zkb_part_order_cat set cat_model = '4C腹部凸阵探头' where cat_no='H47032LH';
+update zkb_part_order_cat set cat_model = '4C腹部大凸阵探头' where cat_no='H4904PC';
+update zkb_part_order_cat set cat_model = '10C-D小凸探头' where cat_no='H46342LA';
+update zkb_part_order_cat set cat_model = 'L3-9i-D术中线阵探头（T型）' where cat_no='H4915IO';
+update zkb_part_order_cat set cat_model = 'C2-7-D介入专用小凸探头' where cat_no='H46422LM';
+update zkb_part_order_cat set cat_model = 'S1-5-D成人心脏探头' where cat_no='H4913SD';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('314', 'H44901AP', 'L3-12-RS', '线阵', 'NormalValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = '3Sp-D单晶体心脏探头' where cat_no='H48681AZ';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('315', 'H44832LH', 'S2-5-D心脏探头', '相控阵', 'NormalValue', '0', '2099-12-31', '', '1900-01-20');
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('316', 'H48062AA', 'L3-12-D小器官探头', '线阵', 'NormalValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = '4C-D 腹部大凸阵探头' where cat_no='H4001BC';
+update zkb_part_order_cat set cat_model = 'C1-5-D腹部大凸阵探头' where cat_no='H40452LE';
+update zkb_part_order_cat set cat_model = 'IC5-9-D腔内微凸阵探头' where cat_no='H40442LK';
+update zkb_part_order_cat set cat_model = '11L-D小器官探头' where cat_no='H40432LN';
+update zkb_part_order_cat set cat_model = '9L-D小器官探头' where cat_no='H40442LM';
+update zkb_part_order_cat set cat_model = '10C-SC小凸探头' where cat_no='H48862LZ';
+update zkb_part_order_cat set cat_model = '12S -RS小儿心脏探头' where cat_no='H44901AB';
+update zkb_part_order_cat set cat_model = '6S-RS 小儿心脏探头' where cat_no='H45021RP';
+update zkb_part_order_cat set cat_model = 'L8-18i-RS小器官探头（L型）' where cat_no='H40462LF';
+update zkb_part_order_cat set cat_model = 'C1-5-RS腹部大凸阵探头' where cat_no='H40462LA';
+update zkb_part_order_cat set cat_model = 'E8CS-SC 腔内微凸探头' where cat_no='H40462LL';
+update zkb_part_order_cat set cat_model = '12L-RS小器官探头' where cat_no='H40402LY';
+update zkb_part_order_cat set cat_model = '4C-SC 腹部凸阵探头' where cat_no='H40452LM';
+update zkb_part_order_cat set cat_model = '8C-RS小凸阵探头' where cat_no='H40402LS';
+update zkb_part_order_cat set cat_model = '3Sc-RS心脏探头' where cat_no='H45041DL';
+update zkb_part_order_cat set cat_model = '4C-RS 腹部大凸探头' where cat_no='H4000SR';
+update zkb_part_order_cat set cat_model = 'L6-12-RS小器官探头' where cat_no='H48062AC';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('317', 'H48691PJ', 'IC9-RS腔内探头', '腔内', 'NormalValue', '0', '2099-12-31', '', '1900-01-20');
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('318', 'H48062AF', 'E8Cs-RS腔内微凸阵探头', '腔内', 'NormalValue', '0', '2099-12-31', '', '1900-01-20');
+update zkb_part_order_cat set cat_model = '3S心脏探头' where cat_no='H41752LW';
+update zkb_part_order_cat set cat_model = '3S心脏探头' where cat_no='H4701SZ';
+update zkb_part_order_cat set cat_model = '3S-SC心脏探头' where cat_no='H40452LD';
+update zkb_part_order_cat set cat_model = 'E8CS-RC 腔内探头' where cat_no='H40462LG';
+update zkb_part_order_cat set cat_model = 'C2-5-RC 腹部大凸探头' where cat_no='H40462LH';
+update zkb_part_order_cat set cat_model = 'L6-12-RC 小器官探头' where cat_no='H40462LJ';
+update zkb_part_order_cat set cat_model = '3S-RC 心脏探头' where cat_no='H40452LA';
+update zkb_part_order_cat set cat_model = 'E7C-RC微凸内腔探头' where cat_no='H48102LG';
+update zkb_part_order_cat set cat_model = '7.5L-RC 小器官探头' where cat_no='H48102LJ';
+update zkb_part_order_cat set cat_model = '6.5C-RC 小凸阵探头' where cat_no='H48102LF';
+update zkb_part_order_cat set cat_model = '4C-RC 腹部大凸阵探头' where cat_no='H48102LE';
+update zkb_part_order_cat set cat_model = 'E6C-RC 微凸腔内探头' where cat_no='H48102LH';
+update zkb_part_order_cat set cat_model = '7L-RC 小器官探头' where cat_no='H48102LK';
+update zkb_part_order_cat set cat_model = '3.8C-RC 腹部 凸阵探头' where cat_no='H48102LD';
+update zkb_part_order_cat set cat_model = 'P2D-RS 连续波多普勒笔式探头',cat_type='CW笔式' where cat_no='H45551CA';
+update zkb_part_order_cat set cat_model = 'P2D-RS 连续波多普勒笔式探头',cat_type='CW笔式' where cat_no='H45021C';
+delete from zkb_part_order_cat c where c.cat_no='H40402LW';
+INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('38', 'H40402LW', 'i12L-RS术中线阵探头', '线阵', 'SpecialValue', '0', '2099-12-31', '', '1900-01-20');
+--2020-04-14 game plan添加batch file type
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','TubeInfoExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+--删除game plan msa_recommend表字段
+ALTER TABLE msa_recommend DROP COLUMN bulb_chance;
+ALTER TABLE msa_recommend DROP COLUMN tube_expected_time;
+ALTER TABLE msa_recommend DROP COLUMN has_msa_recommend;
+ALTER TABLE msa_recommend DROP COLUMN has_tube;

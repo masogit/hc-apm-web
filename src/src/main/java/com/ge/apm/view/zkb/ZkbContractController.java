@@ -133,8 +133,18 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     private StreamedContent exportFile;
     public void exportAll(){
+        List<SearchFilter> searchFilters = this.searchFilters;
 
-        List<Map<String, Object>> zkbContractDataList = zkbContractService.createZkbContractData(zkbContractPage.getContent());
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+
+        if(this.selectionTenantInfo != null){
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectionTenantInfo));
+        }
+
+        List<ZkbContract> contractList = dao.findBySearchFilter(searchFilters);
+        List<Map<String, Object>> zkbContractDataList = zkbContractService.createZkbContractData(contractList);
 
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/contract/excel/APM_ZKB_Contract_Exp_Template.xlsx");

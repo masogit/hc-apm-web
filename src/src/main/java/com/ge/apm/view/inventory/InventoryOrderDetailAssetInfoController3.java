@@ -114,7 +114,6 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 //			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
 //		}
         Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters,pageRequest);
-		
 		//after
 		return pageAssetInfo;
 	}

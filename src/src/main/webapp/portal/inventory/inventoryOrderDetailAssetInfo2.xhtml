@@ -16,7 +16,16 @@
 		<p:column headerText="#{msg.EquipmentName}" exportable="true" visible="false">
 			<h:outputText value="#{item.assetInfo.name}" />
 		</p:column>
-		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}">
+		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}" rendered="#{userContextService.hasCurrentTenantName('')}">
+			<f:facet name="filter">
+				<p:selectOneMenu onchange="PF('varDataList2').filter()" autoWidth="false" style="max-width: 150px;">
+					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItems value="#{inventoryOrderDetailAssetInfoController2.listClinicalDeptName}" />
+				</p:selectOneMenu>
+			</f:facet>
+			<h:outputText value="#{item.clinicalDeptName}" />
+		</p:column>
+		<p:column headerText="#{msg.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}" rendered="#{!userContextService.hasCurrentTenantName('')}">
 			<f:facet name="filter">
 				<p:selectOneMenu onchange="PF('varDataList2').filter()" autoWidth="false" style="max-width: 150px;">
 					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />

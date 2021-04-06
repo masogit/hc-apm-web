@@ -2,6 +2,8 @@ package com.ge.apm.dao.mapper.provider;
 
 import webapp.framework.dao.SearchFilter;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +12,8 @@ import java.util.Map;
  */
 public class ZkbAssetStatisticProvider {
 
+    public static final String dateFormat = "yyyyMMdd";
+
     /**
      * 查出所有设备信息
      * @param param filter 过滤条件
@@ -17,21 +21,36 @@ public class ZkbAssetStatisticProvider {
      */
     public String loadAllAsset(Map<String,Object> param){
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
+        String currentDate = this.getDateStr();
         StringBuilder sb = new StringBuilder();
         sb.append(" SELECT DISTINCT " +
+                " ai.id,"+
+                " ai.clinical_dept_name as hospital_name, "+
+                " ai.function_type, "+
                 " ai.system_id," +
                 " ti.uid AS tenant_uid," +
                 " ti. NAME," +
                 " ai.uid AS asset_uid," +
-                " ac.contract_no"+
+                " ac.contract_no,"+
+                " qr_code_info.reason AS reason," +
+                " qr_code_info.can_not_past_qr_code AS can_not_past_qr_code"+
                 " FROM" +
                 " zkb_contract ac" +
                 " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
                 " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
-                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id where ac.contract_no is not null ");
+                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id" +
+                " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
+                " where ac.contract_no is not null and ai.system_id is not null"+
+                        " and to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date"
+                );
         String filter = buildFilter_loadAllAsset(searchFilterList);
         sb.append(filter);
         return sb.toString();
+    }
+    private String getDateStr()
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+        return formatter.format(new Date());
     }
 
     /**
@@ -55,6 +74,14 @@ public class ZkbAssetStatisticProvider {
             if("contractNo".equals(tempColumn))
             {
                 sb.append(" and ac.contract_no like '%"+value.toString()+"%'");
+            }
+            if("hospitalName".equals(tempColumn))
+            {
+                sb.append(" and ai.clinical_dept_name like'%"+value.toString()+"%'");
+            }
+            if("functionType".equals(tempColumn))
+            {
+                sb.append(" and ai.function_type like'%"+value.toString()+"%'");
             }
         }
         return sb.toString();

@@ -13,4 +13,12 @@ public interface ZkbKeyBehaviorIndexRepository extends GenericRepositoryUUID<Zkb
 
     @Query(value = "SELECT  * from zkb_key_behavior_index where tenant_uid= ?1 and to_char(kbi_date, ?2)=?3 ", nativeQuery = true)
     List<ZkbKeyBehaviorIndex> findByTenantUIDAndKbiDate(String tenantUID,String dateFormat,String kpiDate);
+
+
+    /**
+     * @return
+     */
+    @Query(value = "SELECT * from (SELECT TO_CHAR(kbi_date,'yyyy-MM') as kbi_date from zkb_key_behavior_index ) T GROUP BY kbi_date", nativeQuery = true)
+    List<String> findKbiDate();
+
 }

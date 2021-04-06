@@ -89,19 +89,20 @@ public class ZkbPartOrderProvider {
         String systemId = (String) params.get("systemId");
         String sr = (String) params.get("sr");
         String partOrderNo = (String) params.get("partOrderNo");
+        Integer assetGroup = (Integer) params.get("assetGroup");
         StringBuilder sb = new StringBuilder();
         sb.append(" SELECT o.*,a.system_id from zkb_part_order o " +
                 " INNER JOIN asset_info a on o.asset_id = a.uid " +
                 " where o.status = '"+ ZkbPartOrder.PartOrderStatus.Ordered.toString()+"' " +
                 " and o.order_type='"+ZkbPartOrder.OrderType.Artificial.toString()+"' "+
-                " and o.current_step='Complete' ").append(this.buildFilter_queryBySystemIdAndSr(systemId,sr,partOrderNo));
+                " and o.current_step='Complete' ").append(this.buildFilter_queryBySystemIdAndSr(systemId,sr,partOrderNo,assetGroup));
         return sb.toString();
     }
-    public String buildFilter_queryBySystemIdAndSr(String systemId,String sr,String partOrderNo){
+    public String buildFilter_queryBySystemIdAndSr(String systemId,String sr,String partOrderNo,Integer assetGroup){
         StringBuilder sb = new StringBuilder();
         if(StringUtils.isNotBlank(systemId))
         {
-            sb.append(" and a.system_id like '%"+systemId+"%'");
+            sb.append(" and a.system_id = '"+systemId+"'");
         }
         if(StringUtils.isNotBlank(sr))
         {
@@ -110,6 +111,9 @@ public class ZkbPartOrderProvider {
         if(StringUtils.isNotBlank(partOrderNo))
         {
             sb.append(" and o.part_order_no = '"+partOrderNo+"'");
+        }
+        if(assetGroup!=null) {
+            sb.append(" and a.asset_group ="+assetGroup.intValue());
         }
         return sb.toString();
     }
