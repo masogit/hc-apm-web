@@ -106,4 +106,25 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 			"\tor ai.site_uid in (?1)) order by vpo.plan_time asc nulls last,vpo.pm_num asc",nativeQuery = true)
 	List<Object> getAllPmOrder(List<String >OrgUid);
 
+
+	/**
+	 * 获取个数
+	 * @param dateFormat 日期格式
+	 * @param date 开单月份
+	 * @param tenantUID 租户 tenantUID
+	 * @param kpiDate 生成指定时间的KPI
+	 * @return
+	 */
+	@Query(value = "SELECT count(id) from ( " +
+			" SELECT " +
+			" DISTINCT v2.id " +
+			" FROM " +
+			" v2_pm_order v2 " +
+			" INNER JOIN asset_info a on v2.asset_id = a.id "+
+			" INNER JOIN zkb_contract_asset zca ON zca.asset_id = a.uid "+
+			" INNER JOIN zkb_contract zkbc ON zkbc.ID = zca.contract_id "+
+			" where to_char(v2.created_date, ?1)=?2 " +
+			" and zkbc.tenant_uid = ?3 and zkbc.start_date<=?4 and zkbc.end_date>=?4 ) T", nativeQuery = true)
+	Integer fetchCount(String dateFormat, String date, String tenantUID, Date kpiDate);
+
 }

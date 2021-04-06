@@ -58,4 +58,13 @@ public interface I18nMessageRepository extends GenericRepository<I18nMessage> {
     public String getByTypeAndKey(String msgType, String msgKey);
 
     public List<I18nMessage> getByMsgTypeOrderByMsgKey(String msgType);
+
+    /**
+     * 根据msgType和msgKey获取value_zh
+     * @param msgType 字段类型
+     * @param siteId 站点
+     * @return
+     */
+    @Query(value = "select * from I18n_Message i18n where msg_type=?1 and site_id = ?2",nativeQuery = true)
+    List<I18nMessage> getByTypeAndSiteId(String msgType, Integer siteId);
 }
