@@ -159,3 +159,6 @@ ALTER TABLE msa_recommend DROP COLUMN bulb_chance;
 ALTER TABLE msa_recommend DROP COLUMN tube_expected_time;
 ALTER TABLE msa_recommend DROP COLUMN has_msa_recommend;
 ALTER TABLE msa_recommend DROP COLUMN has_tube;
+
+-- 云上大咖modality及大咖对应表
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserQAExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
