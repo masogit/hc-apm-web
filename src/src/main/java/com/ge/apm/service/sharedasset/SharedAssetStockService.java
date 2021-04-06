@@ -85,6 +85,9 @@ public class SharedAssetStockService {
         ew.andNew()
             .eq("asset_is_deleted", false)
             .and().eq("asset_is_valid", true);
+
+        List<String> allocationCenterUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
+        ew.andNew().in("clinical_dept_uid", allocationCenterUids);
     }
 
     public void addFiltersByQueryType(Wrapper<AssetInfo> ew, int queryType) {
