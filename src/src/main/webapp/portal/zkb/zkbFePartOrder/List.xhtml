@@ -128,6 +128,11 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" action="#{zkbFePartOrderController.intoCreateModel}" rendered="#{zkbFePartOrderController.fourHundredsTeam}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" action="#{zkbFePartOrderController.intoEditModel}" disabled="#{zkbFePartOrderController.selected==null}"/>
+
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbFePartOrderController.exportAll}" icon="ui-icon-arrowstop-1-s">
+                                <p:fileDownload value="#{zkbFePartOrderController.exportFile}"/>
+                            </p:commandButton>
+
                         </f:facet>
                     </p:dataTable>
                 </h:form>

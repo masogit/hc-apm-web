@@ -95,6 +95,12 @@ public class ZkbKeyBehaviorIndexService {
     private ZkbIntegralService zkbIntegralService;
 
     /**
+     * 保养申请单
+     */
+    @Autowired
+    private V2_PmOrderRepository v2PmOrderRepository;
+
+    /**
      * 导入模板头部行数
      */
     public static final int EXCEL_KBI_HEADER_ROW = 1;
@@ -731,14 +737,32 @@ public class ZkbKeyBehaviorIndexService {
             return;
         }
         Integer countWorkOrder = this.v2_WorkOrderRepository.fetchCount(ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry,tenantUID,kpiDate);
+        Integer countPmOrder = this.v2PmOrderRepository.fetchCount(monthDateFormat,dateStry,tenantUID,kpiDate);
+        Integer highMachineCount = this.zkbContractRepository.fetchHighMachineCount(tenantUID,kpiDate);
+        if(highMachineCount==null)
+        {
+            highMachineCount=0;
+        }
         if(countWorkOrder==null)
         {
             countWorkOrder=new Integer(0);
         }
+        if(countPmOrder==null)
+        {
+            countPmOrder=new Integer(0);
+        }
         remark=remark.append("countWorkOrder:").append(countWorkOrder).append(";");
+        remark=remark.append("countPmOrder:").append(countPmOrder).append(";");
         remark=remark.append("totalIbNumber:").append(totalIbNumber).append(";");
-        Integer apmBillingRateScore = new BigDecimal(countWorkOrder).
-                divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
+        remark=remark.append("highMachineCount:").append(highMachineCount).append(";");
+        Integer divide =totalIbNumber-highMachineCount;
+        if(divide<=0)
+        {
+            zkbKeyBehaviorIndex.setApmBillingRateScore(0);
+            return;
+        }
+        Integer apmBillingRateScore = new BigDecimal(countWorkOrder+countPmOrder).
+                divide(new BigDecimal(divide),2,BigDecimal.ROUND_HALF_DOWN).
                 multiply(new BigDecimal(100)).
                 setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
         if(apmBillingRateScore>zkbKeyBehaviorIndex.getApmBillingRateFullScore())
