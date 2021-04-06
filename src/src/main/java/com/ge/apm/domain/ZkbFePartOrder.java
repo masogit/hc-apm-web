@@ -260,7 +260,7 @@ public class ZkbFePartOrder {
      * 订单标注
      */
     @Column(name = "order_annotation")
-    private String orderAnnotation= ZkbFePartOrderService.normalOrderValue;
+    private String orderAnnotation;
 
 
     /**
