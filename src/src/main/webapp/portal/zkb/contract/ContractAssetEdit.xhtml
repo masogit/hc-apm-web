@@ -55,7 +55,7 @@
                 </h:panelGroup>
             </p:panelGrid>
             <br/>
-            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbContractEditController.saveAssetEdit}" update=":growl :zkbContractEditForm:zkbContractCourseDatalist"
+            <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{zkbContractEditController.saveAssetEdit}" update=":growl :zkbContractEditForm:zkbContractAssetDatalist"
                  icon="ui-icon-check" oncomplete="PF('zkbContractAssetModifyDlg').hide()" />
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbContractAssetModifyDlg').hide()"/>
         </h:form>
