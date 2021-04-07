@@ -498,7 +498,7 @@
                                 <p:column headerText="#{msg.arrivalListItemNum}" >
                                     <h:outputText value="#{item.itemNum}"/>
                                 </p:column>
-                                <p:column headerText="#{msg.functionType}">
+                                <p:column headerText="#{msg.functionType}" rendered="#{userContextService.activeSupplier()}">
                                     <h:outputText value="#{item.functionType}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.serialNum}">

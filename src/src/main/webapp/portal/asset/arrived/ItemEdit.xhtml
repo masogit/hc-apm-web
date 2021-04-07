@@ -172,10 +172,6 @@
                                 <label class="label">#{msg.accountingCategory}</label>
                                 <h:outputText  value="#{fieldMsg.fieldValue('accountingCategory', assetInstallationController.arrivalListItem.accountingCategory)}"/>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{userContextService.activeSupplier()}">
-                                <label class="label">#{msg.functionType}</label>
-                                <h:outputText value="#{assetInstallationController.arrivalListItem.functionType}"/>
-                            </h:panelGroup>
                             <c:if test="#{not userContextService.activeSupplier()}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.isAssetPMed}</label>
@@ -230,6 +226,12 @@
                                     </p:inputText>
                                 </h:panelGroup>
                             </c:if>
+                            <h:panelGroup rendered="#{userContextService.activeSupplier()}">
+                                <label class="label">#{msg.functionType}</label>
+                                <p:inputText value="#{assetInstallationController.arrivalListItem.functionType}">
+                                    <p:ajax process="@this" update="@this"/>
+                                </p:inputText>
+                            </h:panelGroup>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['departNum']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.departNum}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['departNum'].arrivalRequired)? '*':''}</span></label>
