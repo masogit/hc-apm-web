@@ -1008,6 +1008,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbContract.setProbeQuotaApply((zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply()) + qty);
             zkbContractRepository.save(zkbContract);
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
+            if("2".equals(zkbPartOrder.getArtificialType())){
+                return;
+            }
             if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
                 if(qty < 0){
                     zkbIntegralService.deductScore(zkbPartOrder.getTenantUID(),zkbPartOrder.getQty(),userAccount,ZkbIntegralRecord.RecordType.QuotaReturn.toString());
@@ -1078,6 +1081,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbContract.setProbeQuotaApply((zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply()) - qty);
             zkbContractRepository.save(zkbContract);
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
+            if("2".equals(zkbPartOrder.getArtificialType())){
+                return;
+            }
             if(CopyByInvok.T.equals(zkbPartOrder.getScoreFlag())){
                 //zkbIntegralService.deductScore(zkbPartOrder.getTenantUID(),zkbPartOrder.getQty(),userAccount,ZkbIntegralRecord.RecordType.QuotaReturn.toString());
             }else{
