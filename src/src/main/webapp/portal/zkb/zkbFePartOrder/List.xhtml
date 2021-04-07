@@ -21,6 +21,9 @@
                         <p:commandButton value="完成"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'Complete'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('Complete')}" />
                         <p:commandButton value="全部"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'all'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('all')}" />
                         <p:commandButton value="待上传探头说明函"  process="@this" disabled="#{zkbFePartOrderController.queryStatus eq 'waitingUpload'}" style="color: white ;font-weight: bolder;background: #088A29" rendered="#{zkbFePartOrderController.hasLetterViewRight()}" action="#{zkbFePartOrderController.queryListByStatus('waitingUpload')}" />
+                        <p:commandLink id="btnRemindLetter" immediate="false" process="@this" style="text-align: right" oncomplete="PF('zkbVacationDlg').show()" update=":growl :zkbVacationForm" rendered="#{zkbFePartOrderController.fourHundredsTeam}">
+                            <h:outputText value="#{msg.zkbFePartOrder_isVacation}" />
+                        </p:commandLink>
                     </h:panelGrid>
                     <p:dataTable id="datalist" value="#{zkbFePartOrderController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbFePartOrderController.selected}"
@@ -128,9 +131,29 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" action="#{zkbFePartOrderController.intoCreateModel}" rendered="#{zkbFePartOrderController.fourHundredsTeam}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" action="#{zkbFePartOrderController.intoEditModel}" disabled="#{zkbFePartOrderController.selected==null}"/>
+
+                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbFePartOrderController.exportAll}" icon="ui-icon-arrowstop-1-s">
+                                <p:fileDownload value="#{zkbFePartOrderController.exportFile}"/>
+                            </p:commandButton>
+
                         </f:facet>
                     </p:dataTable>
                 </h:form>
+                <p:dialog id="zkbVacationDlg" widgetVar="zkbVacationDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.zkbFePartOrder_isVacation}" height="300">
+                    <h:form id="zkbVacationForm">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbFePartOrder_isVacation}:</label>
+                                <p:selectOneMenu id="isVacation" value="#{zkbFePartOrderController.isVacation}" >
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <br/>
+                        <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbFePartOrderController.saveVacation}" oncomplete="PF('zkbVacationDlg').hide()" update=":growl :zkbVacationForm" icon="ui-icon-check" />
+                        <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbVacationDlg').hide()"/>
+                    </h:form>
+                </p:dialog>
             </div>
         </div>
         <script>

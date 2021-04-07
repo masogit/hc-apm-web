@@ -80,6 +80,9 @@ public class ZkbFePartOrderUserConfig implements Serializable {
     @Column(name = "tenant_uid")
     private String tenantUid;
 
+    @Column(name = "is_vacation")
+    private String isVacation = "f";// 是否休假 t f
+
     public String getId() {
         return id;
     }
@@ -170,5 +173,13 @@ public class ZkbFePartOrderUserConfig implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public String getIsVacation() {
+        return isVacation;
+    }
+
+    public void setIsVacation(String isVacation) {
+        this.isVacation = isVacation;
     }
 }
