@@ -53,6 +53,7 @@ public class UserContextService implements Serializable {
     private UserAccount userAccount = null;
     private List<CustomRole> listCustomRole=null;
     private List<SysRole> listSysRole=null;
+    private Boolean activeSupplierFlag = null;
 //    private List<RoleMsgInfo> roleMsgInfoList = null;
 //    private  ZkbContractRepository zkbContractRepository;
 
@@ -1235,6 +1236,10 @@ public class UserContextService implements Serializable {
         return Boolean.FALSE;
     }
 
+    /**
+     * 判断租户是否有激活供应商的权限
+     * @return
+     */
     public Boolean isActiveSupplier(){
         Boolean flag = Boolean.FALSE;
         Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(getCurrentUserTenantInfo().getUid());
@@ -1243,6 +1248,35 @@ public class UserContextService implements Serializable {
             flag = tenantOptionConfig.getActiveSupplier();
         }
         return flag;
+    }
+
+    /**
+     * 判断租户是否已激活供应商
+     * @return
+     */
+    public boolean activeSupplier(){
+        if(activeSupplierFlag == null){
+            activeSupplierFlag = false;
+            UserAccount user = getCurrentUserAccount();
+            WorkflowConfigRepository workflowConfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+            List<WorkflowConfig> workflowConfigList = workflowConfigDao.findBySiteUID(user.getSiteUID());
+            if(workflowConfigList.isEmpty()){
+                workflowConfigList = workflowConfigDao.findBySiteUID(user.getHospitalUID());
+            }
+            if(workflowConfigList.isEmpty()){
+                workflowConfigList = workflowConfigDao.findBySiteUID(user.getInstitutionUID());
+            }
+            if(workflowConfigList.isEmpty()){
+                workflowConfigList = workflowConfigDao.findBySiteUID(user.getTenantUID());
+            }
+
+            if(!workflowConfigList.isEmpty()){
+                if (workflowConfigList.get(0).getActiveSupplier() != null && workflowConfigList.get(0).getActiveSupplier()){
+                    activeSupplierFlag = true;
+                }
+            }
+        }
+        return activeSupplierFlag;
     }
 
     public List<RoleMsgRel> getRoleMsgInfos(Integer userId) {
