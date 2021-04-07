@@ -185,32 +185,32 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             this.contractError=true;
             return;
         }
-        ZkbContract zkbContract = this.contractList.get(0);
-        Date startDate = zkbContract.getStartDate();
-        Date endDate = zkbContract.getEndDate();
-        Date date = new Date();
-        //合同过期
-        if(!(date.compareTo(startDate)>=0&&this.adjustDate(date).compareTo(endDate)<=0))
-        {
-            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractOverdueError"));
-            this.contractError=true;
-        }
+       // ZkbContract zkbContract = this.contractList.get(0);
+//        Date startDate = zkbContract.getStartDate();
+//        Date endDate = zkbContract.getEndDate();
+//        Date date = new Date();
+//        //合同过期
+//        if(!(date.compareTo(startDate)>=0&&this.adjustDate(date).compareTo(endDate)<=0))
+//        {
+//            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractOverdueError"));
+//            this.contractError=true;
+//        }
     }
 
-    private Date adjustDate(Date date)
-    {
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-        String lastDay = format.format(date.getTime());
-        lastDay = lastDay+"000000";
-        SimpleDateFormat formatter = new SimpleDateFormat(ZkbFePartOrderDetailController.dateFormat);
-        Date date1 = null;
-        try {
-            date1 = formatter.parse(lastDay);
-        } catch (ParseException e) {
-            logger.info(e.getMessage());
-        }
-        return date1;
-    }
+//    private Date adjustDate(Date date)
+//    {
+//        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+//        String lastDay = format.format(date.getTime());
+//        lastDay = lastDay+"000000";
+//        SimpleDateFormat formatter = new SimpleDateFormat(ZkbFePartOrderDetailController.dateFormat);
+//        Date date1 = null;
+//        try {
+//            date1 = formatter.parse(lastDay);
+//        } catch (ParseException e) {
+//            logger.info(e.getMessage());
+//        }
+//        return date1;
+//    }
 
 
     public String backList(){
