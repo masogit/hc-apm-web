@@ -145,6 +145,11 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     private StreamedContent exportFile;
 
     /**
+     * 是否休假
+     */
+    private String isVacation;
+
+    /**
      * 初始化数据
      */
     @Override
@@ -307,6 +312,18 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         }
     }
 
+    public void saveVacation(){
+        List<ZkbFePartOrderUserConfig> zkbFePartOrderUserConfigList = this.zkbFePartOrderUserConfigRepository.findByLoginName(this.loginName);
+        if(CollectionUtils.isEmpty(zkbFePartOrderUserConfigList))
+        {
+            return;
+        }
+        for(ZkbFePartOrderUserConfig c : zkbFePartOrderUserConfigList){
+            c.setIsVacation(isVacation);
+            this.zkbFePartOrderUserConfigRepository.save(c);
+        }
+    }
+
 
     @Override
     protected GenericRepositoryUUID<ZkbFePartOrder> getDAO() {
@@ -383,5 +400,29 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
 
     public void setExportFile(StreamedContent exportFile) {
         this.exportFile = exportFile;
+    }
+
+    public String getIsVacation() {
+        List<ZkbFePartOrderUserConfig> list = this.zkbFePartOrderUserConfigRepository.findByLoginName(this.loginName);
+        if(CollectionUtils.isEmpty(list))
+        {
+            return "f";
+        }
+        for(ZkbFePartOrderUserConfig item:list)
+        {
+            if(item==null) continue;
+            if(StringUtils.isBlank(item.getIsVacation()))
+            {
+                isVacation="f";
+                continue;
+            }
+            isVacation=item.getIsVacation();
+
+        }
+        return isVacation;
+    }
+
+    public void setIsVacation(String isVacation) {
+        this.isVacation = isVacation;
     }
 }
