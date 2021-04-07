@@ -371,6 +371,11 @@ public class AssetInstallationController {
     public String finishInstallBatch() {
         String contractNum = arrivalListItem.getArrivalList().getContractNum();
         String clinicalDeptUID = arrivalListItem.getClinicalDeptUID();
+        ArrivalList arrivalList =arrivalListItem.getArrivalList();
+        if(arrivalList.getVendor() == null || arrivalList.getSupplierUserId() == null){
+            WebUtil.addErrorMessage("请至到货清单中填写供应商或供应商责任人！");
+            return null;
+        }
         if(StringUtils.isBlank(contractNum)){
             WebUtil.addErrorMessage("合同编号不能为空");
             return null;

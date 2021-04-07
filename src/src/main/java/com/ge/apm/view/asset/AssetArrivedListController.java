@@ -123,17 +123,24 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     /**
-     * 页面未选择下拉框status值时，默认将column里status的等于2的进行判断，最终返回(1或2)
+     * 1、页面未选择下拉框status值时默认将column里status的等于2的进行判断，最终返回(1或2)
+     * 2、当选择下拉框status值为1时则将column里status赋值为1。
      * @param id
      * @param status
      * @return
      */
     public String getArrivalListStatus(String id,String status){
-        if(statusFlag == null && status.equals("2")){
-            List<ArrivalListItem> arrivalListItem = aiService.getListItem(id);
-            int installNum = arrivalListItem.stream().filter(item -> ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getInstallStatus())
-                    || ArrivalListItem.INSTALL_STATUS_INSTORAGE.equals(item.getInstallStatus())).collect(Collectors.toList()).size();
-            status = installNum > 0 ? status : "1";
+        if(statusFlag != null){
+            if(statusFlag == 1){
+                status = "1";
+            }
+        }else{
+            if(status.equals("2")){
+                List<ArrivalListItem> arrivalListItem = aiService.getListItem(id);
+                int installNum = arrivalListItem.stream().filter(item -> ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getInstallStatus())
+                        || ArrivalListItem.INSTALL_STATUS_INSTORAGE.equals(item.getInstallStatus())).collect(Collectors.toList()).size();
+                status = installNum > 0 ? status : "1";
+            }
         }
 
         return FieldValueMessageController.fieldValue("arrivalListStatus", status);
