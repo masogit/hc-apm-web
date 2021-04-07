@@ -264,6 +264,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             zkbFePartOrder.setContractId(null);
             zkbFePartOrder.setHospitalName(null);
             zkbFePartOrder.setTenantUid(null);
+            zkbFePartOrder.setSubtractTotalStatus(null);
+            zkbFePartOrder.setAssetType(null);
             return zkbFePartOrder;
         }
         ZkbFePartOrder item = list.get(0);
@@ -272,6 +274,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         zkbFePartOrder.setContractId(item.getContractId());
         zkbFePartOrder.setHospitalName(item.getHospitalName());
         zkbFePartOrder.setTenantUid(item.getTenantUid());
+        zkbFePartOrder.setAssetType(item.getAssetType());
         if(assetTypeHighMachineValue.equals(zkbFePartOrder.getAssetType()))
         {
             zkbFePartOrder.setSubtractTotalStatus("false");
