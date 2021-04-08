@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface SharedAssetTypeRepository extends GenericRepositoryUUID<SharedAssetType> {
     //public SharedAssetType findById(String id);
-    @Query(value = "select * from asset_info where shared_asset_type =?1",nativeQuery = true)
+    @Query(value = "select uid from asset_info where shared_asset_type =?1",nativeQuery = true)
     public List<String> findAssetIsExist(String UID);
     
     @Query(value = "select distinct s.* from shared_asset_type s inner join asset_info a on s.id = a.shared_asset_type and s.site_uid =?1 and a.asset_dept_uid =?2",nativeQuery = true)

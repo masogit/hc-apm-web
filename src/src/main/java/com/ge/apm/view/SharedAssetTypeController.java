@@ -7,6 +7,7 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
@@ -50,6 +51,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     SharedAssetTypeRepository dao = null;
     AssetInfoRepository assetInfoDao = null;
     OrgInfoRepository orgInfoDao = null;
+    SharedAssetReqDetailRepository sharedAssetReqDetailRepository = null;
     private String operation;
     private String createDateFormatTime = null;
 
@@ -67,6 +69,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
         dao = WebUtil.getBean(SharedAssetTypeRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
+        sharedAssetReqDetailRepository = WebUtil.getBean(SharedAssetReqDetailRepository.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -200,14 +203,39 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
 
     @Override
     public void delete() {
-        if (dao.findAssetIsExist(this.selected.getId()).isEmpty()) {
+        List<String> assetIds = dao.findAssetIsExist(selected.getId());
+        if (assetIds.isEmpty()) {  //无设备绑定，可直接删除
             dao.delete(selected);
             WebUtil.addSuccessMessage("已成功删除: " + selected.getSwapName());
             selected = null;
         } else {
-            WebUtil.addErrorMessage("此调剂设备已在使用，请核实！");
+            if(sharedAssetReqDetailRepository.findAssetIsBorrowing(assetIds).size()>0) {
+                WebUtil.addErrorMessage("该调剂类型下有设备正在借出,无法删除！");
+                return;
+            } else {
+                RequestContext.getCurrentInstance().addCallbackParam("showDeleteDlg", true);
+            }
         }
     }
+
+    public void deleteAgain() {
+        dao.delete(selected);
+        assetInfoDao.clearShareAssetTypeByIds(dao.findAssetIsExist(selected.getId()));
+        RequestContext.getCurrentInstance().addCallbackParam("showDeleteDlg", false);
+        WebUtil.addSuccessMessage("已成功删除: " + selected.getSwapName());
+        selected = null;
+    }
+
+    //有设备绑定且无在借设备时候，隐藏confirm
+    public Boolean hideConfirmBeforeDelete() {
+        if(selected==null) return false;
+        List<String> assetIds = dao.findAssetIsExist(selected.getId());
+        if(!assetIds.isEmpty()) {
+            if(sharedAssetReqDetailRepository.findAssetIsBorrowing(assetIds).size()==0) return true;
+        }
+        return false;
+    }
+
 
     //根据登录人信息配置权限
     private void setUserSearchFilters() {
