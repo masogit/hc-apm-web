@@ -148,10 +148,10 @@ public class IBUInfoImageEditController extends JpaCRUDController<IBUInfoImage> 
         } else {
             newAdd = true;
             if (!uploadImage) {
-                // 新增货号时删除未保存货号时上传的图片
+                // 新增货号时删除未保存ibuOffer时上传的图片
                 blobDao.deleteByBoUuid(selected.getIbuOffer());
             }
-            // 货号不存在，则新增
+            // ibuOffer不存在，则新增
             selected.setCreatorUID(UserContextService.getCurrentUserAccount().getUid());
             selected.setCreateTime(new Date());
             this.create();
