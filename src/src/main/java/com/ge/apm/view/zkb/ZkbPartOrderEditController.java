@@ -456,18 +456,31 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
                 this.selected.setRemainQty(contractCount - this.selected.getQty());
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-                if(CopyByInvok.T.equals(selected.getScoreFlag())){
-                    this.selected.setRemainQty(0);
-                }else {
-                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                        Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }else{
-                        Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
+                if(!"2".equals(selected.getArtificialType())) {
+                    if(CopyByInvok.T.equals(selected.getScoreFlag())){
+                        this.selected.setRemainQty(0);
+                    }else {
+                        if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                            Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
+                            this.selected.setRemainQty(contractCount);
+                        }else{
+                            Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                            this.selected.setRemainQty(contractCount);
+                        }
+                    }
+                }else{
+                    if(CopyByInvok.T.equals(selected.getScoreFlag())){
+                        this.selected.setRemainQty(0);
+                    }else {
+                        if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                            Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
+                            this.selected.setRemainQty(contractCount - this.selected.getQty());
+                        }else{
+                            Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                            this.selected.setRemainQty(contractCount - this.selected.getQty());
+                        }
                     }
                 }
-
             }
         }
     }
