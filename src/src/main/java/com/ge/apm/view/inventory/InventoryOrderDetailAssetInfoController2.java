@@ -112,6 +112,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         if(UserContextService.hasCurrentTenantName("")){
             List<SearchFilter> inventoryIssueSearchFilters = new ArrayList<>();
             inventoryIssueSearchFilters.addAll(searchFilterList);
+            inventoryIssueSearchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
             List<InventoryIssue> inventoryIssueList = inventoryIssueRepository.findBySearchFilter(inventoryIssueSearchFilters);
             if(!inventoryIssueList.isEmpty()) {
                 List<Integer> idList = new ArrayList<>();
