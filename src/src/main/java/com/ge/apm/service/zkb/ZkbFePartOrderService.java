@@ -1,6 +1,7 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ZkbFePartOrderMapper;
 import com.ge.apm.dao.mapper.ZkbPartOrderMapper;
 import com.ge.apm.domain.*;
@@ -64,6 +65,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      */
     @Autowired
     private AssetInfoRepository assetInfoRepository;
+
+    @Autowired
+    private AssetInfoMapper assetInfoMapper;
 
     /**
      * 根据system_id和用户tenant_uid 查询设备信息
@@ -840,9 +844,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         selected.setPhenomenon(selectZkbFePartOrder.getPhenomenon());
         ZkbContract zkbContract = this.zkbContractRepository.findById(selectZkbFePartOrder.getContractId());
         selected.setTenantUid(zkbContract.getTenantUID());
-        AssetInfo assetInfo = this.assetInfoRepository.getBySystemId(selectZkbFePartOrder.getSystemId());
-        if(assetInfo!=null)
+        List<AssetInfo> assetInfoList = this.assetInfoMapper.fetchByAssetInfoBySystemId(selectZkbFePartOrder.getSystemId(),selectZkbFePartOrder.getContractId());
+        if(CollectionUtils.isNotEmpty(assetInfoList))
         {
+            AssetInfo assetInfo = assetInfoList.get(0);
             selected.setArtificialType("");
             if(assetInfo.getAssetGroup()!=null&&"2".equals(assetInfo.getAssetGroup().toString()))
             {
@@ -850,6 +855,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             }
             selected.setAssetGroup(assetInfo.getAssetGroup().toString());
             selected.setProductNumber(assetInfo.getFunctionType());
+            selected.setAssetType(assetInfo.getAssetType());
+            if(assetTypeHighMachineValue.equals(assetInfo.getAssetType()))
+            {
+                selected.setArtificialType(highArtificialTypeValue);
+            }
         }
         return selected;
     }
