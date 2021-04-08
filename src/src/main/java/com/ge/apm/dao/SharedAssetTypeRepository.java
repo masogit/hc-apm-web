@@ -10,6 +10,9 @@ public interface SharedAssetTypeRepository extends GenericRepositoryUUID<SharedA
     //public SharedAssetType findById(String id);
     @Query(value = "select uid from asset_info where shared_asset_type =?1",nativeQuery = true)
     public List<String> findAssetIsExist(String UID);
+
+    @Query(value = "select count(uid) from asset_info where uid IN ?1 AND swap_type_state = '1'",nativeQuery = true)
+    public Integer findAssetIsBorrowing(List<String> uids);
     
     @Query(value = "select distinct s.* from shared_asset_type s inner join asset_info a on s.id = a.shared_asset_type and s.site_uid =?1 and a.asset_dept_uid =?2",nativeQuery = true)
     public List<SharedAssetType> findbyClinicalDeptUid(String SiteUid, String ClinicalDeptUid);
