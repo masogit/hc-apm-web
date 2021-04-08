@@ -154,6 +154,7 @@ delete from zkb_part_order_cat c where c.cat_no='H40402LW';
 INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('38', 'H40402LW', 'i12L-RS术中线阵探头', '线阵', 'SpecialValue', '0', '2099-12-31', '', '1900-01-20');
 --2020-04-14 game plan添加batch file type
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','TubeInfoExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','IBUInfoExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
 --删除game plan msa_recommend表字段
 ALTER TABLE msa_recommend DROP COLUMN bulb_chance;
 ALTER TABLE msa_recommend DROP COLUMN tube_expected_time;
