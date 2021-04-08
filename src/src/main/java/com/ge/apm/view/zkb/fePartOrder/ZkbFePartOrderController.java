@@ -359,12 +359,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     }
 
     public void exportAll(){
-        List<SearchFilter> searchFilters = this.searchFilters;
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<>();
-        }
-
-        this.getAllSearchFilterByUserConfig(searchFilters);
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
         List<ZkbFePartOrder> zkbFePartOrderList =  this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(excelPath);
