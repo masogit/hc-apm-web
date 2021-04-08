@@ -209,7 +209,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
             WebUtil.addSuccessMessage("已成功删除: " + selected.getSwapName());
             selected = null;
         } else {
-            if(sharedAssetReqDetailRepository.findAssetIsBorrowing(assetIds).size()>0) {
+            if(dao.findAssetIsBorrowing(assetIds)>0) {
                 WebUtil.addErrorMessage("该调剂类型下有设备正在借出,无法删除！");
                 return;
             } else {
@@ -231,7 +231,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         if(selected==null) return false;
         List<String> assetIds = dao.findAssetIsExist(selected.getId());
         if(!assetIds.isEmpty()) {
-            if(sharedAssetReqDetailRepository.findAssetIsBorrowing(assetIds).size()==0) return true;
+            if(dao.findAssetIsBorrowing(assetIds)==0) return true;
         }
         return false;
     }
