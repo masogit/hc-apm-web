@@ -263,15 +263,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             ZkbContract zkbContract = contractList.get(0);
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                    if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() <= 0){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于等于0，请检查！", "");
+                    if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() < 0){
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于0，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         contractList = new ArrayList<>();
                         return;
                     }
                 }else{
-                    if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 0){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件+人工+保养剩余名额小于等于0，请检查！", "");
+                    if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() < 0){
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件+人工+保养剩余名额小于0，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         contractList = new ArrayList<>();
                         return;
@@ -285,37 +285,21 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     return;
                 }
             } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-               /* if("1".equals(artificialType)){
-                    if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于1，请检查！", "");
-                        FacesContext.getCurrentInstance().addMessage(null, message);
-                    }
-                }else if("3".equals(artificialType)){
-                    if(ZkbContract.ContractType.PCB.toString().equals(zkbContract.getContractType())){
-                        if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 1){
-                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于1，请检查！", "");
+                if(!"2".equals(artificialType)){
+                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                        if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 0){
+                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于0，请检查！", "");
                             FacesContext.getCurrentInstance().addMessage(null, message);
+                            contractList = new ArrayList<>();
+                            return;
                         }
-                    }else if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
-                        if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 1){
-                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于1，请检查！", "");
+                    }else{
+                        if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 0){
+                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于0，请检查！", "");
                             FacesContext.getCurrentInstance().addMessage(null, message);
+                            contractList = new ArrayList<>();
+                            return;
                         }
-                    }
-                }*/
-                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                    if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 0){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于0，请检查！", "");
-                        FacesContext.getCurrentInstance().addMessage(null, message);
-                        contractList = new ArrayList<>();
-                        return;
-                    }
-                }else{
-                    if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 0){
-                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于0，请检查！", "");
-                        FacesContext.getCurrentInstance().addMessage(null, message);
-                        contractList = new ArrayList<>();
-                        return;
                     }
                 }
             }
