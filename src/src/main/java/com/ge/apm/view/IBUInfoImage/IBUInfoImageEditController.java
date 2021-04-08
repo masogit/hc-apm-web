@@ -86,12 +86,12 @@ public class IBUInfoImageEditController extends JpaCRUDController<IBUInfoImage> 
     /**
      * 获取图片列表
      *
-     * @param cataLog
+     * @param ibuOffer
      * @return
      */
-    public List<V2_BlobObject> getAttachList(String cataLog) {
+    public List<V2_BlobObject> getAttachList(String ibuOffer) {
         if (attachements == null) {
-            attachements = blobService.findBlobObjectsByBoUid(cataLog);
+            attachements = blobService.findBlobObjectsByBoUid(ibuOffer);
         }
         List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG)).collect(Collectors.toList());
         uploadFlag = collect.size() == 0;
@@ -143,12 +143,12 @@ public class IBUInfoImageEditController extends JpaCRUDController<IBUInfoImage> 
     public String applyChange() {
         IBUInfoImage imageInfo = dao.findByIbuOffer(selected.getIbuOffer());
         if (null != imageInfo) {
-            WebUtil.addErrorMessage("货号已存在！");
+            WebUtil.addErrorMessage("ibuOffer已存在！");
             return "";
         } else {
             newAdd = true;
             if (!uploadImage) {
-                // 新增货号时删除未保存ibuOffer时上传的图片
+                // 新增ibuOffer时删除未保存ibuOffer时上传的图片
                 blobDao.deleteByBoUuid(selected.getIbuOffer());
             }
             // ibuOffer不存在，则新增
