@@ -61,7 +61,7 @@ public class IBUInfoImageController extends JpaCRUDController<IBUInfoImage> {
     @Transactional
     public void deleteIBUInfoImage(IBUInfoImage imageInfo) {
         dao.delete(imageInfo);
-        // 刪除货号同时删除该货号下的图片信息
+        // 刪除ibuOffer同时删除该ibuOffer下的图片信息
         blobDao.deleteByBoUuid(imageInfo.getIbuOffer());
         logger.info("delete IBUInfo image successful. IbuOffer  is:" + imageInfo.getIbuOffer());
     }
