@@ -10,6 +10,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -48,6 +50,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
 
     private UaaService uuaService;
     private BlobFileService blobFileService;
+    private AssetInfoMgrService assetInfoMgrService;
     SharedAssetTypeRepository dao = null;
     AssetInfoRepository assetInfoDao = null;
     OrgInfoRepository orgInfoDao = null;
@@ -66,6 +69,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     protected void init() {
         uuaService = WebUtil.getBean(UaaService.class);
         blobFileService = WebUtil.getBean(BlobFileService.class);
+        assetInfoMgrService = WebUtil.getBean(AssetInfoMgrService.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
         dao = WebUtil.getBean(SharedAssetTypeRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -209,7 +213,10 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
             WebUtil.addSuccessMessage("已成功删除: " + selected.getSwapName());
             selected = null;
         } else {
-            if(dao.findAssetIsBorrowing(assetIds)>0) {
+            List<AssetInfo> assetInfos = assetInfoDao.findBySharedAssetTypeUid(assetIds);
+            AtomicBoolean isBorrowing = new AtomicBoolean(false);
+            assetInfos.forEach(assetInfo -> { if(assetInfoMgrService.isInDispenceCenter(assetInfo)) isBorrowing.set(true); });
+            if(isBorrowing.get()) {
                 WebUtil.addErrorMessage("该调剂类型下有设备正在借出,无法删除！");
                 return;
             } else {
@@ -231,7 +238,11 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         if(selected==null) return false;
         List<String> assetIds = dao.findAssetIsExist(selected.getId());
         if(!assetIds.isEmpty()) {
-            if(dao.findAssetIsBorrowing(assetIds)==0) return true;
+            List<AssetInfo> assetInfos = assetInfoDao.findBySharedAssetTypeUid(assetIds);
+            AtomicBoolean isBorrowing = new AtomicBoolean(false);
+            assetInfos.forEach(assetInfo -> { if(assetInfoMgrService.isInDispenceCenter(assetInfo)) isBorrowing.set(true); });
+
+            if(!isBorrowing.get()) return true;
         }
         return false;
     }
