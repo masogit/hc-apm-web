@@ -889,16 +889,23 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         List<Map<String, Object>> zkbManMadeFePartOrderDataList = (List<Map<String, Object>>) dataMap.get("zkbManMadeFePartOrderDataList");
         List<Map<String, Object>> zkbProbeFePartOrderDataList = (List<Map<String, Object>>) dataMap.get("zkbProbeFePartOrderDataList");
         List<Map<String, Object>> zkbSparePartFePartOrderDataList = (List<Map<String, Object>>) dataMap.get("zkbSparePartFePartOrderDataList");
-        for (Map<String, Object> item : zkbManMadeFePartOrderDataList) {
-            doc.writeRowData(excelSheetNameOfManMade, keyRow, dataRow++, item);
+        if(CollectionUtils.isNotEmpty(zkbManMadeFePartOrderDataList))
+        {
+            for (Map<String, Object> item : zkbManMadeFePartOrderDataList) {
+                doc.writeRowData(excelSheetNameOfManMade, keyRow, dataRow++, item);
+            }
         }
         dataRow = 2;
-        for (Map<String, Object> item : zkbProbeFePartOrderDataList) {
-            doc.writeRowData(excelSheetNameOfProbe, keyRow, dataRow++, item);
+        if(CollectionUtils.isNotEmpty(zkbProbeFePartOrderDataList)) {
+            for (Map<String, Object> item : zkbProbeFePartOrderDataList) {
+                doc.writeRowData(excelSheetNameOfProbe, keyRow, dataRow++, item);
+            }
         }
         dataRow = 2;
+        if(CollectionUtils.isNotEmpty(zkbSparePartFePartOrderDataList)) {
         for (Map<String, Object> item : zkbSparePartFePartOrderDataList) {
             doc.writeRowData(excelSheetNameOfSparePart, keyRow, dataRow++, item);
+        }
         }
     }
 
@@ -927,19 +934,22 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         typeList.add(yesOrNo);
         typeList.add(emergency);
         Map<String,Map<String,String>> i18Map = this.getI18ToMap(typeList);
-        for(ZkbFePartOrder item : zkbFePartOrderList){
-            if(ZkbFePartOrder.OrderType.ManMade.toString().equals(item.getOrderType()))
-            {
-                HashMap<String,Object> map = this.getManMadeHashMap(item,i18Map);
-                zkbManMadeFePartOrderDataList.add(map);
-            }else if(ZkbFePartOrder.OrderType.Probe.toString().equals(item.getOrderType()))
-            {
-                HashMap<String,Object> map = this.getProbeHashMap(item,i18Map);
-                zkbProbeFePartOrderDataList.add(map);
-            }else if(ZkbFePartOrder.OrderType.SpareParts.toString().equals(item.getOrderType()))
-            {
-                HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map);
-                zkbSparePartFePartOrderDataList.add(map);
+        if(CollectionUtils.isNotEmpty(zkbFePartOrderList))
+        {
+            for(ZkbFePartOrder item : zkbFePartOrderList){
+                if(ZkbFePartOrder.OrderType.ManMade.toString().equals(item.getOrderType()))
+                {
+                    HashMap<String,Object> map = this.getManMadeHashMap(item,i18Map);
+                    zkbManMadeFePartOrderDataList.add(map);
+                }else if(ZkbFePartOrder.OrderType.Probe.toString().equals(item.getOrderType()))
+                {
+                    HashMap<String,Object> map = this.getProbeHashMap(item,i18Map);
+                    zkbProbeFePartOrderDataList.add(map);
+                }else if(ZkbFePartOrder.OrderType.SpareParts.toString().equals(item.getOrderType()))
+                {
+                    HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map);
+                    zkbSparePartFePartOrderDataList.add(map);
+                }
             }
         }
         HashMap<String,Object> map = new HashMap<>();
@@ -963,7 +973,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         for(String item:strList)
         {
-
             List<I18nMessage> i18nMessageList = this.i18nMessageRepository.getByTypeAndSiteId(item ,-1);
             if(CollectionUtils.isEmpty(i18nMessageList)) continue;
             Map<String,String> map = new HashMap();
@@ -1161,7 +1170,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return "";
         }
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-        return formatter.format(new Date());
+        return formatter.format(date);
     }
 
 
