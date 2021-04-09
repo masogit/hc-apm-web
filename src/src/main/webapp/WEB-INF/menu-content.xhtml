@@ -202,7 +202,7 @@
                 <p:menuitem value="#{msg.ZKBEngineerMgt}" outcome="/portal/zkb/engineer/List.xhtml " rendered="#{userContextService.accessContains('zkbBasicInfo.engineerMgt')}"/>
             </p:submenu>
 
-            <p:menuitem value="设备数据概览" icon="fa fa-bar-chart" outcome="/portal/nine.xhtml" rendered="#{userContextService.ninth}"/>
+            <p:menuitem value="设备数据概览" icon="fa fa-bar-chart" outcome="/portal/nine.xhtml"/>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
             <p:menuitem id="logout" value="#{msg.Logout}" icon="&#xe8ac;" url="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"/>
