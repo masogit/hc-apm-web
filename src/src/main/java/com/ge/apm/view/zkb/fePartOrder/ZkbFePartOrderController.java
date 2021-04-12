@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -360,7 +361,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
 
     public void exportAll(){
         List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
-        List<ZkbFePartOrder> zkbFePartOrderList =  this.zkbFePartOrderRepository.findBySearchFilter(searchFilters);
+        Sort sort = new Sort(Sort.Direction.DESC, "orderType").and(new Sort(Sort.Direction.DESC, "reportDate"));
+        List<ZkbFePartOrder> zkbFePartOrderList =  this.zkbFePartOrderRepository.findBySearchFilter(searchFilters,sort);
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(excelPath);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
