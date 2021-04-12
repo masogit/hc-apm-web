@@ -239,7 +239,7 @@
             <label class="label">#{msg.clinicalDeptName}</label>
             <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['clinicalDept']}"
                             scrollHeight="300"  forceSelection="true"
-                            readonly="#{!assetInfoBulkEditController.needEdit('clinicalDeptName')}"
+                            readonly="true"
                             completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onAssetDeptChangeEdit('clinicalDept')}" update="@(.clinicalDeptNameChange)" />
