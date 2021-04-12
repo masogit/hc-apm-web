@@ -380,7 +380,7 @@
         <h:panelGroup>
             <label class="label">#{msg.parentAsset}</label>
             <p:autoComplete id="parentAssetList" dropdown="true" scrollHeight="300" value="#{assetInfoBulkEditController.selectedObjectMap['parentAsset']}" completeMethod="#{assetInfoBulkEditController.completeParentAssetIdList}"
-                            forceSelection="true" readonly="#{!assetInfoBulkEditController.needEdit('parentAssetId')}" class="SiteUIDChange clinicalDeptNameChange"
+                            forceSelection="true" readonly="true" class="SiteUIDChange clinicalDeptNameChange"
                             var="t" itemLabel="#{t.getParentAssetDisplayName()}" itemValue="#{t}" converter="assetInfoConverter">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onParentAssetChange()}"/>
                 <p:ajax listener="#{assetInfoBulkEditController.onParentAssetChange()}" />
@@ -391,7 +391,7 @@
         <h:panelGroup>
             <label class="label">#{msg.deviceName}</label>
             <p:inputText id="deviceName" value="#{assetInfoBulkEditController.selected.deviceName}"
-                         readonly="#{!assetInfoBulkEditController.needEdit('deviceName')}"  />
+                         readonly="true"  />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'subjectProject')}" >
@@ -554,7 +554,7 @@
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'isPm')}" >
         <h:panelGroup >
             <label class="label">#{msg.isAssetPMed}</label>
-            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.isPm}"
+            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.isPmValue}"
                               disabled="#{!assetInfoBulkEditController.needEdit('isPm')}" >
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="1"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="2"/>
@@ -564,7 +564,7 @@
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'isChecked')}" >
         <h:panelGroup >
             <label class="label">#{msg.isAssetChecked}</label>
-            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.isChecked}"
+            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.isCheckedValue}"
                                disabled="#{!assetInfoBulkEditController.needEdit('isChecked')}" >
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="1"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="2"/>
@@ -759,7 +759,7 @@
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'warranty')}" >
         <h:panelGroup >
             <label class="label">#{msg.isWarrantyNotice}</label>
-            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.warranty}"
+            <p:selectOneRadio value="#{assetInfoBulkEditController.selected.warrantyValue}"
                                disabled="#{!assetInfoBulkEditController.needEdit('warranty')}" >
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="1"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="2"/>
