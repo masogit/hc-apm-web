@@ -65,12 +65,11 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @param orderedDate 时间
      * @param orderType 订单类型
      * @param tenantUID 租户tenantUID
-     * @param kpiDate 生成KPI时间
      * @return
      */
     @Query(value = "SELECT count(zkbp.id) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where  zkbp.order_type = ?2 and zkbp.ordered_date< ?1 " +
-            "AND (zkbp.status!='PartReturned' and zkbp.status!='Returned' and zkbp.status!='Closed') and zkbc.tenant_uid = ?3 and zkbc.start_date<=?4 and zkbc.end_date>=?4", nativeQuery = true)
-    Integer fetchUnReturnCount(Date orderedDate,String orderType,String tenantUID,Date kpiDate);
+            "AND (zkbp.status!='PartReturned' and zkbp.status!='Returned' and zkbp.status!='Closed') and zkbc.tenant_uid = ?3 and zkbc.start_date<=zkbp.ordered_date and zkbc.end_date>=zkbp.ordered_date", nativeQuery = true)
+    Integer fetchUnReturnCount(Date orderedDate,String orderType,String tenantUID);
 
 
     /**
@@ -78,12 +77,11 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @param orderedDate 下单时间
      * @param orderType 订单类型
      * @param tenantUID 租户tenant uid
-     * @param kpiDate kpi时间
      * @return
      */
     @Query(value = "SELECT sum(qty) from zkb_part_order zkbp INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id where zkbp.order_type = ?2 and zkbp.ordered_date< ?1 and " +
-            "zkbc.tenant_uid = ?3 and zkbc.start_date<=?4 and zkbc.end_date>=?4 ", nativeQuery = true)
-    Integer fetchApplyPartsQty(Date orderedDate,String orderType,String tenantUID,Date kpiDate);
+            "zkbc.tenant_uid = ?3 and zkbc.start_date<=zkbp.ordered_date and zkbc.end_date>=zkbp.ordered_date ", nativeQuery = true)
+    Integer fetchApplyPartsQty(Date orderedDate,String orderType,String tenantUID);
 
 //    /**
 //     * 获取配件

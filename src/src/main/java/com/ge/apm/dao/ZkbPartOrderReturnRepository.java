@@ -31,7 +31,6 @@ public interface ZkbPartOrderReturnRepository extends GenericRepositoryUUID<ZkbP
      * @param orderedDate
      * @param orderType
      * @param tenantUID
-     * @param kpiDate
      * @return
      */
     @Query(value = " SELECT sum(zpor.qty) from zkb_part_order_return zpor " +
@@ -40,8 +39,8 @@ public interface ZkbPartOrderReturnRepository extends GenericRepositoryUUID<ZkbP
             " INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id " +
             " where zpor.data_satus='Accept' " +
             " and zkbp.order_type = ?2 and zkbp.ordered_date< ?1 " +
-            " and zkbc.tenant_uid = ?3 and zkbc.start_date<=?4 and zkbc.end_date>=?4", nativeQuery = true)
-    Integer fetchQty(Date orderedDate,String orderType,String tenantUID,Date kpiDate);
+            " and zkbc.tenant_uid = ?3 and zkbc.start_date<=zkbp.ordered_date and zkbc.end_date>=zkbp.ordered_date", nativeQuery = true)
+    Integer fetchQty(Date orderedDate,String orderType,String tenantUID);
 
     /**
      * 统计数量
