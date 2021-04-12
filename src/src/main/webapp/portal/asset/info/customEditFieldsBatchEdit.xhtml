@@ -225,7 +225,7 @@
         <h:panelGroup>
             <label class="label">#{msg.assetDeptName}</label>
             <p:autoComplete dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['assetDept']}"
-                            readonly="#{!assetInfoBulkEditController.needEdit('assetDeptName')}"
+                            readonly="true"
                             scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onAssetDeptChange('assetDept')}" update="@(.clinicalDeptNameChange)"/>
