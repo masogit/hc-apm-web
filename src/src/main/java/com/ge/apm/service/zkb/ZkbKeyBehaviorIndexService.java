@@ -574,13 +574,14 @@ public class ZkbKeyBehaviorIndexService {
      * @param zkbKeyBehaviorIndex kbi实体
      * @param tenantUID 租户
      * @param kpiDate 对应KPI时间
+     * @param firstDay 第一时间
      */
-    public void calculateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate)
+    public void calculateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,Date firstDay)
     {
         StringBuffer remark = new StringBuffer();
-        this.calculatePartReturnScore(zkbKeyBehaviorIndex,tenantUID,kpiDate,remark);
-        Integer totalIbNumber = this.calculatePasteQuickResponseRateScore(zkbKeyBehaviorIndex,tenantUID,kpiDate,remark);
-        this.calculateApmBillingRateScore(zkbKeyBehaviorIndex,tenantUID,totalIbNumber,kpiDate,remark);
+        this.calculatePartReturnScore(zkbKeyBehaviorIndex,tenantUID,kpiDate,firstDay,remark);
+        Integer totalIbNumber = this.calculatePasteQuickResponseRateScore(zkbKeyBehaviorIndex,tenantUID,kpiDate,firstDay,remark);
+        this.calculateApmBillingRateScore(zkbKeyBehaviorIndex,tenantUID,totalIbNumber,kpiDate,firstDay,remark);
         zkbKeyBehaviorIndex.setRemark(remark.toString());
     }
 
@@ -631,26 +632,26 @@ public class ZkbKeyBehaviorIndexService {
      * @param kpiDate kpi时间
      * @param remark 生成备注
      */
-    private void calculatePartReturnScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,StringBuffer remark)
+    private void calculatePartReturnScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,Date firstDate,StringBuffer remark)
     {
         remark=remark.append("calculatePartReturnScore--");
         Calendar cd = Calendar.getInstance();
         cd.setTime(kpiDate);
         cd.add(Calendar.DATE,-18);
         Date nowBefore = cd.getTime();
-        Integer unReturnCount  = this.zkbPartOrderRepository.fetchUnReturnCount(nowBefore,ZkbPartOrder.OrderType.Probe.toString(),tenantUID,kpiDate);
+        Integer unReturnCount  = this.zkbPartOrderRepository.fetchUnReturnCount(nowBefore,ZkbPartOrder.OrderType.Probe.toString(),tenantUID);
         if(unReturnCount==null)
         {
             unReturnCount=0;
         }
         remark=remark.append("unReturnCount:").append(unReturnCount).append(";");
-        Integer applyPartsCount = this.zkbPartOrderRepository.fetchApplyPartsQty(nowBefore,ZkbPartOrder.OrderType.Parts.toString(),tenantUID,kpiDate);
+        Integer applyPartsCount = this.zkbPartOrderRepository.fetchApplyPartsQty(nowBefore,ZkbPartOrder.OrderType.Parts.toString(),tenantUID);
         if(applyPartsCount==null)
         {
             applyPartsCount=0;
         }
         remark=remark.append("applyPartsCount:").append(applyPartsCount).append(";");
-        Integer returnQty = this.zkbPartOrderReturnRepository.fetchQty(nowBefore,ZkbPartOrder.OrderType.Parts.toString(),tenantUID,kpiDate);
+        Integer returnQty = this.zkbPartOrderReturnRepository.fetchQty(nowBefore,ZkbPartOrder.OrderType.Parts.toString(),tenantUID);
         if(returnQty==null)
         {
             returnQty = new Integer(0);
@@ -676,10 +677,10 @@ public class ZkbKeyBehaviorIndexService {
      * @param kpiDate 某月KPI
      * @param remark 备注
      */
-    private Integer calculatePasteQuickResponseRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,StringBuffer remark)
+    private Integer calculatePasteQuickResponseRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Date kpiDate,Date firstDate,StringBuffer remark)
     {
         remark=remark.append("calculatePasteQuickResponseRateScore--");
-        Integer totalIbNumber = this.zkbContractRepository.fetchIbNumber(tenantUID,kpiDate);
+        Integer totalIbNumber = this.zkbContractRepository.fetchIbNumber(tenantUID,firstDate,kpiDate);
         if(totalIbNumber==null)
         {
             totalIbNumber=new Integer(0);
@@ -690,7 +691,7 @@ public class ZkbKeyBehaviorIndexService {
             zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
             return totalIbNumber;
         }
-        List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findZkbContractAssetByTenantUID(tenantUID,kpiDate);
+        List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findZkbContractAssetByTenantUID(tenantUID,firstDate,kpiDate);
         List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList =  this.zkbAssetQrCodeInfoRepository.findByTenantUIDAndCanNotPastQrCode(tenantUID,yes);
         if(CollectionUtils.isEmpty(zkbContractAssetList))
         {
@@ -726,7 +727,7 @@ public class ZkbKeyBehaviorIndexService {
      * @param totalIbNumber ib 总量
      * @param remark 备注
      */
-    private void calculateApmBillingRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Integer totalIbNumber,Date kpiDate,StringBuffer remark)
+    private void calculateApmBillingRateScore(ZkbKeyBehaviorIndex zkbKeyBehaviorIndex,String tenantUID,Integer totalIbNumber,Date kpiDate,Date firstDate,StringBuffer remark)
     {
         remark=remark.append("calculateApmBillingRateScore--");
         SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexService.monthDateFormat_two);
@@ -736,9 +737,9 @@ public class ZkbKeyBehaviorIndexService {
             zkbKeyBehaviorIndex.setApmBillingRateScore(0);
             return;
         }
-        Integer countWorkOrder = this.v2_WorkOrderRepository.fetchCount(ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry,tenantUID,kpiDate);
-        Integer countPmOrder = this.v2PmOrderRepository.fetchCount(monthDateFormat_two,dateStry,tenantUID,kpiDate);
-        Integer highMachineCount = this.zkbContractRepository.fetchHighMachineCount(tenantUID,kpiDate);
+        Integer countWorkOrder = this.v2_WorkOrderRepository.fetchCount(ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry,tenantUID);
+        Integer countPmOrder = this.v2PmOrderRepository.fetchCount(monthDateFormat_two,dateStry,tenantUID);
+        Integer highMachineCount = this.zkbContractRepository.fetchHighMachineCount(tenantUID,kpiDate,firstDate);
         if(highMachineCount==null)
         {
             highMachineCount=0;

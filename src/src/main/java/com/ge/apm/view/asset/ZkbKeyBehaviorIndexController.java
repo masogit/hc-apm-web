@@ -216,7 +216,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         }
         for(TenantInfo item:tenantInfoList) {
             ZkbKeyBehaviorIndex zkbKeyBehaviorIndex = this.generateSingleKpiData(item.getUid(),defaultZkbKeyBehaviorIndexConfig);
-            this.zkbKeyBehaviorIndexService.calculateScore(zkbKeyBehaviorIndex,item.getUid(),this.getLastDay(this.kpiDate));
+            this.zkbKeyBehaviorIndexService.calculateScore(zkbKeyBehaviorIndex,item.getUid(),this.getLastDay(this.kpiDate),this.getFirstDay(this.kpiDate));
             List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexRepository.findByTenantUIDAndKbiDate(item.getUid(),ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry);
             boolean exist = false;
             if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
@@ -385,7 +385,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      */
     public void calculateScore()
     {
-        this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.selected.getTenantUID(),this.getLastDay(this.selected.getKbiDate()));
+        this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.selected.getTenantUID(),this.getLastDay(this.selected.getKbiDate()),this.getFirstDay(this.selected.getKbiDate()));
     }
 
     @Override
