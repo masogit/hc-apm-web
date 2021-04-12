@@ -164,3 +164,6 @@ ALTER TABLE msa_recommend DROP COLUMN has_tube;
 -- 云上大咖modality及大咖对应表
 delete from role_msg_rel where msg_key = 'UserQAExcel';
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserQAExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+
+-- 刷新手册访问地址
+update cms_content set content=article_url,article_url=replace(article_url, 'https://drcp8gscc0w9a.cloudfront.net','https://geapm.gechs.cn/apm-manuals'),off_shelf=1 where doc_no is not null;
