@@ -482,6 +482,12 @@ public class ZkbFePartOrder {
     @Transient
     private List<ZkbFePartOrderReturn> zkbFePartOrderReturnList;
 
+    /**
+     * 设备类型
+     */
+    @Transient
+    private String assetType;
+
     public String getId() {
         return id;
     }
@@ -1041,5 +1047,13 @@ public class ZkbFePartOrder {
 
     public void setHasUploadLetter(String hasUploadLetter) {
         this.hasUploadLetter = hasUploadLetter;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 }
