@@ -53,4 +53,14 @@ public interface AssetInfoMapper {
 					"</script>"})
 	public List<Supplier> getSupliersBySuplierNamesAndTenantUID(@Param("assetSuppliers")List<String> assetSuppliers, @Param("tenantUid")String tenantUid);
 
+
+	/**
+	 * 根据合同ID和SYSTEM ID获取信息
+	 * @param systemId system ID
+	 * @param contractId 合同ID
+	 * @return
+	 */
+	@SelectProvider(type = AssetInfoProvider.class,method="fetchByAssetInfoBySystemId")
+	List<AssetInfo> fetchByAssetInfoBySystemId(@Param("systemId")String systemId, @Param("contractId")String contractId);
+
 }

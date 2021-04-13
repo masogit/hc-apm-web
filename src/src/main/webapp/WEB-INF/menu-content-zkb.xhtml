@@ -171,7 +171,7 @@
 
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.accessContains('config')}">
                 <p:menuitem  value="USER CONFIG 配置" outcome="/portal/zkb/partOrderUserConfig/List.xhtml" rendered="#{userContextService.geAdmin or userContextService.zkbConfigAdmin}"/>
-                <p:menuitem  value="FE USER CONFIG 配置" outcome="/portal/zkb/fePartOrderUserConfig/List.xhtml" rendered="#{userContextService.geAdmin or userContextService.zkbConfigAdmin}" />
+                <p:menuitem  value="FE USER CONFIG 配置" outcome="/portal/zkb/fePartOrderUserConfig/List.xhtml" rendered="#{userContextService.geAdmin or userContextService.zkbConfigAdmin or userContextService.zkbUser}" />
                 <p:menuitem id="um46" value="#{msg.OrgAdmin}" outcome="/admin/uaa/orgInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/portal/loginAs/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um54" value="#{msg.MessageSubscriber}" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.accessContains('config.assetMessage')}"/>
