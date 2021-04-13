@@ -58,7 +58,7 @@ public class CustomConfigConstant {
                 "pmOwnerName", "pmOwnerTel", "measuringOwner",
                 "siteUID", "clinicalDeptName", "clinicalOwnerName", "clinicalOwnerTel", "assetDeptName",
                 "manufacture", "makerShortName",
-                "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","medicalApparatusClassificationName","medicalApparatusClassification","assetGroup",
+                "deviceName", "registrationNo", "vendor", "vendorTel", "functionGroup", "assetCode68","medicalApparatusClassificationName","medicalApparatusClassificationCode","medicalApparatusClassification","assetGroup",
                 "assetGroupSecondary", "parentAssetId", "functionGrade", "repairForm", "functionType", "serialNum",
                 "systemId", "nationalStandardCode", "financingNum", "barcode", "modalityId", "purchasePrice",
                 "salvageValue", "lifecycle", "depreciationMethod", "manufactDate", "purchaseDate", "arriveDate",
@@ -110,7 +110,8 @@ public class CustomConfigConstant {
             allFields.put("functionType", WebUtil.getMessage("functionType"));
             allFields.put("functionGroup", WebUtil.getMessage("functionGroup"));
             allFields.put("assetCode68", WebUtil.getMessage("assetCode68"));
-            allFields.put("medicalApparatusClassification", WebUtil.getMessage("medicalApparatusClassification")+ "编码");
+            allFields.put("medicalApparatusClassification", WebUtil.getMessage("medicalApparatusClassification"));
+            allFields.put("medicalApparatusClassificationCode", WebUtil.getMessage("medicalApparatusClassification")+ "编码");
             allFields.put("medicalApparatusClassificationName", WebUtil.getMessage("medicalApparatusClassification"));
             allFields.put("functionGrade", WebUtil.getMessage("functionGrade"));
             allFields.put("repairForm", WebUtil.getMessage("repairForm"));
