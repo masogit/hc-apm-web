@@ -90,10 +90,10 @@
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}" />
                         <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetTypeController.getViewPageA('Edit','Edit')}" action="#{urlEncryptController.encodeUrlParam(sharedAssetTypeController.operation)}"  disabled="#{empty sharedAssetTypeController.selected}"/>
                          
-                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close"  class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetTypeController.delete}" update="datalist" disabled="#{empty sharedAssetTypeController.selected}">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close"  class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{sharedAssetTypeController.delete}" update="datalist" oncomplete="showDeleteDialog(xhr, status, args);" disabled="#{empty sharedAssetTypeController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" disabled="#{sharedAssetTypeController.hideConfirmBeforeDelete()}"/>
                             </p:commandButton>
-                       
+
                        </f:facet>
                 </p:dataTable>
 
@@ -122,6 +122,15 @@
                     </h:panelGrid>
                 </p:overlayPanel>
             </h:form>
+            <p:dialog id="DeleteSharedTypeDlg" widgetVar="DeleteSharedTypeDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.DeleteConformation}">
+                <h:panelGroup id="display">
+                    <h:outputText value="存在部分设备属于该调剂类型，是否类型解绑后将其删除？" /><br/><br/>
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetTypeController.deleteAgain}" value="是"
+                                     update="SwapTypeListForm:datalist" icon="ui-icon-check" oncomplete="PF('DeleteSharedTypeDialog').hide()" />
+                    <!--&nbsp;&nbsp;-->
+                    <p:commandButton immediate="true" value="否" icon="ui-icon-cancel" onclick="PF('DeleteSharedTypeDialog').hide()"/>
+                </h:panelGroup>
+            </p:dialog>
             </div>
             </div>
         </div>
@@ -134,6 +143,11 @@
                 });
             }
 
+            function showDeleteDialog(xhr,status,args){
+                if(args.showDeleteDlg){
+                    PF('DeleteSharedTypeDialog').show();
+                }
+            }
 
             function openSwapTypeViewWindow(xhr, status, args) {
                 this.location.href = args.url;

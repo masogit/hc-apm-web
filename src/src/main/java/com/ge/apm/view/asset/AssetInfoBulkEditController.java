@@ -265,6 +265,30 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
             return "";
         }
+        String isPmValue = selected.getIsPmValue();
+        if(isPmValue!=null){
+            if("2".equals(isPmValue)){
+                selected.setIsPm(false);
+            }else {
+                selected.setIsPm(true);
+            }
+        }
+        String isCheckedValue = selected.getIsCheckedValue();
+        if(isCheckedValue!=null){
+            if("2".equals(isCheckedValue)){
+                selected.setIsChecked(false);
+            }else {
+                selected.setIsChecked(true);
+            }
+        }
+        String warrantyValue = selected.getWarrantyValue();
+        if(warrantyValue!=null){
+            if("2".equals(warrantyValue)){
+                selected.setWarranty(false);
+            }else {
+                selected.setWarranty(true);
+            }
+        }
         String clinicalDeptUID = selected.getClinicalDeptUID();
         if(clinicalDeptUID != null){
             List<String> adjustByassetInfoUid = assetInfoBulkEditCheckService.verifyByBatchEdit(assetInfoList);
