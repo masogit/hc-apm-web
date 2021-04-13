@@ -1113,8 +1113,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         if(i18Map.containsKey(needLetterFlag)&&i18Map.get(needLetterFlag).containsKey(zkbFePartOrder.getNeedLetterFlag()))
         {
-            if(ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString().equals(zkbFePartOrder.getCurrentStep())
-                    ||ZkbFePartOrder.workFlowSteps.Complete.toString().equals(zkbFePartOrder.getCurrentStep()))
+            if(ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString().equals(zkbFePartOrder.getStatus())
+                    ||ZkbFePartOrder.workFlowStatus.GEAdminAccept.toString().equals(zkbFePartOrder.getStatus()))
             {
                 probeMap.put(WebUtil.getMessage("zkbFePartOrder_needProbeLetter"),i18Map.get(needLetterFlag).get(zkbFePartOrder.getNeedLetterFlag()));
             }
