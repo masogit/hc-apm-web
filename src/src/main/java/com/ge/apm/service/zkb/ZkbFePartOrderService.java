@@ -211,6 +211,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      */
     private static final String dateFormat = "yyyy-MM-dd HH:mm:ss";
 
+    private static final String dateFormat_month = "yyyy-MM-dd";
+
     /**
      * 合同超声高端机
      */
@@ -1130,7 +1132,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             probeMap.put(WebUtil.getMessage("zkbFePartOrder_partQualityIssue"),i18Map.get(partQualityIssue).get(zkbFePartOrder.getPartQualityIssue()));
         }
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_airWayBillNo"),zkbFePartOrder.getWaybillNo());
-        probeMap.put(WebUtil.getMessage("zkbFePartOrder_returnDate"),this.dateFormat(zkbFePartOrder.getReturnDate(),dateFormat));
+        probeMap.put(WebUtil.getMessage("zkbFePartOrder_returnDate1"),this.dateFormat(zkbFePartOrder.getReturnDate(),dateFormat_month));
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_newCatSn"),zkbFePartOrder.getNewCatSn());
         probeMap.put("FE归还信息"+WebUtil.getMessage("zkbFePartOrder_remark"),zkbFePartOrder.getGeAdminComment());
         return probeMap;
