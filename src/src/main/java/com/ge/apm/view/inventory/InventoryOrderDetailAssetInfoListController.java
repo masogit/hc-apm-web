@@ -172,6 +172,8 @@ public class InventoryOrderDetailAssetInfoListController extends GenericCRUDUUID
                     inventoryOrderDetail.setInventoryCheckListItems(inventoryIssue.getInventoryCheckListItems());
                     inventoryOrderDetail.setIsSolved(inventoryIssue.getIsSolved() ? "是" : "否");
                     inventoryOrderDetail.setStatus(3);//有问题
+                    inventoryOrderDetail.setClinicalDeptUID(inventoryIssue.getClinicalDept().getUid());
+                    inventoryOrderDetail.setClinicalDeptName(inventoryIssue.getClinicalDept().getName());
                     detailList.add(inventoryOrderDetail);
                     AssetInfoIdList.add(inventoryIssue.getAssetInfo().getId());
                 }
@@ -204,14 +206,14 @@ public class InventoryOrderDetailAssetInfoListController extends GenericCRUDUUID
         }
         int size = inventoryOrderDetailList.size();
         inventoryOrderDetailList= this.pageNum(inventoryOrderDetailList, pageRequest);
-        if(size>0){
-            for (InventoryOrderDetail inventoryOrderDetail :inventoryOrderDetailList){
-                if(inventoryOrderDetail.getClinicalDeptName()==null){
-                    inventoryOrderDetail.setClinicalDeptName(inventoryOrderDetail.getAssetInfo().getClinicalDeptName());
-                    inventoryOrderDetail.setClinicalDeptUID(inventoryOrderDetail.getClinicalDeptUID());
-                }
-            }
-        }
+//        if(size>0){
+//            for (InventoryOrderDetail inventoryOrderDetail :inventoryOrderDetailList){
+//                if(inventoryOrderDetail.getClinicalDeptName()==null){
+//                    inventoryOrderDetail.setClinicalDeptName(inventoryOrderDetail.getAssetInfo().getClinicalDeptName());
+//                    inventoryOrderDetail.setClinicalDeptUID(inventoryOrderDetail.getClinicalDeptUID());
+//                }
+//            }
+//        }
         Page<InventoryOrderDetail>  inventoryOrderDetailPage = new PageImpl<InventoryOrderDetail>(inventoryOrderDetailList, pageRequest, size);
         //after
 		return inventoryOrderDetailPage;

@@ -154,6 +154,7 @@ delete from zkb_part_order_cat c where c.cat_no='H40402LW';
 INSERT INTO zkb_part_order_cat ("id", "cat_no", "cat_model", "cat_type", "value_type", "price", "end_date", "is_vaild", "start_date") VALUES ('38', 'H40402LW', 'i12L-RS术中线阵探头', '线阵', 'SpecialValue', '0', '2099-12-31', '', '1900-01-20');
 --2020-04-14 game plan添加batch file type
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','TubeInfoExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','IBUInfoExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
 --删除game plan msa_recommend表字段
 ALTER TABLE msa_recommend DROP COLUMN bulb_chance;
 ALTER TABLE msa_recommend DROP COLUMN tube_expected_time;
@@ -163,3 +164,6 @@ ALTER TABLE msa_recommend DROP COLUMN has_tube;
 -- 云上大咖modality及大咖对应表
 delete from role_msg_rel where msg_key = 'UserQAExcel';
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserQAExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+
+-- 刷新手册访问地址
+update cms_content set content=article_url,article_url=replace(article_url, 'https://drcp8gscc0w9a.cloudfront.net','https://geapm.gechs.cn/apm-manuals'),off_shelf=1 where doc_no is not null;
