@@ -403,7 +403,7 @@
                         <p:inputText  value="#{zkbFePartOrderProbeController.selected.waybillNo}" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}"  required="true" requiredMessage="#{msg.zkbPartOrder_waybillNo} #{msg.ValidationRequire}" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.zkbFePartOrder_returnDate}*</label>
+                        <label class="label">#{msg.zkbFePartOrder_returnDate1}*</label>
                         <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{zkbFePartOrderProbeController.selected.returnDate}" showOn="button"  Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
                     </h:panelGroup>
                     <h:panelGroup>
