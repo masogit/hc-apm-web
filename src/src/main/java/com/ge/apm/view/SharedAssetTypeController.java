@@ -226,8 +226,8 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     }
 
     public void deleteAgain() {
-        dao.delete(selected);
         assetInfoDao.clearShareAssetTypeByIds(dao.findAssetIsExist(selected.getId()));
+        dao.delete(selected);
         RequestContext.getCurrentInstance().addCallbackParam("showDeleteDlg", false);
         WebUtil.addSuccessMessage("已成功删除: " + selected.getSwapName());
         selected = null;
