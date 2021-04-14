@@ -38,7 +38,7 @@ public interface ZkbPartOrderReturnRepository extends GenericRepositoryUUID<ZkbP
             " INNER JOIN zkb_contract zkbc on zkbp.contract_id = zkbc.id" +
             " where zpor.data_satus='Accept' " +
             " and zkbp.order_type = ?2 and zkbp.ordered_date< ?1 " +
-            " and zkbc.tenant_uid = ?3 and zkbc.start_date<=zkbp.ordered_date and zkbc.end_date>=zkbp.ordered_date", nativeQuery = true)
+            " and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')", nativeQuery = true)
     Integer fetchQty(Date orderedDate,String orderType,String tenantUID);
 
     /**

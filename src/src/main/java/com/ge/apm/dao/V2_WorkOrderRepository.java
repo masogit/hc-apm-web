@@ -93,6 +93,6 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
             " INNER JOIN zkb_contract_asset zca ON zca.asset_id = a.uid "+
             " INNER JOIN zkb_contract zkbc ON zkbc.ID = zca.contract_id "+
             " where to_char(v2.created_date, ?1)=?2 " +
-            " and zkbc.tenant_uid = ?3 and zkbc.start_date<=v2.created_date and zkbc.end_date>=v2.created_date ) T", nativeQuery = true)
+            " and zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(v2.created_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(v2.created_date, 'yyyy-MM-dd'),'yyyy-MM-dd') ) T", nativeQuery = true)
     Integer fetchCount(String dateFormat,String date,String tenantUID);
 }
