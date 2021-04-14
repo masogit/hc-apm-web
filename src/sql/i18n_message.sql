@@ -4079,23 +4079,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('supplierUserBind','1','未绑定','UnBing',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('supplierUserBind','2','已绑定','Bingding',NULL,-1);
 
--- 设备类型
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','CT','CT','',NULL,-1,'305001736');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','MR','MR','',NULL,-1,'305012404');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','移动DR','移动DR','',NULL,-1,'305012621');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','血管机','血管机','',NULL,-1,'305008920');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','乳腺机','乳腺机','',NULL,-1,'305011029');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','C臂机','C臂机','',NULL,-1,'305011134');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','PET-CT','PET-CT','',NULL,-1,'305011026');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','SPECT','SPECT','',NULL,-1,'305011026');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','螺旋加速器','螺旋加速器','',NULL,-1,'305008942');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','超声','超声','',NULL,-1,'305010367');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','床旁监护仪/Ecosystems','床旁监护仪/Ecosystems','',NULL,-1,'305010629');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','麻醉','麻醉','',NULL,-1,'305010629');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','呼吸','呼吸','',NULL,-1,'305010629');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','母婴','母婴','',NULL,-1,'305010629');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','诊断心电','诊断心电','',NULL,-1,'305010629');
-
 -- 问题类型 问题类型 问题类型
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('questionType','设备原理相关','设备原理相关','',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('questionType','常见故障相关','常见故障相关','',NULL,-1);
