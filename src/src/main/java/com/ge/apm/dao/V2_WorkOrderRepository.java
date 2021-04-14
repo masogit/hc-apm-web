@@ -78,7 +78,7 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
     Integer fetchCount(List<Integer> assetIdList,Date firstday, Date lastday);
 
     /**
-     * 获取个数
+     * 获取个数 个数
      * @param dateFormat 日期格式
      * @param date 开单月份
      * @param tenantUID 租户 tenantUID
