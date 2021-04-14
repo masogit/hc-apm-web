@@ -739,7 +739,7 @@ public class ZkbKeyBehaviorIndexService {
         }
         Integer countWorkOrder = this.v2_WorkOrderRepository.fetchCount(ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry,tenantUID);
         Integer countPmOrder = this.v2PmOrderRepository.fetchCount(monthDateFormat_two,dateStry,tenantUID);
-        Integer highMachineCount = this.zkbContractRepository.fetchHighMachineCount(tenantUID,kpiDate,firstDate);
+        Integer highMachineCount = this.zkbContractRepository.fetchHighMachineCount(tenantUID,firstDate,kpiDate);
         if(highMachineCount==null)
         {
             highMachineCount=0;
