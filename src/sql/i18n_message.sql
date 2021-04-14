@@ -1,4 +1,4 @@
-	  delete from i18n_message where site_id=-1;
+	  delete from i18n_message where site_id=-1 and msg_type!='modalityType';
 	  DELETE FROM i18n_message WHERE site_id = (SELECT "id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1);
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','cardsIsBlank','盘点卡片不能为空!','Cards cannot be null!',NULL,-1);
