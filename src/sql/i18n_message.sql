@@ -4093,3 +4093,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 -- 云上大咖modality及大咖对应表
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','UserQAExcel','云上大咖modality及大咖对应表','Environmental Status Monitor',NULL,-1);
+
+-- 设备附件类型配置
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label','AssetAttachmentCategoryConfiguration','设备附件类型配置','CategoryConfig',NULL,'-1');
+

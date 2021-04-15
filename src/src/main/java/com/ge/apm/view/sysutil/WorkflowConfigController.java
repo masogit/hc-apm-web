@@ -3,16 +3,22 @@ package com.ge.apm.view.sysutil;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.persistence.Entity;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.constant.WorkFlowConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.google.common.collect.Maps;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.util.Strings;
@@ -24,13 +30,13 @@ import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.service.common.UserCommonService;
 
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -63,6 +69,10 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	private Date telRepStart;
 	private Date telRepEnd;
 	private UserContextService userContextService;
+	@Getter @Setter
+	private List<WorkflowConfig.AttachmentCategory> attachmentCategories;
+	@Setter@Getter
+	private WorkflowConfig.AttachmentCategory attachmentCategory;
 
 	@Override
 	protected void init() {
@@ -79,7 +89,52 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 		selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
 		setTenantUid(user.getTenantUID());
+	}
 
+	public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories(){
+		WorkflowConfig.AttachmentCategory category = new WorkflowConfig.AttachmentCategory();
+		category.setId(WorkFlowConstant.ATTACHMENY_CATEGORY_ID);
+		if (null == attachmentCategories) {
+			attachmentCategories = new ArrayList<>();
+		} else {
+			attachmentCategories = attachmentCategories.stream()
+					.filter(item -> item.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID).collect(Collectors.toList());
+		}
+		attachmentCategories.add(category);
+		return attachmentCategories;
+	}
+
+	public void onAddNode() {
+		attachmentCategory = new WorkflowConfig.AttachmentCategory();
+	}
+
+	public void onEditNode(String nodeType) {
+		for (WorkflowConfig.AttachmentCategory node : attachmentCategories) {
+			if (nodeType == node.getBoType()) {
+				attachmentCategory = node;
+				break;
+			}
+		}
+	}
+
+	public void saveNode() {
+		//修改
+		if(attachmentCategory.getBoType()!=null){
+			Optional<WorkflowConfig.AttachmentCategory> first = attachmentCategories.stream().filter(item -> attachmentCategory.getBoType() == item.getBoType()).findFirst();
+			WorkflowConfig.AttachmentCategory attachmentCategory = first.orElse(null);
+			attachmentCategory.setLabel(attachmentCategory.getLabel());
+		}else{ //新增
+			WorkflowConfig.AttachmentCategory category=new WorkflowConfig.AttachmentCategory();
+			category.setBoType(WorkFlowConstant.CUSTOMIZED_ASSET_ATTACHMENT_CATEGORY +"_" + UUID.randomUUID().toString().replace("-", ""));
+			category.setLabel(attachmentCategory.getLabel());
+			attachmentCategories.add(category);
+		}
+	}
+
+	public void delNode(String nodeType) {
+		List<WorkflowConfig.AttachmentCategory> collect =
+		attachmentCategories = attachmentCategories.stream()
+				.filter(node -> nodeType != node.getBoType()).collect(Collectors.toList());
 	}
 
 	public String getOrgFullName(OrgInfo org) {
@@ -91,7 +146,6 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			org = org.getParentOrg();
 			name = org.getName() + "/" + name;
 		}
-
 		return name;
 	}
 
@@ -528,10 +582,14 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 
 		setSwapCenter();
 
+		//自定义附件类型字段json保存
+		selected.setCustomizedAssetAttachmentCategory
+				(JSON.toJSONString(attachmentCategories.stream().filter(item -> item.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID).collect(Collectors.toList())));
+
         onBeforeSave(selected);
 
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
-//        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+//        if(!userCommonSteantervice.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
 //            return;
 //        }
 
@@ -592,6 +650,15 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		updateApproverList();
 		updateDispatherClinical();
 		parseSwapCenter();
+		parseAttachCategory();
+	}
+
+	private void parseAttachCategory() {
+		String categories = selected.getCustomizedAssetAttachmentCategory();
+		if(null !=categories){
+			attachmentCategories = JSON.parseObject(categories, new TypeReference<List<WorkflowConfig.AttachmentCategory>>(){
+			});
+		}
 	}
 
 	public void parseSwapCenter(){
@@ -620,6 +687,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		dispatchUserList.clear();
 		approveUserList.clear();
 		dispatchUserList.clear();
+		attachmentCategories.clear();
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			super.prepareCreate();
@@ -843,4 +911,5 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	public void setTelRepEnd(Date telRepEnd) {
 		this.telRepEnd = telRepEnd;
 	}
+
 }
