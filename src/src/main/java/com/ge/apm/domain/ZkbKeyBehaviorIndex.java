@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.ge.apm.service.zkb.ZkbKeyBehaviorIndexService;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -120,6 +121,12 @@ public class ZkbKeyBehaviorIndex {
      */
     @Transient
     private String tenantName;
+
+    /**
+     * 是否生效
+     */
+    @Column(name = "effect")
+    private String effect = ZkbKeyBehaviorIndexService.no;
 
     /**
      * 总得分
@@ -426,4 +433,12 @@ public class ZkbKeyBehaviorIndex {
     }
 
 
+
+    public String getEffect() {
+        return effect;
+    }
+
+    public void setEffect(String effect) {
+        this.effect = effect;
+    }
 }

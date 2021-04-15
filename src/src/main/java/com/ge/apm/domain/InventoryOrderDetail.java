@@ -83,6 +83,12 @@ public class InventoryOrderDetail implements Serializable {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate ;
 
+    @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备使用科室
+    @Size(max = 64)
+    @Column(name = "clinical_dept_name")
+    private String clinicalDeptName;
+
     @Transient
     private String inventoryCheckListItems;
 
@@ -94,6 +100,23 @@ public class InventoryOrderDetail implements Serializable {
 
     @Transient
     private Date planStartTime;
+
+
+    public String getClinicalDeptUID() {
+        return clinicalDeptUID;
+    }
+
+    public void setClinicalDeptUID(String clinicalDeptUID) {
+        this.clinicalDeptUID = clinicalDeptUID;
+    }
+
+    public String getClinicalDeptName() {
+        return clinicalDeptName;
+    }
+
+    public void setClinicalDeptName(String clinicalDeptName) {
+        this.clinicalDeptName = clinicalDeptName;
+    }
 
     public Date getPlanStartTime() {
         return planStartTime;

@@ -62,6 +62,17 @@ public class ZkbPartOrderCat implements Serializable {
     @Column(name = "end_date")
     private Date endDate;
 
+    @Transient
+    private String catText;
+
+    public String getCatText() {
+        return this.catModel +"(" + this.catNo +")";
+    }
+
+    public void setCatText(String catText) {
+        this.catText = catText;
+    }
+
     public Date getStartDate() {
         return startDate;
     }

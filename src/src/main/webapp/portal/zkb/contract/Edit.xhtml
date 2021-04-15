@@ -190,12 +190,12 @@
                                 <h:outputText value="#{zkbContractCourseItem.courseCountUse}"/>
                             </p:column>
                            <f:facet name="{Toolbar}">
-                                <p:commandButton immediate="false"  process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareDetailCreate}" update=":growl :zkbContractCourseEditDlg" oncomplete="PF('zkbContractCourseEditDlg').show()" disabled="#{userContextService.zkbUser}"/>
-                                <p:commandButton id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareDetailEdit}" update=":growl :zkbContractCourseEditDlg" disabled="#{zkbContractEditController.courseCanOperate}" oncomplete="PF('zkbContractCourseEditDlg').show()"/>
+                                <p:commandButton immediate="false"  process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareDetailCreate}" update=":growl :zkbContractCourseEditDlg" oncomplete="PF('zkbContractCourseEditDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.operateFlag}"/>
+                                <p:commandButton id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareDetailEdit}" update=":growl :zkbContractCourseEditDlg" disabled="#{zkbContractEditController.courseCanOperate}" oncomplete="PF('zkbContractCourseEditDlg').show()" rendered="#{zkbContractEditController.operateFlag}"/>
                                <!-- <p:commandButton id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.deleteDetail}" update=":growl :zkbContractEditForm:zkbContractCourseDatalist" disabled="#{empty zkbContractEditController.zkbContractCourseSelected.zkbCourse.cname}">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                 </p:commandButton>-->
-                               <p:commandButton id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('CourseDelete')}" update=":growl :zkbConfigDlg" disabled="#{zkbContractEditController.courseCanOperate}" oncomplete="PF('zkbConfigDlg').show()" >
+                               <p:commandButton id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('CourseDelete')}" update=":growl :zkbConfigDlg" disabled="#{zkbContractEditController.courseCanOperate}" oncomplete="PF('zkbConfigDlg').show()" rendered="#{zkbContractEditController.operateFlag}">
                                    <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
                                </p:commandButton>
                             </f:facet>
@@ -207,13 +207,13 @@
                     <p:fieldset id="zkbContractAssetFieldset" legend="相关设备" rendered="#{not empty zkbContractEditController.selected.id}">
                         <p:dataTable id="zkbContractAssetDatalist" value="#{zkbContractEditController.zkbContractAssetList}" var="zkbContractAssetItem"
                                      widgetVar="zkbContractAssetDatalist" selectionMode="single" selection="#{zkbContractEditController.zkbContractAssetSelected}"
-                                     lazy="false" paginator="true" rowKey="#{zkbContractAssetItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{zkbContractAssetItem.contractId}"
+                                     lazy="false" paginator="true" rowKey="#{zkbContractAssetItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{zkbContractAssetItem.id}"
                                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}"
                                      paginatorPosition="both" paginatorAlwaysVisible="true"
                                      rowsPerPageTemplate="20,50,100,500">
 
-                            <p:ajax event="rowSelect" update=":zkbContractEditForm:zkbContractAssetDatalist:deleteAssetButton"/>
+                            <p:ajax event="rowSelect" update=":zkbContractEditForm:zkbContractAssetDatalist:deleteAssetButton :zkbContractEditForm:zkbContractAssetDatalist:editAssetButton"/>
                             <p:column headerText="二维码">
                                 <h:outputText value="#{zkbContractAssetItem.assetInfo.qrCode}"/>
                             </p:column>
@@ -241,12 +241,13 @@
                             <p:column headerText="品牌" >
                                 <h:outputText value="#{zkbContractAssetItem.assetInfo.makerShortName}" />
                             </p:column>
+                            <p:column headerText="是否超声高低机" >
+                                <h:outputText value="#{fieldMsg.fieldValue('zkbContractAssetType',zkbContractAssetItem.assetType)}" />
+                            </p:column>
                             <f:facet name="{Toolbar}">
-                                <p:commandButton immediate="false"  process="@this" id="createAssetButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareAssetCreate}" update=":growl :zkbContractAssetEditDlg" oncomplete="PF('zkbContractAssetEditDlg').show()" disabled="#{userContextService.zkbUser}"/>
-                               <!-- <p:commandButton id="deleteAssetButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.deleteAsset}" update=":growl :zkbContractEditForm:zkbContractAssetDatalist" disabled="#{empty zkbContractEditController.zkbContractAssetSelected.id}">
-                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                                </p:commandButton>-->
-                                <p:commandButton id="deleteAssetButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('assetDelete')}" update=":growl :zkbConfigDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbConfigDlg').show()" >
+                                <p:commandButton immediate="false"  process="@this" id="createAssetButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareAssetCreate}" update=":growl :zkbContractAssetEditDlg" oncomplete="PF('zkbContractAssetEditDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.operateFlag}"/>
+                                <p:commandButton id="editAssetButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbContractEditController.prepareAssetEdit}" update=":growl :zkbContractAssetModifyDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbContractAssetModifyDlg').show()" rendered="#{zkbContractEditController.operateFlag}"/>
+                                <p:commandButton id="deleteAssetButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbContractEditController.preForLog('assetDelete')}" update=":growl :zkbConfigDlg" disabled="#{zkbContractEditController.assetDeleteCanOperate}" oncomplete="PF('zkbConfigDlg').show()" rendered="#{zkbContractEditController.operateFlag}">
                                     <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
                                 </p:commandButton>
                             </f:facet>
@@ -262,6 +263,7 @@
             </h:form>
             <ui:include src="ContractCourse.xhtml"/>
             <ui:include src="ContractAsset.xhtml"/>
+            <ui:include src="ContractAssetEdit.xhtml"/>
             <p:dialog id="zkbConfigDlg" widgetVar="zkbConfigDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="操作原因" height="300">
 
                 <h:form id="zkbConfigForm">

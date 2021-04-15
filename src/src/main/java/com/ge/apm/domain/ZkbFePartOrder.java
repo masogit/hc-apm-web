@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -261,6 +262,7 @@ public class ZkbFePartOrder {
     @Column(name = "order_annotation")
     private String orderAnnotation;
 
+
     /**
      * 发生问题的order number
      */
@@ -329,7 +331,7 @@ public class ZkbFePartOrder {
      * 是否为紧急订单
      */
     @Column(name = "urgent_order")
-    private String urgentOrder;
+    private String urgentOrder=ZkbFePartOrderService.urgentOrderFalse;
 
     /**
      * 订单紧急的原因
@@ -479,6 +481,12 @@ public class ZkbFePartOrder {
      */
     @Transient
     private List<ZkbFePartOrderReturn> zkbFePartOrderReturnList;
+
+    /**
+     * 设备类型
+     */
+    @Transient
+    private String assetType;
 
     public String getId() {
         return id;
@@ -1039,5 +1047,13 @@ public class ZkbFePartOrder {
 
     public void setHasUploadLetter(String hasUploadLetter) {
         this.hasUploadLetter = hasUploadLetter;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
     }
 }
