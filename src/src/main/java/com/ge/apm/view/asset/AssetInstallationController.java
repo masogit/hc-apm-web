@@ -371,14 +371,21 @@ public class AssetInstallationController {
     public String finishInstallBatch() {
         String contractNum = arrivalListItem.getArrivalList().getContractNum();
         String clinicalDeptUID = arrivalListItem.getClinicalDeptUID();
+        ArrivalList arrivalList =arrivalListItem.getArrivalList();
+        if(arrivalList.getVendor() == null || arrivalList.getSupplierUserId() == null){
+            WebUtil.addErrorMessage("请致到货清单中录入供应商或供应商责任人！");
+            return null;
+        }
         if(StringUtils.isBlank(contractNum)){
-            WebUtil.addErrorMessage("合同编号不能为空");
+            WebUtil.addErrorMessage("请致到货清单中录入合同编号");
             return null;
         }
         if(StringUtils.isBlank(clinicalDeptUID)){
             WebUtil.addErrorMessage("所属科室不能为空");
             return null;
         }
+
+        saveItem();
         List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
         if(itemList.isEmpty()){
             WebUtil.addErrorMessage(String.format("没有找到合同编号[%s]以及所属科室的到货单记录 .", contractNum));

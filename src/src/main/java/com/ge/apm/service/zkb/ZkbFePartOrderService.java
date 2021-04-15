@@ -82,6 +82,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     private ZkbFePartOrderStepService zkbFePartOrderStepService;
 
     /**
+     * 备件申请备件信息service
+     */
+    @Autowired
+    private ZkbFePartOrderAssetInfoRepository zkbFePartOrderAssetInfoRepository;
+
+    /**
      *查询i18 repository
      */
     @Autowired
@@ -204,6 +210,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 日期格式
      */
     private static final String dateFormat = "yyyy-MM-dd HH:mm:ss";
+
+    private static final String dateFormat_month = "yyyy-MM-dd";
 
     /**
      * 合同超声高端机
@@ -947,8 +955,19 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbProbeFePartOrderDataList.add(map);
                 }else if(ZkbFePartOrder.OrderType.SpareParts.toString().equals(item.getOrderType()))
                 {
-                    HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map);
-                    zkbSparePartFePartOrderDataList.add(map);
+                    List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(item.getId());
+                    if(CollectionUtils.isNotEmpty(zkbFePartOrderAssetInfoList))
+                    {
+                        for(ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo:zkbFePartOrderAssetInfoList)
+                        {
+                            HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map,zkbFePartOrderAssetInfo);
+                            zkbSparePartFePartOrderDataList.add(map);
+                        }
+                    }else
+                        {
+                            HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map,null);
+                            zkbSparePartFePartOrderDataList.add(map);
+                        }
                 }
             }
         }
@@ -1021,7 +1040,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         if(i18Map.containsKey(status)&&i18Map.get(status).containsKey(zkbFePartOrder.getStatus()))
         {
-            manMadeMap.put(WebUtil.getMessage("zkbFePartOrder_currentStatus"),i18Map.get(subtractTotalStatus).get(zkbFePartOrder.getStatus()));
+            manMadeMap.put(WebUtil.getMessage("zkbFePartOrder_currentStatus"),i18Map.get(status).get(zkbFePartOrder.getStatus()));
         }
         manMadeMap.put(WebUtil.getMessage("zkbFePartOrder_phenomenon"),zkbFePartOrder.getPhenomenon());
         manMadeMap.put(WebUtil.getMessage("zkbFePartOrder_tenantAssignUser"),zkbFePartOrder.getTenantAssignUser());
@@ -1072,7 +1091,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_remark"),zkbFePartOrder.getRemark());
         if(i18Map.containsKey(status)&&i18Map.get(status).containsKey(zkbFePartOrder.getStatus()))
         {
-            probeMap.put(WebUtil.getMessage("zkbFePartOrder_currentStatus"),i18Map.get(subtractTotalStatus).get(zkbFePartOrder.getStatus()));
+            probeMap.put(WebUtil.getMessage("zkbFePartOrder_currentStatus"),i18Map.get(status).get(zkbFePartOrder.getStatus()));
         }
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_catNo"),zkbFePartOrder.getCatNo());
 
@@ -1094,7 +1113,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
         if(i18Map.containsKey(needLetterFlag)&&i18Map.get(needLetterFlag).containsKey(zkbFePartOrder.getNeedLetterFlag()))
         {
-            probeMap.put(WebUtil.getMessage("zkbFePartOrder_needProbeLetter"),i18Map.get(needLetterFlag).get(zkbFePartOrder.getNeedLetterFlag()));
+            if(ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString().equals(zkbFePartOrder.getStatus())
+                    ||ZkbFePartOrder.workFlowStatus.GEAdminAccept.toString().equals(zkbFePartOrder.getStatus()))
+            {
+                probeMap.put(WebUtil.getMessage("zkbFePartOrder_needProbeLetter"),i18Map.get(needLetterFlag).get(zkbFePartOrder.getNeedLetterFlag()));
+            }
         }
         probeMap.put("400下单"+WebUtil.getMessage("zkbFePartOrder_remark"),zkbFePartOrder.getApmComment());
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_orderedPerson"),zkbFePartOrder.getFullApmInfoUser());
@@ -1109,7 +1132,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             probeMap.put(WebUtil.getMessage("zkbFePartOrder_partQualityIssue"),i18Map.get(partQualityIssue).get(zkbFePartOrder.getPartQualityIssue()));
         }
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_airWayBillNo"),zkbFePartOrder.getWaybillNo());
-        probeMap.put(WebUtil.getMessage("zkbFePartOrder_returnDate"),this.dateFormat(zkbFePartOrder.getReturnDate(),dateFormat));
+        probeMap.put(WebUtil.getMessage("zkbFePartOrder_returnDate1"),this.dateFormat(zkbFePartOrder.getReturnDate(),dateFormat_month));
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_newCatSn"),zkbFePartOrder.getNewCatSn());
         probeMap.put("FE归还信息"+WebUtil.getMessage("zkbFePartOrder_remark"),zkbFePartOrder.getGeAdminComment());
         return probeMap;
@@ -1118,9 +1141,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     /**
      * 根据备件申请生成HashMap
      * @param zkbFePartOrder 人工申请List
+     * @param i18Map i18信息
+     * @param zkbFePartOrderAssetInfo 申请信息
      * @return
      */
-    public HashMap<String,Object> getSparePartHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map)
+    public HashMap<String,Object> getSparePartHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map,ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo)
     {
         HashMap sparePartMap = new HashMap();
         if(zkbFePartOrder==null){
@@ -1154,6 +1179,15 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_comment"),zkbFePartOrder.getComment());
         sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_orderedPerson"),zkbFePartOrder.getFullApmInfoUser());
         sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_orderedDate"),this.dateFormat(zkbFePartOrder.getFullApmInfoDate(),dateFormat));
+        if(zkbFePartOrderAssetInfo!=null)
+        {
+            sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_assetNo"),zkbFePartOrderAssetInfo.getAssetNo());
+            sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_assetDescription"),zkbFePartOrderAssetInfo.getAssetDescription());
+            sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_assetQty"),zkbFePartOrderAssetInfo.getAssetQty());
+            sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_orderNoa"),zkbFePartOrderAssetInfo.getOrderNo());
+            sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_assetPrice"),zkbFePartOrderAssetInfo.getPrice());
+            sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_spareParts"),zkbFePartOrderAssetInfo.getSparePart());
+        }
         return sparePartMap;
     }
 

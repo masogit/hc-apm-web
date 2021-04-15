@@ -63,6 +63,7 @@ public class InventoryIssue implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+
     @ManyToMany(targetEntity = InventoryCheckList.class, cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(name = "inventory_issue_detail",
             joinColumns = @JoinColumn(name = "inventory_issue_id"),
@@ -71,6 +72,7 @@ public class InventoryIssue implements Serializable {
     
     @Transient
     private String inventoryCheckListItems;
+
 
     public String getId() {
         return id;

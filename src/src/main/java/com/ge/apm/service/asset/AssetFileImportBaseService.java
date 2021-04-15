@@ -92,6 +92,9 @@ public class AssetFileImportBaseService {
     protected QrCodeService qrCodeService;
 
     @Autowired
+    protected SysAuthGroupRepository authGroupDao;
+
+    @Autowired
     protected AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
     @Autowired
@@ -689,6 +692,16 @@ public class AssetFileImportBaseService {
                 }
             }
 
+
+            if(StringUtils.hasLength(newAsset.getMedicalApparatusClassification())){
+                SysAuthGroup selectedAuthGroup = authGroupDao.findByEncoded(newAsset.getMedicalApparatusClassification());
+                if (selectedAuthGroup == null) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("medicalApparatusClassification") + "编码不存在");
+                    continue;
+                }
+            }
 
         }
 
