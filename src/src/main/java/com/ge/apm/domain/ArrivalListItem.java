@@ -389,6 +389,9 @@ public class ArrivalListItem implements Serializable {
     //使用人电话
     @Column(name = "using_person_tel")
     private String usingPersonTel;
+    //设备型号
+    @Column(name = "function_type")
+    private String functionType;
 
     public String getBuildingName() {
         return buildingName;
@@ -1110,5 +1113,13 @@ public class ArrivalListItem implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public String getFunctionType() {
+        return functionType;
+    }
+
+    public void setFunctionType(String functionType) {
+        this.functionType = functionType;
     }
 }

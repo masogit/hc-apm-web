@@ -128,7 +128,7 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-        pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.ASC,"creationTime"));
+        pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"creationTime"));
         //Page<SqlExportQueue> res = sqlDao.findBySearchFilter(this.searchFilters, pageRequest);
         Page<SqlExportQueue> res = sqlDao.findAll(pageRequest);
 
@@ -170,39 +170,51 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
     }
     //
     public void addSelectSql(){
-        //1.判断是否有数据返回
-        logger.info("=========SqlExportController.addSelectSql start===========");
-        Map<String, Object> params = new HashMap();
-        this.countSql = "select count(*) from ("+sql+ ") tmp";
-        String theCountSQL = (countSql == null) ? "select count(*) from (" + sql + ") _count" : countSql;
-        logger.info("=========SqlExportController.addSelectSql theCountSQL={"+theCountSQL+"}===========");
-        theCountSQL = theCountSQL.replace(":#searchFilter", "");
-        params.put("_sql", countSql);
-        params.put("_pageStart", 0);
-        params.put("_pageSize", 20);
-        List<Map<String, Object>> result = (List<Map<String, Object>>) SiBroker.sendRequestWithHeaders("direct:executeNativeSQL", null, params);
-        logger.info("=========SqlExportController.addSelectSql result.size={"+result.size()+"}===========");
-        int rowCount = Integer.parseInt(result.get(0).values().toArray()[0].toString());
-        logger.info("=========SqlExportController.addSelectSql rowCount={"+rowCount+"}===========");
-        int sqlExportQueueCount = sqlDao.findSqlExportQueueByExecuteStatement(sql);
-        logger.info("=========SqlExportController.addSelectSql sqlExportQueueCount={"+sqlExportQueueCount+"}===========");
-        if(rowCount > 0 && sqlExportQueueCount == 0 ){
-            //2.插入任务列表
-            logger.info("=========SqlExportController.addSelectSql sqlDao.save(sqlExportQueue) start===========");
+        try {
+            //1.判断是否有数据返回
+            logger.info("=========SqlExportController.addSelectSql start===========");
+            Map<String, Object> params = new HashMap();
+            this.countSql = "select count(*) from ("+sql+ ") tmp";
+            //String theCountSQL = (countSql == null) ? "select count(*) from (" + sql + ") _count" : countSql;
+            logger.info("=========SqlExportController.addSelectSql theCountSQL={"+countSql+"}===========");
+            //theCountSQL = theCountSQL.replace(":#searchFilter", "");
+            params.put("_sql", countSql);
+            params.put("_pageStart", 0);
+            params.put("_pageSize", 20);
+            List<Map<String, Object>> result = (List<Map<String, Object>>) SiBroker.sendRequestWithHeaders("direct:executeNativeSQL", null, params);
+            logger.info("=========SqlExportController.addSelectSql result.size={"+result.size()+"}===========");
+            //int rowCount = Integer.parseInt(result.get(0).values().toArray()[0].toString());
+            //logger.info("=========SqlExportController.addSelectSql rowCount={"+rowCount+"}===========");
+            //int sqlExportQueueCount = sqlDao.findSqlExportQueueByExecuteStatement(sql);
+            //logger.info("=========SqlExportController.addSelectSql sqlExportQueueCount={"+sqlExportQueueCount+"}===========");
+            //if(rowCount > 0 && sqlExportQueueCount == 0 ){
+                //2.插入任务列表
+                logger.info("=========SqlExportController.addSelectSql sqlDao.save(sqlExportQueue) start===========");
+                SqlExportQueue sqlExportQueue = new SqlExportQueue();
+                sqlExportQueue.setTaskStatus(0);
+                sqlExportQueue.setCreater(loginUser.getId());
+                sqlExportQueue.setCreaterName(loginUser.getLoginName());
+                sqlExportQueue.setCreationTime(new Date());
+                sqlExportQueue.setExecuteStatement(sql);
+                sqlDao.save(sqlExportQueue);
+                logger.info("=========SqlExportController.addSelectSql sqlDao.save(sqlExportQueue) end===========");
+            //}else{
+            //    if(rowCount == 0){
+            //        WebUtil.addSuccessMessage(WebUtil.getMessage("NoCorrespondingDataFound"));//未查询到数据
+            //    }else{
+            //        WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+"语句");//重复的语句
+            //    }
+            //}
+        } catch (Exception e) {
+            logger.error("=========SqlExportController.addSelectSql error={"+e.getMessage()+"}==========");
             SqlExportQueue sqlExportQueue = new SqlExportQueue();
+            sqlExportQueue.setTaskStatus(5);//未生成:0，生成中:1,生成成功:2，生成失败:3，已删除:4 ,sql执行失败：5
             sqlExportQueue.setCreater(loginUser.getId());
             sqlExportQueue.setCreaterName(loginUser.getLoginName());
             sqlExportQueue.setCreationTime(new Date());
             sqlExportQueue.setExecuteStatement(sql);
-            sqlExportQueue.setTaskStatus(0);
             sqlDao.save(sqlExportQueue);
-            logger.info("=========SqlExportController.addSelectSql sqlDao.save(sqlExportQueue) end===========");
-        }else{
-            if(rowCount == 0){
-                WebUtil.addSuccessMessage(WebUtil.getMessage("NoCorrespondingDataFound"));//未查询到数据
-            }else{
-                WebUtil.addSuccessMessage(WebUtil.getMessage("ErrorDuplicatedData")+":"+"语句");//重复的语句
-            }
+            e.printStackTrace();
         }
 
     }
@@ -370,6 +382,8 @@ public class SqlExportController extends JpaCRUDController<SqlExportQueue>{
                 return "生成失败";
             case "4" :
                 return "已删除";
+            case "5" :
+                return "sql执行失败";
             default :
                 return "未知状态";
         }
