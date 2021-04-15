@@ -583,8 +583,12 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		setSwapCenter();
 
 		//自定义附件类型字段json保存
-		selected.setCustomizedAssetAttachmentCategory
-				(JSON.toJSONString(attachmentCategories.stream().filter(item -> item.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID).collect(Collectors.toList())));
+		attachmentCategories = attachmentCategories.stream().filter(item -> item.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID).collect(Collectors.toList());
+		if(attachmentCategories.size() == 0){
+			selected.setCustomizedAssetAttachmentCategory(null);
+		}else{
+			selected.setCustomizedAssetAttachmentCategory(JSON.toJSONString(attachmentCategories));
+		}
 
         onBeforeSave(selected);
 

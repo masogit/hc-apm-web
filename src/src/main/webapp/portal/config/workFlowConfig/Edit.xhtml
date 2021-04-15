@@ -451,8 +451,9 @@
                                 <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"
                                                  actionListener="#{workflowConfigController.onEditNode(item.boType)}" rendered="#{not empty item.label}"
                                                  update="FieldsAddDialog" oncomplete="PF('FieldsAddDialog').show()"/>
-                                <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" update="FieldsAddDialog"
-                                                 rendered="#{not empty item.label}" actionListener="#{workflowConfigController.delNode(item.boType)}">
+                                <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
+                                                 update="V2_WorkflowConfigEditForm:nodeList" rendered="#{not empty item.label}"
+                                                 actionListener="#{workflowConfigController.delNode(item.boType)}">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                                icon="ui-icon-alert"/>
                                 </p:commandButton>
