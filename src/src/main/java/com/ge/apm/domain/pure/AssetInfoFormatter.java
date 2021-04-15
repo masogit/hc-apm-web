@@ -1,9 +1,6 @@
 package com.ge.apm.domain.pure;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFileImportBaseService;
 import com.ge.apm.service.common.I18nMessageService;
@@ -11,12 +8,10 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import webapp.framework.web.WebUtil;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AssetInfoFormatter {
 
@@ -26,6 +21,7 @@ public class AssetInfoFormatter {
     private AssetInfoRepository assetDao;
     private SupplierRepository supplierDao;
     private UserAccountRepository userDao;
+    private SysAuthGroupRepository authGroupDao;
     private int siteId;
     private static Map<String, String> messageCacheMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(AssetInfoFormatter.class);
@@ -34,7 +30,7 @@ public class AssetInfoFormatter {
                               AssetFileImportBaseService importService,
                               AssetInfoRepository assetDao,
                               OrgInfoRepository orgDao,
-                              SupplierRepository supplierDao ,UserAccountRepository userDao) {
+                              SupplierRepository supplierDao , UserAccountRepository userDao, SysAuthGroupRepository authGroupDao) {
         this.assetInfo = assetInfo;
         this.sites = sites;
         this.importService = importService;
@@ -42,6 +38,7 @@ public class AssetInfoFormatter {
         this.supplierDao = supplierDao;
         this.userDao = userDao;
         this.siteId = UserContextService.getCurrentUserAccount().getSiteId();
+        this.authGroupDao = authGroupDao;
     }
 
     public Integer getAssetUsage() {
@@ -918,6 +915,9 @@ public class AssetInfoFormatter {
         map.put(getMessage("warrantyMonth"), assetInfo.getWarrantyMonth());
         map.put(getMessage("proprietaryClass"), this.getProprietaryClassAsString());
 
+        map.put(getMessage("medicalApparatusClassification") + "编码", assetInfo.getMedicalApparatusClassification());
+        map.put(getMessage("medicalApparatusClassification"),this.getMedicalApparatusClassificationName(assetInfo.getMedicalApparatusClassification()));
+
         map.put(getMessage("createdBy"), this.selectCreatedBy(assetInfo.getCreatedBy()));
         map.put(getMessage("mainDirectory"), assetInfo.getMainDirectory());
         map.put(getMessage("secondDirectory"), assetInfo.getSecondDirectory());
@@ -925,6 +925,40 @@ public class AssetInfoFormatter {
 
         return map;
 
+    }
+
+    private String getMedicalApparatusClassificationName(String medicalApparatusClassification) {
+        if(StringUtils.isEmpty(medicalApparatusClassification)){
+            return "";
+        }
+        SysAuthGroup authGroup = authGroupDao.findByEncoded(medicalApparatusClassification);
+
+        if(authGroup == null || StringUtils.isEmpty(authGroup.getEncoded())){
+            return "";
+        }
+
+        String[] split = authGroup.getEncoded().split("-");
+        if(split.length == 1){
+            return authGroup.getName();
+        }
+
+        ArrayList<String> selectParam = new ArrayList<>(split.length);
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(split[0]);
+        selectParam.add(buffer.toString());
+
+        int endIndex = split.length - 1;
+        for (int i = 1; i < endIndex; i++) {
+            buffer.append("-").append(split[i]);
+            selectParam.add(buffer.toString());
+        }
+        List<SysAuthGroup> pSysAuthGroup = authGroupDao.findByEncodedInOrderByEncodedAsc(selectParam);
+        StringBuffer result = new StringBuffer();
+        for (SysAuthGroup group : pSysAuthGroup) {
+            result.append(group.getName()).append("->");
+        }
+        result.append(authGroup.getName());
+        return result.toString();
     }
 
     private String getMessage(String key) {

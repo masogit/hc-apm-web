@@ -100,6 +100,15 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 			pageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
 		}
 		Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters,pageRequest);
+//		if(!pageAssetInfo.getContent().isEmpty()){
+//            for (InventoryOrderDetail inventoryOrderDetail :pageAssetInfo.getContent()){
+//                if(inventoryOrderDetail.getClinicalDeptName()==null){
+//                    inventoryOrderDetail.setClinicalDeptName(inventoryOrderDetail.getAssetInfo().getClinicalDeptName());
+//                    inventoryOrderDetail.setClinicalDeptUID(inventoryOrderDetail.getClinicalDeptUID());
+//                }
+//            }
+//        }
+
 		//after
 		return pageAssetInfo;
 	}

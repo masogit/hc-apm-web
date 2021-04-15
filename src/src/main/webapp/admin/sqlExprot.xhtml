@@ -55,7 +55,7 @@
 
                 <p:column  headerText="#{msg.Operation}">
                     <p:commandButton update=":listForm :woMgrListForm"
-                                      title="View" value="预览">
+                                      title="View" value="预览" disabled="#{item.taskStatus ==5}">
                         <f:setPropertyActionListener value="#{item}"
                                                      target="#{sqlExportController.selectedProduct}"/>
                     </p:commandButton>

@@ -112,6 +112,7 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         if(UserContextService.hasCurrentTenantName("")){
             List<SearchFilter> inventoryIssueSearchFilters = new ArrayList<>();
             inventoryIssueSearchFilters.addAll(searchFilterList);
+            inventoryIssueSearchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
             List<InventoryIssue> inventoryIssueList = inventoryIssueRepository.findBySearchFilter(inventoryIssueSearchFilters);
             if(!inventoryIssueList.isEmpty()) {
                 List<Integer> idList = new ArrayList<>();
@@ -142,6 +143,14 @@ public class InventoryOrderDetailAssetInfoController2 extends GenericCRUDUUIDCon
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
         searchFilters.addAll(searchFilterList);
         Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters,pageRequest);
+//        if(!pageAssetInfo.getContent().isEmpty()){
+//            for (InventoryOrderDetail inventoryOrderDetail :pageAssetInfo.getContent()){
+//                if(inventoryOrderDetail.getClinicalDeptName()==null){
+//                    inventoryOrderDetail.setClinicalDeptName(inventoryOrderDetail.getAssetInfo().getClinicalDeptName());
+//                    inventoryOrderDetail.setClinicalDeptUID(inventoryOrderDetail.getClinicalDeptUID());
+//                }
+//            }
+//        }
 		//after
 		return pageAssetInfo;
 	}
