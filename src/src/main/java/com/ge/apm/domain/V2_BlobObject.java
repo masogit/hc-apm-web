@@ -47,6 +47,8 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_SUB_TYPE_EXCEL = "Excel";
     public static final String BO_SUB_TYPE_AssetInfo_Measuring = "Measuring";
     public static final String BO_TYPE_ZKB_PART_ORDER = "ZkbPartOrder";
+    public static final String BO_TYPE_ZKB_COURSE = "ZkbCourse";
+    public static final String BO_TYPE_ZKB_COURSE_TRAIN = "ZkbCourseTrain";
     public static final String BO_TYPE_ZKB_FE_PART_ORDER = "ZkbFePartOrder";
     public static final String BO_TYPE_ZKB_PART_ORDER_LETTER = "ZkbPartOrderLetter";
     public static final String BO_TYPE_COIL_OPPORTUNITY = "CoilOpportunity";

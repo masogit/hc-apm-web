@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="远程培训申请"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="zkbPartOrderListForm">
+                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" rendered="#{!userContextService.zkbUser}">
+                        <p:outputLabel value="#{msg.TenantInfo}*:"/>
+                        <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbCourseTrainController.selectionTenantInfo}" disabled="#{userContextService.zkbUser}">
+                            <p:ajax listener="#{zkbCourseTrainController.tenantInfoSelect}" update="datalist :zkbPartOrderListForm"/>
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <c:forEach items="#{zkbCourseTrainController.tenantInfoList}" var="v">
+                                <f:selectItem itemLabel="#{v.name}" itemValue="#{v.uid}"/>
+                            </c:forEach>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                    <p:dataTable id="datalist" value="#{zkbCourseTrainController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbCourseTrainController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500" >
+
+                        <p:ajax event="rowSelect" listener="#{zkbCourseTrainController.prepareEdit}" update="editButton"/>
+                        <p:ajax event="filter" listener="#{zkbCourseTrainController.onFilter}" />
+
+                        <p:column headerText="#{msg.zkbContact_tenant}">
+                            <h:outputText value="#{zkbCourseTrainController.getTenantInfo(item.tenantUID).name}"/>
+                        </p:column>
+
+                        <p:column headerText="申请编号" filterBy="#{item.trainNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.trainNo}"/>
+                        </p:column>
+
+                        <p:column headerText="课表批次号" filterBy="#{item.courseScheduleNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.courseScheduleNo}"/>
+                        </p:column>
+
+                        <p:column headerText="报名时间"  filterMatchMode="GTE">
+                            <h:outputText value="#{item.signDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="培训开始时间"  filterMatchMode="GTE">
+                            <h:outputText value="#{item.trainStartDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="培训结束时间"  filterMatchMode="GTE">
+                            <h:outputText value="#{item.trainEndDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="培训类型" filterBy="#{item.trainType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.trainType}"/>
+                        </p:column>
+
+                        <p:column headerText="预扣除数量" filterBy="#{item.preQty}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.preQty}"/>
+                        </p:column>
+
+                        <p:column headerText="参加状态" filterBy="#{item.participateStatus}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.participateStatus}"/>
+                        </p:column>
+
+                        <p:column headerText="审批状态" filterBy="#{item.flowStatus}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.flowStatus}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="editButton" style="margin-left: 0px" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{zkbCourseTrainController.editAction}" disabled="#{empty zkbCourseTrainController.selected.id}"/>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>
