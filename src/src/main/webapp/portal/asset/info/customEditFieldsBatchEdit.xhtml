@@ -489,6 +489,32 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'medicalApparatusClassification')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.medicalApparatusClassification}</label>
+            <p:inputText id="selectedAuthGroupName" value="#{assetInfoBulkEditController.selectedAuthGroupName==null?'请选择...':assetInfoBulkEditController.selectedAuthGroupName}"  readonly="true" />
+            <p:commandButton id="btnAuthGroup" process="@this" icon="fa fa-angle-down"
+                             class="btn btn-sm popupIconButton"
+                             disabled="#{!assetInfoBulkEditController.needEdit('medicalApparatusClassification')}"/>
+            <p:overlayPanel widgetVar="varPanelSysAuthGroup" for="btnAuthGroup" hideEffect="fade" dynamic="false"
+                            style="width:300px" modal="false">
+                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                    <p:tree id="sysAuthGroupTree" class="tree clinicalDeptNameChange" style="width:98%;border:0;"
+                            value="#{assetInfoBulkEditController.sysAuthGroupTree}" var="node" selectionMode="single">
+                        <p:ajax process="@this" event="select" update="AssetInfoEditForm:selectedAuthGroupName"
+                                listener="#{assetInfoBulkEditController.onSelectSysAuthGroupTreeNode}"
+                                oncomplete="PF('varPanelSysAuthGroup').hide();"/>
+                        <p:ajax process="@this" event="expand"/>
+                        <p:ajax process="@this" event="collapse"/>
+
+                        <p:treeNode type="sysAuthGroup">
+                            <h:outputText value="#{node.name}"/>
+                        </p:treeNode>
+                    </p:tree>
+                </p:scrollPanel>
+            </p:overlayPanel>
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'functionGrade')}" >
         <h:panelGroup>
             <label class="label">#{msg.functionGrade}</label>

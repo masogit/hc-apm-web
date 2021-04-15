@@ -171,6 +171,9 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     @Getter
     private List<AssetInfo> assetInfoList = null;
     public Set<AssetInfo> assetInfos = null;
+    @Getter
+    private TreeNode sysAuthGroupTree;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -198,7 +201,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         blobService = WebUtil.getBean(BlobFileService.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
-
+        sysAuthGroupTree = assetInfoService.buildSysAuthGroupInTree();
         selected = new AssetInfo();
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
@@ -264,6 +267,10 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (!isValidParentAsset()) {
             WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
             return "";
+        }
+        if (null != selectedObjectMap.get("selectedAuthGroup")) {
+            SysAuthGroup selectedAuthGroup = (SysAuthGroup) selectedObjectMap.get("selectedAuthGroup");
+            selected.setMedicalApparatusClassification(selectedAuthGroup.getEncoded());
         }
         String isPmValue = selected.getIsPmValue();
         if(isPmValue!=null){
@@ -1455,7 +1462,19 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         WebUtil.addSuccessMessage("批量修改资产属性成功!");
 
     }
-
+    public void onSelectSysAuthGroupTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        SysAuthGroup nodeData = (SysAuthGroup) node.getData();
+        selectedObjectMap.put("selectedAuthGroup", nodeData);
+    }
+    public String getSelectedAuthGroupName() {
+        SysAuthGroup selectedAuthGroup = (SysAuthGroup) selectedObjectMap.get("selectedAuthGroup");
+        if (null == selectedAuthGroup) {
+            return null;
+        } else {
+            return selectedAuthGroup.getDisplayName();
+        }
+    }
     private boolean checkIsValidInput() {
         if (assets.getTarget().size() == 0) {
             WebUtil.addErrorMessage("请选择相应资产!");
