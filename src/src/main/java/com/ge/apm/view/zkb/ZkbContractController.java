@@ -1,6 +1,8 @@
 package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbContractRepository;
+import com.ge.apm.dao.ZkbPartOrderRepository;
+import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbContractService;
@@ -48,6 +50,8 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
     private String selectionTenantInfo;
     private Page<ZkbContract> zkbContractPage;
     private String reason;
+    private boolean operateFlag = false;
+    private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
 
     @Override
     protected void init() {
@@ -56,10 +60,17 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
         dao = WebUtil.getBean(ZkbContractRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         zkbContractService = WebUtil.getBean(ZkbContractService.class);
+        zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         tenantInfoList = zkbContractService.getSourceTenantInfoList();
         if(userContextService.isZkbUser()) {
             this.selectionTenantInfo = currentUser.getTenantUID();
+        }
+        if(!userContextService.isZkbUser()){
+            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(),ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+            if(zkbPartOrderUserConfigs !=null && zkbPartOrderUserConfigs.size() > 0){
+                operateFlag = true;
+            }
         }
     }
 
@@ -163,8 +174,8 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     public boolean isAddCanOperate(){
 
-        if(StringUtils.isNotEmpty(selectionTenantInfo) && !userContextService.isZkbUser()){
-            return false;
+        if(StringUtils.isNotEmpty(selectionTenantInfo)){
+            return !operateFlag;
         }
         return true;
     }
@@ -176,7 +187,7 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
         if(StringUtils.isEmpty(this.selected.getId())){
             return true;
         }else{
-            if(userContextService.isZkbUser()){
+            if(operateFlag){
                 return true;
             }else{
                 return false;
@@ -238,5 +249,13 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public boolean isOperateFlag() {
+        return operateFlag;
+    }
+
+    public void setOperateFlag(boolean operateFlag) {
+        this.operateFlag = operateFlag;
     }
 }

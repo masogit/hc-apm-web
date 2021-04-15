@@ -63,7 +63,7 @@ public class AssetInstallationReportService {
 
         reportData.put("asset_name", arrivalListItem.getArrivalList().getAssetName());//设备名称
         reportData.put("financing_num", arrivalListItem.getFinancingNum());//设备财产编号
-        reportData.put("function_type", arrivalListItem.getArrivalList().getFunctionType());//型号规格
+        reportData.put("function_type", arrivalListItem.getFunctionType());//型号规格
         reportData.put("brand", arrivalListItem.getArrivalList().getBrand());//品牌
         reportData.put("manufact_num", arrivalListItem.getSerialNum());//出厂编号
         reportData.put("clinical_dept_name", orgInfoDao.findByUid(arrivalListItem.getClinicalDeptUID()));//设备所属科室
@@ -124,7 +124,7 @@ public class AssetInstallationReportService {
             ArrivalList arrivalList = arrivalListItem.getArrivalList();
             arrivalItemMap.put("asset_name", arrivalList.getAssetName());//设备名称
             arrivalItemMap.put("brand", arrivalList.getBrand());//品牌
-            arrivalItemMap.put("function_type", arrivalList.getFunctionType());//型号规格
+            arrivalItemMap.put("function_type", arrivalListItem.getFunctionType());//型号规格
             Integer importEquipment = arrivalListItem.getImportEquipment();
             if(importEquipment == null || importEquipment !=1){
                 importEquipment = 2;//是否进口设备[1:进口,2:国产]

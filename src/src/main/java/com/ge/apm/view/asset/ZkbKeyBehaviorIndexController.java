@@ -4,7 +4,6 @@ import com.ge.apm.dao.ZkbKeyBehaviorIndexConfigRepository;
 import com.ge.apm.dao.ZkbKeyBehaviorIndexRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.zkb.ZkbIntegralService;
 import com.ge.apm.service.zkb.ZkbKeyBehaviorIndexService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
@@ -56,8 +55,6 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      * 获取配置KPI生成配置权重
      */
     private ZkbKeyBehaviorIndexConfigRepository zkbKeyBehaviorIndexConfigRepository;
-
-    private ZkbIntegralService zkbIntegralService;
 
     /**
      * 租户UID
@@ -121,19 +118,19 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
 
     private static final String dateFormat = "yyyyMMddHHmmss";
 
-    private static final String dateFormat_month = "yyyy-MM";
-
     /**
      * kpi新增
      */
-    private static final String kpi_add = "KpiAAd";
+    public static final String kpi_add = "KpiAdd";
 
     /**
      * kpi修改
      */
-    private static final String kpi_modify = "KpiModify";
+    public static final String kpi_modify = "KpiModify";
 
     private Map<String,Map<String,Integer>> rankMap = null;
+
+    private String isZkbadmin =ZkbKeyBehaviorIndexService.yes;
 
     @Override
     protected void init() {
@@ -142,7 +139,6 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         zkbKeyBehaviorIndexRepository = WebUtil.getBean(ZkbKeyBehaviorIndexRepository.class);
         zkbKeyBehaviorIndexConfigRepository= WebUtil.getBean(ZkbKeyBehaviorIndexConfigRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
-        zkbIntegralService= WebUtil.getBean(ZkbIntegralService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         if(!userContextService.isZkbAdmin())
         {
@@ -154,6 +150,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             {
                 this.tenantUID="-";
             }
+            isZkbadmin=ZkbKeyBehaviorIndexService.no;
         }
         this.rankMap = this.zkbKeyBehaviorIndexService.initRankingMap();
         loadData();
@@ -167,7 +164,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      * 根据页面条件查询
      */
     public void loadData() {
-        this.zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexService.loadZkbKeyBehaviorIndex(this.tenantUID,this.beginningTime,this.endingTime,this.rankMap);
+        this.zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexService.loadZkbKeyBehaviorIndex(this.tenantUID,this.beginningTime,this.endingTime,this.rankMap,this.isZkbadmin);
     }
 
     /**
@@ -180,13 +177,22 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         Date endingTimeTimeTemp = this.endingTime;
         if(beginningTimeTemp==null)
         {
-            beginningTimeTemp=this.getFirstDay(date);
+            beginningTimeTemp=this.getYearOfFirstDay(date);
         }
         if(endingTimeTimeTemp==null)
         {
             endingTimeTimeTemp=this.getLastDay(date);
         }
-        this.lineModel = this.zkbKeyBehaviorIndexService.generateCharts(tenantUID,beginningTimeTemp,endingTimeTimeTemp);
+        this.lineModel = this.zkbKeyBehaviorIndexService.generateCharts(tenantUID,beginningTimeTemp,endingTimeTimeTemp,this.isZkbadmin);
+    }
+
+    /**
+     * 生效
+     */
+    public void effect()
+    {
+        this.zkbKeyBehaviorIndexService.effect(this.beginningTime,this.tenantUID,currentUser,this.zkbKeyBehaviorIndexList);
+        WebUtil.addSuccessMessage("生效成功！");
     }
 
     /**
@@ -210,7 +216,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         }
         for(TenantInfo item:tenantInfoList) {
             ZkbKeyBehaviorIndex zkbKeyBehaviorIndex = this.generateSingleKpiData(item.getUid(),defaultZkbKeyBehaviorIndexConfig);
-            this.zkbKeyBehaviorIndexService.calculateScore(zkbKeyBehaviorIndex,item.getUid(),this.getLastDay(this.kpiDate));
+            this.zkbKeyBehaviorIndexService.calculateScore(zkbKeyBehaviorIndex,item.getUid(),this.getLastDay(this.kpiDate),this.getMonthOfFirstDay(this.kpiDate));
             List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexRepository.findByTenantUIDAndKbiDate(item.getUid(),ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry);
             boolean exist = false;
             if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
@@ -226,15 +232,6 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
                 }
             }
             this.zkbKeyBehaviorIndexRepository.save(zkbKeyBehaviorIndex);
-            String kpiDate = "";
-            if(!exist)
-            {
-                kpiDate=kpi_add;
-            }else
-                {
-                    kpiDate=kpi_modify;
-                }
-            zkbIntegralService.kpiScoreHandler(zkbKeyBehaviorIndex.getTenantUID(),zkbKeyBehaviorIndex.getTotalScore(),kpiDate,currentUser,this.getDateFormat(dateFormat_month,zkbKeyBehaviorIndex.getKbiDate()));
         }
         WebUtil.addSuccessMessage("生成成功");
     }
@@ -287,7 +284,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         return date1;
     }
 
-    private Date getFirstDay(final Date date)
+    private Date getYearOfFirstDay(final Date date)
     {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         Calendar cal = Calendar.getInstance();
@@ -305,10 +302,23 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         }
         return date1;
     }
-    private String getDateFormat(String format,Date date)
+
+    private Date getMonthOfFirstDay(final Date date)
     {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-        return simpleDateFormat.format(date);
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+        String lastDay = format.format(cal.getTime());
+        lastDay = lastDay+"000000";
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexController.dateFormat);
+        Date date1 = null;
+        try {
+            date1 = formatter.parse(lastDay);
+        } catch (ParseException e) {
+            LOGGER.info(e.getMessage());
+        }
+        return date1;
     }
     /**
      * 图表
@@ -393,7 +403,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      */
     public void calculateScore()
     {
-        this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.selected.getTenantUID(),this.getLastDay(this.selected.getKbiDate()));
+        this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.selected.getTenantUID(),this.getLastDay(this.selected.getKbiDate()),this.getMonthOfFirstDay(this.selected.getKbiDate()));
     }
 
     @Override
@@ -500,9 +510,14 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         {
             return;
         }
-        zkbIntegralService.kpiScoreHandler(selected.getTenantUID(),selected.getTotalScore(),kpi_modify,currentUser,this.getDateFormat(dateFormat_month,selected.getKbiDate()));
         super.save();
+        if(ZkbKeyBehaviorIndexService.yes.equals(this.selected.getEffect()))
+        {
+            this.zkbKeyBehaviorIndexService.changeScore(this.selected,kpi_modify,this.currentUser);
+        }
         this.selected = null;
+        this.rankMap = this.zkbKeyBehaviorIndexService.initRankingMap();
+        this.zkbKeyBehaviorIndexService.rankZkbKeyBehaviorIndexList(this.zkbKeyBehaviorIndexList,this.rankMap);
     }
 
     public boolean compareDate()

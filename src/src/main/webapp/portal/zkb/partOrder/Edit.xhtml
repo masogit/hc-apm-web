@@ -151,8 +151,7 @@
                             </h:panelGroup>
                         </h:panelGroup>
 
-                        <!--<h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial'}">-->
-                        <h:panelGroup rendered="false">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and !(zkbPartOrderEditController.artificialType eq '2')}">
                             <label class="label">是否使用积分抵扣*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.scoreFlag}" required="true" requiredMessage="是否使用积分抵扣 #{msg.ValidationRequire}" disabled="#{zkbPartOrderEditController.currentScoreFlag}">
                                 <!--<p:ajax event="change"  listener="#{zkbPartOrderEditController.scoreFlagChange}" update="zkbwkEditForm cscore"/>-->
@@ -372,7 +371,7 @@
                         <h:panelGroup>
                             <label class="label">探头型号*</label>
                             <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="探头型号 #{msg.ValidationRequire}"
-                                            completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
+                                            completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catText}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
                                 <p:ajax event="itemSelect" update="valueTypeGroup qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
                             </p:autoComplete>
                         </h:panelGroup>

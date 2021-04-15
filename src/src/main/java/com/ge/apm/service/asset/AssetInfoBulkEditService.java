@@ -2,7 +2,6 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.common.CustomConfigConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -338,7 +337,7 @@ public class AssetInfoBulkEditService {
             //clear asset dept
             item.setAssetDeptId(null);
             item.setAssetDeptUID(null);
-            assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, item, CustomConfigConstant.getAssetsImportantFieldsAll());
+            assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, item);
             if (!isAllTransfer) {
                 item.setParentAssetId(null);
                 List<AssetInfo> childAssetInfos = assetInfoDao.findChildAssets(item.getId());

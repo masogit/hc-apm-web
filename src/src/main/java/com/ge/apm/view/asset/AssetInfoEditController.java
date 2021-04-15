@@ -7,7 +7,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
@@ -1433,7 +1432,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private void saveAssetHistory() {
 
         AssetInfo oldAsset = dao.findByUid(selected.getUid());
-        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected, CustomConfigConstant.getAssetsImportantFieldsAll());
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAsset, selected);
     }
 
     public int getAssetChangeHistoryCount() {

@@ -1,5 +1,6 @@
 package com.ge.apm.dao.mapper.provider;
 
+import org.apache.commons.lang3.StringUtils;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.List;
@@ -43,6 +44,10 @@ public class ZkbKeyBehaviorIndexProvider {
             {
                 sb.append(" and kbi_date<='"+value+"'");
             }
+            if("effect".equals(tempColumn))
+            {
+                sb.append(" and effect = '"+value+"'");
+            }
         }
         return sb.toString();
     }
@@ -71,8 +76,8 @@ public class ZkbKeyBehaviorIndexProvider {
      */
     public String initRanking(Map<String,Object> param)
     {
-        String kpiDate = param.get("kpiDate").toString();//设备system id
-        String dateFormat = param.get("dateFormat").toString();//设备system id
+        String kpiDate = param.get("kpiDate").toString();//kpi时间
+        String dateFormat = param.get("dateFormat").toString();//日期格式
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT " +
                 " RANK () OVER (ORDER BY total_score DESC), " +
@@ -88,6 +93,60 @@ public class ZkbKeyBehaviorIndexProvider {
                 " WHERE " +
                 " '"+kpiDate+"' = TO_CHAR(kbi_date, '"+dateFormat+"') " +
                 " ) T");
+        return sb.toString();
+    }
+
+    /**
+     * 组装批量生效sql语句
+     * @param param
+     * @return
+     */
+    public String batchUpdate(Map<String,Object> param)
+    {
+        String kpiDate = param.get("kpiDate").toString();//kpi时间
+        String dateFormat = param.get("dateFormat").toString();//日期格式
+        String tenantUID = "";
+        if(param.get("tenantUID")!=null)
+        {
+            tenantUID=param.get("tenantUID").toString();
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE zkb_key_behavior_index set effect ='Y' where '"+kpiDate+"' = TO_CHAR(kbi_date, '"+dateFormat+"') ");
+        sb.append(buildFilter_batchUpdate(tenantUID));
+        return sb.toString();
+    }
+
+    /**
+     * 添加租户UID条件
+     * @param tenantUID 租户UID
+     * @return
+     */
+    public String buildFilter_batchUpdate(String tenantUID){
+        StringBuilder sb = new StringBuilder();
+        if(StringUtils.isNotBlank(tenantUID))
+        {
+            sb.append(" and tenant_uid = '"+tenantUID+"'");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 组装批量生效sql语句
+     * @param param
+     * @return
+     */
+    public String findByDateAndTenantUID(Map<String,Object> param)
+    {
+        String kpiDate = param.get("kpiDate").toString();//kpi时间
+        String dateFormat = param.get("dateFormat").toString();//日期格式
+        String tenantUID = "";
+        if(param.get("tenantUID")!=null)
+        {
+            tenantUID=param.get("tenantUID").toString();
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from zkb_key_behavior_index where '"+kpiDate+"' = TO_CHAR(kbi_date, '"+dateFormat+"') ");
+        sb.append(buildFilter_batchUpdate(tenantUID));
         return sb.toString();
     }
 }
