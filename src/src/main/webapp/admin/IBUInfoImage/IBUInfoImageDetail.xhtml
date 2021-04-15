@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="head">
+        <h:outputStylesheet name="css/assetUsageAll.css"/>
+        <h:outputScript name="js/assetUsageAll.js"/>
+        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
+        <style>
+            div.ui-autocomplete.ui-autocomplete-multiple.asset-tags ul.ui-autocomplete-multiple-container{
+                max-width: 200px;
+                max-height: 100px;
+                overflow-y: auto;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.IBUInfoImage}"/>
+            </div>
+        </div>
+        <div class="ui-g-12 card" >
+            <p:accordionPanel id="accordion" multiple="false" >
+                <p:tab title="#{msg.BasicInfo}" style="margin-bottom:100px">
+                    <div class="ui-g">
+                        <div class="ui-g-8 ui-g-nopad">
+                            <p:panelGrid id="basicPanel" columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.ibuOffer}<span style="color:red">*</span></label>
+                                    <p:autoComplete id="ibuOffer" value="#{iBUInfoImageDetailController.selected.ibuOffer}"
+                                                    required="true" readonly="true" requiredMessage="#{msg.ibuOffer} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </div>
+                        <div class="ui-g-4">
+                            <div class="container-fluid" style="height: 400px; overflow: auto;">
+                                <div class="row" id="picDiv">
+                                    <c:forEach items="#{iBUInfoImageDetailController.getAttachList(iBUInfoImageDetailController.selected.ibuOffer)}" var="attach" >
+                                        <div>
+                                            <img data-original="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                 src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                 style="opacity:0; width:1px; height:1px" />
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p:tab>
+            </p:accordionPanel>
+        </div>
+        <script id="shwoPicDialog_s" type="text/javascript">
+            $(function () {
+                    PrimeFaces.cw("Dialog", "shwoPicDialog", {id: "shwoPicDialog", modal: true, appendTo: "@(body)"});
+                });
+        </script>
+        <script>
+            afterPageLoad = function () {
+                $(".jqplot-table-legend").css("display", "none");
+            }
+
+            function showthis(pic) {
+                var s = $('#shwoPicDialogImg')[0];
+                s.src = pic.src;
+                s.style.transform = 'rotate('+ 0 +'deg)';
+                s.width = pic.width * 1.8;
+                s.height = pic.height * 1.8;
+                PF('shwoPicDialog').show();
+                var dia = $("#shwoPicDialog")[0];
+                dia.style.top = '5px';
+                for (let i = 0; i &lt; 12; i++) {
+                    ImageSuofang(true);
+                }
+            }
+
+            //旋转
+            var num = 0;
+            $("#spin").click(function () {
+                num++;
+                // $("#shwoPicDialogImg").style.rotate = num * 90;
+                var pic = $("#shwoPicDialogImg")[0];
+                pic.style.transform = 'rotate('+num * 90+'deg)';
+                if(pic.width > pic.height &amp;&amp; num%2 ==1){
+                    pic.style.marginTop='140px';
+                }else{
+                    pic.style.marginTop='5px';
+                }
+            })
+
+            function ImageSuofang(args) {
+                var imgsrc =  $("#shwoPicDialogImg")[0];
+                if (args) {
+
+                    if(imgsrc.width * 1.1 > 1000 ||imgsrc.height * 1.1 > 700 ){
+                        return;
+                    }
+
+                    imgsrc.width = imgsrc.width * 1.1;
+                    imgsrc.height = imgsrc.height * 1.1;
+                }
+                else {
+                    imgsrc.width = imgsrc.width / 1.1;
+                    imgsrc.height = imgsrc.height / 1.1;
+                }
+            }
+
+        </script>
+        <script>
+            const gallery = new Viewer(document.getElementById('picDiv'), {inline: true});
+        </script>
+    </ui:define>
+</ui:composition>

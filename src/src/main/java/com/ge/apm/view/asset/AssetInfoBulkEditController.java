@@ -7,7 +7,6 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.KeyLabel;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoClinicalDeptService;
 import com.ge.apm.service.uaa.UaaService;
@@ -265,6 +264,30 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (!isValidParentAsset()) {
             WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
             return "";
+        }
+        String isPmValue = selected.getIsPmValue();
+        if(isPmValue!=null){
+            if("2".equals(isPmValue)){
+                selected.setIsPm(false);
+            }else {
+                selected.setIsPm(true);
+            }
+        }
+        String isCheckedValue = selected.getIsCheckedValue();
+        if(isCheckedValue!=null){
+            if("2".equals(isCheckedValue)){
+                selected.setIsChecked(false);
+            }else {
+                selected.setIsChecked(true);
+            }
+        }
+        String warrantyValue = selected.getWarrantyValue();
+        if(warrantyValue!=null){
+            if("2".equals(warrantyValue)){
+                selected.setWarranty(false);
+            }else {
+                selected.setWarranty(true);
+            }
         }
         String clinicalDeptUID = selected.getClinicalDeptUID();
         if(clinicalDeptUID != null){
@@ -532,7 +555,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
                 int oldId = oldAssetInfo.getId();
                 int newId =assetInfoList.get(i).getId();
                 if( oldId == newId ){
-                    assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, assetInfoList.get(i), CustomConfigConstant.getAssetsImportantFieldsAll());
+                    assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, assetInfoList.get(i));
                 }
             }
         }

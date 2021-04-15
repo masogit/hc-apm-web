@@ -1,6 +1,7 @@
 package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbContractRepository;
+import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
 import com.ge.apm.service.zkb.ZkbContractService;
@@ -36,6 +37,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private ZkbContractCourse zkbContractCourseSelected;
     private ZkbContractAsset zkbContractAssetSelected;
     private String actionDetailName;
+    private String actionAssetName;
     private ZkbContractService zkbContractService;
     private UserContextService userContextService;
     private AssetTagService assetTagService;
@@ -48,6 +50,9 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private List<ZkbContractCourse> contractCourseList ;
     private List<ZkbContractAsset> zkbContractAssetList;
     private String reason;
+    private boolean operateFlag = false;
+    private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
+
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -62,6 +67,8 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         zkbContractService = WebUtil.getBean(ZkbContractService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         assetTagService = WebUtil.getBean(AssetTagService.class);
+        zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+
         currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
@@ -85,6 +92,12 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         targetAssets = new ArrayList();
         queryAsset = new AssetInfo();
         this.getQueryAssetsList();
+        if(!userContextService.isZkbUser()){
+            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(),ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+            if(zkbPartOrderUserConfigs !=null && zkbPartOrderUserConfigs.size() > 0){
+                operateFlag = true;
+            }
+        }
     }
 
 
@@ -266,6 +279,18 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         this.getQueryAssetsList();
     }
 
+    public void prepareAssetEdit(){
+        this.actionAssetName="Edit";
+        this.reason = "";
+    }
+
+    public void saveAssetEdit(){
+        zkbContractService.updateAsset(selected,zkbContractAssetSelected,reason,currentUser);
+        zkbContractAssetList = zkbContractService.queryAssetByContractId(this.selected.getId());
+        this.zkbContractAssetSelected = null;
+        this.reason= "";
+    }
+
    public void deleteAsset(){
         zkbContractService.deleteAsset(this.zkbContractAssetSelected,this.selected,currentUser,reason);
         this.zkbContractAssetList.remove(this.zkbContractAssetSelected);
@@ -303,9 +328,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }
         availableAssets = new DualListModel<>(sourceAssets, targetAssets);
     }
-
-
-
 
     public void onAssetsTransfer(TransferEvent event) {
 
@@ -372,7 +394,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public boolean isCreateHide(){
         if("Create".equals(actionName)){
-            return !userContextService.isZkbUser();
+            return operateFlag;
         }else {
             return false;
         }
@@ -380,10 +402,18 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public boolean isEditHide(){
         if("Edit".equals(actionName)){
-            return !userContextService.isZkbUser();
+            return operateFlag;
         }else{
             return false;
         }
+    }
+
+    public String getActionAssetName() {
+        return actionAssetName;
+    }
+
+    public void setActionAssetName(String actionAssetName) {
+        this.actionAssetName = actionAssetName;
     }
 
     public DualListModel<AssetInfo> getAvailableAssets() {
@@ -496,6 +526,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public boolean isOperateFlag() {
+        return operateFlag;
+    }
+
+    public void setOperateFlag(boolean operateFlag) {
+        this.operateFlag = operateFlag;
     }
 
     @Override
