@@ -149,7 +149,10 @@ public class CustomConfigService {
         List<String> exportFields = getExportAssetFieldsByRoles(config, userRoles);
 
         removeDisabledExportFields(exportFields);
-
+        if(exportFields.remove("medicalApparatusClassification")){
+            exportFields.add("medicalApparatusClassificationCode");
+            exportFields.add("medicalApparatusClassificationName");
+        }
         orderByExportFields(exportFields);
 
         List<String> localizedExportFields = exportFields.stream()
