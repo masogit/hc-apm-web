@@ -225,7 +225,7 @@
         <h:panelGroup>
             <label class="label">#{msg.assetDeptName}</label>
             <p:autoComplete dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['assetDept']}"
-                            readonly="true"
+                            readonly="#{!assetInfoBulkEditController.needEdit('assetDeptName')}"
                             scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onAssetDeptChange('assetDept')}" update="@(.clinicalDeptNameChange)"/>
@@ -239,7 +239,7 @@
             <label class="label">#{msg.clinicalDeptName}</label>
             <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['clinicalDept']}"
                             scrollHeight="300"  forceSelection="true"
-                            readonly="true"
+                            readonly="#{!assetInfoBulkEditController.needEdit('clinicalDeptName')}"
                             completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onAssetDeptChangeEdit('clinicalDept')}" update="@(.clinicalDeptNameChange)" />
@@ -380,7 +380,7 @@
         <h:panelGroup>
             <label class="label">#{msg.parentAsset}</label>
             <p:autoComplete id="parentAssetList" dropdown="true" scrollHeight="300" value="#{assetInfoBulkEditController.selectedObjectMap['parentAsset']}" completeMethod="#{assetInfoBulkEditController.completeParentAssetIdList}"
-                            forceSelection="true" readonly="true" class="SiteUIDChange clinicalDeptNameChange"
+                            forceSelection="true" readonly="#{!assetInfoBulkEditController.needEdit('parentAssetId')}" class="SiteUIDChange clinicalDeptNameChange"
                             var="t" itemLabel="#{t.getParentAssetDisplayName()}" itemValue="#{t}" converter="assetInfoConverter">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onParentAssetChange()}"/>
                 <p:ajax listener="#{assetInfoBulkEditController.onParentAssetChange()}" />
@@ -391,7 +391,7 @@
         <h:panelGroup>
             <label class="label">#{msg.deviceName}</label>
             <p:inputText id="deviceName" value="#{assetInfoBulkEditController.selected.deviceName}"
-                         readonly="true"  />
+                         readonly="#{!assetInfoBulkEditController.needEdit('deviceName')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'subjectProject')}" >

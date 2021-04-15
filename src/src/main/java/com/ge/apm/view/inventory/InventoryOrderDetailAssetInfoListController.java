@@ -206,14 +206,14 @@ public class InventoryOrderDetailAssetInfoListController extends GenericCRUDUUID
         }
         int size = inventoryOrderDetailList.size();
         inventoryOrderDetailList= this.pageNum(inventoryOrderDetailList, pageRequest);
-//        if(size>0){
-//            for (InventoryOrderDetail inventoryOrderDetail :inventoryOrderDetailList){
-//                if(inventoryOrderDetail.getClinicalDeptName()==null){
-//                    inventoryOrderDetail.setClinicalDeptName(inventoryOrderDetail.getAssetInfo().getClinicalDeptName());
-//                    inventoryOrderDetail.setClinicalDeptUID(inventoryOrderDetail.getClinicalDeptUID());
-//                }
-//            }
-//        }
+        if(size>0){
+            for (InventoryOrderDetail inventoryOrderDetail :inventoryOrderDetailList){
+                if(inventoryOrderDetail.getClinicalDeptName()==null){
+                    inventoryOrderDetail.setClinicalDeptName(inventoryOrderDetail.getAssetInfo().getClinicalDeptName());
+                    inventoryOrderDetail.setClinicalDeptUID(inventoryOrderDetail.getClinicalDeptUID());
+                }
+            }
+        }
         Page<InventoryOrderDetail>  inventoryOrderDetailPage = new PageImpl<InventoryOrderDetail>(inventoryOrderDetailList, pageRequest, size);
         //after
 		return inventoryOrderDetailPage;
