@@ -177,7 +177,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         Date endingTimeTimeTemp = this.endingTime;
         if(beginningTimeTemp==null)
         {
-            beginningTimeTemp=this.getFirstDay(date);
+            beginningTimeTemp=this.getYearOfFirstDay(date);
         }
         if(endingTimeTimeTemp==null)
         {
@@ -216,7 +216,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         }
         for(TenantInfo item:tenantInfoList) {
             ZkbKeyBehaviorIndex zkbKeyBehaviorIndex = this.generateSingleKpiData(item.getUid(),defaultZkbKeyBehaviorIndexConfig);
-            this.zkbKeyBehaviorIndexService.calculateScore(zkbKeyBehaviorIndex,item.getUid(),this.getLastDay(this.kpiDate));
+            this.zkbKeyBehaviorIndexService.calculateScore(zkbKeyBehaviorIndex,item.getUid(),this.getLastDay(this.kpiDate),this.getMonthOfFirstDay(this.kpiDate));
             List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexRepository.findByTenantUIDAndKbiDate(item.getUid(),ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry);
             boolean exist = false;
             if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
@@ -284,13 +284,31 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         return date1;
     }
 
-    private Date getFirstDay(final Date date)
+    private Date getYearOfFirstDay(final Date date)
     {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         final int last = cal.getActualMinimum(Calendar.DAY_OF_YEAR);
         cal.set(Calendar.DAY_OF_YEAR, last);
+        String lastDay = format.format(cal.getTime());
+        lastDay = lastDay+"000000";
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexController.dateFormat);
+        Date date1 = null;
+        try {
+            date1 = formatter.parse(lastDay);
+        } catch (ParseException e) {
+            LOGGER.info(e.getMessage());
+        }
+        return date1;
+    }
+
+    private Date getMonthOfFirstDay(final Date date)
+    {
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
         String lastDay = format.format(cal.getTime());
         lastDay = lastDay+"000000";
         SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexController.dateFormat);
@@ -385,7 +403,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      */
     public void calculateScore()
     {
-        this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.selected.getTenantUID(),this.getLastDay(this.selected.getKbiDate()));
+        this.zkbKeyBehaviorIndexService.calculateScore(this.selected,this.selected.getTenantUID(),this.getLastDay(this.selected.getKbiDate()),this.getMonthOfFirstDay(this.selected.getKbiDate()));
     }
 
     @Override

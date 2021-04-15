@@ -42,10 +42,20 @@ public interface ZkbContractRepository extends GenericRepositoryUUID<ZkbContract
     /**
      * 统计数量
      * @param tenantUID 租户tenantUID
+     * @param firstDate 第一天
      * @param kpiDate 生成KPI时间
      * @return
      */
-    @Query(value = "SELECT sum(ib_number)  from zkb_contract  where tenant_uid = ?1 and start_date<=?2 and end_date>=?2 ", nativeQuery = true)
-    Integer fetchIbNumber(String tenantUID,Date kpiDate);
+    @Query(value = "SELECT sum(ib_number)  from zkb_contract  where tenant_uid = ?1 and NOT ((end_date < ?2) OR (start_date > ?3)) ", nativeQuery = true)
+    Integer fetchIbNumber(String tenantUID,Date firstDate,Date kpiDate);
+
+    /**
+     * 统计高端机数量
+     * @param tenantUID 租户tenantUID
+     * @param kpiDate 生成KPI时间
+     * @return
+     */
+    @Query(value = "SELECT count(ac.id)  from zkb_contract ac  INNER JOIN zkb_contract_asset zca on zca.contract_id = ac.ID and zca.asset_type='highMachine' where tenant_uid = ?1 and  NOT ((end_date < ?2) OR (start_date > ?3))", nativeQuery = true)
+    Integer fetchHighMachineCount(String tenantUID,Date firstDate,Date kpiDate);
 
 }

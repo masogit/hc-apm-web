@@ -5,18 +5,23 @@ import com.ge.apm.dao.ZkbFePartOrderUserConfigRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbFePartOrder;
 import com.ge.apm.domain.ZkbFePartOrderUserConfig;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.view.zkb.ZkbPartOrderController;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -24,10 +29,14 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * @author 503202755 2020/9/23
@@ -128,6 +137,18 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      * 已经上传探头说明函值
      */
     public static final String hasUploadLetterValue = "t";
+
+    /**
+     * 导出excel路径
+     */
+    private static final String excelPath = "/portal/zkb/zkbFePartOrder/excel/APM_ZKB_FePartOrder_Exp_Template.xlsx";
+
+    private StreamedContent exportFile;
+
+    /**
+     * 是否休假
+     */
+    private String isVacation;
 
     /**
      * 初始化数据
@@ -292,6 +313,18 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         }
     }
 
+    public void saveVacation(){
+        List<ZkbFePartOrderUserConfig> zkbFePartOrderUserConfigList = this.zkbFePartOrderUserConfigRepository.findByLoginName(this.loginName);
+        if(CollectionUtils.isEmpty(zkbFePartOrderUserConfigList))
+        {
+            return;
+        }
+        for(ZkbFePartOrderUserConfig c : zkbFePartOrderUserConfigList){
+            c.setIsVacation(isVacation);
+            this.zkbFePartOrderUserConfigRepository.save(c);
+        }
+    }
+
 
     @Override
     protected GenericRepositoryUUID<ZkbFePartOrder> getDAO() {
@@ -326,6 +359,22 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         requestContext.addCallbackParam("url", url);
     }
 
+    public void exportAll(){
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        Sort sort = new Sort(Sort.Direction.DESC, "orderType").and(new Sort(Sort.Direction.DESC, "reportDate"));
+        List<ZkbFePartOrder> zkbFePartOrderList =  this.zkbFePartOrderRepository.findBySearchFilter(searchFilters,sort);
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(excelPath);
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            HashMap<String,Object> dataMap = this.zkbFePartOrderService.createZkbFePartOrderData(zkbFePartOrderList);
+            zkbFePartOrderService.exportData(doc, dataMap);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbPartOrderExcel_Export.xlsx");
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
     public String getQueryStatus() {
         return queryStatus;
     }
@@ -340,5 +389,37 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
 
     public void setFourHundredsTeam(Boolean fourHundredsTeam) {
         fourHundredsTeam = fourHundredsTeam;
+    }
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
+
+    public String getIsVacation() {
+        List<ZkbFePartOrderUserConfig> list = this.zkbFePartOrderUserConfigRepository.findByLoginName(this.loginName);
+        if(CollectionUtils.isEmpty(list))
+        {
+            return "f";
+        }
+        for(ZkbFePartOrderUserConfig item:list)
+        {
+            if(item==null) continue;
+            if(StringUtils.isBlank(item.getIsVacation()))
+            {
+                isVacation="f";
+                continue;
+            }
+            isVacation=item.getIsVacation();
+
+        }
+        return isVacation;
+    }
+
+    public void setIsVacation(String isVacation) {
+        this.isVacation = isVacation;
     }
 }

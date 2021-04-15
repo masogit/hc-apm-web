@@ -32,7 +32,7 @@
                                 <label class="label">#{msg.assetGroup}</label>
                                 <h:outputText  value="#{fieldMsg.fieldValue('assetGroup', assetInstallationController.arrivalListItem.arrivalList.assetGroup)}"/>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                 <label class="label">#{msg.functionType}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.functionType}" />
                             </h:panelGroup>
@@ -92,30 +92,31 @@
                                 <label class="label">#{msg.registrationNo}</label>
                                 <h:outputText id="registrationNo" value="#{assetInstallationController.arrivalListItem.registrationNo}" />
                             </h:panelGroup>
-
-                            <h:panelGroup rendered="#{not assetInstallationController.activeSupplier()}">
-                                <label class="label">#{msg.maitanance}</label>
-                                <h:outputText value="#{assetInstallationController.arrivalListItem.maitanance}"/>
-                            </h:panelGroup>
-                            <h:panelGroup rendered="#{not assetInstallationController.activeSupplier()}">
-                                <label class="label">#{msg.medicalInstrumentClassification}</label>
-                                <h:outputText  value="#{fieldMsg.fieldValue('assetFunctionType', assetInstallationController.arrivalListItem.functionGroup)}"/>
-                            </h:panelGroup>
-                            <h:panelGroup rendered="#{not assetInstallationController.activeSupplier()}">
-                                <label class="label">#{msg.medicalInstrumentSubclassification}</label>
-                                <h:outputText  value="#{fieldMsg.fieldValue(assetInstallationController.arrivalListItem.functionGroup, assetInstallationController.arrivalListItem.assetCode68)}"/>
-                            </h:panelGroup>
+                            <c:if test="#{not userContextService.activeSupplier()}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.maitanance}</label>
+                                    <h:outputText value="#{assetInstallationController.arrivalListItem.maitanance}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.medicalInstrumentClassification}</label>
+                                    <h:outputText  value="#{fieldMsg.fieldValue('assetFunctionType', assetInstallationController.arrivalListItem.functionGroup)}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.medicalInstrumentSubclassification}</label>
+                                    <h:outputText  value="#{fieldMsg.fieldValue(assetInstallationController.arrivalListItem.functionGroup, assetInstallationController.arrivalListItem.assetCode68)}"/>
+                                </h:panelGroup>
+                            </c:if>
                             <h:panelGroup>
                                 <label class="label">#{msg.purchaseDate}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.purchaseDate}">
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                 </h:outputText>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{not assetInstallationController.activeSupplier()}">
+                            <h:panelGroup>
                                 <label class="label">保修时长(年)</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.warrantyYear}" />
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{assetInstallationController.activeSupplier()}">
+                            <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                 <label class="label">质保日期</label>
                                 <h:outputText value="#{assetArrivedListEditController.easyInstallItem.factoryWarrantyDate}" />
                             </h:panelGroup>
@@ -143,7 +144,7 @@
                                 <label class="label">#{msg.assetUsage}</label>
                                 <h:outputText  value="#{fieldMsg.fieldValue('assetUsage', assetInstallationController.arrivalListItem.assetUsage)}"/>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{not assetInstallationController.activeSupplier()}">
+                            <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                 <label class="label">#{msg.capitalSource}</label>
                                 <h:outputText  value="#{fieldMsg.fieldValue('capitalSource', assetInstallationController.arrivalListItem.capitalSource)}"/>
                             </h:panelGroup>
@@ -171,14 +172,16 @@
                                 <label class="label">#{msg.accountingCategory}</label>
                                 <h:outputText  value="#{fieldMsg.fieldValue('accountingCategory', assetInstallationController.arrivalListItem.accountingCategory)}"/>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{not assetInstallationController.activeSupplier()}">
-                                <label class="label">#{msg.isAssetPMed}</label>
-                                <h:outputText  value="#{assetInstallationController.arrivalListItem.isPm?msg.True2Yes:msg.False2No}"/>
-                            </h:panelGroup>
-                            <h:panelGroup rendered="#{not assetInstallationController.activeSupplier()}">
-                                <label class="label">#{msg.isAssetChecked}</label>
-                                <h:outputText  value="#{assetInstallationController.arrivalListItem.isChecked?msg.True2Yes:msg.False2No}"/>
-                            </h:panelGroup>
+                            <c:if test="#{not userContextService.activeSupplier()}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.isAssetPMed}</label>
+                                    <h:outputText  value="#{assetInstallationController.arrivalListItem.isPm?msg.True2Yes:msg.False2No}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.isAssetChecked}</label>
+                                    <h:outputText  value="#{assetInstallationController.arrivalListItem.isChecked?msg.True2Yes:msg.False2No}"/>
+                                </h:panelGroup>
+                            </c:if>
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -223,6 +226,12 @@
                                     </p:inputText>
                                 </h:panelGroup>
                             </c:if>
+                            <h:panelGroup rendered="#{userContextService.activeSupplier()}">
+                                <label class="label">#{msg.functionType}</label>
+                                <p:inputText value="#{assetInstallationController.arrivalListItem.functionType}">
+                                    <p:ajax process="@this" update="@this"/>
+                                </p:inputText>
+                            </h:panelGroup>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['departNum']}">
                                 <h:panelGroup>
                                     <label class="label">#{msg.departNum}<span style="color:red">#{(assetInstallationController.needInstorageCheck or assetInstallationController.customConfig.assetFields['departNum'].arrivalRequired)? '*':''}</span></label>
@@ -372,7 +381,7 @@
                                     </p:autoComplete>
                                 </h:panelGroup>
                             </c:if>
-                            <c:if test="#{assetInstallationController.activeSupplier()}">
+                            <c:if test="#{userContextService.activeSupplier()}">
                                 <h:panelGroup >
                                     <label class="label">使用人</label>
                                     <p:inputText value="#{assetInstallationController.arrivalListItem.usingPerson}">
@@ -404,6 +413,12 @@
                                     </p:inputText>
                                 </h:panelGroup>
                             </c:if>
+                            <h:panelGroup rendered="#{userContextService.activeSupplier()}">
+                                <label class="label">年保养次数</label>
+                                <p:inputText value="#{assetInstallationController.arrivalListItem.annualMaintenanceTimes}">
+                                    <p:ajax process="@this" update="@this"/>
+                                </p:inputText>
+                            </h:panelGroup>
                             <c:if test="#{not empty assetInstallationController.customConfig.assetFields['comments']}">
                                 <h:panelGroup >
                                     <label class="label">#{msg.comments}<span style="color:red">#{assetInstallationController.customConfig.assetFields['comments'].arrivalRequired? '*':''}</span></label>
@@ -422,7 +437,7 @@
                                 <p:dataList id="pictureList" value="#{assetInstallationController.getAttachList('asset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
                                     <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                    <h:panelGroup rendered="#{assetInstallationController.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                    <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
                                         <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                              src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
@@ -438,7 +453,7 @@
                                 <p:dataList id="contractList" value="#{assetInstallationController.getAttachList('asset2')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
                                     <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                    <h:panelGroup rendered="#{assetInstallationController.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                    <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
                                         <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                              src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
@@ -454,7 +469,7 @@
                                 <p:dataList id="manualList" value="#{assetInstallationController.getAttachList('asset3')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
                                     <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                    <h:panelGroup rendered="#{assetInstallationController.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                    <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
                                         <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                              src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
                                              style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
@@ -612,20 +627,20 @@
                             <p:menuitem style="padding: 0px;" immediate="true" value="临床验收报告" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('clinical')}">
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
-<!--                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('fixasset')}" rendered="#{assetInstallationController.activeSupplier()}">-->
+<!--                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReport('fixasset')}" rendered="#{userContextService.activeSupplier()}">-->
 <!--                                <p:fileDownload value="#{assetInstallationController.exportFile}"/>-->
 <!--                            </p:menuitem>-->
-                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(面单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatch')}" rendered="#{assetInstallationController.activeSupplier()}">
+                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(面单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatch')}" rendered="#{userContextService.activeSupplier()}">
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
-                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(底单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatchBottom')}" rendered="#{assetInstallationController.activeSupplier()}">
+                            <p:menuitem style="padding: 0px;" immediate="true" value="固定资产验收单(底单)" ajax="false" icon="ui-icon-arrowstop-1-s" actionListener="#{assetInstallationController.exportReportBatch('fixassetBatchBottom')}" rendered="#{userContextService.activeSupplier()}">
                                 <p:fileDownload value="#{assetInstallationController.exportFile}"/>
                             </p:menuitem>
                         </p:menuButton>
-                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{!assetInstallationController.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args);">
+                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{!userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args);">
                              <p:confirm header="确认安装" message="您确定要完成安装吗?" icon="ui-icon-warning"/>
                         </p:commandButton>
-                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstallBatch}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{assetInstallationController.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args);">
+                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstallBatch}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" rendered="#{userContextService.activeSupplier()}" update=":ItemEditDlgForm :growl" oncomplete="handleComplete(xhr, status, args);">
                             <p:confirm header="确认批量安装" message="您确定要批量完成安装吗?" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <p:commandButton immediate="true" style="margin-left: 4px;margin-right: 5px" action="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
