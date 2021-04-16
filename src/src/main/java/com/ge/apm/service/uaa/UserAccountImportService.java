@@ -1002,7 +1002,7 @@ public class UserAccountImportService {
 			user.setLastModifiedBy(user.getCreatedBy());
 			user.setLastModifiedDate(user.getCreatedDate());
 			user.setPasswordErrorCount(0);
-
+			user.setAccountCreationType(2);//1：界面创建 2：表格导入 3：自助注册
 			userAccountRepository.save(user);
 			saveUserRole(user,true);
 			saveUserOrgInfo(user, true);
