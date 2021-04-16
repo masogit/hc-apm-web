@@ -238,7 +238,7 @@ public class WorkflowConfig implements Serializable {
     /**
      * 资产附件类型配置
      */
-    @Column(name = "customized_asset_attachment_category",columnDefinition = "CHAR(512)")
+    @Column(name = "customized_asset_attachment_category",columnDefinition="text")
     private String CustomizedAssetAttachmentCategory;
 
     /***
