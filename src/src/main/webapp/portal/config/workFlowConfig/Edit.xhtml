@@ -565,7 +565,7 @@
                     <!--<h:outputText value="#{msg.NoAddableField}" rendered="#{empty customConfigController.addFieldsList}" />-->
                     <p:panelGrid columns="10" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:outputLabel value="附件类型名称" style="height: 50px"/>
-                        <h:inputText id ="fieldd" value="#{workflowConfigController.attachmentCategory.label}" style="height: 25px"/>
+                        <h:inputText id ="fieldd" value="#{workflowConfigController.attachmentCategory.label}" style="height: 25px" required="true" requiredMessage="附件类型名称不能为空"/>
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
