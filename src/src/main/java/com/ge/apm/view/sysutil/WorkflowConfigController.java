@@ -118,6 +118,13 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	}
 
 	public void saveNode() {
+		//校验名称重复
+		if(attachmentCategories.stream().filter(it->it.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID && !it.getBoType().equals(attachmentCategory.getBoType()))
+				.anyMatch(it->attachmentCategory.getLabel().equals(it.getLabel()))){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage("附件类型名称不能重复");
+			return;
+		};
 		//修改
 		if(attachmentCategory.getBoType()!=null){
 			Optional<WorkflowConfig.AttachmentCategory> first = attachmentCategories.stream().filter(item -> attachmentCategory.getBoType() == item.getBoType()).findFirst();
