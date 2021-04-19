@@ -1,6 +1,8 @@
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
@@ -307,7 +309,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    //判断待报废按钮是否禁用
+    public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
+        return configService.getAttachmentCategories(config);
+    }
+
+        //判断待报废按钮是否禁用
     public boolean hasScrappedAuthority() {
         return acService.hasScrappedAuthority();
     }
