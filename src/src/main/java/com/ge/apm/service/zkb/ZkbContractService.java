@@ -76,7 +76,7 @@ public class ZkbContractService {
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractState"), zkbContract.getContractState());
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_ibNumber"), zkbContract.getIbNumber());
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota"), isEmptyInteger(zkbContract.getSpareQuota()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota"), isEmptyInteger(zkbContract.getProbeQuota()));
+            zkbContractDataMap.put("探头任意剩余名额", isEmptyInteger(zkbContract.getProbeQuota()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes"), isEmptyInteger(zkbContract.getGeArtificialSupportTimes()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail"), isEmptyInteger(zkbContract.getSpareArtificail()));
 
@@ -87,6 +87,9 @@ public class ZkbContractService {
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_total"), isEmptyInteger(zkbContract.getProbeQuotaTotal()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_apply"), isEmptyInteger(zkbContract.getProbeQuotaApply()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_use"), isEmptyInteger(zkbContract.getProbeQuotaUse()));
+            zkbContractDataMap.put("探头普通剩余名额", isEmptyInteger(zkbContract.getProbeQuotaNormal()));
+            zkbContractDataMap.put("探头特殊剩余名额", isEmptyInteger(zkbContract.getProbeQuotaSpecial()));
+            zkbContractDataMap.put("探头高值剩余名额", isEmptyInteger(zkbContract.getProbeQuotaHigh()));
 
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes_total"), isEmptyInteger(zkbContract.getGeArtificialSupportTimesTotal()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes_apply"), isEmptyInteger(zkbContract.getGeArtificialSupportTimesApply()));
@@ -302,11 +305,13 @@ public class ZkbContractService {
 
         int probeQuotaTotal = zkbContract.getProbeQuotaTotal() == null ? 0 : zkbContract.getProbeQuotaTotal();
         int probeQuota = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
+        int probeQuotaNormal = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
+        int probeQuotaSpecial = zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial();
         int probeQuotaApply = zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply();
         int probeQuotaUse = zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse();
-        if(probeQuotaTotal != (probeQuota + probeQuotaApply + probeQuotaUse)){
+        if(probeQuotaTotal != (probeQuota + probeQuotaApply + probeQuotaUse + probeQuotaNormal + probeQuotaSpecial)){
             flag = false;
-            errorLog += "探头总额不等于探头剩余名额、探头申请名额、探头已使用名额之和,";
+            errorLog += "探头总额不等于剩余名额、申请名额、已使用名额之和,";
         }
 
         int geArtificialSupportTimesTotal = zkbContract.getGeArtificialSupportTimesTotal() == null ? 0 : zkbContract.getGeArtificialSupportTimesTotal();
@@ -318,11 +323,11 @@ public class ZkbContractService {
             errorLog += "人工支持总次数不等于人工支持剩余次数、人工支持申请次数、人工支持已使用次数之和,";
         }
 
-        int spareArtificailTotal = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
-        int spareArtificail = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
-        int spareArtificailApply = zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply();
-        int spareArtificailUse = zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse();
-        if(spareArtificailTotal != (spareArtificail + spareArtificailApply + spareArtificailUse)){
+        int spareArtificialTotal = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+        int spareArtificial = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+        int spareArtificialApply = zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply();
+        int spareArtificialUse = zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse();
+        if(spareArtificialTotal != (spareArtificial + spareArtificialApply + spareArtificialUse)){
             flag = false;
             errorLog += "备件/人工/保养总额不等于备件/人工/保养剩余名额、备件/人工/保养申请名额、备件/人工/保养已使用名额之和,";
         }

@@ -64,6 +64,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private Integer currentScore = 0;
     private String currentScoreText;
     private boolean currentScoreFlag =false;
+    private boolean probeQuotaFlag = false;
 
     @Override
     protected void init() {
@@ -278,11 +279,19 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() <= 0){
-                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同探头数量小于等于0，请检查！", "");
-                    FacesContext.getCurrentInstance().addMessage(null, message);
-                    contractList = new ArrayList<>();
-                    return;
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                if(zkbPartOrderService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(zkbContract.getStartDate()))< 0){
+                    probeQuotaFlag = false;
+                }else{
+                    probeQuotaFlag = true;
+                }
+                if(!probeQuotaFlag){
+                    if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() <= 0){
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同探头数量小于等于0，请检查！", "");
+                        FacesContext.getCurrentInstance().addMessage(null, message);
+                        contractList = new ArrayList<>();
+                        return;
+                    }
                 }
             } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
                 if(!"2".equals(artificialType)){
@@ -340,8 +349,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) && assetInfo.getAssetGroup() == 2){
                 selected.setArtificialType("2");
-            }
-            if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
                 scoreFlagChange();
             }
         }
@@ -437,8 +445,24 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
-                this.selected.setRemainQty(contractCount - this.selected.getQty());
+                if(probeQuotaFlag){
+                    if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.equals(selected.getProbeQuotaType())){
+                        Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
+                        this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.equals(selected.getProbeQuotaType())){
+                        Integer contractCount = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
+                        this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.equals(selected.getProbeQuotaType())){
+                        Integer contractCount = zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial();
+                        this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.equals(selected.getProbeQuotaType())){
+                        Integer contractCount = zkbContract.getProbeQuotaHigh() == null ? 0 : zkbContract.getProbeQuotaHigh();
+                        this.selected.setRemainQty(contractCount - 1);
+                    }
+                }else{
+                    Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
+                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                }
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
                 if(!"2".equals(selected.getArtificialType())) {
                     if(CopyByInvok.T.equals(selected.getScoreFlag())){
@@ -558,8 +582,38 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-            if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() <= 0){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同探头数量小于等于0，请检查！", "");
+            boolean f = false;
+            String err = "";
+            if(probeQuotaFlag){
+                if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.equals(selected.getProbeQuotaType())){
+                    if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() < 0){
+                        f = true;
+                        err = "合同探头任意剩余名额小于等于0，请检查！";
+                    }
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.equals(selected.getProbeQuotaType())){
+                    if(zkbContract.getProbeQuotaNormal() == null || zkbContract.getProbeQuotaNormal() < 0){
+                        f = true;
+                        err = "合同探头普通剩余名额小于等于0，请检查！";
+                    }
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.equals(selected.getProbeQuotaType())){
+                    if(zkbContract.getProbeQuotaSpecial() == null || zkbContract.getProbeQuotaSpecial() < 0){
+                        f = true;
+                        err = "合同探头特殊剩余名额小于等于0，请检查！";
+                    }
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.equals(selected.getProbeQuotaType())){
+                    if(zkbContract.getProbeQuotaHigh() == null || zkbContract.getProbeQuotaHigh() < 0){
+                        f = true;
+                        err = "合同探头高值剩余名额小于等于0，请检查！";
+                    }
+                }
+            }else{
+                if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() < 0){
+                    f = true;
+                    err = "合同探头任意剩余名额小于等于0，请检查！";
+                }
+            }
+            if(f){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, err, "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 contractList = new ArrayList<>();
                 contractList.add(zkbContract);
@@ -876,6 +930,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setSaveTips(String saveTips) {
         this.saveTips = saveTips;
+    }
+
+    public boolean isProbeQuotaFlag() {
+        return probeQuotaFlag;
+    }
+
+    public void setProbeQuotaFlag(boolean probeQuotaFlag) {
+        this.probeQuotaFlag = probeQuotaFlag;
     }
 
     @Override

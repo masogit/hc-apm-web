@@ -109,7 +109,10 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("人工支持剩余次数", "setGeArtificialSupportTimes");
             contractRow.setFieldNumValue("人工支持已使用次数", "setGeArtificialSupportTimesUse");
             contractRow.setFieldNumValue("探头总额", "setProbeQuotaTotal");
-            contractRow.setFieldNumValue("探头剩余名额", "setProbeQuota");
+            contractRow.setFieldNumValue("探头任意剩余名额", "setProbeQuota");
+            contractRow.setFieldNumValue("探头普通剩余名额", "setProbeQuotaNormal");
+            contractRow.setFieldNumValue("探头特殊剩余名额", "setProbeQuotaSpecial");
+            contractRow.setFieldNumValue("探头高值剩余名额", "setProbeQuotaHigh");
             contractRow.setFieldNumValue("探头已使用名额", "setProbeQuotaUse");
             contractRow.setFieldNumValue("备件+人工+保养总额", "setSpareArtificailTotal");
             contractRow.setFieldNumValue("备件+人工+保养剩余名额", "setSpareArtificail");
@@ -265,10 +268,12 @@ public class ZkbContractImportService {
 
         int probeQuotaTotal = contractInfoVO.getProbeQuotaTotal() == null ? 0 : contractInfoVO.getProbeQuotaTotal();
         int probeQuota = contractInfoVO.getProbeQuota() == null ? 0 : contractInfoVO.getProbeQuota();
+        int probeQuotaNormal = contractInfoVO.getProbeQuotaNormal() == null ? 0 : contractInfoVO.getProbeQuotaNormal();
+        int probeQuotaSpecial = contractInfoVO.getProbeQuotaSpecial() == null ? 0 : contractInfoVO.getProbeQuotaSpecial();
         int probeQuotaUse = contractInfoVO.getProbeQuotaUse() == null ? 0 : contractInfoVO.getProbeQuotaUse();
-        if(probeQuotaTotal < (probeQuota  + probeQuotaUse)){
+        if(probeQuotaTotal < (probeQuota  + probeQuotaUse + probeQuotaNormal + probeQuotaSpecial)){
             item.put("status", ImportStatus.Failure);
-            ZkbContractRow.addErrMessage(item,  "探头总额小于探头剩余名额、探头已使用名额之和");
+            ZkbContractRow.addErrMessage(item,  "探头总额小于剩余名额、已使用名额之和");
             isValidateData = false;
         }
 
