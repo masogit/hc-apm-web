@@ -101,10 +101,17 @@ public class ZkbContract implements ChineseName, Serializable {
     private Integer spareQuotaUse = 0;
 
     /**
-     *探头剩余名额
+     *探头剩余名额 -- 任意名额
      */
     @Column(name = "probe_quota")
     private Integer probeQuota = 0;
+
+    @Column(name = "probe_quota_normal")
+    private Integer probeQuotaNormal = 0;
+    @Column(name = "probe_quota_special")
+    private Integer probeQuotaSpecial = 0;
+    @Column(name = "probe_quota_high")
+    private Integer probeQuotaHigh = 0;
 
     /**
      *探头名额
@@ -254,6 +261,30 @@ public class ZkbContract implements ChineseName, Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false,name = "contract_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     Set<ZkbContractAsset> zkbContractAssets = new HashSet<>();
+
+    public Integer getProbeQuotaNormal() {
+        return probeQuotaNormal;
+    }
+
+    public void setProbeQuotaNormal(Integer probeQuotaNormal) {
+        this.probeQuotaNormal = probeQuotaNormal;
+    }
+
+    public Integer getProbeQuotaSpecial() {
+        return probeQuotaSpecial;
+    }
+
+    public void setProbeQuotaSpecial(Integer probeQuotaSpecial) {
+        this.probeQuotaSpecial = probeQuotaSpecial;
+    }
+
+    public Integer getProbeQuotaHigh() {
+        return probeQuotaHigh;
+    }
+
+    public void setProbeQuotaHigh(Integer probeQuotaHigh) {
+        this.probeQuotaHigh = probeQuotaHigh;
+    }
 
     public Set<ZkbContractAsset> getZkbContractAssets() {
         return zkbContractAssets;

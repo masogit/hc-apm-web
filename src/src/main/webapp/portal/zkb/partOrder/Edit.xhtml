@@ -171,6 +171,14 @@
                                 <f:selectItem itemLabel="超声低端机" itemValue="3"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.probeQuotaFlag}">
+                            <label class="label">扣除名额类型*</label>
+                            <p:selectOneMenu ivalue="#{zkbPartOrderEditController.selected.probeQuotaType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
 
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
