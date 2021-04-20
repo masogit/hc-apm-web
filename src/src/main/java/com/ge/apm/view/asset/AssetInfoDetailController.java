@@ -14,6 +14,7 @@ import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -51,6 +52,7 @@ public class AssetInfoDetailController {
     private SupplierRepository supplierDao;
     private CustomConfigService ccService;
     private AssetInfoMgrService aimService;
+    private ConfigService configService;
     private ContractInfoService contractService;
     private ContractInfoItemRepository contractItemDao;
     private AssetTagsMapper assetTagsMapper;
@@ -88,6 +90,7 @@ public class AssetInfoDetailController {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
+        configService = WebUtil.getBean(ConfigService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
@@ -147,6 +150,10 @@ public class AssetInfoDetailController {
             attachements = blobDao.findBySearchFilter(sfs);
         }
         return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+    }
+
+    public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
+        return configService.getAttachmentCategories(configService.findConfigBySite(selected.getSiteUID()));
     }
 
     public List<PmScheduleData> getPmScheduleData(String type) {

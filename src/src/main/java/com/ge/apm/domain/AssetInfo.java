@@ -605,7 +605,12 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private Supplier supplier;
-
+    @Transient
+    private String isPmValue;
+    @Transient
+    private String isCheckedValue;
+    @Transient
+    private String warrantyValue;
     @Transient
     @Getter
     @Setter
@@ -613,6 +618,30 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Transient
     private List<String> tags = new ArrayList<>();
+
+    public String getIsCheckedValue() {
+        return isCheckedValue;
+    }
+
+    public void setIsCheckedValue(String isCheckedValue) {
+        this.isCheckedValue = isCheckedValue;
+    }
+
+    public String getWarrantyValue() {
+        return warrantyValue;
+    }
+
+    public void setWarrantyValue(String warrantyValue) {
+        this.warrantyValue = warrantyValue;
+    }
+
+    public String getIsPmValue() {
+        return isPmValue;
+    }
+
+    public void setIsPmValue(String isPmValue) {
+        this.isPmValue = isPmValue;
+    }
 
     public List<String> getTags() {
         if (tags == null) {

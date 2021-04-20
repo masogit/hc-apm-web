@@ -50,6 +50,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select ai from AssetInfo ai where ai.uid in ?1 and ai.sharedAssetTypeUid is not null ")
     public List<AssetInfo> findBySharedAssetTypeUid(List<String> uids);
 
+    @Query(value="SELECT count(clinical_dept_uid) FROM asset_info WHERE clinical_dept_uid = ?1 AND clinical_dept_uid != asset_dept_uid",nativeQuery=true)
+    public Integer findCountByClinicalDeptUID(String  clinicalDeptUID);
+
     @Query("select o from AssetInfo o where o.financingNum = ?1 and o.siteUID=?2 and o.isValid=true and o.isDeleted=false and o.status!=4")
     public List<AssetInfo> findByFinancingNum(String financingNum,String siteUID);
 
@@ -259,5 +262,10 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value="select uid from asset_info where depart_num = ?1  and  tenant_uid = ?2  and is_deleted = false ",nativeQuery=true)
     List<String> findIdByDepartNumAndTenantUID(String departNum,String tenantUID);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE asset_info SET shared_asset_type = NULL WHERE uid IN ?1",nativeQuery = true)
+    void  clearShareAssetTypeByIds(List<String> assetIds);
 
 }

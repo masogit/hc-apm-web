@@ -172,6 +172,8 @@ public class InventoryOrderDetailAssetInfoListController extends GenericCRUDUUID
                     inventoryOrderDetail.setInventoryCheckListItems(inventoryIssue.getInventoryCheckListItems());
                     inventoryOrderDetail.setIsSolved(inventoryIssue.getIsSolved() ? "是" : "否");
                     inventoryOrderDetail.setStatus(3);//有问题
+                    inventoryOrderDetail.setClinicalDeptUID(inventoryIssue.getClinicalDept().getUid());
+                    inventoryOrderDetail.setClinicalDeptName(inventoryIssue.getClinicalDept().getName());
                     detailList.add(inventoryOrderDetail);
                     AssetInfoIdList.add(inventoryIssue.getAssetInfo().getId());
                 }

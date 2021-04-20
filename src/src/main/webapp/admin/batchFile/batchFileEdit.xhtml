@@ -29,7 +29,7 @@
                         <p:panel id="uploadPanel" styleClass="ui-panelgrid-blank" style=" border: 0">
                             <h:panelGroup>
                                 <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{batchFileController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this fileType"
-                                              multiple="true" sizeLimit="52428800" update="uploadedList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}50M"  label="#{msg.Add}"  />
+                                              multiple="true" sizeLimit="104857600" update="uploadedList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M"  label="#{msg.Add}"  />
                                 <!--<p:growl id="messages" showDetail="true" />-->
                             </h:panelGroup>
                             <p:dataList id="uploadedList" value="#{batchFileController.fileList}" var="item" varStatus="itemIndex" rowIndexVar="idx" emptyMessage="#{msg.noRecordFound}">

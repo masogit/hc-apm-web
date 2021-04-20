@@ -755,6 +755,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Override
     public void onBeforeSave(UserAccount user) {
         //remove space charactors.
+        selected.setAccountCreationType(1);//，1：界面创建 2：表格导入 3：自助注册
         String loginName = user.getLoginName();
         if (loginName == null) {
             return;
