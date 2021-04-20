@@ -356,6 +356,8 @@ public class ZkbContractService {
      * 保存合同
      */
     public ZkbContract saveContract(ZkbContract zkbContract,String actionName,String reason,UserAccount currentUser){
+        zkbContract.setLastModifiedDate(new Date());
+        zkbContract.setLastModifiedBy(currentUser.getLoginName());
         zkbContract = contractRepository.save(zkbContract);
         if("Edit".equals(actionName)){
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractUpdate","","",reason,currentUser);
@@ -457,6 +459,10 @@ public class ZkbContractService {
             zkbContractAsset.setContractId(zkbContract.getId());
             zkbContractAsset.setAssetId(a.getUid());
             zkbContractAssetRepository.save(zkbContractAsset);
+
+            zkbContract.setLastModifiedDate(new Date());
+            zkbContract.setLastModifiedBy(currentUser.getLoginName());
+            contractRepository.save(zkbContract);
 
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetAdd","",a.getQrCode(),"",currentUser);
         }
