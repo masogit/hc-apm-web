@@ -139,7 +139,7 @@
                 </h:panelGroup>
             </p:fieldset>
             <h:panelGroup>
-                <p:commandButton validateClient="true" actionListener="#{assetFileAttachmentController.batchSave()}" value="#{msg.Save}" update=":AssetFileAttachmentListForm:datalist, :growl" icon="ui-icon-check" oncomplete="PF('FileEditDialog').hide()"/>
+                <p:commandButton validateClient="true" actionListener="#{assetFileAttachmentController.batchSave()}" value="#{msg.Save}" update=":AssetFileAttachmentListForm:datalist, :growl" icon="ui-icon-check" />
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('FileEditDialog').hide()"/>
             </h:panelGroup>
         </h:form>

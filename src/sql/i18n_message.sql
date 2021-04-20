@@ -1,4 +1,4 @@
-	  delete from i18n_message where site_id=-1;
+	  delete from i18n_message where site_id=-1 and msg_type!='modalityType';
 	  DELETE FROM i18n_message WHERE site_id = (SELECT "id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1);
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','cardsIsBlank','盘点卡片不能为空!','Cards cannot be null!',NULL,-1);
@@ -1583,6 +1583,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','WoNeedDispather','维修配置中允许派工时派工人不能为空!','Dispatcher cannot be null when dispatch is allowed in the repair configuration!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','PmNeedDispather','保养配置中允许派工时派工人不能为空!','Dispatcher cannot be null when dispatch is allowed in the PM configuration!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','MeasureNeedDispather','计量配置中允许派工时派工人不能为空!','Dispatcher cannot be null when dispatch is allowed in the measurement configuration!',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CurrentEquipmentIsLoanedOut', '当前已有设备借出，如需更换，请完成当前调剂借用归还流程!', 'The current equipment is loaned out. If you need to replace it, please complete the current transfer loan return process', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','WoManualAndGrapMsg','维修配置中允许抢单和允许人工至少选一个!','There should be at least one repair configuration for manual or grap mode!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','PmManualAndGrapMsg','保养配置中允许抢单和允许人工至少选一个!','There should be at least one PM configuration for manual or grap mode!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','MeasureManualAndGrapMsg','计量配置中允许抢单和允许人工至少选一个!','There should be at least one measurement configuration for manual or grap mode!',NULL,-1);
@@ -3389,6 +3390,11 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractAssetType','lowMachine','超声低端机','lowMachine',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractAssetType','empty','N/A','N/A',NULL,-1);
 
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractAssetType','highMachine','超声高端机','highMachine',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractAssetType','lowMachine','超声低端机','lowMachine',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractAssetType','empty','N/A','N/A',NULL,-1);
+
+
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorCourseNameIsEmpty', '错误：课程名称为空', 'Error: Course Name is empty', NULL, -1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorCourseIdIsEmpty', '错误：课程ID为空', 'Error: Course ID is empty', NULL, -1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorCourseIsNotExist', '错误：课程不存在', 'Error: Course is not Exist', NULL, -1);
@@ -3598,7 +3604,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoOrderAnnotationType','Wrong Part','Wrong Part','Wrong Part',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoOrderAnnotationType','Short Life','Short Life','Short Life',NULL,-1);
 
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbPoProbeQuotaType','Any','任意名额','HighValue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbPoProbeQuotaType','Special','特殊名额','HighValue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbPoProbeQuotaType','Normal','普通名额','HighValue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbPoProbeQuotaType','High','高值名额','HighValue',NULL,-1);
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','directory','目录','DIRECTORY',NULL,-1);
@@ -3823,7 +3832,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','SparePartExcel','备件信息','Spare Part',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','IBReportExcel','IBReport报表','IBReport',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','TubeInfoExcel','球管机会','tube',NULL,-1);
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('gamePlanBatchFileType','IBUInfoExcel','IBU信息','tube',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','GamePlanBatchFileImport','Game Plan数据导入','Game plan Batch Data Import',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','installStatus','装机状态','Install Status',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('installStatus', '0', '已装机', 'Installed', NULL, '-1');
@@ -3931,7 +3940,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_partSerialNumber','Part Serial Number','Part Serial Number',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_partQualityIssue','故障描述','Break Description',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_airWayBillNo','运单号','Air Way Bill No',NULL,-1);
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_returnDate','归还日期','Return Date',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_returnDate1','归还日期','Return Date',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_newCatSn','新探头SN编号','newCatSn',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_isVacation','是否休假','Vacation',NULL,-1);
 
@@ -4053,6 +4062,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_203','其他','其他','',NULL,-1,99);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','CoilOpportunityImage','MR线圈图片上传','Coil Opportunity Image',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','IBUInfoImage','IBU图片上传','IBUOffer Image',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','cataLog','货号','cata Log',NULL,-1);
 
 
@@ -4078,23 +4088,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('supplierUserBind','1','未绑定','UnBing',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('supplierUserBind','2','已绑定','Bingding',NULL,-1);
 
--- 设备类型
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','CT','CT','',NULL,-1,'305001736');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','MR','MR','',NULL,-1,'305012404');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','移动DR','移动DR','',NULL,-1,'305012621');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','血管机','血管机','',NULL,-1,'305008920');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','乳腺机','乳腺机','',NULL,-1,'305011029');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','C臂机','C臂机','',NULL,-1,'305011134');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','PET-CT','PET-CT','',NULL,-1,'305011026');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','SPECT','SPECT','',NULL,-1,'305011026');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','螺旋加速器','螺旋加速器','',NULL,-1,'305008942');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','超声','超声','',NULL,-1,'305010367');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','床旁监护仪/Ecosystems','床旁监护仪/Ecosystems','',NULL,-1,'305010629');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','麻醉','麻醉','',NULL,-1,'305010629');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','呼吸','呼吸','',NULL,-1,'305010629');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','母婴','母婴','',NULL,-1,'305010629');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,created_by) VALUES ('modalityType','诊断心电','诊断心电','',NULL,-1,'305010629');
-
 -- 问题类型 问题类型 问题类型
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('questionType','设备原理相关','设备原理相关','',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('questionType','常见故障相关','常见故障相关','',NULL,-1);
@@ -4104,3 +4097,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 -- 云上大咖modality及大咖对应表
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType','UserQAExcel','云上大咖modality及大咖对应表','Environmental Status Monitor',NULL,-1);
+
+-- 设备附件类型配置
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label','AssetAttachmentCategoryConfiguration','设备附件类型配置','CategoryConfig',NULL,'-1');
+

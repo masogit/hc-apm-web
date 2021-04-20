@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.service.utils.ExcelDocument;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,9 @@ public class ZkbContractService {
 
     @Autowired
     private ZkbContractLogService zkbContractLogService;
+
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
 
     public List<TenantInfo> getSourceTenantInfoList(){
 
@@ -129,8 +133,6 @@ public class ZkbContractService {
 
     /**
      * 比较两日期是否大小
-     * @param date      日期
-     * @param otherDate 另一个日期
      * @return 比较两日期大小。如果date>=otherDate则返回true,否则false
      */
     public static Integer whenEQ(Date d, Date o) {
@@ -201,6 +203,9 @@ public class ZkbContractService {
             zkbContractAssetDataMap.put("维修类型", WebUtil.getFieldValueMessage("repairForm",rfValue));
             if(zkbContractAsset.getAssetInfo() != null){
                 zkbContractAssetDataMap.put("品牌", zkbContractAsset.getAssetInfo().getMakerShortName());
+            }
+            if(StringUtils.isNotEmpty(zkbContractAsset.getAssetType())){
+                zkbContractAssetDataMap.put("高低端机", WebUtil.getFieldValueMessage("zkbContractAssetType",zkbContractAsset.getAssetType()));
             }
             zkbContractAssetDataMap.put("备注", zkbContractAsset.getAssetInfo().getComments());
 
@@ -450,6 +455,16 @@ public class ZkbContractService {
 
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetAdd","",a.getQrCode(),"",currentUser);
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateAsset(ZkbContract zkbContract,ZkbContractAsset zkbContractAsset,String reason,UserAccount currentUser){
+        zkbContractAssetRepository.save(zkbContractAsset);
+        zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetEdit","",zkbContractAsset.getAssetInfo().getQrCode(),reason,currentUser);
+
+        AssetInfo assetInfo = assetInfoRepository.findByUid(zkbContractAsset.getAssetId());
+        assetInfo.setRepairForm(zkbContractAsset.getAssetInfo().getRepairForm());
+        assetInfoRepository.save(assetInfo);
     }
 
     @Transactional(rollbackFor = Exception.class)

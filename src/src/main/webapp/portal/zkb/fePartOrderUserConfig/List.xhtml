@@ -55,7 +55,7 @@
                         <p:column headerText="用户SSO" filterBy="#{item.sso}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.sso}"/>
                         </p:column>
-                        <p:column headerText="角色" filterBy="#{item.configType}" filterMatchMode="LIKE">
+                        <p:column headerText="角色" filterBy="#{item.configType}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_configType', item.configType)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >

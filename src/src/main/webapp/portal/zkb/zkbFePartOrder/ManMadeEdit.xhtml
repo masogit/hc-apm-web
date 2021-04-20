@@ -68,7 +68,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label">#{msg.zkbFePartOrder_subtractTotalStatus}*</label>
-                                    <p:selectOneMenu disabled="#{!zkbFePartOrderDetailController.hasEditRight('Requested')}" id="subtractTotalStatus" value="#{zkbFePartOrderDetailController.selected.subtractTotalStatus}"  required="true" requiredMessage="#{msg.zkbFePartOrder_subtractTotalStatus} #{msg.ValidationRequire}">
+                                    <p:selectOneMenu disabled="#{!zkbFePartOrderDetailController.hasEditRight('Requested')||'highMachine' eq zkbFePartOrderDetailController.selected.assetType}" id="subtractTotalStatus" value="#{zkbFePartOrderDetailController.selected.subtractTotalStatus}"  required="true" requiredMessage="#{msg.zkbFePartOrder_subtractTotalStatus} #{msg.ValidationRequire}">
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
@@ -138,11 +138,11 @@
                     <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingAssignment')}">
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingAssignment')}">
-                                <label class="label">代理商审批人*：</label>
+                                <label class="label">#{msg.zkbFePartOrder_tenantAssignUser}*：</label>
                                 <p:inputText id="tenantAssignUser" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.tenantAssignUser}"  />
                             </h:panelGroup>
                             <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingAssignment')}">
-                                <label class="label">代理商审批时间*：</label>
+                                <label class="label">#{msg.zkbFePartOrder_tenantAssignDate}*：</label>
                                 <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderDetailController.selected.tenantAssignDate}"
                                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>

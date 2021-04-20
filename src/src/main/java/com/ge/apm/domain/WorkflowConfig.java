@@ -1,5 +1,7 @@
 package com.ge.apm.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -221,6 +223,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "swap_center_config")
     private String swapCenterConfig;
 
+    /**
+     * 是否开启用待报废控制
+     */
     @Column(name = "enable_scrapped_control")
     private Boolean enableScrappedControl;
 
@@ -229,6 +234,12 @@ public class WorkflowConfig implements Serializable {
      */
     @Column(name = "enable_update_switching_time",columnDefinition = "boolean default true")
     private Boolean enableUpdateSwitchingTime;
+
+    /**
+     * 资产附件类型配置
+     */
+    @Column(name = "customized_asset_attachment_category",columnDefinition="text")
+    private String CustomizedAssetAttachmentCategory;
 
     /***
      *
@@ -363,6 +374,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setNotSendMsgInTakeOrderMode(Boolean notSendMsgInTakeOrderMode) {
         this.notSendMsgInTakeOrderMode = notSendMsgInTakeOrderMode;
+    }
+
+    public String getCustomizedAssetAttachmentCategory() {
+        return CustomizedAssetAttachmentCategory;
+    }
+
+    public void setCustomizedAssetAttachmentCategory(String customizedAssetAttachmentCategory) {
+        CustomizedAssetAttachmentCategory = customizedAssetAttachmentCategory;
     }
 
     public Boolean getIsCasetypeRequired() {
@@ -1111,6 +1130,15 @@ public class WorkflowConfig implements Serializable {
     @Override
     public String toString() {
         return "com.ge.apm.domain.WorkflowConfig[ id=" + id + " ]";
+    }
+
+    @Data
+    public static class AttachmentCategory{
+
+        @JSONField(serialize = false)
+        String id;
+        String boType;
+        String label;
     }
 
 }

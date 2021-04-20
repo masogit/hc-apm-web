@@ -3,16 +3,23 @@ package com.ge.apm.view.sysutil;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.persistence.Entity;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.constant.WorkFlowConstant;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.google.common.collect.Maps;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.util.Strings;
@@ -31,6 +38,7 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.service.common.UserCommonService;
 
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -48,6 +56,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	private List<UserInfo> userList;
 	private List<V2_DeviceType> deviceTypeList;
 	private OrgInfoRepository orgInfoRepository;
+	private AssetInfoRepository assetInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
@@ -63,6 +72,10 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	private Date telRepStart;
 	private Date telRepEnd;
 	private UserContextService userContextService;
+	@Getter @Setter
+	private List<WorkflowConfig.AttachmentCategory> attachmentCategories;
+	@Setter@Getter
+	private WorkflowConfig.AttachmentCategory attachmentCategory;
 
 	@Override
 	protected void init() {
@@ -71,6 +84,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		dao = WebUtil.getBean(WorkflowConfigRepository.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		uaaService = WebUtil.getBean(UaaService.class);
@@ -79,7 +93,58 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 		selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
 		setTenantUid(user.getTenantUID());
+	}
 
+	public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories(){
+		WorkflowConfig.AttachmentCategory category = new WorkflowConfig.AttachmentCategory();
+		category.setId(WorkFlowConstant.ATTACHMENY_CATEGORY_ID);
+		if (null == attachmentCategories) {
+			attachmentCategories = new ArrayList<>();
+		} else {
+			attachmentCategories = attachmentCategories.stream()
+					.filter(item -> item.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID).collect(Collectors.toList());
+		}
+		attachmentCategories.add(category);
+		return attachmentCategories;
+	}
+
+	public void onAddNode() {
+		attachmentCategory = new WorkflowConfig.AttachmentCategory();
+	}
+
+	public void onEditNode(String nodeType) {
+		for (WorkflowConfig.AttachmentCategory node : attachmentCategories) {
+			if (nodeType == node.getBoType()) {
+				attachmentCategory = node;
+				break;
+			}
+		}
+	}
+	public void saveNode() {
+		//校验名称重复
+		if(attachmentCategories.stream().filter(it->it.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID && !it.getBoType().equals(attachmentCategory.getBoType()))
+				.anyMatch(it->attachmentCategory.getLabel().equals(it.getLabel()))){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage("附件类型名称不能重复");
+			return;
+		};
+		//修改
+		if(attachmentCategory.getBoType()!=null){
+			Optional<WorkflowConfig.AttachmentCategory> first = attachmentCategories.stream().filter(item -> attachmentCategory.getBoType() == item.getBoType()).findFirst();
+			WorkflowConfig.AttachmentCategory attachmentCategory = first.orElse(null);
+			attachmentCategory.setLabel(attachmentCategory.getLabel());
+		}else{ //新增
+			WorkflowConfig.AttachmentCategory category=new WorkflowConfig.AttachmentCategory();
+			category.setBoType(WorkFlowConstant.CUSTOMIZED_ASSET_ATTACHMENT_CATEGORY +"_" + UUID.randomUUID().toString().replace("-", ""));
+			category.setLabel(attachmentCategory.getLabel());
+			attachmentCategories.add(category);
+		}
+	}
+
+	public void delNode(String nodeType) {
+		List<WorkflowConfig.AttachmentCategory> collect =
+		attachmentCategories = attachmentCategories.stream()
+				.filter(node -> nodeType != node.getBoType()).collect(Collectors.toList());
 	}
 
 	public String getOrgFullName(OrgInfo org) {
@@ -91,7 +156,6 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			org = org.getParentOrg();
 			name = org.getName() + "/" + name;
 		}
-
 		return name;
 	}
 
@@ -526,7 +590,16 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			return;
 		}
 
+		if(isCurrentEquipmentLoanedOut()) return;
 		setSwapCenter();
+
+		//自定义附件类型字段json保存
+		attachmentCategories = attachmentCategories.stream().filter(item -> item.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID).collect(Collectors.toList());
+		if(attachmentCategories.size() == 0){
+			selected.setCustomizedAssetAttachmentCategory(null);
+		}else{
+			selected.setCustomizedAssetAttachmentCategory(JSON.toJSONString(attachmentCategories));
+		}
 
         onBeforeSave(selected);
 
@@ -540,6 +613,23 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		selectedUserOrg = null; //orgInfoRepository.getByUid(user.getOrgInfoUID());
         selected = null;
     }
+
+	/**
+	 * 校验被替换的调剂中心时候有未归还设备
+	 * @return
+	 */
+	public boolean isCurrentEquipmentLoanedOut() {
+		String oldSharedAssetCenter = dao.findById(selected.getId()).getDeptForSharedAsset();
+		String newSharedAssetCenter = selected.getDeptForSharedAsset();
+		if(oldSharedAssetCenter!=null && !oldSharedAssetCenter.equals(newSharedAssetCenter)) {
+			if(assetInfoRepository.findCountByClinicalDeptUID(oldSharedAssetCenter)>0) {
+				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage(WebUtil.getMessage("CurrentEquipmentIsLoanedOut"));
+				return true;
+			}
+		}
+		return false;
+	}
 
     public void setSwapCenter(){
 		Map<String,Object> swapCenterMap = Maps.newHashMap();
@@ -592,6 +682,15 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		updateApproverList();
 		updateDispatherClinical();
 		parseSwapCenter();
+		parseAttachCategory();
+	}
+
+	private void parseAttachCategory() {
+		String categories = selected.getCustomizedAssetAttachmentCategory();
+		if(null !=categories){
+			attachmentCategories = JSON.parseObject(categories, new TypeReference<List<WorkflowConfig.AttachmentCategory>>(){
+			});
+		}
 	}
 
 	public void parseSwapCenter(){
@@ -620,6 +719,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		dispatchUserList.clear();
 		approveUserList.clear();
 		dispatchUserList.clear();
+		attachmentCategories.clear();
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			super.prepareCreate();
