@@ -157,6 +157,13 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.probeQuotaType)}">
+                            <label class="label">扣除名额类型*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.probeQuotaType}" disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
                             <p:selectOneMenu id="region" value="#{zkbPartOrderAuditController.selected.region}" disabled="true" required="true" requiredMessage="#{msg.zkbPartOrder_region} #{msg.ValidationRequire}">

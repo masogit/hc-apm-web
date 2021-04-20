@@ -1008,16 +1008,16 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) - qty);
                 zkbContract.setProbeQuotaApply((zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply()) + qty);
             }else{
-                if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.equals(zkbPartOrder.getProbeQuotaType())){
+                if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(zkbPartOrder.getProbeQuotaType())){
                     zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) - qty);
                     zkbContract.setProbeQuotaApply((zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply()) + qty);
-                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.equals(zkbPartOrder.getProbeQuotaType())){
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(zkbPartOrder.getProbeQuotaType())){
                     zkbContract.setProbeQuotaNormal((zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal()) - qty);
                     zkbContract.setProbeQuotaApply((zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply()) + qty);
-                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.equals(zkbPartOrder.getProbeQuotaType())){
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(zkbPartOrder.getProbeQuotaType())){
                     zkbContract.setProbeQuotaSpecial((zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial()) - qty);
                     zkbContract.setProbeQuotaApply((zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply()) + qty);
-                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.equals(zkbPartOrder.getProbeQuotaType())){
+                }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
                     zkbContract.setProbeQuotaHigh((zkbContract.getProbeQuotaHigh() == null ? 0 : zkbContract.getProbeQuotaHigh()) - 1);
                 }
             }
@@ -1138,16 +1138,16 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
                     zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) + qty);
                 }else{
-                    if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.equals(zkbPartOrder.getProbeQuotaType())){
+                    if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(zkbPartOrder.getProbeQuotaType())){
                         zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
                         zkbContract.setProbeQuota((zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota()) + qty);
-                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.equals(zkbPartOrder.getProbeQuotaType())){
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(zkbPartOrder.getProbeQuotaType())){
                         zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
                         zkbContract.setProbeQuotaNormal((zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal()) + qty);
-                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.equals(zkbPartOrder.getProbeQuotaType())){
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(zkbPartOrder.getProbeQuotaType())){
                         zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
                         zkbContract.setProbeQuotaSpecial((zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial()) + qty);
-                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.equals(zkbPartOrder.getProbeQuotaType())){
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
                         zkbContract.setProbeQuotaHigh((zkbContract.getProbeQuotaHigh() == null ? 0 : zkbContract.getProbeQuotaHigh()) + 1);
                     }
                 }
