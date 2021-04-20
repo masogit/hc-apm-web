@@ -173,9 +173,9 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.probeQuotaFlag}">
                             <label class="label">扣除名额类型*</label>
-                            <p:selectOneMenu ivalue="#{zkbPartOrderEditController.selected.probeQuotaType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.probeQuotaType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
 
