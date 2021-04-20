@@ -1232,25 +1232,28 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
      */
     public void sendWeChatMessages(ZkbPartOrder zkbPartOrder,String token){
         //if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
-            if (ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) ||
-                ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(zkbPartOrder.getStatus()) ||
-                ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(zkbPartOrder.getStatus()) ||
-                ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(zkbPartOrder.getStatus()) ||
-                ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString().equals(zkbPartOrder.getStatus()) ||
-                ZkbPartOrder.PartOrderStatus.DirectorReject.toString().equals(zkbPartOrder.getStatus()) ||
-                ZkbPartOrder.PartOrderStatus.DirectorAccept.toString().equals(zkbPartOrder.getStatus())) {
-                try {
-                    String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
-                    //String token = UserContextService.getAccessToken();
-                    HttpHeaders header = createHttpHeaders(token);
-                    HttpEntity<Map> requestEntity = new HttpEntity<>(header);
-                    ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
-                    logger.info(zkbPartOrder.getPartOrderNo()+" sendWeChatMessages "+response.toString());
-                } catch (RestClientException e) {
-                    e.printStackTrace();
-                }
+        List<String> statusList = new ArrayList<>();
+        statusList.add(ZkbPartOrder.PartOrderStatus.ManageAccept.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.ManageReject.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.Ordered.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.OrderedReject.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.DirectorReject.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.DirectorAccept.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString());
+        if (statusList.contains(zkbPartOrder.getStatus())) {
+            try {
+                String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
+                //String token = UserContextService.getAccessToken();
+                HttpHeaders header = createHttpHeaders(token);
+                HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+                ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+                logger.info(zkbPartOrder.getPartOrderNo()+" sendWeChatMessages "+response.toString());
+            } catch (RestClientException e) {
+                e.printStackTrace();
             }
-        //}
+        }
     }
 
     public void sendWeChatBackMessages(ZkbPartOrder zkbPartOrder){
