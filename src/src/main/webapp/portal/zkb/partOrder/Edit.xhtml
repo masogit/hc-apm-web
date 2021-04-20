@@ -165,7 +165,7 @@
 
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' and zkbPartOrderEditController.assetInfo.assetGroup eq 2 }">
                             <label class="label">机型*</label>
-                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}">
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.artificialType}" required="true" disabled="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="超声高端机" itemValue="2"/>
                                 <f:selectItem itemLabel="超声低端机" itemValue="3"/>

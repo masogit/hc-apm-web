@@ -671,16 +671,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void orderTypeChange(){
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
-//            if("2".equals(artificialType)){
-//                this.selected.setQty(1);
-//            }else {
-//                this.selected.setQty(1);
-//            }
             this.selected.setQty(1);
         }else{
             this.selected.setQty(0);
             if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 this.selected.setCatNum(1);
+            }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) && assetInfo.getAssetGroup().equals(2)){
+                this.selected.setArtificialType("3");
             }
         }
         calcRemainQty();
