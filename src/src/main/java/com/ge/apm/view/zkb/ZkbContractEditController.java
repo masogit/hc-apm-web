@@ -132,8 +132,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     @Override
     public void prepareEdit() {
         super.prepareEdit();
-        this.selected.setLastModifiedBy(this.currentUser.getLoginName());
-        this.selected.setLastModifiedDate(new Date());
         this.initCourseList();
     }
 
@@ -299,6 +297,10 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         zkbContractService.deleteAsset(this.zkbContractAssetSelected,this.selected,currentUser,reason);
         this.zkbContractAssetList.remove(this.zkbContractAssetSelected);
         this.zkbContractAssetSelected = null;
+
+       this.selected.setLastModifiedBy(currentUser.getLoginName());
+       this.selected.setLastModifiedDate(new Date());
+       dao.save(this.selected);
    }
 
     public void getQueryAssetsList() {
