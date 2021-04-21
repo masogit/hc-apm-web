@@ -8,7 +8,17 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <ui:composition>
-
+    <style type="text/css">
+        #FileAssetForm\:upload >  .ui-fileupload-responsive {
+            border: 1px solid #bdbdbd;
+        }
+        #FileAssetForm\:upload .ui-fileupload-content{
+            display: none;
+        }
+        #FileEditDlg {
+            z-index: 1010!important
+        }
+    </style>
     <p:dialog id="FileEditDlg" widgetVar="FileEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="批量创建" width="70%" height="550">
         <h:form id="FileSearchForm">
             <p:fieldset legend="#{msg.assetSearchingConditions}">
@@ -107,21 +117,19 @@
                                 </c:forEach>
                             </p:selectOneMenu>
                         </h:panelGroup>
-
                         <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0"
                                  rendered="#{'vlink' ne assetFileAttachmentController.boSubTypeBatch}">
-                            <h:panelGroup rendered="#{assetFileAttachmentController.batchBlobObject.objectName==null}">
-                                <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatch}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                              multiple="false" sizeLimit="500000000" update=":FileAssetForm:upload" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
-                                <!--<p:growl id="messages" showDetail="true" />-->
-                            </h:panelGroup>
-                            <h:panelGroup id="namepanel" rendered="#{assetFileAttachmentController.batchBlobObject.objectName!=null}">
-                                <label class="label">#{msg.name}*</label>
-                                <p:inputText id="name" value="#{assetFileAttachmentController.batchBlobObject.objectName}"  required="false" requiredMessage="#{msg.SelectUploadFile}" readonly="true"/>
-                                <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(assetFileAttachmentController.batchBlobObject.boId)}" id="iconOnly" update=":FileAssetForm:upload" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                </p:commandButton>
-                            </h:panelGroup>
+                            <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatch}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                          multiple="true" sizeLimit="500000000" update=":FileAssetForm:upload" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" >
+                                <c:forEach items="#{assetFileAttachmentController.batchBlobObjectList}" var="objectItem" >
+                                    <label class="label">#{msg.name}*</label>
+                                    <p:inputText  value="#{objectItem.objectName}"  required="false" requiredMessage="#{msg.SelectUploadFile}" readonly="true"/>
+                                    <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachmentBatch(objectItem.id)}"  update=":FileAssetForm:upload" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </c:forEach>
+                            </p:fileUpload>
+                            <!--<p:growl id="messages" showDetail="true" />-->
                         </p:panel>
                         <p:panel id="vlinkPanel" styleClass="ui-panelgrid-blank" style=" border: 0"
                                  rendered="#{'vlink' eq assetFileAttachmentController.boSubTypeBatch}">
@@ -139,7 +147,7 @@
                 </h:panelGroup>
             </p:fieldset>
             <h:panelGroup>
-                <p:commandButton validateClient="true" actionListener="#{assetFileAttachmentController.batchSave()}" value="#{msg.Save}" update=":AssetFileAttachmentListForm:datalist, :growl" icon="ui-icon-check" />
+                <p:commandButton validateClient="true" actionListener="#{assetFileAttachmentController.batchSave()}" value="#{msg.Save}" update=":FileAssetForm:upload"  icon="ui-icon-check" />
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('FileEditDialog').hide()"/>
             </h:panelGroup>
         </h:form>

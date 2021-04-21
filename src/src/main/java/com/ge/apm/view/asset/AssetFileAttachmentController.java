@@ -29,10 +29,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -71,6 +68,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     private List<OrgInfo> clinicalDeptList;
     private V2_BlobObject batchBlobObject;
+    private List<V2_BlobObject> batchBlobObjectList = new ArrayList<>();
     private String boSubTypeBatch;
 
     //复选的附件数据
@@ -360,23 +358,25 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     }
 
     public void handleFileUploadBatch(FileUploadEvent event) {
-
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
-            batchBlobObject = blobObject;
+            batchBlobObjectList.add(blobObject);
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
 
     }
 
-    public void removeAttachmentBatch(Integer fileId) {
-
-        blobService.deleteBlobFile(batchBlobObject);
-        batchBlobObject.setId(null);
-        batchBlobObject.setObjectName(null);
-        batchBlobObject.setObjectStorageId(null);
-        batchBlobObject.setObjectSize(null);
+    public void removeAttachmentBatch(String objectId) {
+        Iterator<V2_BlobObject> iterator = batchBlobObjectList.iterator();
+        while (iterator.hasNext()){
+            V2_BlobObject object = iterator.next();
+            if(object.getId().equals(objectId)){
+                blobService.deleteBlobFile(object);
+                iterator.remove();
+                return;
+            }
+        }
     }
 
     public void onSelectAllOfPage() {
@@ -404,41 +404,70 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             return;
         }
 
-        if (batchBlobObject != null || "vlink".equals(boSubTypeBatch)) {
-            String parsedLink = vlinkParserService.parseVlink(vlink);
-            if ("vlink".equals(boSubTypeBatch) && StringUtils.isEmpty(parsedLink)) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("source_not_supported"));
-                return;
-            }
-            for (AssetInfo tempAssetInfo : targetAssets) {
-                V2_BlobObject tempBlobObject = new V2_BlobObject();
+        List<V2_BlobObject> batchSaveObject;
+        //保存视频链接
+        if("vlink".equals(boSubTypeBatch)){
+            batchSaveObject= batchSaveVlink();
+        }else{
+            //保存上传对象
+            batchSaveObject= batchSaveObject();
+        }
 
+        if(batchSaveObject.isEmpty()){
+            return;
+        }
+
+        dao.save(batchSaveObject);
+        this.initBatchData();
+    }
+
+    private List<V2_BlobObject> batchSaveObject() {
+        if(batchBlobObjectList.isEmpty()){
+            WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
+            return Collections.EMPTY_LIST;
+        }
+        ArrayList<V2_BlobObject> result = new ArrayList<>(targetAssets.size() * batchBlobObjectList.size());
+        for (AssetInfo tempAssetInfo : targetAssets) {
+            for(V2_BlobObject batchBlobObject : batchBlobObjectList){
+                V2_BlobObject tempBlobObject = new V2_BlobObject();
                 tempBlobObject.setBoId(tempAssetInfo.getId());
                 tempBlobObject.setBoUuid(tempAssetInfo.getUid());
                 tempBlobObject.setBoSubType(boSubTypeBatch);
                 tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-                if ("vlink".equals(boSubTypeBatch)) {
-                    tempBlobObject.setObjectName(vlinkTitle);
-                    tempBlobObject.setExtLink(parsedLink);
-                } else {
-                    tempBlobObject.setObjectName(batchBlobObject.getObjectName());
-                    tempBlobObject.setObjectStorageId(batchBlobObject.getObjectStorageId());
-                    tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
-                    tempBlobObject.setObjectType(batchBlobObject.getObjectType());
-                }
-                dao.save(tempBlobObject);
+                tempBlobObject.setObjectName(batchBlobObject.getObjectName());
+                tempBlobObject.setObjectStorageId(batchBlobObject.getObjectStorageId());
+                tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
+                tempBlobObject.setObjectType(batchBlobObject.getObjectType());
+                result.add(tempBlobObject);
             }
-        } else {
-            WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
-            return;
         }
+        return result;
+    }
 
-        this.initBatchData();
+    private List<V2_BlobObject> batchSaveVlink() {
+        String parsedLink = vlinkParserService.parseVlink(vlink);
+        if (StringUtils.isEmpty(parsedLink)) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("source_not_supported"));
+            return Collections.EMPTY_LIST;
+        }
+        ArrayList<V2_BlobObject> result = new ArrayList<>(targetAssets.size());
+        for (AssetInfo tempAssetInfo : targetAssets) {
+            V2_BlobObject tempBlobObject = new V2_BlobObject();
+            tempBlobObject.setBoId(tempAssetInfo.getId());
+            tempBlobObject.setBoUuid(tempAssetInfo.getUid());
+            tempBlobObject.setBoSubType(boSubTypeBatch);
+            tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+            tempBlobObject.setObjectName(vlinkTitle);
+            tempBlobObject.setExtLink(parsedLink);
+            result.add(tempBlobObject);
+        }
+        return result;
     }
 
     private void initBatchData() {
         selectedOrg = null;
         batchBlobObject = null;
+        batchBlobObjectList.clear();
         boSubTypeBatch = null;
 
         targetAssets = new ArrayList();
@@ -573,5 +602,13 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void setAssetName(String assetName) {
         this.assetName = assetName;
+    }
+
+    public List<V2_BlobObject> getBatchBlobObjectList() {
+        return batchBlobObjectList;
+    }
+
+    public void setBatchBlobObjectList(List<V2_BlobObject> batchBlobObjectList) {
+        this.batchBlobObjectList = batchBlobObjectList;
     }
 }
