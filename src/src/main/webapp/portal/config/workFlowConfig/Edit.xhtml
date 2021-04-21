@@ -428,6 +428,10 @@
                                 <label class="label">弹窗内容</label>
                                 <p:inputTextarea id="hintText" value="#{workflowConfigController.selected.hintText}" placeholder="20:00 - 08:00不受理调剂申请， 紧急情况请拨打021-66666666。"/>
                             </h:panelGroup>-->
+                            <h:panelGroup>
+                                <label class="label">调剂设备安全基准</label>
+                                <p:inputNumber value="#{workflowConfigController.selected.sharedAssetSafetyThreshold}" minValue="0.0" decimalPlaces="1"/>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
