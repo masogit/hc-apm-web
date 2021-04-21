@@ -357,15 +357,39 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         }
     }
 
-    public void handleFileUploadBatch(FileUploadEvent event) {
+
+
+    public void handleFileUploadBatch(FileUploadEvent event,String type) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
+            blobObject.setBoSubType(type);
             batchBlobObjectList.add(blobObject);
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
-
     }
+
+    public void handleFileUploadBatchImage(FileUploadEvent event) {
+        handleFileUploadBatch(event,"1");
+    }
+
+    public void handleFileUploadBatchUserManual(FileUploadEvent event) {
+        handleFileUploadBatch(event,"2");
+    }
+
+    public void handleFileUploadBatchTrainingMaterial(FileUploadEvent event) {
+        handleFileUploadBatch(event,"3");
+    }
+
+    public void handleFileUploadBatchMeasurementDocument(FileUploadEvent event) {
+        handleFileUploadBatch(event,"Measuring");
+    }
+
+    public void handleFileUploadBatchVideoLink(FileUploadEvent event) {
+        handleFileUploadBatch(event,"vlink");
+    }
+
+
 
     public void removeAttachmentBatch(String objectId) {
         Iterator<V2_BlobObject> iterator = batchBlobObjectList.iterator();
@@ -404,64 +428,63 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             return;
         }
 
-        List<V2_BlobObject> batchSaveObject;
-        //保存视频链接
-        if("vlink".equals(boSubTypeBatch)){
-            batchSaveObject= batchSaveVlink();
-        }else{
-            //保存上传对象
-            batchSaveObject= batchSaveObject();
-        }
+        List<V2_BlobObject> batchSaveObject =new ArrayList<>();
 
+        //保存视频链接
+        if(!batchSaveVlinkAdd(batchSaveObject)){
+            return;
+        }
+        //保存上传对象
+        batchSaveObjectAdd(batchSaveObject);
+
+        this.initBatchData();
         if(batchSaveObject.isEmpty()){
             return;
         }
-
         dao.save(batchSaveObject);
-        this.initBatchData();
+
     }
 
-    private List<V2_BlobObject> batchSaveObject() {
+    private void batchSaveObjectAdd(List<V2_BlobObject> batchSaveObject) {
         if(batchBlobObjectList.isEmpty()){
-            WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
-            return Collections.EMPTY_LIST;
+            return ;
         }
-        ArrayList<V2_BlobObject> result = new ArrayList<>(targetAssets.size() * batchBlobObjectList.size());
         for (AssetInfo tempAssetInfo : targetAssets) {
             for(V2_BlobObject batchBlobObject : batchBlobObjectList){
                 V2_BlobObject tempBlobObject = new V2_BlobObject();
                 tempBlobObject.setBoId(tempAssetInfo.getId());
                 tempBlobObject.setBoUuid(tempAssetInfo.getUid());
-                tempBlobObject.setBoSubType(boSubTypeBatch);
+                tempBlobObject.setBoSubType(batchBlobObject.getBoSubType());
                 tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
                 tempBlobObject.setObjectName(batchBlobObject.getObjectName());
                 tempBlobObject.setObjectStorageId(batchBlobObject.getObjectStorageId());
                 tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
                 tempBlobObject.setObjectType(batchBlobObject.getObjectType());
-                result.add(tempBlobObject);
+                batchSaveObject.add(tempBlobObject);
             }
         }
-        return result;
     }
 
-    private List<V2_BlobObject> batchSaveVlink() {
+    private boolean batchSaveVlinkAdd(List<V2_BlobObject> batchSaveObject) {
+        if(StringUtils.isEmpty(vlink)){
+            return true;
+        }
         String parsedLink = vlinkParserService.parseVlink(vlink);
         if (StringUtils.isEmpty(parsedLink)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("source_not_supported"));
-            return Collections.EMPTY_LIST;
+            return false;
         }
-        ArrayList<V2_BlobObject> result = new ArrayList<>(targetAssets.size());
         for (AssetInfo tempAssetInfo : targetAssets) {
             V2_BlobObject tempBlobObject = new V2_BlobObject();
             tempBlobObject.setBoId(tempAssetInfo.getId());
             tempBlobObject.setBoUuid(tempAssetInfo.getUid());
-            tempBlobObject.setBoSubType(boSubTypeBatch);
+            tempBlobObject.setBoSubType("vlink");
             tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
             tempBlobObject.setObjectName(vlinkTitle);
             tempBlobObject.setExtLink(parsedLink);
-            result.add(tempBlobObject);
+            batchSaveObject.add(tempBlobObject);
         }
-        return result;
+        return true;
     }
 
     private void initBatchData() {
@@ -606,6 +629,11 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public List<V2_BlobObject> getBatchBlobObjectList() {
         return batchBlobObjectList;
+    }
+
+    public List<V2_BlobObject> getBatchBlobObjectListByType(String type) {
+        List<V2_BlobObject> collect = batchBlobObjectList.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
+        return collect;
     }
 
     public void setBatchBlobObjectList(List<V2_BlobObject> batchBlobObjectList) {
