@@ -12,6 +12,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -425,6 +426,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     public void batchSave() {
         if(targetAssets == null || targetAssets.isEmpty()){
             WebUtil.addErrorMessage(WebUtil.getMessage("assetName") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
 
@@ -471,6 +473,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         }
         String parsedLink = vlinkParserService.parseVlink(vlink);
         if (StringUtils.isEmpty(parsedLink)) {
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("source_not_supported"));
             return false;
         }
