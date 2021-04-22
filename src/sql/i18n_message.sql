@@ -1583,6 +1583,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','WoNeedDispather','维修配置中允许派工时派工人不能为空!','Dispatcher cannot be null when dispatch is allowed in the repair configuration!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','PmNeedDispather','保养配置中允许派工时派工人不能为空!','Dispatcher cannot be null when dispatch is allowed in the PM configuration!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','MeasureNeedDispather','计量配置中允许派工时派工人不能为空!','Dispatcher cannot be null when dispatch is allowed in the measurement configuration!',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CurrentEquipmentIsLoanedOut', '当前已有设备借出，如需更换，请完成当前调剂借用归还流程!', 'The current equipment is loaned out. If you need to replace it, please complete the current transfer loan return process', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','WoManualAndGrapMsg','维修配置中允许抢单和允许人工至少选一个!','There should be at least one repair configuration for manual or grap mode!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','PmManualAndGrapMsg','保养配置中允许抢单和允许人工至少选一个!','There should be at least one PM configuration for manual or grap mode!',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('message','MeasureManualAndGrapMsg','计量配置中允许抢单和允许人工至少选一个!','There should be at least one measurement configuration for manual or grap mode!',NULL,-1);
@@ -3604,7 +3605,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoOrderAnnotationType','Wrong Part','Wrong Part','Wrong Part',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoOrderAnnotationType','Short Life','Short Life','Short Life',NULL,-1);
 
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbPoProbeQuotaType','Any','任意名额','HighValue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbPoProbeQuotaType','Special','特殊名额','HighValue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbPoProbeQuotaType','Normal','普通名额','HighValue',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('ZkbPoProbeQuotaType','High','高值名额','HighValue',NULL,-1);
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','directory','目录','DIRECTORY',NULL,-1);

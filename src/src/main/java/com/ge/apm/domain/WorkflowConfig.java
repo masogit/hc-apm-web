@@ -239,7 +239,13 @@ public class WorkflowConfig implements Serializable {
      * 资产附件类型配置
      */
     @Column(name = "customized_asset_attachment_category",columnDefinition="text")
-    private String CustomizedAssetAttachmentCategory;
+    private String customizedAssetAttachmentCategory;
+
+    /**
+     * 调剂中心安全基准线
+     */
+    @Column(name = "shared_asset_safety_threshold")
+    private Double sharedAssetSafetyThreshold;
 
     /***
      *
@@ -377,11 +383,19 @@ public class WorkflowConfig implements Serializable {
     }
 
     public String getCustomizedAssetAttachmentCategory() {
-        return CustomizedAssetAttachmentCategory;
+        return customizedAssetAttachmentCategory;
     }
 
     public void setCustomizedAssetAttachmentCategory(String customizedAssetAttachmentCategory) {
-        CustomizedAssetAttachmentCategory = customizedAssetAttachmentCategory;
+        this.customizedAssetAttachmentCategory = customizedAssetAttachmentCategory;
+    }
+
+    public Double getSharedAssetSafetyThreshold() {
+        return sharedAssetSafetyThreshold;
+    }
+
+    public void setSharedAssetSafetyThreshold(Double sharedAssetSafetyThreshold) {
+        this.sharedAssetSafetyThreshold = sharedAssetSafetyThreshold;
     }
 
     public Boolean getIsCasetypeRequired() {
