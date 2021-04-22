@@ -58,7 +58,7 @@ public class ZkbContractCourseVO extends ZkbContractCourse {
         str += (this.getContractNo() != null ? this.getContractNo().toString() : "");
         str += (this.getCid() != null ? this.getCid().toString() : "");
         str += (this.getCname() != null ? this.getCname() : "");
-        str += (this.getCourseCount() != null ? this.getCourseCount().toString() : "");
+        str += (this.getMainCourseCount() != null ? this.getMainCourseCount().toString() : "");
 
         return str.hashCode();
     }

@@ -122,6 +122,14 @@ public class ZkbContractService {
         }
     }
 
+    public Double isEmptyDouble(Double value){
+        if(value == null){
+            return new Double(0);
+        }else{
+            return value;
+        }
+    }
+
     public String calcContractState(Date startDate,Date endDate){
         Integer startFlag = whenEQ(new Date(),startDate);
         Integer endFlag = whenEQ(new Date(),endDate);
@@ -175,10 +183,12 @@ public class ZkbContractService {
             zkbContractCourseDataMap.put(WebUtil.getMessage("zkbContract_contractState"), zkbContract.getContractState());
             zkbContractCourseDataMap.put("课程ID", zkbContractCourse.getZkbCourse().getCid());
             zkbContractCourseDataMap.put("课程名称", zkbContractCourse.getZkbCourse().getCname());
-            zkbContractCourseDataMap.put("课程剩余名额", isEmptyInteger(zkbContractCourse.getCourseCount()));
-            zkbContractCourseDataMap.put("课程总额", isEmptyInteger(zkbContractCourse.getCourseCountTotal()));
-            zkbContractCourseDataMap.put("课程申请名额", isEmptyInteger(zkbContractCourse.getCourseCountApply()));
-            zkbContractCourseDataMap.put("课程已使用名额", isEmptyInteger(zkbContractCourse.getCourseCountUse()));
+            zkbContractCourseDataMap.put("modality", zkbContractCourse.getZkbCourse().getModality());
+            zkbContractCourseDataMap.put("培训合同号", zkbContractCourse.getCourseContractNo());
+            zkbContractCourseDataMap.put("课程剩余名额", isEmptyDouble(zkbContractCourse.getMainCourseCount()));
+            zkbContractCourseDataMap.put("课程总额", isEmptyDouble(zkbContractCourse.getMainCourseCountTotal()));
+            zkbContractCourseDataMap.put("课程申请名额", isEmptyDouble(zkbContractCourse.getMainCourseCountApply()));
+            zkbContractCourseDataMap.put("课程已使用名额", isEmptyDouble(zkbContractCourse.getMainCourseCountUse()));
 
             zkbContractCourseDataList.add(zkbContractCourseDataMap);
         }
@@ -334,10 +344,10 @@ public class ZkbContractService {
 
         if(zkbContract.getZkbContractCourses() != null && zkbContract.getZkbContractCourses().size() > 0){
             for(ZkbContractCourse c : zkbContract.getZkbContractCourses()){
-                int courseCountTotal = c.getCourseCountTotal() == null ? 0 : c.getCourseCountTotal();
-                int courseCount = c.getCourseCount() == null ? 0 : c.getCourseCount();
-                int courseCountApply = c.getCourseCountApply() == null ? 0 : c.getCourseCountApply();
-                int courseCountUse = c.getCourseCountUse() == null ? 0 : c.getCourseCountUse();
+                double courseCountTotal = c.getMainCourseCountTotal() == null ? 0 : c.getMainCourseCountTotal();
+                double courseCount = c.getMainCourseCount() == null ? 0 : c.getMainCourseCount();
+                double courseCountApply = c.getMainCourseCountApply() == null ? 0 : c.getMainCourseCountApply();
+                double courseCountUse = c.getMainCourseCountUse() == null ? 0 : c.getMainCourseCountUse();
                 if(courseCountTotal != (courseCount + courseCountApply + courseCountUse)){
                     flag = false;
                     errorLog += "课程总额不等于课程剩余名额、课程申请名额、课程已使用名额之和,";
