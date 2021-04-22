@@ -1,8 +1,6 @@
 package com.ge.apm.view.asset;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
@@ -17,6 +15,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.*;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.SupplierController;
+import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -69,6 +68,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private AssetHistoryService assetHistoryService;
     private MvsUtil mvsUtil;
     private NurseSiteMaintainService nurseSiteMaintainService;
+    private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
+
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
     private List<AssetInfo> parentAssetList;
@@ -169,9 +170,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.treeNodeNameFilter = treeNodeNameFilter;
     }
 
-    @Getter
-    private TreeNode sysAuthGroupTree;
-
     @Override
     protected void init() {
         isStatus = false;
@@ -205,9 +203,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         zkbFileDirectoryService = WebUtil.getBean(ZkbFileDirectoryService.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
+        medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
+
+        medicalInstrumentsClassificationCompCtrl.registerController(this);
+
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
-        sysAuthGroupTree = assetInfoService.buildSysAuthGroupInTree();
 
         qr_Code = WebUtil.getRequestParameter("qrCode");
         siteUid = WebUtil.getRequestParameter("siteUid");
@@ -442,12 +443,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("parentAsset", selected.getParentAssetId() == null ? null : dao.findById(selected.getParentAssetId()));
         selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
         qrCode = selected.getQrCode();
-        if (null != selected.getMedicalApparatusClassification()) {
-            SysAuthGroup selectedAuthGroup = authGroupDao.findByEncoded(selected.getMedicalApparatusClassification());
-            if (null != selectedAuthGroup) {
-                selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
-            }
-        }
+
+        medicalInstrumentsClassificationCompCtrl.onServerEvent(MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE, this.selected.getMedicalApparatusClassification());
+
         //parentAssetList = aimService.getParentsAssetsList(this.selected);
         getClinicalOwnerList();
 
@@ -485,23 +483,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("selectedOrg", orgInfo);
 
         changeAssetOrg(orgInfo);
-    }
-
-    public void onSelectSysAuthGroupTreeNode(NodeSelectEvent event) {
-        TreeNode node = event.getTreeNode();
-        SysAuthGroup nodeData = (SysAuthGroup) node.getData();
-
-        selectedObjectMap.put("selectedAuthGroup", nodeData);
-//        authGroup = nodeData.getEncoded();
-    }
-
-    public String getSelectedAuthGroupName() {
-        SysAuthGroup selectedAuthGroup = (SysAuthGroup) selectedObjectMap.get("selectedAuthGroup");
-        if (null == selectedAuthGroup) {
-            return null;
-        } else {
-            return selectedAuthGroup.getDisplayName();
-        }
     }
 
     public List<UserAccount> completeOwnerList(String query) {
@@ -1480,6 +1461,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public boolean getUploadFlag() {
         return uploadFlag;
+    }
+
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
+            SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
+            selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
+        }
     }
 
 }
