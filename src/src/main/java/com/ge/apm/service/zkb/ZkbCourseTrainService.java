@@ -80,7 +80,7 @@ public class ZkbCourseTrainService {
         ZkbContractCourse zkbContractCourse = zkbContractCourseRepository.findById(zkbContractCourseId);
         //zkbContractCourse.setCourseCount((zkbContractCourse.getCourseCount() == null ? 0 : zkbContractCourse.getCourseCount()) - q);
         //zkbContractCourse.setCourseCountApply((zkbContractCourse.getCourseCountApply() == null ? 0 : zkbContractCourse.getCourseCountApply()) + q);
-        zkbContractCourseRepository.save(zkbContractCourse);
+        //zkbContractCourseRepository.save(zkbContractCourse);
     }
 
     public Double mulByDouble(Double d1,Double d2){
