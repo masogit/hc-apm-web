@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: qtang
+  Date: 2021/1/6
+  Time: 16:00
+-->
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+<ui:composition>
+    <p:commandButton id="btnOrgMvsFilterComponenet" value="#{filterMvsSiteOrgTreeComponentController.selectedOrgName}" icon="fa fa-angle-down" iconPos="right"/>
+    <p:overlayPanel widgetVar="varPanelOrgMvsFilterComponenet" for="btnOrgMvsFilterComponenet" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+        <p:scrollPanel style="height:300px;border: 0" mode="native">
+            <p:tree id="orgTreeMvsFilterComponent" class="tree" style="width:98%;border:0;" value="#{filterMvsSiteOrgTreeComponentController.orgTree}" selection="#{filterMvsSiteOrgTreeComponentController.selectedNode}" var="node" selectionMode="single">
+                <p:ajax process="@this" event="select" update="#{update}" listener="#{filterMvsSiteOrgTreeComponentController.onSelectTreeNode}" oncomplete="PF('varPanelOrgMvsFilterComponenet').hide();"/>
+                <p:ajax process="@this" event="expand"/>
+                <p:ajax process="@this" event="collapse"/>
+                <p:treeNode type="org">
+                    <h:outputText value="#{node}"/>
+                </p:treeNode>
+            </p:tree>
+            <p:treeNode type="hidden" rendered="false"/>
+        </p:scrollPanel>
+    </p:overlayPanel>
+</ui:composition>
+
+</html>
