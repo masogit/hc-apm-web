@@ -1,11 +1,15 @@
 package com.ge.apm.view.zkb;
 
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.ZkbContactPersonRepository;
+import com.ge.apm.dao.ZkbIbCrossUserStatusRepository;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContactPerson;
+import com.ge.apm.domain.ZkbIbCrossUserStatus;
 import com.ge.apm.service.zkb.ZkbContactPersonService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,9 +20,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author 212605082 on 2019/12/16.
@@ -27,6 +29,8 @@ import java.util.List;
 @ViewScoped
 public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbContactPerson> {
 
+    private UserAccountRepository userAccountRepository;
+    private ZkbIbCrossUserStatusRepository zkbIbCrossUserStatusRepository;
     private ZkbContactPersonRepository dao;
     private ZkbContactPersonService zkbContactPersonService;
     private UserContextService userContextService;
@@ -36,6 +40,13 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
     private String selectionTenantInfo;
     private String actionName;
     private boolean positionDisabled = Boolean.FALSE;
+    private String[] positionValue = new String[]{"AfterSales","AfterSalesManager","AssetSales","AssetSalesManager"};
+    private Map<String,String> positionMap = new HashMap<>();
+
+    /**
+     *用户list
+     */
+    private List<UserAccount> userAccountList;
 
     @Override
     protected void init() {
@@ -43,6 +54,8 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
 
         dao = WebUtil.getBean(ZkbContactPersonRepository.class);
         zkbContactPersonService = WebUtil.getBean(ZkbContactPersonService.class);
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        zkbIbCrossUserStatusRepository = WebUtil.getBean(ZkbIbCrossUserStatusRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
@@ -51,6 +64,11 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
 
         if(userContextService.isZkbUser()) {
             this.selectionTenantInfo = currentUser.getTenantUID();
+            this.userAccountList=userAccountRepository.getTenantUidAndRoleId(this.selectionTenantInfo);
+        }
+        for(int i=0;i<positionValue.length;i++)
+        {
+            positionMap.put(positionValue[i],positionValue[i]);
         }
     }
 
@@ -106,8 +124,30 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
 
     @Override
     public void save() {
+        ZkbContactPerson old = null;
+        if (selected.hashCode()!=0 )
+        {
+            old = this.dao.findById(this.selected.getId());
+            if(old!=null)
+            {
+                this.insertIbCross(old.getLoginName(),old.getPosition());
+            }
+        }
         super.save();
+        this.insertIbCross(this.selected.getLoginName(),this.selected.getPosition());
         this.cancel();
+    }
+
+    private void insertIbCross(String loginName,String position)
+    {
+        if(!positionMap.containsKey(position)) return;
+        if(StringUtils.isBlank(loginName)) return;
+        List<ZkbIbCrossUserStatus> zkbIbCrossUserStatusList = zkbIbCrossUserStatusRepository.findByLoginName(loginName);
+        if(CollectionUtils.isNotEmpty(zkbIbCrossUserStatusList)) return;
+        ZkbIbCrossUserStatus zkbIbCrossUserStatus = new ZkbIbCrossUserStatus();
+        zkbIbCrossUserStatus.setStatus("N");
+        zkbIbCrossUserStatus.setLoginName(loginName);
+        this.zkbIbCrossUserStatusRepository.save(zkbIbCrossUserStatus);
     }
 
     public void tenantInfoSelect(){
@@ -174,5 +214,13 @@ public class ZkbContactPersonController extends GenericCRUDUUIDController<ZkbCon
 
     public void setPositionDisabled(boolean positionDisabled) {
         this.positionDisabled = positionDisabled;
+    }
+
+    public List<UserAccount> getUserAccountList() {
+        return userAccountList;
+    }
+
+    public void setUserAccountList(List<UserAccount> userAccountList) {
+        this.userAccountList = userAccountList;
     }
 }
