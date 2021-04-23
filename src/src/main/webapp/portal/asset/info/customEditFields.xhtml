@@ -4,7 +4,9 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:apm="http://www.ge.com/tags/apm">
+
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'serialNum')}">
         <h:panelGroup>
             <label class="label">#{msg.serialNum}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['serialNum'].required? '*':''}</span></label>
@@ -477,32 +479,18 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'medicalApparatusClassification')}" >
         <h:panelGroup >
             <label class="label">#{msg.medicalApparatusClassification}</label>
-            <p:inputText id="selectedAuthGroupName" value="#{assetInfoEditController.selectedAuthGroupName==null?'请选择...':assetInfoEditController.selectedAuthGroupName}"  readonly="true" />
-            <p:commandButton id="btnAuthGroup" process="@this" icon="fa fa-angle-down"
-                             class="btn btn-sm popupIconButton"
-                             disabled="#{!assetInfoEditController.needEdit('medicalApparatusClassification')}"/>
-            <p:overlayPanel widgetVar="varPanelSysAuthGroup" for="btnAuthGroup" hideEffect="fade" dynamic="false"
-                            style="width:300px" modal="false">
-                <p:scrollPanel style="height:300px;border: 0" mode="native">
-                    <p:tree id="sysAuthGroupTree" class="tree clinicalDeptNameChange" style="width:98%;border:0;"
-                            value="#{assetInfoEditController.sysAuthGroupTree}" var="node" selectionMode="single">
-                        <p:ajax process="@this" event="select" update="tab:AssetInfoEditForm:selectedAuthGroupName"
-                                listener="#{assetInfoEditController.onSelectSysAuthGroupTreeNode}"
-                                oncomplete="PF('varPanelSysAuthGroup').hide();"/>
-                        <p:ajax process="@this" event="expand"/>
-                        <p:ajax process="@this" event="collapse"/>
+            <apm:selectMedicalInstrumentsClassification
+                    disabled="#{!assetInfoEditController.needEdit('medicalApparatusClassification')}"
+                    update=""
+            />
 
-                        <p:treeNode type="sysAuthGroup">
-                            <h:outputText value="#{node.name}"/>
-                        </p:treeNode>
-                    </p:tree>
-                </p:scrollPanel>
-            </p:overlayPanel>
         </h:panelGroup>
     </c:if>
+
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'functionGrade')}" >
         <h:panelGroup>
             <label class="label">#{msg.functionGrade}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['functionGrade'].required? '*':''}</span></label>
