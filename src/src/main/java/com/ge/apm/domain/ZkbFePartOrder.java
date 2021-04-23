@@ -46,6 +46,10 @@ public class ZkbFePartOrder {
         Requested,WaitingAssignment,WaitingApm,WaitingGEAdmin,Complete
     }
 
+    public enum zkbPoProbeQuotaType {
+        Any,Special,Normal,High
+    }
+
     /**
      * 流程步骤
      */
@@ -469,6 +473,12 @@ public class ZkbFePartOrder {
      */
     @Column(name = "has_upload_letter")
     private String hasUploadLetter = "f";
+
+    /**
+     * 扣除名额类型
+     */
+    @Column(name = "zkb_po_probe_quota_type")
+    private String zkbPoProbeQuotaType;
 
     /**
      * 申请备件列表
@@ -1055,5 +1065,13 @@ public class ZkbFePartOrder {
 
     public void setAssetType(String assetType) {
         this.assetType = assetType;
+    }
+
+    public String getZkbPoProbeQuotaType() {
+        return zkbPoProbeQuotaType;
+    }
+
+    public void setZkbPoProbeQuotaType(String zkbPoProbeQuotaType) {
+        this.zkbPoProbeQuotaType = zkbPoProbeQuotaType;
     }
 }
