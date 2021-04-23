@@ -175,6 +175,13 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbFePartOrderProbeController.showZkbPoProbeQuotaType}">
+                            <label class="label">#{msg.zkbFePartOrder_deductType}*</label>
+                            <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.zkbPoProbeQuotaType}" required="true" requiredMessage="#{msg.zkbFePartOrder_deductType} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
 <!--                        <h:panelGroup>-->
 <!--                            <label class="label">订单名额</label>-->
 <!--                            <p:inputText id="qty"  value="#{zkbFePartOrderProbeController.selected.qty}" required="true"  requiredMessage="#{msg.zkbPartOrder_qty} #{msg.ValidationRequire}" disabled="true" />-->
