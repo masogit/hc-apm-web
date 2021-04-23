@@ -619,6 +619,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	 * @return
 	 */
 	public boolean isCurrentEquipmentLoanedOut() {
+		if(selected.getId()==null) return false;
 		String oldSharedAssetCenter = dao.findById(selected.getId()).getDeptForSharedAsset();
 		String newSharedAssetCenter = selected.getDeptForSharedAsset();
 		if(oldSharedAssetCenter!=null && !oldSharedAssetCenter.equals(newSharedAssetCenter)) {
