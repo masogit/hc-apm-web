@@ -218,6 +218,18 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      */
     private static final String assetTypeHighMachineValue = "highMachine";
 
+    public static final String testLoginNameStartWith = "test.";
+
+    /**
+     * 是测试数据值
+     */
+    public static final String testStatusTrueValue = "t";
+
+    /**
+     * 是测试数据值
+     */
+    public static final String testStatusFalseValue = "f";
+
     /**
      * 给申请单添加单号和索引
      * @param zkbFePartOrder
@@ -244,6 +256,15 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         Date date = new Date();
         zkbFePartOrder.setReportDate(date);
         this.fullOrderNo(zkbFePartOrder,ZkbFePartOrderService.ORDER_PREFIX);
+        return zkbFePartOrder;
+    }
+
+    public ZkbFePartOrder initTestStatus(String loginName,ZkbFePartOrder zkbFePartOrder)
+    {
+        zkbFePartOrder.setTestStatus(testStatusFalseValue);
+        if(StringUtils.isBlank(loginName)) return zkbFePartOrder;
+        if(loginName.startsWith(testLoginNameStartWith))
+            zkbFePartOrder.setTestStatus(testStatusTrueValue);
         return zkbFePartOrder;
     }
 

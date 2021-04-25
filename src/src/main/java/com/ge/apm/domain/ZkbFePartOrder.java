@@ -480,6 +480,9 @@ public class ZkbFePartOrder {
     @Column(name = "zkb_po_probe_quota_type")
     private String zkbPoProbeQuotaType;
 
+    @Column(name = "test_status")
+    private String testStatus;
+
     /**
      * 申请备件列表
      */
@@ -1073,5 +1076,13 @@ public class ZkbFePartOrder {
 
     public void setZkbPoProbeQuotaType(String zkbPoProbeQuotaType) {
         this.zkbPoProbeQuotaType = zkbPoProbeQuotaType;
+    }
+
+    public String getTestStatus() {
+        return testStatus;
+    }
+
+    public void setTestStatus(String testStatus) {
+        this.testStatus = testStatus;
     }
 }
