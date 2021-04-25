@@ -209,6 +209,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setCatNum(1);
         this.selected.setOrderAnnotation(ZkbFePartOrderService.normalOrderValue);
         this.orderAnnotationChange();
+        this.zkbFePartOrderService.initTestStatus(this.loginName,this.selected);
     }
 
     @Override

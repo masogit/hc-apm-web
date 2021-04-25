@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbKeyBehaviorIndexConfigRepository;
 import com.ge.apm.dao.ZkbKeyBehaviorIndexRepository;
 import com.ge.apm.domain.*;
@@ -55,6 +56,11 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
      * 获取配置KPI生成配置权重
      */
     private ZkbKeyBehaviorIndexConfigRepository zkbKeyBehaviorIndexConfigRepository;
+
+    /**
+     * 租户repository
+     */
+    private TenantInfoRepository tenantInfoRepository;
 
     /**
      * 租户UID
@@ -132,11 +138,18 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
 
     private String isZkbadmin =ZkbKeyBehaviorIndexService.yes;
 
+
+    /**
+     * 租户
+     */
+    private static final Integer tenant_type = 3;
+
     @Override
     protected void init() {
         super.init();
         zkbKeyBehaviorIndexService = WebUtil.getBean(ZkbKeyBehaviorIndexService.class);
         zkbKeyBehaviorIndexRepository = WebUtil.getBean(ZkbKeyBehaviorIndexRepository.class);
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         zkbKeyBehaviorIndexConfigRepository= WebUtil.getBean(ZkbKeyBehaviorIndexConfigRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
@@ -203,20 +216,23 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexService.monthDateFormat_two);
         String dateStry = formatter.format(this.kpiDate);
         ZkbKeyBehaviorIndexConfig defaultZkbKeyBehaviorIndexConfig = this.zkbKeyBehaviorIndexConfigRepository.getDefaultConfig();
+        Date lastDay = this.getLastDay(this.kpiDate);
+        Date monthOfFirstDay = this.getMonthOfFirstDay(this.kpiDate);
         List<TenantInfo> tenantInfoList = new ArrayList<>();
         if(StringUtils.isNotBlank(this.kpiTenantUID)) {
             TenantInfo tenantInfo = new TenantInfo();
             tenantInfo.setUid(this.kpiTenantUID);
             tenantInfoList.add(tenantInfo);
         }else {
-            tenantInfoList = this.zkbKeyBehaviorIndexService.getSourceTenantInfoList();
+            //tenantInfoList = this.zkbKeyBehaviorIndexService.getSourceTenantInfoList();
+            tenantInfoList = this.tenantInfoRepository.findByAnyContractDate(monthOfFirstDay,lastDay,tenant_type);
             if(CollectionUtils.isEmpty(tenantInfoList)) {
                 return;
             }
         }
         for(TenantInfo item:tenantInfoList) {
             ZkbKeyBehaviorIndex zkbKeyBehaviorIndex = this.generateSingleKpiData(item.getUid(),defaultZkbKeyBehaviorIndexConfig);
-            this.zkbKeyBehaviorIndexService.calculateScore(zkbKeyBehaviorIndex,item.getUid(),this.getLastDay(this.kpiDate),this.getMonthOfFirstDay(this.kpiDate));
+            this.zkbKeyBehaviorIndexService.calculateScore(zkbKeyBehaviorIndex,item.getUid(),lastDay,monthOfFirstDay);
             List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexRepository.findByTenantUIDAndKbiDate(item.getUid(),ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry);
             boolean exist = false;
             if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
