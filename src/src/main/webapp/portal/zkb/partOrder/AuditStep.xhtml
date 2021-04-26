@@ -148,7 +148,7 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 2 }">
+                            <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 2 }">
                                 <label class="label">机型*</label>
                                 <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}" disabled="true">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -157,7 +157,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Probe' and !(zkbPartOrderAuditController.selected.probeQuotaType)}">
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and !(zkbPartOrderAuditController.selected.probeQuotaType)}">
                             <label class="label">扣除名额类型*</label>
                             <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.probeQuotaType}" disabled="true">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
