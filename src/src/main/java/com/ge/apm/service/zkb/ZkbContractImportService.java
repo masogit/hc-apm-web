@@ -605,7 +605,7 @@ public class ZkbContractImportService {
                 newZkbContractAsset.setAssetId(zkbContractAssetVO.getAssetId());
                 newZkbContractAsset.setHighLowMachine(zkbContractAssetVO.getHighLowMachine());
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getAssetType())){
-                    zkbContractAsset.setAssetType(getHighLowAssetFromCh(zkbContractAssetVO.getAssetType()));
+                    newZkbContractAsset.setAssetType(getHighLowAssetFromCh(zkbContractAssetVO.getAssetType()));
                 }
                 newZkbContractAsset.setSubRegion(zkbContractAssetVO.getSubRegion());
                 newZkbContractAsset.setModality(zkbContractAssetVO.getModality());
