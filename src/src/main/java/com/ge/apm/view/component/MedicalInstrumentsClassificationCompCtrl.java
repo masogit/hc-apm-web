@@ -87,7 +87,7 @@ public class MedicalInstrumentsClassificationCompCtrl implements ServerEventInte
                 selectedSysAuthGroup = null;
             }
 
-            selectedSysAuthGroup = sysAuthGroupDao.findByEncoded(sysAuthGroupUid);
+            selectedSysAuthGroup = sysAuthGroupDao.findByClassificationCode(sysAuthGroupUid);
         }
 
     }
