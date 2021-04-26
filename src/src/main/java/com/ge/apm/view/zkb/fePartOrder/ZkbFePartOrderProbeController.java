@@ -2,7 +2,10 @@ package com.ge.apm.view.zkb.fePartOrder;
 
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbFePartOrderRepository;
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.ZkbContract;
+import com.ge.apm.domain.ZkbFePartOrder;
+import com.ge.apm.domain.ZkbPartOrderCat;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
@@ -12,7 +15,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.primefaces.event.FileUploadEvent;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -21,7 +23,10 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -152,6 +157,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     private String remindLetterFlag = "0";
 
+    /**
+     * 是否显示扣除按钮
+     */
+    private Boolean showZkbPoProbeQuotaType = false;
+
     @Override
     protected void init() {
         super.init();
@@ -199,6 +209,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setCatNum(1);
         this.selected.setOrderAnnotation(ZkbFePartOrderService.normalOrderValue);
         this.orderAnnotationChange();
+        this.zkbFePartOrderService.initTestStatus(this.loginName,this.selected);
     }
 
     @Override
@@ -207,6 +218,12 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected=this.zkbFePartOrderRepository.findById(this.id);
         this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo(),null,ZkbFePartOrder.OrderType.Probe.toString());
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
+        Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+        ZkbContract item = this.contractList.get(0);
+        if(item.getStartDate()!=null&&item.getStartDate().compareTo(contractStartDate)>=0)
+        {
+            this.showZkbPoProbeQuotaType=true;
+        }
        // this.initBlobObjectList(this.selected.getId());
         this.orderAnnotationChange();
     }
@@ -234,10 +251,19 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selectZkbFePartOrder.getContractId());
         this.selected = this.zkbFePartOrderService.selectedWorkFlow(this.selected,this.selectZkbFePartOrder);
         this.selected.setProductNumber(this.selectZkbFePartOrder.getFunctionType());
+        this.showZkbPoProbeQuotaType=false;
+        this.selected.setZkbPoProbeQuotaType(null);
         if(CollectionUtils.isNotEmpty(this.contractList))
         {
-            initZknPartCat(this.contractList.get(0).getStartDate());
+            ZkbContract item = this.contractList.get(0);
+            initZknPartCat(item.getStartDate());
+            Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+            if(item.getStartDate()!=null&&item.getStartDate().compareTo(contractStartDate)>=0)
+            {
+                this.showZkbPoProbeQuotaType=true;
+            }
         }
+        zkbPartOrderCatSelect();
 
     }
     public boolean hasLetterViewRight()
@@ -304,6 +330,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     public String saveAndToListPage()
     {
+        calcRemainQty();
 //        if(CollectionUtils.isEmpty(v2_blobObjectList))
 //        {
 //            WebUtil.addErrorMessage("附件不能为空！");
@@ -317,7 +344,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
         if(this.selected.getQty()>0)
         {
-            this.zkbFePartOrderService.moveProbe(1,this.contractList.get(0),this.selected.getQty());
+            this.zkbFePartOrderService.moveProbe(1,this.contractList.get(0),this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType());
         }
         String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null, GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
@@ -353,7 +380,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(this.selected.getQty()>0)
         {
-            this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty());
+            this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType());
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
@@ -370,14 +397,14 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(this.selected.getQty()>0){
-            this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty());
+            this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType());
             if("t".equals(this.selected.getNewCatFlag()))
             {
                 zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
                 Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
                 if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)==-1)
                 {
-                    this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty());
+                    this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType());
                     this.selected.setQty(this.getSelected().getQty()*2);
                 }
             }
@@ -396,7 +423,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(!ZkbFePartOrderSparePartDetailController.badReturnValue.equals(this.selected.getReturnType()))
         {
-            this.zkbFePartOrderService.moveProbe(5,zkbContract,this.selected.getQty());
+            this.zkbFePartOrderService.moveProbe(5,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType());
         }
         Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(
@@ -428,19 +455,23 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
             }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
                 this.selected.setQty(2);
-                if(CollectionUtils.isNotEmpty(this.contractList))
-                {
-                    ZkbContract zkbContract = this.contractList.get(0);
-                    Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
-                    if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)>=0)
-                    {
-                        this.selected.setQty(1);
-                    }
-                }
+//                if(CollectionUtils.isNotEmpty(this.contractList))
+//                {
+//                    ZkbContract zkbContract = this.contractList.get(0);
+//                    Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+//                    if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)>=0)
+//                    {
+//                        this.selected.setQty(1);
+//                    }
+//                }
                 valueTypeTips = "";
             }
+            if(this.showZkbPoProbeQuotaType)
+            {
+                this.selected.setQty(1);
+            }
         }
-        calcRemainQty();
+        //calcRemainQty();
     }
 
     private Date getDateFormat(String format,String formatDate)
@@ -460,7 +491,27 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             return;
         }
         ZkbContract zkbContract = contractList.get(0);
-        Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
+        Integer qty = new Integer(0);
+        if(showZkbPoProbeQuotaType)
+        {
+            if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(this.selected.getZkbPoProbeQuotaType()))
+            {
+                qty=zkbContract.getProbeQuota();
+            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(this.selected.getZkbPoProbeQuotaType()))
+            {
+                qty=zkbContract.getProbeQuotaSpecial();
+            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(this.selected.getZkbPoProbeQuotaType()))
+            {
+                qty=zkbContract.getProbeQuotaNormal();
+            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(this.selected.getZkbPoProbeQuotaType()))
+            {
+                qty=zkbContract.getProbeQuotaHigh();
+            }
+        }else
+            {
+                qty=zkbContract.getProbeQuota();
+            }
+        Integer contractCount = qty == null ? 0 : qty;
         this.selected.setRemainQty(contractCount - this.selected.getQty());
     }
 
@@ -595,5 +646,13 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     public void setConfigTypeMap(Map<String, String> configTypeMap) {
         this.configTypeMap = configTypeMap;
+    }
+
+    public Boolean getShowZkbPoProbeQuotaType() {
+        return showZkbPoProbeQuotaType;
+    }
+
+    public void setShowZkbPoProbeQuotaType(Boolean showZkbPoProbeQuotaType) {
+        this.showZkbPoProbeQuotaType = showZkbPoProbeQuotaType;
     }
 }

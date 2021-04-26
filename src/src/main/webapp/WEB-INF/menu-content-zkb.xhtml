@@ -145,6 +145,7 @@
             <p:submenu label="合同管理 New" icon="fa fa-briefcase" rendered="#{userContextService.accessContains('zkbContract')}">
                 <p:menuitem value="合同管理 New" outcome="/portal/zkb/contract/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.contractMgt')}"/>
                 <p:menuitem value="课程管理 New" outcome="/portal/zkb/course/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.courseMgt') and userContextService.zkbAdmin}"/>
+                <p:menuitem value="课程计划" outcome="/portal/zkb/courseSchedule/List.xhtml" rendered="#{userContextService.zkbUser or userContextService.geAdmin}"/>
             </p:submenu>
             <p:submenu label="#{msg.ZKBBasicInfo} New" icon="fa fa-clipboard" rendered="#{userContextService.accessContains('zkbBasicInfo')}">
                 <p:menuitem value="#{msg.ZKBAgentContactPersonMgt} New" outcome="/portal/zkb/contactPerson/List.xhtml" rendered="#{userContextService.accessContains('zkbBasicInfo.agentContactPersonMgt')}"/>
@@ -154,6 +155,7 @@
             <p:submenu label="维修服务 New" icon="fa fa-wrench">
                 <p:menuitem value="ZKB FE 维修申请" outcome="/portal/zkb/partOrder/List.xhtml" />
                 <p:menuitem value="GEFE 维修申请" outcome="/portal/zkb/zkbFePartOrder/List.xhtml" />
+                <p:menuitem  value="FE USER CONFIG 配置" outcome="/portal/zkb/fePartOrderUserConfig/List.xhtml" />
                 <p:menuitem value="历史申请数据 New" outcome="/portal/zkb/orderHistory/List.xhtml"/>
                 <p:menuitem value="二维码实施统计表" outcome="/portal/zkb/assetStatistic/List.xhtml" rendered="#{userContextService.zkbUser or userContextService.geAdmin}"/>
                 <p:menuitem value="KPI" outcome="/portal/zkb/keyHehaviorIndex/List.xhtml" rendered="#{userContextService.zkbUser or userContextService.geAdmin}"  />
@@ -171,7 +173,6 @@
 
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.accessContains('config')}">
                 <p:menuitem  value="USER CONFIG 配置" outcome="/portal/zkb/partOrderUserConfig/List.xhtml" rendered="#{userContextService.geAdmin or userContextService.zkbConfigAdmin}"/>
-                <p:menuitem  value="FE USER CONFIG 配置" outcome="/portal/zkb/fePartOrderUserConfig/List.xhtml" rendered="#{userContextService.geAdmin or userContextService.zkbConfigAdmin or userContextService.zkbUser}" />
                 <p:menuitem id="um46" value="#{msg.OrgAdmin}" outcome="/admin/uaa/orgInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um47" value="#{msg.UserAdmin}" outcome="/portal/loginAs/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>
                 <p:menuitem id="um54" value="#{msg.MessageSubscriber}" outcome="/portal/asset/assetTag/TagSubscriberAll.xhtml" rendered="#{userContextService.accessContains('config.assetMessage')}"/>

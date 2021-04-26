@@ -120,6 +120,18 @@ public class ZkbContractCourseSchedule implements Serializable {
     @Column(name = "type")
     private String type;
 
+    /**
+     * 参加个数
+     */
+    @Transient
+    private Double joinCount;
+
+    /**
+     * 不参加原因
+     */
+    @Transient
+    private String reason;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -282,5 +294,21 @@ public class ZkbContractCourseSchedule implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Double getJoinCount() {
+        return joinCount;
+    }
+
+    public void setJoinCount(Double joinCount) {
+        this.joinCount = joinCount;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }

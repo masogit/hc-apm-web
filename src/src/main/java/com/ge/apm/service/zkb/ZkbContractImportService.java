@@ -329,11 +329,12 @@ public class ZkbContractImportService {
             contractCourseVO.setLineNum(i);
             ZkbContractCourseRow contractCourseRow = new ZkbContractCourseRow(contractCourseVO, rowMap);
             contractCourseRow.setFieldStringValue("合同号", "setContractNo");
+            contractCourseRow.setFieldStringValue("培训合同号", "setCourseContractNo");
             contractCourseRow.setFieldStringValue("课程ID","setCid");
             contractCourseRow.setFieldStringValue("课程名称","setCname");
-            contractCourseRow.setFieldIntegerValue("课程总额", "setCourseCountTotal");
-            contractCourseRow.setFieldIntegerValue("课程剩余名额", "setCourseCount");
-            contractCourseRow.setFieldIntegerValue("课程已使用名额", "setCourseCountUse");
+            contractCourseRow.setFieldDoubleValue("课程总额", "setMainCourseCountTotal");
+            contractCourseRow.setFieldDoubleValue("课程剩余名额", "setMainCourseCount");
+            contractCourseRow.setFieldDoubleValue("课程已使用名额", "setMainCourseCountUse");
 
             map.put("contractCourseVO", contractCourseVO);
             map.put("rowData", rowMap);
@@ -430,9 +431,9 @@ public class ZkbContractImportService {
                 }
             }
 
-            int courseCountTotal = contractCourseVO.getCourseCountTotal() == null ? 0 : contractCourseVO.getCourseCountTotal();
-            int courseCount = contractCourseVO.getCourseCount() == null ? 0 : contractCourseVO.getCourseCount();
-            int courseCountUse = contractCourseVO.getCourseCountUse() == null ? 0 : contractCourseVO.getCourseCountUse();
+            double courseCountTotal = contractCourseVO.getMainCourseCountTotal() == null ? 0 : contractCourseVO.getMainCourseCountTotal();
+            double courseCount = contractCourseVO.getMainCourseCount() == null ? 0 : contractCourseVO.getMainCourseCount();
+            double courseCountUse = contractCourseVO.getMainCourseCountUse() == null ? 0 : contractCourseVO.getMainCourseCountUse();
             if(courseCountTotal < (courseCount + courseCountUse)){
                 isValidateData = false;
                 item.put("status", ImportStatus.Failure);
@@ -457,12 +458,13 @@ public class ZkbContractImportService {
     @Transactional(rollbackFor = Exception.class)
     public void importOneContractCourse(ZkbContractCourseVO contractCourseVO){
         ZkbContractCourse zkbContractCourse = new ZkbContractCourse();
-        zkbContractCourse.setCourseCount(contractCourseVO.getCourseCount());
+        zkbContractCourse.setCourseContractNo(contractCourseVO.getCourseContractNo());
+        zkbContractCourse.setMainCourseCount(contractCourseVO.getMainCourseCount());
         zkbContractCourse.setCourseId(contractCourseVO.getZkbCourse().getId());
         zkbContractCourse.setContractId(contractCourseVO.getContractId());
-        zkbContractCourse.setCourseCountTotal(contractCourseVO.getCourseCountTotal());
-        zkbContractCourse.setCourseCountUse(contractCourseVO.getCourseCountUse());
-        zkbContractCourse.setCourseCountApply(contractCourseVO.getCourseCountTotal() - contractCourseVO.getCourseCountUse() - contractCourseVO.getCourseCount());
+        zkbContractCourse.setMainCourseCountTotal(contractCourseVO.getMainCourseCountTotal());
+        zkbContractCourse.setMainCourseCountUse(contractCourseVO.getMainCourseCountUse());
+        zkbContractCourse.setMainCourseCountApply(contractCourseVO.getMainCourseCountTotal() - contractCourseVO.getMainCourseCountUse() - contractCourseVO.getMainCourseCount());
         zkbContractCourseRepository.save(zkbContractCourse);
     }
     //endregion

@@ -201,6 +201,13 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
+        if(StringUtils.isNotBlank(this.loginName)&&this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        {
+            searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ,ZkbFePartOrderService.testStatusTrueValue)));
+        }else
+            {
+                searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ,ZkbFePartOrderService.testStatusFalseValue)));
+            }
         //判断是不是我的待办选项卡
         if(MY_WORK.equals(this.queryStatus))
         {

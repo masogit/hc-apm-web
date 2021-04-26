@@ -185,21 +185,26 @@
                                      paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
 
                             <p:ajax event="rowSelect" update=":zkbContractEditForm:zkbContractCourseDatalist:editDetailButton :zkbContractEditForm:zkbContractCourseDatalist:deleteDetailButton"/>
-
+                            <p:column headerText="培训合同号">
+                                <h:outputText value="#{zkbContractCourseItem.courseContractNo}"/>
+                            </p:column>
                             <p:column headerText="课程名称">
                                 <h:outputText value="#{zkbContractCourseItem.zkbCourse.cname}"/>
                             </p:column>
+                            <p:column headerText="modality">
+                                <h:outputText value="#{zkbContractCourseItem.zkbCourse.modality}"/>
+                            </p:column>
                             <p:column headerText="课程总额">
-                                <h:outputText value="#{zkbContractCourseItem.courseCountTotal}"/>
+                                <h:outputText value="#{zkbContractCourseItem.mainCourseCount}"/>
                             </p:column>
                             <p:column headerText="课程剩余额度">
-                                <h:outputText value="#{zkbContractCourseItem.courseCount}"/>
+                                <h:outputText value="#{zkbContractCourseItem.mainCourseCount}"/>
                             </p:column>
                             <p:column headerText="课程申请额度">
-                                <h:outputText value="#{zkbContractCourseItem.courseCountApply}"/>
+                                <h:outputText value="#{zkbContractCourseItem.mainCourseCountApply}"/>
                             </p:column>
                             <p:column headerText="课程已使用额度">
-                                <h:outputText value="#{zkbContractCourseItem.courseCountUse}"/>
+                                <h:outputText value="#{zkbContractCourseItem.mainCourseCountUse}"/>
                             </p:column>
                            <f:facet name="{Toolbar}">
                                 <p:commandButton immediate="false"  process="@this" id="createDetailButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareDetailCreate}" update=":growl :zkbContractCourseEditDlg" oncomplete="PF('zkbContractCourseEditDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.operateFlag}"/>
