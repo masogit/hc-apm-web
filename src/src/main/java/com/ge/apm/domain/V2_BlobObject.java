@@ -53,6 +53,10 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_ZKB_PART_ORDER_LETTER = "ZkbPartOrderLetter";
     public static final String BO_TYPE_COIL_OPPORTUNITY = "CoilOpportunity";
     public static final String BO_TYPE_ADJUST_EQUIPMENT = "AdjustEquipment";
+    /**
+     * 工程师信息
+     */
+    public static final String BO_TYPE_ZKB_ENGINEER="ZkbEngineer";
 
     @Id
     @GeneratedValue(generator = "uuid")

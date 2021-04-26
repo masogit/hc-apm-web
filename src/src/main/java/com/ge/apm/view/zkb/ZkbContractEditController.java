@@ -237,10 +237,10 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             return;
         }
 
-        int courseCountTotal = zkbContractCourseSelected.getCourseCountTotal() == null ? 0 : zkbContractCourseSelected.getCourseCountTotal();
-        int courseCount = zkbContractCourseSelected.getCourseCount() == null ? 0 : zkbContractCourseSelected.getCourseCount();
-        int courseCountApply = zkbContractCourseSelected.getCourseCountApply() == null ? 0 : zkbContractCourseSelected.getCourseCountApply();
-        int courseCountUse = zkbContractCourseSelected.getCourseCountUse() == null ? 0 : zkbContractCourseSelected.getCourseCountUse();
+        double courseCountTotal = zkbContractCourseSelected.getMainCourseCountTotal() == null ? 0 : zkbContractCourseSelected.getMainCourseCountTotal();
+        double courseCount = zkbContractCourseSelected.getMainCourseCount() == null ? 0 : zkbContractCourseSelected.getMainCourseCount();
+        double courseCountApply = zkbContractCourseSelected.getMainCourseCountApply() == null ? 0 : zkbContractCourseSelected.getMainCourseCountApply();
+        double courseCountUse = zkbContractCourseSelected.getMainCourseCountUse() == null ? 0 : zkbContractCourseSelected.getMainCourseCountUse();
         if(courseCountTotal != (courseCount + courseCountApply + courseCountUse)){
             WebUtil.addErrorMessage("课程总额不等于课程剩余名额、课程申请名额、课程已使用名额之和,");
             return;

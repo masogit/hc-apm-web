@@ -153,6 +153,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.selected.setReportUser(this.userName);
         this.selected.setOrderType(ZkbFePartOrder.OrderType.ManMade.toString());
         this.selected.setCurrentStep(ZkbFePartOrder.workFlowSteps.Requested.toString());
+        this.zkbFePartOrderService.initTestStatus(this.loginName,this.selected);
     }
 
     /**

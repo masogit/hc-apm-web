@@ -1,19 +1,20 @@
 package com.ge.apm.service.zkb;
 
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbEngineerRepository;
 import com.ge.apm.dao.ZkbEngineerTrackRecordRepository;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.ZkbEngineer;
 import com.ge.apm.domain.ZkbEngineerTrackRecord;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,6 +22,9 @@ import java.util.List;
  */
 @Component
 public class ZkbEngineerService {
+
+    @Autowired
+    BlobObjectRepository blobObjectRepository;
 
     @Autowired
     private TenantInfoRepository tenantInfoDao;
@@ -87,6 +91,31 @@ public class ZkbEngineerService {
         });
 
         return tempZkbEngineerTrackRecordList;
+    }
+
+    /**
+     * 保存附件
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void saveUploadFile(List<V2_BlobObject> v2_blobObjects, String id){
+        if(CollectionUtils.isNotEmpty(v2_blobObjects)){
+            for (V2_BlobObject v : v2_blobObjects){
+                v.setBoUuid(id);
+                blobObjectRepository.save(v);
+            }
+        }
+    }
+
+    /**
+     * 移除附件
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void removeFile(List<V2_BlobObject> v2_blobObjects){
+        if(CollectionUtils.isNotEmpty(v2_blobObjects)){
+            for (V2_BlobObject v : v2_blobObjects){
+                blobObjectRepository.delete(v.getId());
+            }
+        }
     }
 
 }
