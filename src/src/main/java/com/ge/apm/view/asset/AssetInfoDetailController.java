@@ -118,7 +118,7 @@ public class AssetInfoDetailController {
         assetEvents  = aimService.getAssetEventsList(selected);
 
         if (null != selected.getMedicalApparatusClassification()) {
-            selectedAuthGroup = sysAuthGroupDao.findByEncoded(selected.getMedicalApparatusClassification());
+            selectedAuthGroup = sysAuthGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
         }
 
         //ge mvc data
