@@ -12,4 +12,6 @@ import java.util.List;
 public interface ZkbIbCrossUserStatusRepository extends GenericRepositoryUUID<ZkbIbCrossUserStatus> {
 
     List<ZkbIbCrossUserStatus> findByLoginName(String loginName);
+
+    void deleteByLoginName(String loginName);
 }
