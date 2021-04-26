@@ -1018,7 +1018,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     zkbContract.setProbeQuotaSpecial((zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial()) - qty);
                     zkbContract.setProbeQuotaApply((zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply()) + qty);
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
-                    if(qty < 0){
+                    if(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(zkbPartOrder.getStatus()) ||
+                    ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(zkbPartOrder.getStatus()) ||
+                    ZkbPartOrder.PartOrderStatus.DirectorReject.toString().equals(zkbPartOrder.getStatus())){
                         zkbContract.setProbeQuotaHigh((zkbContract.getProbeQuotaHigh() == null ? 0 : zkbContract.getProbeQuotaHigh()) + 1);
                     }else{
                         zkbContract.setProbeQuotaHigh((zkbContract.getProbeQuotaHigh() == null ? 0 : zkbContract.getProbeQuotaHigh()) - 1);

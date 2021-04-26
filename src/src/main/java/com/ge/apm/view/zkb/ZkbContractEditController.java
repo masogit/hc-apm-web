@@ -11,6 +11,7 @@ import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -300,6 +301,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
        this.selected.setLastModifiedBy(currentUser.getLoginName());
        this.selected.setLastModifiedDate(new Date());
+       this.selected.setZkbContractAssets(null);
        dao.save(this.selected);
    }
 
