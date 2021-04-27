@@ -589,92 +589,134 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             {
                     return;
             }
+            Integer probeQuota = zkbContract.getProbeQuota()==null?0:zkbContract.getProbeQuota();
+            Integer probeQuotaTotal = zkbContract.getProbeQuotaTotal()==null?0:zkbContract.getProbeQuotaTotal();
+            Integer probeQuotaUse = zkbContract.getProbeQuotaUse()==null?0:zkbContract.getProbeQuotaUse();
+            Integer probeQuotaApply = zkbContract.getProbeQuotaApply()==null?0:zkbContract.getProbeQuotaApply();
+            Integer probeQuotaNormal = zkbContract.getProbeQuotaNormal()==null?0:zkbContract.getProbeQuotaNormal();
+            Integer probeQuotaNormalTotal = zkbContract.getProbeQuotaNormalTotal()==null?0:zkbContract.getProbeQuotaNormalTotal();
+            Integer probeQuotaNormalUse = zkbContract.getProbeQuotaNormalUse()==null?0:zkbContract.getProbeQuotaNormalUse();
+            Integer probeQuotaNormalApply = zkbContract.getProbeQuotaNormalApply()==null?0:zkbContract.getProbeQuotaNormalApply();
+            Integer probeQuotaSpecial = zkbContract.getProbeQuotaSpecial()==null?0:zkbContract.getProbeQuotaSpecial();
+            Integer probeQuotaSpecialTotal = zkbContract.getProbeQuotaSpecialTotal()==null?0:zkbContract.getProbeQuotaSpecialTotal();
+            Integer probeQuotaSpecialUse = zkbContract.getProbeQuotaSpecialUse()==null?0:zkbContract.getProbeQuotaSpecialUse();
+            Integer probeQuotaSpecialApply = zkbContract.getProbeQuotaSpecialApply()==null?0:zkbContract.getProbeQuotaSpecialApply();
+            Integer probeQuotaHigh = zkbContract.getProbeQuotaHigh()==null?0:zkbContract.getProbeQuotaHigh();
+            Integer probeQuotaHighUse = zkbContract.getProbeQuotaHighUse()==null?0:zkbContract.getProbeQuotaHighUse();
+            Integer probeQuotaHighApply = zkbContract.getProbeQuotaHighApply()==null?0:zkbContract.getProbeQuotaHighApply();
+            Integer probeQuotaHighTotal = zkbContract.getProbeQuotaHighTotal()==null?0:zkbContract.getProbeQuotaHighTotal();
             if(showZkbPoProbeQuotaType)
             {
-                    switch(type){
-                        case 1 :
-                            //探头剩余名额-1，探头申请名额+1
-                            if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuota(zkbContract.getProbeQuota()-qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaNormal(zkbContract.getProbeQuotaNormal()-qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaSpecial(zkbContract.getProbeQuotaSpecial()-qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaHigh(zkbContract.getProbeQuotaHigh()-qty);
-                            }
-                            if(!ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaApply()+qty);
-                            }
-                            break;
-                        case 2 :
+
+                switch(type){
+                    case 1 :
+                        //探头剩余名额-1，探头申请名额+1
+                        if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            zkbContract.setProbeQuota(probeQuota-qty);
+                            zkbContract.setProbeQuotaApply(probeQuotaApply+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            zkbContract.setProbeQuotaNormal(probeQuotaNormal-qty);
+                            zkbContract.setProbeQuotaNormalApply(probeQuotaNormalApply+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            zkbContract.setProbeQuotaSpecial(probeQuotaSpecial-qty);
+                            zkbContract.setProbeQuotaSpecialApply(probeQuotaSpecialApply+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            zkbContract.setProbeQuotaHigh(probeQuotaHigh-qty);
+                            zkbContract.setProbeQuotaHighApply(probeQuotaHighApply+qty);
+                        }
+                        break;
+                    case 2 :
+                        if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType))
+                        {
                             //探头申请名额-1，探头已使用名额+1
-                            zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaApply()-qty);
-                            zkbContract.setProbeQuotaUse(zkbContract.getProbeQuotaUse()+qty);
-                            break;
-                        case 3 :
-                            //探头剩余名额-1 探头已使用名额+1
-                            if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuota(zkbContract.getProbeQuota()-qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaNormal(zkbContract.getProbeQuotaNormal()-qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaSpecial(zkbContract.getProbeQuotaSpecial()-qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaHigh(zkbContract.getProbeQuotaHigh()-qty);
-                            }
-                            zkbContract.setProbeQuotaUse(zkbContract.getProbeQuotaUse()+qty);
-                            break;
-                        case 4 :
-                            //探头剩余名额+1，探头申请名额-1
-                            if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuota(zkbContract.getProbeQuota()+qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaNormal(zkbContract.getProbeQuotaNormal()+qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaSpecial(zkbContract.getProbeQuotaSpecial()+qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaHigh(zkbContract.getProbeQuotaHigh()+qty);
-                            }
-                            if(!ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaApply(zkbContract.getProbeQuotaApply()-qty);
-                            }
-                            break;
-                        case 5 :
+                            zkbContract.setProbeQuotaApply(probeQuotaApply-qty);
+                            zkbContract.setProbeQuotaUse(probeQuotaUse+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            zkbContract.setProbeQuotaNormalApply(probeQuotaNormalApply-qty);
+                            zkbContract.setProbeQuotaNormalUse(probeQuotaNormalUse+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            zkbContract.setProbeQuotaSpecialApply(probeQuotaSpecialApply-qty);
+                            zkbContract.setProbeQuotaSpecialUse(probeQuotaSpecialUse+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            zkbContract.setProbeQuotaHighApply(probeQuotaHighApply-qty);
+                            zkbContract.setProbeQuotaHighUse(probeQuotaHighUse+qty);
+                        }
+                        break;
+                    case 3 :
+                        //探头剩余名额-1 探头已使用名额+1
+                        if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            //探头申请名额-1，探头已使用名额+1
+                            zkbContract.setProbeQuota(probeQuota-qty);
+                            zkbContract.setProbeQuotaUse(probeQuotaUse+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            //探头申请名额-1，探头已使用名额+1
+                            zkbContract.setProbeQuotaNormal(probeQuotaNormal-qty);
+                            zkbContract.setProbeQuotaNormalUse(probeQuotaNormalUse+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            //探头申请名额-1，探头已使用名额+1
+                            zkbContract.setProbeQuotaSpecial(probeQuotaSpecial-qty);
+                            zkbContract.setProbeQuotaSpecialUse(probeQuotaSpecialUse+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            //探头申请名额-1，探头已使用名额+1
+                            zkbContract.setProbeQuotaHigh(probeQuotaHigh-qty);
+                            zkbContract.setProbeQuotaHighUse(probeQuotaHighUse+qty);
+                        }
+                        break;
+                    case 4 :
+                        if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            //探头申请名额-1，探头已使用名额+1
+                            zkbContract.setProbeQuota(probeQuota+qty);
+                            zkbContract.setProbeQuotaApply(probeQuotaApply-qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            zkbContract.setProbeQuotaNormal(probeQuotaNormal+qty);
+                            zkbContract.setProbeQuotaNormalApply(probeQuotaNormalApply-qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            zkbContract.setProbeQuotaSpecial(probeQuotaSpecial+qty);
+                            zkbContract.setProbeQuotaSpecialApply(probeQuotaSpecialApply-qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            zkbContract.setProbeQuotaHigh(probeQuotaHigh+qty);
+                            zkbContract.setProbeQuotaHighApply(probeQuotaHighApply-qty);
+                        }
+                        break;
+                    case 5 :
+                        if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType))
+                        {
                             //探头已使用名额-1，探头剩余名额+1
-                            if(!ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaUse(zkbContract.getProbeQuotaUse()-qty);
-                            }
-                            if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuota(zkbContract.getProbeQuota()+qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaNormal(zkbContract.getProbeQuotaNormal()+qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaSpecial(zkbContract.getProbeQuotaSpecial()+qty);
-                            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
-                            {
-                                zkbContract.setProbeQuotaHigh(zkbContract.getProbeQuotaHigh()+qty);
-                            }
-                            break;
-                    }
+                            zkbContract.setProbeQuotaUse(probeQuotaUse-qty);
+                            zkbContract.setProbeQuota(probeQuota+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            //探头已使用名额-1，探头剩余名额+1
+                            zkbContract.setProbeQuotaNormalUse(probeQuotaNormalUse-qty);
+                            zkbContract.setProbeQuotaNormal(probeQuotaNormal+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            //探头已使用名额-1，探头剩余名额+1
+                            zkbContract.setProbeQuotaSpecialUse(probeQuotaSpecialUse-qty);
+                            zkbContract.setProbeQuotaSpecial(probeQuotaSpecial+qty);
+                        }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType))
+                        {
+                            //探头已使用名额-1，探头剩余名额+1
+                            zkbContract.setProbeQuotaHighUse(probeQuotaHighUse-qty);
+                            zkbContract.setProbeQuotaHigh(probeQuotaHigh+qty);
+                        }
+                        break;
+                }
             }else
                 {
                     switch(type){

@@ -111,6 +111,26 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     private static final String t = "f";
 
     /**
+     * 课程名称
+     */
+    private String cname;
+
+    /**
+     * modality
+     */
+    private String modality;
+
+    /**
+     * 开始时间
+     */
+    private Date startDate;
+
+    /**
+     * 结束时间
+     */
+    private Date endDate;
+
+    /**
      * 初始化
      */
     @Override
@@ -138,22 +158,33 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
      */
     @Override
     protected Page<ZkbContractCourseSchedule> loadData(PageRequest pageRequest) {
-        searchFilters= this.getSearchFilter(this.searchFilters);
+        searchFilters= this.getSearchFilter();
         return zkbCourseScheduleRepository.findBySearchFilter(searchFilters, pageRequest);
     }
 
     /**
      * 动态组装列表过滤条件
-     * @param csearchFilters
      * @return
      */
-    public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters) {
+    public List<SearchFilter> getSearchFilter() {
         Date date = new Date();
-        List<SearchFilter> searchFilters = csearchFilters;
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<>();
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        if(StringUtils.isNotBlank(this.cname))
+        {
+            searchFilters.add(new SearchFilter("cname", SearchFilter.Operator.EQ,this.cname));
         }
-
+        if(StringUtils.isNotBlank(this.modality))
+        {
+            searchFilters.add(new SearchFilter("modality", SearchFilter.Operator.EQ,this.modality));
+        }
+        if(startDate!=null)
+        {
+            searchFilters.add(new SearchFilter("startDate",SearchFilter.Operator.LTE, startDate));
+        }
+        if(endDate!=null)
+        {
+            searchFilters.add(new SearchFilter("endDate", SearchFilter.Operator.GTE, endDate));
+        }
         if(this.tenant)
         {
             searchFilters.add(new SearchFilter("valid", SearchFilter.Operator.EQ,"t"));
@@ -317,5 +348,37 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
 
     public void setTenant(Boolean tenant) {
         this.tenant = tenant;
+    }
+
+    public String getCname() {
+        return cname;
+    }
+
+    public void setCname(String cname) {
+        this.cname = cname;
+    }
+
+    public String getModality() {
+        return modality;
+    }
+
+    public void setModality(String modality) {
+        this.modality = modality;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 }
