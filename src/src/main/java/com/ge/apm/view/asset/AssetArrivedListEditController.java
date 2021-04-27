@@ -14,6 +14,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.view.SupplierController;
 import lombok.Setter;
 import org.primefaces.event.FileUploadEvent;
@@ -73,6 +74,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private String nationalStandardCode;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+    private ConfigService configService;
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
     private SupplierController supplierController;
@@ -137,6 +139,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         orgTree.getChildren().add(subTree);
         attachList = new ArrayList();
         currentUser=UserContextService.getCurrentUserAccount();
+        configService = WebUtil.getBean(ConfigService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -501,6 +504,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+    }
+
+    public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
+        return configService.getAttachmentCategories(configService.findConfigBySite(UserContextService.getCurrentUserAccount().getSiteUID()));
     }
 
     public void handleFileUpload(FileUploadEvent event) {
