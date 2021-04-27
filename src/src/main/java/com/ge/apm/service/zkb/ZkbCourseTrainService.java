@@ -1,6 +1,7 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbContractCourseRepository;
 import com.ge.apm.dao.ZkbCourseTrainRepository;
 import com.ge.apm.domain.*;
@@ -32,8 +33,15 @@ public class ZkbCourseTrainService {
     @Autowired
     ZkbContractCourseRepository zkbContractCourseRepository;
 
+    @Autowired
+    private TenantInfoRepository tenantInfoDao;
+
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
+
+    public TenantInfo getTenantInfo(String tenantUID){
+        return tenantInfoDao.findByuid(tenantUID);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public void generateTrain(ZkbContractCourseSchedule s, String joinFlag, UserAccount userAccount,String reason,Double c){
@@ -66,21 +74,17 @@ public class ZkbCourseTrainService {
             t.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ScheduleNoJoin.toString());
         }
         zkbCourseTrainRepository.save(t);
-        dealPreQuota(t.getContractCourseId(),t.getPreDeductCount(),t.getTrainType());
+        dealPreQuota(t.getContractCourseId(),t.getPreDeductCount(),t.getPreDeductCount());
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void dealPreQuota(String zkbContractCourseId, Double c,String trainType){
+    public void dealPreQuota(String zkbContractCourseId, Double c,Double deductCount){
         Double q = new Double(0);
-        if(ZkbCourseTrain.TrainTypeEnum.Online.toString().equals(trainType)){
-            q = mulByDouble(c, 0.5);
-        }else {
-            q = c;
-        }
+        q = mulByDouble(c, deductCount);
         ZkbContractCourse zkbContractCourse = zkbContractCourseRepository.findById(zkbContractCourseId);
-        //zkbContractCourse.setCourseCount((zkbContractCourse.getCourseCount() == null ? 0 : zkbContractCourse.getCourseCount()) - q);
-        //zkbContractCourse.setCourseCountApply((zkbContractCourse.getCourseCountApply() == null ? 0 : zkbContractCourse.getCourseCountApply()) + q);
-        //zkbContractCourseRepository.save(zkbContractCourse);
+        zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) - q);
+        zkbContractCourse.setMainCourseCountApply((zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply()) + q);
+        zkbContractCourseRepository.save(zkbContractCourse);
     }
 
     public Double mulByDouble(Double d1,Double d2){
@@ -102,17 +106,11 @@ public class ZkbCourseTrainService {
         }else if(ZkbCourseTrain.FlowStepEnum.ApplyCancelAuditPending.toString().equals(c.getCurrentStep())){
             c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ApplyCancelAccepted.toString());
             c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
-        }else if(ZkbCourseTrain.FlowStepEnum.LetterCancelAuditPending.toString().equals(c.getCurrentStep())){
-            c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ApplyCancelAccepted.toString());
-            c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
-            //返还名额
         }
         //名额变化
         if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(c.getCurrentStep())){
             //扣除申请中名额，增加已使用名额
 
-        }else if(ZkbCourseTrain.FlowStepEnum.LetterCancelAuditPending.toString().equals(c.getCurrentStep())){
-            //返还已使用名额
         }
         zkbCourseTrainRepository.save(c);
     }
@@ -126,9 +124,6 @@ public class ZkbCourseTrainService {
             c.setReason(reason);
         }else if(ZkbCourseTrain.FlowStepEnum.ApplyCancelAuditPending.toString().equals(c.getCurrentStep())){
             c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ApplyCancelRejected.toString());
-            c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
-        }else if(ZkbCourseTrain.FlowStepEnum.LetterCancelAuditPending.toString().equals(c.getCurrentStep())){
-            c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.LetterCancelRejected.toString());
             c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
         }
         zkbCourseTrainRepository.save(c);
@@ -144,5 +139,20 @@ public class ZkbCourseTrainService {
         sfs.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, V2_BlobObject.BO_TYPE_ZKB_COURSE_TRAIN));
         v2_blobObjectList = blobObjectRepository.findBySearchFilter(sfs);
         return v2_blobObjectList;
+    }
+
+
+    public boolean isZkbAdmin(String tid){
+        TenantInfo currentTenantInfo = tenantInfoDao.findByuid(tid);
+
+        if(currentTenantInfo.getType() == null || currentTenantInfo.getTestStatus() == null){
+            return Boolean.FALSE;
+        }
+
+        if(currentTenantInfo.getType().equals(3) && currentTenantInfo.getTestStatus().equals(-1)){
+            return Boolean.TRUE;
+        }
+
+        return Boolean.FALSE;
     }
 }
