@@ -108,12 +108,23 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("人工支持总次数", "setGeArtificialSupportTimesTotal");
             contractRow.setFieldNumValue("人工支持剩余次数", "setGeArtificialSupportTimes");
             contractRow.setFieldNumValue("人工支持已使用次数", "setGeArtificialSupportTimesUse");
-            contractRow.setFieldNumValue("探头总额", "setProbeQuotaTotal");
+            contractRow.setFieldNumValue("探头任意总额", "setProbeQuotaTotal");
             contractRow.setFieldNumValue("探头任意剩余名额", "setProbeQuota");
+            contractRow.setFieldNumValue("探头任意已使用名额", "setProbeQuotaUse");
+
+
+            contractRow.setFieldNumValue("探头普通总额", "setProbeQuotaNormalTotal");
             contractRow.setFieldNumValue("探头普通剩余名额", "setProbeQuotaNormal");
+            contractRow.setFieldNumValue("探头普通已使用名额", "setProbeQuotaNormalUse");
+
+            contractRow.setFieldNumValue("探头特殊总额", "setProbeQuotaSpecialTotal");
             contractRow.setFieldNumValue("探头特殊剩余名额", "setProbeQuotaSpecial");
+            contractRow.setFieldNumValue("探头特殊已使用名额", "setProbeQuotaSpecialUse");
+
+            contractRow.setFieldNumValue("探头高值总额", "setProbeQuotaHighTotal");
             contractRow.setFieldNumValue("探头高值剩余名额", "setProbeQuotaHigh");
-            contractRow.setFieldNumValue("探头已使用名额", "setProbeQuotaUse");
+            contractRow.setFieldNumValue("探头高值已使用名额", "setProbeQuotaHighUse");
+
             contractRow.setFieldNumValue("备件+人工+保养总额", "setSpareArtificailTotal");
             contractRow.setFieldNumValue("备件+人工+保养剩余名额", "setSpareArtificail");
             contractRow.setFieldNumValue("备件+人工+保养已使用名额", "setSpareArtificailUse");
@@ -268,12 +279,37 @@ public class ZkbContractImportService {
 
         int probeQuotaTotal = contractInfoVO.getProbeQuotaTotal() == null ? 0 : contractInfoVO.getProbeQuotaTotal();
         int probeQuota = contractInfoVO.getProbeQuota() == null ? 0 : contractInfoVO.getProbeQuota();
-        int probeQuotaNormal = contractInfoVO.getProbeQuotaNormal() == null ? 0 : contractInfoVO.getProbeQuotaNormal();
-        int probeQuotaSpecial = contractInfoVO.getProbeQuotaSpecial() == null ? 0 : contractInfoVO.getProbeQuotaSpecial();
         int probeQuotaUse = contractInfoVO.getProbeQuotaUse() == null ? 0 : contractInfoVO.getProbeQuotaUse();
-        if(probeQuotaTotal < (probeQuota  + probeQuotaUse + probeQuotaNormal + probeQuotaSpecial)){
+        if(probeQuotaTotal < (probeQuota  + probeQuotaUse )){
             item.put("status", ImportStatus.Failure);
-            ZkbContractRow.addErrMessage(item,  "探头总额小于剩余名额、已使用名额之和");
+            ZkbContractRow.addErrMessage(item,  "探头任意总额小于任意剩余名额、任意已使用名额之和");
+            isValidateData = false;
+        }
+
+        int probeQuotaNormalTotal = contractInfoVO.getProbeQuotaNormalTotal() == null ? 0 : contractInfoVO.getProbeQuotaNormalTotal();
+        int probeQuotaNormal = contractInfoVO.getProbeQuotaNormal() == null ? 0 : contractInfoVO.getProbeQuotaNormal();
+        int probeQuotaNormalUse = contractInfoVO.getProbeQuotaNormalUse() == null ? 0 : contractInfoVO.getProbeQuotaNormalUse();
+        if(probeQuotaNormalTotal < (probeQuotaNormal  + probeQuotaNormalUse)){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item,  "探头普通总额小于普通剩余名额、普通已使用名额之和");
+            isValidateData = false;
+        }
+
+        int probeQuotaSpecialTotal = contractInfoVO.getProbeQuotaSpecialTotal() == null ? 0 : contractInfoVO.getProbeQuotaSpecialTotal();
+        int probeQuotaSpecial = contractInfoVO.getProbeQuotaSpecial() == null ? 0 : contractInfoVO.getProbeQuotaSpecial();
+        int probeQuotaSpecialUse = contractInfoVO.getProbeQuotaSpecialUse() == null ? 0 : contractInfoVO.getProbeQuotaSpecialUse();
+        if(probeQuotaSpecialTotal < (probeQuotaSpecial + probeQuotaSpecialUse)){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item,  "探头特殊总额小于特殊剩余名额、特殊已使用名额之和");
+            isValidateData = false;
+        }
+
+        int probeQuotaHighTotal = contractInfoVO.getProbeQuotaHighTotal() == null ? 0 : contractInfoVO.getProbeQuotaHighTotal();
+        int probeQuotaHigh = contractInfoVO.getProbeQuotaHigh() == null ? 0 : contractInfoVO.getProbeQuotaHigh();
+        int probeQuotaHighUse = contractInfoVO.getProbeQuotaHighUse() == null ? 0 : contractInfoVO.getProbeQuotaHighUse();
+        if(probeQuotaHighTotal < (probeQuotaHigh  + probeQuotaHighUse)){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item,  "探头高值总额小于高值剩余名额、高值已使用名额之和");
             isValidateData = false;
         }
 

@@ -75,21 +75,34 @@ public class ZkbContractService {
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_endDate"), DateFormatUtils.format(zkbContract.getEndDate(),"yyyy-MM-dd"));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractState"), zkbContract.getContractState());
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_ibNumber"), zkbContract.getIbNumber());
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota"), isEmptyInteger(zkbContract.getSpareQuota()));
-            zkbContractDataMap.put("探头任意剩余名额", isEmptyInteger(zkbContract.getProbeQuota()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes"), isEmptyInteger(zkbContract.getGeArtificialSupportTimes()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail"), isEmptyInteger(zkbContract.getSpareArtificail()));
 
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota"), isEmptyInteger(zkbContract.getSpareQuota()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_total"), isEmptyInteger(zkbContract.getSpareQuotaTotal()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_apply"), isEmptyInteger(zkbContract.getSpareQuotaApply()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_use"), isEmptyInteger(zkbContract.getSpareQuotaUse()));
 
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_total"), isEmptyInteger(zkbContract.getProbeQuotaTotal()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_apply"), isEmptyInteger(zkbContract.getProbeQuotaApply()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_use"), isEmptyInteger(zkbContract.getProbeQuotaUse()));
+            zkbContractDataMap.put("探头任意总额", isEmptyInteger(zkbContract.getProbeQuotaTotal()));
+            zkbContractDataMap.put("探头任意剩余名额", isEmptyInteger(zkbContract.getProbeQuota()));
+            zkbContractDataMap.put("探头任意申请名额", isEmptyInteger(zkbContract.getProbeQuotaApply()));
+            zkbContractDataMap.put("探头任意已使用名额", isEmptyInteger(zkbContract.getProbeQuotaUse()));
+
+            zkbContractDataMap.put("探头普通总额", isEmptyInteger(zkbContract.getProbeQuotaNormalTotal()));
             zkbContractDataMap.put("探头普通剩余名额", isEmptyInteger(zkbContract.getProbeQuotaNormal()));
+            zkbContractDataMap.put("探头普通申请名额", isEmptyInteger(zkbContract.getProbeQuotaNormalApply()));
+            zkbContractDataMap.put("探头普通已使用名额", isEmptyInteger(zkbContract.getProbeQuotaNormalUse()));
+
+            zkbContractDataMap.put("探头特殊总额", isEmptyInteger(zkbContract.getProbeQuotaSpecialTotal()));
             zkbContractDataMap.put("探头特殊剩余名额", isEmptyInteger(zkbContract.getProbeQuotaSpecial()));
+            zkbContractDataMap.put("探头特殊申请名额", isEmptyInteger(zkbContract.getProbeQuotaSpecialApply()));
+            zkbContractDataMap.put("探头特殊已使用名额", isEmptyInteger(zkbContract.getProbeQuotaSpecialUse()));
+
+            zkbContractDataMap.put("探头高值总额", isEmptyInteger(zkbContract.getProbeQuotaHighTotal()));
             zkbContractDataMap.put("探头高值剩余名额", isEmptyInteger(zkbContract.getProbeQuotaHigh()));
+            zkbContractDataMap.put("探头高值申请名额", isEmptyInteger(zkbContract.getProbeQuotaHighApply()));
+            zkbContractDataMap.put("探头高值已使用名额", isEmptyInteger(zkbContract.getProbeQuotaHighUse()));
+
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes"), isEmptyInteger(zkbContract.getGeArtificialSupportTimes()));
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail"), isEmptyInteger(zkbContract.getSpareArtificail()));
 
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes_total"), isEmptyInteger(zkbContract.getGeArtificialSupportTimesTotal()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes_apply"), isEmptyInteger(zkbContract.getGeArtificialSupportTimesApply()));
@@ -304,6 +317,14 @@ public class ZkbContractService {
             errorLog += "开始时间不能大于结束时间,";
         }
 
+        boolean newContractFlag = false;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        if(getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(zkbContract.getStartDate()))< 0){
+            newContractFlag = false;
+        }else{
+            newContractFlag = true;
+        }
+
         int spareQuotaTotal = zkbContract.getSpareQuotaTotal() == null ? 0 : zkbContract.getSpareQuotaTotal();
         int spareQuota = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
         int spareQuotaApply = zkbContract.getSpareQuotaApply() == null ? 0 : zkbContract.getSpareQuotaApply();
@@ -315,15 +336,47 @@ public class ZkbContractService {
 
         int probeQuotaTotal = zkbContract.getProbeQuotaTotal() == null ? 0 : zkbContract.getProbeQuotaTotal();
         int probeQuota = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
-        int probeQuotaNormal = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
-        int probeQuotaSpecial = zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial();
+
         int probeQuotaApply = zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply();
         int probeQuotaUse = zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse();
-        if(probeQuotaTotal != (probeQuota + probeQuotaApply + probeQuotaUse + probeQuotaNormal + probeQuotaSpecial)){
+        if(probeQuotaTotal != (probeQuota + probeQuotaApply + probeQuotaUse)){
             flag = false;
-            errorLog += "探头总额不等于剩余名额、申请名额、已使用名额之和,";
+            if(!newContractFlag){
+                errorLog += "探头总额不等于剩余名额、申请名额、已使用名额之和,";
+            }else{
+                errorLog += "探头任意总额不等于任意剩余名额、任意申请名额、任意已使用名额之和,";
+            }
         }
 
+        if(newContractFlag){
+            int probeQuotaNormal = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
+            int probeQuotaNormalTotal = zkbContract.getProbeQuotaNormalTotal() == null ? 0 : zkbContract.getProbeQuotaNormalTotal();
+            int probeQuotaNormalApply = zkbContract.getProbeQuotaNormalApply() == null ? 0 : zkbContract.getProbeQuotaNormalApply();
+            int probeQuotaNormalUse = zkbContract.getProbeQuotaNormalUse() == null ? 0 : zkbContract.getProbeQuotaNormalUse();
+            if(probeQuotaNormalTotal != (probeQuotaNormal + probeQuotaNormalApply + probeQuotaNormalUse)){
+                flag = false;
+                errorLog += "探头普通总额不等于普通剩余名额、普通申请名额、普通已使用名额之和,";
+            }
+
+            int probeQuotaSpecial = zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial();
+            int probeQuotaSpecialTotal = zkbContract.getProbeQuotaSpecialTotal() == null ? 0 : zkbContract.getProbeQuotaSpecialTotal();
+            int probeQuotaSpecialApply = zkbContract.getProbeQuotaSpecialApply() == null ? 0 : zkbContract.getProbeQuotaSpecialApply();
+            int probeQuotaSpecialUse = zkbContract.getProbeQuotaSpecialUse() == null ? 0 : zkbContract.getProbeQuotaSpecialUse();
+            if(probeQuotaSpecialTotal != (probeQuotaSpecial + probeQuotaSpecialApply + probeQuotaSpecialUse)){
+                flag = false;
+                errorLog += "探头特殊总额不等于特殊剩余名额、特殊申请名额、特殊已使用名额之和,";
+            }
+
+            int probeQuotaHigh = zkbContract.getProbeQuotaHigh() == null ? 0 : zkbContract.getProbeQuotaHigh();
+            int probeQuotaHighTotal = zkbContract.getProbeQuotaHighTotal() == null ? 0 : zkbContract.getProbeQuotaHighTotal();
+            int probeQuotaHighApply = zkbContract.getProbeQuotaHighApply() == null ? 0 : zkbContract.getProbeQuotaHighApply();
+            int probeQuotaHighUse = zkbContract.getProbeQuotaHighUse() == null ? 0 : zkbContract.getProbeQuotaHighUse();
+            if(probeQuotaHighTotal != (probeQuotaHigh + probeQuotaHighApply + probeQuotaHighUse)){
+                flag = false;
+                errorLog += "探头高值总额不等于高值剩余名额、高值申请名额、高值已使用名额之和,";
+            }
+        }
+        
         int geArtificialSupportTimesTotal = zkbContract.getGeArtificialSupportTimesTotal() == null ? 0 : zkbContract.getGeArtificialSupportTimesTotal();
         int geArtificialSupportTimes = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
         int geArtificialSupportTimesApply = zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply();
@@ -360,6 +413,22 @@ public class ZkbContractService {
         resut.put("flag",flag);
         resut.put("errorLog",errorLog);
         return resut;
+    }
+
+    public int getBetweenDay(String sd1, String sd2) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date1 = format.parse(sd1);
+            Date date2 = format.parse(sd2);
+            long days = (date2.getTime() - date1.getTime()) / (24*3600*1000);
+            if((date2.getTime() - date1.getTime())% (24*3600*1000) != 0){
+                days++;
+            }
+            return (int)days;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     /**
