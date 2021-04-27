@@ -149,7 +149,7 @@ public class AssetInstallationService {
                     pmService.createPMrequest(newAsset.getUid(), null);
                 }
                 List<V2_BlobObject> assetPicList = Optional.ofNullable(getPicList(itemId)).orElse(new ArrayList<V2_BlobObject>())
-                        .stream().filter(item -> item.getBoSubType().contains("asset")).collect(Collectors.toList());
+                        .stream().filter(item -> item.getBoSubType().contains("asset") || item.getBoSubType().contains("CustomizedAssetAttachmentCategory")).collect(Collectors.toList());
                 assetPicList.addAll(getPicList(temp.getArrivalListId()));
                 assetPicList.forEach(item -> {
                     item.setId(null);

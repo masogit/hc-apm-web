@@ -96,8 +96,8 @@ public class SharedAssetConfigController {
 
     public List<UserAccount> loadUserList(){
 
-        List<UserAccount> userAccountList = new ArrayList<>();
-        userAccountList = userAccountDao.findByTenantUIDAndRoleName(currentUser.getTenantUID(), "SharedAssetMgmt");
+        //userAccountList = userAccountDao.findByTenantUIDAndRoleName(currentUser.getTenantUID(), "SharedAssetMgmt");
+        List<UserAccount> userAccountList = userAccountDao.findByTenantUIDAndRoleNames(currentUser.getTenantUID(), Arrays.asList("SharedAssetMgmt","AssetStaff"));
 
         if(!userAccountList.isEmpty()){
             if(currentUser.getOrgLevel() != 0){

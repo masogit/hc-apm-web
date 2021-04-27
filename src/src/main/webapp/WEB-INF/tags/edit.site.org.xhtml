@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: qtang
+  Date: 2021/1/6
+  Time: 16:00
+-->
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+<ui:composition>
+    <p:inputText id="selectedOrgName" value="#{userSiteOrgTreeComponentController.selectedOrg==null ? '': userSiteOrgTreeComponentController.selectedOrg.name}" readonly="true" required="true"/>
+    <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+    <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+        <p:scrollPanel style="height:300px;border: 0" mode="native">
+            <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userSiteOrgTreeComponentController.orgTree}" selection="#{userSiteOrgTreeComponentController.selectedNode}" var="node" selectionMode="single">
+                <p:ajax process="@this" event="select" update="#{update}" listener="#{userSiteOrgTreeComponentController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                <p:ajax process="@this" event="expand"/>
+                <p:ajax process="@this" event="collapse"/>
+                <p:treeNode type="org">
+                    <h:outputText value="#{node}"/>
+                </p:treeNode>
+                <p:treeNode type="hidden" rendered="false"/>
+            </p:tree>
+        </p:scrollPanel>
+    </p:overlayPanel>
+</ui:composition>
+
+</html>

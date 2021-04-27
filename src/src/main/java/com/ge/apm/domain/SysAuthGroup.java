@@ -30,8 +30,8 @@ public class SysAuthGroup implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "encoded")
-    private String encoded;
+//    @Column(name = "encoded")
+//    private String encoded;
 
     @Column(name = "classification_code")
     private String classificationCode;
@@ -68,7 +68,7 @@ public class SysAuthGroup implements Serializable {
 
     public void setName(String name) { this.name = name; }
 
-    public String getEncoded() {
-        return encoded;
-    }
+//    public String getEncoded() {
+//        return encoded;
+//    }
 }
