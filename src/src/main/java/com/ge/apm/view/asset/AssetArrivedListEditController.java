@@ -1,10 +1,6 @@
 package com.ge.apm.view.asset;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -507,7 +503,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
-        return configService.getAttachmentCategories(configService.findConfigBySite(UserContextService.getCurrentUserAccount().getSiteUID()));
+        if(selectedOrg==null) Collections.emptyList();
+        return configService.getAttachmentCategories(configService.findConfigBySite(selectedOrg.getSiteUID()));
     }
 
     public void handleFileUpload(FileUploadEvent event) {
