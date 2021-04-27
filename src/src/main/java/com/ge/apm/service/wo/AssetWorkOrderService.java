@@ -4,6 +4,7 @@ import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.AssetWorkOrder;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by 212605082 on 2019/1/11.
@@ -33,6 +35,9 @@ public class AssetWorkOrderService {
 
     @Autowired
     private OrgInfoTreeService orgInfoTreeService;
+
+    @Autowired
+    UaaService uaaService;
 
     public List<AssetWorkOrder> loadAssetWorkOrderData(OrgInfo selectedOrg, OrgInfo filterDeptOrg, Integer filterAssetGroup, String searchStr, List<OrgInfo> clinicalDeptList, Date starDate, Date endDate){
 
@@ -58,6 +63,9 @@ public class AssetWorkOrderService {
                 clinicalDeptUIDList.add(oi.getUid());
             }
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, clinicalDeptUIDList));
+        } else {
+            List<String> allAccessibleClinicalDeptUids = uaaService.getAllAccessibleClinicalDeptList().stream().filter(item -> item.getOrgType() == 4).map(orgInfo -> orgInfo.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, allAccessibleClinicalDeptUids));
         }
 
         if(filterAssetGroup != null){
