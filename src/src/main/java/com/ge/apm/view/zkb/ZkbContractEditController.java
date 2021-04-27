@@ -5,6 +5,7 @@ import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
 import com.ge.apm.service.zkb.ZkbContractService;
+import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -19,6 +20,8 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,7 +56,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private String reason;
     private boolean operateFlag = false;
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
-
+    private boolean newContractFlag = false;
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -89,6 +92,12 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             contractCourseList = this.selected.getZkbContractCourses() == null ? new ArrayList<>() : this.selected.getZkbContractCourses();
             zkbContractAssetList = zkbContractService.queryAssetByContractId(this.selected.getId());
             prepareEdit();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            if(zkbContractService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(selected.getStartDate()))< 0){
+                newContractFlag = false;
+            }else{
+                newContractFlag = true;
+            }
         }
         targetAssets = new ArrayList();
         queryAsset = new AssetInfo();
@@ -181,28 +190,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public List<ZkbCourse> autoCompleteCourse(String query){
         List<ZkbCourse> res = courseList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getCname().contains(query)).collect(Collectors.toList());
-        /*if(contractCourseList != null && contractCourseList.size() > 0){
-            List<ZkbCourse> delCourse = new ArrayList<>();
-            for(ZkbCourse z : res){
-                for(ZkbContractCourse zkbContractCourse : contractCourseList){
-                    if(z.getId().equals(zkbContractCourse.getCourseId())){
-                        if("Create".equals(actionDetailName)){
-                            delCourse.add(z);
-                            break;
-                        }else if("Edit".equals(actionDetailName)){
-                            if(!zkbContractCourse.getId().equals(this.zkbContractCourseSelected.getId())){
-                                delCourse.add(z);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            if(delCourse.size() > 0){
-                res.removeAll(delCourse);
-            }
-        }
-*/
         return res;
     }
 
@@ -317,19 +304,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
             sourceAssets = new ArrayList(sourceAssets);
             sourceAssets.removeAll(targetAssets);
-            //将已选择的设备从查询去除
-            /*if(zkbContractAssetList != null && zkbContractAssetList.size() > 0){
-                List<AssetInfo> exsitAssets = new ArrayList<>();
-                for(ZkbContractAsset asset : zkbContractAssetList){
-                    for (AssetInfo a : sourceAssets){
-                        if(a.getUid().equals(asset.getAssetId())){
-                            exsitAssets.add(a);
-                            break;
-                        }
-                    }
-                }
-                sourceAssets.removeAll(exsitAssets);
-            }*/
         } else {
             sourceAssets = new ArrayList<AssetInfo>();
             targetAssets = new ArrayList<AssetInfo>();
@@ -415,6 +389,8 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             return false;
         }
     }
+
+
 
     public String getActionAssetName() {
         return actionAssetName;
@@ -542,6 +518,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void setOperateFlag(boolean operateFlag) {
         this.operateFlag = operateFlag;
+    }
+
+    public boolean isNewContractFlag() {
+        return newContractFlag;
+    }
+
+    public void setNewContractFlag(boolean newContractFlag) {
+        this.newContractFlag = newContractFlag;
     }
 
     @Override
