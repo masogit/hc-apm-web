@@ -123,7 +123,7 @@
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                             <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                         </p:autoComplete>
-                                        <p:commandButton id="createSupplierButton4" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+                                        <p:commandButton id="createSupplierButton4" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" disabled="#{assetArrivedListEditController.selected.status eq 3}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                         <label class="label">供应商责任人</label>
