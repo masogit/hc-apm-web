@@ -13,7 +13,7 @@ import java.util.Date;
  * @description :
  */
 @Entity
-@Table(name = "zkb_train_course_info")
+@Table(name = "zkb_course_train")
 public class ZkbCourseTrain implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -23,11 +23,11 @@ public class ZkbCourseTrain implements Serializable {
     }
 
     public enum FlowStatusEnum{
-        ScheduleJoin,ScheduleNoJoin,LetterSubmit,LetterCancelJoin,ApplySubmit,ApplyCancelJoin,LetterCancelAccepted,LetterCancelRejected,ApplyCancelAccepted,ApplyCancelRejected
+        ScheduleJoin,ScheduleNoJoin,LetterSubmit,LetterCancelJoin,ApplySubmit,ApplyCancelJoin,ApplyCancelAccepted,ApplyCancelRejected,AuditAccepted,AuditRejected
     }
 
     public enum FlowStepEnum{
-        LetterPending,LetterCancelAuditPending,ApplyPending,ApplyCancelAuditPending,Completed
+        LetterPending,ApplyPending,ApplyCancelAuditPending,ApplyAuditPending,Completed
     }
 
     public enum TrainTypeEnum{

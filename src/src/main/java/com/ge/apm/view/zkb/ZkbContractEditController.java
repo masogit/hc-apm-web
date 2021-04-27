@@ -89,7 +89,8 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }else {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             this.selected = dao.findById(selectedId);
-            contractCourseList = this.selected.getZkbContractCourses() == null ? new ArrayList<>() : this.selected.getZkbContractCourses();
+            contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
+            this.selected.setZkbContractCourses(contractCourseList);
             zkbContractAssetList = zkbContractService.queryAssetByContractId(this.selected.getId());
             prepareEdit();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
