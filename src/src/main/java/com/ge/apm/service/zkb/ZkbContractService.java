@@ -516,6 +516,11 @@ public class ZkbContractService {
         return list;
     }
 
+    public List<ZkbContractCourse> queryCourseByContractId(String contractId){
+        List<ZkbContractCourse> list = contractCourseRepository.findByContractId(contractId);
+        return list;
+    }
+
     /**
      * 根据选择的设备，保存合同设备数据
      */

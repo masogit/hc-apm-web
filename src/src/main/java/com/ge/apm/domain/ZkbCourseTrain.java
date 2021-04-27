@@ -13,7 +13,7 @@ import java.util.Date;
  * @description :
  */
 @Entity
-@Table(name = "zkb_train_course_info")
+@Table(name = "zkb_course_train")
 public class ZkbCourseTrain implements Serializable {
 
     private static final long serialVersionUID = 1L;

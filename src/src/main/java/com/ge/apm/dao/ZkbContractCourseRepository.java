@@ -16,6 +16,9 @@ public interface ZkbContractCourseRepository extends GenericRepositoryUUID<ZkbCo
 
     List<ZkbContractCourse> findByCourseId(String id);
 
+
+    List<ZkbContractCourse> findByContractId(String contractId);
+
     /**
      * 根据时间和tenantUID查询数据
      * @param date 当前时间
