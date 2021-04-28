@@ -10,7 +10,7 @@ import javax.persistence.*;
  * @description :
  */
 @Entity
-@Table(name = "zkb_course_user_config")
+@Table(name = "zkb_course_train_user_config")
 public class ZkbCourseTrainUserConfig {
 
     @Id
