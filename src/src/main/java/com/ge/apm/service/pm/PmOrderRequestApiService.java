@@ -15,6 +15,7 @@ import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -205,7 +206,38 @@ public String invokePmOrderCancel(String token, PmOrderActionForm formData, Stri
         		logger.error("rmi failure,code is {},body is {}",response.getStatusCode(),response.getBody());
         		return null;
         }
-    } 
+    }
+
+    public Map<String, Object> getAcker(String token, String pmOrderId) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+
+        String gatewayURL = getGatewayURL(GatewayURL.PM_GET_ACKER);
+        String url = gatewayURL.replace("{pmOrderId}", pmOrderId);
+
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap;
+        } else {
+            return null;
+        }
+    }
+
+    public Map<String, Object> getAckerForBatchComplete(String token) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+
+        String gatewayURL = getGatewayURL(GatewayURL.PM_GET_ACKER_FOR_BATCH_COMPLETE);
+
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap;
+        } else {
+            return null;
+        }
+    }
 }
 
 
