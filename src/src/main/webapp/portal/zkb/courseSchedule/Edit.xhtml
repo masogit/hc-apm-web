@@ -61,7 +61,8 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbContractCourseSchedule_studentClass}*</label>
-                        <p:inputText disabled="#{!zkbCourseScheduleController.hasEditRight()}"  value="#{zkbCourseScheduleController.selected.studentClass}"  required="true" requiredMessage="#{msg.zkbContractCourseSchedule_studentClass}#{msg.ValidationRequire}" />
+                        <p:inputNumber disabled="#{!zkbCourseScheduleController.hasEditRight()}" minValue="0" decimalPlaces="1" value="#{zkbCourseScheduleController.selected.studentClass}" required="true" requiredMessage="#{msg.zkbContractCourseSchedule_studentClass} #{msg.ValidationRequire}">
+                        </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbContractCourseSchedule_batchNo}*</label>
@@ -89,28 +90,10 @@
                 </p:panelGrid>
             </h:panelGroup>
         </p:fieldset>
-        <p:fieldset id="joinInfo" legend="报名信息" rendered="#{zkbCourseScheduleController.showJoinButton()}">
-            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                <h:panelGroup>
-                    <label class="label">#{msg.zkbContractCourseSchedule_reason}</label>
-                    <p:inputTextarea  value="#{zkbCourseScheduleController.selected.reason}" rows="2" cols="20">
-                    </p:inputTextarea>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">#{msg.zkbContractCourseSchedule_joinCount}</label>
-                    <p:inputNumber  minValue="1" decimalPlaces="1" value="#{zkbCourseScheduleController.selected.joinCount}">
-                    </p:inputNumber>
-                </h:panelGroup>
-            </p:panelGrid>
-        </p:fieldset>
         <h:panelGroup>
-            <p:commandButton rendered="#{zkbCourseScheduleController.showJoinButton()}" actionListener="#{zkbCourseScheduleController.join('Y')}" update=":growl :zkbCourseScheduleListForm :zkbCourseScheduleEditGroup" value="参加" icon="ui-icon-check"/>
-            <p:commandButton rendered="#{zkbCourseScheduleController.showJoinButton()}" actionListener="#{zkbCourseScheduleController.join('N')}" update=":growl :zkbCourseScheduleListForm :zkbCourseScheduleEditGroup" value="不参加" icon="ui-icon-close"/>
-<!--            <p:commandButton rendered="#{zkbCourseScheduleController.showCancelButton()}" actionListener="#{zkbCourseScheduleController.join('N')}" update=":growl :zkbCourseScheduleListForm :zkbCourseScheduleEditGroup" value="取消参加" icon="ui-icon-close"/>-->
             <p:commandButton rendered="#{zkbCourseScheduleController.hasEditRight()}" validateClient="true" actionListener="#{zkbCourseScheduleController.save}" update=":growl :zkbCourseScheduleListForm :zkbCourseScheduleEditGroup" value="#{msg.Save}" icon="ui-icon-check"/>
             <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" update=":growl :zkbCourseScheduleEditGroup" actionListener="#{zkbCourseScheduleController.cancel}" />
         </h:panelGroup>
-
     </h:form>
     </h:panelGroup>
 </ui:composition>

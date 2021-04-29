@@ -88,7 +88,7 @@ public class ZkbContractCourseSchedule implements Serializable {
      * 个数
      */
     @Column(name = "student_class")
-    private String studentClass;
+    private Integer studentClass;
 
     /**
      * 批次号
@@ -119,18 +119,6 @@ public class ZkbContractCourseSchedule implements Serializable {
      */
     @Column(name = "type")
     private String type;
-
-    /**
-     * 参加个数
-     */
-    @Transient
-    private Double joinCount;
-
-    /**
-     * 不参加原因
-     */
-    @Transient
-    private String reason;
 
     @Override
     public int hashCode() {
@@ -248,11 +236,11 @@ public class ZkbContractCourseSchedule implements Serializable {
         this.location = location;
     }
 
-    public String getStudentClass() {
+    public Integer getStudentClass() {
         return studentClass;
     }
 
-    public void setStudentClass(String studentClass) {
+    public void setStudentClass(Integer studentClass) {
         this.studentClass = studentClass;
     }
 
@@ -296,19 +284,4 @@ public class ZkbContractCourseSchedule implements Serializable {
         this.type = type;
     }
 
-    public Double getJoinCount() {
-        return joinCount;
-    }
-
-    public void setJoinCount(Double joinCount) {
-        this.joinCount = joinCount;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
 }

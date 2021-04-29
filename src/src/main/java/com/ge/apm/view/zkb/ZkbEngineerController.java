@@ -7,6 +7,7 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbEngineerExportService;
 import com.ge.apm.service.zkb.ZkbEngineerService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -70,6 +71,8 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
      */
     private List<V2_BlobObject> removev2_blobObjectList = new ArrayList<>();
 
+    private static final String ssoStartWith="ZKB";
+
     @Override
     protected void init() {
         super.init();
@@ -116,6 +119,7 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
         this.selected.setTenantUID(this.selectionTenantInfo);
         this.selected.setCreatedBy(this.currentUser.getLoginName());
         this.selected.setCreatedDate(new Date());
+        this.zkbEngineerService.fullSso(this.selected,ssoStartWith);
     }
 
     @Override
@@ -131,6 +135,14 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
 
     @Override
     public void save() {
+        if(selected.hashCode()==0)
+        {
+           List<ZkbEngineer> zkbEngineerList = this.dao.findBySso(selected.getSso());
+           if(CollectionUtils.isNotEmpty(zkbEngineerList))
+           {
+               this.zkbEngineerService.fullSso(this.selected,ssoStartWith);
+           }
+        }
         super.save();
         this.zkbEngineerService.saveUploadFile(this.v2_blobObjectList,this.selected.getId());
         this.zkbEngineerService.removeFile(this.removev2_blobObjectList);

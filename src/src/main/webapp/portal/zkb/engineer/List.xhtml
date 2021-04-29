@@ -73,7 +73,9 @@
                         <p:column headerText="#{msg.zkbEngineer_specialty}" filterBy="#{item.specialty}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.specialty}"/>
                         </p:column>
-
+                        <p:column headerText="SSO">
+                            <h:outputText value="#{item.sso}"/>
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbEngineerController.prepareCreate}" update=":zkbEngineerEditForm" disabled="#{empty zkbEngineerController.selectionTenantInfo}"/>
                             <!--<p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbEngineerController.prepareEdit}" update=":zkbContactPersonEditForm" disabled="#{empty zkbEngineerController.selected.id}"/>-->

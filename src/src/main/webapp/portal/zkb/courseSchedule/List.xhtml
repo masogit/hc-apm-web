@@ -100,9 +100,14 @@
                             <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',item.type)}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" rendered="#{!zkbCourseScheduleController.tenant}"  title="#{msg.Create}" update=":zkbCourseScheduleEditGroup :zkbCourseScheduleEditForm" action="#{zkbCourseScheduleController.prepareCreate}" />
-                            <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" update=":zkbCourseScheduleEditGroup" action="#{zkbCourseScheduleController.prepareEdit}" disabled="#{empty zkbCourseScheduleController.selected.id}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-close"  rendered="#{!zkbCourseScheduleController.tenant}"  title="#{msg.Delete}" update=":zkbCourseScheduleListForm :zkbCourseScheduleEditGroup" actionListener="#{zkbCourseScheduleController.delete}"  disabled="#{(empty zkbCourseScheduleController.selected.id) or !zkbCourseScheduleController.hasEditRight()}" />
+                            <p:commandButton id="createButton" icon="ui-icon-plus" rendered="#{zkbCourseScheduleController.hasEditRight}"  title="#{msg.Create}" update=":zkbCourseScheduleEditGroup :zkbCourseScheduleEditForm" action="#{zkbCourseScheduleController.prepareCreate}" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" rendered="#{zkbCourseScheduleController.hasEditRight}" title="#{msg.Edit}" update=":zkbCourseScheduleEditGroup :zkbCourseScheduleEditForm" action="#{zkbCourseScheduleController.prepareEdit}" disabled="#{empty zkbCourseScheduleController.selected.id}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-close"  rendered="#{zkbCourseScheduleController.hasEditRight}"  title="#{msg.Delete}" update=":zkbCourseScheduleListForm" actionListener="#{zkbCourseScheduleController.delete}"  disabled="#{(empty zkbCourseScheduleController.selected.id||'t' eq zkbCourseScheduleController.selected.valid)}" />
+                            <p:commandButton id="exportButton" ajax="false"  title="#{msg.exportToXLS}" actionListener="#{zkbCourseScheduleController.exportAll}" icon="ui-icon-arrowstop-1-s">
+                                <p:fileDownload value="#{zkbCourseScheduleController.exportFile}"/>
+                            </p:commandButton>
+                            <p:commandButton id="importButton" ajax="false"  rendered="#{zkbCourseScheduleController.hasEditRight}" title="课程导入" action="#{zkbCourseScheduleController.importAction}" icon="ui-icon-arrowstop-1-n">
+                            </p:commandButton>
                         </f:facet>
                     </p:dataTable>
                 </h:form>

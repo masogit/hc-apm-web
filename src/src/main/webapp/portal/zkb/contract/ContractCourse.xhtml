@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="zkbContractCourseEditDlg" widgetVar="zkbContractCourseEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="课程操作"   height="380">
+    <p:dialog id="zkbContractCourseEditDlg" widgetVar="zkbContractCourseEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="课程操作"   height="430">
 
         <h:form id="zkbContractCourseEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -16,21 +16,35 @@
                                     completeMethod="#{zkbContractEditController.autoCompleteCourse}" var="t" itemLabel="#{t.cname}" itemValue="#{t}" converter="zkbCourseConverter">
                     </p:autoComplete>
                 </h:panelGroup>
+
+                <h:panelGroup>
+                    <label class="label">培训合同号</label>
+                    <p:inputText required="true" requiredMessage="培训合同号 不能为空" value="#{zkbContractEditController.zkbContractCourseSelected.courseContractNo}" />
+                </h:panelGroup>
+
                 <h:panelGroup>
                     <label class="label">课程总额度*</label>
-                    <p:spinner id="courseCountTotal" value="#{zkbContractEditController.zkbContractCourseSelected.courseCountTotal}" min="1" max="1000" />
+<!--                    <p:spinner id="courseCountTotal" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountTotal}" min="1" max="1000" />-->
+                    <p:inputNumber id="courseCountTotal"  minValue="1" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountTotal}">
+                    </p:inputNumber>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程剩余额度*</label>
-                    <p:spinner id="courseCount" value="#{zkbContractEditController.zkbContractCourseSelected.courseCount}" min="0" max="1000" />
+<!--                    <p:spinner id="courseCount" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCount}" min="0" max="1000" />-->
+                    <p:inputNumber id="courseCount"  minValue="1" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCount}">
+                    </p:inputNumber>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程申请额度*</label>
-                    <p:spinner id="courseCountApply" value="#{zkbContractEditController.zkbContractCourseSelected.courseCountApply}" min="0" max="1000" />
+<!--                    <p:spinner id="courseCountApply" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountApply}" min="0" max="1000" />-->
+                    <p:inputNumber id="courseCountApply"  minValue="1" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountApply}">
+                    </p:inputNumber>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程已使用额度*</label>
-                    <p:spinner id="courseCountUse" value="#{zkbContractEditController.zkbContractCourseSelected.courseCountUse}" min="0" max="1000" />
+<!--                    <p:spinner id="courseCountUse" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountUse}" min="0" max="1000" />-->
+                    <p:inputNumber id="courseCountUse"  minValue="1" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountUse}">
+                    </p:inputNumber>
                 </h:panelGroup>
                 <h:panelGroup rendered="#{zkbContractEditController.actionDetailName eq 'Edit'}">
                     <label class="label">操作原因*</label>

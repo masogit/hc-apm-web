@@ -64,6 +64,10 @@
                         <p:inputText id="specialty" value="#{zkbEngineerController.selected.specialty}" required="true" requiredMessage="#{msg.zkbEngineer_specialty} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
+                    <h:panelGroup>
+                        <label class="label">SSO</label>
+                        <p:inputText id="sso" disabled="true" value="#{zkbEngineerController.selected.sso}" />
+                    </h:panelGroup>
                 </p:panelGrid>
 
                 <p:fieldset id="zkbEngineerTrackRecordFieldset" legend="#{msg.zkbEngineerTrackRecord}" rendered="#{zkbEngineerController.actionName eq 'Edit'}">

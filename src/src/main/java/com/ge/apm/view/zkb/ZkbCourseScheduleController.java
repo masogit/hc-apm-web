@@ -1,26 +1,42 @@
 package com.ge.apm.view.zkb;
 
-import com.ge.apm.dao.ZkbContractCourseRepository;
 import com.ge.apm.dao.ZkbCourseRepository;
 import com.ge.apm.dao.ZkbCourseScheduleRepository;
-import com.ge.apm.dao.ZkbCourseTrainRepository;
-import com.ge.apm.domain.*;
+import com.ge.apm.dao.ZkbCourseTrainUserConfigRepository;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.ZkbContractCourseSchedule;
+import com.ge.apm.domain.ZkbCourse;
+import com.ge.apm.domain.ZkbCourseTrainUserConfig;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbCourseScheduleService;
-import com.ge.apm.service.zkb.ZkbCourseTrainService;
+import com.ge.apm.view.asset.ContractImportController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.*;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 
 
 /**
@@ -30,20 +46,12 @@ import java.util.*;
 @ViewScoped
 public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbContractCourseSchedule> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZkbCourseScheduleController.class);
+
     /**
      * 课程计划表service
      */
     private ZkbCourseScheduleService zkbCourseScheduleService;
-
-    /**
-     * 获取用户信息
-     */
-    private UserContextService userContextService;
-
-    /**
-     * 报名service
-     */
-    private ZkbCourseTrainService zkbCourseTrainService;
 
     /**
      * 课程计划表repository
@@ -56,49 +64,14 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     private ZkbCourseRepository zkbCourseRepository;
 
     /**
-     * 获取用户合同中课程信息
+     * 权限
      */
-    private ZkbContractCourseRepository zkbContractCourseRepository;
-
-    /**
-     * 获取流程记录
-     */
-    private ZkbCourseTrainRepository zkbCourseTrainRepository;
+    private ZkbCourseTrainUserConfigRepository zkbCourseTrainUserConfigRepository;
 
     /**
      * 当前登录用户信息service
      */
     private UserAccount currentUser;
-
-    /**
-     * 是否代理商
-     */
-    private Boolean tenant = false;
-
-    /**
-     * 当前用户tenantUID
-     */
-    private String tenantUid;
-
-    /**
-     * 日期格式
-     */
-    private static final String dateFormat="yyyy-MM-dd";
-
-    /**
-     * 日期格式
-     */
-    private static final String dateFormat1="yyyy-MM-dd HH:mm:ss";
-
-    /**
-     * yes
-     */
-    private static final String yes = "Y";
-
-    /**
-     * no
-     */
-    private static final String no = "N";
 
     /**
      * false
@@ -130,6 +103,23 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
      */
     private Date endDate;
 
+
+    private UploadedFile file;
+
+    /**
+     * 错误列表
+     */
+    private List<Map<String, Object>> errorZknCourseScheduleList;
+
+    private static final String EXCEL_NAME = "APM_ZKB_Course_Schedule_Template.xlsx";
+
+    /**
+     * 导出文件
+     */
+    private StreamedContent exportFile;
+
+    private Boolean hasEditRight=false;
+
     /**
      * 初始化
      */
@@ -138,17 +128,15 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         super.init();
         zkbCourseScheduleService = WebUtil.getBean(ZkbCourseScheduleService.class);
         zkbCourseScheduleRepository = WebUtil.getBean(ZkbCourseScheduleRepository.class);
-        zkbContractCourseRepository = WebUtil.getBean(ZkbContractCourseRepository.class);
-        zkbCourseTrainRepository = WebUtil.getBean(ZkbCourseTrainRepository.class);
+        zkbCourseTrainUserConfigRepository=WebUtil.getBean(ZkbCourseTrainUserConfigRepository.class);
         zkbCourseRepository=WebUtil.getBean(ZkbCourseRepository.class);
-        zkbCourseTrainService=WebUtil.getBean(ZkbCourseTrainService.class);
-        userContextService=WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
-        if(userContextService.isZkbUser())
+        List<ZkbCourseTrainUserConfig> zkbCourseTrainUserConfigList = this.zkbCourseTrainUserConfigRepository.findByLoginName(currentUser.getLoginName());
+        if(CollectionUtils.isNotEmpty(zkbCourseTrainUserConfigList))
         {
-            tenant=true;
-            tenantUid=currentUser.getTenantUID();
+            hasEditRight=true;
         }
+       // zkbCourseScheduleRepository.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
     }
 
     /**
@@ -167,15 +155,14 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
      * @return
      */
     public List<SearchFilter> getSearchFilter() {
-        Date date = new Date();
         List<SearchFilter> searchFilters = new ArrayList<>();
         if(StringUtils.isNotBlank(this.cname))
         {
-            searchFilters.add(new SearchFilter("cname", SearchFilter.Operator.EQ,this.cname));
+            searchFilters.add(new SearchFilter("cname", SearchFilter.Operator.LIKE,this.cname));
         }
         if(StringUtils.isNotBlank(this.modality))
         {
-            searchFilters.add(new SearchFilter("modality", SearchFilter.Operator.EQ,this.modality));
+            searchFilters.add(new SearchFilter("modality", SearchFilter.Operator.LIKE,this.modality));
         }
         if(startDate!=null)
         {
@@ -185,56 +172,16 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         {
             searchFilters.add(new SearchFilter("endDate", SearchFilter.Operator.GTE, endDate));
         }
-        if(this.tenant)
-        {
-            searchFilters.add(new SearchFilter("valid", SearchFilter.Operator.EQ,"t"));
-            String dateStr = DateUtil.getFormatStrByDate(date,dateFormat);
-            List<ZkbContractCourse> zkbContractCourseList = this.zkbContractCourseRepository.findByDateAndTenantUid(dateStr,tenantUid);
-            if(CollectionUtils.isEmpty(zkbContractCourseList))
-            {
-                searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ,"error"));
-                return searchFilters;
-            }
-            Set<String> set = new HashSet();
-            for(ZkbContractCourse item:zkbContractCourseList)
-            {
-                set.add(item.getCourseId());
-            }
-            dateStr=dateStr+" 00:00:00";
-            Date date1 = DateUtil.getDateByFormatStr(dateStr,dateFormat1);
-            searchFilters.add(new SearchFilter("zkbCourseId", SearchFilter.Operator.IN,set));
-            searchFilters.add(new SearchFilter("startDate",SearchFilter.Operator.LTE, date1));
-            searchFilters.add(new SearchFilter("endDate",SearchFilter.Operator.GTE, date1));
-        }
         return searchFilters;
     }
 
-    public Boolean showJoinButton()
-    {
-        if(!this.tenant)
-        {
-            return false;
-        }
-        ZkbCourseTrain zkbCourseTrain = this.zkbCourseTrainRepository.findByUidAndSheduleId(this.tenantUid,this.selected.getId());
-        if(zkbCourseTrain==null)
-        {
-            return true;
-        }
-            return false;
-    }
 
-    public Boolean showCancelButton()
-    {
-        if(!this.tenant)
-        {
-            return false;
-        }
-        ZkbCourseTrain zkbCourseTrain = this.zkbCourseTrainRepository.findByUidAndSheduleId(this.tenantUid,this.selected.getId());
-        if(zkbCourseTrain!=null&&ZkbCourseTrain.ParticipateStatusEnum.Y.toString().equals(zkbCourseTrain.getParticipateStatus()))
-        {
-            return true;
-        }
-        return false;
+    /**
+     * 跳转导入页面
+     * @return
+     */
+    public String importAction() {
+        return "Import?faces-redirect=true";
     }
 
     /**
@@ -243,7 +190,6 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
      */
     public Boolean hasEditRight()
     {
-        if(this.tenant)  return false;
         if(this.selected!=null&&(f.equals(this.selected.getValid())||StringUtils.isBlank(this.selected.getValid()))) return true;
         return false;
     }
@@ -291,33 +237,55 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     }
 
 
-    /**
-     * 报名
-     * @param joinFlag 报名标识
-     */
-    public void join(String joinFlag)
-        {
-        if(yes.equals(joinFlag))
-        {
-            if(this.selected.getJoinCount()==null||this.selected.getJoinCount().intValue()==0)
-            {
-                WebUtil.addErrorMessage(WebUtil.getMessage("zkbContractCourseSchedul_joinCountCanotBeNull"));
-                return;
-            }
-        }else if(no.equals(joinFlag))
-        {
-            if(StringUtils.isBlank(this.selected.getReason()))
-            {
-                WebUtil.addErrorMessage(WebUtil.getMessage("zkbContractCourseSchedul_reasonCanotBeNull"));
-                return;
-            }
-        }
+    public void handleFileUpload(FileUploadEvent event) throws IOException {
+
+        ExcelDocument doc = null;
+        this.file = event.getFile();
         try {
-            this.zkbCourseTrainService.generateTrain(this.selected,joinFlag,this.currentUser,this.selected.getReason(),this.selected.getJoinCount());
+            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+            int maxRowNum = ZkbCourseScheduleService.EXCEL_COURSE_SCHEDULE_HEADER_ROW + ZkbCourseScheduleService.EXCEL_COURSE_SCHEDULE_IMPORT_MAX_ROW;
+            if(doc.checkMaxRowNumIsFull(ZkbCourseScheduleService.SHEET_SERVICE_COURSE_SCHEDULE, maxRowNum)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel10000"));
+                return;
+            }
+            List<Map<String, Object>> importCourseScheduleMapList = zkbCourseScheduleService.getZkbCourseScheduleMapFromTemplate(doc);
+            zkbCourseScheduleService.importData(importCourseScheduleMapList);
+            errorZknCourseScheduleList = zkbCourseScheduleService.filterErrorRecords(importCourseScheduleMapList);
+            if(!errorZknCourseScheduleList.isEmpty()){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+errorZknCourseScheduleList.size()+WebUtil.getMessage("RecordsOfFailure"));
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }else {
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ImportComplete"));
+            }
+        } catch (IOException ex) {
+            WebUtil.addErrorMessage("File can not be read!");
+            java.util.logging.Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception e) {
-            e.printStackTrace();
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
+            java.util.logging.Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            if (doc != null) {
+                doc.release();
+            }
         }
-        this.selected = null;
+
+    }
+
+    /**
+     * 数据导出
+     */
+    public void exportAll(){
+        List<ZkbContractCourseSchedule> zkbContractCourseSchedule = zkbCourseScheduleRepository.find();
+        List<Map<String, Object>> orderHistoryMapList = zkbCourseScheduleService.createExportCourseScheduleData(zkbContractCourseSchedule);
+        try {
+            String path = ZkbCourseScheduleService.COURSE_SCHEDULE_PATH+EXCEL_NAME;
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(path);
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            zkbCourseScheduleService.exportData(doc,orderHistoryMapList);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", EXCEL_NAME);
+        } catch (IOException ex) {
+            LOGGER.info(ex.getMessage());
+        }
     }
 
     /**
@@ -341,13 +309,12 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         this.selected.setCname(zkbCourse.getCname());
         this.selected.setModality(zkbCourse.getModality());
     }
-
-    public Boolean getTenant() {
-        return tenant;
-    }
-
-    public void setTenant(Boolean tenant) {
-        this.tenant = tenant;
+    /**
+     * 文件下载
+     * @return
+     */
+    public String getTemplateName(){
+        return EXCEL_NAME;
     }
 
     public String getCname() {
@@ -380,5 +347,29 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public List<Map<String, Object>> getErrorZknCourseScheduleList() {
+        return errorZknCourseScheduleList;
+    }
+
+    public void setErrorZknCourseScheduleList(List<Map<String, Object>> errorZknCourseScheduleList) {
+        this.errorZknCourseScheduleList = errorZknCourseScheduleList;
+    }
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
+    }
+
+    public Boolean getHasEditRight() {
+        return hasEditRight;
+    }
+
+    public void setHasEditRight(Boolean hasEditRight) {
+        this.hasEditRight = hasEditRight;
     }
 }

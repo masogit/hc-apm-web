@@ -4,17 +4,16 @@ import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbEngineerRepository;
 import com.ge.apm.dao.ZkbEngineerTrackRecordRepository;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.ZkbEngineer;
-import com.ge.apm.domain.ZkbEngineerTrackRecord;
+import com.ge.apm.domain.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.DateUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,6 +31,9 @@ public class ZkbEngineerService {
     private ZkbEngineerRepository zkbEngineerDao;
     @Autowired
     private ZkbEngineerTrackRecordRepository zkbEngineerTrackRecordDao;
+
+    @Autowired
+    private ZkbEngineerRepository zkbEngineerRepository;
 
     public List<TenantInfo> getSourceTenantInfoList(){
 
@@ -116,6 +118,24 @@ public class ZkbEngineerService {
                 blobObjectRepository.delete(v.getId());
             }
         }
+    }
+
+    /**
+     * 生成SSO索引
+     * @param zkbEngineer 当前工程师
+     * @return
+     */
+    public ZkbEngineer fullSso(ZkbEngineer zkbEngineer, String orderPrefix)
+    {
+        String yearStr = DateUtil.getFormatStrByDate(new Date(),"yyyy");
+        String endIndex = yearStr.substring(2);
+        Object o= zkbEngineerRepository.getMaxIndex(orderPrefix+endIndex+"%") ;
+        int index = o == null ? 0 : Integer.parseInt(o.toString());
+        index++;
+        String sso = orderPrefix+endIndex+String.format("%04d",index);
+        zkbEngineer.setSso(sso);
+        zkbEngineer.setSsoIndex(index);
+        return zkbEngineer;
     }
 
 }
