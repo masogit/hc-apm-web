@@ -235,6 +235,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String plannedCompletionTimeFormat = null;
     private String actualCompletionTimeFormat = null;
 
+    //备注
+    @Getter @Setter
+    private String remarks;
+
     public String getActualCompletionTimeFormat() {
         return actualCompletionTimeFormat;
     }
@@ -1254,7 +1258,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             coWorkerList.forEach(item -> item.setCreatedDate(null));
         }
         selectedPmOrder.setQualityChecking(qaStatus);
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch);
         //保存保养清单中的数据
         saveCheckItemData();
         selected = null;
@@ -1754,6 +1758,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+        } else if (queryIndex == 11) { //待验收
+            filterOutPm(searchFilters);
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Acceptance"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
+            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+
         } else if (queryIndex == 7) { //已关单
 
             if (!userContextService.hasRole("AssetHead") && !userContextService.isPmDispatcher()) {
@@ -2054,7 +2064,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void repairPmOrderBatch() {
 //        保存检查项
        // saveCheckItemDataBatch(orderNumList);
-        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, selectedMap);
+        pmOrderService.repairWorkOrderBatch(endTime, totalManHours, selectedMap, currentPersonIdBatch);
         selectedMap = new HashMap<String, Boolean>();
     }
 
@@ -2074,7 +2084,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         selectedPmOrder.setQualityChecking(qaStatus);
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList, endTime, selectedPmOrder.getPlanTime(), picList, currentPersonIdBatch);
     }
 
     public void stagingPmOrder() {
@@ -2440,6 +2450,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             coWorkerList.add(emptyDetail);
         }
         return coWorkerList;
+    }
+
+    //1 验收通过 和 0验收不通过
+    public void invokeAcceptance(boolean pass) {
+        if (isChecked() == false) {
+            pmOrderService.invokeAcceptance(selectedPmOrder, remarks, pass);
+        }else { //批量
+            pmOrderService.invokeAcceptanceInBatch(selectedMap, remarks, pass);
+        }
     }
 
     public V2_WorkOrder_Detail getItemDetail() {

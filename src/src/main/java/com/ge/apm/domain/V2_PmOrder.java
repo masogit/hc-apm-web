@@ -203,6 +203,9 @@ public class V2_PmOrder  implements Serializable {
     @Column(name = "cancel_reason")
     private String cancelReason;
 
+    @Column(name = "auto_ack_maintenance")
+    private Boolean autoAckMaintenance;
+
     @Transient
     @JsonIgnore
     private String strPlanTime;
@@ -636,5 +639,13 @@ public class V2_PmOrder  implements Serializable {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    public Boolean getAutoAckMaintenance() {
+        return autoAckMaintenance;
+    }
+
+    public void setAutoAckMaintenance(Boolean autoAckMaintenance) {
+        this.autoAckMaintenance = autoAckMaintenance;
     }
 }
