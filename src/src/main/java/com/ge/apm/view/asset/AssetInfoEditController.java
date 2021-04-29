@@ -707,7 +707,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         if (null != selectedObjectMap.get("selectedAuthGroup")) {
             SysAuthGroup selectedAuthGroup = (SysAuthGroup) selectedObjectMap.get("selectedAuthGroup");
-            selected.setMedicalApparatusClassification(selectedAuthGroup.getEncoded());
+            selected.setMedicalApparatusClassification(selectedAuthGroup.getClassificationCode());
         }
 
         //when mvs user create a new record, mark this asset as mvs asset

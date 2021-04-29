@@ -68,6 +68,18 @@
 							<h:outputText value="#{item.costTime}">
 							</h:outputText>
 						</p:column>
+						<p:column headerText="住院号" filterBy="#{item.hospitalNumber}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.hospitalNumber}">
+							</h:outputText>
+						</p:column>
+						<p:column headerText="床号" filterBy="#{item.bedNo}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.bedNo}">
+							</h:outputText>
+						</p:column>
+						<p:column headerText="诊断结果" filterBy="#{item.diagnosticResult}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.diagnosticResult}">
+							</h:outputText>
+						</p:column>
 						<p:column headerText="备注">
 							<h:outputText value="#{item.comment}">
 							</h:outputText>
