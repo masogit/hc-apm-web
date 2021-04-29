@@ -1506,6 +1506,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //return zkbPartOrderCatRepository.findByValueTypeIsNot(ZkbPartOrderCat.ValueType.HighValue.toString());
     }
 
+    public List<ZkbPartOrderCat> queryPartOrderCat(Date contractDate,List<String> typeList){
+        return zkbPartOrderCatRepository.getByStartDateLessThanEqualAndEndDateGreaterThanEqualAndValueTypeIn(contractDate,contractDate,typeList);
+    }
+
     public ZkbPartOrderRepository getZkbPartOrderRepository() {
         return zkbPartOrderRepository;
     }
