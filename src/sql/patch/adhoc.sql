@@ -45,6 +45,7 @@ update sys_auth_group  set encoded = code.encoded_new, classification_code = cod
     from cte_code code
 where sys_auth_group.uid = code.uid;
 
+--资产表的 医疗器械分类编码迁移
 with cte_asset_info as (
     select uid,
            medical_apparatus_classification,
@@ -64,25 +65,23 @@ with cte_asset_info as (
             else ''
         end) as encoded_new,
            (case
-                when cardinality(string_to_array(medical_apparatus_classification, '-')) = 1 then medical_apparatus_classification
-                when cardinality(string_to_array(medical_apparatus_classification, '-')) = 2 then replace(medical_apparatus_classification, '-', '')
+                when cardinality(string_to_array(medical_apparatus_classification, '-')) = 1 then null
+                when cardinality(string_to_array(medical_apparatus_classification, '-')) = 2
+                    then (string_to_array(medical_apparatus_classification, '-'))[2]
                 when cardinality(string_to_array(medical_apparatus_classification, '-')) = 3
-                    then (string_to_array(medical_apparatus_classification, '-'))[1]
-                        || (string_to_array(medical_apparatus_classification, '-'))[2]
+                    then (string_to_array(medical_apparatus_classification, '-'))[2]
                         || right((string_to_array(medical_apparatus_classification, '-'))[3], 2)
            when cardinality(string_to_array(medical_apparatus_classification, '-')) = 4
-               then (string_to_array(medical_apparatus_classification, '-'))[1]
-                        || (string_to_array(medical_apparatus_classification, '-'))[2]
+               then (string_to_array(medical_apparatus_classification, '-'))[2]
                         || right((string_to_array(medical_apparatus_classification, '-'))[3], 2)
                         || right((string_to_array(medical_apparatus_classification, '-'))[4], 2)
-            else ''
+            else null
 
         end) as classification_code_new
     from asset_info where medical_apparatus_classification is not null
 )
 
-update asset_info  set medical_apparatus_classification = cte.encoded_new
+update asset_info  set medical_apparatus_classification = cte.classification_code_new
     from cte_asset_info cte
 where asset_info.uid = cte.uid and asset_info.medical_apparatus_classification is not null;
-
 
