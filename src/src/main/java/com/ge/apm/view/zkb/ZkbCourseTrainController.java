@@ -44,6 +44,7 @@ public class ZkbCourseTrainController extends GenericCRUDUUIDController<ZkbCours
         zkbCourseTrainRepository =  WebUtil.getBean(ZkbCourseTrainRepository.class);
         zkbCourseTrainService =  WebUtil.getBean(ZkbCourseTrainService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        tenantInfoList = zkbCourseTrainService.getSourceTenantInfoList();
         initBtn();
     }
 

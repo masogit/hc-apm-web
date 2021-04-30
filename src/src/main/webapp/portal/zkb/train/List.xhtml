@@ -55,22 +55,40 @@
                         <p:column headerText="培训天数" >
                             <h:outputText value="#{item.trainingDays}"/>
                         </p:column>
-                        <p:column headerText="培训类型" filterBy="#{item.trainType}" filterMatchMode="LIKE">
+                        <p:column headerText="培训类型" >
                             <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',item.trainType)}"/>
                         </p:column>
                         <p:column headerText="预扣除数量" >
                             <h:outputText value="#{item.preQuota}"/>
                         </p:column>
 
-                        <p:column headerText="参加状态" filterBy="#{item.participateStatus}" filterMatchMode="LIKE">
+                        <p:column headerText="参加状态" filterBy="#{item.participateStatus}"  filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbCourseTrainParticipateStatus',item.participateStatus)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCourseTrainParticipateStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
 
-                        <p:column headerText="审批状态" filterBy="#{item.currentStatus}" filterMatchMode="LIKE">
+                        <p:column headerText="审批状态" filterBy="#{item.currentStatus}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbCourseTrainStatus',item.currentStatus)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCourseTrainStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                         <p:column headerText="步骤" filterBy="#{item.currentStep}" filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbCourseTrainStep',item.currentStep)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCourseTrainStep')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{zkbCourseTrainController.createAction}" rendered="#{zkbCourseTrainController.showBtn}" />

@@ -16,10 +16,12 @@
                 <p:messages id="messages" showDetail="true" closable="false" autoUpdate="true"></p:messages>
                 <p:fieldset legend="选择课表" rendered="#{empty zkbCourseTrainEditController.selected.id}">
                     <p:dataTable id="datalist" value="#{zkbCourseTrainEditController.zkbContractCourseSchedules}" var="item" widgetVar="varDataList"
-                                 selectionMode="single" selection="#{zkbCourseTrainEditController.selectedCourseSchedule}"
+                                 selection="#{zkbCourseTrainEditController.selectedCourseSchedule}"
                                  lazy="true" paginator="false"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                  emptyMessage="#{msg.noRecordFound}">
+                        <p:column selectionMode="single" style="width:40px;text-align:center"/>
+
                         <p:column headerText="#{msg.zkbContractCourseSchedule_cid}">
                             <h:outputText value="#{item.cid}"/>
                         </p:column>
@@ -177,6 +179,14 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset legend="原因审批" rendered="#{zkbCourseTrainEditController.showReasonAuditFlag}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup rendered="#{zkbCourseTrainEditController.selected.currentStatus eq 'ApplyCancelAccepted' or zkbCourseTrainEditController.selected.currentStatus eq 'ApplyCancelRejected'}">
+                        <label class="label">审批结果</label>
+                        <p:selectOneMenu value="#{zkbCourseTrainEditController.selected.currentStatus}" disabled="true">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCourseTrainStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">审批备注</label>
                         <p:inputTextarea  rows="2" cols="20" value="#{zkbCourseTrainEditController.selected.auditRemark}" disabled="#{!(zkbCourseTrainEditController.selected.currentStep eq 'ApplyCancelAuditPending' and zkbCourseTrainEditController.canEditFlag)}">
@@ -190,9 +200,17 @@
                         <label class="label">审批时间*</label>
                         <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbCourseTrainEditController.selected.auditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                     </h:panelGroup>
+                    </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset legend="申请审批" rendered="#{zkbCourseTrainEditController.showAuditFlag}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup rendered="#{zkbCourseTrainEditController.selected.currentStatus eq 'AuditAccepted' or zkbCourseTrainEditController.selected.currentStatus eq 'AuditRejected'}">
+                            <label class="label">审批结果</label>
+                            <p:selectOneMenu value="#{zkbCourseTrainEditController.selected.currentStatus}" disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCourseTrainStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">审批备注</label>
                             <p:inputTextarea  rows="2" cols="20" value="#{zkbCourseTrainEditController.selected.auditRemark}" disabled="#{!(zkbCourseTrainEditController.selected.currentStep eq 'ApplyAuditPending' and zkbCourseTrainEditController.canEditFlag)}">
@@ -227,7 +245,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" value="#{msg.Confirm}" actionListener="#{zkbCourseTrainEditController.noJoinNext}" oncomplete="PF('zkbConfigDlg').hide()" update=":zkbTrainEditForm :zkbConfigForm :growl" icon="ui-icon-check" />
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbCourseTrainEditController.noJoinNext}"  update=":zkbTrainEditForm :zkbConfigForm :growl" icon="ui-icon-check" />
                     <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfigDlg').hide()"/>
                 </h:form>
 
