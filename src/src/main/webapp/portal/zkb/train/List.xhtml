@@ -52,30 +52,32 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-
                         <p:column headerText="培训天数" >
                             <h:outputText value="#{item.trainingDays}"/>
                         </p:column>
-
-
                         <p:column headerText="培训类型" filterBy="#{item.trainType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.trainType}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',item.trainType)}"/>
                         </p:column>
-
-                        <p:column headerText="预扣除数量" filterBy="#{item.preDeductCount}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.preDeductCount}"/>
+                        <p:column headerText="预扣除数量" >
+                            <h:outputText value="#{item.preQuota}"/>
                         </p:column>
 
                         <p:column headerText="参加状态" filterBy="#{item.participateStatus}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.participateStatus}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbCourseTrainParticipateStatus',item.participateStatus)}"/>
                         </p:column>
 
                         <p:column headerText="审批状态" filterBy="#{item.currentStatus}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.currentStatus}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbCourseTrainStatus',item.currentStatus)}"/>
                         </p:column>
-
+                        <p:column headerText="步骤" filterBy="#{item.currentStep}" filterMatchMode="LIKE">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbCourseTrainStep',item.currentStep)}"/>
+                        </p:column>
                         <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{zkbCourseTrainController.createAction}" rendered="#{zkbCourseTrainController.showBtn}" />
                             <p:commandButton id="editButton" style="margin-left: 0px" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{zkbCourseTrainController.editAction}" disabled="#{empty zkbCourseTrainController.selected.id}"/>
+                            <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{zkbCourseTrainController.delete}"  rendered="#{zkbCourseTrainController.showBtn}"  update=":growl :zkbPartOrderListForm" >
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
                         </f:facet>
                     </p:dataTable>
                 </h:form>
