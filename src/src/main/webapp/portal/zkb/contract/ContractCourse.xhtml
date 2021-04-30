@@ -25,25 +25,25 @@
                 <h:panelGroup>
                     <label class="label">课程总额度*</label>
 <!--                    <p:spinner id="courseCountTotal" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountTotal}" min="1" max="1000" />-->
-                    <p:inputNumber id="courseCountTotal"  minValue="1" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountTotal}">
+                    <p:inputNumber id="courseCountTotal"  minValue="0" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountTotal}">
                     </p:inputNumber>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程剩余额度*</label>
 <!--                    <p:spinner id="courseCount" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCount}" min="0" max="1000" />-->
-                    <p:inputNumber id="courseCount"  minValue="1" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCount}">
+                    <p:inputNumber id="courseCount"  minValue="0" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCount}">
                     </p:inputNumber>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程申请额度*</label>
 <!--                    <p:spinner id="courseCountApply" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountApply}" min="0" max="1000" />-->
-                    <p:inputNumber id="courseCountApply"  minValue="1" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountApply}">
+                    <p:inputNumber id="courseCountApply"  minValue="0" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountApply}">
                     </p:inputNumber>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程已使用额度*</label>
 <!--                    <p:spinner id="courseCountUse" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountUse}" min="0" max="1000" />-->
-                    <p:inputNumber id="courseCountUse"  minValue="1" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountUse}">
+                    <p:inputNumber id="courseCountUse"  minValue="0" decimalPlaces="1" value="#{zkbContractEditController.zkbContractCourseSelected.mainCourseCountUse}">
                     </p:inputNumber>
                 </h:panelGroup>
                 <h:panelGroup rendered="#{zkbContractEditController.actionDetailName eq 'Edit'}">
