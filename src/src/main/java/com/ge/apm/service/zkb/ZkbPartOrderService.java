@@ -280,7 +280,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 qty++;
             }
             a = qty ;
-            b = zkbContract.getProbeQuotaTotal() + zkbContract.getProbeQuotaNormal()+zkbContract.getProbeQuotaSpecial();
+            b = zkbContract.getProbeQuotaTotal() + (zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal())+(zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial());
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
             filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
             List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
