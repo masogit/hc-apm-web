@@ -274,10 +274,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
             Integer qty = 0;
             for(ZkbPartOrder o : zkbPartOrders){
+                if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(o.getZkbPartOrderCat().getValueType())){
+                    continue;
+                }
                 qty++;
             }
             a = qty ;
-            b = zkbContract.getProbeQuotaTotal();
+            b = zkbContract.getProbeQuotaTotal() + zkbContract.getProbeQuotaNormal()+zkbContract.getProbeQuotaSpecial();
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
             filters.add(new SearchFilter("status", SearchFilter.Operator.NE, ZkbPartOrder.PartOrderStatus.PartReturned.toString()));
             List<ZkbPartOrder> zkbPartOrders = zkbPartOrderRepository.findBySearchFilter(filters);
@@ -586,12 +589,17 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setManageAuditer(userAccount.getName());
             if(nextFlag){
                 ZkbContract c = zkbContractRepository.findById(zkbPartOrder.getContractId());
-                boolean r = checkApplyNumValid(zkbPartOrder,c);
-                if(!r){
-                    zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
+                if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(zkbPartOrder.getZkbPartOrderCat().getValueType())){
+                    boolean r = checkApplyNumValid(zkbPartOrder,c);
+                    if(!r){
+                        zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
+                    }else{
+                        zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
+                    }
                 }else{
                     zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
                 }
+
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ManageAccept.toString());
                 if(CopyByInvok.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
