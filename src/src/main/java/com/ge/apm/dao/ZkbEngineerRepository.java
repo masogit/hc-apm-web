@@ -20,4 +20,6 @@ public interface ZkbEngineerRepository extends GenericRepositoryUUID<ZkbEngineer
     Object getMaxIndex(String sso);
 
     List<ZkbEngineer> findBySso(String sso);
+
+    List<ZkbEngineer> findByTenantUID(String tenantUid);
 }

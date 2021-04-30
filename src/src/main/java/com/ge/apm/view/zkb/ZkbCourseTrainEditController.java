@@ -1,10 +1,7 @@
 package com.ge.apm.view.zkb;
 
-import com.ge.apm.dao.ZkbCourseTrainRepository;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.ZkbCourseTrain;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.zkb.ZkbCourseTrainService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -15,8 +12,11 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbCourseTrain> {
     private UserAccount currentUser;
     private ZkbCourseTrainRepository zkbCourseTrainRepository;
+    private ZkbCourseTrainUserConfigRepository zkbCourseTrainUserConfigRepository;
+    private ZkbCourseScheduleRepository zkbCourseScheduleRepository;
     private UserContextService userContextService;
     private ZkbCourseTrainService zkbCourseTrainService;
     private List<V2_BlobObject> v2_blobObjectList;
@@ -42,13 +44,19 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
     private boolean canEditFlag = false;
     private String showBtn = "";
     private String reason;
+    private List<ZkbCourseTrainDetail> zkbCourseTrainDetailList = new ArrayList<>();
+    private List<ZkbCourseTrainDetail> selectedCourseTrainDetailList = new ArrayList<>();
+    private List<ZkbContractCourseSchedule> zkbContractCourseSchedules = new ArrayList<>();
+    private ZkbContractCourseSchedule selectedCourseSchedule = new ZkbContractCourseSchedule();
 
     @Override
     protected void init() {
         super.init();
         zkbCourseTrainRepository =  WebUtil.getBean(ZkbCourseTrainRepository.class);
+        zkbCourseScheduleRepository =  WebUtil.getBean(ZkbCourseScheduleRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         zkbCourseTrainService = WebUtil.getBean(ZkbCourseTrainService.class);
+        zkbCourseTrainUserConfigRepository = WebUtil.getBean(ZkbCourseTrainUserConfigRepository.class);
         blobFileService = WebUtil.getBean(BlobFileService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -57,16 +65,29 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             selected = zkbCourseTrainRepository.findById(selectedId);
             v2_blobObjectList = zkbCourseTrainService.queryBlobObjectByPid(selectedId);
             initFlag();
+            initApplyList();
+        }else {
+            zkbContractCourseSchedules = zkbCourseScheduleRepository.find();
+            selected = new ZkbCourseTrain();
         }
     }
+
+    public List<V2_BlobObject> queryByDetailEid(String eid){
+
+        return null;
+    }
     public void initFlag(){
-        if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(selected.getCurrentStep()) || ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(selected.getCurrentStep())){
+        if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(selected.getCurrentStep()) ||
+            ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(selected.getCurrentStep())){
             if(currentUser.getTenantUID().equals(selected.getTenantUID())){
                 canEditFlag = true;
             }
         }else {
             if(zkbCourseTrainService.isZkbAdmin(currentUser.getTenantUID())){
-                canEditFlag = true;
+                List<ZkbCourseTrainUserConfig> zkbCourseTrainUserConfigs = zkbCourseTrainUserConfigRepository.findByLoginName(currentUser.getLoginName());
+                if(zkbCourseTrainUserConfigs.size() > 0){
+                    canEditFlag = true;
+                }
             }
         }
 
@@ -89,8 +110,8 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
         }else if(ZkbCourseTrain.FlowStatusEnum.ApplySubmit.toString().equals(selected.getCurrentStatus())){
             showLetterFlag = true;
             showApplyFlag = true;
-            showAuditFlag = true;
             if(canEditFlag){
+                showAuditFlag = true;
                 showBtn = "1";
             }
         }else if(ZkbCourseTrain.FlowStatusEnum.ApplyCancelJoin.toString().equals(selected.getCurrentStatus())){
@@ -116,13 +137,21 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
         }
     }
 
+    public void initApplyList(){
+        if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(selected.getCurrentStep())){
+            zkbCourseTrainDetailList = zkbCourseTrainService.queryInitDetails(selected);
+        }else if(ZkbCourseTrain.FlowStepEnum.ApplyAuditPending.toString().equals(selected.getCurrentStep()) ||
+                ZkbCourseTrain.FlowStepEnum.Completed.toString().equals(selected.getCurrentStep())){
+            zkbCourseTrainDetailList = zkbCourseTrainService.querySaveDetail(selected);
+        }
+    }
 
     public void handleFileUpload(FileUploadEvent event){
         V2_BlobObject v2_blobObject = blobFileService.uploadFile(event);
         if (null != v2_blobObject) {
             v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_COURSE);
             v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_COURSE_TRAIN);
-            v2_blobObject.setBoUuid(selected.getId());
+            //v2_blobObject.setBoUuid(selected.getId());
             v2_blobObjectList.add(v2_blobObject);
             WebUtil.addSuccessMessage(v2_blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
@@ -130,24 +159,55 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
         }
     }
 
+    public String saveData() {
+        if(selectedCourseSchedule == null){
+            return "";
+        }
+        zkbCourseTrainService.save(selectedCourseSchedule,selected,currentUser);
+        return "List?faces-redirect=true";
+
+    }
+
     public void removeFile(V2_BlobObject v2_blobObject) {
         v2_blobObjectList = v2_blobObjectList.stream().filter(item -> !item.getId().equals(v2_blobObject.getId())).collect(Collectors.toList());
     }
 
-    public void submitData(){
-        zkbCourseTrainService.submitNext(selected);
+    public String submitData(){
+        if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(selected.getCurrentStep())){
+            if(selectedCourseTrainDetailList.size() == 0){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请选择参加的工程师！", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                return "";
+            }
+        }else if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(selected.getCurrentStep())){
+           /* if(v2_blobObjectList ==null || v2_blobObjectList.size() == 0){
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请上传确认函！", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                return "";
+            }*/
+        }
+        zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList);
+        return "List?faces-redirect=true";
     }
 
-    public void noJoinNext(){
-
+    public String noJoinNext(){
+        selected.setReason(reason);
+        zkbCourseTrainService.noJoinNext(selected);
+        return "List?faces-redirect=true";
     }
 
-    public void acceptNext(){
-
+    public String acceptNext(){
+        zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList);
+        return "List?faces-redirect=true";
     }
 
-    public void rejectNext(){
+    public String rejectNext(){
+        zkbCourseTrainService.rejectedNext(selected);
+        return "List?faces-redirect=true";
+    }
 
+    public String backList(){
+        return "List?faces-redirect=true";
     }
     @Override
     protected GenericRepositoryUUID<ZkbCourseTrain> getDAO() {
@@ -224,5 +284,37 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public List<ZkbCourseTrainDetail> getZkbCourseTrainDetailList() {
+        return zkbCourseTrainDetailList;
+    }
+
+    public void setZkbCourseTrainDetailList(List<ZkbCourseTrainDetail> zkbCourseTrainDetailList) {
+        this.zkbCourseTrainDetailList = zkbCourseTrainDetailList;
+    }
+
+    public List<ZkbCourseTrainDetail> getSelectedCourseTrainDetailList() {
+        return selectedCourseTrainDetailList;
+    }
+
+    public void setSelectedCourseTrainDetailList(List<ZkbCourseTrainDetail> selectedCourseTrainDetailList) {
+        this.selectedCourseTrainDetailList = selectedCourseTrainDetailList;
+    }
+
+    public List<ZkbContractCourseSchedule> getZkbContractCourseSchedules() {
+        return zkbContractCourseSchedules;
+    }
+
+    public void setZkbContractCourseSchedules(List<ZkbContractCourseSchedule> zkbContractCourseSchedules) {
+        this.zkbContractCourseSchedules = zkbContractCourseSchedules;
+    }
+
+    public ZkbContractCourseSchedule getSelectedCourseSchedule() {
+        return selectedCourseSchedule;
+    }
+
+    public void setSelectedCourseSchedule(ZkbContractCourseSchedule selectedCourseSchedule) {
+        this.selectedCourseSchedule = selectedCourseSchedule;
     }
 }

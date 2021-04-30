@@ -1,9 +1,6 @@
 package com.ge.apm.service.zkb;
 
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.ZkbContractCourseRepository;
-import com.ge.apm.dao.ZkbCourseTrainRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,8 +28,12 @@ public class ZkbCourseTrainService {
     ZkbCourseTrainRepository zkbCourseTrainRepository;
 
     @Autowired
-    ZkbContractCourseRepository zkbContractCourseRepository;
+    ZkbEngineerRepository zkbEngineerRepository;
 
+    @Autowired
+    ZkbContractCourseRepository zkbContractCourseRepository;
+    @Autowired
+    ZkbCourseTrainDetailRepository zkbCourseTrainDetailRepository;
     @Autowired
     private TenantInfoRepository tenantInfoDao;
 
@@ -45,7 +46,31 @@ public class ZkbCourseTrainService {
 
     @Transactional(rollbackFor = Exception.class)
     public void generateTrain(ZkbContractCourseSchedule s, String joinFlag, UserAccount userAccount,String reason,Double c){
-        ZkbCourseTrain t = new ZkbCourseTrain();
+
+    }
+
+    public Double mulByDouble(Double d1,Double d2){
+        BigDecimal a1 = BigDecimal.valueOf(d1);
+        BigDecimal a2 = BigDecimal.valueOf(d2);
+        double result = (a1.multiply(a2)).doubleValue();
+        return result;
+    }
+
+    public Double subByDouble(Double d1,Double d2){
+        BigDecimal a1 = BigDecimal.valueOf(d1);
+        BigDecimal a2 = BigDecimal.valueOf(d2);
+        double result = (a1.subtract(a2)).doubleValue();
+        return result;
+    }
+
+    public Double addByDouble(Double d1,Double d2){
+        BigDecimal a1 = BigDecimal.valueOf(d1);
+        BigDecimal a2 = BigDecimal.valueOf(d2);
+        double result = (a1.add(a2)).doubleValue();
+        return result;
+    }
+
+    public void save(ZkbContractCourseSchedule s, ZkbCourseTrain t,UserAccount userAccount){
         Integer index = zkbCourseTrainRepository.getMaxIndex("ST"+simpleDateFormat.format(new Date())+"%") ;
         index = index == null ? 1 : index;
         String partOrderNo = "ST"+simpleDateFormat.format(new Date())+String.format("%04d",index);
@@ -63,57 +88,117 @@ public class ZkbCourseTrainService {
         t.setCreatedDate(new Date());
         t.setInstructor(s.getInstructor());
         t.setLocation(s.getLocation());
-        if(ZkbCourseTrain.ParticipateStatusEnum.Y.toString().equals(joinFlag)){
-            t.setPreDeductCount(c);
-            t.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
-            t.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ScheduleJoin.toString());
-            t.setCurrentStep(ZkbCourseTrain.FlowStepEnum.LetterPending.toString());
-        }else if(ZkbCourseTrain.ParticipateStatusEnum.N.toString().equals(joinFlag)){
-            t.setReason(reason);
-            t.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.N.toString());
-            t.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ScheduleNoJoin.toString());
-        }
+        t.setDeductCount(s.getDeductCount());
+        t.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
+        t.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ScheduleJoin.toString());
+        t.setCurrentStep(ZkbCourseTrain.FlowStepEnum.LetterPending.toString());
+        t.setPreQuota(mulByDouble(t.getDeductCount(),t.getPrePersonCount()));
         zkbCourseTrainRepository.save(t);
-        dealPreQuota(t.getContractCourseId(),t.getPreDeductCount(),t.getPreDeductCount());
-    }
 
-    @Transactional(rollbackFor = Exception.class)
-    public void dealPreQuota(String zkbContractCourseId, Double c,Double deductCount){
-        Double q = new Double(0);
-        q = mulByDouble(c, deductCount);
-        ZkbContractCourse zkbContractCourse = zkbContractCourseRepository.findById(zkbContractCourseId);
-        zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) - q);
-        zkbContractCourse.setMainCourseCountApply((zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply()) + q);
-        zkbContractCourseRepository.save(zkbContractCourse);
-    }
-
-    public Double mulByDouble(Double d1,Double d2){
-        BigDecimal a1 = BigDecimal.valueOf(d1);
-        BigDecimal a2 = BigDecimal.valueOf(d2);
-        double result = (a1.multiply(a2)).doubleValue();
-        return result;
+        subQuotaSign(t,"add");
     }
 
     //region 流程事件
     @Transactional(rollbackFor = Exception.class)
-    public void submitNext(ZkbCourseTrain c){
+    public void submitNext(ZkbCourseTrain c,List<ZkbCourseTrainDetail> zkbCourseTrainDetailList,List<V2_BlobObject> v2_blobObjects){
+        String oldStep = c.getCurrentStep();
         if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(c.getCurrentStep())){
             c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString());
             c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.LetterSubmit.toString());
         }else if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(c.getCurrentStep())){
-            c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
+            c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.ApplyAuditPending.toString());
             c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ApplySubmit.toString());
+            c.setActualPersonCount((double)zkbCourseTrainDetailList.size());
+            c.setActualQuota(mulByDouble(c.getDeductCount(),c.getActualPersonCount()));
         }else if(ZkbCourseTrain.FlowStepEnum.ApplyCancelAuditPending.toString().equals(c.getCurrentStep())){
             c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ApplyCancelAccepted.toString());
             c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
+        }else if(ZkbCourseTrain.FlowStepEnum.ApplyAuditPending.toString().equals(c.getCurrentStep())){
+            c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.AuditAccepted.toString());
+            c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
         }
-        //名额变化
-        if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(c.getCurrentStep())){
-            //扣除申请中名额，增加已使用名额
 
+        zkbCourseTrainRepository.save(c);
+
+        //名额变化
+        if(ZkbCourseTrain.FlowStepEnum.ApplyAuditPending.toString().equals(oldStep)){
+            //扣除申请中名额，增加已使用名额
+            subQuotaUse(c);
+        }else if(ZkbCourseTrain.FlowStepEnum.ApplyCancelAuditPending.toString().equals(oldStep)){
+            //返还预扣名额
+            subQuotaSign(c,"return");
+        }if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(oldStep)){
+            for(ZkbCourseTrainDetail d : zkbCourseTrainDetailList){
+                d.setTrainId(c.getId());
+            }
+            zkbCourseTrainDetailRepository.save(zkbCourseTrainDetailList);
+        }if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(oldStep)){
+            for(V2_BlobObject v :v2_blobObjects){
+                v.setBoUuid(c.getId());
+            }
+            blobObjectRepository.save(v2_blobObjects);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void noJoinNext(ZkbCourseTrain t){
+        String oldStep = t.getCurrentStep();
+        if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(t.getCurrentStep())){
+            t.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.N.toString());
+            t.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
+            t.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.LetterCancelJoin.toString());
+            subQuotaSign(t,"return");
+        }else if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(t.getCurrentStep())){
+            t.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.N.toString());
+            t.setCurrentStep(ZkbCourseTrain.FlowStepEnum.ApplyCancelAuditPending.toString());
+            t.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ApplyCancelJoin.toString());
+        }
+        zkbCourseTrainRepository.save(t);
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public void rejectedNext(ZkbCourseTrain c){
+        String oldStep = c.getCurrentStep();
+        if(ZkbCourseTrain.FlowStepEnum.ApplyCancelAuditPending.toString().equals(c.getCurrentStep())){
+            c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ApplyCancelRejected.toString());
+            c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
+        }else if(ZkbCourseTrain.FlowStepEnum.ApplyAuditPending.toString().equals(c.getCurrentStep())){
+            c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.AuditRejected.toString());
+            c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString());
         }
         zkbCourseTrainRepository.save(c);
+        if(ZkbCourseTrain.FlowStatusEnum.ApplyCancelRejected.toString().equals(c.getCurrentStatus())){
+            //扣除名额
+            subQuotaUse(c);
+        }
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void subQuotaUse(ZkbCourseTrain ct){
+        ZkbContractCourse zkbContractCourse = zkbContractCourseRepository.findById(ct.getContractCourseId());
+        Double preQuota = ct.getPreQuota() ==null? 0 : ct.getPreQuota();
+        zkbContractCourse.setMainCourseCountApply((zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply()) - preQuota);
+        Double actQuota = ct.getActualQuota() == null ? 0 : ct.getActualQuota();
+        zkbContractCourse.setMainCourseCountUse((zkbContractCourse.getMainCourseCountUse() == null ? 0 : zkbContractCourse.getMainCourseCountUse()) + actQuota);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void subQuotaSign(ZkbCourseTrain ct,String type){
+        ZkbContractCourse zkbContractCourse = zkbContractCourseRepository.findById(ct.getContractCourseId());
+        if(zkbContractCourse == null){
+            return;
+        }
+        Double preQuota = ct.getPreQuota() ==null? 0 : ct.getPreQuota();
+        if("add".equals(type)){
+            zkbContractCourse.setMainCourseCountApply((zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply()) + preQuota);
+            zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) - preQuota);
+        }else{
+            zkbContractCourse.setMainCourseCountApply((zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply()) - preQuota);
+            zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) -+ preQuota);
+        }
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void cancelNext(ZkbCourseTrain c,String reason){
         if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(c.getCurrentStep())){
@@ -130,6 +215,40 @@ public class ZkbCourseTrainService {
     }
     //endregion
 
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(ZkbCourseTrain t){
+        zkbCourseTrainRepository.delete(t);
+        subQuotaSign(t,"return");
+    }
+
+    public List<ZkbCourseTrainDetail> queryInitDetails(ZkbCourseTrain zkbCourseTrain){
+        List<ZkbEngineer> zkbEngineerList = zkbEngineerRepository.findByTenantUID(zkbCourseTrain.getTenantUID());
+        if(zkbEngineerList == null || zkbEngineerList.size() == 0){
+            return new ArrayList<>();
+        }
+        List<ZkbCourseTrainDetail> zkbCourseTrainDetails = new ArrayList<>();
+        for(ZkbEngineer e : zkbEngineerList){
+            ZkbCourseTrainDetail zkbCourseTrainDetail = new ZkbCourseTrainDetail();
+            zkbCourseTrainDetail.setEid(e.getId());
+            zkbCourseTrainDetail.setEname(e.getName());
+            zkbCourseTrainDetail.setEphone(e.getPhone());
+            zkbCourseTrainDetail.setEemail(e.getEmail());
+            zkbCourseTrainDetail.setTrainId(zkbCourseTrain.getId());
+            List<V2_BlobObject> v2_blobObjects = blobObjectRepository.findByBoUuid(e.getId());
+            zkbCourseTrainDetail.setV2_blobObjectList(v2_blobObjects);
+            zkbCourseTrainDetails.add(zkbCourseTrainDetail);
+        }
+        return zkbCourseTrainDetails;
+    }
+
+    public List<ZkbCourseTrainDetail> querySaveDetail(ZkbCourseTrain zkbCourseTrain){
+        List<ZkbCourseTrainDetail> zkbCourseTrainDetails = zkbCourseTrainDetailRepository.findByTrainId(zkbCourseTrain.getId());
+        for(ZkbCourseTrainDetail c : zkbCourseTrainDetails){
+            List<V2_BlobObject> v2_blobObjects = blobObjectRepository.findByBoUuid(c.getEid());
+            c.setV2_blobObjectList(v2_blobObjects);
+        }
+        return zkbCourseTrainDetails;
+    }
 
     public List<V2_BlobObject> queryBlobObjectByPid(String id){
         List<V2_BlobObject> v2_blobObjectList = new ArrayList<>();

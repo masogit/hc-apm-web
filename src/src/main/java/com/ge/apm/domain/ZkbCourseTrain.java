@@ -138,17 +138,26 @@ public class ZkbCourseTrain implements Serializable {
     @Column(name = "location")
     private String location;
 
+    @Column(name = "deduct_count")
+    private Double deductCount;
+
     /**
      * 预扣除数量
      */
-    @Column(name = "pre_deduct_count")
-    private Double preDeductCount;
+    @Column(name = "pre_Quota")
+    private Double preQuota;
+
+    @Column(name = "pre_person_count")
+    private Double prePersonCount;
 
     /**
      * 实际扣除数量
      */
-    @Column(name = "actual_deduct_count")
-    private Double actualDeductCount;
+    @Column(name = "actual_Quota")
+    private Double actualQuota;
+
+    @Column(name = "actual_person_count")
+    private Double actualPersonCount;
 
     @Column(name = "remark")
     @Size(max = 2000)
@@ -158,23 +167,19 @@ public class ZkbCourseTrain implements Serializable {
     @Size(max = 2000)
     private String reason;
 
-    @Column(name = "reason_auditer")
-    private String reasonAuditer;
+    @Column(name = "audit_remark")
+    @Size(max = 2000)
+    private String auditRemark;
 
-    @Column(name = "reason_auditer_uid")
-    private String reasonAuditerUid;
+    @Column(name = "auditer")
+    private String auditer;
 
-    @Column(name = "reason_audit_date")
-    private Date reasonAuditDate;
+    @Column(name = "auditer_uid")
+    private String auditerUid;
 
-    @Column(name = "letter_auditer")
-    private String letterAuditer;
+    @Column(name = "audit_date")
+    private Date auditDate;
 
-    @Column(name = "letter_auditer_uid")
-    private String letterAuditerUid;
-
-    @Column(name = "letter_audit_date")
-    private Date letterAuditDate;
 
     @Column(name = "created_by")
     private String createdBy;
@@ -308,20 +313,44 @@ public class ZkbCourseTrain implements Serializable {
         this.id = id;
     }
 
-    public Double getPreDeductCount() {
-        return preDeductCount;
+    public Double getDeductCount() {
+        return deductCount;
     }
 
-    public void setPreDeductCount(Double preDeductCount) {
-        this.preDeductCount = preDeductCount;
+    public void setDeductCount(Double deductCount) {
+        this.deductCount = deductCount;
     }
 
-    public Double getActualDeductCount() {
-        return actualDeductCount;
+    public Double getPreQuota() {
+        return preQuota;
     }
 
-    public void setActualDeductCount(Double actualDeductCount) {
-        this.actualDeductCount = actualDeductCount;
+    public void setPreQuota(Double preQuota) {
+        this.preQuota = preQuota;
+    }
+
+    public Double getPrePersonCount() {
+        return prePersonCount;
+    }
+
+    public void setPrePersonCount(Double prePersonCount) {
+        this.prePersonCount = prePersonCount;
+    }
+
+    public Double getActualQuota() {
+        return actualQuota;
+    }
+
+    public void setActualQuota(Double actualQuota) {
+        this.actualQuota = actualQuota;
+    }
+
+    public Double getActualPersonCount() {
+        return actualPersonCount;
+    }
+
+    public void setActualPersonCount(Double actualPersonCount) {
+        this.actualPersonCount = actualPersonCount;
     }
 
     public String getRemark() {
@@ -388,52 +417,36 @@ public class ZkbCourseTrain implements Serializable {
         this.reason = reason;
     }
 
-    public String getReasonAuditer() {
-        return reasonAuditer;
+    public String getAuditer() {
+        return auditer;
     }
 
-    public void setReasonAuditer(String reasonAuditer) {
-        this.reasonAuditer = reasonAuditer;
+    public void setAuditer(String auditer) {
+        this.auditer = auditer;
     }
 
-    public String getReasonAuditerUid() {
-        return reasonAuditerUid;
+    public String getAuditerUid() {
+        return auditerUid;
     }
 
-    public void setReasonAuditerUid(String reasonAuditerUid) {
-        this.reasonAuditerUid = reasonAuditerUid;
+    public void setAuditerUid(String auditerUid) {
+        this.auditerUid = auditerUid;
     }
 
-    public Date getReasonAuditDate() {
-        return reasonAuditDate;
+    public Date getAuditDate() {
+        return auditDate;
     }
 
-    public void setReasonAuditDate(Date reasonAuditDate) {
-        this.reasonAuditDate = reasonAuditDate;
+    public void setAuditDate(Date auditDate) {
+        this.auditDate = auditDate;
     }
 
-    public String getLetterAuditer() {
-        return letterAuditer;
+    public String getAuditRemark() {
+        return auditRemark;
     }
 
-    public void setLetterAuditer(String letterAuditer) {
-        this.letterAuditer = letterAuditer;
-    }
-
-    public String getLetterAuditerUid() {
-        return letterAuditerUid;
-    }
-
-    public void setLetterAuditerUid(String letterAuditerUid) {
-        this.letterAuditerUid = letterAuditerUid;
-    }
-
-    public Date getLetterAuditDate() {
-        return letterAuditDate;
-    }
-
-    public void setLetterAuditDate(Date letterAuditDate) {
-        this.letterAuditDate = letterAuditDate;
+    public void setAuditRemark(String auditRemark) {
+        this.auditRemark = auditRemark;
     }
 
     @Override

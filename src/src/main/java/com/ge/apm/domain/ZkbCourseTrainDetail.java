@@ -5,7 +5,9 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author : 503189362
@@ -24,11 +26,81 @@ public class ZkbCourseTrainDetail implements Serializable {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
-    @Column(name = "tenant_uid")
+    @Column(name = "train_id")
+    private String trainId;
+
+    @Column(name = "eid")
     private String eid;
 
-    @Column(name = "file_name")
-    private String fileName;
+    @Column(name = "ename")
+    private String ename;
+
+    @Column(name = "ephone")
+    private String ephone;
+
+    @Column(name = "eemail")
+    private String eemail;
+
+    @Transient
+    private List<V2_BlobObject> v2_blobObjectList = new ArrayList<>();
+
+
+
+    public List<V2_BlobObject> getV2_blobObjectList() {
+        return v2_blobObjectList;
+    }
+
+    public void setV2_blobObjectList(List<V2_BlobObject> v2_blobObjectList) {
+        this.v2_blobObjectList = v2_blobObjectList;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getEid() {
+        return eid;
+    }
+
+    public void setEid(String eid) {
+        this.eid = eid;
+    }
+
+    public String getEname() {
+        return ename;
+    }
+
+    public void setEname(String ename) {
+        this.ename = ename;
+    }
+
+    public String getEphone() {
+        return ephone;
+    }
+
+    public void setEphone(String ephone) {
+        this.ephone = ephone;
+    }
+
+    public String getEemail() {
+        return eemail;
+    }
+
+    public void setEemail(String eemail) {
+        this.eemail = eemail;
+    }
+
+    public String getTrainId() {
+        return trainId;
+    }
+
+    public void setTrainId(String trainId) {
+        this.trainId = trainId;
+    }
 
     @Override
     public int hashCode() {

@@ -4,7 +4,10 @@ package com.ge.apm.view.zkb;
  import com.ge.apm.domain.TenantInfo;
  import com.ge.apm.domain.UserAccount;
  import com.ge.apm.domain.ZkbCourseTrain;
+ import com.ge.apm.domain.ZkbCourseTrainUserConfig;
+ import com.ge.apm.service.zkb.ZkbCourseTrainService;
  import com.ge.apm.view.sysutil.UrlEncryptController;
+ import com.ge.apm.view.sysutil.UserContextService;
  import org.springframework.data.domain.Page;
  import org.springframework.data.domain.PageRequest;
  import webapp.framework.dao.GenericRepositoryUUID;
@@ -31,12 +34,17 @@ public class ZkbCourseTrainController extends GenericCRUDUUIDController<ZkbCours
     private Page<ZkbCourseTrain> zkbCourseTrainPage;
     private List<TenantInfo> tenantInfoList;
     private String selectionTenantInfo;
+    private ZkbCourseTrainService zkbCourseTrainService;
+    private boolean showBtn = false;
+
 
     @Override
     protected void init() {
         super.init();
         zkbCourseTrainRepository =  WebUtil.getBean(ZkbCourseTrainRepository.class);
-
+        zkbCourseTrainService =  WebUtil.getBean(ZkbCourseTrainService.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        initBtn();
     }
 
     @Override
@@ -54,14 +62,47 @@ public class ZkbCourseTrainController extends GenericCRUDUUIDController<ZkbCours
         zkbCourseTrainPage = zkbCourseTrainRepository.findBySearchFilter(searchFilters, pageRequest);
         return zkbCourseTrainPage;
     }
+    public void initBtn(){
+        if(!zkbCourseTrainService.isZkbAdmin(currentUser.getTenantUID())){
+            showBtn = true;
+        }else{
+            showBtn = false;
+        }
+    }
+
+    public String createAction(){
+        return UrlEncryptController.encodeUrlParam("Edit?action=Create");
+    }
 
     public String editAction() {
         return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedId=".concat(selected.getId()));
     }
 
+    public TenantInfo getTenantInfo(String tenantInfoUID){
+        return zkbCourseTrainService.getTenantInfo(tenantInfoUID);
+    }
+
+
+    @Override
+    public void delete() {
+        if(!ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(selected.getCurrentStep())){
+            WebUtil.addErrorMessage("数据不能删除");
+            return;
+        }
+        zkbCourseTrainService.delete(selected);
+    }
+
     @Override
     protected GenericRepositoryUUID<ZkbCourseTrain> getDAO() {
         return zkbCourseTrainRepository;
+    }
+
+    public boolean isShowBtn() {
+        return showBtn;
+    }
+
+    public void setShowBtn(boolean showBtn) {
+        this.showBtn = showBtn;
     }
 
     public List<TenantInfo> getTenantInfoList() {
