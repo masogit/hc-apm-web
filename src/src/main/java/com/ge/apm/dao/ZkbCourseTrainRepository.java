@@ -4,6 +4,8 @@ import com.ge.apm.domain.ZkbCourseTrain;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
+import java.util.List;
+
 public interface ZkbCourseTrainRepository extends GenericRepositoryUUID<ZkbCourseTrain> {
 
     @Query("select max(p.trainNoIndex) from ZkbCourseTrain p where p.trainNo like ?1 ")
@@ -19,5 +21,6 @@ public interface ZkbCourseTrainRepository extends GenericRepositoryUUID<ZkbCours
     @Query(value = "SELECT * FROM zkb_course_train WHERE tenant_uid = ?1 and course_schedule_id = ?2 ORDER BY created_date desc limit 1 ", nativeQuery = true)
     ZkbCourseTrain findByUidAndSheduleId(String tenantUid, String courseScheduleId);
 
+    List<ZkbCourseTrain> findByCourseScheduleIdAndParticipateStatus(String courseScheduleId,String participateStatus);
 
 }

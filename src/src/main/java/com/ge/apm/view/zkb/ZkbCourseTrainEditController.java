@@ -1,6 +1,7 @@
 package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.ZknContractCourseScheduleMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.zkb.ZkbCourseTrainService;
@@ -31,7 +32,7 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
     private UserAccount currentUser;
     private ZkbCourseTrainRepository zkbCourseTrainRepository;
     private ZkbCourseTrainUserConfigRepository zkbCourseTrainUserConfigRepository;
-    private ZkbCourseScheduleRepository zkbCourseScheduleRepository;
+    private ZknContractCourseScheduleMapper zknContractCourseScheduleMapper;
     private UserContextService userContextService;
     private ZkbCourseTrainService zkbCourseTrainService;
     private List<V2_BlobObject> v2_blobObjectList;
@@ -53,7 +54,7 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
     protected void init() {
         super.init();
         zkbCourseTrainRepository =  WebUtil.getBean(ZkbCourseTrainRepository.class);
-        zkbCourseScheduleRepository =  WebUtil.getBean(ZkbCourseScheduleRepository.class);
+        zknContractCourseScheduleMapper =  WebUtil.getBean(ZknContractCourseScheduleMapper.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         zkbCourseTrainService = WebUtil.getBean(ZkbCourseTrainService.class);
         zkbCourseTrainUserConfigRepository = WebUtil.getBean(ZkbCourseTrainUserConfigRepository.class);
@@ -67,7 +68,7 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             initFlag();
             initApplyList();
         }else {
-            zkbContractCourseSchedules = zkbCourseScheduleRepository.find();
+            zkbContractCourseSchedules = zknContractCourseScheduleMapper.fetchByTenantUid(currentUser.getTenantUID());
             selected = new ZkbCourseTrain();
         }
     }
@@ -118,14 +119,17 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             showLetterFlag = true;
             showReasonFlag = true;
             if(canEditFlag){
+                showReasonAuditFlag = true;
                 showBtn = "1";
             }
         }else if(ZkbCourseTrain.FlowStatusEnum.ApplyCancelAccepted.toString().equals(selected.getCurrentStatus())){
             showLetterFlag = true;
             showReasonAuditFlag = true;
+            showReasonFlag = true;
         }else if(ZkbCourseTrain.FlowStatusEnum.ApplyCancelRejected.toString().equals(selected.getCurrentStatus())){
             showLetterFlag = true;
             showReasonAuditFlag = true;
+            showReasonFlag = true;
         }else if(ZkbCourseTrain.FlowStatusEnum.AuditAccepted.toString().equals(selected.getCurrentStatus())){
             showLetterFlag = true;
             showApplyFlag = true;
@@ -134,6 +138,9 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             showLetterFlag = true;
             showApplyFlag = true;
             showAuditFlag = true;
+            if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(selected.getCurrentStep())){
+                showBtn = "0";
+            }
         }
     }
 
@@ -163,6 +170,11 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
         if(selectedCourseSchedule == null){
             return "";
         }
+        List<ZkbCourseTrain> zkbCourseTrains = zkbCourseTrainRepository.findByCourseScheduleIdAndParticipateStatus(selectedCourseSchedule.getId(),ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
+        if(zkbCourseTrains != null && zkbCourseTrains.size() > 0){
+            WebUtil.addErrorMessage("该课程已申请过培训");
+            return "";
+        }
         zkbCourseTrainService.save(selectedCourseSchedule,selected,currentUser);
         return "List?faces-redirect=true";
 
@@ -186,23 +198,24 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
                 return "";
             }*/
         }
-        zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList);
+        zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList,currentUser);
         return "List?faces-redirect=true";
     }
 
     public String noJoinNext(){
         selected.setReason(reason);
         zkbCourseTrainService.noJoinNext(selected);
+        selected = zkbCourseTrainRepository.findById(selected.getId());
         return "List?faces-redirect=true";
     }
 
     public String acceptNext(){
-        zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList);
+        zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList,currentUser);
         return "List?faces-redirect=true";
     }
 
     public String rejectNext(){
-        zkbCourseTrainService.rejectedNext(selected);
+        zkbCourseTrainService.rejectedNext(selected,currentUser);
         return "List?faces-redirect=true";
     }
 

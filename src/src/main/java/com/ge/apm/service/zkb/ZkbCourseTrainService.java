@@ -44,6 +44,13 @@ public class ZkbCourseTrainService {
         return tenantInfoDao.findByuid(tenantUID);
     }
 
+    public List<TenantInfo> getSourceTenantInfoList(){
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, 3));
+        return tenantInfoDao.findBySearchFilter(searchFilters);
+    }
+
+
     @Transactional(rollbackFor = Exception.class)
     public void generateTrain(ZkbContractCourseSchedule s, String joinFlag, UserAccount userAccount,String reason,Double c){
 
@@ -70,6 +77,7 @@ public class ZkbCourseTrainService {
         return result;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void save(ZkbContractCourseSchedule s, ZkbCourseTrain t,UserAccount userAccount){
         Integer index = zkbCourseTrainRepository.getMaxIndex("ST"+simpleDateFormat.format(new Date())+"%") ;
         index = index == null ? 1 : index;
@@ -77,7 +85,7 @@ public class ZkbCourseTrainService {
         t.setTrainNo(partOrderNo);
         t.setCourseScheduleId(s.getId());
         t.setTenantUID(userAccount.getTenantUID());
-        t.setContractCourseId(s.getZkbCourseId());
+        t.setContractCourseId(s.getZkbContractCourseId());
         t.setCourseId(s.getCid());
         t.setCourseName(s.getCname());
         t.setTrainingDays(s.getTrainingDays());
@@ -100,7 +108,7 @@ public class ZkbCourseTrainService {
 
     //region 流程事件
     @Transactional(rollbackFor = Exception.class)
-    public void submitNext(ZkbCourseTrain c,List<ZkbCourseTrainDetail> zkbCourseTrainDetailList,List<V2_BlobObject> v2_blobObjects){
+    public void submitNext(ZkbCourseTrain c,List<ZkbCourseTrainDetail> zkbCourseTrainDetailList,List<V2_BlobObject> v2_blobObjects,UserAccount userAccount){
         String oldStep = c.getCurrentStep();
         if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(c.getCurrentStep())){
             c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString());
@@ -113,11 +121,16 @@ public class ZkbCourseTrainService {
         }else if(ZkbCourseTrain.FlowStepEnum.ApplyCancelAuditPending.toString().equals(c.getCurrentStep())){
             c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ApplyCancelAccepted.toString());
             c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
+            c.setAuditDate(new Date());
+            c.setAuditer(userAccount.getName());
+            c.setAuditerUid(userAccount.getUid());
         }else if(ZkbCourseTrain.FlowStepEnum.ApplyAuditPending.toString().equals(c.getCurrentStep())){
             c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.AuditAccepted.toString());
             c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
+            c.setAuditDate(new Date());
+            c.setAuditer(userAccount.getName());
+            c.setAuditerUid(userAccount.getUid());
         }
-
         zkbCourseTrainRepository.save(c);
 
         //名额变化
@@ -158,14 +171,21 @@ public class ZkbCourseTrainService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public void rejectedNext(ZkbCourseTrain c){
+    public void rejectedNext(ZkbCourseTrain c,UserAccount userAccount){
         String oldStep = c.getCurrentStep();
         if(ZkbCourseTrain.FlowStepEnum.ApplyCancelAuditPending.toString().equals(c.getCurrentStep())){
+            c.setActualQuota(c.getPreQuota());
             c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ApplyCancelRejected.toString());
             c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
+            c.setAuditDate(new Date());
+            c.setAuditer(userAccount.getName());
+            c.setAuditerUid(userAccount.getUid());
         }else if(ZkbCourseTrain.FlowStepEnum.ApplyAuditPending.toString().equals(c.getCurrentStep())){
             c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.AuditRejected.toString());
             c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString());
+            c.setAuditDate(new Date());
+            c.setAuditer(userAccount.getName());
+            c.setAuditerUid(userAccount.getUid());
         }
         zkbCourseTrainRepository.save(c);
         if(ZkbCourseTrain.FlowStatusEnum.ApplyCancelRejected.toString().equals(c.getCurrentStatus())){
@@ -179,8 +199,11 @@ public class ZkbCourseTrainService {
         ZkbContractCourse zkbContractCourse = zkbContractCourseRepository.findById(ct.getContractCourseId());
         Double preQuota = ct.getPreQuota() ==null? 0 : ct.getPreQuota();
         zkbContractCourse.setMainCourseCountApply((zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply()) - preQuota);
+        zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) + preQuota);
         Double actQuota = ct.getActualQuota() == null ? 0 : ct.getActualQuota();
         zkbContractCourse.setMainCourseCountUse((zkbContractCourse.getMainCourseCountUse() == null ? 0 : zkbContractCourse.getMainCourseCountUse()) + actQuota);
+        zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) - actQuota);
+        zkbContractCourseRepository.save(zkbContractCourse);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -197,6 +220,7 @@ public class ZkbCourseTrainService {
             zkbContractCourse.setMainCourseCountApply((zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply()) - preQuota);
             zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) -+ preQuota);
         }
+        zkbContractCourseRepository.save(zkbContractCourse);
     }
 
     @Transactional(rollbackFor = Exception.class)
