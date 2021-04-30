@@ -192,11 +192,11 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
                 return "";
             }
         }else if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(selected.getCurrentStep())){
-           /* if(v2_blobObjectList ==null || v2_blobObjectList.size() == 0){
+            if(v2_blobObjectList ==null || v2_blobObjectList.size() == 0){
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请上传确认函！", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 return "";
-            }*/
+            }
         }
         zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList,currentUser);
         return "List?faces-redirect=true";
