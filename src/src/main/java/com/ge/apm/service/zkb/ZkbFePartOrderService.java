@@ -585,10 +585,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      */
     public void moveProbe(Integer type,ZkbContract zkbContract,Integer qty,Boolean showZkbPoProbeQuotaType,String zkbPoProbeQuotaType)
     {
-            if(showZkbPoProbeQuotaType&&ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType)&&(2==type||3==type))
-            {
-                    return;
-            }
+//            if(showZkbPoProbeQuotaType&&ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(zkbPoProbeQuotaType)&&(2==type||3==type))
+//            {
+//                    return;
+//            }
             Integer probeQuota = zkbContract.getProbeQuota()==null?0:zkbContract.getProbeQuota();
             Integer probeQuotaTotal = zkbContract.getProbeQuotaTotal()==null?0:zkbContract.getProbeQuotaTotal();
             Integer probeQuotaUse = zkbContract.getProbeQuotaUse()==null?0:zkbContract.getProbeQuotaUse();

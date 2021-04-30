@@ -120,6 +120,9 @@ public class ZkbContractCourseSchedule implements Serializable {
     @Column(name = "type")
     private String type;
 
+    @Transient
+    private String zkbContractCourseId;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -284,4 +287,11 @@ public class ZkbContractCourseSchedule implements Serializable {
         this.type = type;
     }
 
+    public String getZkbContractCourseId() {
+        return zkbContractCourseId;
+    }
+
+    public void setZkbContractCourseId(String zkbContractCourseId) {
+        this.zkbContractCourseId = zkbContractCourseId;
+    }
 }
