@@ -23,10 +23,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -162,6 +159,27 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     private Boolean showZkbPoProbeQuotaType = false;
 
+
+    /**
+     * 高值
+     */
+    private final static String[] valueHighValueType = new String[]{ZkbPartOrderCat.ValueType.HighValue.toString()};
+
+    /**
+     * 普通
+     */
+    private final static String[] valueNormalValueType = new String[]{ZkbPartOrderCat.ValueType.NormalValue.toString()};
+
+    /**
+     * 特殊
+     */
+    private final static String[] valueSpecialValueValueType = new String[]{ZkbPartOrderCat.ValueType.SpecialValue.toString()};
+
+    /**
+     * 特殊和普通
+     */
+    private final static String[] valueNormalAndSpecialValueType = new String[]{ZkbPartOrderCat.ValueType.NormalValue.toString(),ZkbPartOrderCat.ValueType.SpecialValue.toString()};
+
     @Override
     protected void init() {
         super.init();
@@ -256,7 +274,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         if(CollectionUtils.isNotEmpty(this.contractList))
         {
             ZkbContract item = this.contractList.get(0);
-            initZknPartCat(item.getStartDate());
+            initZknPartCat();
             Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
             if(item.getStartDate()!=null&&item.getStartDate().compareTo(contractStartDate)>=0)
             {
@@ -441,8 +459,29 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         return res;
     }
 
-    public void initZknPartCat(Date contractDate){
-        zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat(contractDate);
+    public void initZknPartCat(){
+        ZkbContract item = this.contractList.get(0);
+        if(showZkbPoProbeQuotaType&&StringUtils.isNotBlank(this.selected.getZkbPoProbeQuotaType()))
+        {
+            List<String> valueTypeList = null;
+            if(ZkbFePartOrder.zkbPoProbeQuotaType.Any.toString().equals(this.selected.getZkbPoProbeQuotaType()))
+            {
+                valueTypeList= Arrays.asList(valueNormalAndSpecialValueType);
+            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Normal.toString().equals(this.selected.getZkbPoProbeQuotaType()))
+            {
+                valueTypeList= Arrays.asList(valueNormalValueType);
+            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.Special.toString().equals(this.selected.getZkbPoProbeQuotaType()))
+            {
+                valueTypeList= Arrays.asList(valueSpecialValueValueType);
+            }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(this.selected.getZkbPoProbeQuotaType()))
+            {
+                valueTypeList= Arrays.asList(valueHighValueType);
+            }
+            zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat(item.getStartDate(),valueTypeList);
+        }else
+        {
+            zkbPartOrderCatList = zkbPartOrderService.queryPartOrderCat(item.getStartDate());
+        }
     }
 
     public void zkbPartOrderCatSelect(){

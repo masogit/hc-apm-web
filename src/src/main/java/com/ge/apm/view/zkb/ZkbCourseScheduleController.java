@@ -3,6 +3,7 @@ package com.ge.apm.view.zkb;
 import com.ge.apm.dao.ZkbCourseRepository;
 import com.ge.apm.dao.ZkbCourseScheduleRepository;
 import com.ge.apm.dao.ZkbCourseTrainUserConfigRepository;
+import com.ge.apm.dao.mapper.ZknContractCourseScheduleMapper;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContractCourseSchedule;
 import com.ge.apm.domain.ZkbCourse;
@@ -120,6 +121,8 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
 
     private Boolean hasEditRight=false;
 
+    private ZknContractCourseScheduleMapper zknContractCourseScheduleMapper;
+
     /**
      * 初始化
      */
@@ -130,13 +133,15 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         zkbCourseScheduleRepository = WebUtil.getBean(ZkbCourseScheduleRepository.class);
         zkbCourseTrainUserConfigRepository=WebUtil.getBean(ZkbCourseTrainUserConfigRepository.class);
         zkbCourseRepository=WebUtil.getBean(ZkbCourseRepository.class);
+        zknContractCourseScheduleMapper=WebUtil.getBean(ZknContractCourseScheduleMapper.class);
         currentUser = UserContextService.getCurrentUserAccount();
         List<ZkbCourseTrainUserConfig> zkbCourseTrainUserConfigList = this.zkbCourseTrainUserConfigRepository.findByLoginName(currentUser.getLoginName());
         if(CollectionUtils.isNotEmpty(zkbCourseTrainUserConfigList))
         {
             hasEditRight=true;
         }
-       // zkbCourseScheduleRepository.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
+        //zkbCourseScheduleRepository.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
+        //zknContractCourseScheduleMapper.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
     }
 
     /**
