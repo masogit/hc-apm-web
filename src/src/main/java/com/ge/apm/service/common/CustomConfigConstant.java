@@ -179,7 +179,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsListPageFields() {
         return Arrays.asList("name", "functionType", "serialNum", "departNum", "assetGroup",
-                "clinicalDeptName", "manufacture", "vendor", "status", "warrantyDate", "financingNum", "qrCode", "qrCode","oneQrCodeStatus");
+                "clinicalDeptName", "manufacture", "vendor", "status", "warrantyDate", "financingNum", "qrCode", "oneQrCodeStatus");
     }
 
     public static List<String> getAssetsDetailpageBasicFields() {
