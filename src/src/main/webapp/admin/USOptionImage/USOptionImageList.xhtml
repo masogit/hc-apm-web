@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <script type="text/javascript">
+            function handleAssetGroupChange(selection) {
+                var ct = document.getElementById('USOptionImageListForm:datalist:assetGroupSeconday_input');
+                if (ct) {
+                    ct.value = '';
+                }
+                PF('varDataList').filter();
+            }
+        </script>
+        <style>
+            .warrantyExpireSoon {
+            background-color: #fca752!important;
+            color: #000000!important;
+            }
+            .warrantyExpired {
+            background-color: #f04134!important;
+            color: #000000!important;
+            }
+            .btn+.btn { margin-left: 0 }
+            .ui-column-resizer:before {content: none!important;}
+            th{font-size: 12px!important;}
+            td{font-size: 12px!important;padding: 0px!important;}
+            table .ui-chkbox-icon, td img{ zoom: 0.7!important}
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value=" #{msg.USOptionImage}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="USOptionImageListForm">
+                    <p:dataTable id="datalist" value="#{uSOptionImageController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
+                                 selectionMode="single" scrollable="false" selection="#{uSOptionImageController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowStyleClass="#{item.USSegment}"
+                                 rowKey="#{item.id}" sortMode="single"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="filter" listener="#{uSOptionImageController.onFilter}"/>
+                        <p:column headerText="操 作" exportable="false" width="#{60}" id="operatorColumn">
+                            <h:panelGroup >
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{uSOptionImageController.getEditPage(item.id,item.USSegment,item.productName)}" rendered="#{userContextService.hasRole('DataMaintainStaff')}">
+                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>`
+                                </p:link>
+                                <p:link target="_detail" title="#{msg.View}" outcome="#{uSOptionImageController.getDetailPage(item.id,item.USSegment,item.productName)}" rendered="#{userContextService.hasRole('DataMaintainStaff')}">
+                                    <p:graphicImage name="icons/eye.png" style="width: 27px; height: 30px;"/>
+                                </p:link>
+                                <p:commandLink rendered="#{userContextService.hasRole('DataMaintainStaff')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{uSOptionImageController.deleteUSOptionImage(item)}" update="datalist">
+                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandLink>
+                            </h:panelGroup>
+                        </p:column>
+                        <p:column headerText="#{msg.USSegment}" sortBy="#{item.USSegment}" filterBy="#{item.USSegment}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.USSegment}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.productName}" sortBy="#{item.productName}" filterBy="#{item.productName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.productName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.creatorUID}" sortBy="#{item.creatorUID}">
+                            <h:outputText value="#{batchFileController.getUserName(item.creatorUID)}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.createTime}" sortBy="#{item.createTime}">
+                            <h:outputText value="#{item.createTime}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{uSOptionImageController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('USOptionImageCreate.xhtml?actionName=Create')}" rendered="#{userContextService.hasRole('DataMaintainStaff')}"/>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
