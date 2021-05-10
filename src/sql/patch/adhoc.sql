@@ -1,5 +1,3 @@
--- 设备型号数据初始化
-update arrival_list_item set function_type=(select function_type from arrival_list where id=arrival_list_item.arrival_list_id);
 
 -- 医疗器械分类编码迁移
 with recursive cte_auth_group as (
@@ -85,3 +83,7 @@ update asset_info  set medical_apparatus_classification = cte.classification_cod
     from cte_asset_info cte
 where asset_info.uid = cte.uid and asset_info.medical_apparatus_classification is not null;
 
+-- 设备型号数据初始化
+update arrival_list_item set function_type=(select function_type from arrival_list where id=arrival_list_item.arrival_list_id);
+--2020-05-19 game plan添加batch file type
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','ProbeRecommendExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
