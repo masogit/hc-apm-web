@@ -111,7 +111,8 @@ public enum GatewayURL {
     FE_PART_ORDER_SEND_EMAIL("/hcapmreportservice/api/apm/report/fepartOrder/sendMail"),
     FE_PART_ORDER_SEND_MESSAGE("/hcapmreportservice/api/apm/report/fepartOrder/sendMessage"),
     FE_PART_ORDER_SEND_WECHART("/hcapmassetservice/api/apm/zkb/zkbfepartorder/sendWechatMessage"),
-    FE_PART_ORDER_SEND_WECHART_REMIND_LETTER("/hcapmassetservice/api/apm/zkb/zkbfepartorder/sendWeChatRemindLetter");
+    FE_PART_ORDER_SEND_WECHART_REMIND_LETTER("/hcapmassetservice/api/apm/zkb/zkbfepartorder/sendWeChatRemindLetter"),
+    CONTRACT_COURSE_SCHEDULE_MESSAGE("/hcapmreportservice/api/apm/zkb/zkbCourseSchedule/sendMessage");
 
     private final String url;
 

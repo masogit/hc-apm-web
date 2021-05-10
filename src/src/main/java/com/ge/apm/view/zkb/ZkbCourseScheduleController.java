@@ -8,8 +8,10 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContractCourseSchedule;
 import com.ge.apm.domain.ZkbCourse;
 import com.ge.apm.domain.ZkbCourseTrainUserConfig;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbCourseScheduleService;
+import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.view.asset.ContractImportController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
@@ -82,7 +84,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     /**
      * true
      */
-    private static final String t = "f";
+    public static final String t = "t";
 
     /**
      * 课程名称
@@ -123,6 +125,8 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
 
     private ZknContractCourseScheduleMapper zknContractCourseScheduleMapper;
 
+    private ZkbFePartOrderService zkbFePartOrderService;
+
     /**
      * 初始化
      */
@@ -134,6 +138,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         zkbCourseTrainUserConfigRepository=WebUtil.getBean(ZkbCourseTrainUserConfigRepository.class);
         zkbCourseRepository=WebUtil.getBean(ZkbCourseRepository.class);
         zknContractCourseScheduleMapper=WebUtil.getBean(ZknContractCourseScheduleMapper.class);
+        zkbFePartOrderService=WebUtil.getBean(ZkbFePartOrderService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         List<ZkbCourseTrainUserConfig> zkbCourseTrainUserConfigList = this.zkbCourseTrainUserConfigRepository.findByLoginName(currentUser.getLoginName());
         if(CollectionUtils.isNotEmpty(zkbCourseTrainUserConfigList))
@@ -238,6 +243,10 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     @Override
     public void save() {
         super.save();
+        if(t.equals(this.selected.getValid()))
+        {
+            zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.CONTRACT_COURSE_SCHEDULE_MESSAGE);
+        }
         this.selected = null;
     }
 

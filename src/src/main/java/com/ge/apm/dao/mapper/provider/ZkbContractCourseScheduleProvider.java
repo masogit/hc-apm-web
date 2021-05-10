@@ -20,10 +20,12 @@ public class ZkbContractCourseScheduleProvider {
         StringBuilder sb = new StringBuilder();
         sb.append("" +
                 " SELECT DISTINCT zkb_sch.*," +
-                " zkbcou.id as zkb_contract_course_id " +
+                " zkbcou.id as zkb_contract_course_id, " +
+                " zkbcon.contract_no as contract_no, " +
+                " zkbcon.id as contract_id " +
                 " from zkb_contract zkbcon " +
-                " LEFT JOIN zkb_contract_course zkbcou on zkbcon.id = zkbcou.contract_id "+
-                " LEFT JOIN Zkb_contract_course_schedule zkb_sch on zkb_sch.zkb_course_id = zkbcou.course_id"+
+                " INNER JOIN zkb_contract_course zkbcou on zkbcon.id = zkbcou.contract_id "+
+                " INNER JOIN Zkb_contract_course_schedule zkb_sch on zkb_sch.zkb_course_id = zkbcou.course_id"+
                 " where zkbcon.tenant_uid = '"+tenantUID+"' " +
                 " and zkbcon.start_date<= current_date " +
                 " and zkbcon.end_date>=current_date "  +

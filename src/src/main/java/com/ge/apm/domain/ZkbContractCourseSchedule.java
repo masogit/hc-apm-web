@@ -123,6 +123,12 @@ public class ZkbContractCourseSchedule implements Serializable {
     @Transient
     private String zkbContractCourseId;
 
+    @Transient
+    private String contractNo;
+
+    @Transient
+    private String contractId;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -293,5 +299,21 @@ public class ZkbContractCourseSchedule implements Serializable {
 
     public void setZkbContractCourseId(String zkbContractCourseId) {
         this.zkbContractCourseId = zkbContractCourseId;
+    }
+
+    public String getContractNo() {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
+    }
+
+    public String getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(String contractId) {
+        this.contractId = contractId;
     }
 }
