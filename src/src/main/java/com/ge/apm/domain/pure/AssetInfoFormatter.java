@@ -931,34 +931,10 @@ public class AssetInfoFormatter {
         if(StringUtils.isEmpty(medicalApparatusClassification)){
             return "";
         }
-        SysAuthGroup authGroup = authGroupDao.findByEncoded(medicalApparatusClassification);
 
-        if(authGroup == null || StringUtils.isEmpty(authGroup.getEncoded())){
-            return "";
-        }
+        String connectedCode = authGroupDao.listSysAuthGroupNamePathInHierarchyByClassificationCode(medicalApparatusClassification);
 
-        String[] split = authGroup.getEncoded().split("-");
-        if(split.length == 1){
-            return authGroup.getName();
-        }
-
-        ArrayList<String> selectParam = new ArrayList<>(split.length);
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(split[0]);
-        selectParam.add(buffer.toString());
-
-        int endIndex = split.length - 1;
-        for (int i = 1; i < endIndex; i++) {
-            buffer.append("-").append(split[i]);
-            selectParam.add(buffer.toString());
-        }
-        List<SysAuthGroup> pSysAuthGroup = authGroupDao.findByEncodedInOrderByEncodedAsc(selectParam);
-        StringBuffer result = new StringBuffer();
-        for (SysAuthGroup group : pSysAuthGroup) {
-            result.append(group.getName()).append("->");
-        }
-        result.append(authGroup.getName());
-        return result.toString();
+        return connectedCode;
     }
 
     private String getMessage(String key) {
