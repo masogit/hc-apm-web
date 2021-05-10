@@ -93,16 +93,16 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
         }
 
         if(ZkbCourseTrain.FlowStatusEnum.ScheduleNoJoin.toString().equals(selected.getCurrentStatus())){
-            showLetterFlag = false;
+            showReasonFlag = true;
         }else if(ZkbCourseTrain.FlowStatusEnum.ScheduleJoin.toString().equals(selected.getCurrentStatus())){
-            showLetterFlag = true;
             if(canEditFlag){
+                showLetterFlag = true;
                 showBtn = "0";
             }
         }else if(ZkbCourseTrain.FlowStatusEnum.LetterSubmit.toString().equals(selected.getCurrentStatus())){
             showLetterFlag = true;
-            showApplyFlag = true;
             if(canEditFlag){
+                showApplyFlag = true;
                 showBtn = "0";
             }
         }else if(ZkbCourseTrain.FlowStatusEnum.LetterCancelJoin.toString().equals(selected.getCurrentStatus())){
