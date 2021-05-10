@@ -586,7 +586,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             String err = "";
             if(probeQuotaFlag){
                 if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(selected.getProbeQuotaType())){
-                    if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() < 0){
+                    if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() <= 0){
                         f = true;
                         err = "合同探头任意剩余名额小于等于0，请检查！";
                     }
@@ -595,7 +595,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         err += "高值探头不能选用任意名额！";
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(selected.getProbeQuotaType())){
-                    if(zkbContract.getProbeQuotaNormal() == null || zkbContract.getProbeQuotaNormal() < 0){
+                    if(zkbContract.getProbeQuotaNormal() == null || zkbContract.getProbeQuotaNormal() <= 0){
                         f = true;
                         err = "合同探头普通剩余名额小于等于0，请检查！";
                     }
@@ -604,7 +604,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         err += "探头普通剩余名额只能选择普通探头！";
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())){
-                    if(zkbContract.getProbeQuotaSpecial() == null || zkbContract.getProbeQuotaSpecial() < 0){
+                    if(zkbContract.getProbeQuotaSpecial() == null || zkbContract.getProbeQuotaSpecial() <= 0){
                         f = true;
                         err = "合同探头特殊剩余名额小于等于0，请检查！";
                     }
@@ -613,7 +613,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         err += "探头特殊剩余名额只能选择特殊探头！";
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
-                    if(zkbContract.getProbeQuotaHigh() == null || zkbContract.getProbeQuotaHigh() < 0){
+                    if(zkbContract.getProbeQuotaHigh() == null || zkbContract.getProbeQuotaHigh() <= 0){
                         f = true;
                         err = "合同探头高值剩余名额小于等于0，请检查！";
                     }
