@@ -39,7 +39,7 @@
                     <p:dataTable id="datalist" value="#{uSOptionImageController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" liveResize="true" resizeMode="fit"
                                  selectionMode="single" scrollable="false" selection="#{uSOptionImageController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowStyleClass="#{item.USSegment}"
+                                 rowStyleClass="#{item.usSegment}"
                                  rowKey="#{item.id}" sortMode="single"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.JumpTo} {JumpToPageDropdown} #{msg.Page} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rowIndexVar="idx"
@@ -48,10 +48,10 @@
                         <p:ajax event="filter" listener="#{uSOptionImageController.onFilter}"/>
                         <p:column headerText="操 作" exportable="false" width="#{60}" id="operatorColumn">
                             <h:panelGroup >
-                                <p:link target="_new" title="#{msg.Edit}" outcome="#{uSOptionImageController.getEditPage(item.id,item.USSegment,item.productName)}" rendered="#{userContextService.hasRole('DataMaintainStaff')}">
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{uSOptionImageController.getEditPage(item.id,item.usSegment,item.productName)}" rendered="#{userContextService.hasRole('DataMaintainStaff')}">
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>`
                                 </p:link>
-                                <p:link target="_detail" title="#{msg.View}" outcome="#{uSOptionImageController.getDetailPage(item.id,item.USSegment,item.productName)}" rendered="#{userContextService.hasRole('DataMaintainStaff')}">
+                                <p:link target="_detail" title="#{msg.View}" outcome="#{uSOptionImageController.getDetailPage(item.id,item.usSegment,item.productName)}" rendered="#{userContextService.hasRole('DataMaintainStaff')}">
                                     <p:graphicImage name="icons/eye.png" style="width: 27px; height: 30px;"/>
                                 </p:link>
                                 <p:commandLink rendered="#{userContextService.hasRole('DataMaintainStaff')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{uSOptionImageController.deleteUSOptionImage(item)}" update="datalist">
@@ -60,8 +60,8 @@
                                 </p:commandLink>
                             </h:panelGroup>
                         </p:column>
-                        <p:column headerText="#{msg.USSegment}" sortBy="#{item.USSegment}" filterBy="#{item.USSegment}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.USSegment}"/>
+                        <p:column headerText="#{msg.usSegment}" sortBy="#{item.usSegment}" filterBy="#{item.usSegment}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.usSegment}"/>
                         </p:column>
                         <p:column headerText="#{msg.productName}" sortBy="#{item.productName}" filterBy="#{item.productName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.productName}"/>
