@@ -180,7 +180,8 @@ public class ZkbCourseTrain implements Serializable {
     @Column(name = "audit_date")
     private Date auditDate;
 
-
+    @Column(name = "created_uid")
+    private String createdUid;
     @Column(name = "created_by")
     private String createdBy;
 
@@ -192,6 +193,14 @@ public class ZkbCourseTrain implements Serializable {
 
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
+
+    public String getCreatedUid() {
+        return createdUid;
+    }
+
+    public void setCreatedUid(String createdUid) {
+        this.createdUid = createdUid;
+    }
 
     public Integer getTrainNoIndex() {
         return trainNoIndex;
