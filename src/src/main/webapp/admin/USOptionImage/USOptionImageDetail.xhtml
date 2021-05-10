@@ -31,9 +31,9 @@
                         <div class="ui-g-8 ui-g-nopad">
                             <p:panelGrid id="basicPanel" columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
                                 <h:panelGroup>
-                                    <label class="label">#{msg.USSegment}<span style="color:red">*</span></label>
-                                    <p:autoComplete id="USSegment" value="#{uSOptionImageDetailController.selected.USSegment}"
-                                                    required="true" readonly="true" requiredMessage="#{msg.USSegment} #{msg.ValidationRequire}"/>
+                                    <label class="label">#{msg.usSegment}<span style="color:red">*</span></label>
+                                    <p:autoComplete id="usSegment" value="#{uSOptionImageDetailController.selected.usSegment}"
+                                                    required="true" readonly="true" requiredMessage="#{msg.usSegment} #{msg.ValidationRequire}"/>
                                     <label class="label">#{msg.productName}<span style="color:red">*</span></label>
                                     <p:autoComplete id="productName" value="#{uSOptionImageEditController.selected.productName}"
                                                     required="true" requiredMessage="#{msg.productName} #{msg.ValidationRequire}"/>
@@ -43,7 +43,7 @@
                         <div class="ui-g-4">
                             <div class="container-fluid" style="height: 400px; overflow: auto;">
                                 <div class="row" id="picDiv">
-                                    <c:forEach items="#{uSOptionImageDetailController.getAttachList(uSOptionImageDetailController.selected.USSegment,uSOptionImageDetailController.selected.productName)}" var="attach" >
+                                    <c:forEach items="#{uSOptionImageDetailController.getAttachList(uSOptionImageDetailController.selected.usSegment,uSOptionImageDetailController.selected.productName)}" var="attach" >
                                         <div>
                                             <img data-original="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
                                                  src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
