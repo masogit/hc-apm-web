@@ -694,7 +694,7 @@ public class AssetFileImportBaseService {
 
 
             if(StringUtils.hasLength(newAsset.getMedicalApparatusClassification())){
-                SysAuthGroup selectedAuthGroup = authGroupDao.findByEncoded(newAsset.getMedicalApparatusClassification());
+                SysAuthGroup selectedAuthGroup = authGroupDao.findByClassificationCode(newAsset.getMedicalApparatusClassification());
                 if (selectedAuthGroup == null) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);

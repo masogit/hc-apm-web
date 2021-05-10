@@ -22,7 +22,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.util.Strings;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -121,13 +120,27 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		}
 	}
 	public void saveNode() {
-		//校验名称重复
+		//先去除空格
+		attachmentCategory.setLabel(attachmentCategory.getLabel().replace(" ",""));
+		//校验名称不能为空格
+		if(StringUtils.isBlank(attachmentCategory.getLabel())){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage("附件类型名称不能空格");
+			return;
+		}
+		//校验名称重复添加
 		if(attachmentCategories.stream().filter(it->it.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID && !it.getBoType().equals(attachmentCategory.getBoType()))
 				.anyMatch(it->attachmentCategory.getLabel().equals(it.getLabel()))){
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-			WebUtil.addErrorMessage("附件类型名称不能重复");
+			WebUtil.addErrorMessage("附件类型名称不能重复添加");
 			return;
 		};
+		//校验已经存在的名称
+		if(Arrays.asList("照片","用户手册","培训资料").contains(attachmentCategory.getLabel())){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage("附件类型名称:'"+attachmentCategory.getLabel()+"'已经存在");
+			return;
+		}
 		//修改
 		if(attachmentCategory.getBoType()!=null){
 			Optional<WorkflowConfig.AttachmentCategory> first = attachmentCategories.stream().filter(item -> attachmentCategory.getBoType() == item.getBoType()).findFirst();
@@ -619,6 +632,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	 * @return
 	 */
 	public boolean isCurrentEquipmentLoanedOut() {
+		if(selected.getId()==null) return false;
 		String oldSharedAssetCenter = dao.findById(selected.getId()).getDeptForSharedAsset();
 		String newSharedAssetCenter = selected.getDeptForSharedAsset();
 		if(oldSharedAssetCenter!=null && !oldSharedAssetCenter.equals(newSharedAssetCenter)) {
