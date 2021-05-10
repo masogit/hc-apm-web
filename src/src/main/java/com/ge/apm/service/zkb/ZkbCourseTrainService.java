@@ -93,6 +93,7 @@ public class ZkbCourseTrainService {
         t.setSignDate(new Date());
         t.setBatchNo(s.getBatchNo());
         t.setCreatedBy(userAccount.getName());
+        t.setCreatedUid(userAccount.getUid());
         t.setCreatedDate(new Date());
         t.setInstructor(s.getInstructor());
         t.setLocation(s.getLocation());
