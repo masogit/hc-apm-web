@@ -158,7 +158,7 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
         if (null != v2_blobObject) {
             v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_COURSE);
             v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_COURSE_TRAIN);
-            //v2_blobObject.setBoUuid(selected.getId());
+            v2_blobObject.setBoUuid(selected.getId());
             v2_blobObjectList.add(v2_blobObject);
             WebUtil.addSuccessMessage(v2_blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
