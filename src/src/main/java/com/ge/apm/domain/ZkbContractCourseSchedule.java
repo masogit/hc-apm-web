@@ -10,7 +10,7 @@ import java.util.Date;
  * 课程计划表
  */
 @Entity
-@Table(name = "Zkb_contract_course_schedule")
+@Table(name = "zkb_contract_course_schedule")
 public class ZkbContractCourseSchedule implements Serializable {
 
     private static final long serialVersionUID = 1L;
