@@ -93,16 +93,16 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
         }
 
         if(ZkbCourseTrain.FlowStatusEnum.ScheduleNoJoin.toString().equals(selected.getCurrentStatus())){
-            showLetterFlag = false;
+            showReasonFlag = true;
         }else if(ZkbCourseTrain.FlowStatusEnum.ScheduleJoin.toString().equals(selected.getCurrentStatus())){
-            showLetterFlag = true;
             if(canEditFlag){
+                showLetterFlag = true;
                 showBtn = "0";
             }
         }else if(ZkbCourseTrain.FlowStatusEnum.LetterSubmit.toString().equals(selected.getCurrentStatus())){
             showLetterFlag = true;
-            showApplyFlag = true;
             if(canEditFlag){
+                showApplyFlag = true;
                 showBtn = "0";
             }
         }else if(ZkbCourseTrain.FlowStatusEnum.LetterCancelJoin.toString().equals(selected.getCurrentStatus())){
@@ -158,7 +158,7 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
         if (null != v2_blobObject) {
             v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_COURSE);
             v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_COURSE_TRAIN);
-            //v2_blobObject.setBoUuid(selected.getId());
+            v2_blobObject.setBoUuid(selected.getId());
             v2_blobObjectList.add(v2_blobObject);
             WebUtil.addSuccessMessage(v2_blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
