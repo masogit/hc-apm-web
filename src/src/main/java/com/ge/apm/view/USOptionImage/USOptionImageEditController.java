@@ -66,7 +66,7 @@ public class USOptionImageEditController extends JpaCRUDController<USOptionImage
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             setSelected(Integer.parseInt(selectedId));
             prepareEdit();
-            uploadFlag = getAttachList(selected.getUSSegment(),selected.getProductName()).size() == 0;
+            uploadFlag = getAttachList(selected.getUsSegment(),selected.getProductName()).size() == 0;
         }
         if (selected == null) {
             try {
@@ -114,7 +114,7 @@ public class USOptionImageEditController extends JpaCRUDController<USOptionImage
      * @param event
      */
     public void handleFileUpload(FileUploadEvent event) {
-        if (StringUtils.isEmpty(selected.getUSSegment())) {
+        if (StringUtils.isEmpty(selected.getUsSegment())) {
             WebUtil.addErrorMessage("请填写USSegment");
             return;
         }
@@ -123,7 +123,7 @@ public class USOptionImageEditController extends JpaCRUDController<USOptionImage
             attachements.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_COIL_OPPORTUNITY);
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
-            blobObject.setBoUuid(selected.getUSSegment()+"_"+selected.getProductName());
+            blobObject.setBoUuid(selected.getUsSegment()+"_"+selected.getProductName());
             blobService.saveBlobObject(blobObject);
             uploadImage = true;
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
@@ -139,14 +139,14 @@ public class USOptionImageEditController extends JpaCRUDController<USOptionImage
 
     @Transactional
     public String applyChange() {
-        USOptionImage imageInfo = dao.findUS(selected.getUSSegment(),selected.getProductName());
+        USOptionImage imageInfo = dao.findUS(selected.getUsSegment(),selected.getProductName());
         if (null != imageInfo) {
             WebUtil.addErrorMessage("USSegment,ProductName 已存在！");
             return "";
         } else {
             newAdd = true;
             if (!uploadImage) {
-                blobDao.deleteByBoUuid(selected.getUSSegment()+"_"+selected.getProductName());
+                blobDao.deleteByBoUuid(selected.getUsSegment()+"_"+selected.getProductName());
             }
             // USSegment ProductName不存在，则新增
             selected.setCreatorUID(UserContextService.getCurrentUserAccount().getUid());
@@ -165,7 +165,7 @@ public class USOptionImageEditController extends JpaCRUDController<USOptionImage
             V2_BlobObject blobObject = blobDao.findAllByObjectStorageId(item).stream().findFirst().get();
             blobObject.setBoType(V2_BlobObject.BO_TYPE_COIL_OPPORTUNITY);
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
-            blobObject.setBoUuid(image.getUSSegment()+"_"+selected.getProductName());
+            blobObject.setBoUuid(image.getUsSegment()+"_"+selected.getProductName());
             blobObject.setBoId(image.getId());
             attachList.add(blobObject);
         }

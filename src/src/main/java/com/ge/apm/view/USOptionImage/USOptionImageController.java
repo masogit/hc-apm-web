@@ -61,8 +61,8 @@ public class USOptionImageController extends JpaCRUDController<USOptionImage> {
     @Transactional
     public void deleteUSOptionImage(USOptionImage imageInfo) {
         dao.delete(imageInfo);
-        blobDao.deleteByBoUuid(imageInfo.getUSSegment()+"_"+imageInfo.getProductName());
-        logger.info("delete IBUInfo image successful. USSegment  is:" + imageInfo.getUSSegment() + " ProductName  is: " + imageInfo.getProductName());
+        blobDao.deleteByBoUuid(imageInfo.getUsSegment()+"_"+imageInfo.getProductName());
+        logger.info("delete IBUInfo image successful. USSegment  is:" + imageInfo.getUsSegment() + " ProductName  is: " + imageInfo.getProductName());
     }
 
 }
