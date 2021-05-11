@@ -272,7 +272,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         }
         if (null != selectedObjectMap.get("selectedAuthGroup")) {
             SysAuthGroup selectedAuthGroup = (SysAuthGroup) selectedObjectMap.get("selectedAuthGroup");
-            selected.setMedicalApparatusClassification(selectedAuthGroup.getEncoded());
+            selected.setMedicalApparatusClassification(selectedAuthGroup.getClassificationCode());
         }
         String isPmValue = selected.getIsPmValue();
         if(isPmValue!=null){
