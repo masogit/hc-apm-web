@@ -82,7 +82,9 @@ public class ZkbCourseTrainService {
         Integer index = zkbCourseTrainRepository.getMaxIndex("ST"+simpleDateFormat.format(new Date())+"%") ;
         index = index == null ? 1 : index;
         String partOrderNo = "ST"+simpleDateFormat.format(new Date())+String.format("%04d",index);
+        index++;
         t.setTrainNo(partOrderNo);
+        t.setTrainNoIndex(index);
         t.setCourseScheduleId(s.getId());
         t.setTenantUID(userAccount.getTenantUID());
         t.setContractCourseId(s.getZkbContractCourseId());
@@ -98,10 +100,12 @@ public class ZkbCourseTrainService {
         t.setInstructor(s.getInstructor());
         t.setLocation(s.getLocation());
         t.setDeductCount(s.getDeductCount());
-        t.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
+        /*t.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.Y.toString());*/
         t.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ScheduleJoin.toString());
         t.setCurrentStep(ZkbCourseTrain.FlowStepEnum.LetterPending.toString());
-        t.setPreQuota(mulByDouble(t.getDeductCount(),t.getPrePersonCount()));
+        if(ZkbCourseTrain.ParticipateStatusEnum.Y.toString().equals(t.getParticipateStatus())){
+            t.setPreQuota(mulByDouble(t.getDeductCount(),t.getPrePersonCount()));
+        }
         zkbCourseTrainRepository.save(t);
 
         subQuotaSign(t,"add");
@@ -199,11 +203,15 @@ public class ZkbCourseTrainService {
     public void subQuotaUse(ZkbCourseTrain ct){
         ZkbContractCourse zkbContractCourse = zkbContractCourseRepository.findById(ct.getContractCourseId());
         Double preQuota = ct.getPreQuota() ==null? 0 : ct.getPreQuota();
-        zkbContractCourse.setMainCourseCountApply((zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply()) - preQuota);
-        zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) + preQuota);
+        Double apply = subByDouble(zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply(),preQuota);
+        zkbContractCourse.setMainCourseCountApply(apply);
+        Double count = addByDouble(zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount(),preQuota);
+        zkbContractCourse.setMainCourseCount(count);
         Double actQuota = ct.getActualQuota() == null ? 0 : ct.getActualQuota();
-        zkbContractCourse.setMainCourseCountUse((zkbContractCourse.getMainCourseCountUse() == null ? 0 : zkbContractCourse.getMainCourseCountUse()) + actQuota);
-        zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) - actQuota);
+        Double use = addByDouble(zkbContractCourse.getMainCourseCountUse() == null ? 0 : zkbContractCourse.getMainCourseCountUse(),actQuota);
+        zkbContractCourse.setMainCourseCountUse(use);
+        count = subByDouble(zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount(),actQuota);
+        zkbContractCourse.setMainCourseCount(count);
         zkbContractCourseRepository.save(zkbContractCourse);
     }
 
@@ -215,11 +223,15 @@ public class ZkbCourseTrainService {
         }
         Double preQuota = ct.getPreQuota() ==null? 0 : ct.getPreQuota();
         if("add".equals(type)){
-            zkbContractCourse.setMainCourseCountApply((zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply()) + preQuota);
-            zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) - preQuota);
+            Double apply = addByDouble(zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply(),preQuota);
+            zkbContractCourse.setMainCourseCountApply(apply);
+            Double count = subByDouble(zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount(),preQuota);
+            zkbContractCourse.setMainCourseCount(count);
         }else{
-            zkbContractCourse.setMainCourseCountApply((zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply()) - preQuota);
-            zkbContractCourse.setMainCourseCount((zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount()) -+ preQuota);
+            Double apply = subByDouble(zkbContractCourse.getMainCourseCountApply() == null ? 0 : zkbContractCourse.getMainCourseCountApply(),preQuota);
+            zkbContractCourse.setMainCourseCountApply(apply);
+            Double count = addByDouble(zkbContractCourse.getMainCourseCount() == null ? 0 : zkbContractCourse.getMainCourseCount(),preQuota);
+            zkbContractCourse.setMainCourseCount(count);
         }
         zkbContractCourseRepository.save(zkbContractCourse);
     }

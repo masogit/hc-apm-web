@@ -71,6 +71,10 @@ public class ZkbCourseTrainController extends GenericCRUDUUIDController<ZkbCours
         }
     }
 
+    public String redirectLSign(){
+        return "Sign.xhtml?faces-redirect=true";
+    }
+
     public String createAction(){
         return UrlEncryptController.encodeUrlParam("Edit?action=Create");
     }
