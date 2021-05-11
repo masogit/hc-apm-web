@@ -926,8 +926,8 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.orderCancelNext}" oncomplete="PF('zkbConfigDlg').hide()" update=":growl" icon="ui-icon-check" />
-                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfigDlg').hide()"/>
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.orderCancelNext}" oncomplete="PF('zkbCancelReasonDlg').hide()" update=":growl" icon="ui-icon-check" />
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbCancelReasonDlg').hide()"/>
                 </h:form>
 
             </p:dialog>
