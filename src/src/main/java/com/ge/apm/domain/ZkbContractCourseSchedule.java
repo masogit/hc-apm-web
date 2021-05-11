@@ -123,6 +123,9 @@ public class ZkbContractCourseSchedule implements Serializable {
     @Transient
     private String zkbContractCourseId;
 
+    @Transient
+    private Double prePersonCount;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -149,6 +152,14 @@ public class ZkbContractCourseSchedule implements Serializable {
     @Override
     public String toString() {
         return "com.ge.apm.domain.ZkbContractCourseSchedule[ id=" + id + " ]";
+    }
+
+    public Double getPrePersonCount() {
+        return prePersonCount;
+    }
+
+    public void setPrePersonCount(Double prePersonCount) {
+        this.prePersonCount = prePersonCount;
     }
 
     public String getId() {
