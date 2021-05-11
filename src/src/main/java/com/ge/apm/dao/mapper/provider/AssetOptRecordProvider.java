@@ -170,6 +170,14 @@ public class AssetOptRecordProvider {
 			sb.append("(e.name like '%" + value + "%' or ");
 			sb.append("e.name_py_code like '%" + value + "%') and ");
 		}
+
+		else if (tempColumn.equals("hospitalNumber")) {
+            sb.append("a.hospital_number like '%" + value + "%' and ");
+        }else if (tempColumn.equals("bedNo")) {
+            sb.append("a.bed_No like '%" + value + "%' and ");
+        }else if (tempColumn.equals("diagnosticResult")) {
+            sb.append("a.diagnostic_result like '%" + value + "%' and ");
+        }
 		// orgInfo
 		
 		// assetInfo
