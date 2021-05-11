@@ -149,7 +149,7 @@ public class ZkbCourseTrainService {
                 d.setTrainId(c.getId());
             }
             zkbCourseTrainDetailRepository.save(zkbCourseTrainDetailList);
-        }if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(oldStep)){
+        }if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(oldStep)){
             for(V2_BlobObject v :v2_blobObjects){
                 v.setBoUuid(c.getId());
             }
