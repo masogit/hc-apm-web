@@ -63,11 +63,11 @@ public class AssetInstallationReportService {
 
         reportData.put("asset_name", arrivalListItem.getArrivalList().getAssetName());//设备名称
         reportData.put("financing_num", arrivalListItem.getFinancingNum());//设备财产编号
-        if(StringUtils.isBlank(arrivalListItem.getFunctionType())){
-            reportData.put("function_type", arrivalListItem.getArrivalList().getFunctionType());//型号规格
-        }else{
-            reportData.put("function_type", arrivalListItem.getFunctionType());//型号规格
+        String functionType = arrivalListItem.getFunctionType();
+        if(StringUtils.isBlank(functionType)){
+            functionType = arrivalListItem.getArrivalList().getFunctionType();
         }
+        reportData.put("function_type", functionType);//型号规格
         reportData.put("brand", arrivalListItem.getArrivalList().getBrand());//品牌
         reportData.put("manufact_num", arrivalListItem.getSerialNum());//出厂编号
         reportData.put("clinical_dept_name", orgInfoDao.findByUid(arrivalListItem.getClinicalDeptUID()));//设备所属科室
@@ -121,7 +121,6 @@ public class AssetInstallationReportService {
         }
         reportData.put("location_name", locationName);//安置地点
         reportData.put("fixasset_ack_date", ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getFixassetAckStatus()) ? arrivalListItem.getFixassetAckDate() : "");//验收日期
-
         return reportData;
     }
 
@@ -198,7 +197,7 @@ public class AssetInstallationReportService {
         reportData.put("repairer_tel", arrivalListItem.getArrivalList().getRepairerTel());//维修联系人电话
 //        reportData.put("location_name", locationName);//安置地点
         reportData.put("fixasset_ack_date", ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getFixassetAckStatus()) ? arrivalListItem.getFixassetAckDate() : "");//验收日期
-
+        reportData.put("approval_no", arrivalListItem.getArrivalList().getApprovalNo());//批文号
         return reportData;
     }
 

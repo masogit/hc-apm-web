@@ -5,9 +5,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.*;
 
 /**
  * @author 212579464
@@ -119,6 +119,9 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "is_casetype_required")
     private Boolean isCasetypeRequired;//故障类别是否必填
+
+    @Column(name = "is_send_msg_at_night",columnDefinition = "boolean default false")
+    private Boolean isSendMsgAtNight;//夜间是否发送消息
 
     /****for pm *****/
     @Column(name = "pm_manhour_price")
@@ -396,6 +399,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setSharedAssetSafetyThreshold(Double sharedAssetSafetyThreshold) {
         this.sharedAssetSafetyThreshold = sharedAssetSafetyThreshold;
+    }
+
+    public Boolean getIsSendMsgAtNight() {
+        return isSendMsgAtNight;
+    }
+
+    public void setIsSendMsgAtNight(Boolean sendMsgAtNight) {
+        isSendMsgAtNight = sendMsgAtNight;
     }
 
     public Boolean getIsCasetypeRequired() {

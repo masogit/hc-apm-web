@@ -156,7 +156,7 @@ public class CustomConfigService {
         orderByExportFields(exportFields);
 
         List<String> localizedExportFields = exportFields.stream()
-                .map(item -> CustomConfigConstant.getAllFields().get(item)).collect(Collectors.toList());
+                .map(item -> CustomConfigConstant.getExportOrImportFields().get(item)).collect(Collectors.toList());
 
         //uuid is required to export, but not in custom config fields, so include it here.
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
