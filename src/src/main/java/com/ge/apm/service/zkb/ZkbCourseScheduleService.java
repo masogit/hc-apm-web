@@ -8,7 +8,9 @@ import com.ge.apm.domain.ZkbContractCourseScheduleVO;
 import com.ge.apm.domain.ZkbCourse;
 import com.ge.apm.service.asset.AssetInfoRow;
 import com.ge.apm.service.asset.ZkbContractCourseScheduleRow;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.zkb.ZkbCourseScheduleController;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -71,6 +73,9 @@ public class ZkbCourseScheduleService {
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
     }
+
+    @Autowired
+    private ZkbFePartOrderService zkbFePartOrderService;
 
     public List<Map<String, Object>> getZkbCourseScheduleMapFromTemplate(ExcelDocument doc) throws Exception {
 
@@ -180,6 +185,7 @@ public class ZkbCourseScheduleService {
             }
         }
         LocalDateTime startTime = LocalDateTime.now();
+        StringBuffer ids = new StringBuffer();
         int row = 0;
         try {
             for (Map<String, Object> item : importCourseScheduleMapList) {
@@ -195,6 +201,10 @@ public class ZkbCourseScheduleService {
                     }
                     BeanUtils.copyProperties(zkbContractCourseScheduleVO, zkbContractCourseSchedule);
                     this.zkbCourseScheduleRepository.save(zkbContractCourseSchedule);
+                    if(ZkbCourseScheduleController.t.equals(zkbContractCourseSchedule.getValid()))
+                    {
+                        ids=ids.append(zkbContractCourseSchedule.getId()).append(",");
+                    }
                 }
             }
         } catch (Exception e) {
@@ -204,6 +214,12 @@ public class ZkbCourseScheduleService {
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
+        String idsStr = ids.toString();
+        if(StringUtils.isNotBlank(idsStr))
+        {
+            idsStr = idsStr.substring(0,idsStr.length()-1);
+            this.zkbFePartOrderService.sendMessage(idsStr, GatewayURL.CONTRACT_COURSE_SCHEDULE_MESSAGE);
+        }
     }
 
     /**
@@ -290,6 +306,18 @@ public class ZkbCourseScheduleService {
             isValidateData = false;
         }
         return isValidateData;
+    }
+
+    /**
+     * @param course
+     * @return
+     */
+    public boolean isCourseUsed(ZkbCourse course) {
+        List<ZkbContractCourseSchedule> list = zkbCourseScheduleRepository.findByZkbCourseId(course.getId());
+        if(CollectionUtils.isNotEmpty(list)){
+            return true;
+        }
+        return false;
     }
 
     /**

@@ -4,6 +4,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbCourse;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbCourseImExportService;
+import com.ge.apm.service.zkb.ZkbCourseScheduleService;
 import com.ge.apm.service.zkb.ZkbCourseService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
@@ -35,6 +36,8 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
 
     private ZkbCourseService zkbCourseServic;
 
+    private ZkbCourseScheduleService zkbCourseScheduleService;
+
     private UserContextService userContextService;
 
     private ZkbCourseImExportService zkbCourseImExportService;
@@ -55,6 +58,7 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
     protected void init() {
         super.init();
         zkbCourseServic = WebUtil.getBean(ZkbCourseService.class);
+        zkbCourseScheduleService = WebUtil.getBean(ZkbCourseScheduleService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         zkbCourseImExportService = WebUtil.getBean(ZkbCourseImExportService.class);
@@ -113,6 +117,10 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
     public String deleteCourse(){
         if(zkbCourseServic.isContractUsed(this.selected)){
             WebUtil.addErrorMessage("该课程在合同已使用，不能删除! ");
+            return "";
+        }
+        if(zkbCourseScheduleService.isCourseUsed(this.selected)){
+            WebUtil.addErrorMessage("该课程在课程计划已使用，不能删除! ");
             return "";
         }
         super.delete();
