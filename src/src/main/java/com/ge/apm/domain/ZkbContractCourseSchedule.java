@@ -129,6 +129,12 @@ public class ZkbContractCourseSchedule implements Serializable {
     @Transient
     private String contractId;
 
+    @Transient
+    private Date created_date;
+
+    @Column(name = "valid_date")
+    private Date validDate;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -315,5 +321,21 @@ public class ZkbContractCourseSchedule implements Serializable {
 
     public void setContractId(String contractId) {
         this.contractId = contractId;
+    }
+
+    public Date getCreated_date() {
+        return created_date;
+    }
+
+    public void setCreated_date(Date created_date) {
+        this.created_date = created_date;
+    }
+
+    public Date getValidDate() {
+        return validDate;
+    }
+
+    public void setValidDate(Date validDate) {
+        this.validDate = validDate;
     }
 }
