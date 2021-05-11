@@ -4140,7 +4140,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('engineerModalityType','US','US','',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('engineerModalityType','X-Xray','X-Xray','',NULL,-1);
 
-
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbCourseTrainStatus','ScheduleNoJoin','不报名','ScheduleNoJoin',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbCourseTrainStatus','ScheduleJoin','已报名','ScheduleJoin',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbCourseTrainStatus','LetterSubmit','已上传确认函','ScheduleJoin',NULL,-1);
@@ -4160,3 +4159,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbCourseTrainParticipateStatus','Y','参加','Y',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbCourseTrainParticipateStatus','N','不参加','N',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('engineerModalityType','X-Ray','X-Ray','',NULL,-1);
