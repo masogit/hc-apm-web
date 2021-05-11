@@ -23,6 +23,9 @@
                             </c:forEach>
                         </p:selectOneMenu>
                     </h:panelGrid>
+                    <h:panelGrid columns="4" style="margin-bottom:10px" cellpadding="5" rendered="#{userContextService.zkbUser}">
+                        <p:commandButton value="返回报名"  process="@this" action="#{zkbCourseTrainController.redirectLSign}" />
+                    </h:panelGrid>
                     <p:dataTable id="datalist" value="#{zkbCourseTrainController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbCourseTrainController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -91,11 +94,11 @@
                             </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{zkbCourseTrainController.createAction}" rendered="#{zkbCourseTrainController.showBtn}" />
+                            <!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{zkbCourseTrainController.createAction}" rendered="#{zkbCourseTrainController.showBtn}" />-->
                             <p:commandButton id="editButton" style="margin-left: 0px" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{zkbCourseTrainController.editAction}" disabled="#{empty zkbCourseTrainController.selected.id}"/>
-                            <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{zkbCourseTrainController.delete}"  rendered="#{zkbCourseTrainController.showBtn}"  update=":growl :zkbPartOrderListForm" >
+                            <!--<p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{zkbCourseTrainController.delete}"  rendered="#{zkbCourseTrainController.showBtn}"  update=":growl :zkbPartOrderListForm" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
-                            </p:commandButton>
+                            </p:commandButton>-->
                         </f:facet>
                     </p:dataTable>
                 </h:form>
