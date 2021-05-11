@@ -175,6 +175,7 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             WebUtil.addErrorMessage("该课程已申请过培训");
             return "";
         }
+        selected.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
         zkbCourseTrainService.save(selectedCourseSchedule,selected,currentUser);
         return "List?faces-redirect=true";
 
@@ -193,9 +194,9 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             }
         }else if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(selected.getCurrentStep())){
             if(v2_blobObjectList ==null || v2_blobObjectList.size() == 0){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请上传确认函！", "");
+               /* FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请上传确认函！", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
-                return "";
+                return "";*/
             }
         }
         zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList,currentUser);
