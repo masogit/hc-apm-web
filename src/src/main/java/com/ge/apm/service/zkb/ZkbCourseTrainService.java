@@ -101,8 +101,7 @@ public class ZkbCourseTrainService {
         t.setLocation(s.getLocation());
         t.setDeductCount(s.getDeductCount());
         /*t.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.Y.toString());*/
-        t.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ScheduleJoin.toString());
-        t.setCurrentStep(ZkbCourseTrain.FlowStepEnum.LetterPending.toString());
+
         if(ZkbCourseTrain.ParticipateStatusEnum.Y.toString().equals(t.getParticipateStatus())){
             t.setPreQuota(mulByDouble(t.getDeductCount(),t.getPrePersonCount()));
         }

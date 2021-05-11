@@ -176,6 +176,8 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             return "";
         }
         selected.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
+        selected.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ScheduleJoin.toString());
+        selected.setCurrentStep(ZkbCourseTrain.FlowStepEnum.LetterPending.toString());
         zkbCourseTrainService.save(selectedCourseSchedule,selected,currentUser);
         return "List?faces-redirect=true";
 

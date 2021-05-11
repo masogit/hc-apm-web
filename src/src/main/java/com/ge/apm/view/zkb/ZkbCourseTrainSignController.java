@@ -66,6 +66,8 @@ public class ZkbCourseTrainSignController extends GenericCRUDUUIDController<ZkbC
             ZkbCourseTrain zkbCourseTrain = new ZkbCourseTrain();
             zkbCourseTrain.setPrePersonCount(schedule.getPrePersonCount());
             zkbCourseTrain.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
+            zkbCourseTrain.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ScheduleJoin.toString());
+            zkbCourseTrain.setCurrentStep(ZkbCourseTrain.FlowStepEnum.LetterPending.toString());
             zkbCourseTrainService.save(schedule,zkbCourseTrain,currentUser);
             zkbContractCourseSchedules = zknContractCourseScheduleMapper.fetchByTenantUid(currentUser.getTenantUID());
         }
@@ -87,6 +89,8 @@ public class ZkbCourseTrainSignController extends GenericCRUDUUIDController<ZkbC
         ZkbCourseTrain zkbCourseTrain = new ZkbCourseTrain();
         zkbCourseTrain.setReason(reason);
         zkbCourseTrain.setParticipateStatus(ZkbCourseTrain.ParticipateStatusEnum.N.toString());
+        zkbCourseTrain.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.ScheduleNoJoin.toString());
+        zkbCourseTrain.setCurrentStep(ZkbCourseTrain.FlowStepEnum.Completed.toString());
         zkbCourseTrainService.save(selectedSchedule,zkbCourseTrain,currentUser);
         zkbContractCourseSchedules = zknContractCourseScheduleMapper.fetchByTenantUid(currentUser.getTenantUID());
     }
