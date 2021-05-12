@@ -138,7 +138,7 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             showLetterFlag = true;
             showApplyFlag = true;
             showAuditFlag = true;
-            if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(selected.getCurrentStep())){
+            if(canEditFlag){
                 showBtn = "0";
             }
         }
@@ -147,6 +147,9 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
     public void initApplyList(){
         if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(selected.getCurrentStep())){
             zkbCourseTrainDetailList = zkbCourseTrainService.queryInitDetails(selected);
+            if(ZkbCourseTrain.FlowStatusEnum.AuditRejected.toString().equals(selected.getCurrentStatus())){
+                selectedCourseTrainDetailList = zkbCourseTrainService.querySaveDetail(selected);
+            }
         }else if(ZkbCourseTrain.FlowStepEnum.ApplyAuditPending.toString().equals(selected.getCurrentStep()) ||
                 ZkbCourseTrain.FlowStepEnum.Completed.toString().equals(selected.getCurrentStep())){
             zkbCourseTrainDetailList = zkbCourseTrainService.querySaveDetail(selected);
@@ -196,9 +199,9 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             }
         }else if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(selected.getCurrentStep())){
             if(v2_blobObjectList ==null || v2_blobObjectList.size() == 0){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请上传确认函！", "");
+                /*FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请上传确认函！", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
-                return "";
+                return "";*/
             }
         }
         zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList,currentUser);
