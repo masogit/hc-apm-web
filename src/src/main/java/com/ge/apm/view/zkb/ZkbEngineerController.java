@@ -52,6 +52,12 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
     private Page<ZkbEngineer> zkbEngineerPage;
 
     private List<ZkbEngineerTrackRecord> zkbEngineerTrackRecordList;
+
+
+    /**
+     * 培训记录
+     */
+    private List<ZkbContractCourseSchedule> zkbEngineerTrainRecordList;
     private ZkbEngineerTrackRecord zkbEngineerTrackRecordSelected;
 
 
@@ -130,6 +136,7 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
         this.selected.setLastModifiedDate(new Date());
 
         zkbEngineerTrackRecordList = zkbEngineerService.getZkbEngineerTrackRecordList(this.selected.getId());
+        zkbEngineerTrainRecordList = zkbEngineerService.getZkbEngineerTrainRecordList(this.selected.getId());
         this.initBlobObjectList(this.selected.getId());
     }
 
@@ -293,5 +300,13 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
 
     public void setV2_blobObjectList(List<V2_BlobObject> v2_blobObjectList) {
         this.v2_blobObjectList = v2_blobObjectList;
+    }
+
+    public List<ZkbContractCourseSchedule> getZkbEngineerTrainRecordList() {
+        return zkbEngineerTrainRecordList;
+    }
+
+    public void setZkbEngineerTrainRecordList(List<ZkbContractCourseSchedule> zkbEngineerTrainRecordList) {
+        this.zkbEngineerTrainRecordList = zkbEngineerTrainRecordList;
     }
 }
