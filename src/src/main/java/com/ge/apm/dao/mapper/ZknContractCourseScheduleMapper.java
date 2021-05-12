@@ -22,4 +22,12 @@ public interface ZknContractCourseScheduleMapper {
     @SelectProvider(type = ZkbContractCourseScheduleProvider.class,method = "fetchByTenantUid")
     List<ZkbContractCourseSchedule>  fetchByTenantUid(@Param("tenantUID") String tenantUID);
 
+    /**
+     * 根据工程师ID查询培训记录
+     * @param eid
+     * @return
+     */
+    @SelectProvider(type = ZkbContractCourseScheduleProvider.class,method = "fetchByEid")
+    List<ZkbContractCourseSchedule> fetchByEid(@Param("eid") String eid);
+
 }

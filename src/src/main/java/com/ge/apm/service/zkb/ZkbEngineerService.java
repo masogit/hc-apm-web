@@ -4,6 +4,7 @@ import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbEngineerRepository;
 import com.ge.apm.dao.ZkbEngineerTrackRecordRepository;
+import com.ge.apm.dao.mapper.ZknContractCourseScheduleMapper;
 import com.ge.apm.domain.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ public class ZkbEngineerService {
     @Autowired
     private ZkbEngineerRepository zkbEngineerRepository;
 
+    @Autowired
+    private ZknContractCourseScheduleMapper zknContractCourseScheduleMapper;
+
     public List<TenantInfo> getSourceTenantInfoList(){
 
         List<SearchFilter> searchFilters = new ArrayList<>();
@@ -56,6 +60,16 @@ public class ZkbEngineerService {
 
         return zkbEngineerTrackRecordDao.findBySearchFilter(searchFilters);
 
+    }
+
+    /**
+     * 根据工程师ID获取培训记录
+     * @param eid 工程师主键
+     * @return
+     */
+    public List<ZkbContractCourseSchedule> getZkbEngineerTrainRecordList(String eid)
+    {
+        return this.zknContractCourseScheduleMapper.fetchByEid(eid);
     }
 
     @Transactional

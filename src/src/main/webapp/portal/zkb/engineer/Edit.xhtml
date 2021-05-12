@@ -106,6 +106,33 @@
 
                     </p:dataTable>
                 </p:fieldset>
+                <p:fieldset id="zkbEngineerTrainRecordFieldset" legend="培训记录" rendered="#{zkbEngineerController.actionName eq 'Edit'}">
+                    <p:dataTable id="zkbEngineerTrainRecordDatalist" value="#{zkbEngineerController.zkbEngineerTrainRecordList}" var="zkbEngineerTrainRecordItem"
+                                 widgetVar="zkbEngineerTrainRecordDataList" selectionMode="single" selection="#{zkbEngineerController.zkbContractCourseSchedule}"
+                                 lazy="false" paginator="true" rowKey="#{zkbEngineerTrainRecordItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{zkbEngineerTrainRecordItem.createdDate}"
+                                 paginatorTemplate="{Toolbar}" rows="100" emptyMessage="#{msg.noRecordFound}">
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_cid}">
+                            <h:outputText value="#{zkbEngineerTrainRecordItem.cid}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_cname}">
+                            <h:outputText value="#{zkbEngineerTrainRecordItem.cname}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_modality}">
+                            <h:outputText value="#{zkbEngineerTrainRecordItem.modality}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_batchNo}">
+                            <h:outputText value="#{zkbEngineerTrainRecordItem.batchNo}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_type}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',zkbEngineerTrainRecordItem.type)}"/>
+                        </p:column>
+                        <p:column headerText="报名时间">
+                            <h:outputText value="#{zkbEngineerTrainRecordItem.createdDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
                 <p:fieldset id="zkbEngineerAttachFileInfoFieldset" legend="#{msg.zkbEngineerAttachFileInfo}">
                     <p:panelGrid>
                         <h:panelGroup>
