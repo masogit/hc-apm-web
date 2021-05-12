@@ -87,7 +87,7 @@
                             <label class="label">培训类型*</label>
                             <p:selectOneMenu id="orderType" value="#{zkbCourseTrainEditController.selected.trainType}" disabled="true" required="true" requiredMessage="#{msg.zkbTrain_orderType} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractCourseSchedule_type')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
 
@@ -125,7 +125,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">实际扣除数量*</label>
+                            <label class="label">实际扣除数量</label>
                             <p:inputText id="actualDeductCount" value="#{zkbCourseTrainEditController.selected.actualQuota}" disabled="true" />
                         </h:panelGroup>
                     </p:panelGrid>
