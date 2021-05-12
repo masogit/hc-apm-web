@@ -60,6 +60,8 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
     private List<ZkbContractCourseSchedule> zkbEngineerTrainRecordList;
     private ZkbEngineerTrackRecord zkbEngineerTrackRecordSelected;
 
+    private ZkbContractCourseSchedule zkbContractCourseSchedule;
+
 
     /**
      * 获取附件处理service
@@ -308,5 +310,13 @@ public class ZkbEngineerController extends GenericCRUDUUIDController<ZkbEngineer
 
     public void setZkbEngineerTrainRecordList(List<ZkbContractCourseSchedule> zkbEngineerTrainRecordList) {
         this.zkbEngineerTrainRecordList = zkbEngineerTrainRecordList;
+    }
+
+    public ZkbContractCourseSchedule getZkbContractCourseSchedule() {
+        return zkbContractCourseSchedule;
+    }
+
+    public void setZkbContractCourseSchedule(ZkbContractCourseSchedule zkbContractCourseSchedule) {
+        this.zkbContractCourseSchedule = zkbContractCourseSchedule;
     }
 }
