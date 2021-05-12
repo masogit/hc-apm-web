@@ -4,10 +4,7 @@ import com.ge.apm.dao.ZkbCourseRepository;
 import com.ge.apm.dao.ZkbCourseScheduleRepository;
 import com.ge.apm.dao.ZkbCourseTrainUserConfigRepository;
 import com.ge.apm.dao.mapper.ZknContractCourseScheduleMapper;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbContractCourseSchedule;
-import com.ge.apm.domain.ZkbCourse;
-import com.ge.apm.domain.ZkbCourseTrainUserConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbCourseScheduleService;
@@ -35,10 +32,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 
@@ -79,7 +73,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     /**
      * false
      */
-    private static final String f = "f";
+    public static final String f = "f";
 
     /**
      * true
@@ -110,11 +104,18 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     private UploadedFile file;
 
     /**
+     * 是否生效
+     */
+    private String valid;
+
+    /**
      * 错误列表
      */
     private List<Map<String, Object>> errorZknCourseScheduleList;
 
     private static final String EXCEL_NAME = "APM_ZKB_Course_Schedule_Template.xlsx";
+
+    private static final String Export_EXCEL_NAME = "APM_ZKB_Course_Schedule_Template_Export.xlsx";
 
     /**
      * 导出文件
@@ -126,6 +127,10 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     private ZknContractCourseScheduleMapper zknContractCourseScheduleMapper;
 
     private ZkbFePartOrderService zkbFePartOrderService;
+
+    private Map<String, Boolean> selectedMap = new HashMap<>();
+
+    private Page<ZkbContractCourseSchedule> page;
 
     /**
      * 初始化
@@ -146,7 +151,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
             hasEditRight=true;
         }
         //zkbCourseScheduleRepository.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
-        //zknContractCourseScheduleMapper.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
+        zknContractCourseScheduleMapper.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
     }
 
     /**
@@ -157,7 +162,8 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     @Override
     protected Page<ZkbContractCourseSchedule> loadData(PageRequest pageRequest) {
         searchFilters= this.getSearchFilter();
-        return zkbCourseScheduleRepository.findBySearchFilter(searchFilters, pageRequest);
+        page = zkbCourseScheduleRepository.findBySearchFilter(searchFilters, pageRequest);
+        return page;
     }
 
     /**
@@ -176,11 +182,15 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         }
         if(startDate!=null)
         {
-            searchFilters.add(new SearchFilter("startDate",SearchFilter.Operator.LTE, startDate));
+            searchFilters.add(new SearchFilter("startDate",SearchFilter.Operator.GTE, startDate));
         }
         if(endDate!=null)
         {
-            searchFilters.add(new SearchFilter("endDate", SearchFilter.Operator.GTE, endDate));
+            searchFilters.add(new SearchFilter("endDate", SearchFilter.Operator.LTE, endDate));
+        }
+        if(valid!=null)
+        {
+            searchFilters.add(new SearchFilter("valid", SearchFilter.Operator.EQ, valid));
         }
         return searchFilters;
     }
@@ -217,6 +227,34 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     }
 
     /**
+     * 批量生效
+     */
+    public void batchValid()
+    {
+        if(this.selectedMap==null||this.selectedMap.isEmpty())
+            return;
+        StringBuffer ids = new StringBuffer();
+        for (String key : selectedMap.keySet()) {
+            if(!this.selectedMap.get(key))
+                continue;
+            ids=ids.append(key).append(",");
+            ZkbContractCourseSchedule item = this.zkbCourseScheduleRepository.findById(key);
+            item.setValid(t);
+            this.zkbCourseScheduleRepository.save(item);
+        }
+        String idsStr = ids.toString();
+        if(StringUtils.isBlank(idsStr))
+            return;
+        idsStr = idsStr.substring(0,idsStr.length()-1);
+        this.zkbFePartOrderService.sendMessage(idsStr, GatewayURL.CONTRACT_COURSE_SCHEDULE_MESSAGE);
+    }
+
+    public void sendTestMessage()
+    {
+        this.zkbCourseScheduleService.sendMessageByTelephone(GatewayURL.CONTRACT_COURSE_SCHEDULE_SEND_MESSAGE_BY_TELEPHONE);
+    }
+
+    /**
      * 预编辑
      */
     @Override
@@ -248,6 +286,14 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
             zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.CONTRACT_COURSE_SCHEDULE_MESSAGE);
         }
         this.selected = null;
+    }
+
+    public void onSelectAllOfPage() {
+        List<ZkbContractCourseSchedule> zkbContractCourseScheduleList = page.getContent();
+        boolean isSelectedAll = !zkbContractCourseScheduleList.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        for (ZkbContractCourseSchedule item : zkbContractCourseScheduleList) {
+            selectedMap.put(item.getId(), !isSelectedAll);
+        }
     }
 
 
@@ -292,7 +338,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         List<ZkbContractCourseSchedule> zkbContractCourseSchedule = zkbCourseScheduleRepository.find();
         List<Map<String, Object>> orderHistoryMapList = zkbCourseScheduleService.createExportCourseScheduleData(zkbContractCourseSchedule);
         try {
-            String path = ZkbCourseScheduleService.COURSE_SCHEDULE_PATH+EXCEL_NAME;
+            String path = ZkbCourseScheduleService.COURSE_SCHEDULE_PATH+Export_EXCEL_NAME;
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(path);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             zkbCourseScheduleService.exportData(doc,orderHistoryMapList);
@@ -386,4 +432,21 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     public void setHasEditRight(Boolean hasEditRight) {
         this.hasEditRight = hasEditRight;
     }
+
+    public String getValid() {
+        return valid;
+    }
+
+    public void setValid(String valid) {
+        this.valid = valid;
+    }
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+        this.selectedMap = selectedMap;
+    }
+
 }

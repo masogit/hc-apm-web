@@ -10,6 +10,7 @@ import com.ge.apm.service.asset.AssetInfoRow;
 import com.ge.apm.service.asset.ZkbContractCourseScheduleRow;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.zkb.ZkbCourseScheduleController;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import webapp.framework.web.WebUtil;
 
 import java.time.Duration;
@@ -28,12 +31,15 @@ import java.util.*;
  * 课程计划表service
  */
 @Component
-public class ZkbCourseScheduleService {
+public class ZkbCourseScheduleService extends MicroServiceInvoker {
 
     private static final Logger logger = LoggerFactory.getLogger(ZkbOrderHistoryService.class);
 
     @Autowired
     private ZkbCourseScheduleRepository zkbCourseScheduleRepository;
+
+    @Autowired
+    protected RestTemplate template;
 
     /**
      * 根据excel文件 读取文件中的数据
@@ -98,13 +104,13 @@ public class ZkbCourseScheduleService {
             zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_location"), "setLocation");
             zkbContractCourseScheduleRow.setFieldIntegerValue(WebUtil.getMessage("zkbContractCourseSchedule_studentClass"), "setStudentClass");
             zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_batchNo"), "setBatchNo");
-            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_valid"), "setValid");
+//            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_valid"), "setValid");
             zkbContractCourseScheduleRow.setFieldDoubleValue(WebUtil.getMessage("zkbContractCourseSchedule_deductCount"), "setDeductCount");
             zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_type"), "setType");
             if("是".equals(zkbContractCourseScheduleVO.getValid()))zkbContractCourseScheduleVO.setValid("t");
             if("否".equals(zkbContractCourseScheduleVO.getValid()))zkbContractCourseScheduleVO.setValid("f");
-            if("线下".equals(zkbContractCourseScheduleVO.getType()))zkbContractCourseScheduleVO.setType("offline");
-            if("线上".equals(zkbContractCourseScheduleVO.getType()))zkbContractCourseScheduleVO.setType("online");
+            if("ATC".equals(zkbContractCourseScheduleVO.getType()))zkbContractCourseScheduleVO.setType("offline");
+            if("Online".equals(zkbContractCourseScheduleVO.getType()))zkbContractCourseScheduleVO.setType("online");
 
             if(zkbContractCourseScheduleVO.isNull()){
                 break;
@@ -145,10 +151,10 @@ public class ZkbCourseScheduleService {
             String type = "";
             if("offline".equals(zkbContractCourseSchedule.getType()))
             {
-                type="线下";
+                type="ATC";
             }else if("online".equals(zkbContractCourseSchedule.getType()))
             {
-                type="线上";
+                type="Online";
             }
             zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_cid"),zkbContractCourseSchedule.getCid());
             zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_cname"),zkbContractCourseSchedule.getCname());
@@ -200,11 +206,12 @@ public class ZkbCourseScheduleService {
                         zkbContractCourseScheduleVO.setModality(zkbCourse.getModality());
                     }
                     BeanUtils.copyProperties(zkbContractCourseScheduleVO, zkbContractCourseSchedule);
+                    zkbContractCourseSchedule.setValid(ZkbCourseScheduleController.f);
                     this.zkbCourseScheduleRepository.save(zkbContractCourseSchedule);
-                    if(ZkbCourseScheduleController.t.equals(zkbContractCourseSchedule.getValid()))
-                    {
-                        ids=ids.append(zkbContractCourseSchedule.getId()).append(",");
-                    }
+//                    if(ZkbCourseScheduleController.t.equals(zkbContractCourseSchedule.getValid()))
+//                    {
+//                        ids=ids.append(zkbContractCourseSchedule.getId()).append(",");
+//                    }
                 }
             }
         } catch (Exception e) {
@@ -214,12 +221,12 @@ public class ZkbCourseScheduleService {
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
-        String idsStr = ids.toString();
-        if(StringUtils.isNotBlank(idsStr))
-        {
-            idsStr = idsStr.substring(0,idsStr.length()-1);
-            this.zkbFePartOrderService.sendMessage(idsStr, GatewayURL.CONTRACT_COURSE_SCHEDULE_MESSAGE);
-        }
+//        String idsStr = ids.toString();
+//        if(StringUtils.isNotBlank(idsStr))
+//        {
+//            idsStr = idsStr.substring(0,idsStr.length()-1);
+//            this.zkbFePartOrderService.sendMessage(idsStr, GatewayURL.CONTRACT_COURSE_SCHEDULE_MESSAGE);
+//        }
     }
 
     /**
@@ -344,6 +351,31 @@ public class ZkbCourseScheduleService {
         for (Map<String, Object> item : courseScheduleMapList) {
             doc.writeRowData(SHEET_SERVICE_COURSE_SCHEDULE, 1, dataRow++, item);
         }
+    }
+
+    /**
+     * 根据ID发送消息
+     */
+    public void sendMessageByTelephone(GatewayURL gatewayURL)
+    {
+        HttpHeaders headers = new HttpHeaders();
+        MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
+        headers.setContentType(type);
+//        String url = env.getProperty("messageCourseSchedule");
+        HttpEntity<Map> requestEntity = new HttpEntity<>(headers);
+        //运用多线程，防止服务不可用，不影响主流程
+        Thread t=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //停顿5秒，防止数据未入库
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                }
+                ResponseEntity<LinkedHashMap> response = template.exchange(getGatewayURL(gatewayURL), HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            }
+        });
+        t.start();
     }
 
 }
