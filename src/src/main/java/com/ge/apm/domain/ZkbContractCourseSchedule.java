@@ -133,7 +133,7 @@ public class ZkbContractCourseSchedule implements Serializable {
     private String contractId;
 
     @Transient
-    private Date created_date;
+    private Date createdDate;
 
     @Column(name = "valid_date")
     private Date validDate;
@@ -334,12 +334,12 @@ public class ZkbContractCourseSchedule implements Serializable {
         this.contractId = contractId;
     }
 
-    public Date getCreated_date() {
-        return created_date;
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
-    public void setCreated_date(Date created_date) {
-        this.created_date = created_date;
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 
     public Date getValidDate() {
