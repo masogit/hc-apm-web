@@ -31,9 +31,27 @@ public class ZkbContractCourseScheduleProvider {
                 " and zkbcon.end_date>=current_date "  +
                 " and zkb_sch.valid = 't' " +
                 " and zkb_sch.start_date<= current_date " +
-                " and zkb_sch.end_date>=current_date;");
+                " and zkb_sch.end_date>=current_date" +
+                " and zkb_sch.id not in (SELECT course_schedule_id FROM zkb_course_train where tenant_uid = '"+tenantUID+"');");
         return sb.toString();
     }
+
+    /**
+     * 初始化排名信息
+     * @param param
+     * @return
+     */
+    public String fetchByEid(Map<String,Object> param)
+    {
+        String eid = param.get("eid").toString();//租户tenantUID
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT zccs.*,zct.created_date from zkb_course_train_detail zctd " +
+                "INNER JOIN zkb_course_train zct on zctd.train_id = zct.id " +
+                "INNER JOIN zkb_contract_course_schedule zccs on zct.course_schedule_id=zccs.id " +
+                "where zct.participate_status = 'Y' and zctd.eid = '"+eid+"'");
+        return sb.toString();
+    }
+
 
 
 }
