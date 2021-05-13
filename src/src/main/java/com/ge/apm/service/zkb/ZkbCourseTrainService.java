@@ -2,16 +2,25 @@ package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.sysutil.UserContextService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import webapp.framework.dao.SearchFilter;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author : 503189362
@@ -19,7 +28,10 @@ import java.util.List;
  * @description :
  */
 @Service
-public class ZkbCourseTrainService {
+public class ZkbCourseTrainService extends MicroServiceInvoker {
+
+    Logger logger = LoggerFactory.getLogger(ZkbCourseTrainService.class);
+
 
     @Autowired
     BlobObjectRepository blobObjectRepository;
@@ -155,6 +167,9 @@ public class ZkbCourseTrainService {
             }
             blobObjectRepository.save(v2_blobObjects);
         }
+        if(ZkbCourseTrain.FlowStatusEnum.ApplySubmit.toString().equals(c.getCurrentStatus())){
+            sendEmail(c,UserContextService.getAccessToken());
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -184,7 +199,7 @@ public class ZkbCourseTrainService {
             c.setAuditDate(new Date());
             c.setAuditer(userAccount.getName());
             c.setAuditerUid(userAccount.getUid());
-        }else if(ZkbCourseTrain.FlowStepEnum.ApplyAuditPending.toString().equals(c.getCurrentStep())){
+        }else if(ZkbCourseTrain.FlowStepEnum.ApplyAuditPending.toString().equals(oldStep)){
             c.setCurrentStatus(ZkbCourseTrain.FlowStatusEnum.AuditRejected.toString());
             c.setCurrentStep(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString());
             c.setAuditDate(new Date());
@@ -196,6 +211,7 @@ public class ZkbCourseTrainService {
             //扣除名额
             subQuotaUse(c);
         }
+        sendWeChatMessages(c,UserContextService.getAccessToken());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -264,12 +280,19 @@ public class ZkbCourseTrainService {
         }
         List<ZkbCourseTrainDetail> zkbCourseTrainDetails = new ArrayList<>();
         for(ZkbEngineer e : zkbEngineerList){
-            ZkbCourseTrainDetail zkbCourseTrainDetail = new ZkbCourseTrainDetail();
-            zkbCourseTrainDetail.setEid(e.getId());
-            zkbCourseTrainDetail.setEname(e.getName());
-            zkbCourseTrainDetail.setEphone(e.getPhone());
-            zkbCourseTrainDetail.setEemail(e.getEmail());
-            zkbCourseTrainDetail.setTrainId(zkbCourseTrain.getId());
+            ZkbCourseTrainDetail zkbCourseTrainDetail = null;
+            if(ZkbCourseTrain.FlowStatusEnum.AuditRejected.toString().equals(zkbCourseTrain.getCurrentStatus())){
+                zkbCourseTrainDetail = zkbCourseTrainDetailRepository.findFirstByTrainIdAndEid(zkbCourseTrain.getId(),e.getId());
+            }
+            if(zkbCourseTrainDetail == null){
+                zkbCourseTrainDetail = new ZkbCourseTrainDetail();
+                zkbCourseTrainDetail.setEid(e.getId());
+                zkbCourseTrainDetail.setEname(e.getName());
+                zkbCourseTrainDetail.setEphone(e.getPhone());
+                zkbCourseTrainDetail.setEemail(e.getEmail());
+                zkbCourseTrainDetail.setTrainId(zkbCourseTrain.getId());
+            }
+
             List<V2_BlobObject> v2_blobObjects = blobObjectRepository.findByBoUuid(e.getId());
             zkbCourseTrainDetail.setV2_blobObjectList(v2_blobObjects);
             zkbCourseTrainDetails.add(zkbCourseTrainDetail);
@@ -310,4 +333,33 @@ public class ZkbCourseTrainService {
 
         return Boolean.FALSE;
     }
+
+    @Async
+    public void sendWeChatMessages(ZkbCourseTrain t,String token){
+        try {
+            String url = getGatewayURL(GatewayURL.COURSE_TRAIN_SEND_WE_CHART).concat("?id=").concat(t.getId());
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(t.getTrainNo()+" sendWeChatMessages "+response.toString());
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Async
+    public void sendEmail(ZkbCourseTrain t,String token){
+        try {
+            HashMap<String, String> emailWrapperMap = new HashMap<>();
+            emailWrapperMap.put("systemId", t.getId());
+            String url = getGatewayURL(GatewayURL.COURSE_TRAIN_SEND_EMAIL_AUDIT);
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(emailWrapperMap, header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            logger.info(t.getTrainNo()+" 发送邮件 "+response.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
