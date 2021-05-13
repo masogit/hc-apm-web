@@ -47,7 +47,7 @@
                             <p:commandButton value="#{msg.SearchResult}" actionListener="#{zkbCourseScheduleController.cancel}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :zkbCourseScheduleListForm:datalist">
                             </p:commandButton>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbCourseScheduleController.testPerson}">
                             <p:commandButton value="手动发送短信，用于测试" actionListener="#{zkbCourseScheduleController.sendTestMessage}" icon="ui-icon-arrowthick-1-s">
                             </p:commandButton>
                         </h:panelGroup>

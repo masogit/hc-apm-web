@@ -27,7 +27,6 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -138,6 +137,8 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
 
     private Page<ZkbContractCourseSchedule> page;
 
+    boolean testPerson = false;
+
     /**
      * 初始化
      */
@@ -156,6 +157,11 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         if(CollectionUtils.isNotEmpty(zkbCourseTrainUserConfigList))
         {
             hasEditRight=true;
+        }
+        String loginName =currentUser.getLoginName();
+        if(StringUtils.isNotBlank(loginName)&&loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        {
+            testPerson=true;
         }
         //zknContractCourseScheduleMapper.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
     }
@@ -479,4 +485,11 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         this.selectedMap = selectedMap;
     }
 
+    public boolean isTestPerson() {
+        return testPerson;
+    }
+
+    public void setTestPerson(boolean testPerson) {
+        this.testPerson = testPerson;
+    }
 }
