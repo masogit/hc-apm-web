@@ -2,6 +2,7 @@ package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbCourseRepository;
 import com.ge.apm.dao.ZkbCourseScheduleRepository;
+import com.ge.apm.dao.ZkbCourseTrainRepository;
 import com.ge.apm.dao.ZkbCourseTrainUserConfigRepository;
 import com.ge.apm.dao.mapper.ZknContractCourseScheduleMapper;
 import com.ge.apm.domain.*;
@@ -26,7 +27,6 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -64,6 +64,11 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
      * 权限
      */
     private ZkbCourseTrainUserConfigRepository zkbCourseTrainUserConfigRepository;
+
+    /**
+     * 获取培训信息
+     */
+    private ZkbCourseTrainRepository zkbCourseTrainRepository;
 
     /**
      * 当前登录用户信息service
@@ -132,6 +137,8 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
 
     private Page<ZkbContractCourseSchedule> page;
 
+    boolean testPerson = false;
+
     /**
      * 初始化
      */
@@ -144,14 +151,19 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         zkbCourseRepository=WebUtil.getBean(ZkbCourseRepository.class);
         zknContractCourseScheduleMapper=WebUtil.getBean(ZknContractCourseScheduleMapper.class);
         zkbFePartOrderService=WebUtil.getBean(ZkbFePartOrderService.class);
+        zkbCourseTrainRepository=WebUtil.getBean(ZkbCourseTrainRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         List<ZkbCourseTrainUserConfig> zkbCourseTrainUserConfigList = this.zkbCourseTrainUserConfigRepository.findByLoginName(currentUser.getLoginName());
         if(CollectionUtils.isNotEmpty(zkbCourseTrainUserConfigList))
         {
             hasEditRight=true;
         }
-        //zkbCourseScheduleRepository.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
-        zknContractCourseScheduleMapper.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
+        String loginName =currentUser.getLoginName();
+        if(StringUtils.isNotBlank(loginName)&&loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        {
+            testPerson=true;
+        }
+        //zknContractCourseScheduleMapper.fetchByTenantUid("0c4f91644a0f4b18993f4fc766cd4022");
     }
 
     /**
@@ -195,7 +207,6 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         return searchFilters;
     }
 
-
     /**
      * 跳转导入页面
      * @return
@@ -205,17 +216,6 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     }
 
     /**
-     * 是否有编辑权限
-     * @return
-     */
-    public Boolean hasEditRight()
-    {
-        if(this.selected!=null&&(f.equals(this.selected.getValid())||StringUtils.isBlank(this.selected.getValid()))) return true;
-        return false;
-    }
-
-
-    /**
      * 预创建
      * @throws InstantiationException
      * @throws IllegalAccessException
@@ -223,6 +223,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
+        this.selected.setValid(f);
 
     }
 
@@ -240,6 +241,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
             ids=ids.append(key).append(",");
             ZkbContractCourseSchedule item = this.zkbCourseScheduleRepository.findById(key);
             item.setValid(t);
+            item.setValidDate(new Date());
             this.zkbCourseScheduleRepository.save(item);
         }
         String idsStr = ids.toString();
@@ -267,8 +269,31 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
      */
     @Override
     public void delete() {
+        String id = this.selected.getId();
+        List<ZkbCourseTrain> zkbCourseTrainList = this.zkbCourseTrainRepository.findByCourseScheduleId(id);
+        if(CollectionUtils.isNotEmpty(zkbCourseTrainList))
+        {
+            WebUtil.addErrorMessage("该课程已有用户报名，不能删除");
+            return;
+        }
         super.delete();
         this.cancel();
+    }
+
+    public boolean checkSelectMap()
+    {
+        boolean batchValid = false;
+        if(this.selectedMap!=null&&!this.selectedMap.isEmpty())
+        {
+           for(String key:selectedMap.keySet())
+           {
+                if(selectedMap.get(key))
+                {
+                    batchValid=true;
+                }
+           }
+        }
+        return batchValid;
     }
 
     /**
@@ -280,11 +305,23 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
 
     @Override
     public void save() {
-        super.save();
-        if(t.equals(this.selected.getValid()))
+        String id = this.selected.getId();
+        List<ZkbCourseTrain> zkbCourseTrainList = this.zkbCourseTrainRepository.findByCourseScheduleId(id);
+        if(CollectionUtils.isNotEmpty(zkbCourseTrainList))
         {
-            zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.CONTRACT_COURSE_SCHEDULE_MESSAGE);
+            WebUtil.addErrorMessage("该课程已有用户报名，不能修改");
+            return;
         }
+        if(this.selected.getStartDate().compareTo(this.selected.getEndDate())>0)
+        {
+            WebUtil.addErrorMessage("开始时间不能大于结束时间");
+            return;
+        }
+        if(StringUtils.isNotBlank(this.selected.getValid())&&t.equals(this.selected.getValid()))
+        {
+            this.selected.setValidDate(new Date());
+        }
+        super.save();
         this.selected = null;
     }
 
@@ -312,8 +349,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
             zkbCourseScheduleService.importData(importCourseScheduleMapList);
             errorZknCourseScheduleList = zkbCourseScheduleService.filterErrorRecords(importCourseScheduleMapList);
             if(!errorZknCourseScheduleList.isEmpty()){
-                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+errorZknCourseScheduleList.size()+WebUtil.getMessage("RecordsOfFailure"));
-                FacesContext.getCurrentInstance().addMessage(null, message);
+                WebUtil.addErrorMessage("导入失败");
             }else {
                 WebUtil.addSuccessMessage(WebUtil.getMessage("ImportComplete"));
             }
@@ -321,7 +357,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
             WebUtil.addErrorMessage("File can not be read!");
             java.util.logging.Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception e) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError"));
             java.util.logging.Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, e);
         } finally {
             if (doc != null) {
@@ -449,4 +485,11 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         this.selectedMap = selectedMap;
     }
 
+    public boolean isTestPerson() {
+        return testPerson;
+    }
+
+    public void setTestPerson(boolean testPerson) {
+        this.testPerson = testPerson;
+    }
 }

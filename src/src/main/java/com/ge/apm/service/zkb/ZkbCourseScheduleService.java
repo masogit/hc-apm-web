@@ -104,14 +104,12 @@ public class ZkbCourseScheduleService extends MicroServiceInvoker {
             zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_location"), "setLocation");
             zkbContractCourseScheduleRow.setFieldIntegerValue(WebUtil.getMessage("zkbContractCourseSchedule_studentClass"), "setStudentClass");
             zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_batchNo"), "setBatchNo");
-//            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_valid"), "setValid");
             zkbContractCourseScheduleRow.setFieldDoubleValue(WebUtil.getMessage("zkbContractCourseSchedule_deductCount"), "setDeductCount");
             zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_type"), "setType");
             if("是".equals(zkbContractCourseScheduleVO.getValid()))zkbContractCourseScheduleVO.setValid("t");
             if("否".equals(zkbContractCourseScheduleVO.getValid()))zkbContractCourseScheduleVO.setValid("f");
             if("ATC".equals(zkbContractCourseScheduleVO.getType()))zkbContractCourseScheduleVO.setType("offline");
             if("Online".equals(zkbContractCourseScheduleVO.getType()))zkbContractCourseScheduleVO.setType("online");
-
             if(zkbContractCourseScheduleVO.isNull()){
                 break;
             }
@@ -190,8 +188,9 @@ public class ZkbCourseScheduleService extends MicroServiceInvoker {
                 allZkbCourseMap.put(item.getCid(),item);
             }
         }
+        Boolean toSave =true;
         LocalDateTime startTime = LocalDateTime.now();
-        StringBuffer ids = new StringBuffer();
+        List<ZkbContractCourseSchedule> zkbContractCourseScheduleList = new ArrayList<>();
         int row = 0;
         try {
             for (Map<String, Object> item : importCourseScheduleMapList) {
@@ -204,29 +203,30 @@ public class ZkbCourseScheduleService extends MicroServiceInvoker {
                         ZkbCourse zkbCourse = allZkbCourseMap.get(zkbContractCourseScheduleVO.getCid());
                         zkbContractCourseScheduleVO.setCname(zkbCourse.getCname());
                         zkbContractCourseScheduleVO.setModality(zkbCourse.getModality());
+                        zkbContractCourseScheduleVO.setZkbCourseId(zkbCourse.getId());
                     }
                     BeanUtils.copyProperties(zkbContractCourseScheduleVO, zkbContractCourseSchedule);
                     zkbContractCourseSchedule.setValid(ZkbCourseScheduleController.f);
-                    this.zkbCourseScheduleRepository.save(zkbContractCourseSchedule);
-//                    if(ZkbCourseScheduleController.t.equals(zkbContractCourseSchedule.getValid()))
-//                    {
-//                        ids=ids.append(zkbContractCourseSchedule.getId()).append(",");
-//                    }
-                }
+                    zkbContractCourseScheduleList.add(zkbContractCourseSchedule);
+                }else
+                    {
+                        toSave=false;
+                    }
             }
         } catch (Exception e) {
             logger.info("error occurred when importing the {} row", row);
             throw e;
         }
+        if(toSave&&CollectionUtils.isNotEmpty(zkbContractCourseScheduleList))
+        {
+            for(ZkbContractCourseSchedule item:zkbContractCourseScheduleList)
+            {
+                this.zkbCourseScheduleRepository.save(item);
+            }
+        }
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
-//        String idsStr = ids.toString();
-//        if(StringUtils.isNotBlank(idsStr))
-//        {
-//            idsStr = idsStr.substring(0,idsStr.length()-1);
-//            this.zkbFePartOrderService.sendMessage(idsStr, GatewayURL.CONTRACT_COURSE_SCHEDULE_MESSAGE);
-//        }
     }
 
     /**
@@ -254,6 +254,12 @@ public class ZkbCourseScheduleService extends MicroServiceInvoker {
         if(zkbContractCourseScheduleVO.getEndDate()==null){
             item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_endDate")+errorMessage);
+            isValidateData = false;
+        }
+        if(zkbContractCourseScheduleVO.getStartDate().compareTo(zkbContractCourseScheduleVO.getEndDate())>0)
+        {
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item,"开始时间不能大于结束时间");
             isValidateData = false;
         }
         if(zkbContractCourseScheduleVO.getTrainingDays()==null){
@@ -286,11 +292,11 @@ public class ZkbCourseScheduleService extends MicroServiceInvoker {
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_batchNo")+errorMessage);
             isValidateData = false;
         }
-        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getValid())){
-            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_valid")+errorMessage);
-            isValidateData = false;
-        }
+//        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getValid())){
+//            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+//            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_valid")+errorMessage);
+//            isValidateData = false;
+//        }
         if(zkbContractCourseScheduleVO.getDeductCount()==null){
             item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_deductCount")+errorMessage);

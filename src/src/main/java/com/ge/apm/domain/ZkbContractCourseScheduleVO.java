@@ -39,7 +39,7 @@ public class ZkbContractCourseScheduleVO extends ZkbContractCourseSchedule{
     @Override
     public int hashCode() {
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer=stringBuffer.append(this.getCid() != null ? this.getCname().toString() : "");
+        stringBuffer=stringBuffer.append(this.getCid() != null ? this.getCid().toString() : "");
         stringBuffer=stringBuffer.append(this.getCname() != null ? this.getCname().toString() : "");
         stringBuffer=stringBuffer.append(this.getModality() != null ? this.getModality().toString() : "");
         stringBuffer=stringBuffer.append(this.getStartDate() != null ? this.getStartDate().toString() : "");

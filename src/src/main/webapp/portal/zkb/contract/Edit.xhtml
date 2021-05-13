@@ -236,7 +236,7 @@
                     <p:fieldset id="zkbContractCourseFieldset" legend="相关课程" rendered="#{not empty zkbContractEditController.selected.id}">
                         <p:dataTable id="zkbContractCourseDatalist" value="#{zkbContractEditController.contractCourseList}" var="zkbContractCourseItem"
                                      widgetVar="zkbContractCourseDatalist" selectionMode="single" selection="#{zkbContractEditController.zkbContractCourseSelected}"
-                                     lazy="false" paginator="true" rowKey="#{zkbContractCourseItem.zkbCourse.cname}" sortMode="single" sortOrder="ascending" sortBy="#{zkbContractCourseItem.contractId}"
+                                     lazy="false" paginator="true" rowKey="#{zkbContractCourseItem.zkbCourse.cname}" sortMode="single"
                                      paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
 
                             <p:ajax event="rowSelect" update=":zkbContractEditForm:zkbContractCourseDatalist:editDetailButton :zkbContractEditForm:zkbContractCourseDatalist:deleteDetailButton"/>
