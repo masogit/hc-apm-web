@@ -47,7 +47,7 @@
                             <p:commandButton value="#{msg.SearchResult}" actionListener="#{zkbCourseScheduleController.cancel}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :zkbCourseScheduleListForm:datalist">
                             </p:commandButton>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{zkbCourseScheduleController.testPerson}">
                             <p:commandButton value="手动发送短信，用于测试" actionListener="#{zkbCourseScheduleController.sendTestMessage}" icon="ui-icon-arrowthick-1-s">
                             </p:commandButton>
                         </h:panelGroup>
@@ -64,18 +64,16 @@
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:ajax event="rowSelect" listener="#{zkbCourseScheduleController.prepareEdit}" update="editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{zkbCourseScheduleController.onFilter}" />
-
                         <p:column   id="checkBoxColumn">
                             <p:selectBooleanCheckbox value="#{zkbCourseScheduleController.selectedMap[item.id]}"  class="selectCheckBox">
                                 <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                    <p:ajax listener="#{zkbCourseScheduleController.onSelectAllOfPage}" update="@(.selectCheckBox) :zkbCourseScheduleListForm:datalist" oncomplete="updateSelectAllCheckBox();"/>
+                                    <p:ajax listener="#{zkbCourseScheduleController.onSelectAllOfPage}" update="@(.selectCheckBox) :zkbCourseScheduleListForm:datalist:batchValid" oncomplete="updateSelectAllCheckBox();"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-
                         <p:column headerText="#{msg.zkbContractCourseSchedule_batchNo}">
                             <h:outputText value="#{item.batchNo}"/>
                         </p:column>
@@ -125,29 +123,21 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" rendered="#{zkbCourseScheduleController.hasEditRight}"  title="#{msg.Create}" update=":zkbCourseScheduleEditGroup :zkbCourseScheduleEditForm" action="#{zkbCourseScheduleController.prepareCreate}" />
                             <p:commandButton id="editButton" icon="ui-icon-pencil" rendered="#{zkbCourseScheduleController.hasEditRight}" title="#{msg.Edit}" update=":zkbCourseScheduleEditGroup :zkbCourseScheduleEditForm" action="#{zkbCourseScheduleController.prepareEdit}" disabled="#{empty zkbCourseScheduleController.selected.id}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-close"  rendered="#{zkbCourseScheduleController.hasEditRight}"  title="#{msg.Delete}" update=":zkbCourseScheduleListForm" actionListener="#{zkbCourseScheduleController.delete}"  disabled="#{(empty zkbCourseScheduleController.selected.id||'t' eq zkbCourseScheduleController.selected.valid)}" />
+                            <p:commandButton id="deleteButton" icon="ui-icon-close"  rendered="#{zkbCourseScheduleController.hasEditRight}"  title="#{msg.Delete}" update=":zkbCourseScheduleListForm" actionListener="#{zkbCourseScheduleController.delete}"  disabled="#{(empty zkbCourseScheduleController.selected.id)}" />
                             <p:commandButton id="exportButton" ajax="false"  title="#{msg.exportToXLS}" actionListener="#{zkbCourseScheduleController.exportAll}" icon="ui-icon-arrowstop-1-s">
                                 <p:fileDownload value="#{zkbCourseScheduleController.exportFile}"/>
                             </p:commandButton>
                             <p:commandButton id="importButton" ajax="false"  rendered="#{zkbCourseScheduleController.hasEditRight}" title="课程导入" action="#{zkbCourseScheduleController.importAction}" icon="ui-icon-arrowstop-1-n">
                             </p:commandButton>
-                            <p:commandButton id="valid" icon="ui-icon-settings" rendered="#{zkbCourseScheduleController.hasEditRight}"  title="批量生效" update=":zkbCourseScheduleEditGroup :zkbCourseScheduleEditForm" onclick="PF('batchValidDialog').show()"/>
+                            <ui:fragment rendered="#{zkbCourseScheduleController.hasEditRight}">
+                                <p:commandButton id="batchValid" icon="ui-icon-settings" class="batch-terminated" title="批量生效" actionListener="#{zkbCourseScheduleController.batchValid}" update=":zkbCourseScheduleListForm" disabled="#{!zkbCourseScheduleController.checkSelectMap()}">
+                                    <p:confirm header="确定生效" message="确定选中课程生效" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </ui:fragment>
                         </f:facet>
                     </p:dataTable>
                 </h:form>
                 <ui:include src="Edit.xhtml"/>
-                <p:dialog id="batchValidDialog" widgetVar="batchValidDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="确认信息">
-                    <h:outputText value="确定选中课程生效"/>
-                    <br/>
-                    <h:form id="batchValidDialogForm" >
-                        <h:panelGroup>
-                            <h:panelGroup>
-                                <p:commandButton immediate="false"  actionListener="#{zkbCourseScheduleController.batchValid()}" value="#{msg.Confirm}" icon="ui-icon-check" oncomplete="handleSubmit(args, 'batchValidDialog');"/>
-                                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('batchValidDialog').hide()"/>
-                            </h:panelGroup>
-                        </h:panelGroup>
-                    </h:form>
-                </p:dialog>
             </div>
         </div>
 
