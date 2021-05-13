@@ -187,6 +187,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
         sharedAssetConfigDao = WebUtil.getBean(SharedAssetConfigRepository.class);
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
+        sharedAssetRequestService = WebUtil.getServiceBean(SharedAssetRequestService.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
         String encodeStr = request.getParameter("str");
