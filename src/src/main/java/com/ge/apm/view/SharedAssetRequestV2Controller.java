@@ -22,6 +22,7 @@ import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -1344,7 +1345,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             return;
         }
     }
-    
+
+    @Transactional(rollbackFor = Exception.class)
     public void deliver() throws Exception {
 
         String uid = selected.getId();
