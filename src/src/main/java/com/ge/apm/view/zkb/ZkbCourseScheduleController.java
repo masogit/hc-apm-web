@@ -357,7 +357,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
             WebUtil.addErrorMessage("File can not be read!");
             java.util.logging.Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception e) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError"));
             java.util.logging.Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, e);
         } finally {
             if (doc != null) {
