@@ -23,4 +23,11 @@ public interface ZkbCourseTrainRepository extends GenericRepositoryUUID<ZkbCours
 
     List<ZkbCourseTrain> findByCourseScheduleIdAndParticipateStatus(String courseScheduleId,String participateStatus);
 
+    /**
+     * 根据课程计划主键查询列表
+     * @param courseScheduleId 课程计划主键
+     * @return
+     */
+    List<ZkbCourseTrain> findByCourseScheduleId(String courseScheduleId);
+
 }
