@@ -858,6 +858,9 @@
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending')}">
                             <label class="label">关单审批时间*</label>
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.closedDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                            <p:commandLink immediate="false" process="@this" update="growl zkbPartOrderReturnModifyDlg" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'Complete' and zkbPartOrderAuditController.choseAdmin}">
+                                <h:outputText value="归还数据修改" />
+                            </p:commandLink>
                         </h:panelGroup>
                         <h:panelGroup  rendered="#{zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
                             <label class="label">是否已上传探头说明函</label>
@@ -885,9 +888,6 @@
                             <label class="label">关单备注</label>
                             <p:inputTextarea id="closedRemark" value="#{zkbPartOrderAuditController.selected.closedRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag)}">
                             </p:inputTextarea>
-                            <p:commandLink immediate="false" process="@this" update="growl zkbPartOrderReturnModifyDlg" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'Complete' and zkbPartOrderAuditController.choseAdmin}">
-                                <h:outputText value="归还数据修改" />
-                            </p:commandLink>
                         </h:panelGroup>
 
                     </p:panelGrid>
