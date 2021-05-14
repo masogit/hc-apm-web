@@ -140,8 +140,8 @@
                             <p:commandButton id="importButton" ajax="false"  rendered="#{zkbCourseScheduleController.hasEditRight}" title="课程导入" action="#{zkbCourseScheduleController.importAction}" icon="ui-icon-arrowstop-1-n">
                             </p:commandButton>
                             <ui:fragment rendered="#{zkbCourseScheduleController.hasEditRight}">
-                                <p:commandButton  id="batchValid" icon="ui-icon-settings" class="batch-terminated" title="批量生效" actionListener="#{zkbCourseScheduleController.batchValid}" update=":zkbCourseScheduleListForm" disabled="#{!zkbCourseScheduleController.checkSelectMap()}">
-                                    <p:confirm header="确定生效" message="确定选中课程生效" icon="ui-icon-warning"/>
+                                <p:commandButton  id="batchValid" icon="ui-icon-settings" class="batch-terminated" title="批量生效" actionListener="#{zkbCourseScheduleController.batchValid}" update=":zkbCourseScheduleListForm"  disabled="#{!zkbCourseScheduleController.checkSelectMap()}">
+                                    <p:confirm header="确定生效" message="点击确定后，选中的课程将会被生效" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </ui:fragment>
                         </f:facet>
