@@ -48,7 +48,7 @@ public class ZkbContractCourseScheduleProvider {
         sb.append("SELECT zccs.*,zct.created_date from zkb_course_train_detail zctd " +
                 "INNER JOIN zkb_course_train zct on zctd.train_id = zct.id " +
                 "INNER JOIN zkb_contract_course_schedule zccs on zct.course_schedule_id=zccs.id " +
-                "where zct.participate_status = 'Y' and zctd.eid = '"+eid+"'");
+                "where zct.participate_status = 'Y' and current_status='AuditAccepted' and current_date>=zccs.train_end_date and zctd.eid = '"+eid+"'");
         return sb.toString();
     }
 

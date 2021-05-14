@@ -41,6 +41,20 @@
                                     required="true" requiredMessage="#{msg.zkbContractCourseSchedule_endDate} #{msg.ValidationRequire}"
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbContractCourseSchedule_trainStartDate}*</label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd"  value="#{zkbCourseScheduleController.selected.trainStartDate}"
+                                    required="true" requiredMessage="#{msg.zkbContractCourseSchedule_trainStartDate} #{msg.ValidationRequire}"
+                                    showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zkbContractCourseSchedule_trainEndDate}*</label>
+                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale="#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd"  value="#{zkbCourseScheduleController.selected.trainEndDate}"
+                                    required="true" requiredMessage="#{msg.zkbContractCourseSchedule_trainEndDate} #{msg.ValidationRequire}"
+                                    showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">#{msg.zkbContractCourseSchedule_trainingDays}*</label>
                         <p:inputNumber  maxValue="100" minValue="0" decimalPlaces="0" value="#{zkbCourseScheduleController.selected.trainingDays}" required="true" requiredMessage="#{msg.zkbContractCourseSchedule_trainingDays} #{msg.ValidationRequire}">

@@ -137,6 +137,23 @@ public class ZkbContractCourseSchedule implements Serializable {
 
     @Column(name = "valid_date")
     private Date validDate;
+    /**
+     * 删除标识
+     */
+    @Transient
+    private String deleteFlag;
+
+    /**
+     * 培训开始时间
+     */
+    @Column(name = "train_start_date")
+    private Date trainStartDate;
+
+    /**
+     * 培训结束时间
+     */
+    @Column(name = "train_end_date")
+    private Date trainEndDate;
 
     @Override
     public int hashCode() {
@@ -348,5 +365,29 @@ public class ZkbContractCourseSchedule implements Serializable {
 
     public void setValidDate(Date validDate) {
         this.validDate = validDate;
+    }
+
+    public String getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(String deleteFlag) {
+        this.deleteFlag = deleteFlag;
+    }
+
+    public Date getTrainStartDate() {
+        return trainStartDate;
+    }
+
+    public void setTrainStartDate(Date trainStartDate) {
+        this.trainStartDate = trainStartDate;
+    }
+
+    public Date getTrainEndDate() {
+        return trainEndDate;
+    }
+
+    public void setTrainEndDate(Date trainEndDate) {
+        this.trainEndDate = trainEndDate;
     }
 }
