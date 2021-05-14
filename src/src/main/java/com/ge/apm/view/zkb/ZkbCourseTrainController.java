@@ -36,6 +36,7 @@ public class ZkbCourseTrainController extends GenericCRUDUUIDController<ZkbCours
     private String selectionTenantInfo;
     private ZkbCourseTrainService zkbCourseTrainService;
     private boolean showBtn = false;
+    private UserContextService userContextService;
 
 
     @Override
@@ -43,7 +44,11 @@ public class ZkbCourseTrainController extends GenericCRUDUUIDController<ZkbCours
         super.init();
         zkbCourseTrainRepository =  WebUtil.getBean(ZkbCourseTrainRepository.class);
         zkbCourseTrainService =  WebUtil.getBean(ZkbCourseTrainService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        if(userContextService.isZkbUser()) {
+            this.selectionTenantInfo = currentUser.getTenantUID();
+        }
         tenantInfoList = zkbCourseTrainService.getSourceTenantInfoList();
         initBtn();
     }
