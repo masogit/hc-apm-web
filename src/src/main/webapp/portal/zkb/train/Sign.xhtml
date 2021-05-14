@@ -97,7 +97,7 @@
                             </h:panelGroup>
                         </p:panelGrid>
                         <br/>
-                        <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbCourseTrainSignController.noJoinNext}" oncomplete="PF('zkbCancelReasonDlg').hide()" update=":growl" icon="ui-icon-check" />
+                        <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbCourseTrainSignController.noJoinNext}" oncomplete="PF('zkbCancelReasonDlg').hide()" update=":growl :zkbSignListForm" icon="ui-icon-check" />
                         <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbCancelReasonDlg').hide()"/>
                     </h:form>
 
