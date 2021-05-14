@@ -4162,3 +4162,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbCourseTrainParticipateStatus','Y','参加','Y',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbCourseTrainParticipateStatus','N','不参加','N',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('engineerModalityType','X-Ray','X-Ray','',NULL,-1);
+
+-- 2021.04.26 保养完成签名
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SignatureRequiredForPMWorkComplete', '保养完成是否需要签名', 'Signature required for work complete', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'pendingAcceptance', '待验收', 'Waiting for Acceptance', NULL, '-1');

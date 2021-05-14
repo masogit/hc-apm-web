@@ -177,6 +177,14 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "pm_is_support_batch_finish")
     private Boolean pmIsSupportBatchFinish = true;// 保养是否支持批量完成，默认支持
 
+    @Column(name = "auto_ack_maintenance")
+    private Boolean autoAckMaintenance; //工单完工不需要验收?
+
+    @Column(name="pm_ack_need_sign")
+    private Boolean pmAckNeedSign; //保养验收是否需要签名
+
+    @Column(name="pm_wc_need_sign")
+    private Boolean pmWcNeedSign; //保养完成是否需要签名
 
     /***
      * for measure
@@ -1130,6 +1138,34 @@ public class WorkflowConfig implements Serializable {
 
     public void setEnableUpdateSwitchingTime(Boolean enableUpdateSwitchingTime) {
         this.enableUpdateSwitchingTime = enableUpdateSwitchingTime;
+    }
+
+    /**
+     * 工单完工不需要验收? 默认 *打勾*
+     * @return
+     */
+    public Boolean getAutoAckMaintenance() {
+        return null == autoAckMaintenance ? true : autoAckMaintenance;
+    }
+
+    public void setAutoAckMaintenance(Boolean autoAckMaintenance) {
+        this.autoAckMaintenance = autoAckMaintenance;
+    }
+
+    public Boolean getPmAckNeedSign() {
+        return pmAckNeedSign;
+    }
+
+    public void setPmAckNeedSign(Boolean pmAckNeedSign) {
+        this.pmAckNeedSign = pmAckNeedSign;
+    }
+
+    public Boolean getPmWcNeedSign() {
+        return pmWcNeedSign;
+    }
+
+    public void setPmWcNeedSign(Boolean pmWcNeedSign) {
+        this.pmWcNeedSign = pmWcNeedSign;
     }
 
     @Override

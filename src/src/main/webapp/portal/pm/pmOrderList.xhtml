@@ -22,6 +22,7 @@
                 <p:commandButton value="#{msg.OrderToCompete}"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=31" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{ userContextService.hasRole('AssetStaff') and !userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}"  />
 
                 <p:commandButton value="#{msg.Planned}"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=0" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasRole('AssetStaff') and !userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}"  />
+                <p:commandButton value="#{msg.pendingAcceptance}" process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=11" disabled="#{v2PmOrderController.queryIndex==11}" rendered="#{userContextService.hasRole('ClinicalStaff')  or userContextService.hasRole('DeptHead')}"  />
                 <p:commandButton value="#{msg.ToBeApproved}"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=8" disabled="#{v2PmOrderController.queryIndex==8}" rendered="#{(userContextService.hasRole('DeptHead') or userContextService.hasRole('ClinicalStaff') or userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetHead') or userContextService.hasRole('Guest')) and !userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}"/>
                 <p:commandButton value="#{msg.Finished}"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=7" disabled="#{v2PmOrderController.queryIndex==7}"  rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff'))and !userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}"  />
                 <p:commandButton value="#{msg.Canceled}"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=20" disabled="#{v2PmOrderController.queryIndex==20}"  rendered="#{(userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')) and !userContextService.isYunNanFuWai(userContextService.getTenantInfo().getName())}"  />
@@ -234,6 +235,12 @@
                     <p:commandButton value="#{msg.Close}" class="closeButton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:pmOrderListForm @(.closePmDialogClass)" oncomplete="PF('closePmDialog').show()" />
                 </p:column>
 
+                <!--待验收 11-->
+                <p:column headerText="#{msg.Operation}"  style="width: 100px" rendered="#{v2PmOrderController.queryIndex==11}" exportable="false">
+                    <p:commandButton  class="planedCompleteButton" value="验收"  disabled="#{v2PmOrderController.isChecked()}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:ackDialogForm" oncomplete="PF('ackDialog').show()"/>
+                    <p:commandButton value="#{msg.Cancel}" update="pmTab:pmCancelForm" disabled="#{!userContextService.hasRole('AssetHead')}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
+                </p:column>
+
                 <f:facet name="{Toolbar}" >
                     <p:commandButton title="#{msg.exportToXLS}" class="exportExcelBtn" icon="ui-icon-arrowstop-1-s" actionListener="#{v2PmOrderController.exportExcel}" disabled="#{v2PmOrderController.exportButtonShow()}" onclick="PrimeFaces.monitorDownload(start, stop);">
 
@@ -355,7 +362,7 @@
         </h:panelGroup>
     </p:dialog >
     <!--批量完成2级保养工单对话框-->
-    <p:dialog class ="pmCompleteDialogBatch" id="pmCompleteDialogBatch" widgetVar="pmCompleteDialogBatch" modal="true" height="100" width="500"  resizable="false" draggable="true" appendTo="@this" header="#{msg.BatchComplete}">
+    <p:dialog class ="pmCompleteDialogBatch" id="pmCompleteDialogBatch" widgetVar="pmCompleteDialogBatch" modal="true" height="180" width="500"  resizable="false" draggable="true" appendTo="@this" header="#{msg.BatchComplete}">
         <h:form id="pmCompleteDialogFormBatch" class="pmCompleteDialogFormclsBatch" >
             <h:panelGroup  id="display6" style="height:500px">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -366,6 +373,14 @@
                     <h:panelGroup>
                         <label class="label">#{msg.TotalManhours}*</label>
                         <p:inputText value="#{v2PmOrderController.totalManHours}" required="true"  requiredMessage="#{msg.TotalManhoursHours}#{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">验收人*</label>
+                        <p:selectOneMenu  value="#{v2PmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.AcknowledgedBy} #{msg.ValidationRequire}">
+                            <f:selectItems value="#{pmOrderGlobalController.getAckerListForBatchComplete()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                        </p:selectOneMenu>
                     </h:panelGroup>
                 </p:panelGrid>
                 <h:panelGroup>
@@ -709,6 +724,36 @@ function test(){
                 }
                 //]]>
             </script>
+    </p:dialog>
+
+    <!--验收ack-->
+    <p:dialog id="ackDialog" widgetVar="ackDialog" class="addClass11" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Acknowledge}">
+        <h:form id="ackDialogForm" >
+            <!--批量-->
+            <h:panelGroup id="display11" rendered="#{v2PmOrderController.isChecked() eq true}">
+                <p:panelGrid  columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup >
+                        <label class="label">#{msg.comments}</label>
+                        <p:inputTextarea value="#{v2PmOrderController.remarks}" maxlength="256"  required="true" requiredMessage="#{msg.comments}#{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </h:panelGroup>
+
+            <!--非批量-->
+            <h:panelGroup id="display12" rendered="#{not empty v2PmOrderController.selectedPmOrder and  v2PmOrderController.isChecked() eq false}">
+                <p:panelGrid  columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup >
+                        <label class="label">#{msg.comments}</label>
+                        <p:inputTextarea value="#{v2PmOrderController.remarks}" maxlength="256"  required="true" requiredMessage="#{msg.comments}#{msg.ValidationRequire}"/>
+                    </h:panelGroup> <!---v2PmOrderController.selectedPmOrder.remarks-->
+                </p:panelGrid>
+            </h:panelGroup>
+            <h:panelGroup>
+                <p:commandButton validateClient="true" value="#{msg.AckPass}" icon="ui-icon-check" actionListener="#{v2PmOrderController.invokeAcceptance(true)}" oncomplete="handleSubmit(args, 'ackDialog');" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist @(.this)"/>   <!--actionListener="#{workOrderMgrController.ackWorkOrder()}"   update="woTab:woMgrListForm ackDialogForm :growl" -->
+                <p:commandButton validateClient="true" value="#{msg.AckNoPass}" actionListener="#{v2PmOrderController.invokeAcceptance(false)}" oncomplete="handleSubmit(args, 'ackDialog');" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist @(.this)"/>  <!-- actionListener="#{workOrderMgrController.rejectWorkOrder()}" update="woTab:woMgrListForm ackDialogForm :growl" -->
+                <p:commandButton immediate="true" value="#{msg.Cancel}"  icon="ui-icon-cancel" onclick="PF('ackDialog').hide()"/>   <!---actionListener="#{workOrderMgrController.cancel()}" -->
+            </h:panelGroup>
+        </h:form>
     </p:dialog>
 
     <!-- </ui:define>-->
