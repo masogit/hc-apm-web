@@ -269,14 +269,41 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
      */
     @Override
     public void delete() {
-        String id = this.selected.getId();
-        List<ZkbCourseTrain> zkbCourseTrainList = this.zkbCourseTrainRepository.findByCourseScheduleId(id);
-        if(CollectionUtils.isNotEmpty(zkbCourseTrainList))
+        if(this.selectedMap==null||this.selectedMap.isEmpty())
+            return;
+        List<String> ids = new ArrayList<>();
+        for (String key : selectedMap.keySet()) {
+            if(!this.selectedMap.get(key))
+                continue;
+            ids.add(key);
+        }
+        if(CollectionUtils.isEmpty(ids))
         {
-            WebUtil.addErrorMessage("该课程已有用户报名，不能删除");
+            WebUtil.addErrorMessage("请选中需要删除的数据");
             return;
         }
-        super.delete();
+        StringBuffer cnName = new StringBuffer();
+        boolean canNotDelete = true;
+        for(String id:ids)
+        {
+            List<ZkbCourseTrain> zkbCourseTrainList = this.zkbCourseTrainRepository.findByCourseScheduleId(id);
+            if(CollectionUtils.isNotEmpty(zkbCourseTrainList))
+            {
+                ZkbContractCourseSchedule zbContractCourseSchedule = this.zkbCourseScheduleRepository.findById(id);
+                cnName=cnName.append("《").append(zbContractCourseSchedule.getCname()).append("》,");
+                canNotDelete=false;
+            }
+        }
+        if(!canNotDelete)
+        {
+            cnName.deleteCharAt(cnName.length()-1);
+            WebUtil.addErrorMessage(cnName.toString()+"已有用户报名，不能删除");
+            return;
+        }
+        for(String id:ids)
+        {
+            this.zkbCourseScheduleRepository.delete(id);
+        }
         this.cancel();
     }
 
@@ -314,7 +341,12 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         }
         if(this.selected.getStartDate().compareTo(this.selected.getEndDate())>0)
         {
-            WebUtil.addErrorMessage("开始时间不能大于结束时间");
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbContractCourseSchedule_startDate")+"不能大于"+WebUtil.getMessage("zkbContractCourseSchedule_endDate"));
+            return;
+        }
+        if(this.selected.getTrainStartDate().compareTo(this.selected.getTrainEndDate())>0)
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbContractCourseSchedule_trainStartDate")+"不能大于"+WebUtil.getMessage("zkbContractCourseSchedule_trainEndDate"));
             return;
         }
         if(StringUtils.isNotBlank(this.selected.getValid())&&t.equals(this.selected.getValid()))

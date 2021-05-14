@@ -70,7 +70,7 @@
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                    <p:ajax listener="#{zkbCourseScheduleController.onSelectAllOfPage}" update="@(.selectCheckBox) :zkbCourseScheduleListForm:datalist:batchValid" oncomplete="updateSelectAllCheckBox();"/>
+                                    <p:ajax listener="#{zkbCourseScheduleController.onSelectAllOfPage}" update="@(.selectCheckBox) :zkbCourseScheduleListForm:datalist:batchValid :zkbCourseScheduleListForm:datalist:deleteButton" oncomplete="updateSelectAllCheckBox();"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
@@ -93,6 +93,16 @@
                         </p:column>
                         <p:column headerText="#{msg.zkbContractCourseSchedule_endDate}">
                             <h:outputText value="#{item.endDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_trainStartDate}">
+                            <h:outputText value="#{item.trainStartDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_trainEndDate}">
+                            <h:outputText value="#{item.trainEndDate}">
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
                             </h:outputText>
                         </p:column>
@@ -123,14 +133,14 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" rendered="#{zkbCourseScheduleController.hasEditRight}"  title="#{msg.Create}" update=":zkbCourseScheduleEditGroup :zkbCourseScheduleEditForm" action="#{zkbCourseScheduleController.prepareCreate}" />
                             <p:commandButton id="editButton" icon="ui-icon-pencil" rendered="#{zkbCourseScheduleController.hasEditRight}" title="#{msg.Edit}" update=":zkbCourseScheduleEditGroup :zkbCourseScheduleEditForm" action="#{zkbCourseScheduleController.prepareEdit}" disabled="#{empty zkbCourseScheduleController.selected.id}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-close"  rendered="#{zkbCourseScheduleController.hasEditRight}"  title="#{msg.Delete}" update=":zkbCourseScheduleListForm" actionListener="#{zkbCourseScheduleController.delete}"  disabled="#{(empty zkbCourseScheduleController.selected.id)}" />
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="batch-terminated"  rendered="#{zkbCourseScheduleController.hasEditRight}"  title="#{msg.Delete}" update=":zkbCourseScheduleListForm" actionListener="#{zkbCourseScheduleController.delete}"  disabled="#{!zkbCourseScheduleController.checkSelectMap()}" />
                             <p:commandButton id="exportButton" ajax="false"  title="#{msg.exportToXLS}" actionListener="#{zkbCourseScheduleController.exportAll}" icon="ui-icon-arrowstop-1-s">
                                 <p:fileDownload value="#{zkbCourseScheduleController.exportFile}"/>
                             </p:commandButton>
                             <p:commandButton id="importButton" ajax="false"  rendered="#{zkbCourseScheduleController.hasEditRight}" title="课程导入" action="#{zkbCourseScheduleController.importAction}" icon="ui-icon-arrowstop-1-n">
                             </p:commandButton>
                             <ui:fragment rendered="#{zkbCourseScheduleController.hasEditRight}">
-                                <p:commandButton id="batchValid" icon="ui-icon-settings" class="batch-terminated" title="批量生效" actionListener="#{zkbCourseScheduleController.batchValid}" update=":zkbCourseScheduleListForm" disabled="#{!zkbCourseScheduleController.checkSelectMap()}">
+                                <p:commandButton  id="batchValid" icon="ui-icon-settings" class="batch-terminated" title="批量生效" actionListener="#{zkbCourseScheduleController.batchValid}" update=":zkbCourseScheduleListForm" disabled="#{!zkbCourseScheduleController.checkSelectMap()}">
                                     <p:confirm header="确定生效" message="确定选中课程生效" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </ui:fragment>
