@@ -79,6 +79,18 @@ public class ZkbCourseTrain implements Serializable {
     private Integer trainingDays;
 
     /**
+     * 培训开始时间
+     */
+    @Column(name = "train_start_date")
+    private Date trainStartDate;
+
+    /**
+     * 培训结束时间
+     */
+    @Column(name = "train_end_date")
+    private Date trainEndDate;
+
+    /**
      * 参加状态
      */
     @Column(name = "participate_status")
@@ -193,6 +205,22 @@ public class ZkbCourseTrain implements Serializable {
 
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
+
+    public Date getTrainStartDate() {
+        return trainStartDate;
+    }
+
+    public void setTrainStartDate(Date trainStartDate) {
+        this.trainStartDate = trainStartDate;
+    }
+
+    public Date getTrainEndDate() {
+        return trainEndDate;
+    }
+
+    public void setTrainEndDate(Date trainEndDate) {
+        this.trainEndDate = trainEndDate;
+    }
 
     public String getCreatedUid() {
         return createdUid;
