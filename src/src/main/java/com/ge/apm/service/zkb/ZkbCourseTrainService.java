@@ -103,6 +103,8 @@ public class ZkbCourseTrainService extends MicroServiceInvoker {
         t.setCourseId(s.getCid());
         t.setCourseName(s.getCname());
         t.setTrainingDays(s.getTrainingDays());
+        t.setTrainStartDate(s.getTrainStartDate());
+        t.setTrainEndDate(s.getTrainEndDate());
         t.setTrainType(s.getType());
         t.setSignDate(new Date());
         t.setBatchNo(s.getBatchNo());
