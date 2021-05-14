@@ -1,3 +1,5 @@
+-- 删除收藏表唯一约束
+ALTER TABLE user_favorites DROP CONSTRAINT "uk_c0m37nir6vp9w1hdoffxtcpr";
 
 -- 医疗器械分类编码迁移
 with recursive cte_auth_group as (
