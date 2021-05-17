@@ -149,7 +149,7 @@
 <!--                <p:menuitem value="原厂培训申请" outcome="/portal/zkb/train/List.xhtml" rendered="#{userContextService.zkbAdmin}"/>-->
 <!--                <p:menuitem value="原厂培训报名" outcome="/portal/zkb/train/Sign.xhtml" rendered="#{!userContextService.zkbAdmin}"/>-->
             </p:submenu>
-            <p:submenu label="培训管理" icon="fa fa-briefcase" rendered="#{userContextService.editCourseScheduleAdmin or userContextService.zkbAdmin}">
+            <p:submenu label="培训管理" icon="fa fa-briefcase" rendered="#{userContextService.zkbUser or userContextService.zkbAdmin}">
                 <p:menuitem value="课程计划" outcome="/portal/zkb/courseSchedule/List.xhtml" rendered="#{userContextService.editCourseScheduleAdmin or userContextService.zkbAdmin}"/>
                 <p:menuitem value="原厂培训申请" outcome="/portal/zkb/train/List.xhtml" rendered="#{userContextService.zkbAdmin}"/>
                 <p:menuitem value="原厂培训报名" outcome="/portal/zkb/train/Sign.xhtml" rendered="#{!userContextService.zkbAdmin}"/>

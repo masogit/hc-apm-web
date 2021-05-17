@@ -137,6 +137,13 @@ public class ZkbContractCourseSchedule implements Serializable {
 
     @Column(name = "valid_date")
     private Date validDate;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_date")
+    private Date createDate;
+
     /**
      * 删除标识
      */
@@ -389,5 +396,13 @@ public class ZkbContractCourseSchedule implements Serializable {
 
     public void setTrainEndDate(Date trainEndDate) {
         this.trainEndDate = trainEndDate;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }
