@@ -9,6 +9,8 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -17,6 +19,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -225,12 +228,35 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
         return "List?faces-redirect=true";
     }
 
+
+
+    private StreamedContent exportFile;
+
+    public void downLoadTemplateName(String ty){
+        if("1".equals(ty)){
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/train/template_1.doc");
+            exportFile = new DefaultStreamedContent(stream, "application/vnd.ms-word", "公司培训学员推荐函.doc");
+        }else{
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/train/template_ehs.docx");
+            exportFile = new DefaultStreamedContent(stream, "application/vnd.ms-word", "智康宝工程师EHS告知函.docx");
+        }
+    }
+
     public String backList(){
         return "List?faces-redirect=true";
     }
     @Override
     protected GenericRepositoryUUID<ZkbCourseTrain> getDAO() {
         return zkbCourseTrainRepository;
+    }
+
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
     }
 
     public List<V2_BlobObject> getV2_blobObjectList() {

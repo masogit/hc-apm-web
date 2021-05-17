@@ -142,6 +142,29 @@
                         <p:fileUpload id="uploadFile" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|rar|zip|htm|html|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|RAR|ZIP|HTM|HTML)$/" fileUploadListener="#{zkbCourseTrainEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                       multiple="true"  sizeLimit="100000000"  update="uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" rendered="#{zkbCourseTrainEditController.selected.currentStep eq 'LetterPending'}"/>
                     </h:panelGroup>
+                    <h:panelGroup>
+                    <table style="width: 100%;padding:0px;margin: 0px;height: 100%;">
+                        <tr>
+                            <td style="text-align:left;">模板下载:</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;">
+                                1.
+                                <p:commandLink immediate="false" ajax="false" value="公司培训学员推荐函" process="@this" actionListener="#{zkbCourseTrainEditController.downLoadTemplateName('2')}">
+                                    <p:fileDownload value="#{zkbCourseTrainEditController.exportFile}"/>
+                                </p:commandLink>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;">
+                                2.
+                                <p:commandLink immediate="false" ajax="false" value="智康宝工程师EHS告知函" process="@this" actionListener="#{zkbCourseTrainEditController.downLoadTemplateName('2')}">
+                                    <p:fileDownload value="#{zkbCourseTrainEditController.exportFile}"/>
+                                </p:commandLink>
+                            </td>
+                        </tr>
+                    </table>
+                    </h:panelGroup>
                 </p:fieldset>
                 <p:fieldset legend="申请信息" rendered="#{zkbCourseTrainEditController.showApplyFlag}">
                     <p:dataTable id="onlineList" value="#{zkbCourseTrainEditController.zkbCourseTrainDetailList}" var="item"
