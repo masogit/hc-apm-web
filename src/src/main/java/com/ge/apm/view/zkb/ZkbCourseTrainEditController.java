@@ -139,9 +139,9 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             showAuditFlag = true;
         }else if(ZkbCourseTrain.FlowStatusEnum.AuditRejected.toString().equals(selected.getCurrentStatus())){
             showLetterFlag = true;
-            showApplyFlag = true;
             showAuditFlag = true;
             if(canEditFlag){
+                showApplyFlag = true;
                 showBtn = "0";
             }
         }
