@@ -249,6 +249,8 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
             return;
         idsStr = idsStr.substring(0,idsStr.length()-1);
         this.zkbFePartOrderService.sendMessage(idsStr, GatewayURL.CONTRACT_COURSE_SCHEDULE_MESSAGE);
+        WebUtil.addSuccessMessage("生效成功！");
+        this.selectedMap.clear();
     }
 
     public void sendTestMessage()
@@ -297,7 +299,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         if(!canNotDelete)
         {
             cnName.deleteCharAt(cnName.length()-1);
-            WebUtil.addErrorMessage(cnName.toString()+"已有用户报名，不能删除");
+            WebUtil.addErrorMessage(cnName.toString()+"已有用户提交报名记录，不能删除");
             return;
         }
         for(String id:ids)
@@ -333,7 +335,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     @Override
     public void save() {
         String id = this.selected.getId();
-        List<ZkbCourseTrain> zkbCourseTrainList = this.zkbCourseTrainRepository.findByCourseScheduleId(id);
+        List<ZkbCourseTrain> zkbCourseTrainList = this.zkbCourseTrainRepository.checkCourseTrain(id,ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
         if(CollectionUtils.isNotEmpty(zkbCourseTrainList))
         {
             WebUtil.addErrorMessage("该课程已有用户报名，不能修改");
