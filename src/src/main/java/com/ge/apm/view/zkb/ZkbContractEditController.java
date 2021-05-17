@@ -221,6 +221,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }
         if (!flag){
             WebUtil.addErrorMessage("课程已存在");
+            contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
             return;
         }
 
@@ -229,6 +230,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         double courseCountApply = zkbContractCourseSelected.getMainCourseCountApply() == null ? 0 : zkbContractCourseSelected.getMainCourseCountApply();
         double courseCountUse = zkbContractCourseSelected.getMainCourseCountUse() == null ? 0 : zkbContractCourseSelected.getMainCourseCountUse();
         if(courseCountTotal != (courseCount + courseCountApply + courseCountUse)){
+            contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
             WebUtil.addErrorMessage("课程总额不等于课程剩余名额、课程申请名额、课程已使用名额之和,");
             return;
         }
