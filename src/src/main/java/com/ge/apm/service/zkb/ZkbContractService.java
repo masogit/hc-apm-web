@@ -475,19 +475,20 @@ public class ZkbContractService {
      */
     @Transactional
     public List<ZkbContractCourse> saveContractCourse(ZkbContractCourse zkbContractCourse,List<ZkbContractCourse> contractCourseList,ZkbContract zkbContract,String actionDetailName,String reason,UserAccount currentUser){
-        contractCourseRepository.save(zkbContractCourse);
-        List<ZkbContractCourse> tempZkbContractCourseList = new ArrayList<>();
         contractCourseList.forEach((item) -> {
-            if(!item.getId().equals(zkbContractCourse.getId())){
-                tempZkbContractCourseList.add(item);
+            if(item.getId().equals(zkbContractCourse.getId())){
+                item=zkbContractCourse;
             }
         });
-        tempZkbContractCourseList.add(zkbContractCourse);
-
+        if(StringUtils.isBlank(zkbContractCourse.getId()))
+        {
+            contractCourseList.add(zkbContractCourse);
+        }
+        contractCourseRepository.save(zkbContractCourse);
         if("Edit".equals(actionDetailName)){
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"courseUpdate",zkbContractCourse.getZkbCourse().getCid(),"",reason,currentUser);
         }
-        return tempZkbContractCourseList;
+        return contractCourseList;
     }
 
     /**
