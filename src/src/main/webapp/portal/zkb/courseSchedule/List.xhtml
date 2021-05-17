@@ -57,7 +57,7 @@
                     <p:dataTable id="datalist" value="#{zkbCourseScheduleController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{zkbCourseScheduleController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"

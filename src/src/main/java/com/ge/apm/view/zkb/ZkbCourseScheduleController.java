@@ -224,7 +224,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
         this.selected.setValid(f);
-
+        this.selected.setCreateDate(new Date());
     }
 
     /**
@@ -306,6 +306,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
         {
             this.zkbCourseScheduleRepository.delete(id);
         }
+        WebUtil.addSuccessMessage("删除成功！");
         this.cancel();
     }
 
@@ -335,7 +336,11 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
     @Override
     public void save() {
         String id = this.selected.getId();
-        List<ZkbCourseTrain> zkbCourseTrainList = this.zkbCourseTrainRepository.checkCourseTrain(id,ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
+        List<ZkbCourseTrain> zkbCourseTrainList= null;
+        if(StringUtils.isNotBlank(id))
+        {
+            zkbCourseTrainList = this.zkbCourseTrainRepository.checkCourseTrain(id,ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
+        }
         if(CollectionUtils.isNotEmpty(zkbCourseTrainList))
         {
             WebUtil.addErrorMessage("该课程已有用户报名，不能修改");
@@ -405,7 +410,7 @@ public class ZkbCourseScheduleController extends GenericCRUDUUIDController<ZkbCo
      * 数据导出
      */
     public void exportAll(){
-        List<ZkbContractCourseSchedule> zkbContractCourseSchedule = zkbCourseScheduleRepository.find();
+        List<ZkbContractCourseSchedule> zkbContractCourseSchedule = zkbCourseScheduleRepository.fetchAllSortByCreateDate();
         List<Map<String, Object>> orderHistoryMapList = zkbCourseScheduleService.createExportCourseScheduleData(zkbContractCourseSchedule);
         try {
             String path = ZkbCourseScheduleService.COURSE_SCHEDULE_PATH+Export_EXCEL_NAME;

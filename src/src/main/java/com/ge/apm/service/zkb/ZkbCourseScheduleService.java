@@ -247,6 +247,17 @@ public class ZkbCourseScheduleService extends MicroServiceInvoker {
                     this.zkbCourseScheduleRepository.delete(item.getId());
                     continue;
                 }
+                if(StringUtils.isBlank(item.getId()))
+                {
+                    item.setCreateDate(new Date());
+                }
+
+                if(StringUtils.isNotBlank(item.getId()))
+                {
+                    ZkbContractCourseSchedule item1 = this.zkbCourseScheduleRepository.findById(item.getId());
+                    item.setCreateDate(item1.getCreateDate());
+                }
+
                 this.zkbCourseScheduleRepository.save(item);
             }
         }
@@ -355,7 +366,7 @@ public class ZkbCourseScheduleService extends MicroServiceInvoker {
 //            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_type")+errorMessage);
 //            isValidateData = false;
 //        }
-        if(!allZkbCourseMap.containsKey(zkbContractCourseScheduleVO.getCid()))
+        if(StringUtils.isNotBlank(zkbContractCourseScheduleVO.getCid())&&!allZkbCourseMap.containsKey(zkbContractCourseScheduleVO.getCid()))
         {
             item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_cid")+"不存在");
