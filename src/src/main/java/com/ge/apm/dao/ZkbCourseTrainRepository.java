@@ -30,4 +30,14 @@ public interface ZkbCourseTrainRepository extends GenericRepositoryUUID<ZkbCours
      */
     List<ZkbCourseTrain> findByCourseScheduleId(String courseScheduleId);
 
+
+    /**
+     * 检查是否点击参加
+     * @param courseScheduleId 课程计划ID
+     * @param participateStatus 参加状态
+     * @return
+     */
+    @Query(value = "SELECT * FROM zkb_course_train WHERE course_schedule_id = ?1 and participate_status = ?2  ", nativeQuery = true)
+    List<ZkbCourseTrain> checkCourseTrain(String courseScheduleId,String participateStatus);
+
 }

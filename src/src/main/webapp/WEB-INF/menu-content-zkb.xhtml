@@ -145,6 +145,11 @@
             <p:submenu label="合同管理 New" icon="fa fa-briefcase" rendered="#{userContextService.accessContains('zkbContract')}">
                 <p:menuitem value="合同管理 New" outcome="/portal/zkb/contract/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.contractMgt')}"/>
                 <p:menuitem value="课程管理 New" outcome="/portal/zkb/course/List.xhtml" rendered="#{userContextService.accessContains('zkbContract.courseMgt') and userContextService.zkbAdmin}"/>
+<!--                <p:menuitem value="课程计划" outcome="/portal/zkb/courseSchedule/List.xhtml" rendered="#{userContextService.editCourseScheduleAdmin or userContextService.zkbAdmin}"/>-->
+<!--                <p:menuitem value="原厂培训申请" outcome="/portal/zkb/train/List.xhtml" rendered="#{userContextService.zkbAdmin}"/>-->
+<!--                <p:menuitem value="原厂培训报名" outcome="/portal/zkb/train/Sign.xhtml" rendered="#{!userContextService.zkbAdmin}"/>-->
+            </p:submenu>
+            <p:submenu label="培训管理" icon="fa fa-briefcase" rendered="#{userContextService.editCourseScheduleAdmin or userContextService.zkbAdmin}">
                 <p:menuitem value="课程计划" outcome="/portal/zkb/courseSchedule/List.xhtml" rendered="#{userContextService.editCourseScheduleAdmin or userContextService.zkbAdmin}"/>
                 <p:menuitem value="原厂培训申请" outcome="/portal/zkb/train/List.xhtml" rendered="#{userContextService.zkbAdmin}"/>
                 <p:menuitem value="原厂培训报名" outcome="/portal/zkb/train/Sign.xhtml" rendered="#{!userContextService.zkbAdmin}"/>
