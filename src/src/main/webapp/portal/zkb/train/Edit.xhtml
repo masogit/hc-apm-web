@@ -107,6 +107,16 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
+                            <label class="label">培训开始日期*</label>
+                            <p:inputText id="trainStartDate" value="#{zkbCourseTrainEditController.selected.trainStartDate}" disabled="true" required="true" requiredMessage="培训开始日期 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">培训结束日期*</label>
+                            <p:inputText id="trainEndDate" value="#{zkbCourseTrainEditController.selected.trainEndDate}" disabled="true" required="true" requiredMessage="培训结束日期 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
                             <label class="label">主讲老师*</label>
                             <p:inputText id="instructor" value="#{zkbCourseTrainEditController.selected.instructor}" disabled="true" required="true" requiredMessage="主讲老师 #{msg.ValidationRequire}" />
                         </h:panelGroup>
