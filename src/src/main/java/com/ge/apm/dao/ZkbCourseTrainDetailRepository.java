@@ -10,4 +10,6 @@ public interface ZkbCourseTrainDetailRepository extends GenericRepositoryUUID<Zk
     List<ZkbCourseTrainDetail> findByTrainId(String trainId);
 
     ZkbCourseTrainDetail findFirstByTrainIdAndEid(String trainId,String eid);
+
+    void deleteByTrainId(String trainId);
 }
