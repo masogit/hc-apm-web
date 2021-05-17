@@ -350,11 +350,11 @@ public class ZkbCourseScheduleService extends MicroServiceInvoker {
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_type")+errorMessage);
             isValidateData = false;
         }
-        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getType())){
-            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_type")+errorMessage);
-            isValidateData = false;
-        }
+//        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getType())){
+//            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+//            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_type")+errorMessage);
+//            isValidateData = false;
+//        }
         if(!allZkbCourseMap.containsKey(zkbContractCourseScheduleVO.getCid()))
         {
             item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
@@ -372,11 +372,21 @@ public class ZkbCourseScheduleService extends MicroServiceInvoker {
                 AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_systemId")+"不正确");
                 isValidateData = false;
             }
-            List<ZkbCourseTrain> zkbCourseTrainList = this.zkbCourseTrainRepository.findByCourseScheduleId(zkbContractCourseScheduleVO.getId());
+            List<ZkbCourseTrain> zkbCourseTrainList = null;
+            String message = null;
+            if("是".equals(zkbContractCourseScheduleVO.getDeleteFlag()))
+            {
+                message="该课程已有用户提交报名记录，不能删除";
+                zkbCourseTrainList = this.zkbCourseTrainRepository.findByCourseScheduleId(zkbContractCourseScheduleVO.getId());
+            }else
+            {
+                message="该课程已有用户报名，不能修改";
+                zkbCourseTrainList = this.zkbCourseTrainRepository.checkCourseTrain(zkbContractCourseScheduleVO.getId(),ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
+            }
             if(CollectionUtils.isNotEmpty(zkbCourseTrainList))
             {
                 item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-                AssetInfoRow.addErrMessage(item, "该课程已有用户报名，不能修改");
+                AssetInfoRow.addErrMessage(item, message);
                 isValidateData = false;
             }
         }
