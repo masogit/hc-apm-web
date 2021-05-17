@@ -5,6 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,6 +160,7 @@ public class ZkbCourseTrainService extends MicroServiceInvoker {
             //返还预扣名额
             subQuotaSign(c,"return");
         }if(ZkbCourseTrain.FlowStepEnum.ApplyPending.toString().equals(oldStep)){
+            zkbCourseTrainDetailRepository.deleteByTrainId(c.getId());
             for(ZkbCourseTrainDetail d : zkbCourseTrainDetailList){
                 d.setTrainId(c.getId());
             }
