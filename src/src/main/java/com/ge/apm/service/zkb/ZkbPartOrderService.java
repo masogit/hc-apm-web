@@ -589,15 +589,24 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setManageAuditer(userAccount.getName());
             if(nextFlag){
                 ZkbContract c = zkbContractRepository.findById(zkbPartOrder.getContractId());
-                if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(zkbPartOrder.getZkbPartOrderCat().getValueType())){
+                if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+                    if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(zkbPartOrder.getZkbPartOrderCat().getValueType())){
+                        boolean r = checkApplyNumValid(zkbPartOrder,c);
+                        if(!r){
+                            zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
+                        }else{
+                            zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
+                        }
+                    }else{
+                        zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
+                    }
+                }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
                     boolean r = checkApplyNumValid(zkbPartOrder,c);
                     if(!r){
                         zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
                     }else{
                         zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
                     }
-                }else{
-                    zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.T);
                 }
 
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ManageAccept.toString());
