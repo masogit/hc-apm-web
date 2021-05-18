@@ -219,6 +219,10 @@ public class ArrivalList implements Serializable {
     @Column(name = "supplier_status", columnDefinition = "VARCHAR(60)")
     private String supplierStatus;
 
+    // 批文号（=合同表批文号）
+    @Column(name = "approval_no")
+    private String approvalNo;
+
     public String getId() {
         return id;
     }
@@ -565,6 +569,14 @@ public class ArrivalList implements Serializable {
 
     public String getSupplierStatus() {
         return supplierStatus;
+    }
+
+    public String getApprovalNo() {
+        return approvalNo;
+    }
+
+    public void setApprovalNo(String approvalNo) {
+        this.approvalNo = approvalNo;
     }
 
     public void setSupplierStatus(String supplierStatus) {

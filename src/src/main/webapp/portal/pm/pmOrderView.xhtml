@@ -29,9 +29,13 @@
                             <label class="label">#{msg.MaintenanceType}</label>
                             <p:outputLabel value="#{fieldMsg.fieldValue('pmType',v2PmOrderController.selected.pmType)}"></p:outputLabel>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{!userContextService.hasCurrentTenantName('') }">
                             <label class="label">#{msg.clinicalDeptName}</label>
                             <p:outputLabel value="#{v2PmOrderController.selected.assetInfo.clinicalDeptName}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{userContextService.hasCurrentTenantName('') }">
+                            <label class="label">#{msg.clinicalDeptName}</label>
+                            <p:outputLabel value="#{v2PmOrderController.getOrgInfoByUid(v2PmOrderController.selected.clinicalDeptId).name}"></p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.MaintenanceNumber}</label>
