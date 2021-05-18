@@ -255,6 +255,7 @@ public class ZkbCourseScheduleService extends MicroServiceInvoker {
                 if(StringUtils.isNotBlank(item.getId()))
                 {
                     ZkbContractCourseSchedule item1 = this.zkbCourseScheduleRepository.findById(item.getId());
+                    item.setValid(item1.getValid());
                     item.setCreateDate(item1.getCreateDate());
                 }
 
