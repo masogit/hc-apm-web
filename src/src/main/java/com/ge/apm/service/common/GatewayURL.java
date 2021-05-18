@@ -56,6 +56,8 @@ public enum GatewayURL {
     CREATE_MEASURE_ORDER_BY_BATCH("/hcapmworkflowservice/api/apm/measuringOrders/batch"),
     AUTO_GENERATE_FINANCING_NUM("/hcapmassetservice/api/apm/asset/assetinfos/finacing_num"),
     CANCEL_PM_ORDER("/hcapmworkflowservice/api/apm/pmOrders/{pmOrderId}/cancel"),
+    PM_GET_ACKER("/hcapmassetservice/api/apm/asset/pmorders/{pmOrderId}/acker"),
+    PM_GET_ACKER_FOR_BATCH_COMPLETE("/hcapmassetservice/api/apm/asset/pmorders/acker"),
 
     // MEASURE Order URL
     MEASURE_ORDER_ACTION("/hcapmworkflowservice/api/apm/measuringOrders/{orderId}/action"),

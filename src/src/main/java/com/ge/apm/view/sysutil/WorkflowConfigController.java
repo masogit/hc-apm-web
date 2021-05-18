@@ -460,6 +460,11 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		if (this.telRepEnd != null) {
 			selected.setTelReportEnd(new DateTime(telRepEnd).toString("HH:mm:ss"));
 		}
+
+		if(null == selected.getAutoAckMaintenance()){
+			selected.setAutoAckMaintenance(false);
+		}
+
 	}
 	
 	@Transactional

@@ -119,7 +119,7 @@
                 <p:tabView id="tab">
                     <p:tab title="#{msg.Create2}">
                         <h:form id="AssetInfoEditForm">
-                            <c:if test="#{assetInfoEditController.CRUDActionName.equals('新增')}">
+                            <c:if test="#{assetInfoEditController.CRUDActionName.equals('新增') or assetInfoEditController.CRUDActionName.equals('')}">
                                 <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
                                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                         <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >

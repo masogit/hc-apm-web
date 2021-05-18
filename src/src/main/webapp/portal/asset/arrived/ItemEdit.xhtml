@@ -70,7 +70,7 @@
                                 <label class="label">#{msg.creatorUID}</label>
                                 <h:outputText value="#{assetInstallationController.getUserAccountByUid(assetInstallationController.arrivalListItem.arrivalList.creatorUID).name}" />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                 <label class="label">#{msg.arrivalDate}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" />
                             </h:panelGroup>
@@ -83,7 +83,7 @@
                     </p:fieldset>
                     <p:fieldset  legend="#{msg.AssetArrivalListAssetInfo}" >
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                 <label class="label">设备国标码</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.nationalStandardCode}" />
                             </h:panelGroup>
@@ -112,13 +112,13 @@
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                 </h:outputText>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                 <label class="label">保修时长(年)</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.warrantyYear}" />
                             </h:panelGroup>
                             <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                 <label class="label">质保日期</label>
-                                <h:outputText value="#{assetArrivedListEditController.easyInstallItem.factoryWarrantyDate}" />
+                                <h:outputText value="#{assetInstallationController.arrivalListItem.factoryWarrantyDate}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.purchasePrice}</label>
@@ -126,7 +126,7 @@
                                     <f:convertNumber minIntegerDigits="0"  minFractionDigits="2" />
                                 </h:outputText>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                 <label class="label">#{msg.salvageValue}</label>
                                 <h:outputText  value="#{assetInstallationController.arrivalListItem.salvageValue}">
                                     <f:convertNumber minIntegerDigits="0"  minFractionDigits="2" />
@@ -152,7 +152,7 @@
                                 <label class="label">#{msg.measureGrade}</label>
                                 <h:outputText  value="#{fieldMsg.fieldValue('measureGrade', assetInstallationController.arrivalListItem.measureGrade)}"/>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                 <label class="label">#{msg.riskGrade}</label>
                                 <h:outputText  value="#{fieldMsg.fieldValue('riskGrade', assetInstallationController.arrivalListItem.riskGrade)}"/>
                             </h:panelGroup>
@@ -182,6 +182,10 @@
                                     <h:outputText  value="#{assetInstallationController.arrivalListItem.isChecked?msg.True2Yes:msg.False2No}"/>
                                 </h:panelGroup>
                             </c:if>
+                            <h:panelGroup rendered="#{userContextService.activeSupplier()}">
+                                <label class="label">入库单号</label>
+                                <p:inputText value="#{assetInstallationController.arrivalListItem.arrivalList.receiptNumber}" />
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -446,7 +450,7 @@
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
-                                <p:fileUpload id="typeasset" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                <p:fileUpload id="typeasset" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                               multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" oncomplete="updatePreviewImg()"/>
                             </h:panelGroup>
                             <h:panelGroup >
@@ -462,7 +466,7 @@
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
-                                <p:fileUpload id="typeasset2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                <p:fileUpload id="typeasset2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                               multiple="true"  sizeLimit="100000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                             </h:panelGroup>
                             <h:panelGroup >
@@ -478,13 +482,54 @@
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
-                                <p:fileUpload id="typeasset3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                <p:fileUpload id="typeasset3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                               multiple="true"  sizeLimit="100000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                             </h:panelGroup>
+                            <h:panelGroup rendered="#{userContextService.activeSupplier()}">
+                                <p:dataList id="accessoryList" value="#{assetInstallationController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <c:choose>
+                                        <c:when test="#{userContextService.activeSupplier()}">
+                                            <f:facet name="header">临床验收确认</f:facet>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                    <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                        <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                             src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;" />
+                                    </h:panelGroup>
+                                    <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="accessoryList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{fileitem.boType eq 'ArrivalList'}" oncomplete="updatePreviewImg()">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                              multiple="true"  sizeLimit="100000000"  update="accessoryList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                            <c:forEach items="#{assetInstallationController.getAttachmentCategories()}" var="attachmentConfig">
+                                <h:panelGroup >
+                                    <p:dataList id="#{attachmentConfig.boType.concat('List')}" value="#{assetInstallationController.getAttachList(attachmentConfig.boType)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                        <f:facet name="header">#{attachmentConfig.label}</f:facet>
+                                        <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                        <h:panelGroup rendered="#{userContextService.activeSupplier() and assetInstallationController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                            <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                 src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                 style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                        </h:panelGroup>
+                                        <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{fileitem.boType eq 'ArrivalList'}" oncomplete="updatePreviewImg()">
+                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                        </p:commandButton>
+                                    </p:dataList>
+                                    <p:fileUpload id="#{'type'.concat(attachmentConfig.boType)}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                                  multiple="true"  sizeLimit="100000000"  update="#{attachmentConfig.boType.concat('List')}" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                </h:panelGroup>
+                            </c:forEach>
                         </p:panelGrid>
                     </p:fieldset>
 
-                    <p:fieldset legend="#{msg.AssetArrivalListAckInfo}" rendered="#{assetInstallationController.arrivalListItem.arrivalList.processType eq 'Normal'}">
+                    <p:fieldset legend="#{msg.AssetArrivalListAckInfo}" rendered="#{assetInstallationController.arrivalListItem.arrivalList.processType eq 'Normal' and not userContextService.activeSupplier()}">
                         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup id="businessAck">
                                 <h:panelGroup>

@@ -427,22 +427,22 @@ public class AssetInstallationController {
                     message = message + "、" + WebUtil.getMessage(qrCodeStatus);
                 }
             }
-            if(arrivalListItem.getBusinessAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
+            //if(arrivalListItem.getBusinessAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
                 arrivalListItem.setBusinessAckStatus(arrivalListItem.ACK_STATUS_PASS);
                 arrivalListItem.setBusinessAckDate(new Date());
-            }
-            if(arrivalListItem.getTechnicalAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
+            //}
+//            if(arrivalListItem.getTechnicalAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
                 arrivalListItem.setTechnicalAckStatus(arrivalListItem.ACK_STATUS_PASS);
                 arrivalListItem.setTechnicalAckDate(new Date());
-            }
-            if(arrivalListItem.getClinicalAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
+//            }
+//            if(arrivalListItem.getClinicalAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
                 arrivalListItem.setClinicalAckStatus(arrivalListItem.ACK_STATUS_PASS);
                 arrivalListItem.setClinicalAckDate(new Date());
-            }
-            if(arrivalListItem.getFixassetAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
+//            }
+//            if(arrivalListItem.getFixassetAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
                 arrivalListItem.setFixassetAckStatus(arrivalListItem.ACK_STATUS_PASS);
                 arrivalListItem.setFixassetAckDate(new Date());
-            }
+//            }
 
             Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
             if (!isvalidDeptNum._1) {
@@ -506,7 +506,7 @@ public class AssetInstallationController {
             }
         }
         if(StringUtils.isEmpty(message)){
-            WebUtil.addSuccessMessage("提交成功");
+            WebUtil.addSuccessMessage("入库安装成功");
         }else{
             WebUtil.addErrorMessage(message);
         }
@@ -910,6 +910,7 @@ public class AssetInstallationController {
             WebUtil.addErrorMessage("所属科室不能为空");
             return;
         }
+//        saveItem();
         List<ArrivalListItem> itemList = itemDao.getArrivalListItem(contractNum,clinicalDeptUID,"new");
         if(itemList == null || itemList.isEmpty()){
             WebUtil.addErrorMessage("没有需要导出的验收报告");
