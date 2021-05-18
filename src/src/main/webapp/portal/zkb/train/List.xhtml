@@ -55,8 +55,15 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="培训天数" >
-                            <h:outputText value="#{item.trainingDays}"/>
+                        <p:column headerText="培训开始时间"  >
+                            <h:outputText value="#{item.trainStartDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="培训结束时间">
+                            <h:outputText value="#{item.trainEndDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="培训类型" >
                             <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',item.trainType)}"/>

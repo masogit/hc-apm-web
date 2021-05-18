@@ -47,8 +47,15 @@
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{msg.zkbContractCourseSchedule_trainingDays}">
-                            <h:outputText value="#{item.trainingDays}"/>
+                        <p:column headerText="培训开始日期">
+                            <h:outputText value="#{item.trainStartDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="培训结束日期">
+                            <h:outputText value="#{item.trainEndDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.zkbContractCourseSchedule_instructor}">
                             <h:outputText value="#{item.instructor}"/>
@@ -69,11 +76,9 @@
                         <p:column headerText="#{msg.zkbContractCourseSchedule_type}">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',item.type)}"/>
                         </p:column>
-                        <p:column headerText="参加人数">
-                            <p:inputText value="#{item.prePersonCount}" />
-                        </p:column>
 
-                        <p:column headerText="">
+
+                        <p:column headerText="操作" style="width: 120px;">
                             <!--<p:commandButton immediate="false" process="@this" value="参加" update=":growl :zkbSignListForm" icon="ui-icon-check" />
                             <p:commandButton immediate="false" process="@this" value="不参加" update=":growl :zkbSignListForm" icon="ui-icon-check" />-->
                             <p:commandLink validateClient="true" update=":growl :zkbSignListForm" action="#{zkbCourseTrainSignController.joinNext(item.id,item.zkbContractCourseId)}" >
