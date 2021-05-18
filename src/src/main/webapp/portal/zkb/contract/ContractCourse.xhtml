@@ -10,11 +10,15 @@
 
         <h:form id="zkbContractCourseEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                <h:panelGroup>
+                <h:panelGroup rendered="#{zkbContractEditController.actionDetailName eq 'Create'}">
                     <label class="label">课程*</label>
                     <p:autoComplete dropdown="true" value="#{zkbContractEditController.zkbContractCourseSelected.zkbCourse}"  scrollHeight="300" forceSelection="true" required="true"
                                     completeMethod="#{zkbContractEditController.autoCompleteCourse}" var="t" itemLabel="#{t.cname}" itemValue="#{t}" converter="zkbCourseConverter">
                     </p:autoComplete>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{zkbContractEditController.actionDetailName eq 'Edit'}">
+                    <label class="label">课程*</label>
+                    <p:inputText disabled="true" value="#{zkbContractEditController.zkbContractCourseSelected.zkbCourse.cname}" />
                 </h:panelGroup>
 
                 <h:panelGroup>
