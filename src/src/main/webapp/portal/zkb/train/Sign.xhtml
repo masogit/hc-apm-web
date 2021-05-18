@@ -20,7 +20,7 @@
                     <p:dataTable id="datalist" value="#{zkbCourseTrainSignController.zkbContractCourseSchedules}" var="item" widgetVar="varDataList"
                                  selectionMode="single"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -47,12 +47,12 @@
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="培训开始日期">
+                        <p:column headerText="开始培训日期">
                             <h:outputText value="#{item.trainStartDate}">
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="培训结束日期">
+                        <p:column headerText="结束培训日期">
                             <h:outputText value="#{item.trainEndDate}">
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
                             </h:outputText>
@@ -77,7 +77,9 @@
                             <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',item.type)}"/>
                         </p:column>
 
-
+                        <p:column headerText="参加人数">
+                            <p:inputText value="#{item.prePersonCount}" />
+                        </p:column>
                         <p:column headerText="操作" style="width: 120px;">
                             <!--<p:commandButton immediate="false" process="@this" value="参加" update=":growl :zkbSignListForm" icon="ui-icon-check" />
                             <p:commandButton immediate="false" process="@this" value="不参加" update=":growl :zkbSignListForm" icon="ui-icon-check" />-->
