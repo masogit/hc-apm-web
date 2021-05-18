@@ -173,8 +173,6 @@ public class ZkbCourseTrainService extends MicroServiceInvoker {
         }
         if(ZkbCourseTrain.FlowStatusEnum.ApplySubmit.toString().equals(c.getCurrentStatus())){
             sendEmail(c,UserContextService.getAccessToken());
-        }else if(ZkbCourseTrain.FlowStatusEnum.AuditAccepted.toString().equals(c.getCurrentStatus())){
-            sendWeChatMessages(c,UserContextService.getAccessToken());
         }
     }
 
@@ -217,7 +215,6 @@ public class ZkbCourseTrainService extends MicroServiceInvoker {
             //扣除名额
             subQuotaUse(c);
         }
-        sendWeChatMessages(c,UserContextService.getAccessToken());
     }
 
     @Transactional(rollbackFor = Exception.class)

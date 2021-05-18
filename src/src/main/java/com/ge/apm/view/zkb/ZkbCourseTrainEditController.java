@@ -202,12 +202,16 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
             }
         }else if(ZkbCourseTrain.FlowStepEnum.LetterPending.toString().equals(selected.getCurrentStep())){
             if(v2_blobObjectList ==null || v2_blobObjectList.size() == 0){
-                /*FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请上传确认函！", "");
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请上传确认函！", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
-                return "";*/
+                return "";
             }
         }
         zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList,currentUser);
+        ZkbCourseTrain c = zkbCourseTrainRepository.findById(selected.getId());
+        if(ZkbCourseTrain.FlowStatusEnum.AuditAccepted.toString().equals(c.getCurrentStatus())){
+            zkbCourseTrainService.sendWeChatMessages(c,UserContextService.getAccessToken());
+        }
         return "List?faces-redirect=true";
     }
 
@@ -225,6 +229,7 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
 
     public String rejectNext(){
         zkbCourseTrainService.rejectedNext(selected,currentUser);
+        zkbCourseTrainService.sendWeChatMessages(selected,UserContextService.getAccessToken());
         return "List?faces-redirect=true";
     }
 
