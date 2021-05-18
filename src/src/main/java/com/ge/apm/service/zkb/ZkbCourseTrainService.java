@@ -171,9 +171,6 @@ public class ZkbCourseTrainService extends MicroServiceInvoker {
             }
             blobObjectRepository.save(v2_blobObjects);
         }
-        if(ZkbCourseTrain.FlowStatusEnum.ApplySubmit.toString().equals(c.getCurrentStatus())){
-            sendEmail(c,UserContextService.getAccessToken());
-        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -350,7 +347,6 @@ public class ZkbCourseTrainService extends MicroServiceInvoker {
         }
     }
 
-    @Async
     public void sendEmail(ZkbCourseTrain t,String token){
         try {
             HashMap<String, String> emailWrapperMap = new HashMap<>();
