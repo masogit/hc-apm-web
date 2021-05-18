@@ -191,7 +191,7 @@
                     </p:selectOneRadio>
 
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                        <h:panelGroup >
+                        <h:panelGroup rendered="#{!pmOrderGlobalController.isAutoAck(v2PmOrderController.selectedPmOrder)}">
                             <label class="label">验收人*</label>
                             <p:selectOneMenu  value="#{v2PmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
                                 <f:selectItems value="#{pmOrderGlobalController.getAckerList(v2PmOrderController.selectedPmOrder.id)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>

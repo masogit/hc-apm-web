@@ -1,6 +1,7 @@
 package com.ge.apm.view.pm;
 
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.service.common.UserCommonService;
 import webapp.framework.web.WebUtil;
 
@@ -26,6 +27,10 @@ public class PmOrderGlobalController {
 
     public List<UserAccount> getAckerListForBatchComplete() {
         return userCommonService.getPmAckerListForBatchComplete();
+    }
+
+    public boolean isAutoAck(V2_PmOrder pmOrder) {
+        return null == pmOrder.getAutoAckMaintenance() ? true : pmOrder.getAutoAckMaintenance();
     }
 
 }
