@@ -173,6 +173,8 @@ public class ZkbCourseTrainService extends MicroServiceInvoker {
         }
         if(ZkbCourseTrain.FlowStatusEnum.ApplySubmit.toString().equals(c.getCurrentStatus())){
             sendEmail(c,UserContextService.getAccessToken());
+        }else if(ZkbCourseTrain.FlowStatusEnum.AuditAccepted.toString().equals(c.getCurrentStatus())){
+            sendWeChatMessages(c,UserContextService.getAccessToken());
         }
     }
 
@@ -338,7 +340,6 @@ public class ZkbCourseTrainService extends MicroServiceInvoker {
         return Boolean.FALSE;
     }
 
-    @Async
     public void sendWeChatMessages(ZkbCourseTrain t,String token){
         try {
             String url = getGatewayURL(GatewayURL.COURSE_TRAIN_SEND_WE_CHART).concat("?id=").concat(t.getId());
@@ -347,6 +348,7 @@ public class ZkbCourseTrainService extends MicroServiceInvoker {
             ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
             logger.info(t.getTrainNo()+" sendWeChatMessages "+response.toString());
         } catch (RestClientException e) {
+            logger.info(t.getTrainNo()+" sendWeChatMessages 异常 ");
             e.printStackTrace();
         }
     }
