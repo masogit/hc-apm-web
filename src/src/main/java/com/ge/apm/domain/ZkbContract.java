@@ -101,11 +101,10 @@ public class ZkbContract implements ChineseName, Serializable {
     private Integer spareQuotaUse = 0;
 
     /**
-     *探头剩余名额
+     *探头剩余名额 -- 任意名额
      */
     @Column(name = "probe_quota")
     private Integer probeQuota = 0;
-
     /**
      *探头名额
      */
@@ -123,6 +122,34 @@ public class ZkbContract implements ChineseName, Serializable {
      */
     @Column(name = "probe_quota_use")
     private Integer probeQuotaUse = 0;
+
+    @Column(name = "probe_quota_normal")
+    private Integer probeQuotaNormal = 0;
+    @Column(name = "probe_quota_normal_total")
+    private Integer probeQuotaNormalTotal = 0;
+    @Column(name = "probe_quota_normal_use")
+    private Integer probeQuotaNormalUse = 0;
+    @Column(name = "probe_quota_normal_apply")
+    private Integer probeQuotaNormalApply = 0;
+
+
+    @Column(name = "probe_quota_special")
+    private Integer probeQuotaSpecial = 0;
+    @Column(name = "probe_quota_special_total")
+    private Integer probeQuotaSpecialTotal = 0;
+    @Column(name = "probe_quota_special_use")
+    private Integer probeQuotaSpecialUse = 0;
+    @Column(name = "probe_quota_special_apply")
+    private Integer probeQuotaSpecialApply = 0;
+
+    @Column(name = "probe_quota_high")
+    private Integer probeQuotaHigh = 0;
+    @Column(name = "probe_quota_high_use")
+    private Integer probeQuotaHighUse = 0;
+    @Column(name = "probe_quota_high_apply")
+    private Integer probeQuotaHighApply = 0;
+    @Column(name = "probe_quota_high_total")
+    private Integer probeQuotaHighTotal = 0;
 
     /**
      *GE人工支持剩余次数
@@ -254,6 +281,102 @@ public class ZkbContract implements ChineseName, Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false,name = "contract_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     Set<ZkbContractAsset> zkbContractAssets = new HashSet<>();
+
+    public Integer getProbeQuotaHighUse() {
+        return probeQuotaHighUse;
+    }
+
+    public void setProbeQuotaHighUse(Integer probeQuotaHighUse) {
+        this.probeQuotaHighUse = probeQuotaHighUse;
+    }
+
+    public Integer getProbeQuotaHighApply() {
+        return probeQuotaHighApply;
+    }
+
+    public void setProbeQuotaHighApply(Integer probeQuotaHighApply) {
+        this.probeQuotaHighApply = probeQuotaHighApply;
+    }
+
+    public Integer getProbeQuotaNormalTotal() {
+        return probeQuotaNormalTotal;
+    }
+
+    public void setProbeQuotaNormalTotal(Integer probeQuotaNormalTotal) {
+        this.probeQuotaNormalTotal = probeQuotaNormalTotal;
+    }
+
+    public Integer getProbeQuotaNormalUse() {
+        return probeQuotaNormalUse;
+    }
+
+    public void setProbeQuotaNormalUse(Integer probeQuotaNormalUse) {
+        this.probeQuotaNormalUse = probeQuotaNormalUse;
+    }
+
+    public Integer getProbeQuotaNormalApply() {
+        return probeQuotaNormalApply;
+    }
+
+    public void setProbeQuotaNormalApply(Integer probeQuotaNormalApply) {
+        this.probeQuotaNormalApply = probeQuotaNormalApply;
+    }
+
+    public Integer getProbeQuotaSpecialTotal() {
+        return probeQuotaSpecialTotal;
+    }
+
+    public void setProbeQuotaSpecialTotal(Integer probeQuotaSpecialTotal) {
+        this.probeQuotaSpecialTotal = probeQuotaSpecialTotal;
+    }
+
+    public Integer getProbeQuotaSpecialUse() {
+        return probeQuotaSpecialUse;
+    }
+
+    public void setProbeQuotaSpecialUse(Integer probeQuotaSpecialUse) {
+        this.probeQuotaSpecialUse = probeQuotaSpecialUse;
+    }
+
+    public Integer getProbeQuotaSpecialApply() {
+        return probeQuotaSpecialApply;
+    }
+
+    public void setProbeQuotaSpecialApply(Integer probeQuotaSpecialApply) {
+        this.probeQuotaSpecialApply = probeQuotaSpecialApply;
+    }
+
+    public Integer getProbeQuotaHighTotal() {
+        return probeQuotaHighTotal;
+    }
+
+    public void setProbeQuotaHighTotal(Integer probeQuotaHighTotal) {
+        this.probeQuotaHighTotal = probeQuotaHighTotal;
+    }
+
+    public Integer getProbeQuotaNormal() {
+        return probeQuotaNormal;
+    }
+
+    public void setProbeQuotaNormal(Integer probeQuotaNormal) {
+        this.probeQuotaNormal = probeQuotaNormal;
+    }
+
+    public Integer getProbeQuotaSpecial() {
+        return probeQuotaSpecial;
+    }
+
+    public void setProbeQuotaSpecial(Integer probeQuotaSpecial) {
+        this.probeQuotaSpecial = probeQuotaSpecial;
+    }
+
+    public Integer getProbeQuotaHigh() {
+        return probeQuotaHigh;
+    }
+
+    public void setProbeQuotaHigh(Integer probeQuotaHigh) {
+        this.probeQuotaHigh = probeQuotaHigh;
+    }
 
     public Set<ZkbContractAsset> getZkbContractAssets() {
         return zkbContractAssets;

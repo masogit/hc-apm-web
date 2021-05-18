@@ -12,7 +12,6 @@ import javax.persistence.Entity;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.constant.WorkFlowConstant;
 import com.ge.apm.service.uaa.UaaService;
@@ -22,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -30,7 +30,6 @@ import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
@@ -55,7 +54,6 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	private List<UserInfo> userList;
 	private List<V2_DeviceType> deviceTypeList;
 	private OrgInfoRepository orgInfoRepository;
-	private AssetInfoRepository assetInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
@@ -83,7 +81,6 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		dao = WebUtil.getBean(WorkflowConfigRepository.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		uaaService = WebUtil.getBean(UaaService.class);
@@ -119,28 +116,8 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			}
 		}
 	}
+
 	public void saveNode() {
-		//先去除空格
-		attachmentCategory.setLabel(attachmentCategory.getLabel().replace(" ",""));
-		//校验名称不能为空格
-		if(StringUtils.isBlank(attachmentCategory.getLabel())){
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-			WebUtil.addErrorMessage("附件类型名称不能空格");
-			return;
-		}
-		//校验名称重复添加
-		if(attachmentCategories.stream().filter(it->it.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID && !it.getBoType().equals(attachmentCategory.getBoType()))
-				.anyMatch(it->attachmentCategory.getLabel().equals(it.getLabel()))){
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-			WebUtil.addErrorMessage("附件类型名称不能重复添加");
-			return;
-		};
-		//校验已经存在的名称
-		if(Arrays.asList("照片","用户手册","培训资料").contains(attachmentCategory.getLabel())){
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-			WebUtil.addErrorMessage("附件类型名称:'"+attachmentCategory.getLabel()+"'已经存在");
-			return;
-		}
 		//修改
 		if(attachmentCategory.getBoType()!=null){
 			Optional<WorkflowConfig.AttachmentCategory> first = attachmentCategories.stream().filter(item -> attachmentCategory.getBoType() == item.getBoType()).findFirst();
@@ -608,21 +585,16 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			return;
 		}
 
-		if(isCurrentEquipmentLoanedOut()) return;
 		setSwapCenter();
 
 		//自定义附件类型字段json保存
-		attachmentCategories = attachmentCategories.stream().filter(item -> item.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID).collect(Collectors.toList());
-		if(attachmentCategories.size() == 0){
-			selected.setCustomizedAssetAttachmentCategory(null);
-		}else{
-			selected.setCustomizedAssetAttachmentCategory(JSON.toJSONString(attachmentCategories));
-		}
+		selected.setCustomizedAssetAttachmentCategory
+				(JSON.toJSONString(attachmentCategories.stream().filter(item -> item.getId() != WorkFlowConstant.ATTACHMENY_CATEGORY_ID).collect(Collectors.toList())));
 
         onBeforeSave(selected);
 
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
-//        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+//        if(!userCommonSteantervice.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
 //            return;
 //        }
 
@@ -631,24 +603,6 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		selectedUserOrg = null; //orgInfoRepository.getByUid(user.getOrgInfoUID());
         selected = null;
     }
-
-	/**
-	 * 校验被替换的调剂中心时候有未归还设备
-	 * @return
-	 */
-	public boolean isCurrentEquipmentLoanedOut() {
-		if(selected.getId()==null) return false;
-		String oldSharedAssetCenter = dao.findById(selected.getId()).getDeptForSharedAsset();
-		String newSharedAssetCenter = selected.getDeptForSharedAsset();
-		if(oldSharedAssetCenter!=null && !oldSharedAssetCenter.equals(newSharedAssetCenter)) {
-			if(assetInfoRepository.findCountByClinicalDeptUID(oldSharedAssetCenter)>0) {
-				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-				WebUtil.addErrorMessage(WebUtil.getMessage("CurrentEquipmentIsLoanedOut"));
-				return true;
-			}
-		}
-		return false;
-	}
 
     public void setSwapCenter(){
 		Map<String,Object> swapCenterMap = Maps.newHashMap();
@@ -962,4 +916,5 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	public void setTelRepEnd(Date telRepEnd) {
 		this.telRepEnd = telRepEnd;
 	}
+
 }

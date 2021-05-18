@@ -50,9 +50,6 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select ai from AssetInfo ai where ai.uid in ?1 and ai.sharedAssetTypeUid is not null ")
     public List<AssetInfo> findBySharedAssetTypeUid(List<String> uids);
 
-    @Query(value="SELECT count(clinical_dept_uid) FROM asset_info WHERE clinical_dept_uid = ?1 AND clinical_dept_uid != asset_dept_uid",nativeQuery=true)
-    public Integer findCountByClinicalDeptUID(String  clinicalDeptUID);
-
     @Query("select o from AssetInfo o where o.financingNum = ?1 and o.siteUID=?2 and o.isValid=true and o.isDeleted=false and o.status!=4")
     public List<AssetInfo> findByFinancingNum(String financingNum,String siteUID);
 

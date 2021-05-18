@@ -1,0 +1,171 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.zkbContractCourseSchedule_name}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <p:fieldset legend="#{msg.FilterCondition}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbContractCourseSchedule_cname}</label>
+                                <p:inputText id="cname" value="#{zkbCourseScheduleController.cname}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbContractCourseSchedule_modality}</label>
+                                <p:inputText id="modality" value="#{zkbCourseScheduleController.modality}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbContractCourseSchedule_startDate}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="startDate" value="#{zkbCourseScheduleController.startDate}"
+                                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbContractCourseSchedule_endDate}</label>
+                                <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="endDate" value="#{zkbCourseScheduleController.endDate}"
+                                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.zkbContractCourseSchedule_valid}</label>
+                                <p:selectOneMenu id="contractType" value="#{zkbCourseScheduleController.valid}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <p:commandButton value="#{msg.SearchResult}" actionListener="#{zkbCourseScheduleController.cancel}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :zkbCourseScheduleListForm:datalist">
+                            </p:commandButton>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbCourseScheduleController.testPerson}">
+                            <p:commandButton value="手动发送短信，用于测试" actionListener="#{zkbCourseScheduleController.sendTestMessage}" icon="ui-icon-arrowthick-1-s">
+                            </p:commandButton>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </h:form>
+                <h:form id="zkbCourseScheduleListForm">
+                    <p:dataTable id="datalist" value="#{zkbCourseScheduleController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbCourseScheduleController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:ajax event="rowSelect" listener="#{zkbCourseScheduleController.prepareEdit}" update="editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{zkbCourseScheduleController.onFilter}" />
+                        <p:column   id="checkBoxColumn">
+                            <p:selectBooleanCheckbox value="#{zkbCourseScheduleController.selectedMap[item.id]}"  class="selectCheckBox">
+                                <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                            </p:selectBooleanCheckbox>
+                            <f:facet name="header"  >
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
+                                    <p:ajax listener="#{zkbCourseScheduleController.onSelectAllOfPage}" update="@(.selectCheckBox) :zkbCourseScheduleListForm:datalist:batchValid :zkbCourseScheduleListForm:datalist:deleteButton" oncomplete="updateSelectAllCheckBox();"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_batchNo}">
+                            <h:outputText value="#{item.batchNo}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_cid}">
+                            <h:outputText value="#{item.cid}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_cname}">
+                            <h:outputText value="#{item.cname}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_modality}">
+                            <h:outputText value="#{item.modality}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_startDate}">
+                            <h:outputText value="#{item.startDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_endDate}">
+                            <h:outputText value="#{item.endDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_trainStartDate}">
+                            <h:outputText value="#{item.trainStartDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_trainEndDate}">
+                            <h:outputText value="#{item.trainEndDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_trainingDays}">
+                            <h:outputText value="#{item.trainingDays}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_instructor}">
+                            <h:outputText value="#{item.instructor}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_audience}">
+                            <h:outputText value="#{item.audience}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_location}">
+                            <h:outputText value="#{item.location}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_studentClass}">
+                            <h:outputText value="#{item.studentClass}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_valid}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_yesOrNo',item.valid)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_deductCount}">
+                            <h:outputText value="#{item.deductCount}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_type}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',item.type)}"/>
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" rendered="#{zkbCourseScheduleController.hasEditRight}"  title="#{msg.Create}" update=":zkbCourseScheduleEditGroup :zkbCourseScheduleEditForm" action="#{zkbCourseScheduleController.prepareCreate}" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" rendered="#{zkbCourseScheduleController.hasEditRight}" title="#{msg.Edit}" update=":zkbCourseScheduleEditGroup :zkbCourseScheduleEditForm" action="#{zkbCourseScheduleController.prepareEdit}" disabled="#{empty zkbCourseScheduleController.selected.id}"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="batch-terminated"  rendered="#{zkbCourseScheduleController.hasEditRight}"  title="#{msg.Delete}" update=":zkbCourseScheduleListForm" actionListener="#{zkbCourseScheduleController.delete}"  disabled="#{!zkbCourseScheduleController.checkSelectMap()}" />
+                            <p:commandButton id="exportButton" ajax="false"  title="#{msg.exportToXLS}" actionListener="#{zkbCourseScheduleController.exportAll}" icon="ui-icon-arrowstop-1-s">
+                                <p:fileDownload value="#{zkbCourseScheduleController.exportFile}"/>
+                            </p:commandButton>
+                            <p:commandButton id="importButton" ajax="false"  rendered="#{zkbCourseScheduleController.hasEditRight}" title="课程导入" action="#{zkbCourseScheduleController.importAction}" icon="ui-icon-arrowstop-1-n">
+                            </p:commandButton>
+                            <ui:fragment rendered="#{zkbCourseScheduleController.hasEditRight}">
+                                <p:commandButton  id="batchValid" icon="ui-icon-settings" class="batch-terminated" title="批量生效" actionListener="#{zkbCourseScheduleController.batchValid}" update=":zkbCourseScheduleListForm"  disabled="#{!zkbCourseScheduleController.checkSelectMap()}">
+                                    <p:confirm header="确定生效" message="点击确定后，选中的课程将会被生效" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </ui:fragment>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+
+        <script>
+            function updateSelectAllCheckBox() {
+                var checkboxlist = $(".selectCheckBox");
+                var selectAllstatus = true;
+                checkboxlist.each(function () {
+                    selectAllstatus = selectAllstatus &amp;&amp; this.children[0].children[0].checked;
+                });
+                $("#zkbCourseScheduleListForm\\:datalist\\:selectCheckBoxHeader_input").attr('checked', selectAllstatus);
+                if (selectAllstatus) {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.add("ui-state-active");
+                } else {
+                    $(".selectCheckBoxHeader")[0].children[1].classList.remove("ui-state-active");
+                }
+            }
+        </script>
+
+    </ui:define>
+</ui:composition>

@@ -36,6 +36,10 @@
                             <h:outputText value="#{item.cname}"/>
                         </p:column>
 
+                       <p:column headerText="modality" filterBy="#{item.modality}" filterMatchMode="LIKE">
+                           <h:outputText value="#{item.modality}"/>
+                       </p:column>
+
                        <p:column headerText="课程描述" >
                            <h:outputText value="#{item.description}"/>
                        </p:column>

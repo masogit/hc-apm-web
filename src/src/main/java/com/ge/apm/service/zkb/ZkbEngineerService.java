@@ -1,17 +1,18 @@
 package com.ge.apm.service.zkb;
 
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.ZkbEngineerRepository;
 import com.ge.apm.dao.ZkbEngineerTrackRecordRepository;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.ZkbEngineer;
-import com.ge.apm.domain.ZkbEngineerTrackRecord;
+import com.ge.apm.dao.mapper.ZknContractCourseScheduleMapper;
+import com.ge.apm.domain.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.DateUtil;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,11 +24,20 @@ import java.util.List;
 public class ZkbEngineerService {
 
     @Autowired
+    BlobObjectRepository blobObjectRepository;
+
+    @Autowired
     private TenantInfoRepository tenantInfoDao;
     @Autowired
     private ZkbEngineerRepository zkbEngineerDao;
     @Autowired
     private ZkbEngineerTrackRecordRepository zkbEngineerTrackRecordDao;
+
+    @Autowired
+    private ZkbEngineerRepository zkbEngineerRepository;
+
+    @Autowired
+    private ZknContractCourseScheduleMapper zknContractCourseScheduleMapper;
 
     public List<TenantInfo> getSourceTenantInfoList(){
 
@@ -50,6 +60,16 @@ public class ZkbEngineerService {
 
         return zkbEngineerTrackRecordDao.findBySearchFilter(searchFilters);
 
+    }
+
+    /**
+     * 根据工程师ID获取培训记录
+     * @param eid 工程师主键
+     * @return
+     */
+    public List<ZkbContractCourseSchedule> getZkbEngineerTrainRecordList(String eid)
+    {
+        return this.zknContractCourseScheduleMapper.fetchByEid(eid);
     }
 
     @Transactional
@@ -87,6 +107,49 @@ public class ZkbEngineerService {
         });
 
         return tempZkbEngineerTrackRecordList;
+    }
+
+    /**
+     * 保存附件
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void saveUploadFile(List<V2_BlobObject> v2_blobObjects, String id){
+        if(CollectionUtils.isNotEmpty(v2_blobObjects)){
+            for (V2_BlobObject v : v2_blobObjects){
+                v.setBoUuid(id);
+                blobObjectRepository.save(v);
+            }
+        }
+    }
+
+    /**
+     * 移除附件
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void removeFile(List<V2_BlobObject> v2_blobObjects){
+        if(CollectionUtils.isNotEmpty(v2_blobObjects)){
+            for (V2_BlobObject v : v2_blobObjects){
+                blobObjectRepository.delete(v.getId());
+            }
+        }
+    }
+
+    /**
+     * 生成SSO索引
+     * @param zkbEngineer 当前工程师
+     * @return
+     */
+    public ZkbEngineer fullSso(ZkbEngineer zkbEngineer, String orderPrefix)
+    {
+        String yearStr = DateUtil.getFormatStrByDate(new Date(),"yyyy");
+        String endIndex = yearStr.substring(2);
+        Object o= zkbEngineerRepository.getMaxIndex(orderPrefix+endIndex+"%") ;
+        int index = o == null ? 0 : Integer.parseInt(o.toString());
+        index++;
+        String sso = orderPrefix+endIndex+String.format("%04d",index);
+        zkbEngineer.setSso(sso);
+        zkbEngineer.setSsoIndex(index);
+        return zkbEngineer;
     }
 
 }

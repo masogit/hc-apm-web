@@ -1,0 +1,471 @@
+package com.ge.apm.service.zkb;
+
+
+import com.ge.apm.dao.ZkbCourseRepository;
+import com.ge.apm.dao.ZkbCourseScheduleRepository;
+import com.ge.apm.dao.ZkbCourseTrainRepository;
+import com.ge.apm.domain.ZkbContractCourseSchedule;
+import com.ge.apm.domain.ZkbContractCourseScheduleVO;
+import com.ge.apm.domain.ZkbCourse;
+import com.ge.apm.domain.ZkbCourseTrain;
+import com.ge.apm.service.asset.AssetInfoRow;
+import com.ge.apm.service.asset.ZkbContractCourseScheduleRow;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.zkb.ZkbCourseScheduleController;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import webapp.framework.web.WebUtil;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
+
+/**
+ * 课程计划表service
+ */
+@Component
+public class ZkbCourseScheduleService extends MicroServiceInvoker {
+
+    private static final Logger logger = LoggerFactory.getLogger(ZkbOrderHistoryService.class);
+
+    @Autowired
+    private ZkbCourseScheduleRepository zkbCourseScheduleRepository;
+
+    @Autowired
+    protected RestTemplate template;
+
+    /**
+     * 根据excel文件 读取文件中的数据
+     * @param doc 文件
+     * @return
+     * @throws Exception
+     */
+
+    /**
+     * 模板数据起始行数
+     */
+    public static final int EXCEL_ORDER_HISTORY_DATA_ROW = 2;
+
+    /**
+     * excel sheet 名称
+     */
+    public static final String SHEET_SERVICE_COURSE_SCHEDULE = "课程计划";
+
+    /**
+     * 导入模板头部行数
+     */
+    public static final int EXCEL_COURSE_SCHEDULE_HEADER_ROW = 1;
+
+    /**
+     * 最大导入行数
+     */
+    public static final int EXCEL_COURSE_SCHEDULE_IMPORT_MAX_ROW = 10000;
+
+    /**
+     * 目录地址
+     */
+    public static final String COURSE_SCHEDULE_PATH="/portal/zkb/courseSchedule/";
+
+    @Autowired
+    private ZkbCourseRepository zkbCourseRepository;
+
+    public enum ImportStatus {
+        New, Exist, Created, Failure, CheckFail
+    }
+
+    @Autowired
+    private ZkbFePartOrderService zkbFePartOrderService;
+
+    /**
+     * 获取培训信息
+     */
+    @Autowired
+    private ZkbCourseTrainRepository zkbCourseTrainRepository;
+
+    public List<Map<String, Object>> getZkbCourseScheduleMapFromTemplate(ExcelDocument doc) throws Exception {
+
+        LocalDateTime startTime = LocalDateTime.now();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (int i = EXCEL_ORDER_HISTORY_DATA_ROW ; i <= doc.getWorkBook().getSheet(SHEET_SERVICE_COURSE_SCHEDULE).getLastRowNum() + 1 ; i++) {
+            Map< String, Object> rowMap = doc.getDataRowMap(SHEET_SERVICE_COURSE_SCHEDULE, EXCEL_COURSE_SCHEDULE_HEADER_ROW, i);
+            Map<String, Object> map = new LinkedHashMap();
+            ZkbContractCourseScheduleVO zkbContractCourseScheduleVO = new ZkbContractCourseScheduleVO();
+            zkbContractCourseScheduleVO.setLineNum(i);
+            ZkbContractCourseScheduleRow zkbContractCourseScheduleRow = new ZkbContractCourseScheduleRow(zkbContractCourseScheduleVO,rowMap);
+            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_systemId"), "setId");
+            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_cid"), "setCid");
+            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_cname"), "setCname");
+            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_modality"), "setModality");
+            zkbContractCourseScheduleRow.setFieldDateValue(WebUtil.getMessage("zkbContractCourseSchedule_startDate"),"setStartDate");
+            zkbContractCourseScheduleRow.setFieldDateValue(WebUtil.getMessage("zkbContractCourseSchedule_endDate"),"setEndDate");
+            zkbContractCourseScheduleRow.setFieldDateValue(WebUtil.getMessage("zkbContractCourseSchedule_trainStartDate"),"setTrainStartDate");
+            zkbContractCourseScheduleRow.setFieldDateValue(WebUtil.getMessage("zkbContractCourseSchedule_trainEndDate"),"setTrainEndDate");
+            zkbContractCourseScheduleRow.setFieldIntegerValue(WebUtil.getMessage("zkbContractCourseSchedule_trainingDays"), "setTrainingDays");
+            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_instructor"), "setInstructor");
+            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_audience"), "setAudience");
+            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_location"), "setLocation");
+            zkbContractCourseScheduleRow.setFieldIntegerValue(WebUtil.getMessage("zkbContractCourseSchedule_studentClass"), "setStudentClass");
+            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_batchNo"), "setBatchNo");
+            zkbContractCourseScheduleRow.setFieldDoubleValue(WebUtil.getMessage("zkbContractCourseSchedule_deductCount"), "setDeductCount");
+            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("zkbContractCourseSchedule_type"), "setType");
+            zkbContractCourseScheduleRow.setFieldStringValue(WebUtil.getMessage("Delete"), "setDeleteFlag");
+            if("是".equals(zkbContractCourseScheduleVO.getValid()))zkbContractCourseScheduleVO.setValid("t");
+            if("否".equals(zkbContractCourseScheduleVO.getValid()))zkbContractCourseScheduleVO.setValid("f");
+            if("ATC".equals(zkbContractCourseScheduleVO.getType()))zkbContractCourseScheduleVO.setType("offline");
+            if("Online".equals(zkbContractCourseScheduleVO.getType()))zkbContractCourseScheduleVO.setType("online");
+            if(zkbContractCourseScheduleVO.isNull()){
+                break;
+            }
+            map.put("zkbContractCourseScheduleVO", zkbContractCourseScheduleVO);
+            map.put("rowData", rowMap);
+            map.put("status", zkbContractCourseScheduleVO.getId()==null ? ZkbOrderHistoryService.ImportStatus.New.name() : ZkbOrderHistoryService.ImportStatus.Exist.name());
+            map.put("hashCode", zkbContractCourseScheduleVO.hashCode());
+            result.add(map);
+        }
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for getOrderHistoryMapFromTemplate: {} seconds", duration.getSeconds());
+        return result;
+    }
+
+    /**
+     * 导出
+     * @param zkbContractCourseScheduleList
+     * @return
+     */
+    public List<Map<String, Object>> createExportCourseScheduleData(List<ZkbContractCourseSchedule> zkbContractCourseScheduleList){
+        List<Map<String, Object>> zkbContractCourseScheduleMapList = new ArrayList<>();
+        if(CollectionUtils.isEmpty(zkbContractCourseScheduleList))
+        {
+            return zkbContractCourseScheduleMapList;
+        }
+        for (ZkbContractCourseSchedule zkbContractCourseSchedule : zkbContractCourseScheduleList) {
+            Map<String, Object> zkbContractCourseScheduleMap = new HashMap<>();
+            String valid = "";
+            if("t".equals(zkbContractCourseSchedule.getValid()))
+            {
+                valid="是";
+            }else if("f".equals(zkbContractCourseSchedule.getValid()))
+            {
+                valid="否";
+            }
+            String type = "";
+            if("offline".equals(zkbContractCourseSchedule.getType()))
+            {
+                type="ATC";
+            }else if("online".equals(zkbContractCourseSchedule.getType()))
+            {
+                type="Online";
+            }
+            zkbContractCourseScheduleMap.put("",zkbContractCourseSchedule.getCid());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbHistory_systemId"),zkbContractCourseSchedule.getId());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_cid"),zkbContractCourseSchedule.getCid());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_cname"),zkbContractCourseSchedule.getCname());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_modality"),zkbContractCourseSchedule.getModality());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_startDate"),zkbContractCourseSchedule.getStartDate());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_endDate"),zkbContractCourseSchedule.getEndDate());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_trainStartDate"),zkbContractCourseSchedule.getTrainStartDate());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_trainEndDate"),zkbContractCourseSchedule.getTrainEndDate());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_trainingDays"),zkbContractCourseSchedule.getTrainingDays());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_instructor"),zkbContractCourseSchedule.getInstructor());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_audience"),zkbContractCourseSchedule.getAudience());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_location"),zkbContractCourseSchedule.getLocation());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_studentClass"),zkbContractCourseSchedule.getStudentClass());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_batchNo"),zkbContractCourseSchedule.getBatchNo());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_valid"),valid);
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_deductCount"),zkbContractCourseSchedule.getDeductCount());
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("zkbContractCourseSchedule_type"),type);
+            zkbContractCourseScheduleMap.put(WebUtil.getMessage("Delete"),"否");
+            zkbContractCourseScheduleMapList.add(zkbContractCourseScheduleMap);
+        }
+        return zkbContractCourseScheduleMapList;
+    }
+
+    /**
+     * 导入数据
+     * @param importCourseScheduleMapList 课程计划信息
+     */
+    public void importData(List<Map<String, Object>> importCourseScheduleMapList) {
+        List<ZkbCourse> allZkbCourseList =  this.zkbCourseRepository.find();
+        Map<String,ZkbCourse> allZkbCourseMap = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(allZkbCourseList))
+        {
+            for(ZkbCourse item:allZkbCourseList){
+                if(item==null) continue;
+                if(allZkbCourseMap.containsKey(item.getCid())) continue;
+                allZkbCourseMap.put(item.getCid(),item);
+            }
+        }
+        Boolean toSave =true;
+        LocalDateTime startTime = LocalDateTime.now();
+        List<ZkbContractCourseSchedule> zkbContractCourseScheduleList = new ArrayList<>();
+        int row = 0;
+        try {
+            for (Map<String, Object> item : importCourseScheduleMapList) {
+                ++row;
+                if(checkData(item,allZkbCourseMap)) {
+                    ZkbContractCourseScheduleVO zkbContractCourseScheduleVO = (ZkbContractCourseScheduleVO)item.get("zkbContractCourseScheduleVO");
+                    ZkbContractCourseSchedule zkbContractCourseSchedule = new ZkbContractCourseSchedule();
+                    if(allZkbCourseMap.containsKey(zkbContractCourseScheduleVO.getCid()))
+                    {
+                        ZkbCourse zkbCourse = allZkbCourseMap.get(zkbContractCourseScheduleVO.getCid());
+                        zkbContractCourseScheduleVO.setCname(zkbCourse.getCname());
+                        zkbContractCourseScheduleVO.setModality(zkbCourse.getModality());
+                        zkbContractCourseScheduleVO.setZkbCourseId(zkbCourse.getId());
+                    }
+                    BeanUtils.copyProperties(zkbContractCourseScheduleVO, zkbContractCourseSchedule);
+                    zkbContractCourseSchedule.setValid(ZkbCourseScheduleController.f);
+                    zkbContractCourseScheduleList.add(zkbContractCourseSchedule);
+                }else
+                    {
+                        toSave=false;
+                    }
+            }
+        } catch (Exception e) {
+            logger.info("error occurred when importing the {} row", row);
+            throw e;
+        }
+        if(toSave&&CollectionUtils.isNotEmpty(zkbContractCourseScheduleList))
+        {
+            for(ZkbContractCourseSchedule item:zkbContractCourseScheduleList)
+            {
+                if("是".equals(item.getDeleteFlag())&&StringUtils.isBlank(item.getId()))
+                {
+                    continue;
+                }
+                if("是".equals(item.getDeleteFlag())&&StringUtils.isNotBlank(item.getId()))
+                {
+                    this.zkbCourseScheduleRepository.delete(item.getId());
+                    continue;
+                }
+                if(StringUtils.isBlank(item.getId()))
+                {
+                    item.setCreateDate(new Date());
+                }
+
+                if(StringUtils.isNotBlank(item.getId()))
+                {
+                    ZkbContractCourseSchedule item1 = this.zkbCourseScheduleRepository.findById(item.getId());
+                    item.setValid(item1.getValid());
+                    item.setCreateDate(item1.getCreateDate());
+                }
+
+                this.zkbCourseScheduleRepository.save(item);
+            }
+        }
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for importData: {} seconds", duration.getSeconds());
+    }
+
+    /**
+     * 检查数据是否合法
+     * 1.数据类型字段必填
+     * @param item
+     * @param allZkbCourseMap 所有课程MAP
+     * @return
+     */
+    public boolean checkData(Map<String, Object> item,Map<String,ZkbCourse> allZkbCourseMap) {
+        boolean isValidateData = true;
+        ZkbContractCourseScheduleVO zkbContractCourseScheduleVO = (ZkbContractCourseScheduleVO)item.get("zkbContractCourseScheduleVO");
+        AssetInfoRow.clearErrMessage(item);
+        String errorMessage = "不能为空";
+        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getCid())){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_cid")+errorMessage);
+            isValidateData = false;
+        }
+        if(zkbContractCourseScheduleVO.getStartDate()==null){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_startDate")+errorMessage);
+            isValidateData = false;
+        }
+        if(zkbContractCourseScheduleVO.getEndDate()==null){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_endDate")+errorMessage);
+            isValidateData = false;
+        }
+        if(zkbContractCourseScheduleVO.getStartDate()!=null&&zkbContractCourseScheduleVO.getEndDate()!=null&&zkbContractCourseScheduleVO.getStartDate().compareTo(zkbContractCourseScheduleVO.getEndDate())>0)
+        {
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item,WebUtil.getMessage("zkbContractCourseSchedule_startDate")+"不能大于"+WebUtil.getMessage("zkbContractCourseSchedule_endDate"));
+            isValidateData = false;
+        }
+        if(zkbContractCourseScheduleVO.getTrainStartDate()==null){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_trainStartDate")+errorMessage);
+            isValidateData = false;
+        }
+        if(zkbContractCourseScheduleVO.getTrainEndDate()==null){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_trainEndDate")+errorMessage);
+            isValidateData = false;
+        }
+        if(zkbContractCourseScheduleVO.getTrainStartDate()!=null&&zkbContractCourseScheduleVO.getTrainEndDate()!=null&&zkbContractCourseScheduleVO.getTrainStartDate().compareTo(zkbContractCourseScheduleVO.getTrainEndDate())>0)
+        {
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item,WebUtil.getMessage("zkbContractCourseSchedule_trainStartDate")+"不能大于"+WebUtil.getMessage("zkbContractCourseSchedule_trainEndDate"));
+            isValidateData = false;
+        }
+
+        if(zkbContractCourseScheduleVO.getTrainingDays()==null){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_trainingDays")+errorMessage);
+            isValidateData = false;
+        }
+        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getInstructor())){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_instructor")+errorMessage);
+            isValidateData = false;
+        }
+        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getAudience())){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_audience")+errorMessage);
+            isValidateData = false;
+        }
+        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getLocation())){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_location")+errorMessage);
+            isValidateData = false;
+        }
+        if(zkbContractCourseScheduleVO.getStudentClass()==null){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_studentClass")+errorMessage);
+            isValidateData = false;
+        }
+        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getBatchNo())){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_batchNo")+errorMessage);
+            isValidateData = false;
+        }
+//        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getValid())){
+//            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+//            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_valid")+errorMessage);
+//            isValidateData = false;
+//        }
+        if(zkbContractCourseScheduleVO.getDeductCount()==null){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_deductCount")+errorMessage);
+            isValidateData = false;
+        }
+        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getType())){
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_type")+errorMessage);
+            isValidateData = false;
+        }
+//        if(StringUtils.isBlank(zkbContractCourseScheduleVO.getType())){
+//            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+//            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_type")+errorMessage);
+//            isValidateData = false;
+//        }
+        if(StringUtils.isNotBlank(zkbContractCourseScheduleVO.getCid())&&!allZkbCourseMap.containsKey(zkbContractCourseScheduleVO.getCid()))
+        {
+            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbContractCourseSchedule_cid")+"不存在");
+            isValidateData = false;
+
+        }
+        if(StringUtils.isNotBlank(zkbContractCourseScheduleVO.getId()))
+        {
+            ZkbContractCourseSchedule zkbContractCourseScheduleExcel= this.zkbCourseScheduleRepository.findById(zkbContractCourseScheduleVO.getId());
+            if(zkbContractCourseScheduleExcel==null)
+            {
+
+                item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbHistory_systemId")+"不正确");
+                isValidateData = false;
+            }
+            List<ZkbCourseTrain> zkbCourseTrainList = null;
+            String message = null;
+            if("是".equals(zkbContractCourseScheduleVO.getDeleteFlag()))
+            {
+                message="该课程已有用户提交报名记录，不能删除";
+                zkbCourseTrainList = this.zkbCourseTrainRepository.findByCourseScheduleId(zkbContractCourseScheduleVO.getId());
+            }else
+            {
+                message="该课程已有用户报名，不能修改";
+                zkbCourseTrainList = this.zkbCourseTrainRepository.checkCourseTrain(zkbContractCourseScheduleVO.getId(),ZkbCourseTrain.ParticipateStatusEnum.Y.toString());
+            }
+            if(CollectionUtils.isNotEmpty(zkbCourseTrainList))
+            {
+                item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+                AssetInfoRow.addErrMessage(item, message);
+                isValidateData = false;
+            }
+        }
+        return isValidateData;
+    }
+
+    /**
+     * @param course
+     * @return
+     */
+    public boolean isCourseUsed(ZkbCourse course) {
+        List<ZkbContractCourseSchedule> list = zkbCourseScheduleRepository.findByZkbCourseId(course.getId());
+        if(CollectionUtils.isNotEmpty(list)){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 整理错误信息
+     * @param importCourseScheduleMapList
+     * @return
+     */
+    public List<Map<String, Object>> filterErrorRecords(List<Map<String, Object>> importCourseScheduleMapList) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map<String, Object> map: importCourseScheduleMapList) {
+            String importStatus = map.get("status").toString();
+            if (importStatus == null) {
+                continue;
+            }
+            if (ZkbCourseScheduleService.ImportStatus.CheckFail.name().equals(importStatus) || ZkbCourseScheduleService.ImportStatus.Failure.name().equals(importStatus)) {
+                result.add(map);
+            }
+        }
+        return result;
+    }
+
+    public void exportData(ExcelDocument doc, List<Map<String, Object>> courseScheduleMapList) {
+        Integer dataRow = 2;
+        for (Map<String, Object> item : courseScheduleMapList) {
+            doc.writeRowData(SHEET_SERVICE_COURSE_SCHEDULE, 1, dataRow++, item);
+        }
+    }
+
+    /**
+     * 根据ID发送消息
+     */
+    public void sendMessageByTelephone(GatewayURL gatewayURL)
+    {
+        HttpHeaders headers = new HttpHeaders();
+        MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
+        headers.setContentType(type);
+//        String url = env.getProperty("messageCourseSchedule");
+        HttpEntity<Map> requestEntity = new HttpEntity<>(headers);
+        //运用多线程，防止服务不可用，不影响主流程
+        Thread t=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //停顿5秒，防止数据未入库
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                }
+                ResponseEntity<LinkedHashMap> response = template.exchange(getGatewayURL(gatewayURL), HttpMethod.POST, requestEntity, LinkedHashMap.class);
+            }
+        });
+        t.start();
+    }
+
+}
