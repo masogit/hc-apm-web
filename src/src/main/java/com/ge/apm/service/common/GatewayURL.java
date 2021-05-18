@@ -108,7 +108,7 @@ public enum GatewayURL {
     PART_ORDER_SEND_WECHAT_BACK_MESSAGE("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatBackMessages"),
     PART_ORDER_SEND_WECHAT_REMIND_LETTER("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatRemindLetter"),
     PART_ORDER_SEND_WECHAT_RETURN_AUDIT("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatReturnAudit"),
-    COURSE_TRAIN_SEND_WE_CHART("/hcapmreportservice/api/apm/report/courseTrain/sendWeChatMessages"),
+    COURSE_TRAIN_SEND_WE_CHART("/hcapmassetservice/api/apm/zkb/courseTrain/sendWeChatMessages"),
     COURSE_TRAIN_SEND_EMAIL_AUDIT("/hcapmreportservice/api/apm/report/courseTrain/sendHtmlForAudit"),
 
     SMS_VERIFICATION_CODE("/hcapmreportservice/api/apm/report/partOrder/sendTheVerificationCode"),
