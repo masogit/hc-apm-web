@@ -1,11 +1,11 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.TenantInfo;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,4 +45,8 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
     @Modifying
     @Query(nativeQuery = true, value = "UPDATE tenant_info a SET qrcode_editable = ?1 WHERE a.uid = ?2")
     void updateQrCodeEditable(boolean editable, String uid);
+
+    @Query(value = "SELECT DISTINCT t1.* from tenant_info t1 INNER JOIN zkb_contract z1 on t1.uid = z1.tenant_uid " +
+            " where t1.name not like 'ZKB%' and NOT ((end_date < ?1) OR (start_date > ?2)) and t1.type =?3", nativeQuery = true)
+    List<TenantInfo> findByAnyContractDate(Date firstDate, Date kpiDate, Integer type);
 }

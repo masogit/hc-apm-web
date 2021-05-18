@@ -15,6 +15,7 @@ import java.util.*;
  */
 public class CustomConfigConstant {
 
+    private static LinkedHashMap<String, String> allFields;
     private static HashMap<String, String> exportFields;
 
     public static final String DEFAULT_MOBILE_PAGE_JSON =
@@ -71,19 +72,9 @@ public class CustomConfigConstant {
         );
     }
 
-    /**
-     * 导入导出所需要的两个字段，别的地方不需要
-     * @return
-     */
-    public static synchronized Map<String, String> getExportOrImportFields() {
-        Map<String,String> result = getAllFields();
-        result.put("medicalApparatusClassificationCode", WebUtil.getMessage("medicalApparatusClassification")+ "编码");
-        result.put("medicalApparatusClassificationName", WebUtil.getMessage("medicalApparatusClassification"));
-        return result;
-    }
-
-        public static synchronized LinkedHashMap<String, String> getAllFields() {
-            LinkedHashMap<String,String> allFields = new LinkedHashMap();
+     public static synchronized LinkedHashMap<String, String> getAllFields() {
+//        if (null == allFields) {
+            allFields = new LinkedHashMap();
             allFields.put("serialNum", WebUtil.getMessage("serialNum"));
             allFields.put("departNum", WebUtil.getMessage("departNum"));
             allFields.put("name", WebUtil.getMessage("EquipmentName"));
@@ -120,6 +111,8 @@ public class CustomConfigConstant {
             allFields.put("functionGroup", WebUtil.getMessage("functionGroup"));
             allFields.put("assetCode68", WebUtil.getMessage("assetCode68"));
             allFields.put("medicalApparatusClassification", WebUtil.getMessage("medicalApparatusClassification"));
+            allFields.put("medicalApparatusClassificationCode", WebUtil.getMessage("medicalApparatusClassification")+ "编码");
+            allFields.put("medicalApparatusClassificationName", WebUtil.getMessage("medicalApparatusClassification"));
             allFields.put("functionGrade", WebUtil.getMessage("functionGrade"));
             allFields.put("repairForm", WebUtil.getMessage("repairForm"));
             allFields.put("locationCode", WebUtil.getMessage("locationCode"));
@@ -174,6 +167,7 @@ public class CustomConfigConstant {
          allFields.put("oneQrCodeStatus", WebUtil.getMessage("oneQrCodeStatus"));
          allFields.put("installStatus", WebUtil.getMessage("installStatus"));
          allFields.put("geibTable_installedTime", WebUtil.getMessage("geibTable_installedTime"));
+//        }
         return allFields;
     }
 

@@ -521,10 +521,6 @@ public class AssetInstallationController {
                 .collect(Collectors.toList());
     }
 
-    public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
-        return configService.getAttachmentCategories(config);
-    }
-
     public String returnAction() {
         if ("List".equals(src)) {
             return "arrivalItemsList?faces-redirect=true";

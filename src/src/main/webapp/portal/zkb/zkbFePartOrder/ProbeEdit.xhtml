@@ -175,8 +175,16 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbFePartOrderProbeController.showZkbPoProbeQuotaType}">
+                            <label class="label">#{msg.zkbFePartOrder_deductType}*</label>
+                            <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.zkbPoProbeQuotaType}" required="true" requiredMessage="#{msg.zkbFePartOrder_deductType} #{msg.ValidationRequire}">
+                                <p:ajax update="valueType" listener="#{zkbFePartOrderProbeController.initZknPartCat}"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
 <!--                        <h:panelGroup>-->
-<!--                            <label class="label">订单名额</label>-->
+<!--                            <label class="label">  订单名额</label>-->
 <!--                            <p:inputText id="qty"  value="#{zkbFePartOrderProbeController.selected.qty}" required="true"  requiredMessage="#{msg.zkbPartOrder_qty} #{msg.ValidationRequire}" disabled="true" />-->
 <!--                        </h:panelGroup>-->
 <!--                        <h:panelGroup rendered="#{zkbFePartOrderProbeController.workFlowInFistStep()}">-->
@@ -235,7 +243,7 @@
                         <label class="label">#{msg.zkbFePartOrder_catNo}*</label>
                         <p:inputText  disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.catNo}" required="true" requiredMessage="#{msg.zkbFePartOrder_catNo} #{msg.ValidationRequire}" />
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup id="valueType">
                         <label class="label">#{msg.zkbFePartOrder_zkbPartOrderCat}*</label>
                         <p:autoComplete disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" dropdown="true" value="#{zkbFePartOrderProbeController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="#{msg.zkbFePartOrder_zkbPartOrderCat} #{msg.ValidationRequire}"
                                         completeMethod="#{zkbFePartOrderProbeController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">

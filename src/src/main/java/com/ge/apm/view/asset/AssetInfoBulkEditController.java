@@ -15,7 +15,6 @@ import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.zkb.ZkbFileDirectoryService;
 import com.ge.apm.view.SupplierController;
-import com.ge.apm.view.component.MedicalInstrumentsClassificationCompCtrl;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import lombok.Getter;
@@ -35,11 +34,13 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
+import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -77,8 +78,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     private BlobFileService blobService;
     private AssetHistoryService assetHistoryService;
     private SupplierController supplierController;
-    private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
-
     private QrCodeLib createRequest;
     //******* filter start
 
@@ -172,7 +171,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
     @Getter
     private List<AssetInfo> assetInfoList = null;
     public Set<AssetInfo> assetInfos = null;
-
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -200,9 +198,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         blobService = WebUtil.getBean(BlobFileService.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
-        medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
-
-        medicalInstrumentsClassificationCompCtrl.registerController(this);
 
         selected = new AssetInfo();
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
@@ -269,10 +264,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
         if (!isValidParentAsset()) {
             WebUtil.addErrorMessage("主设备不符合要求，请重新设置");
             return "";
-        }
-        if (null != selectedObjectMap.get("selectedAuthGroup")) {
-            SysAuthGroup selectedAuthGroup = (SysAuthGroup) selectedObjectMap.get("selectedAuthGroup");
-            selected.setMedicalApparatusClassification(selectedAuthGroup.getClassificationCode());
         }
         String isPmValue = selected.getIsPmValue();
         if(isPmValue!=null){
@@ -1506,14 +1497,6 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
 
     public String getTabIDAsSelectAssets() {
         return TAB_SELECT_ASSETS;
-    }
-
-    @Override
-    public void onServerEvent(String eventName, Object eventObject) {
-        if (MedicalInstrumentsClassificationCompCtrl.MEDICALINSTRUMENTS_CLASSIFICATION_CHANGE.equals(eventName)) {
-            SysAuthGroup selectedAuthGroup = (SysAuthGroup) eventObject;
-            selectedObjectMap.put("selectedAuthGroup", selectedAuthGroup);
-        }
     }
 
 }
