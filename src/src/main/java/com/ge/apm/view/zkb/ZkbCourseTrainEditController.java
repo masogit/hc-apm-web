@@ -211,6 +211,8 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
         ZkbCourseTrain c = zkbCourseTrainRepository.findById(selected.getId());
         if(ZkbCourseTrain.FlowStatusEnum.AuditAccepted.toString().equals(c.getCurrentStatus())){
             zkbCourseTrainService.sendWeChatMessages(c,UserContextService.getAccessToken());
+        }else if(ZkbCourseTrain.FlowStatusEnum.ApplySubmit.toString().equals(c.getCurrentStatus())){
+            zkbCourseTrainService.sendEmail(c,UserContextService.getAccessToken());
         }
         return "List?faces-redirect=true";
     }
@@ -224,6 +226,11 @@ public class ZkbCourseTrainEditController extends GenericCRUDUUIDController<ZkbC
 
     public String acceptNext(){
         zkbCourseTrainService.submitNext(selected,selectedCourseTrainDetailList,v2_blobObjectList,currentUser);
+        ZkbCourseTrain c = zkbCourseTrainRepository.findById(selected.getId());
+
+        if(ZkbCourseTrain.FlowStatusEnum.ApplySubmit.toString().equals(c.getCurrentStatus())){
+            zkbCourseTrainService.sendEmail(c,UserContextService.getAccessToken());
+        }
         return "List?faces-redirect=true";
     }
 
