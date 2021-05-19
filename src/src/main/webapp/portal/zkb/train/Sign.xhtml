@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="原厂培训报名"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="zkbSignListForm">
+                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" >
+                        <p:commandButton value="申请列表"  process="@this" action="#{zkbCourseTrainSignController.redirectList}" />
+                    </h:panelGrid>
+
+                    <p:dataTable id="datalist" value="#{zkbCourseTrainSignController.zkbContractCourseSchedules}" var="item" widgetVar="varDataList"
+                                 selectionMode="single"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500" >
+                        <p:column headerText="合同号">
+                            <h:outputText value="#{item.contractNo}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_cid}">
+                            <h:outputText value="#{item.cid}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_cname}">
+                            <h:outputText value="#{item.cname}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_modality}">
+                            <h:outputText value="#{item.modality}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_startDate}">
+                            <h:outputText value="#{item.startDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_endDate}">
+                            <h:outputText value="#{item.endDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="开始培训日期">
+                            <h:outputText value="#{item.trainStartDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="结束培训日期">
+                            <h:outputText value="#{item.trainEndDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_instructor}">
+                            <h:outputText value="#{item.instructor}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_location}">
+                            <h:outputText value="#{item.location}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_studentClass}">
+                            <h:outputText value="#{item.studentClass}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_batchNo}">
+                            <h:outputText value="#{item.batchNo}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_deductCount}">
+                            <h:outputText value="#{item.deductCount}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_type}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',item.type)}"/>
+                        </p:column>
+
+                        <p:column headerText="参加人数">
+                            <p:inputText value="#{item.prePersonCount}" />
+                        </p:column>
+                        <p:column headerText="操作" style="width: 120px;">
+                            <!--<p:commandButton immediate="false" process="@this" value="参加" update=":growl :zkbSignListForm" icon="ui-icon-check" />
+                            <p:commandButton immediate="false" process="@this" value="不参加" update=":growl :zkbSignListForm" icon="ui-icon-check" />-->
+                            <p:commandLink validateClient="true" update=":growl :zkbSignListForm" action="#{zkbCourseTrainSignController.joinNext(item.id,item.zkbContractCourseId)}" >
+                                <h:outputText value="参加" />
+                            </p:commandLink>
+                            <p:commandLink immediate="false" process="@this" update=":growl :zkbSignListForm" style="margin-left: 10px;" action="#{zkbCourseTrainSignController.getSelectedSchedule(item.id,item.zkbContractCourseId)}" oncomplete="PF('zkbCancelReasonDlg').show()" >
+                                <h:outputText value="不参加" />
+                            </p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+
+                <p:dialog id="zkbCancelReasonDlg" widgetVar="zkbCancelReasonDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="不参加原因" height="300">
+
+                    <h:form id="zkbConfigForm">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <label class="label">原因：</label>
+                                <p:inputTextarea rows="10" cols="50" value="#{zkbCourseTrainSignController.reason}" required="true" requiredMessage="原因不能为空">
+                                </p:inputTextarea>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <br/>
+                        <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbCourseTrainSignController.noJoinNext}" oncomplete="PF('zkbCancelReasonDlg').hide()" update=":growl :zkbSignListForm" icon="ui-icon-check" />
+                        <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbCancelReasonDlg').hide()"/>
+                    </h:form>
+
+                </p:dialog>
+
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>

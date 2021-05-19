@@ -268,9 +268,6 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "two_factor_valid",columnDefinition="bool default false")
 	private Boolean twoFactorValid;          //登录是否2次验证开关
 
-	@Column(name = "account_creation_type")
-	private Integer accountCreationType;
-
 	public Boolean getTwoFactorValid() {
 		return twoFactorValid;
 	}
@@ -1181,13 +1178,5 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setComment(String comment) {
 		this.comment = comment;
-	}
-
-	public Integer getAccountCreationType() {
-		return accountCreationType;
-	}
-
-	public void setAccountCreationType(Integer accountCreationType) {
-		this.accountCreationType = accountCreationType;
 	}
 }

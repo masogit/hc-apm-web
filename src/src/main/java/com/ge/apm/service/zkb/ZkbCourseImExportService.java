@@ -29,6 +29,7 @@ public class ZkbCourseImExportService {
 
     private final String HEADER_CID = "课程ID";
     private final String HEADER_CNAME = "课程名称";
+    private final String HEADER_MODALITY = "modality";
     private final String HEADER_DESCRIPTION = "课程描述";
 
     @Autowired
@@ -53,6 +54,7 @@ public class ZkbCourseImExportService {
             zkbCourseDataMap.put("课程ID", zkbCourse.getCid());
             zkbCourseDataMap.put("课程名称", zkbCourse.getCname());
             zkbCourseDataMap.put("课程描述",zkbCourse.getDescription());
+            zkbCourseDataMap.put("modality",zkbCourse.getModality());
 
             zkbCourseDataList.add(zkbCourseDataMap);
 
@@ -88,6 +90,7 @@ public class ZkbCourseImExportService {
         List<String> headers = new ArrayList<>();
         headers.add(HEADER_CID);
         headers.add(HEADER_CNAME);
+        headers.add(HEADER_MODALITY);
         headers.add(HEADER_DESCRIPTION);
         Map<String, Integer> header = ExcelParser.findHeader(sheet, headers);
         if (header.isEmpty()) {
@@ -95,10 +98,12 @@ public class ZkbCourseImExportService {
         }
         String cid;
         String cname;
+        String modality;
         String description;
 
         int cidIdx = header.get(HEADER_CID);
         int cnameIdx = header.get(HEADER_CNAME);
+        int modalityIdx = header.get(HEADER_MODALITY);
         int descriptionIdx = header.get(HEADER_DESCRIPTION);
         List<ZkbCourse> listRe = new ArrayList<ZkbCourse>();
         int len = sheet.getLastRowNum();
@@ -114,6 +119,7 @@ public class ZkbCourseImExportService {
                 detail.setTenantUID(user.getTenantUID());
                 cid = StringUtils.trim(ExcelParser.getCellStringValue(row, cidIdx));
                 cname = StringUtils.trim(ExcelParser.getCellStringValue(row, cnameIdx));
+                modality = StringUtils.trim(ExcelParser.getCellStringValue(row, modalityIdx));
                 description = StringUtils.trim(ExcelParser.getCellStringValue(row, descriptionIdx));
                 if(StringUtils.isEmpty(cid)){
                     detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "课程ID不能为空；");
@@ -137,8 +143,14 @@ public class ZkbCourseImExportService {
                     pass = false;
                 }
 
+                if (StringUtils.isEmpty(modality)) {
+                    detail.setErrorMsg(UploadFileErrorTypeEnum.OTHER_ERROR, "modality不能为空；");
+                    pass = false;
+                }
+
                 detail.setCid(cid);
                 detail.setCname(cname);
+                detail.setModality(modality);
                 detail.setDescription(description);
 
                 if (!pass) {

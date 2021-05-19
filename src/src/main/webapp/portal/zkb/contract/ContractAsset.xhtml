@@ -68,7 +68,7 @@
                 </p:pickList>
             </p:fieldset>
             <h:panelGroup>
-                <p:commandButton validateClient="true" actionListener="#{zkbContractEditController.saveAsset()}" value="#{msg.Save}" update=":zkbContractEditForm:zkbContractAssetDatalist, :growl" icon="ui-icon-check" oncomplete="PF('zkbContractAssetEditDlg').hide()"/>
+                <p:commandButton validateClient="true" actionListener="#{zkbContractEditController.saveAsset()}" value="#{msg.Save}" update=":zkbContractEditForm :growl" icon="ui-icon-check" oncomplete="PF('zkbContractAssetEditDlg').hide()"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbContractAssetEditDlg').hide()"/>
             </h:panelGroup>
         </h:form>

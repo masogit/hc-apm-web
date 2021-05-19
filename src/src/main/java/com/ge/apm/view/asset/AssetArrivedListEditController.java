@@ -1,6 +1,10 @@
 package com.ge.apm.view.asset;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -10,7 +14,6 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
-import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.view.SupplierController;
 import lombok.Setter;
 import org.primefaces.event.FileUploadEvent;
@@ -70,7 +73,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private String nationalStandardCode;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
-    private ConfigService configService;
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
     private SupplierController supplierController;
@@ -135,7 +137,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         orgTree.getChildren().add(subTree);
         attachList = new ArrayList();
         currentUser=UserContextService.getCurrentUserAccount();
-        configService = WebUtil.getBean(ConfigService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -500,11 +501,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
-    }
-
-    public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
-        if(selectedOrg==null) Collections.emptyList();
-        return configService.getAttachmentCategories(configService.findConfigBySite(selectedOrg.getSiteUID()));
     }
 
     public void handleFileUpload(FileUploadEvent event) {
