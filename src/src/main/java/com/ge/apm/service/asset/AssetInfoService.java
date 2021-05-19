@@ -197,7 +197,7 @@ public class AssetInfoService {
         root.getChildren().sort((TreeNode o1, TreeNode o2) -> {
                     SysAuthGroup sag1 = (SysAuthGroup) o1.getData();
                     SysAuthGroup sag2 = (SysAuthGroup) o2.getData();
-                    return sag1.getClassificationCode().compareTo(sag2.getClassificationCode());
+                    return sag1.getEncoded().compareTo(sag2.getEncoded());
                 }
         );
         for (TreeNode node: root.getChildren()) {

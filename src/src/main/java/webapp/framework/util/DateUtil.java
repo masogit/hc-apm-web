@@ -1,5 +1,7 @@
 package webapp.framework.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -76,5 +78,36 @@ public class DateUtil {
 		Calendar cal2 = Calendar.getInstance();
 		cal2.setTime(date2);
 		return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH);
+	}
+
+
+	/**
+	 * 根据指定日期指定格式，格式化日期
+	 * @param date 时间
+	 * @param format 日期格式
+	 * @return 格式化日期字符串
+	 */
+	public static String getFormatStrByDate(Date date,String format)
+	{
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+		return simpleDateFormat.format(date);
+	}
+
+	/**
+	 * 根据字符串类型时间和日期格式返回时间
+	 * @param dateStr 时间
+	 * @param format 日期格式
+	 * @return
+	 */
+	public static Date getDateByFormatStr(String dateStr,String format)
+	{
+		SimpleDateFormat sdf=new SimpleDateFormat(format);
+		Date date = null;
+		try {
+			date=sdf.parse(dateStr);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return date;
 	}
 }

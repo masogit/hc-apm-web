@@ -1,15 +1,11 @@
 package webapp.framework.util;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.apache.camel.Main;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
+
+import java.util.Date;
 
 public class TimeUtil {
     protected static final Logger logger = Logger.getLogger(TimeUtil.class);

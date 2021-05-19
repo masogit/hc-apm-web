@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:p="http://primefaces.org/ui"
+				template="/WEB-INF/template.xhtml">
+
+
+	<ui:define name="content">
+<div class="ui-g">
+	<div class="ui-g-12 card cardTitle">
+		<p:outputLabel class="pageTitle" value="#{msg.zkbContractCourseSchedule_name}导入"/><!--#{msg.ZKBCourseMgt}-->
+	</div>
+	<div class="ui-g-12 card"><br/><br/>
+		<h:form enctype="multipart/form-data">
+			<p:fieldset legend="批量导入 #{msg.zkbContractCourseSchedule_name}" id="uploaderContainer">
+				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+					<p:fileUpload fileUploadListener="#{zkbCourseScheduleController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
+						invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M"
+						update=":dataListForm" sizeLimit="5242880"
+						allowTypes="/(\.|\/)(xls|xlsx)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
+					<p:growl id="messages" showDetail="true" />
+				</p:panelGrid>
+				<h:panelGroup>
+					<p>说明</p>
+					<p>
+						1.<a href="APM_ZKB_Course_Schedule_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
+					</p>
+					<p>
+						2.如需批量修改课程计划，请先在上一页导出课程列表，编辑完后再导入。
+					</p>
+					<p>
+						3.生效字段不做批量更新。
+					</p>
+					<p>4.文件中填入要导入的数据其中[#{msg.zkbContractCourseSchedule_cid}]，[#{msg.zkbContractCourseSchedule_startDate}]，[#{msg.zkbContractCourseSchedule_endDate}]，[#{msg.zkbContractCourseSchedule_trainStartDate}]，[#{msg.zkbContractCourseSchedule_trainEndDate}]，[#{msg.zkbContractCourseSchedule_trainingDays}]，[#{msg.zkbContractCourseSchedule_instructor}]，[#{msg.zkbContractCourseSchedule_audience}]，[#{msg.zkbContractCourseSchedule_location}]，[#{msg.zkbContractCourseSchedule_studentClass}]，[#{msg.zkbContractCourseSchedule_batchNo}，[#{msg.zkbContractCourseSchedule_deductCount}]，[#{msg.zkbContractCourseSchedule_type}]必填。</p>
+					<p>5.上传文件进行导入。</p>
+				</h:panelGroup>
+			</p:fieldset>
+		</h:form>
+		<h:panelGroup>
+			<p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="List.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
+		</h:panelGroup>
+	</div>
+
+
+	<div class="ui-g-12 card">
+		<h:form id="dataListForm">
+			<p:fieldset legend="错误的数据">
+				<p:dataTable id="datalist" rendered="#{not empty zkbCourseScheduleController.errorZknCourseScheduleList}"
+					value="#{zkbCourseScheduleController.errorZknCourseScheduleList}" var="item" lazy="false" paginator="true" paginatorPosition="both"
+					paginatorAlwaysVisible="true"
+					paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+					<p:column headerText="EXCEL行数">
+						<h:outputText value="#{item.get('zkbContractCourseScheduleVO').lineNum}" />
+					</p:column>
+					<p:column headerText="#{msg.zkbContractCourseSchedule_cid}">
+						<h:outputText value="#{item.get('zkbContractCourseScheduleVO').cid}" />
+					</p:column>
+					<p:column headerText="#{msg.zkbContractCourseSchedule_cname}">
+						<h:outputText value="#{item.get('zkbContractCourseScheduleVO').cname}" />
+					</p:column>
+					<p:column headerText="#{msg.zkbContractCourseSchedule_modality}">
+						<h:outputText value="#{item.get('zkbContractCourseScheduleVO').modality}" />
+					</p:column>
+					<p:column headerText="#{msg.FailureInformation}" >
+						<h:outputText value="#{item.get('errmsg')}"/>
+					</p:column>
+				</p:dataTable>
+			</p:fieldset>
+		</h:form>
+	</div>
+</div>
+	</ui:define>
+</ui:composition>

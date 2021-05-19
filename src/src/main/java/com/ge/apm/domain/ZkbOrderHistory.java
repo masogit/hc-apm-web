@@ -244,6 +244,36 @@ public class ZkbOrderHistory {
     @Column(name = "tenant_uid")
     private String tenantUid;
 
+    /**
+     * 合同探头总名额
+     */
+    @Column(name = "total_contract_probe_count")
+    private Integer totalContractProbeCount;
+
+    /**
+     * 任意申请限额
+     */
+    @Column(name = "apply_limit_count")
+    private Integer applyLimitCount;
+
+    /**
+     * 普通限额
+     */
+    @Column(name = "normal_limit_count")
+    private Integer normalLimitCount;
+
+    /**
+     * 特殊限额
+     */
+    @Column(name = "special_limit_count")
+    private Integer specialLimitCount;
+
+    /**
+     * 高值限额
+     */
+    @Column(name = "high_value_limit_count")
+    private Integer highValueLimitCount;
+
 
     @Override
     public int hashCode() {
@@ -564,5 +594,45 @@ public class ZkbOrderHistory {
 
     public void setTenantUid(String tenantUid) {
         this.tenantUid = tenantUid;
+    }
+
+    public Integer getTotalContractProbeCount() {
+        return totalContractProbeCount;
+    }
+
+    public void setTotalContractProbeCount(Integer totalContractProbeCount) {
+        this.totalContractProbeCount = totalContractProbeCount;
+    }
+
+    public Integer getApplyLimitCount() {
+        return applyLimitCount;
+    }
+
+    public void setApplyLimitCount(Integer applyLimitCount) {
+        this.applyLimitCount = applyLimitCount;
+    }
+
+    public Integer getNormalLimitCount() {
+        return normalLimitCount;
+    }
+
+    public void setNormalLimitCount(Integer normalLimitCount) {
+        this.normalLimitCount = normalLimitCount;
+    }
+
+    public Integer getSpecialLimitCount() {
+        return specialLimitCount;
+    }
+
+    public void setSpecialLimitCount(Integer specialLimitCount) {
+        this.specialLimitCount = specialLimitCount;
+    }
+
+    public Integer getHighValueLimitCount() {
+        return highValueLimitCount;
+    }
+
+    public void setHighValueLimitCount(Integer highValueLimitCount) {
+        this.highValueLimitCount = highValueLimitCount;
     }
 }

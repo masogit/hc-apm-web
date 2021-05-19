@@ -5,8 +5,6 @@
  */
 package com.ge.apm.service.common;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
@@ -14,8 +12,6 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.WorkflowConfig;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,18 +63,6 @@ public class ConfigService {
             return configList.get(0);
         }
         return null;
-    }
-
-    public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories(WorkflowConfig config) {
-        List<WorkflowConfig.AttachmentCategory> result = new ArrayList<>();
-        if(config!=null) {
-            String categories = config.getCustomizedAssetAttachmentCategory();
-            if(null !=categories){
-                result = JSON.parseObject(categories, new TypeReference<List<WorkflowConfig.AttachmentCategory>>(){
-                });
-            }
-        }
-        return result;
     }
 
     public boolean isNeedAssetApprover(String siteUid) {

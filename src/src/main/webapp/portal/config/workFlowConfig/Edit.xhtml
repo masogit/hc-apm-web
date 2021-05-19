@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{workflowConfigController.onSelect()}" width="1000" height="520" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{workflowConfigController.CRUDActionName} #{msg.SystemConfig}">
+        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{workflowConfigController.onSelect()}" width="1000" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{workflowConfigController.CRUDActionName} #{msg.SystemConfig}">
             <h:form id="V2_WorkflowConfigEditForm">
                 <h:panelGroup id="display">
                     <p:fieldset id="basic" legend="#{msg.CommonConfiguration}">
@@ -258,12 +258,6 @@
                                     <p:ajax process="@this" />
                                 </p:selectBooleanCheckbox>
                             </h:panelGroup >
-                            <h:panelGroup>
-                                <label class = "label">夜间是否发送消息?</label>
-                                <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isSendMsgAtNight}">
-                                    <p:ajax process="@this" />
-                                </p:selectBooleanCheckbox>
-                            </h:panelGroup >
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -455,10 +449,6 @@
                                 <label class="label">弹窗内容</label>
                                 <p:inputTextarea id="hintText" value="#{workflowConfigController.selected.hintText}" placeholder="20:00 - 08:00不受理调剂申请， 紧急情况请拨打021-66666666。"/>
                             </h:panelGroup>-->
-                            <h:panelGroup>
-                                <label class="label">调剂设备安全基准</label>
-                                <p:inputNumber value="#{workflowConfigController.selected.sharedAssetSafetyThreshold}" minValue="0.0" decimalPlaces="1"/>
-                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -482,9 +472,8 @@
                                 <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"
                                                  actionListener="#{workflowConfigController.onEditNode(item.boType)}" rendered="#{not empty item.label}"
                                                  update="FieldsAddDialog" oncomplete="PF('FieldsAddDialog').show()"/>
-                                <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}"
-                                                 update="V2_WorkflowConfigEditForm:nodeList" rendered="#{not empty item.label}"
-                                                 actionListener="#{workflowConfigController.delNode(item.boType)}">
+                                <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" update="FieldsAddDialog"
+                                                 rendered="#{not empty item.label}" actionListener="#{workflowConfigController.delNode(item.boType)}">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
                                                icon="ui-icon-alert"/>
                                 </p:commandButton>
@@ -596,7 +585,7 @@
                     <!--<h:outputText value="#{msg.NoAddableField}" rendered="#{empty customConfigController.addFieldsList}" />-->
                     <p:panelGrid columns="10" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:outputLabel value="附件类型名称" style="height: 50px"/>
-                        <h:inputText id ="fieldd" value="#{workflowConfigController.attachmentCategory.label}" style="height: 25px" required="true" requiredMessage="附件类型名称不能为空"/>
+                        <h:inputText id ="fieldd" value="#{workflowConfigController.attachmentCategory.label}" style="height: 25px"/>
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>

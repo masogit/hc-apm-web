@@ -12,7 +12,6 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -30,7 +29,10 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -69,7 +71,6 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     private List<OrgInfo> clinicalDeptList;
     private V2_BlobObject batchBlobObject;
-    private List<V2_BlobObject> batchBlobObjectList = new ArrayList<>();
     private String boSubTypeBatch;
 
     //复选的附件数据
@@ -358,50 +359,24 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         }
     }
 
+    public void handleFileUploadBatch(FileUploadEvent event) {
 
-
-    public void handleFileUploadBatch(FileUploadEvent event,String type) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
-            blobObject.setBoSubType(type);
-            batchBlobObjectList.add(blobObject);
+            batchBlobObject = blobObject;
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
+
     }
 
-    public void handleFileUploadBatchImage(FileUploadEvent event) {
-        handleFileUploadBatch(event,"1");
-    }
+    public void removeAttachmentBatch(Integer fileId) {
 
-    public void handleFileUploadBatchUserManual(FileUploadEvent event) {
-        handleFileUploadBatch(event,"2");
-    }
-
-    public void handleFileUploadBatchTrainingMaterial(FileUploadEvent event) {
-        handleFileUploadBatch(event,"3");
-    }
-
-    public void handleFileUploadBatchMeasurementDocument(FileUploadEvent event) {
-        handleFileUploadBatch(event,"Measuring");
-    }
-
-    public void handleFileUploadBatchVideoLink(FileUploadEvent event) {
-        handleFileUploadBatch(event,"vlink");
-    }
-
-
-
-    public void removeAttachmentBatch(String objectId) {
-        Iterator<V2_BlobObject> iterator = batchBlobObjectList.iterator();
-        while (iterator.hasNext()){
-            V2_BlobObject object = iterator.next();
-            if(object.getId().equals(objectId)){
-                blobService.deleteBlobFile(object);
-                iterator.remove();
-                return;
-            }
-        }
+        blobService.deleteBlobFile(batchBlobObject);
+        batchBlobObject.setId(null);
+        batchBlobObject.setObjectName(null);
+        batchBlobObject.setObjectStorageId(null);
+        batchBlobObject.setObjectSize(null);
     }
 
     public void onSelectAllOfPage() {
@@ -426,74 +401,44 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     public void batchSave() {
         if(targetAssets == null || targetAssets.isEmpty()){
             WebUtil.addErrorMessage(WebUtil.getMessage("assetName") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
 
-        List<V2_BlobObject> batchSaveObject =new ArrayList<>();
-
-        //保存视频链接
-        if(!batchSaveVlinkAdd(batchSaveObject)){
-            return;
-        }
-        //保存上传对象
-        batchSaveObjectAdd(batchSaveObject);
-
-        this.initBatchData();
-        if(batchSaveObject.isEmpty()){
-            return;
-        }
-        dao.save(batchSaveObject);
-
-    }
-
-    private void batchSaveObjectAdd(List<V2_BlobObject> batchSaveObject) {
-        if(batchBlobObjectList.isEmpty()){
-            return ;
-        }
-        for (AssetInfo tempAssetInfo : targetAssets) {
-            for(V2_BlobObject batchBlobObject : batchBlobObjectList){
+        if (batchBlobObject != null || "vlink".equals(boSubTypeBatch)) {
+            String parsedLink = vlinkParserService.parseVlink(vlink);
+            if ("vlink".equals(boSubTypeBatch) && StringUtils.isEmpty(parsedLink)) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("source_not_supported"));
+                return;
+            }
+            for (AssetInfo tempAssetInfo : targetAssets) {
                 V2_BlobObject tempBlobObject = new V2_BlobObject();
+
                 tempBlobObject.setBoId(tempAssetInfo.getId());
                 tempBlobObject.setBoUuid(tempAssetInfo.getUid());
-                tempBlobObject.setBoSubType(batchBlobObject.getBoSubType());
+                tempBlobObject.setBoSubType(boSubTypeBatch);
                 tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-                tempBlobObject.setObjectName(batchBlobObject.getObjectName());
-                tempBlobObject.setObjectStorageId(batchBlobObject.getObjectStorageId());
-                tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
-                tempBlobObject.setObjectType(batchBlobObject.getObjectType());
-                batchSaveObject.add(tempBlobObject);
+                if ("vlink".equals(boSubTypeBatch)) {
+                    tempBlobObject.setObjectName(vlinkTitle);
+                    tempBlobObject.setExtLink(parsedLink);
+                } else {
+                    tempBlobObject.setObjectName(batchBlobObject.getObjectName());
+                    tempBlobObject.setObjectStorageId(batchBlobObject.getObjectStorageId());
+                    tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
+                    tempBlobObject.setObjectType(batchBlobObject.getObjectType());
+                }
+                dao.save(tempBlobObject);
             }
+        } else {
+            WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
+            return;
         }
-    }
 
-    private boolean batchSaveVlinkAdd(List<V2_BlobObject> batchSaveObject) {
-        if(StringUtils.isEmpty(vlink)){
-            return true;
-        }
-        String parsedLink = vlinkParserService.parseVlink(vlink);
-        if (StringUtils.isEmpty(parsedLink)) {
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            WebUtil.addErrorMessage(WebUtil.getMessage("link") + WebUtil.getMessage("source_not_supported"));
-            return false;
-        }
-        for (AssetInfo tempAssetInfo : targetAssets) {
-            V2_BlobObject tempBlobObject = new V2_BlobObject();
-            tempBlobObject.setBoId(tempAssetInfo.getId());
-            tempBlobObject.setBoUuid(tempAssetInfo.getUid());
-            tempBlobObject.setBoSubType("vlink");
-            tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-            tempBlobObject.setObjectName(vlinkTitle);
-            tempBlobObject.setExtLink(parsedLink);
-            batchSaveObject.add(tempBlobObject);
-        }
-        return true;
+        this.initBatchData();
     }
 
     private void initBatchData() {
         selectedOrg = null;
         batchBlobObject = null;
-        batchBlobObjectList.clear();
         boSubTypeBatch = null;
 
         targetAssets = new ArrayList();
@@ -628,18 +573,5 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void setAssetName(String assetName) {
         this.assetName = assetName;
-    }
-
-    public List<V2_BlobObject> getBatchBlobObjectList() {
-        return batchBlobObjectList;
-    }
-
-    public List<V2_BlobObject> getBatchBlobObjectListByType(String type) {
-        List<V2_BlobObject> collect = batchBlobObjectList.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
-        return collect;
-    }
-
-    public void setBatchBlobObjectList(List<V2_BlobObject> batchBlobObjectList) {
-        this.batchBlobObjectList = batchBlobObjectList;
     }
 }

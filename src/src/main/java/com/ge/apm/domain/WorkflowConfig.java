@@ -5,9 +5,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.*;
 
 /**
  * @author 212579464
@@ -119,9 +119,6 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "is_casetype_required")
     private Boolean isCasetypeRequired;//故障类别是否必填
-
-    @Column(name = "is_send_msg_at_night",columnDefinition = "boolean default false")
-    private Boolean isSendMsgAtNight;//夜间是否发送消息
 
     /****for pm *****/
     @Column(name = "pm_manhour_price")
@@ -249,14 +246,8 @@ public class WorkflowConfig implements Serializable {
     /**
      * 资产附件类型配置
      */
-    @Column(name = "customized_asset_attachment_category",columnDefinition="text")
-    private String customizedAssetAttachmentCategory;
-
-    /**
-     * 调剂中心安全基准线
-     */
-    @Column(name = "shared_asset_safety_threshold")
-    private Double sharedAssetSafetyThreshold;
+    @Column(name = "customized_asset_attachment_category",columnDefinition = "CHAR(512)")
+    private String CustomizedAssetAttachmentCategory;
 
     /***
      *
@@ -394,27 +385,11 @@ public class WorkflowConfig implements Serializable {
     }
 
     public String getCustomizedAssetAttachmentCategory() {
-        return customizedAssetAttachmentCategory;
+        return CustomizedAssetAttachmentCategory;
     }
 
     public void setCustomizedAssetAttachmentCategory(String customizedAssetAttachmentCategory) {
-        this.customizedAssetAttachmentCategory = customizedAssetAttachmentCategory;
-    }
-
-    public Double getSharedAssetSafetyThreshold() {
-        return sharedAssetSafetyThreshold;
-    }
-
-    public void setSharedAssetSafetyThreshold(Double sharedAssetSafetyThreshold) {
-        this.sharedAssetSafetyThreshold = sharedAssetSafetyThreshold;
-    }
-
-    public Boolean getIsSendMsgAtNight() {
-        return isSendMsgAtNight;
-    }
-
-    public void setIsSendMsgAtNight(Boolean sendMsgAtNight) {
-        isSendMsgAtNight = sendMsgAtNight;
+        CustomizedAssetAttachmentCategory = customizedAssetAttachmentCategory;
     }
 
     public Boolean getIsCasetypeRequired() {

@@ -30,6 +30,12 @@ public class ZkbContractCourse implements Serializable {
     @Column(name = "course_id")
     private String courseId;
 
+    /**
+     * 课程合同号
+     */
+    @Column(name = "course_contract_no")
+    private String courseContractNo;
+
     @Column(name = "course_count")
     private Integer courseCount;
 
@@ -41,6 +47,18 @@ public class ZkbContractCourse implements Serializable {
 
     @Column(name = "course_count_use")
     private Integer courseCountUse;
+
+    @Column(name = "main_course_count")
+    private Double mainCourseCount;
+
+    @Column(name = "main_course_count_total")
+    private Double mainCourseCountTotal;
+
+    @Column(name = "main_course_count_apply")
+    private Double mainCourseCountApply;
+
+    @Column(name = "main_course_count_use")
+    private Double mainCourseCountUse;
 
     @Column(name = "contract_id")
     @Size(max = 32)
@@ -108,6 +126,46 @@ public class ZkbContractCourse implements Serializable {
 
     public void setCourseCountUse(Integer courseCountUse) {
         this.courseCountUse = courseCountUse;
+    }
+
+    public String getCourseContractNo() {
+        return courseContractNo;
+    }
+
+    public void setCourseContractNo(String courseContractNo) {
+        this.courseContractNo = courseContractNo;
+    }
+
+    public Double getMainCourseCount() {
+        return mainCourseCount;
+    }
+
+    public void setMainCourseCount(Double mainCourseCount) {
+        this.mainCourseCount = mainCourseCount;
+    }
+
+    public Double getMainCourseCountTotal() {
+        return mainCourseCountTotal;
+    }
+
+    public void setMainCourseCountTotal(Double mainCourseCountTotal) {
+        this.mainCourseCountTotal = mainCourseCountTotal;
+    }
+
+    public Double getMainCourseCountApply() {
+        return mainCourseCountApply;
+    }
+
+    public void setMainCourseCountApply(Double mainCourseCountApply) {
+        this.mainCourseCountApply = mainCourseCountApply;
+    }
+
+    public Double getMainCourseCountUse() {
+        return mainCourseCountUse;
+    }
+
+    public void setMainCourseCountUse(Double mainCourseCountUse) {
+        this.mainCourseCountUse = mainCourseCountUse;
     }
 
     @Override

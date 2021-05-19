@@ -64,6 +64,10 @@
                         <p:inputText id="specialty" value="#{zkbEngineerController.selected.specialty}" required="true" requiredMessage="#{msg.zkbEngineer_specialty} #{msg.ValidationRequire}" />
                     </h:panelGroup>
 
+                    <h:panelGroup>
+                        <label class="label">SSO</label>
+                        <p:inputText id="sso" disabled="true" value="#{zkbEngineerController.selected.sso}" />
+                    </h:panelGroup>
                 </p:panelGrid>
 
                 <p:fieldset id="zkbEngineerTrackRecordFieldset" legend="#{msg.zkbEngineerTrackRecord}" rendered="#{zkbEngineerController.actionName eq 'Edit'}">
@@ -102,7 +106,48 @@
 
                     </p:dataTable>
                 </p:fieldset>
-
+                <p:fieldset id="zkbEngineerTrainRecordFieldset" legend="培训记录" rendered="#{zkbEngineerController.actionName eq 'Edit'}">
+                    <p:dataTable id="zkbEngineerTrainRecordDatalist" value="#{zkbEngineerController.zkbEngineerTrainRecordList}" var="zkbEngineerTrainRecordItem"
+                                 widgetVar="zkbEngineerTrainRecordDataList" selectionMode="single" selection="#{zkbEngineerController.zkbContractCourseSchedule}"
+                                 lazy="false" paginator="true" rowKey="#{zkbEngineerTrainRecordItem.id}" sortMode="single" sortOrder="ascending" sortBy="#{zkbEngineerTrainRecordItem.createdDate}"
+                                 paginatorTemplate="{Toolbar}" rows="100" emptyMessage="#{msg.noRecordFound}">
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_cid}">
+                            <h:outputText value="#{zkbEngineerTrainRecordItem.cid}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_cname}">
+                            <h:outputText value="#{zkbEngineerTrainRecordItem.cname}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_modality}">
+                            <h:outputText value="#{zkbEngineerTrainRecordItem.modality}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_batchNo}">
+                            <h:outputText value="#{zkbEngineerTrainRecordItem.batchNo}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_type}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',zkbEngineerTrainRecordItem.type)}"/>
+                        </p:column>
+                        <p:column headerText="报名时间">
+                            <h:outputText value="#{zkbEngineerTrainRecordItem.createdDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
+                <p:fieldset id="zkbEngineerAttachFileInfoFieldset" legend="#{msg.zkbEngineerAttachFileInfo}">
+                    <p:panelGrid>
+                        <h:panelGroup>
+                            <p:dataList id="uploadList" value="#{zkbEngineerController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">附件上传</f:facet>
+                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                <p:commandButton actionListener="#{zkbEngineerController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
+                            <p:fileUpload  allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|rar|zip|htm|html|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|RAR|ZIP|HTM|HTML)$/" fileUploadListener="#{zkbEngineerController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                          multiple="true"  sizeLimit="100000000"  update="uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
                 <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbEngineerController.save}" update=":growl :zkbEngineerListForm :zkbEngineerEditForm" style="float:left"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" actionListener="#{zkbEngineerController.cancel}" update=":growl :zkbEngineerListForm :zkbEngineerEditForm"/>
             </p:fieldset>
