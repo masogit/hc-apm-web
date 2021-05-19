@@ -31,7 +31,7 @@ public class ZkbCourseTrain implements Serializable {
     }
 
     public enum TrainTypeEnum{
-        Online, Offline
+        online, offline
     }
 
     @Id
