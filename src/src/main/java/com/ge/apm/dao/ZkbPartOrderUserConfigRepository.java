@@ -37,4 +37,5 @@ public interface ZkbPartOrderUserConfigRepository extends GenericRepositoryUUID<
      * @return
      */
     List<ZkbPartOrderUserConfig> findByLoginNameAndConfigType(String loginName,String configType);
+    List<ZkbPartOrderUserConfig> findByLoginNameAndConfigTypeIsIn(String loginName,List<String> conFigTypes);
 }

@@ -24,6 +24,12 @@ public class ZkbCourse {
     @Column(name = "cname")
     private String cname;
 
+    /**
+     * modality
+     */
+    @Column(name = "modality")
+    private String modality;
+
     @Column(name = "description")
     private String description;
 
@@ -162,4 +168,11 @@ public class ZkbCourse {
         return "com.ge.apm.domain.ZkbCourse[ id=" + id + " ]";
     }
 
+    public String getModality() {
+        return modality;
+    }
+
+    public void setModality(String modality) {
+        this.modality = modality;
+    }
 }

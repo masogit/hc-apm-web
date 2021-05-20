@@ -311,6 +311,27 @@
                             <label class = "label">#{msg.PmIsSupportBatchFinish}</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmIsSupportBatchFinish}"/>
                         </h:panelGroup >
+                        <!-- 工单完工需要验收?-->
+                        <h:panelGroup>
+                            <label class = "label">#{msg.NoAcceptanceRequired}?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.autoAckMaintenance}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <!--验收是否需要签名-->
+                        <h:panelGroup>
+                            <label class = "label">#{msg.SignatureRequiredForAcceptance}?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmAckNeedSign}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
+                        <!--保养完成是否需要签名-->
+                        <h:panelGroup>
+                            <label class = "label">#{msg.SignatureRequiredForPMWorkComplete}?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmWcNeedSign}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
 
@@ -431,6 +452,35 @@
                         </p:panelGrid>
                     </p:fieldset>
 
+                    <p:fieldset id="attachment" legend="#{msg.AssetAttachmentCategoryConfiguration}">
+                        <p:dataTable id="nodeList" value="#{workflowConfigController.attachmentCategories}" var="item"
+                                     lazy="false" paginator="false" rowKey="#{item.id}" rows="1000"
+                                     emptyMessage="#{msg.noRecordFound}">
+
+                            <!--<p:column headerText="序号">
+                                <h:outputText value="1"/>
+                            </p:column>-->
+
+                            <p:column headerText="类型名称">
+                                <h:outputText value="#{item.label}"/>
+                            </p:column>
+
+                            <p:column headerText="操作">
+                                <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"
+                                                 actionListener="#{workflowConfigController.onAddNode()}" rendered="#{empty item.label}"
+                                                 oncomplete="PF('FieldsAddDialog').show()" update="FieldsAddDialog"/>
+                                <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}"
+                                                 actionListener="#{workflowConfigController.onEditNode(item.boType)}" rendered="#{not empty item.label}"
+                                                 update="FieldsAddDialog" oncomplete="PF('FieldsAddDialog').show()"/>
+                                <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" update="FieldsAddDialog"
+                                                 rendered="#{not empty item.label}" actionListener="#{workflowConfigController.delNode(item.boType)}">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                               icon="ui-icon-alert"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+
                     <p:fieldset id="other" legend="#{msg.OtherConfiguration}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                             <h:panelGroup >
@@ -525,6 +575,25 @@
                     <p:commandButton validateClient="false" actionListener="#{workflowConfigController.applyChange()}" value="#{msg.Save}" update="display,:V2_WorkflowConfigEditDlg, :V2_WorkflowConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'V2_WorkflowConfigEditDialog');"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true"  value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('V2_WorkflowConfigEditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="FieldsAddDialog" widgetVar="FieldsAddDialog" modal="true" width="400" height="140"  resizable="true" draggable="true" appendTo="@this" closable="false" header="添加附件类型">
+            <h:form id="FieldsAddForm" >
+                <h:panelGroup id="display1" >
+                    <!--<h:outputText value="#{msg.NoAddableField}" rendered="#{empty customConfigController.addFieldsList}" />-->
+                    <p:panelGrid columns="10" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:outputLabel value="附件类型名称" style="height: 50px"/>
+                        <h:inputText id ="fieldd" value="#{workflowConfigController.attachmentCategory.label}" style="height: 25px"/>
+                    </p:panelGrid>
+                    <br/>
+                    <h:panelGroup>
+                        <p:commandButton immediate="false" validateClient="true"  value="#{msg.Confirm}"  actionListener="#{workflowConfigController.saveNode}"
+                                         update="V2_WorkflowConfigEditForm:nodeList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'FieldsAddDialog');" />
+                        <h:outputLabel value="枚举值" rendered="false" />
+                        <p:commandButton immediate="true"  value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('FieldsAddDialog').hide()"/>
+                    </h:panelGroup>
                 </h:panelGroup>
             </h:form>
         </p:dialog>

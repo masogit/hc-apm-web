@@ -1,0 +1,290 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g-12 card cardTitle">
+            <p:outputLabel class="pageTitle" value="申请表"/>
+        </div>
+
+        <div  class="ui-g-12 card">
+            <h:form id="zkbTrainEditForm" >
+                <p:messages id="messages" showDetail="true" closable="false" autoUpdate="true"></p:messages>
+                <p:fieldset legend="选择课表" rendered="#{empty zkbCourseTrainEditController.selected.id}">
+                    <p:dataTable id="datalist" value="#{zkbCourseTrainEditController.zkbContractCourseSchedules}" var="item" widgetVar="varDataList"
+                                 selection="#{zkbCourseTrainEditController.selectedCourseSchedule}"
+                                 lazy="true" paginator="false"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 emptyMessage="#{msg.noRecordFound}">
+                        <p:column selectionMode="single" style="width:40px;text-align:center"/>
+
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_cid}">
+                            <h:outputText value="#{item.cid}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_cname}">
+                            <h:outputText value="#{item.cname}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_modality}">
+                            <h:outputText value="#{item.modality}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_startDate}">
+                            <h:outputText value="#{item.startDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_endDate}">
+                            <h:outputText value="#{item.endDate}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_trainingDays}">
+                            <h:outputText value="#{item.trainingDays}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_instructor}">
+                            <h:outputText value="#{item.instructor}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_audience}">
+                            <h:outputText value="#{item.audience}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_location}">
+                            <h:outputText value="#{item.location}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_studentClass}">
+                            <h:outputText value="#{item.studentClass}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_batchNo}">
+                            <h:outputText value="#{item.batchNo}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_valid}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_yesOrNo',item.valid)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_deductCount}">
+                            <h:outputText value="#{item.deductCount}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.zkbContractCourseSchedule_type}">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractCourseSchedule_type',item.type)}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">参加人数*</label>
+                            <p:inputText value="#{zkbCourseTrainEditController.selected.prePersonCount}"  required="true" requiredMessage="参加人数 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset id="zkbTrainFieldset" legend="培训申请信息" rendered="#{!(empty zkbCourseTrainEditController.selected.id)}">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">申请编号*</label>
+                            <p:inputText id="trainNo" value="#{zkbCourseTrainEditController.selected.trainNo}" disabled="true" required="true" requiredMessage="申请编号 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">培训类型*</label>
+                            <p:selectOneMenu id="orderType" value="#{zkbCourseTrainEditController.selected.trainType}" disabled="true" required="true" requiredMessage="#{msg.zkbTrain_orderType} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractCourseSchedule_type')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">课表批次号*</label>
+                            <p:inputText id="batchNo" value="#{zkbCourseTrainEditController.selected.batchNo}" disabled="true" required="true" requiredMessage="课表批次号 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">课程名称*</label>
+                            <p:inputText id="courseName" value="#{zkbCourseTrainEditController.selected.courseName}" disabled="true" required="true" requiredMessage="课程名称 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">培训天数*</label>
+                            <p:inputText id="trainingDays" value="#{zkbCourseTrainEditController.selected.trainingDays}" disabled="true" required="true" requiredMessage="培训天数 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">开始培训日期*</label>
+                            <p:inputText id="trainStartDate" value="#{zkbCourseTrainEditController.selected.trainStartDate}" disabled="true" required="true" requiredMessage="培训开始日期 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">结束培训日期*</label>
+                            <p:inputText id="trainEndDate" value="#{zkbCourseTrainEditController.selected.trainEndDate}" disabled="true" required="true" requiredMessage="培训结束日期 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">主讲老师*</label>
+                            <p:inputText id="instructor" value="#{zkbCourseTrainEditController.selected.instructor}" disabled="true" required="true" requiredMessage="主讲老师 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">位置*</label>
+                            <p:inputText id="location" value="#{zkbCourseTrainEditController.selected.location}" disabled="true" required="true" requiredMessage="位置 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">参加人数*</label>
+                            <p:inputText value="#{zkbCourseTrainEditController.selected.prePersonCount}" disabled="true" required="true" requiredMessage="参加人数 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">预扣除数量*</label>
+                            <p:inputText value="#{zkbCourseTrainEditController.selected.preQuota}" disabled="true" required="true" requiredMessage="预扣除名额 #{msg.ValidationRequire}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">实际扣除数量</label>
+                            <p:inputText id="actualDeductCount" value="#{zkbCourseTrainEditController.selected.actualQuota}" disabled="true" />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="确认函信息" rendered="#{zkbCourseTrainEditController.showLetterFlag}">
+                    <h:panelGroup>
+                        <p:dataList id="uploadList" value="#{zkbCourseTrainEditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">上传确认函</f:facet>
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            <p:commandButton actionListener="#{zkbCourseTrainEditController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </p:dataList>
+                        <p:fileUpload id="uploadFile" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|rar|zip|htm|html|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS|RAR|ZIP|HTM|HTML)$/" fileUploadListener="#{zkbCourseTrainEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                      multiple="true"  sizeLimit="100000000"  update="uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}" rendered="#{zkbCourseTrainEditController.selected.currentStep eq 'LetterPending'}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                    <table style="width: 100%;padding:0px;margin: 0px;height: 100%;">
+                        <tr>
+                            <td style="text-align:left;">模板下载:</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;">
+                                1.
+                                <p:commandLink immediate="false" ajax="false" value="公司培训学员推荐函" process="@this" actionListener="#{zkbCourseTrainEditController.downLoadTemplateName('1')}">
+                                    <p:fileDownload value="#{zkbCourseTrainEditController.exportFile}"/>
+                                </p:commandLink>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;">
+                                2.
+                                <p:commandLink immediate="false" ajax="false" value="智康宝工程师EHS告知函" process="@this" actionListener="#{zkbCourseTrainEditController.downLoadTemplateName('2')}">
+                                    <p:fileDownload value="#{zkbCourseTrainEditController.exportFile}"/>
+                                </p:commandLink>
+                            </td>
+                        </tr>
+                    </table>
+                    </h:panelGroup>
+                </p:fieldset>
+                <p:fieldset legend="申请信息" rendered="#{zkbCourseTrainEditController.showApplyFlag}">
+                    <p:dataTable id="onlineList" value="#{zkbCourseTrainEditController.zkbCourseTrainDetailList}" var="item"
+                                 widgetVar="onlineList" sortMode="single" selection="#{zkbCourseTrainEditController.selectedCourseTrainDetailList}"
+                                 lazy="false" paginator="true" rowKey="#{item.eid}"  sortOrder="ascending" sortBy="#{item.eid}">
+                        <c:if test="#{zkbCourseTrainEditController.selected.currentStep eq 'ApplyPending' and zkbCourseTrainEditController.canEditFlag}">
+                            <p:column selectionMode="multiple" style="width:40px;text-align:center"/>
+                        </c:if>
+                        <p:column headerText="工程师姓名">
+                            <h:outputText value="#{item.ename}"/>
+                        </p:column>
+                        <p:column headerText="电话">
+                            <h:outputText value="#{item.ephone}"/>
+                        </p:column>
+                        <p:column headerText="邮箱">
+                            <h:outputText value="#{item.eemail}"/>
+                        </p:column>
+                       <p:column headerText="资质">
+                          <!-- <h:outputText value="#{item.v2_blobObjectList.size()}"/>
+                           <c:forEach var="i" begin="0" end="${item.v2_blobObjectList.size()}" >
+                               <h:outputText value="1"/>
+                           </c:forEach>-->
+                           <c:forEach var="i" begin="0" end="9" >
+                               <p style="margin: 0px;"><p:link style="color: #0000ff" href="#{fileDownloadService.getFileUrl(item.v2_blobObjectList[i].objectStorageId)}">#{item.v2_blobObjectList[i].objectName}</p:link></p>
+                           </c:forEach>
+                        </p:column>
+                    </p:dataTable>
+                </p:fieldset>
+                <p:fieldset legend="不参加原因" rendered="#{zkbCourseTrainEditController.showReasonFlag}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">不参加原因</label>
+                            <p:inputTextarea id="reason" value="#{zkbCourseTrainEditController.selected.reason}" rows="2" cols="20" disabled="true"></p:inputTextarea>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="原因审批" rendered="#{zkbCourseTrainEditController.showReasonAuditFlag}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup rendered="#{zkbCourseTrainEditController.selected.currentStatus eq 'ApplyCancelAccepted' or zkbCourseTrainEditController.selected.currentStatus eq 'ApplyCancelRejected'}">
+                        <label class="label">审批结果</label>
+                        <p:selectOneMenu value="#{zkbCourseTrainEditController.selected.currentStatus}" disabled="true">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCourseTrainStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">审批备注</label>
+                        <p:inputTextarea  rows="2" cols="20" value="#{zkbCourseTrainEditController.selected.auditRemark}" disabled="#{!(zkbCourseTrainEditController.selected.currentStep eq 'ApplyCancelAuditPending' and zkbCourseTrainEditController.canEditFlag)}">
+                        </p:inputTextarea>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{zkbCourseTrainEditController.selected.currentStatus eq 'ApplyCancelAccepted' or zkbCourseTrainEditController.selected.currentStatus eq 'ApplyCancelRejected'}">
+                        <label class="label">审批人*</label>
+                        <p:inputText value="#{zkbCourseTrainEditController.selected.auditer}" disabled="true" />
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{zkbCourseTrainEditController.selected.currentStatus eq 'ApplyCancelAccepted' or zkbCourseTrainEditController.selected.currentStatus eq 'ApplyCancelRejected'}">
+                        <label class="label">审批时间*</label>
+                        <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbCourseTrainEditController.selected.auditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                    </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="申请审批" rendered="#{zkbCourseTrainEditController.showAuditFlag}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup rendered="#{zkbCourseTrainEditController.selected.currentStatus eq 'AuditAccepted' or zkbCourseTrainEditController.selected.currentStatus eq 'AuditRejected'}">
+                            <label class="label">审批结果</label>
+                            <p:selectOneMenu value="#{zkbCourseTrainEditController.selected.currentStatus}" disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbCourseTrainStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">审批备注</label>
+                            <p:inputTextarea  rows="2" cols="20" value="#{zkbCourseTrainEditController.selected.auditRemark}" disabled="#{!(zkbCourseTrainEditController.selected.currentStep eq 'ApplyAuditPending' and zkbCourseTrainEditController.canEditFlag)}">
+                            </p:inputTextarea>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbCourseTrainEditController.selected.currentStatus eq 'AuditAccepted' or zkbCourseTrainEditController.selected.currentStatus eq 'AuditRejected'}">
+                            <label class="label">审批人*</label>
+                            <p:inputText value="#{zkbCourseTrainEditController.selected.auditer}" disabled="true" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbCourseTrainEditController.selected.currentStatus eq 'AuditAccepted' or zkbCourseTrainEditController.selected.currentStatus eq 'AuditRejected'}">
+                            <label class="label">审批时间*</label>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbCourseTrainEditController.selected.auditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+
+                <p:commandButton validateClient="true" value="保存" action="#{zkbCourseTrainEditController.saveData}" update=":growl" icon="ui-icon-check" rendered="#{empty zkbCourseTrainEditController.selected.id}" />
+                <p:commandButton validateClient="true" value="提交" action="#{zkbCourseTrainEditController.submitData}" update=":growl" icon="ui-icon-check" rendered="#{zkbCourseTrainEditController.showBtn eq '0'}" />
+                <p:commandButton validateClient="true" value="不参加"  update=":growl :zkbConfigDlg" oncomplete="PF('zkbConfigDlg').show()"  icon="ui-icon-close" rendered="#{zkbCourseTrainEditController.showBtn eq '0'}" />
+                <p:commandButton validateClient="true" value="审批通过" action="#{zkbCourseTrainEditController.acceptNext}" update=":growl" icon="ui-icon-check" rendered="#{zkbCourseTrainEditController.showBtn eq '1'}"/>
+                <p:commandButton validateClient="true" value="审批不通过" action="#{zkbCourseTrainEditController.rejectNext}" update=":growl" icon="ui-icon-close" rendered="#{zkbCourseTrainEditController.showBtn eq '1'}"/>
+                <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbCourseTrainEditController.backList}" />
+            </h:form>
+
+            <p:dialog id="zkbConfigDlg" widgetVar="zkbConfigDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="操作原因" height="300">
+                <h:form id="zkbConfigForm">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">原因</label>
+                            <p:inputTextarea rows="10" cols="50" id="opRemark" value="#{zkbCourseTrainEditController.reason}" required="true" requiredMessage="原因不能为空">
+                            </p:inputTextarea>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbCourseTrainEditController.noJoinNext}"  update=":zkbTrainEditForm :zkbConfigForm :growl" icon="ui-icon-check" />
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfigDlg').hide()"/>
+                </h:form>
+
+            </p:dialog>
+
+        </div>
+    </ui:define>
+</ui:composition>
+

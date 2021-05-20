@@ -32,6 +32,7 @@
                 <p:menuitem id="um4200" value="#{msg.AlertSettingsList}" outcome="/portal/fealert/report/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DataMaintainStaff,SiteAdmin')}"/>
                 <p:menuitem id="um472" value="#{msg.CoilOpportunityImage}" outcome="/admin/coilOpportunityImage/coilOpportunityImageList.xhtml" rendered="#{userContextService.hasRole('DataMaintainStaff')}"/>
                 <p:menuitem id="um473" value="#{msg.IBUInfoImage}" outcome="/admin/IBUInfoImage/IBUInfoImageList.xhtml" rendered="#{userContextService.hasRole('DataMaintainStaff')}"/>
+                <p:menuitem id="um474" value="#{msg.USOptionImage}" outcome="/admin/USOptionImage/USOptionImageList.xhtml" rendered="#{userContextService.hasRole('DataMaintainStaff')}"/>
             </p:submenu>
             <p:submenu id="um25" label="#{msg.MyTrain}" icon="fa fa-check-square-o" rendered="#{userContextService.isAccessMyTrain()}">
                 <p:menuitem value="#{msg.TrainReport}" outcome="/portal/trainreport/trainReport.xhtml"/>

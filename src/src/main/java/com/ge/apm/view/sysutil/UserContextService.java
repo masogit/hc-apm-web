@@ -415,6 +415,8 @@ public class UserContextService implements Serializable {
      */
     ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
 
+    ZkbCourseTrainUserConfigRepository zkbCourseTrainUserConfigRepository = WebUtil.getBean(ZkbCourseTrainUserConfigRepository.class);
+
     /**
      * 获取 fe part order user config
      */
@@ -922,6 +924,16 @@ public class UserContextService implements Serializable {
             return false;
         List<ZkbPartOrderUserConfig>  zkbPartOrderUserConfig= this.zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(user.getLoginName(),"ClosePending");
         if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfig))
+            return true;
+        return false;
+    }
+
+    public boolean isEditCourseScheduleAdmin() {
+        UserAccount user = getLoginUser();
+        if(StringUtils.isBlank(user.getLoginName()))
+            return false;
+        List<ZkbCourseTrainUserConfig>  zkbCourseTrainUserConfigList = this.zkbCourseTrainUserConfigRepository.findByLoginName(user.getLoginName());
+        if(CollectionUtils.isNotEmpty(zkbCourseTrainUserConfigList))
             return true;
         return false;
     }

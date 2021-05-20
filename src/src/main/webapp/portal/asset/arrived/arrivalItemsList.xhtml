@@ -35,6 +35,9 @@
                         <p:column headerText="#{msg.arrivalListContractNum}" sortBy="#{item.arrivalList.contractNum}" filterBy="#{item.arrivalList.contractNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.contractNum}"/>
                         </p:column>
+                        <p:column headerText="批文号" sortBy="#{item.arrivalList.approvalNo}" filterBy="#{item.arrivalList.approvalNo}" filterMatchMode="LIKE" rendered="#{userContextService.activeSupplier()}">
+                            <h:outputText value="#{item.arrivalList.approvalNo}"/>
+                        </p:column>
                         <p:column headerText="#{msg.assetName}" sortBy="#{item.arrivalList.assetName}" filterBy="#{item.arrivalList.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.assetName}"/>
                         </p:column>
@@ -52,7 +55,7 @@
                         <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" filterBy="#{item.arrivalList.creator.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.creator.name}"/>
                         </p:column>
-                        <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalList.arrivalDate}" filterBy="#{item.arrivalList.arrivalDate}" filterMatchMode="GTE">
+                        <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalList.arrivalDate}" filterBy="#{item.arrivalList.arrivalDate}" filterMatchMode="GTE" rendered="#{not userContextService.activeSupplier()}">
                             <f:facet name="filter">
                                 <p:inputText id="filterArrivalDate" widgetVar="varFilterArrivalDate" value="#{assetArrivedItemsController.arrivalFormatTime}"/>
                             </f:facet>

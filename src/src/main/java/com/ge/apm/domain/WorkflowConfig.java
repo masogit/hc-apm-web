@@ -1,5 +1,7 @@
 package com.ge.apm.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -172,6 +174,14 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "pm_is_support_batch_finish")
     private Boolean pmIsSupportBatchFinish = true;// 保养是否支持批量完成，默认支持
 
+    @Column(name = "auto_ack_maintenance")
+    private Boolean autoAckMaintenance; //工单完工不需要验收?
+
+    @Column(name="pm_ack_need_sign")
+    private Boolean pmAckNeedSign; //保养验收是否需要签名
+
+    @Column(name="pm_wc_need_sign")
+    private Boolean pmWcNeedSign; //保养完成是否需要签名
 
     /***
      * for measure
@@ -221,6 +231,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "swap_center_config")
     private String swapCenterConfig;
 
+    /**
+     * 是否开启用待报废控制
+     */
     @Column(name = "enable_scrapped_control")
     private Boolean enableScrappedControl;
 
@@ -229,6 +242,12 @@ public class WorkflowConfig implements Serializable {
      */
     @Column(name = "enable_update_switching_time",columnDefinition = "boolean default true")
     private Boolean enableUpdateSwitchingTime;
+
+    /**
+     * 资产附件类型配置
+     */
+    @Column(name = "customized_asset_attachment_category",columnDefinition = "CHAR(512)")
+    private String CustomizedAssetAttachmentCategory;
 
     /***
      *
@@ -363,6 +382,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setNotSendMsgInTakeOrderMode(Boolean notSendMsgInTakeOrderMode) {
         this.notSendMsgInTakeOrderMode = notSendMsgInTakeOrderMode;
+    }
+
+    public String getCustomizedAssetAttachmentCategory() {
+        return CustomizedAssetAttachmentCategory;
+    }
+
+    public void setCustomizedAssetAttachmentCategory(String customizedAssetAttachmentCategory) {
+        CustomizedAssetAttachmentCategory = customizedAssetAttachmentCategory;
     }
 
     public Boolean getIsCasetypeRequired() {
@@ -1088,6 +1115,34 @@ public class WorkflowConfig implements Serializable {
         this.enableUpdateSwitchingTime = enableUpdateSwitchingTime;
     }
 
+    /**
+     * 工单完工不需要验收? 默认 *打勾*
+     * @return
+     */
+    public Boolean getAutoAckMaintenance() {
+        return null == autoAckMaintenance ? true : autoAckMaintenance;
+    }
+
+    public void setAutoAckMaintenance(Boolean autoAckMaintenance) {
+        this.autoAckMaintenance = autoAckMaintenance;
+    }
+
+    public Boolean getPmAckNeedSign() {
+        return pmAckNeedSign;
+    }
+
+    public void setPmAckNeedSign(Boolean pmAckNeedSign) {
+        this.pmAckNeedSign = pmAckNeedSign;
+    }
+
+    public Boolean getPmWcNeedSign() {
+        return pmWcNeedSign;
+    }
+
+    public void setPmWcNeedSign(Boolean pmWcNeedSign) {
+        this.pmWcNeedSign = pmWcNeedSign;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -1111,6 +1166,15 @@ public class WorkflowConfig implements Serializable {
     @Override
     public String toString() {
         return "com.ge.apm.domain.WorkflowConfig[ id=" + id + " ]";
+    }
+
+    @Data
+    public static class AttachmentCategory{
+
+        @JSONField(serialize = false)
+        String id;
+        String boType;
+        String label;
     }
 
 }
