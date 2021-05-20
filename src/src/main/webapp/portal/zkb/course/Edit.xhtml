@@ -20,7 +20,10 @@
                     <label class="label">课程名称*</label>
                     <p:inputText id="cname" value="#{zkbCourseController.selected.cname}" required="true" requiredMessage="#{'课程名称'} #{msg.ValidationRequire}" />
                 </h:panelGroup>
-
+                <h:panelGroup>
+                    <label class="label">modality*</label>
+                    <p:inputText id="modality" value="#{zkbCourseController.selected.modality}" required="true" requiredMessage="#{'modality'} #{msg.ValidationRequire}" />
+                </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">课程描述</label>
                     <p:inputText id="description" value="#{zkbCourseController.selected.description}"  />

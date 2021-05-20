@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.sharedasset.SharedAssetRequestService;
 import com.ge.apm.service.sharedasset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.AllocationCenterUtils;
@@ -54,6 +55,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private Double total;
     private UaaService uuaService;
     private SharedAssetService sharedAssetService;
+    private SharedAssetRequestService sharedAssetRequestService;
     private Integer queryIndex=-1;
     UserOrgInfoRepository userOrgDao = null;
     OrgInfoRepository orgInfoDao = null;
@@ -185,6 +187,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
         sharedAssetConfigDao = WebUtil.getBean(SharedAssetConfigRepository.class);
         userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
+        sharedAssetRequestService = WebUtil.getServiceBean(SharedAssetRequestService.class);
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         p=request.getServletPath();
         String encodeStr = request.getParameter("str");
@@ -1344,7 +1347,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             return;
         }
     }
-    
+
     public void deliver() throws Exception {
 
         String uid = selected.getId();
@@ -1395,30 +1398,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                WebUtil.addWarnMessage(msg);
                return;
            } else {
-                selected.setState(state);
-                selected.setModifyDate(new Date());
-                dao.save(selected);
-                asiDao.save(selected.getInfoList());
-
-                apdDao.save(selected.getSartList());
-
-                String voucherNum = sharedAssetService.getVoucherNum();
-                for(SharedAssetReqDetail sard : selected.getSardList()) {
-                    logger.info("voucherNum :" + voucherNum + ", for sard:" + sard.getId());
-                    sard.setVoucherNum(voucherNum);
-                    voucherNum = String.format("%06d", Integer.parseInt(voucherNum) + 1);
-                }
-               asdDao.save(selected.getSardList());
-
-               //调用微服务
-               try {
-                   sharedAssetService.pushWxMsg(selected.getId());
-               }catch (Exception e){
-                   e.printStackTrace();
-               }
+               selected.setState(state);
+               selected.setModifyDate(new Date());
+               sharedAssetRequestService.save(selected);
                String url = "List.xhtml?faces-redirect=true";
-                requestContext.addCallbackParam("url", url);
-                return;
+               requestContext.addCallbackParam("url", url);
+               return;
            }
           
        }else {

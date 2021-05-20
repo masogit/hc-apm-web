@@ -28,6 +28,8 @@ public class PmOrderActionForm {
     Integer pmType;
     String applyTime;
 
+//    String currentPersonId;//验收人
+
 
 //V2_WorkOrder_Coworker[] coworkes //optional
     public String getPmOrderId() {
@@ -173,4 +175,12 @@ public class PmOrderActionForm {
     public void setApplyTime(String applyTime) {
         this.applyTime = applyTime;
     }
+
+//    public String getCurrentPersonId() {
+//        return currentPersonId;
+//    }
+//
+//    public void setCurrentPersonId(String currentPersonId) {
+//        this.currentPersonId = currentPersonId;
+//    }
 }

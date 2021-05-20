@@ -194,6 +194,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         this.selected.setApplyPersonPhone(this.telephone);
         this.selected.setOrderType(ZkbFePartOrder.OrderType.SpareParts.toString());
         this.selected.setCurrentStep(ZkbFePartOrder.workFlowSteps.Requested.toString());
+        this.zkbFePartOrderService.initTestStatus(this.loginName,this.selected);
     }
 
     @Override

@@ -88,8 +88,17 @@
                     <p:column headerText="#{msg.zkbContract_spareQuota}">
                         <h:outputText value="#{item.spareQuota}"/>
                     </p:column>
-                    <p:column headerText="#{msg.zkbContract_probeQuota}" >
+                    <p:column headerText="探头任意剩余名额" >
                         <h:outputText value="#{item.probeQuota}"/>
+                    </p:column>
+                    <p:column headerText="探头普通剩余名额" >
+                        <h:outputText value="#{item.probeQuotaNormal}"/>
+                    </p:column>
+                    <p:column headerText="探头特殊剩余名额" >
+                        <h:outputText value="#{item.probeQuotaSpecial}"/>
+                    </p:column>
+                    <p:column headerText="探头高值剩余名额" >
+                        <h:outputText value="#{item.probeQuotaHigh}"/>
                     </p:column>
                     <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
                         <h:outputText value="#{item.geArtificialSupportTimes}"/>
@@ -132,7 +141,7 @@
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.orderType eq 'Artificial')}">
                             <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 1}">
                                 <label class="label">设备类型（DI）*</label>
-                                <p:selectOneMenu id="assetTypeDi" value="#{zkbPartOrderEditController.selected.assetTypeDi}" required="true" requiredMessage="#设备类型（DI） #{msg.ValidationRequire}" disabled="true">
+                                <p:selectOneMenu id="assetTypeDi" value="#{zkbPartOrderAuditController.selected.assetTypeDi}" required="true" requiredMessage="#设备类型（DI） #{msg.ValidationRequire}" disabled="true">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItem itemLabel="CT" itemValue="CT"/>
                                     <f:selectItem itemLabel="XR" itemValue="XR"/>
@@ -148,7 +157,7 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <h:panelGroup rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 2 }">
+                            <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and zkbPartOrderAuditController.selected.assetInfo.assetGroup eq 2 }">
                                 <label class="label">机型*</label>
                                 <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.artificialType}" required="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}" disabled="true">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -156,6 +165,13 @@
                                     <f:selectItem itemLabel="超声低端机" itemValue="3"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and !(zkbPartOrderAuditController.selected.probeQuotaType)}">
+                            <label class="label">扣除名额类型*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.probeQuotaType}" disabled="true">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
@@ -851,6 +867,9 @@
                         <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending')}">
                             <label class="label">关单审批时间*</label>
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.closedDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                            <p:commandLink immediate="false" process="@this" update="growl zkbPartOrderReturnModifyDlg" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'Complete' and zkbPartOrderAuditController.choseAdmin}">
+                                <h:outputText value="归还数据修改" />
+                            </p:commandLink>
                         </h:panelGroup>
                         <h:panelGroup  rendered="#{zkbPartOrderAuditController.selected.needLetterFlag eq 't'}">
                             <label class="label">是否已上传探头说明函</label>
@@ -878,9 +897,6 @@
                             <label class="label">关单备注</label>
                             <p:inputTextarea id="closedRemark" value="#{zkbPartOrderAuditController.selected.closedRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag)}">
                             </p:inputTextarea>
-                            <p:commandLink immediate="false" process="@this" update="growl zkbPartOrderReturnModifyDlg" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" style="margin-left:30px;" rendered="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'Complete' and zkbPartOrderAuditController.choseAdmin}">
-                                <h:outputText value="归还数据修改" />
-                            </p:commandLink>
                         </h:panelGroup>
 
                     </p:panelGrid>
@@ -919,8 +935,8 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.orderCancelNext}" oncomplete="PF('zkbConfigDlg').hide()" update=":growl" icon="ui-icon-check" />
-                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbConfigDlg').hide()"/>
+                    <p:commandButton validateClient="true" value="#{msg.Confirm}" action="#{zkbPartOrderAuditController.orderCancelNext}" oncomplete="PF('zkbCancelReasonDlg').hide()" update=":growl" icon="ui-icon-check" />
+                    <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbCancelReasonDlg').hide()"/>
                 </h:form>
 
             </p:dialog>
