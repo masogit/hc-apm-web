@@ -1,5 +1,5 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+				xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
 	<ui:define name="content">
 		<div class="ui-g">
@@ -10,10 +10,10 @@
 				<h:form id="optRecordListForm" rendered="#{(not empty assetOptRecordController)}">
 					<ui:include src="/portal/asset/searchDiv.xhtml"/>
 					<p:dataTable id="datalist" value="#{assetOptRecordController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
-						selection="#{assetOptRecordController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
-						sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-						paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-						currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" rendered="#{assetOptRecordController.customRoleAuth.authSearch}">
+								 selection="#{assetOptRecordController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
+								 sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+								 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+								 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500" rendered="#{assetOptRecordController.customRoleAuth.authSearch}">
 
 						<!-- <p:ajax event="rowSelect" update="createButton editButton deleteButton" /> -->
 						<p:ajax event="filter" listener="#{assetOptRecordController.onFilter}" />
@@ -68,6 +68,18 @@
 							<h:outputText value="#{item.costTime}">
 							</h:outputText>
 						</p:column>
+						<p:column headerText="住院号" filterBy="#{item.hospitalNumber}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.hospitalNumber}">
+							</h:outputText>
+						</p:column>
+						<p:column headerText="床号" filterBy="#{item.bedNo}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.bedNo}">
+							</h:outputText>
+						</p:column>
+						<p:column headerText="诊断结果" filterBy="#{item.diagnosticResult}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.diagnosticResult}">
+							</h:outputText>
+						</p:column>
 						<p:column headerText="备注">
 							<h:outputText value="#{item.comment}">
 							</h:outputText>
@@ -76,18 +88,18 @@
 							<p:commandButton ajax="false" icon="ui-icon-arrowthick-1-s" update=":growl" title="导出到Excel" rendered="#{assetOptRecordController.customRoleAuth.authExport}">
 								<p:dataExporter type="xlsx" target="datalist" fileName="assetOptRecord"/>
 							</p:commandButton>
-				            <!-- <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
-				                actionListener="#{assetOptRecordController.prepareCreate}" update=":optRecordCreateDlg"
-				                oncomplete="PF('optRecordCreateDialog').show()" onclick="NurseSiteMaintain.on()"/>
-				            <p:commandButton id="editButton" actionListener="#{assetOptRecordController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
-				                update=":optRecordEditDlg" oncomplete="PF('optRecordEditDialog').show()"
-				                disabled="#{empty assetOptRecordController.selected.id}" onclick="NurseSiteMaintain.on()"/>
-				            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
-				                actionListener="#{assetOptRecordController.delete}" update=":optRecordListForm:datalist"
-				                disabled="#{empty assetOptRecordController.selected.id}">
-				                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
-				            </p:commandButton> -->
-				        </f:facet>
+							<!-- <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
+                                actionListener="#{assetOptRecordController.prepareCreate}" update=":optRecordCreateDlg"
+                                oncomplete="PF('optRecordCreateDialog').show()" onclick="NurseSiteMaintain.on()"/>
+                            <p:commandButton id="editButton" actionListener="#{assetOptRecordController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
+                                update=":optRecordEditDlg" oncomplete="PF('optRecordEditDialog').show()"
+                                disabled="#{empty assetOptRecordController.selected.id}" onclick="NurseSiteMaintain.on()"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
+                                actionListener="#{assetOptRecordController.delete}" update=":optRecordListForm:datalist"
+                                disabled="#{empty assetOptRecordController.selected.id}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+                            </p:commandButton> -->
+						</f:facet>
 					</p:dataTable>
 				</h:form>
 			</div>
@@ -96,28 +108,28 @@
 			<h:panelGrid columns="2">
 				<p:outputLabel value="#{msg.From}" />
 				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_startDate" pattern="MM/dd/yyyy" showOn="button" showButtonPanel="false" navigator="true"
-					mask="true" size="12" locale="zh" />
+							mask="true" size="12" locale="zh" />
 				<p:outputLabel value="#{msg.To}" />
 				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_startDate" pattern="MM/dd/yyyy" showOn="button" showButtonPanel="false" navigator="true" mask="true"
-					size="12" locale="zh" />
+							size="12" locale="zh" />
 			</h:panelGrid>
 			<p:commandButton
-				onclick="setDateFilter('varDataList','varFilterstartDate','varStartTimeFrom_startDate','varStartTimeTo_startDate'); PF('panelFilterstartDate').hide();"
-				title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					onclick="setDateFilter('varDataList','varFilterstartDate','varStartTimeFrom_startDate','varStartTimeTo_startDate'); PF('panelFilterstartDate').hide();"
+					title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
 			<p:commandButton onclick="PF('panelFilterstartDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
 		</p:overlayPanel>
 		<p:overlayPanel widgetVar="panelFilterendDate" for="optRecordListForm:datalist:filterendDate" dismissable="false">
 			<h:panelGrid columns="2">
 				<p:outputLabel value="#{msg.From}" />
 				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_endDate" pattern="MM/dd/yyyy" showOn="button" showButtonPanel="false" navigator="true" mask="true"
-					size="12" locale="zh" />
+							size="12" locale="zh" />
 				<p:outputLabel value="#{msg.To}" />
 				<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_endDate" pattern="MM/dd/yyyy" showOn="button" showButtonPanel="false" navigator="true" mask="true"
-					size="12" locale="zh" />
+							size="12" locale="zh" />
 			</h:panelGrid>
 			<p:commandButton
-				onclick="setDateFilter('varDataList','varFilterendDate','varStartTimeFrom_endDate','varStartTimeTo_endDate'); PF('panelFilterendDate').hide();"
-				title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					onclick="setDateFilter('varDataList','varFilterendDate','varStartTimeFrom_endDate','varStartTimeTo_endDate'); PF('panelFilterendDate').hide();"
+					title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
 			<p:commandButton onclick="PF('panelFilterendDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
 		</p:overlayPanel>
 	</ui:define>
