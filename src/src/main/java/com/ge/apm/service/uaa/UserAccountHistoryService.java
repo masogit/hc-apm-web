@@ -44,22 +44,14 @@ public class UserAccountHistoryService {
             UserAccountHistory history = new UserAccountHistory();
             history.setCreatedBy(userAccount.getLastModifiedBy());
             history.setCreatedDate(userAccount.getLastModifiedDate());
-            String operationType = "";
-            if (persistAction == WebUtil.PersistAction.CREATE) {
-                operationType = "新增";
-            } else if (persistAction == WebUtil.PersistAction.DELETE) {
-                operationType = "删除";
-            } else if (persistAction == WebUtil.PersistAction.UPDATE) {
-                operationType = "修改";
-            }
-            history.setOperationType(operationType);
+            history.setOperationType(WebUtil.PersistAction.DELETE.toString());
             history.setOrgName(orgInfoRepository.getDepName(userAccount.getOrgInfoId()));
             history.setLoginName(userAccount.getLoginName());
             history.setName(userAccount.getName());
             history.setEmail(userAccount.getEmail());
             history.setTelephone(userAccount.getTelephone());
-            history.setIsActive(userAccount.getIsActive() ? "是" : "否");
-            history.setIsLocked(userAccount.getIsLocked() ? "是" : "否");
+            history.setIsActive(Boolean.toString(userAccount.getIsActive()));
+            history.setIsLocked(Boolean.toString(userAccount.getIsLocked()));
             I18nMessage i18nMessage = messageRepository.getByMsgTypeAndMsgKey("userPosition", userAccount.getPosition());
             history.setPosition(i18nMessage == null ? null : i18nMessage.getValueZh());
             history.setComment(userAccount.getComment());
@@ -85,10 +77,10 @@ public class UserAccountHistoryService {
                     history.setTelephone(oldUserAccount.getTelephone() + "->" + userAccount.getTelephone());
                 }
                 if (oldUserAccount.getIsActive() != userAccount.getIsActive()) {
-                    history.setIsActive((oldUserAccount.getIsActive() ? "是" : "否") + "->" + (userAccount.getIsActive() ? "是" : "否"));
+                    history.setIsActive(Boolean.toString(oldUserAccount.getIsActive()) + "->" + Boolean.toString(userAccount.getIsActive()));
                 }
                 if (oldUserAccount.getIsLocked() != userAccount.getIsLocked()) {
-                    history.setIsLocked((oldUserAccount.getIsLocked() ? "是" : "否") + "->" + (userAccount.getIsLocked() ? "是" : "否"));
+                    history.setIsLocked(Boolean.toString(oldUserAccount.getIsLocked()) + "->" + Boolean.toString(userAccount.getIsLocked()));
                 }
                 if (!isEqual(oldUserAccount.getPosition(), userAccount.getPosition())) {
                     I18nMessage oldMessage = messageRepository.getByMsgTypeAndMsgKey("userPosition", oldUserAccount.getPosition());
@@ -113,7 +105,7 @@ public class UserAccountHistoryService {
             }
             historyRepository.save(history);
         } catch (Exception e) {
-            log.error("保存用户修改记录出错,错误信息：" + e.getMessage(),e);
+            log.error("UserAccountHistoryService.save() running error,errorMessage：" + e.getMessage(), e);
         }
     }
 
