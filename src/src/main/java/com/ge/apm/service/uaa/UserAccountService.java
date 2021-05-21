@@ -349,4 +349,9 @@ public class UserAccountService {
 			return false;
 		}
 	}
+
+	public List<String> getLoginNameBySiteId(Integer siteId){
+		return userAccountMapper.getLoginNameBySiteId(siteId);
+	}
+
 }
