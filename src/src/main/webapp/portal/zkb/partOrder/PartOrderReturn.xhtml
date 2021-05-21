@@ -65,7 +65,7 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">归还日期*</label>
-                    <p:calendar timeZone="GMT+8"  mode="inline" id="returnDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
+                    <p:calendar timeZone="GMT+8"  mode="inline" id="returnDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">备注</label>
