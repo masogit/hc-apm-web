@@ -35,6 +35,11 @@ public class PmOrderGlobalController {
         return userCommonService.getPmAckerListForBatchComplete();
     }
 
+    public List<UserAccount> getAckerForMultiplePmOrders() {
+        V2PmOrderController pmOrderController = WebUtil.getBean(V2PmOrderController.class);
+        return userCommonService.getAckerForMultiplePmOrders(pmOrderController.pmIdList);
+    }
+
     public boolean isAutoAck(V2_PmOrder pmOrder) {
         return null == pmOrder.getAutoAckMaintenance() ? true : pmOrder.getAutoAckMaintenance();
     }

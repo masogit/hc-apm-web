@@ -403,4 +403,22 @@ public class UserCommonService {
         return Collections.emptyList();
     }
 
+    public List<UserAccount> getAckerForMultiplePmOrders(List<String> pmIds) {
+        Map<String, Object> res = pmApi.getAckerForMultiplePmOrders(UserContextService.getAccessToken(), pmIds);
+        if (null != res) {
+            List<LinkedHashMap> mapList = (List<LinkedHashMap>) res.get("data");
+            List<UserAccount> userList = mapList.stream().map(item -> {
+                UserAccount u = new UserAccount();
+                u.setId(Integer.parseInt(item.get("id").toString()));
+                u.setUid(item.get("uid").toString());
+                u.setName(item.get("name").toString());
+                u.setTelephone(Optional.ofNullable(item.get("telephone")).orElse("").toString());
+                return u;
+            }).collect(Collectors.toList());
+
+            return userList;
+        }
+        return Collections.emptyList();
+    }
+
 }
