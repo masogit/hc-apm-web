@@ -35,6 +35,7 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.TabChangeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -47,6 +48,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -110,7 +112,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private  UserOrgInfoRepository userOrgInfoRepository;
     private BlobObjectRepository blobObjectRepository;
     private V2_ServiceRequest newServiceRequest;
-private  MvsAssetInfoRepository mvsAssetInfoRepository;
+    private MvsAssetInfoRepository mvsAssetInfoRepository;
     private V2_WorkOrder selectedWorkOrder;
     private List<V2_WorkOrder> selectedWorkOrderList;
 
@@ -171,6 +173,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private String oneSearchStr;
     //选定的院区
     private OrgInfo selectSite;
+    //tab Title
+    @Getter
+    private String tabTitle;
 
     public String faultReason;
     public CustomConfigService customConfigService;
@@ -534,6 +539,19 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         }
     }
 
+    //tab切换
+    public void onTabChange(TabChangeEvent event) {
+        FacesMessage msg = new FacesMessage("activeTab", event.getTab().getTitle());
+        tabTitle = msg.getDetail();
+        /*if("MVS工单".equals(tabTitle)){
+        }*/
+        queryIndex = 0;
+    }
+
+    public void updateQueryIndex(int query){
+        queryIndex = query;
+    }
+
     private void setUserSearchFilters() {
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         if (terminate) {
@@ -586,8 +604,6 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         }
 
     }
-
-
 
     private Boolean isRating;
 
@@ -892,12 +908,57 @@ public void test1(){
                     searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN, woIdList, "1*"));
                 }
             }
-            bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            //查询Mvs工单
+            if("MVS工单".equals(tabTitle)){
+
+                List<SearchFilter> filters = buildMvsSearchFilter();
+                bySearchFilter = dao.findBySearchFilter(filters, pageRequest);
+            }else{
+                bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            }
         } catch (Exception e) {
             LOGGER.error("load data occur exception,{}", e.getMessage());
             throw e;
         }
         return   bySearchFilter;
+    }
+
+    public List<SearchFilter> buildMvsSearchFilter(){
+        List<SearchFilter> filters = new ArrayList<>();
+        TenantInfoRepository tenantDao=WebUtil.getBean(TenantInfoRepository.class);
+        Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
+        String tenantUid = tenantInfo.get().getUid();
+
+        List<String> orderIds = getVisableMvsAssetSystemId();
+        filters.add(new SearchFilter("tenantUID",SearchFilter.Operator.EQ,tenantUid));
+
+        /*if(!orderIds.isEmpty()){
+
+        }*/
+        filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
+                filters.add(searchFilter);
+            }
+        }
+
+        return filters;
+    }
+
+    List<String> getVisableMvsAssetSystemId(){
+        List<SearchFilter> filters = new ArrayList<>();
+        filters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false));
+        filters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true));
+        filters.add(new SearchFilter("assetInfo.systemId", SearchFilter.Operator.LIKE, "MVS-"));
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        filters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        filters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        filters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        filters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        filters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        filters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        return dao.findBySearchFilter(filters).stream().map(V2_WorkOrder::getId).collect(Collectors.toList());
     }
 
     @Override
