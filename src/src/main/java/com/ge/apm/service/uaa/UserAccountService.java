@@ -6,6 +6,7 @@ import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.PasswordUtil;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.web.WebUtil;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -58,6 +60,9 @@ public class UserAccountService {
 
 	@Autowired
 	UserTagsRepository userTagsRepository;
+
+	@Autowired
+	UserAccountHistoryService userAccountHistoryService;
 
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
@@ -321,6 +326,11 @@ public class UserAccountService {
         userRoleRepository.deleteByUserAccount(userAccount.getId());
         userAccountRepository.deleteByUid(userUid);
 		log.info("delete userAccount , uid: {}",userAccount.getUid());
+
+		UserAccount currentUser = UserContextService.getCurrentUserAccount();
+		userAccount.setLastModifiedBy(currentUser.getLoginName());
+		userAccount.setLastModifiedDate(new Date());
+		userAccountHistoryService.save(WebUtil.PersistAction.DELETE, userAccount);
 	}
 
 	public boolean whetherTheCallIsRepeated(String telephone,String userTelephone,Integer userId){
