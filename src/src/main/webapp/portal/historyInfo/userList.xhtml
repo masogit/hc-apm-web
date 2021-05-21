@@ -14,14 +14,14 @@
                 </p>
             </div>
             <div class="ui-g-12 card">
-                <h:form id="LoginListForm">
+                <h:form id="userListForm">
 
                     <p:dataTable id="datalist"
-                                 value="#{loginRecordController.lazyModel}"
+                                 value="#{userAccountHistoryController.lazyModel}"
                                  var="item"
                                  widgetVar="varDataList"
                                  selectionMode="single"
-                                 selection="#{loginRecordController.selected}"
+                                 selection="#{userAccountHistoryController.selected}"
                                  lazy="true"
                                  paginator="true"
                                  paginatorPosition="both"
@@ -29,50 +29,107 @@
                                  rowKey="#{item.id}"
                                  sortMode="single"
                                  sortOrder="descending"
-                                 sortBy="#{item.loginTime}"
+                                 sortBy="#{item.createdDate}"
                                  paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20"
                                  emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="filter" listener="#{loginRecordController.onFilter}"/>
+                        <p:ajax event="filter" listener="#{userAccountHistoryController.onFilter}"/>
 
                         <p:column headerText="#{msg.loginName}" sortBy="#{item.loginName}" filterBy="#{item.loginName}"
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.loginName}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.loginUrl}" sortBy="#{item.loginUrl}" filterBy="#{item.loginUrl}"
+                        <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.loginUrl}"/>
+                            <h:outputText value="#{item.name}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.loginIp}" sortBy="#{item.loginIp}" filterBy="#{item.loginIp}"
+                        <p:column headerText="#{msg.orgName}" sortBy="#{item.orgName}" filterBy="#{item.orgName}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.loginIp}"/>
+                            <h:outputText value="#{item.orgName}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.isDeleted}" sortBy="#{item.isDeleted}" filterBy="#{item.isDeleted}"
+                        <p:column headerText="#{msg.position}" sortBy="#{item.position}" filterBy="#{item.position}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.isDeleted}"/>
+                            <h:outputText value="#{item.position}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.loginTime}" sortBy="#{item.loginTime}" filterBy="#{item.loginTime}"
+                        <p:column headerText="#{msg.telephone}" sortBy="#{item.telephone}" filterBy="#{item.telephone}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.loginTime}"/>
+                            <h:outputText value="#{item.telephone}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.logoutTime}" sortBy="#{item.logoutTime}"
-                                  filterBy="#{item.logoutTime}"
+                        <p:column headerText="#{msg.email}" sortBy="#{item.email}" filterBy="#{item.email}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.logoutTime}"/>
+                            <h:outputText value="#{item.email}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.tenantUID}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.tenantUID}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.institutionUID}" sortBy="#{item.institutionUID}"
+                                  filterBy="#{item.institutionUID}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.institutionUID}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.hospitalUID}" sortBy="#{item.hospitalUID}"
+                                  filterBy="#{item.hospitalUID}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.hospitalUID}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.siteUID}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.siteUID}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.operationType}" sortBy="#{item.operationType}"
+                                  filterBy="#{item.operationType}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.operationType}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.createdBy}" sortBy="#{item.createdBy}" filterBy="#{item.createdBy}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.createdBy}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.createdDate}" sortBy="#{item.createdDate}"
+                                  filterBy="#{item.createdDate}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.createdDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="#{msg.comment}" sortBy="#{item.comment}"
+                                  filterBy="#{item.comment}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.comment}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.isActive}" sortBy="#{item.isActive}" filterBy="#{item.isActive}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.isActive}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.isLocked}" sortBy="#{item.isLocked}"
+                                  filterBy="#{item.isLocked}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.isLocked}"/>
                         </p:column>
 
                         <f:facet name="{Toolbar}">
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
                                              class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="loginRecord_export"/>
+                                <p:dataExporter type="xls" target="datalist" fileName="userHistory_export"/>
                             </p:commandButton>
                         </f:facet>
 
@@ -81,7 +138,6 @@
 
             </div>
         </div>
-
 
 
         <script type="text/javascript">

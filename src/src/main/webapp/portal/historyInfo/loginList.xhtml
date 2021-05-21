@@ -60,13 +60,17 @@
 
                         <p:column headerText="#{msg.loginTime}" sortBy="#{item.loginTime}" filterBy="#{item.loginTime}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.loginTime}"/>
+                            <h:outputText value="#{item.loginTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
                         </p:column>
 
                         <p:column headerText="#{msg.logoutTime}" sortBy="#{item.logoutTime}"
                                   filterBy="#{item.logoutTime}"
                                   filterMatchMode="LIKE">
-                            <h:outputText value="#{item.logoutTime}"/>
+                            <h:outputText value="#{item.logoutTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
                         </p:column>
 
                         <f:facet name="{Toolbar}">
@@ -81,38 +85,6 @@
 
             </div>
         </div>
-
-
-
-        <script type="text/javascript">
-
-            window.onbeforeunload = onbeforeunload_handler;
-            window.onunload = onunload_handler;
-            function onbeforeunload_handler(){
-                alert(3333);
-                var warning="确认退出?";
-                // window.location.href = "../../logout.xhtml";
-                // window.location.href = "../historyInfo/assetList.xhtml";
-
-                // return warning;
-            }
-            function onunload_handler(){
-                var warning="谢谢光临";
-                alert(warning);
-                // window.location.href = "../../login.xhtml";
-                window.location.href = "../geapm/logout.xhtml?uid=2";
-
-            }
-
-            // window.onbeforeunload=function (){
-            //     alert("===onbeforeunload===");
-            // }
-
-
-            // http://localhost:8080/geapm/portal/historyInfo/loginList.xhtml
-            // http://localhost:8080/geapm/logout.xhtml
-
-        </script>
 
     </ui:define>
 
