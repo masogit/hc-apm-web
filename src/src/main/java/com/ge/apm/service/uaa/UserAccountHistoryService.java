@@ -44,7 +44,7 @@ public class UserAccountHistoryService {
             UserAccountHistory history = new UserAccountHistory();
             history.setCreatedBy(userAccount.getLastModifiedBy());
             history.setCreatedDate(userAccount.getLastModifiedDate());
-            history.setOperationType(WebUtil.PersistAction.DELETE.toString());
+            history.setOperationType(persistAction.toString());
             history.setOrgName(orgInfoRepository.getDepName(userAccount.getOrgInfoId()));
             history.setLoginName(userAccount.getLoginName());
             history.setName(userAccount.getName());
