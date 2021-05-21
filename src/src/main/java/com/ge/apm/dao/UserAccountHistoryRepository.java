@@ -1,8 +1,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.UserAccountHistory;
-import org.springframework.data.jpa.repository.JpaRepository;
-import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.GenericRepository;
 
 /**
  * @author lyh
@@ -11,6 +10,6 @@ import webapp.framework.dao.GenericRepositoryUUID;
  * @descript SystemConfigHistory操作记录
  * @package com.ge.apm.dao
  */
-public interface UserAccountHistoryRepository extends GenericRepositoryUUID<UserAccountHistory>, JpaRepository<UserAccountHistory, String> {
+public interface UserAccountHistoryRepository extends GenericRepository<UserAccountHistory> {
 
 }
