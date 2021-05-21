@@ -5,13 +5,11 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
 
+
     <ui:define name="content">
         <div class="ui-g">
-            <div class="ui-g-12 card">
-                <p align="center">
-                    <!--   <b>#{msg.QrCodeLib}</b>-->
-                    <b>用户登陆历史</b>
-                </p>
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value=" #{msg.userModifyRecord}"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id="userListForm">
@@ -53,10 +51,6 @@
                             <h:outputText value="#{item.orgName}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.position}" sortBy="#{item.position}" filterBy="#{item.position}"
-                                  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.position}"/>
-                        </p:column>
 
                         <p:column headerText="#{msg.telephone}" sortBy="#{item.telephone}" filterBy="#{item.telephone}"
                                   filterMatchMode="LIKE">
@@ -66,28 +60,6 @@
                         <p:column headerText="#{msg.email}" sortBy="#{item.email}" filterBy="#{item.email}"
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.email}"/>
-                        </p:column>
-
-                        <p:column headerText="#{msg.tenantUID}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}"
-                                  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.tenantUID}"/>
-                        </p:column>
-
-                        <p:column headerText="#{msg.institutionUID}" sortBy="#{item.institutionUID}"
-                                  filterBy="#{item.institutionUID}"
-                                  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.institutionUID}"/>
-                        </p:column>
-
-                        <p:column headerText="#{msg.hospitalUID}" sortBy="#{item.hospitalUID}"
-                                  filterBy="#{item.hospitalUID}"
-                                  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.hospitalUID}"/>
-                        </p:column>
-
-                        <p:column headerText="#{msg.siteUID}" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}"
-                                  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.siteUID}"/>
                         </p:column>
 
                         <p:column headerText="#{msg.operationType}" sortBy="#{item.operationType}"
@@ -138,11 +110,6 @@
 
             </div>
         </div>
-
-
-        <script type="text/javascript">
-
-        </script>
 
     </ui:define>
 
