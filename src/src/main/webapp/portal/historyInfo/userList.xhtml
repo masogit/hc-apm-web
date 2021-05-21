@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card">
+                <p align="center">
+                    <!--   <b>#{msg.QrCodeLib}</b>-->
+                    <b>用户登陆历史</b>
+                </p>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="LoginListForm">
+
+                    <p:dataTable id="datalist"
+                                 value="#{loginRecordController.lazyModel}"
+                                 var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single"
+                                 selection="#{loginRecordController.selected}"
+                                 lazy="true"
+                                 paginator="true"
+                                 paginatorPosition="both"
+                                 paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}"
+                                 sortMode="single"
+                                 sortOrder="descending"
+                                 sortBy="#{item.loginTime}"
+                                 paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20"
+                                 emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="filter" listener="#{loginRecordController.onFilter}"/>
+
+                        <p:column headerText="#{msg.loginName}" sortBy="#{item.loginName}" filterBy="#{item.loginName}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.loginName}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.loginUrl}" sortBy="#{item.loginUrl}" filterBy="#{item.loginUrl}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.loginUrl}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.loginIp}" sortBy="#{item.loginIp}" filterBy="#{item.loginIp}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.loginIp}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.isDeleted}" sortBy="#{item.isDeleted}" filterBy="#{item.isDeleted}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.isDeleted}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.loginTime}" sortBy="#{item.loginTime}" filterBy="#{item.loginTime}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.loginTime}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.logoutTime}" sortBy="#{item.logoutTime}"
+                                  filterBy="#{item.logoutTime}"
+                                  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.logoutTime}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s"
+                                             class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="loginRecord_export"/>
+                            </p:commandButton>
+                        </f:facet>
+
+                    </p:dataTable>
+                </h:form>
+
+            </div>
+        </div>
+
+
+
+        <script type="text/javascript">
+
+        </script>
+
+    </ui:define>
+
+</ui:composition>

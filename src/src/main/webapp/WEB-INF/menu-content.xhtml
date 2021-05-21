@@ -202,6 +202,12 @@
                 <p:menuitem value="#{msg.ZKBEngineerMgt}" outcome="/portal/zkb/engineer/List.xhtml " rendered="#{userContextService.accessContains('zkbBasicInfo.engineerMgt')}"/>
             </p:submenu>
 
+            <p:submenu id="um4001" label="日志审计" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}">
+                <p:menuitem id="item001" value="用户修改记录" outcome="/portal/historyInfo/userList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
+                <p:menuitem id="item002" value="资产修改记录" outcome="/portal/historyInfo/assetList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
+                <p:menuitem id="item003" value="登陆历史记录" outcome="/portal/historyInfo/loginList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
+            </p:submenu>
+
             <p:menuitem value="设备数据概览" icon="fa fa-bar-chart" outcome="/portal/nine.xhtml"/>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
