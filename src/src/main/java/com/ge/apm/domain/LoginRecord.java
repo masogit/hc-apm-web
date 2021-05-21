@@ -32,6 +32,10 @@ public class LoginRecord {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date loginTime;
 
+	@Column(name = "logout_time")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date logoutTime;
+
 	@Column(name = "login_ip")
 	private String loginIp;
 
@@ -68,6 +72,14 @@ public class LoginRecord {
 
 	public void setLoginTime(Date loginTime) {
 		this.loginTime = loginTime;
+	}
+
+	public Date getLogoutTime() {
+		return logoutTime;
+	}
+
+	public void setLogoutTime(Date logoutTime) {
+		this.logoutTime = logoutTime;
 	}
 
 	public String getLoginIp() {
