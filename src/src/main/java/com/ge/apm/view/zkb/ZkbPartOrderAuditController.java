@@ -577,7 +577,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return "";
                 }
             }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
-                if(CopyByInvok.T.equals(selected.getNewCatFlag())){
+                if(CopyByInvok.T.equals(selected.getNewCatFlag()) && StringUtils.isEmpty(selected.getProbeQuotaType())){
                     ZkbContract c = zkbContractRepository.findById(selected.getContractId());
                     if(c.getProbeQuota() < selected.getQty()){
                         WebUtil.addErrorMessage("探头剩余数量不足，请联系供应商！","");

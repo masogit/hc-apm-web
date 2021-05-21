@@ -3,4 +3,4 @@ insert into user_favorites(created_by,created_date,last_modified_by,last_modifie
 select value::jsonb->>'id' as userid,jsonb_array_elements(value::jsonb->'assets')->>'id' as aid from apm_config_info as aci
 where value like '%assets%' and value not like '%assets":[]%') as t
 LEFT JOIN user_account u on t.userid::int=u.id
-LEFT JOIN asset_info ai on ai.id=t.aid::int;
+LEFT JOIN asset_info ai on ai.id=t.aid::int where ai.system_id is not null and ai.system_id != '';
