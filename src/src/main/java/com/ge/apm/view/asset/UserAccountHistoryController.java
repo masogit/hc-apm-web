@@ -5,6 +5,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserAccountHistory;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -41,7 +42,24 @@ public class UserAccountHistoryController extends GenericCRUDController<UserAcco
     @Override
     protected Page<UserAccountHistory> loadData(PageRequest pageRequest) {
         setSearchFilter();
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<UserAccountHistory> pgData = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        List<UserAccountHistory> content = pgData.getContent();
+        content.stream().forEach(c -> {
+            if (StringUtils.isNotEmpty(c.getOperationType())) {
+                switch (c.getOperationType()) {
+                    case "CREATE":
+                        c.setOperationType("新增");
+                        break;
+                    case "DELETE":
+                        c.setOperationType("删除");
+                        break;
+                    case "UPDATE":
+                        c.setOperationType("修改");
+                        break;
+                }
+            }
+        });
+        return pgData;
     }
 
     @Override

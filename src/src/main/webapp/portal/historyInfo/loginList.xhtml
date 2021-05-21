@@ -7,11 +7,8 @@
 
     <ui:define name="content">
         <div class="ui-g">
-            <div class="ui-g-12 card">
-                <p align="center">
-                    <!--   <b>#{msg.QrCodeLib}</b>-->
-                    <b>用户登陆历史</b>
-                </p>
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value=" #{msg.loginHistoryRecord}"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id="LoginListForm">
@@ -61,7 +58,7 @@
                         <p:column headerText="#{msg.loginTime}" sortBy="#{item.loginTime}" filterBy="#{item.loginTime}"
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.loginTime}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
                             </h:outputText>
                         </p:column>
 
@@ -69,7 +66,7 @@
                                   filterBy="#{item.logoutTime}"
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.logoutTime}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
                             </h:outputText>
                         </p:column>
 
