@@ -10,7 +10,7 @@
         <h:outputScript name="js/assetUsageAll.js"/>
         <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
-<!--        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css"/>-->
+        <!--        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css"/>-->
         <style>
             div.ui-autocomplete.ui-autocomplete-multiple.asset-tags ul.ui-autocomplete-multiple-container{
                 max-width: 200px;
@@ -40,9 +40,9 @@
                             </p:panelGrid>
                         </div>
                         <div class="ui-g-4">
-<!--                            <p:galleria value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="attach" panelWidth="300" panelHeight="200" showCaption="false" rendered="#{!empty assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}">-->
-<!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;" onclick="javascript:showthis(this);"/>-->
-<!--                            </p:galleria>-->
+                            <!--                            <p:galleria value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="attach" panelWidth="300" panelHeight="200" showCaption="false" rendered="#{!empty assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}">-->
+                            <!--                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;" onclick="javascript:showthis(this);"/>-->
+                            <!--                            </p:galleria>-->
                             <div class="container-fluid" style="height: 400px; overflow: auto;">
                                 <div class="row" id="picDiv">
                                     <c:forEach items="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,1)}" var="attach" >
@@ -240,26 +240,26 @@
                 </p:panelGrid>
             </h:form>
 
-<!--            <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceExpo.series}">
-                 Chart 2: Device Exposure 
-                <div class="ui-g-12">
-                    <div class="block">
-                        <h3 class="block-title">#{msg.deviceExpohd}</h3>
-                        <p:chart id="exposure_bar" type="line" model="#{assetUsageSingleController.deviceExpo}" 
-                                 responsive="true"/>
-                    </div>
-                </div>
-            </p:fieldset>
-            <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceScan.series}">
-                 Chart 1: Device Scan  
-                <div class="ui-g-12">
-                    <div class="block">
-                        <h3 class="block-title">#{msg.deviceScanhd}</h3>
-                        <p:chart id="scan_bar" type="line"
-                                 model="#{assetUsageSingleController.deviceScan}" responsive="true"/>
-                    </div>
-                </div>
-            </p:fieldset>-->
+            <!--            <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceExpo.series}">
+                             Chart 2: Device Exposure
+                            <div class="ui-g-12">
+                                <div class="block">
+                                    <h3 class="block-title">#{msg.deviceExpohd}</h3>
+                                    <p:chart id="exposure_bar" type="line" model="#{assetUsageSingleController.deviceExpo}"
+                                             responsive="true"/>
+                                </div>
+                            </div>
+                        </p:fieldset>
+                        <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoDetailController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceScan.series}">
+                             Chart 1: Device Scan
+                            <div class="ui-g-12">
+                                <div class="block">
+                                    <h3 class="block-title">#{msg.deviceScanhd}</h3>
+                                    <p:chart id="scan_bar" type="line"
+                                             model="#{assetUsageSingleController.deviceScan}" responsive="true"/>
+                                </div>
+                            </div>
+                        </p:fieldset>-->
             <h:form>
                 <p:panel  header="#{msg.RelatedEquipmentUID}" rendered="#{assetInfoDetailController.showParentsTree()}">
                     <p:treeTable styleClass="ui-datatable"  value="#{assetInfoDetailController.getParentsRelationTree()}" var="assetItem">
@@ -287,7 +287,7 @@
 
                 <p:panel  header="#{msg.EquipmentRelatedContract}">
                     <f:facet name="actions">
-                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractList?faces-redirect=true&amp;assetUid='.concat(assetInfoDetailController.selected.uid))}" 
+                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractList?faces-redirect=true&amp;assetUid='.concat(assetInfoDetailController.selected.uid))}"
                                        disabled="#{not (userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff') and userContextService.versionContains('asset.mgt'))}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Create&amp;assetId='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                     </f:facet>
@@ -340,6 +340,13 @@
                             <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                         </p:dataList>
                     </p:tab>
+                    <c:forEach items="#{assetInfoDetailController.getAttachmentCategories()}" var="attachmentConfig">
+                        <p:tab title="#{attachmentConfig.label}">
+                            <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,attachmentConfig.boType)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            </p:dataList>
+                        </p:tab>
+                    </c:forEach>
                     <p:tab title="#{fieldMsg.fieldValue('attachmentType', 'vlink')}">
                         <p:dataList value="#{assetInfoDetailController.getAttachList(assetInfoDetailController.selected.uid,'vlink')}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
                             <p:link href="#{fileitem.extLink}" target="_blank">#{fileitem.objectName}</p:link>
@@ -390,8 +397,8 @@
             </div>
         </div>
         <script id="shwoPicDialog_s" type="text/javascript">$(function () {
-                PrimeFaces.cw("Dialog", "shwoPicDialog", {id: "shwoPicDialog", modal: true, appendTo: "@(body)"});
-            });
+            PrimeFaces.cw("Dialog", "shwoPicDialog", {id: "shwoPicDialog", modal: true, appendTo: "@(body)"});
+        });
         </script>
         <script>
             afterPageLoad = function () {

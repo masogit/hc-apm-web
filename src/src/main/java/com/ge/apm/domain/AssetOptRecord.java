@@ -83,18 +83,30 @@ public class AssetOptRecord implements Serializable {
 	@Column(name = "modify_by")
 	private String modifyByUid;
 
-//	@Transient
+	//住院号
+	@Column(name = "hospital_number")
+	private String hospitalNumber;
+
+	//床号
+	@Column(name = "bed_No")
+	private String bedNo;
+
+	//诊断结果
+	@Column(name = "diagnostic_result")
+	private String diagnosticResult;
+
+	//	@Transient
 	@JoinColumn(name = "create_by", referencedColumnName = "uid", insertable = false, updatable = false)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@NotFound(action= NotFoundAction.IGNORE)
 	private UserAccount createBy;
 
-//	@Transient
+	//	@Transient
 	@JoinColumn(name = "modify_by", referencedColumnName = "uid", insertable = false, updatable = false)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@NotFound(action= NotFoundAction.IGNORE)
 	private UserAccount modifyBy;
-	
+
 	@Transient
 	private String costTime;
 
@@ -126,10 +138,10 @@ public class AssetOptRecord implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 //	@Transient
 	private AssetInfo assetInfo;
-	
+
 	@Transient
 	private OrgInfo siteOrgInfo;
-	
+
 	@Transient
 	private String assetInfoname;
 	@Transient
@@ -152,6 +164,30 @@ public class AssetOptRecord implements Serializable {
 
 	public AssetOptRecord() {
 		super();
+	}
+
+	public String getHospitalNumber() {
+		return hospitalNumber;
+	}
+
+	public void setHospitalNumber(String hospitalNumber) {
+		this.hospitalNumber = hospitalNumber;
+	}
+
+	public String getBedNo() {
+		return bedNo;
+	}
+
+	public void setBedNo(String bedNo) {
+		this.bedNo = bedNo;
+	}
+
+	public String getDiagnosticResult() {
+		return diagnosticResult;
+	}
+
+	public void setDiagnosticResult(String diagnosticResult) {
+		this.diagnosticResult = diagnosticResult;
 	}
 
 	public String getId() {
