@@ -231,6 +231,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public static final String testStatusFalseValue = "f";
 
     /**
+     * 租户信息
+     */
+    @Autowired
+    private TenantInfoRepository tenantInfoRepository;
+
+    /**
      * 给申请单添加单号和索引
      * @param zkbFePartOrder
      * @return
@@ -1007,6 +1013,13 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         selected.setSystemId(selectZkbFePartOrder.getSystemId());
         selected.setContractId(selectZkbFePartOrder.getContractId());
         selected.setPhenomenon(selectZkbFePartOrder.getPhenomenon());
+        selected.setFunctionType(selectZkbFePartOrder.getFunctionType());
+        selected.setMachineStatus(selectZkbFePartOrder.getMachineStatus());
+        selected.setUrgencyStatus(selectZkbFePartOrder.getUrgencyStatus());
+        selected.setSubtractTotalStatus(selectZkbFePartOrder.getSubtractTotalStatus());
+        selected.setHospitalName(selectZkbFePartOrder.getHospitalName());
+        selected.setHospitalClientName(selectZkbFePartOrder.getHospitalClientName());
+        selected.setHospitalClientPhone(selectZkbFePartOrder.getHospitalClientPhone());
         ZkbContract zkbContract = this.zkbContractRepository.findById(selectZkbFePartOrder.getContractId());
         selected.setTenantUid(zkbContract.getTenantUID());
         List<AssetInfo> assetInfoList = this.assetInfoMapper.fetchByAssetInfoBySystemId(selectZkbFePartOrder.getSystemId(),selectZkbFePartOrder.getContractId());
@@ -1074,6 +1087,52 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }
     }
 
+    /**
+     * 批量获取合同信息
+     * @param zkbFePartOrderList 流程列表
+     * @return
+     */
+    public Map<String, ZkbContract> getContractMap(List<ZkbFePartOrder> zkbFePartOrderList)
+    {
+        Map<String,ZkbContract> contractMap = new HashMap<>();
+        if(CollectionUtils.isEmpty(zkbFePartOrderList))
+            return contractMap;
+        Set<String> contractIdSet = new HashSet<>();
+        for(ZkbFePartOrder item:zkbFePartOrderList)
+            contractIdSet.add(item.getContractId());
+        if(CollectionUtils.isEmpty(contractIdSet))
+            return contractMap;
+        List<ZkbContract> zkbContractList = this.zkbContractRepository.findByIdIn(contractIdSet);
+        if(CollectionUtils.isEmpty(zkbContractList))
+            return contractMap;
+        for(ZkbContract item:zkbContractList)
+            contractMap.put(item.getId(),item);
+        return contractMap;
+    }
+
+    /**
+     * 批量获取租户信息
+     * @param zkbFePartOrderList
+     * @return
+     */
+    public Map<String, TenantInfo> getTenantInfoMap(List<ZkbFePartOrder> zkbFePartOrderList)
+    {
+        Map<String,TenantInfo> tenantInfoMap = new HashMap<>();
+        if(CollectionUtils.isEmpty(zkbFePartOrderList))
+            return tenantInfoMap;
+        Set<String> tenantUidSet = new HashSet<>();
+        for(ZkbFePartOrder item:zkbFePartOrderList)
+            tenantUidSet.add(item.getTenantUid());
+        if(CollectionUtils.isEmpty(tenantUidSet))
+            return tenantInfoMap;
+        List<TenantInfo> tenantInfoList = this.tenantInfoRepository.findByUidIn(tenantUidSet);
+        if(CollectionUtils.isEmpty(tenantInfoList))
+            return tenantInfoMap;
+        for(TenantInfo item:tenantInfoList)
+            tenantInfoMap.put(item.getUid(),item);
+        return tenantInfoMap;
+    }
+
 
     /**
      * 根据订单列表生成MAP
@@ -1099,16 +1158,18 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         typeList.add(yesOrNo);
         typeList.add(emergency);
         Map<String,Map<String,String>> i18Map = this.getI18ToMap(typeList);
+        Map<String,ZkbContract> contractMap=this.getContractMap(zkbFePartOrderList);
+        Map<String,TenantInfo> tenantInfoMap=this.getTenantInfoMap(zkbFePartOrderList);
         if(CollectionUtils.isNotEmpty(zkbFePartOrderList))
         {
             for(ZkbFePartOrder item : zkbFePartOrderList){
                 if(ZkbFePartOrder.OrderType.ManMade.toString().equals(item.getOrderType()))
                 {
-                    HashMap<String,Object> map = this.getManMadeHashMap(item,i18Map);
+                    HashMap<String,Object> map = this.getManMadeHashMap(item,i18Map,contractMap,tenantInfoMap);
                     zkbManMadeFePartOrderDataList.add(map);
                 }else if(ZkbFePartOrder.OrderType.Probe.toString().equals(item.getOrderType()))
                 {
-                    HashMap<String,Object> map = this.getProbeHashMap(item,i18Map);
+                    HashMap<String,Object> map = this.getProbeHashMap(item,i18Map,contractMap,tenantInfoMap);
                     zkbProbeFePartOrderDataList.add(map);
                 }else if(ZkbFePartOrder.OrderType.SpareParts.toString().equals(item.getOrderType()))
                 {
@@ -1117,12 +1178,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     {
                         for(ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo:zkbFePartOrderAssetInfoList)
                         {
-                            HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map,zkbFePartOrderAssetInfo);
+                            HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map,zkbFePartOrderAssetInfo,contractMap,tenantInfoMap);
                             zkbSparePartFePartOrderDataList.add(map);
                         }
                     }else
                         {
-                            HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map,null);
+                            HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map,null,contractMap,tenantInfoMap);
                             zkbSparePartFePartOrderDataList.add(map);
                         }
                 }
@@ -1169,12 +1230,13 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param i18Map i18 Map集合
      * @return
      */
-    public HashMap<String,Object> getManMadeHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map)
+    public HashMap<String,Object> getManMadeHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map,Map<String,ZkbContract> contractMap,Map<String,TenantInfo> tenantInfoMap)
     {
         HashMap<String,Object> manMadeMap = new HashMap();
         if(zkbFePartOrder==null){
             return manMadeMap;
         }
+        this.fullContractAndTenantInfo(contractMap,tenantInfoMap,manMadeMap,zkbFePartOrder);
         manMadeMap.put(WebUtil.getMessage("zkbFePartOrder_systemId"),zkbFePartOrder.getSystemId());
         manMadeMap.put(WebUtil.getMessage("zkbFePartOrder_orderNo"),zkbFePartOrder.getPartOrderNo());
         manMadeMap.put(WebUtil.getMessage("zkbFePartOrder_reportUser"),zkbFePartOrder.getReportUser());
@@ -1212,16 +1274,40 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     }
 
     /**
+     * 组装租户信息和合同信息
+     * @param contractMap 合同集合
+     * @param tenantInfoMap 租户集合
+     * @param map 导出数据集合
+     * @param zkbFePartOrder 当前流程数据
+     */
+    public void fullContractAndTenantInfo(Map<String,ZkbContract> contractMap,Map<String,TenantInfo> tenantInfoMap,HashMap<String,Object> map,ZkbFePartOrder zkbFePartOrder)
+    {
+        ZkbContract zkbContract = contractMap.get(zkbFePartOrder.getContractId());
+        if(zkbContract!=null)
+        {
+            map.put(WebUtil.getMessage("zkbContract_contractNo"),zkbContract.getContractNo());
+            map.put(WebUtil.getMessage("zkbContract_region"),zkbContract.getRegion());
+            map.put(WebUtil.getMessage("zkbContract_contractType"),zkbContract.getContractType());
+        }
+        TenantInfo tenantInfo = tenantInfoMap.get(zkbFePartOrder.getTenantUid());
+        if(tenantInfo!=null)
+        {
+            map.put(WebUtil.getMessage("zkbContact_tenant"),tenantInfo.getName());
+        }
+    }
+
+    /**
      * 根据探头申请生成HashMap
      * @param zkbFePartOrder 人工申请List
      * @return
      */
-    public HashMap<String,Object> getProbeHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map)
+    public HashMap<String,Object> getProbeHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map,Map<String,ZkbContract> contractMap,Map<String,TenantInfo> tenantInfoMap)
     {
         HashMap probeMap = new HashMap();
         if(zkbFePartOrder==null){
             return probeMap;
         }
+        this.fullContractAndTenantInfo(contractMap,tenantInfoMap,probeMap,zkbFePartOrder);
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_systemId"),zkbFePartOrder.getSystemId());
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_probeOrderNo"),zkbFePartOrder.getPartOrderNo());
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_reportUser"),zkbFePartOrder.getReportUser());
@@ -1302,13 +1388,14 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbFePartOrderAssetInfo 申请信息
      * @return
      */
-    public HashMap<String,Object> getSparePartHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map,ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo)
+    public HashMap<String,Object> getSparePartHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map,ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo,Map<String,ZkbContract> contractMap,Map<String,TenantInfo> tenantInfoMap)
     {
         HashMap sparePartMap = new HashMap();
         if(zkbFePartOrder==null){
             return sparePartMap;
         }
         sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_systemId"),zkbFePartOrder.getSystemId());
+        this.fullContractAndTenantInfo(contractMap,tenantInfoMap,sparePartMap,zkbFePartOrder);
         if(i18Map.containsKey(artificialType )&&i18Map.get(artificialType ).containsKey(zkbFePartOrder.getArtificialType()))
         {
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_artificialType"),i18Map.get(artificialType).get(zkbFePartOrder.getArtificialType()));

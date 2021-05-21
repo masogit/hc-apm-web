@@ -26,4 +26,12 @@ public interface ZkbFePartOrderRepository extends GenericRepositoryUUID<ZkbFePar
      */
     List<ZkbFePartOrder> findByPartOrderNo(String partOrderNo);
 
+
+    /**
+     * 根据父流程编号批量获取数据
+     * @param fatherPartOrderNoList 父流程编号
+     * @return
+     */
+    List<ZkbFePartOrder> findByPartOrderNoIn(List<String> fatherPartOrderNoList);
+
 }
