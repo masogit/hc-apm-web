@@ -68,12 +68,12 @@
                             <h:outputText value="#{item.operationType}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.createdBy}" sortBy="#{item.createdBy}" filterBy="#{item.createdBy}"
+                        <p:column headerText="#{msg.modifiedBy}" sortBy="#{item.createdBy}" filterBy="#{item.createdBy}"
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.createdBy}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.createdDate}" sortBy="#{item.createdDate}"
+                        <p:column headerText="#{msg.modifiedTime}" sortBy="#{item.createdDate}"
                                   filterBy="#{item.createdDate}"
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.createdDate}">
