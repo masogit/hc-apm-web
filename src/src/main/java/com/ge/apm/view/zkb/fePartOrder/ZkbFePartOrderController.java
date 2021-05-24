@@ -188,6 +188,45 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     protected Page<ZkbFePartOrder> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
         zkbFePartOrderPage=zkbFePartOrderRepository.findBySearchFilter(searchFilters, pageRequest);
+//        this.fullPage(zkbFePartOrderPage);
+        return zkbFePartOrderPage;
+    }
+
+    private Page<ZkbFePartOrder> fullPage( Page<ZkbFePartOrder> zkbFePartOrderPage)
+    {
+        List<ZkbFePartOrder> zkbFePartOrderList = zkbFePartOrderPage.getContent();
+        if(CollectionUtils.isEmpty(zkbFePartOrderList))
+            return zkbFePartOrderPage;
+        List<String> fatherPartOrderNoList = new ArrayList<>();
+        for(ZkbFePartOrder item:zkbFePartOrderList)
+        {
+            if(StringUtils.isBlank(item.getFatherPartOrderNo()))
+                continue;
+            fatherPartOrderNoList.add(item.getFatherPartOrderNo());
+        }
+        if(CollectionUtils.isEmpty(fatherPartOrderNoList))
+            return zkbFePartOrderPage;
+        List<ZkbFePartOrder> zkbFePartOrders = this.zkbFePartOrderRepository.findByPartOrderNoIn(fatherPartOrderNoList);
+        HashMap<String,ZkbFePartOrder> hashMap = new HashMap<>();
+        if(CollectionUtils.isEmpty(zkbFePartOrders))
+            return zkbFePartOrderPage;
+        for(ZkbFePartOrder item:zkbFePartOrders)
+            hashMap.put(item.getPartOrderNo(),item);
+        for(ZkbFePartOrder item:zkbFePartOrderList)
+        {
+            if(StringUtils.isBlank(item.getFatherPartOrderNo()))
+                continue;
+            ZkbFePartOrder fatherZkbFePartOrder = hashMap.get(item.getFatherPartOrderNo());
+            if(fatherZkbFePartOrder==null)
+                continue;
+            item.setFunctionType(fatherZkbFePartOrder.getFunctionType());
+            item.setMachineStatus(fatherZkbFePartOrder.getMachineStatus());
+            item.setUrgencyStatus(fatherZkbFePartOrder.getUrgencyStatus());
+            item.setSubtractTotalStatus(fatherZkbFePartOrder.getSubtractTotalStatus());
+            item.setHospitalName(fatherZkbFePartOrder.getHospitalName());
+            item.setHospitalClientName(fatherZkbFePartOrder.getHospitalClientName());
+            item.setHospitalClientPhone(fatherZkbFePartOrder.getHospitalClientPhone());
+        }
         return zkbFePartOrderPage;
     }
 

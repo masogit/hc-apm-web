@@ -1,6 +1,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ZkbFePartOrderAssetInfo;
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
@@ -25,5 +26,8 @@ public interface ZkbFePartOrderAssetInfoRepository extends GenericRepositoryUUID
      * @return 归还列表
      */
     List<ZkbFePartOrderAssetInfo> findByFePartOrderIdAndAssetNo(String fePartOrderId,String assetNo);
+
+    @Query(value = "SELECT sum(asset_qty) from zkb_fe_part_order_asset_info where fe_part_order_id = ?1", nativeQuery = true)
+    Integer fetchQty(String fePartOrderId);
 
 }
