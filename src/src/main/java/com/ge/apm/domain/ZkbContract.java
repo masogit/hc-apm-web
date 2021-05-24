@@ -33,6 +33,10 @@ public class ZkbContract implements ChineseName, Serializable {
         PCB,Biomed,CCS,DI
     }
 
+    public enum ModifyTypeEnum{
+        OC,NextYearBalance,Others
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -273,6 +277,9 @@ public class ZkbContract implements ChineseName, Serializable {
     @Transient
     private String agentName;
 
+    @Column(name = "modify_type")
+    private String modifyType;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false,name = "contract_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     List<ZkbContractCourse> zkbContractCourses = new ArrayList<>();
@@ -281,6 +288,15 @@ public class ZkbContract implements ChineseName, Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false,name = "contract_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     Set<ZkbContractAsset> zkbContractAssets = new HashSet<>();
+
+
+    public String getModifyType() {
+        return modifyType;
+    }
+
+    public void setModifyType(String modifyType) {
+        this.modifyType = modifyType;
+    }
 
     public Integer getProbeQuotaHighUse() {
         return probeQuotaHighUse;
