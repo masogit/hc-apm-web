@@ -73,6 +73,15 @@ public class ZkbFePartOrderAssetInfo {
     private String comment;
 
     /**
+     * 修改备注
+     */
+    @Column(name = "update_comment")
+    private String updateComment;
+
+    @Column(name = "before_Adjust_Asset_Qty")
+    private Integer beforeAdjustAssetQty;
+
+    /**
      * 用于判断list中选中是哪个对象
      */
     @Transient
@@ -166,6 +175,14 @@ public class ZkbFePartOrderAssetInfo {
         this.comment = comment;
     }
 
+    public String getUpdateComment() {
+        return updateComment;
+    }
+
+    public void setUpdateComment(String updateComment) {
+        this.updateComment = updateComment;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -191,5 +208,11 @@ public class ZkbFePartOrderAssetInfo {
         return "com.ge.apm.domain.ZkbFePartOrderAssetInfo[ id=" + id + " ]";
     }
 
+    public Integer getBeforeAdjustAssetQty() {
+        return beforeAdjustAssetQty;
+    }
 
+    public void setBeforeAdjustAssetQty(Integer beforeAdjustAssetQty) {
+        this.beforeAdjustAssetQty = beforeAdjustAssetQty;
+    }
 }
