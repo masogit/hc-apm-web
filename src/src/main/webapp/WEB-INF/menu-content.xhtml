@@ -202,7 +202,7 @@
                 <p:menuitem value="#{msg.ZKBEngineerMgt}" outcome="/portal/zkb/engineer/List.xhtml " rendered="#{userContextService.accessContains('zkbBasicInfo.engineerMgt')}"/>
             </p:submenu>
 
-            <p:submenu id="um4001" label="日志审计" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}">
+            <p:submenu id="um4001" label="#{msg.logView}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}">
                 <p:menuitem id="item001" value="#{msg.userModifyRecord}" outcome="/portal/historyInfo/userList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
                 <p:menuitem id="item002" value="#{msg.assetModifyRecord}" outcome="/portal/historyInfo/assetList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>
                 <p:menuitem id="item003" value="#{msg.loginHistoryRecord}" outcome="/portal/historyInfo/loginList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}"/>

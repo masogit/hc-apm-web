@@ -98,3 +98,27 @@ where asset_info.uid = cte.uid and asset_info.medical_apparatus_classification i
 update arrival_list_item set function_type=(select function_type from arrival_list where id=arrival_list_item.arrival_list_id);
 --2020-05-19 game plan添加batch file type
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','ProbeRecommendExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+
+
+
+--2021-05-24  start
+--'日志审计-用户修改记录'页面的字段
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','orgName','所属部门','org name',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','comment','备注','comment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','isLocked','锁定？','is locked',NULL,-1);
+
+--menu菜单(日志审计： 用户修改记录， 资产修改记录， 登陆历史记录)
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','logView','日志审计','log view',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','userModifyRecord','用户修改记录','user modify record',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','assetModifyRecord','资产修改记录','asset modify record',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginHistoryRecord','登陆历史记录','login record',NULL,-1);
+
+--'日志审计-登陆历史记录'页面的字段
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginName','登陆姓名','login name',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginUrl','登陆网址','login url',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginIp','登陆ip','login ip',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginTime','登陆时间','login time',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','logoutTime','登出时间','logout time',NULL,-1);
+--2021-05-24  end
+
+
