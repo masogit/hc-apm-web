@@ -157,6 +157,7 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("Department"), workOrderExportPojo.getAssetClinicalDeptName());
             workOrderMap.put(WebUtil.getMessage("manufacture"), workOrderExportPojo.getAssetManufacture());
             workOrderMap.put(WebUtil.getMessage("brand"), workOrderExportPojo.getAssetMakerShortName());
+            workOrderMap.put(WebUtil.getMessage("MaintenanceSubStatus"), getSubStatus(workOrderExportPojo.getSubStatus()));
             workOrderMap.put(WebUtil.getMessage("CurrentOwner_xlsx"), workOrderExportPojo.getCurrentPersonName());
             //workOrderMap.put("当前步骤", workOrderExportPojo.getCurrentStepName());
             Integer currentStepId = workOrderExportPojo.getCurrentStepId();
@@ -643,6 +644,27 @@ public class WorkOrderExportService {
             }
         }
         return partType;
+    }
+
+    private String getSubStatus(Integer status) {
+        String subStatus = null;
+
+        if (status != null) {
+            switch (status) {
+                case 1:
+                    subStatus = "等待备件";
+                    break;
+                case 2:
+                    subStatus = "返厂维修-有备机";
+                    break;
+                case 3:
+                    subStatus = "返厂维修-无备机";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return subStatus;
     }
 
     private String getPdfStatus(Integer status) {
