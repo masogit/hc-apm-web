@@ -121,9 +121,9 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("探头特殊剩余名额", "setProbeQuotaSpecial");
             contractRow.setFieldNumValue("探头特殊已使用名额", "setProbeQuotaSpecialUse");
 
-            contractRow.setFieldNumValue("探头高值总额", "setProbeQuotaHighTotal");
+            /*contractRow.setFieldNumValue("探头高值总额", "setProbeQuotaHighTotal");
             contractRow.setFieldNumValue("探头高值剩余名额", "setProbeQuotaHigh");
-            contractRow.setFieldNumValue("探头高值已使用名额", "setProbeQuotaHighUse");
+            contractRow.setFieldNumValue("探头高值已使用名额", "setProbeQuotaHighUse");*/
 
             contractRow.setFieldNumValue("备件+人工+保养总额", "setSpareArtificailTotal");
             contractRow.setFieldNumValue("备件+人工+保养剩余名额", "setSpareArtificail");

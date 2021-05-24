@@ -146,7 +146,7 @@
                                 <label class="label">探头特殊已使用名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaSpecialUse}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <!--<h:panelGroup>
                                 <label class="label">探头高值总名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaHighTotal}" min="0" max="1000"  />
                             </h:panelGroup>
@@ -161,7 +161,7 @@
                             <h:panelGroup>
                                 <label class="label">探头高值已使用名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaHighUse}" min="0" max="1000"  />
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                         </c:if>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_geArtificialSupportTimes_total}</label>
@@ -224,6 +224,13 @@
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_adminAddress}</label>
                             <p:inputText id="address" value="#{zkbContractEditController.selected.adminAddress}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{!(empty zkbContractEditController.selected.id)}">
+                            <label class="label">修改类型</label>
+                            <p:selectOneMenu id="orderType" value="#{zkbPartOrderEditController.selected.modifyType}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractModifyType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_remark}</label>
