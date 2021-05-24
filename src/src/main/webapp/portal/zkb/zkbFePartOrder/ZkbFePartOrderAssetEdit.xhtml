@@ -22,7 +22,7 @@
                 </h:panelGroup>
                 <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('Requested')}" >
                     <label class="label">#{msg.zkbFePartOrder_assetQty}*</label>
-                    <p:spinner  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderAssetInfo.assetQty}" required="true"  min="0" max="#{zkbFePartOrderSparePartDetailController.maxAssetQty}"  />
+                    <p:spinner  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderAssetInfo.assetQty}" required="true"  min="1" max="#{zkbFePartOrderSparePartDetailController.maxAssetQty}"  />
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">备注</label>

@@ -126,10 +126,6 @@
                             <label class="label">#{msg.zkbFePartOrder_systemId}</label>
                             <p:inputText   disabled="true" value="#{zkbFePartOrderProbeController.selected.systemId}"    />
                         </h:panelGroup>
-<!--                        <h:panelGroup>-->
-<!--                            <label class="label">报修单号</label>-->
-<!--                            <p:inputText  disabled="true" value="#{zkbFePartOrderProbeController.selected.fatherPartOrderNo}" />-->
-<!--                        </h:panelGroup>-->
                         <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.currentStep.equals('Requested')}">
                             <label class="label">#{msg.zkbFePartOrder_probeOrderNo}</label>
                             <p:inputText disabled="true"  value="#{zkbFePartOrderProbeController.selected.partOrderNo}" />
