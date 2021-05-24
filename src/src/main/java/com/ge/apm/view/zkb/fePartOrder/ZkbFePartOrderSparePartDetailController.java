@@ -322,6 +322,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public void prepareItemEdit(){
         this.actionItemName = "Edit";
+        if(StringUtils.isNotBlank(this.selectZkbFePartOrderAssetInfo.getId()))
         this.maxAssetQty =this.zkbFePartOrderAssetInfoRepository.findById(this.selectZkbFePartOrderAssetInfo.getId()).getAssetQty();
     }
 
