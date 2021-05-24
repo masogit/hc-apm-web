@@ -59,7 +59,7 @@
 				</p:column>
 				<p:column headerText="#{msg.ReportDownload}" exportable="false">
 					<p:repeat value="#{item.reports}" var="report">
-						<p:commandLink actionListener="#{assetLifecycleEvent3Controller.getAnonymousReport(report.storageId)}" value="#{report.displayName}"/>
+						<h:commandLink action="#{assetLifecycleEvent3Controller.getAnonymousReport(report.storageId)}" value="#{report.displayName}" />
 						<br />
 					</p:repeat>
 				</p:column>
