@@ -225,6 +225,13 @@ public class WorkOrderExportService {
             workOrderMap.put(WebUtil.getMessage("CurrentLocation_xlsx"), workOrderExportPojo.getLocationName());
             //workOrderMap.put("报修状态", workOrderExportPojo.getAssetStatusName());
             workOrderMap.put(WebUtil.getMessage("RequestStatus_xlsx"), workOrderExportPojo.getAssetStatus() != null ? FieldValueMessageController.fieldValue("assetStatus", workOrderExportPojo.getAssetStatus().toString()) : "");
+            V2_WorkOrder v2_workOrder = v2WorkOrderDao.findById(workOrderExportPojo.getId());
+            AssetInfo assetInfo = null;
+            if(v2_workOrder!=null) {
+                assetInfo = assetInfoDao.findById(v2_workOrder.getAssetId());
+            }
+                workOrderMap.put("设备价格", assetInfo !=null ? assetInfo.getPurchasePrice() : null);
+                workOrderMap.put("采购日期", assetInfo !=null ? assetInfo.getPurchaseDate() : null);
 
             if (workOrderExportPojo.getAssetFunctionGroup() != null) {
                 workOrderMap.put(WebUtil.getMessage("MedicalDeviceClassification_xlsx"), workOrderExportPojo.getAssetFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType", workOrderExportPojo.getAssetFunctionGroup().toString()) : "");
@@ -380,7 +387,7 @@ public class WorkOrderExportService {
             SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(siteFilter);
         }
-        
+
         if(clinicalDept !=null){
             List<OrgInfo> orgSearchList = new ArrayList<>();
             orgSearchList.add(clinicalDept);
