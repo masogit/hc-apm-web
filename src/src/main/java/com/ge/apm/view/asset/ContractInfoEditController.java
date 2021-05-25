@@ -28,6 +28,7 @@ import javax.faces.bean.ViewScoped;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import java.util.Collections;
@@ -285,6 +286,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         uploadedFileObjects.clear();
     }
 
+    @Transactional
     public void saveContract() {
         if (!Strings.isNullOrEmpty(selected.getContractNum())) {
             List<ContractInfo> contractList = dao.findByContractNumAndTenantUID(selected.getContractNum(), selected.getTenantUID());
@@ -314,8 +316,8 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             // 质保合同
             allItemList.stream().filter(item -> null != item.getAssetInfo()).forEach(item -> udpateAssetInfoWarranty(item.getAssetInfo()));
         }
-
-        allItemList = contractService.getContractItems(selected.getId());
+        allItemList.stream().forEach(item -> item.setContractId(selected.getId()));
+        contractItemDao.save(allItemList);
         WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
     }
 
@@ -557,8 +559,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         if (!allItemList.contains(paymentInfo)) {
             allItemList.add(paymentInfo);
         }
-
-        contractItemDao.save(paymentInfo);
+//        contractItemDao.save(paymentInfo);
     }
 
     public Boolean getCanBeEdit() {
