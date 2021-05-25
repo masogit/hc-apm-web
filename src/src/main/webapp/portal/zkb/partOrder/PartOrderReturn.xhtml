@@ -6,20 +6,23 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="zkbPartOrderReturnEditDlg" widgetVar="zkbPartOrderReturnEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还明细操作" height="550">
+    <p:dialog id="zkbPartOrderReturnEditDlg" widgetVar="zkbPartOrderReturnEditDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还明细操作" height="550" width="500">
         <h:form id="zkbItemEditForm">
             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                 <h:panelGroup>
                     <label class="label">运单号*</label>
                     <p:inputText id="waybillNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.waybillNo}" required="true" requiredMessage="#{msg.zkbPartOrder_waybillNo} #{msg.ValidationRequire}" />
                 </h:panelGroup>
-
                 <h:panelGroup>
                     <label class="label">配件号*</label>
                     <p:selectOneMenu id="partNo" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.partNo}" required="true" requiredMessage="配件号不能为空">
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{zkbPartOrderAuditController.partNoList}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                     </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">归还日期*</label>
+                    <p:calendar timeZone="GMT+8"   id="returnDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">归还类型*</label>
@@ -63,10 +66,7 @@
                     <label class="label">归还数量*</label>
                     <p:spinner id="courseCount" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.qty}" min="1" max="1000" />
                 </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">归还日期*</label>
-                    <p:calendar timeZone="GMT+8"  mode="inline" id="returnDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.returnDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
-                </h:panelGroup>
+
                 <h:panelGroup>
                     <label class="label">备注</label>
                     <p:inputText id="remark" value="#{zkbPartOrderAuditController.zkbPartOrderReturn.remark}"  />
