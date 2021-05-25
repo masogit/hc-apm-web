@@ -188,16 +188,40 @@ public class ZkbContractImportService {
 
     @Transactional(rollbackFor = Exception.class)
     protected void importOneContract(ZkbContractVO contractInfoVO,UserAccount currentUser) {
-        ZkbContract newZkbContract = new ZkbContract();
-        BeanUtils.copyProperties(contractInfoVO, newZkbContract);
-        newZkbContract.setCreatedBy(currentUser.getLoginName());
-        newZkbContract.setCreatedDate(new Date());
+        ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
+        if(zkbContract != null){
+            zkbContract.setSpareQuotaTotal(contractInfoVO.getSpareQuotaTotal());
+            zkbContract.setSpareQuota(contractInfoVO.getSpareQuota());
+            zkbContract.setSpareQuotaUse(contractInfoVO.getSpareQuotaUse());
 
-        newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
-        newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
-        newZkbContract.setGeArtificialSupportTimesApply(newZkbContract.getGeArtificialSupportTimesTotal() - newZkbContract.getGeArtificialSupportTimesUse() - newZkbContract.getGeArtificialSupportTimes());
-        newZkbContract.setSpareArtificailApply(newZkbContract.getSpareArtificailTotal() - newZkbContract.getSpareArtificailUse() - newZkbContract.getSpareArtificail());
-        zkbContractRepository.save(newZkbContract);
+            zkbContract.setProbeQuotaTotal(contractInfoVO.getProbeQuotaTotal());
+            zkbContract.setProbeQuota(contractInfoVO.getProbeQuota());
+            zkbContract.setProbeQuotaUse(contractInfoVO.getProbeQuotaUse());
+
+            zkbContract.setSpareArtificailTotal(contractInfoVO.getSpareArtificailTotal());
+            zkbContract.setSpareArtificail(contractInfoVO.getSpareArtificail());
+            zkbContract.setSpareArtificailUse(contractInfoVO.getSpareArtificailUse());
+
+            zkbContract.setGeArtificialSupportTimesTotal(contractInfoVO.getGeArtificialSupportTimesTotal());
+            zkbContract.setGeArtificialSupportTimes(contractInfoVO.getGeArtificialSupportTimes());
+            zkbContract.setGeArtificialSupportTimesUse(contractInfoVO.getGeArtificialSupportTimesUse());
+
+            zkbContract.setLastModifiedBy(currentUser.getLoginName());
+            zkbContract.setLastModifiedDate(new Date());
+            zkbContractRepository.save(zkbContract);
+        }else{
+            ZkbContract newZkbContract = new ZkbContract();
+            BeanUtils.copyProperties(contractInfoVO, newZkbContract);
+            newZkbContract.setCreatedBy(currentUser.getLoginName());
+            newZkbContract.setCreatedDate(new Date());
+
+            newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
+            newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
+            newZkbContract.setGeArtificialSupportTimesApply(newZkbContract.getGeArtificialSupportTimesTotal() - newZkbContract.getGeArtificialSupportTimesUse() - newZkbContract.getGeArtificialSupportTimes());
+            newZkbContract.setSpareArtificailApply(newZkbContract.getSpareArtificailTotal() - newZkbContract.getSpareArtificailUse() - newZkbContract.getSpareArtificail());
+            zkbContractRepository.save(newZkbContract);
+        }
+
     }
 
     public boolean checkData(Map<String, Object> item, List<Map<String, Object>> importContractMapList,Map<String, String> tenantInfoMap) {
@@ -212,12 +236,12 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractNoIsEmpty"));
             isValidateData = false;
         }else{
-            ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
+           /* ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
             if(zkbContract != null){
                 item.put("status", ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractNoIsExist"));
                 isValidateData = false;
-            }
+            }*/
         }
 
         if(contractInfoVO.getRegion() == null){
