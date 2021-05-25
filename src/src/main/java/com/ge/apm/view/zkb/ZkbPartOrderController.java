@@ -54,6 +54,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private boolean showStatusBtn = true;
     private boolean vacationBtn = false;
     private String isVacation;
+    private boolean canDelete= false;
 
 
     @Override
@@ -90,6 +91,12 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) && ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrderUserConfig.getOrderType())){
                         isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
                         vacationBtn = true;
+                    }
+                }
+                for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
+                    if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(c.getConfigType())){
+                        canDelete = true;
+                        break;
                     }
                 }
             }
@@ -494,5 +501,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setVacationBtn(boolean vacationBtn) {
         this.vacationBtn = vacationBtn;
+    }
+
+    public boolean isCanDelete() {
+        return canDelete;
+    }
+
+    public void setCanDelete(boolean canDelete) {
+        this.canDelete = canDelete;
     }
 }
