@@ -107,6 +107,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Transactional(rollbackFor = Exception.class)
     public void delete(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
+        List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(zkbPartOrder.getId());
         zkbPartOrderItemRepository.deleteByPartOrderId(zkbPartOrder.getId());
         zkbPartOrderStepRepository.deleteByPartOrderId(zkbPartOrder.getId());
         zkbPartOrderRepository.delete(zkbPartOrder);
@@ -114,6 +115,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(zkbContract != null){
             subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount);
         }
+
+        zkbPartOrder.setZkbPartOrderItems(zkbPartOrderItems);
         zkbPartOrder.setAssetInfo(null);
         ZkbContractLog zkbContractLog = new ZkbContractLog();
         zkbContractLog.setContractId(zkbPartOrder.getId());

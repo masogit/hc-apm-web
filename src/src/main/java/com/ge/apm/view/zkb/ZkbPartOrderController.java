@@ -55,7 +55,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private boolean vacationBtn = false;
     private String isVacation;
     private boolean canDelete= false;
-
+    private boolean operateDelete = false;
 
     @Override
     protected void init() {
@@ -365,6 +365,22 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     }
 
     @Override
+    public void prepareEdit() {
+        crudActionName = "Edit";
+        if(StringUtils.isEmpty(selected.getId())){
+            operateDelete = Boolean.TRUE;
+        }else if(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.DirectorReject.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
+            operateDelete = Boolean.FALSE;
+        }else{
+            operateDelete = Boolean.TRUE;
+        }
+    }
+
+
+    @Override
     public void delete() {
         //if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus())){
             zkbPartOrderService.delete(this.selected,currentUser);
@@ -509,5 +525,13 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setCanDelete(boolean canDelete) {
         this.canDelete = canDelete;
+    }
+
+    public boolean isOperateDelete() {
+        return operateDelete;
+    }
+
+    public void setOperateDelete(boolean operateDelete) {
+        this.operateDelete = operateDelete;
     }
 }
