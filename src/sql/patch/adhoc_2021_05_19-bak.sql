@@ -1,3 +1,8 @@
+-- 删除开关机登记的外键约束
+ALTER TABLE asset_opt_record DROP CONSTRAINT "fk3goow0twmmkvcf8rem5juby3j";
+ALTER TABLE asset_opt_record DROP CONSTRAINT "fkhmd105dn8hl6gywkb5wffemxw";
+ALTER TABLE asset_opt_record DROP CONSTRAINT "fkfxunn74gmcytw84gwilo20apk";
+
 -- 删除收藏表唯一约束
 ALTER TABLE user_favorites DROP CONSTRAINT "uk_c0m37nir6vp9w1hdoffxtcpr";
 
@@ -98,3 +103,7 @@ where asset_info.uid = cte.uid and asset_info.medical_apparatus_classification i
 update arrival_list_item set function_type=(select function_type from arrival_list where id=arrival_list_item.arrival_list_id);
 --2020-05-19 game plan添加batch file type
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','ProbeRecommendExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+
+
+
+
