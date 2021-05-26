@@ -40,7 +40,7 @@ public class CoilOpportunityImageDetailController {
         if (attachements == null) {
             attachements = blobService.findBlobObjectsByBoUid(cataLog);
         }
-        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG)).collect(Collectors.toList());
+        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG) && item.getBoType().equals(V2_BlobObject.BO_TYPE_COIL_OPPORTUNITY) ).collect(Collectors.toList());
         return collect;
     }
 
