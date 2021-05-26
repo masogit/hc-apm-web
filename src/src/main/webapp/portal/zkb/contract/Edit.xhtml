@@ -227,7 +227,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{!(empty zkbContractEditController.selected.id)}">
                             <label class="label">修改类型</label>
-                            <p:selectOneMenu id="modifyType" value="#{zkbContractEditController.selected.modifyType}" >
+                            <p:selectOneMenu id="modifyType" value="#{zkbContractEditController.selected.modifyType}" required="true" requiredMessage="修改类型 #{msg.ValidationRequire}" >
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractModifyType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
