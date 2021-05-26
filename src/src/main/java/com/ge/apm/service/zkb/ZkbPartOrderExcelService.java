@@ -136,6 +136,8 @@ public class ZkbPartOrderExcelService {
                     zkbPartOrderDataMap.put("价格", i.getPrice());
                     zkbPartOrderDataMap.put("备注（说明是否DOA或者Short life）", i.getRemark());
                 }
+            }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(p.getOrderType())){
+                zkbPartOrderDataMap = getPartOrderMap(p);
             }
             zkbPartOrderReportDataList.add(zkbPartOrderDataMap);
         }

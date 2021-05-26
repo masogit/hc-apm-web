@@ -1,5 +1,6 @@
 package com.ge.apm.service.zkb;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.ZkbPartOrderMapper;
 import com.ge.apm.domain.*;
@@ -84,6 +85,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     private ZkbPartOrderReturnHistoryRepository zkbPartOrderReturnHistoryRepository;
 
     @Autowired
+    private ZkbContractLogRepository zkbContractLogRepository;
+
+    @Autowired
     private ZkbIntegralService zkbIntegralService;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -110,6 +114,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         if(zkbContract != null){
             subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount);
         }
+        zkbPartOrder.setAssetInfo(null);
+        ZkbContractLog zkbContractLog = new ZkbContractLog();
+        zkbContractLog.setContractId(zkbPartOrder.getId());
+        zkbContractLog.setContractNo(zkbPartOrder.getPartOrderNo());
+        zkbContractLog.setLogType(ZkbContractLog.LogType.zkbPartOrderDelete.toString());
+        zkbContractLog.setJsonData(JSON.toJSONString(zkbPartOrder));
+        zkbContractLog.setLoginUserName(userAccount.getName());
+        zkbContractLog.setCreatedDate(new Date());
+        zkbContractLogRepository.save(zkbContractLog);
     }
 
 
