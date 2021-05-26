@@ -121,7 +121,7 @@ public class IBUInfoImageEditController extends JpaCRUDController<IBUInfoImage> 
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             attachements.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_COIL_OPPORTUNITY);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_IBU_INFO);
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
             blobObject.setBoUuid(selected.getIbuOffer());
             blobService.saveBlobObject(blobObject);
@@ -166,7 +166,7 @@ public class IBUInfoImageEditController extends JpaCRUDController<IBUInfoImage> 
         List<V2_BlobObject> attachList = new ArrayList<>();
         for (String item : selectedPictures) {
             V2_BlobObject blobObject = blobDao.findAllByObjectStorageId(item).stream().findFirst().get();
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_COIL_OPPORTUNITY);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_IBU_INFO);
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
             blobObject.setBoUuid(image.getIbuOffer());
             blobObject.setBoId(image.getId());
