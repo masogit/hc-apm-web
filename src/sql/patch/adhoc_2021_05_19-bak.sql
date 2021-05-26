@@ -1,8 +1,3 @@
--- 删除开关机登记的外键约束
-ALTER TABLE asset_opt_record DROP CONSTRAINT "fk3goow0twmmkvcf8rem5juby3j";
-ALTER TABLE asset_opt_record DROP CONSTRAINT "fkhmd105dn8hl6gywkb5wffemxw";
-ALTER TABLE asset_opt_record DROP CONSTRAINT "fkfxunn74gmcytw84gwilo20apk";
-
 -- 删除收藏表唯一约束
 ALTER TABLE user_favorites DROP CONSTRAINT "uk_c0m37nir6vp9w1hdoffxtcpr";
 
