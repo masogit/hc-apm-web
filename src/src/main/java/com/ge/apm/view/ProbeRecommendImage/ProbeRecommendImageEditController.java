@@ -121,7 +121,7 @@ public class ProbeRecommendImageEditController extends JpaCRUDController<ProbeRe
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             attachements.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_COIL_OPPORTUNITY);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PROBE_RECOMMEND);
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
             blobObject.setBoUuid(selected.getCatNo());
             blobService.saveBlobObject(blobObject);
@@ -166,7 +166,7 @@ public class ProbeRecommendImageEditController extends JpaCRUDController<ProbeRe
         List<V2_BlobObject> attachList = new ArrayList<>();
         for (String item : selectedPictures) {
             V2_BlobObject blobObject = blobDao.findAllByObjectStorageId(item).stream().findFirst().get();
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_COIL_OPPORTUNITY);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PROBE_RECOMMEND);
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
             blobObject.setBoUuid(image.getCatNo());
             blobObject.setBoId(image.getId());
