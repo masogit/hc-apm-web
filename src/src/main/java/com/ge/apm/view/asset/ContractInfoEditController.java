@@ -318,6 +318,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
         allItemList.stream().forEach(item -> item.setContractId(selected.getId()));
         contractItemDao.save(allItemList);
+        allItemList = contractService.getContractItems(selected.getId());
         WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
     }
 
