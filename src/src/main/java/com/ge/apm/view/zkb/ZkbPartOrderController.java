@@ -373,7 +373,9 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
         }else if(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(selected.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus()) ||
                 ZkbPartOrder.PartOrderStatus.DirectorReject.toString().equals(selected.getStatus()) ||
-                ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus())){
+                ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString().equals(selected.getStatus())
+        ){
             operateDelete = Boolean.FALSE;
         }else{
             operateDelete = Boolean.TRUE;
