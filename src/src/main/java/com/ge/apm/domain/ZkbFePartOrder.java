@@ -243,6 +243,52 @@ public class ZkbFePartOrder {
     private String tenantUid;
 
     /**
+     * 租户名称
+     */
+    @Transient
+    private String tenantName;
+
+    /**
+     * 合同编号
+     */
+    @Transient
+    private String contractNo;
+
+    /**
+     * 区域
+     */
+    @Transient
+    private String region;
+
+    /**
+     * 合同类型
+     */
+    @Transient
+    private String contractType;
+
+    /**
+     * 备件号
+     */
+    @Transient
+    private String assetNo;
+
+
+    /**
+     * 归还备注
+     */
+    @Transient
+    private String assetDescription;
+
+    /**
+     * 价值类型
+     */
+    @Transient
+    private String valueType;
+
+    @Transient
+    private String catModel;
+
+    /**
      * 设备类型（DI）
      */
     @Column(name = "asset_type_di")
@@ -482,6 +528,9 @@ public class ZkbFePartOrder {
 
     @Column(name = "test_status")
     private String testStatus;
+
+    @Transient
+    private String yesOrNo;
 
     /**
      * 申请备件列表
@@ -1084,5 +1133,77 @@ public class ZkbFePartOrder {
 
     public void setTestStatus(String testStatus) {
         this.testStatus = testStatus;
+    }
+
+    public String getTenantName() {
+        return tenantName;
+    }
+
+    public void setTenantName(String tenantName) {
+        this.tenantName = tenantName;
+    }
+
+    public String getContractNo() {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public String getContractType() {
+        return contractType;
+    }
+
+    public void setContractType(String contractType) {
+        this.contractType = contractType;
+    }
+
+    public String getAssetNo() {
+        return assetNo;
+    }
+
+    public void setAssetNo(String assetNo) {
+        this.assetNo = assetNo;
+    }
+
+    public String getAssetDescription() {
+        return assetDescription;
+    }
+
+    public void setAssetDescription(String assetDescription) {
+        this.assetDescription = assetDescription;
+    }
+
+    public String getValueType() {
+        return valueType;
+    }
+
+    public void setValueType(String valueType) {
+        this.valueType = valueType;
+    }
+
+    public String getCatModel() {
+        return catModel;
+    }
+
+    public void setCatModel(String catModel) {
+        this.catModel = catModel;
+    }
+
+    public String getYesOrNo() {
+        return yesOrNo;
+    }
+
+    public void setYesOrNo(String yesOrNo) {
+        this.yesOrNo = yesOrNo;
     }
 }
