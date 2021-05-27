@@ -124,6 +124,7 @@ public class ZkbPartOrderExcelService {
                 }
                 zkbPartOrderDataMap.put("旧探头SN号输入框", p.getOldCatSn());
                 zkbPartOrderDataMap.put("数量", p.getCatNum());
+                zkbPartOrderReportDataList.add(zkbPartOrderDataMap);
             }else if(ZkbPartOrder.OrderType.Parts.toString().equals(p.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(p.getOrderType())){
                 List<ZkbPartOrderItem> zkbPartOrderItemList = zkbPartOrderItemRepository.findByPartOrderId(p.getId());
                 for(ZkbPartOrderItem i : zkbPartOrderItemList){
@@ -135,11 +136,12 @@ public class ZkbPartOrderExcelService {
                     zkbPartOrderDataMap.put("Order#", i.getOrderNo());
                     zkbPartOrderDataMap.put("价格", i.getPrice());
                     zkbPartOrderDataMap.put("备注（说明是否DOA或者Short life）", i.getRemark());
+                    zkbPartOrderReportDataList.add(zkbPartOrderDataMap);
                 }
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(p.getOrderType())){
                 zkbPartOrderDataMap = getPartOrderMap(p);
+                zkbPartOrderReportDataList.add(zkbPartOrderDataMap);
             }
-            zkbPartOrderReportDataList.add(zkbPartOrderDataMap);
         }
         return zkbPartOrderReportDataList;
     }

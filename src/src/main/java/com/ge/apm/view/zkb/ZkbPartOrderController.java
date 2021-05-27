@@ -14,6 +14,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -409,7 +410,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void exportAll(){
         List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
-        List<ZkbPartOrder> zkbPartOrders =  dao.findBySearchFilter(searchFilters);
+        Sort sort=new Sort(Sort.Direction.DESC,"createdDate");
+        List<ZkbPartOrder> zkbPartOrders =  dao.findBySearchFilter(searchFilters,sort);
         HashMap<String, Object> dataMap = zkbPartOrderExcelService.createZkbPartOrderData(zkbPartOrders);
 
         try {
