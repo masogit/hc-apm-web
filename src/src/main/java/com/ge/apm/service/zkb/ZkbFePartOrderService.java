@@ -1016,6 +1016,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 zkbFePartOrder.setOrderType(item.getOrderType());
                 zkbFePartOrder.setId(item.getId());
                 zkbFePartOrder.setReportDate(item.getRequestDate());
+                zkbFePartOrder.setHospitalName(item.getHospitalName());
+                zkbFePartOrder.setHospitalClientName(item.getHospitalRepairer());
+                zkbFePartOrder.setHospitalClientPhone(item.getHospitalRepairerPhone());
                 list.add(zkbFePartOrder);
             }
             if(CollectionUtils.isNotEmpty(sparePartsZkbFePartOrderList))
@@ -1991,6 +1994,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_assetNo"),zkbFePartOrderAssetInfo.getAssetNo());
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_assetDescription"),zkbFePartOrderAssetInfo.getAssetDescription());
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_assetQty"),zkbFePartOrderAssetInfo.getAssetQty());
+            sparePartMap.put("修改数量备注",zkbFePartOrderAssetInfo.getUpdateComment());
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_orderNoa"),zkbFePartOrderAssetInfo.getOrderNo());
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_assetPrice"),zkbFePartOrderAssetInfo.getPrice());
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_spareParts"),zkbFePartOrderAssetInfo.getSparePart());
