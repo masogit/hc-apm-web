@@ -93,7 +93,7 @@ public class USOptionImageEditController extends JpaCRUDController<USOptionImage
         if (attachements == null) {
             attachements = blobService.findBlobObjectsByBoUid(USSegment+"_"+productName);
         }
-        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG)).collect(Collectors.toList());
+        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG) && item.getBoType().equals(V2_BlobObject.BO_TYPE_US_Option) ).collect(Collectors.toList());
         uploadFlag = collect.size() == 0;
         return collect;
     }
@@ -121,7 +121,7 @@ public class USOptionImageEditController extends JpaCRUDController<USOptionImage
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             attachements.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_COIL_OPPORTUNITY);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_US_Option);
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
             blobObject.setBoUuid(selected.getUsSegment()+"_"+selected.getProductName());
             blobService.saveBlobObject(blobObject);
@@ -163,7 +163,7 @@ public class USOptionImageEditController extends JpaCRUDController<USOptionImage
         List<V2_BlobObject> attachList = new ArrayList<>();
         for (String item : selectedPictures) {
             V2_BlobObject blobObject = blobDao.findAllByObjectStorageId(item).stream().findFirst().get();
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_COIL_OPPORTUNITY);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_US_Option);
             blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
             blobObject.setBoUuid(image.getUsSegment()+"_"+selected.getProductName());
             blobObject.setBoId(image.getId());
