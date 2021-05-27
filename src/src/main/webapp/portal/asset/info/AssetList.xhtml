@@ -260,17 +260,6 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
                                 </p:column>
                             </c:if>
-                            <c:if test="#{columnItem eq 'oneQrCodeStatus'}">
-                                <p:column headerText="#{msg.oneQrCodeStatus}" sortBy="#{item.qrCodeLib.status}" filterBy="#{item.oneQrCodeStatus}" filterMatchMode="EQ" rendered="#{!assetInfoListController.terminate}">
-                                    <f:facet name="filter">
-                                        <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.oneQrCodeStatus}" >
-                                            <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('qrCodeLibStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                        </p:selectOneMenu>
-                                    </f:facet>
-                                    <h:outputText value="#{fieldMsg.fieldValue('qrCodeLibStatus',item.oneQrCodeStatus)}"/>
-                                </p:column>
-                            </c:if>
                             <c:if test="#{columnItem eq 'warrantyDate'}">
                                 <p:column  headerText="#{msg.warrantyDate}" sortBy="#{item.warrantyDate}" filterBy="#{item.warrantyDate}" filterMatchMode="GTE">
                                     <f:facet name="filter">
