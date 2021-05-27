@@ -25,4 +25,18 @@ public interface ZkbFePartOrderMapper {
 
     @SelectProvider(type = ZkbFePartOrderProvider.class, method = "queryZkbFePart")
     List<ZkbFePartOrder> queryZkbFePart(@Param("filters") List<SearchFilter> filters);
+
+    /**
+     * 查询等待归还的配件
+     * @return
+     */
+    @SelectProvider(type = ZkbFePartOrderProvider.class, method = "buildFilter_queryNeedReturnSparePart")
+    List<ZkbFePartOrder> buildFilter_queryNeedReturnSparePart();
+
+    /**
+     * 查询等待归还的探头
+     * @return
+     */
+    @SelectProvider(type = ZkbFePartOrderProvider.class, method = "buildFilter_queryNeedReturnProbe")
+    List<ZkbFePartOrder> buildFilter_queryNeedReturnProbe();
 }

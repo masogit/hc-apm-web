@@ -27,7 +27,22 @@ public interface ZkbFePartOrderAssetInfoRepository extends GenericRepositoryUUID
      */
     List<ZkbFePartOrderAssetInfo> findByFePartOrderIdAndAssetNo(String fePartOrderId,String assetNo);
 
+    /**
+     * 根据流程ID获取申请备件数量
+     * @param fePartOrderId
+     * @return
+     */
     @Query(value = "SELECT sum(asset_qty) from zkb_fe_part_order_asset_info where fe_part_order_id = ?1", nativeQuery = true)
     Integer fetchQty(String fePartOrderId);
+
+    /**
+     * 根据单号获取申请数量
+     * @param fePartOrderId 流程ID
+     * @param partOrderNo 备件号
+     * @param orderNo order#
+     * @return
+     */
+    @Query(value = "SELECT sum(asset_qty) from zkb_fe_part_order_asset_info where fe_part_order_id = ?1 and part_order_no = ?2 and order_no = ?3", nativeQuery = true)
+    Integer fetchQty(String fePartOrderId,String partOrderNo,String orderNo);
 
 }
