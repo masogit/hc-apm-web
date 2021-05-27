@@ -25,7 +25,7 @@ public class CustomConfigConstant {
 
     //默认不使用的字段
     static public List<String> getExtFields() {
-        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","oneQrCodeStatus","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime");
+        return Arrays.asList("assetGroupSecondary","acceptDate","warrantyMonth","subjectProject","createdDate","proprietaryClass","connectToInsite","oneQrCode","installStatus","assetClass","geibTable_installedTime");
     }
 
     //只读字段
@@ -171,7 +171,6 @@ public class CustomConfigConstant {
         allFields.put("connectToInsite", WebUtil.getMessage("connectToInsite"));
         allFields.put("assetClass", WebUtil.getMessage("assetClass"));
         allFields.put("oneQrCode", WebUtil.getMessage("oneQrCode"));
-        allFields.put("oneQrCodeStatus", WebUtil.getMessage("oneQrCodeStatus"));
         allFields.put("installStatus", WebUtil.getMessage("installStatus"));
         allFields.put("geibTable_installedTime", WebUtil.getMessage("geibTable_installedTime"));
         return allFields;
@@ -179,7 +178,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsListPageFields() {
         return Arrays.asList("name", "functionType", "serialNum", "departNum", "assetGroup",
-                "clinicalDeptName", "manufacture", "vendor", "status", "warrantyDate", "financingNum", "qrCode", "oneQrCodeStatus");
+                "clinicalDeptName", "manufacture", "vendor", "status", "warrantyDate", "financingNum", "qrCode");
     }
 
     public static List<String> getAssetsDetailpageBasicFields() {
