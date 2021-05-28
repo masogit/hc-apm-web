@@ -439,7 +439,7 @@ public class AssetInfoBulkEditController extends JpaCRUDController<AssetInfo>  {
             selected.setIbDeviceStatus(assetInfo.getIbDeviceStatus());
             selected.setConnectToInsite(assetInfo.getConnectToInsite());
             if(selected.getAssetDeptId()==0){
-                selected.setAssetDeptId(null);
+                selected.setAssetDeptId(assetInfo.getAssetDeptId());
             }
             selected.setSiteId(assetInfo.getSiteId());
             selected.setSiteUID(assetInfo.getSiteUID());
