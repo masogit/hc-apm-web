@@ -7,6 +7,7 @@ package com.ge.apm.view.wo;
 
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
@@ -115,7 +116,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private MvsAssetInfoRepository mvsAssetInfoRepository;
     private V2_WorkOrder selectedWorkOrder;
     private List<V2_WorkOrder> selectedWorkOrderList;
-
+    private AssetInfoMapper assetInfoMapper;
     private AssetInfo selectedAsset;
     private String assetStatus;
     private Integer currentStatus = 1;
@@ -227,6 +228,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
             woConDao = WebUtil.getBean(WorkflowConfigRepository.class);
             woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
+            assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
             serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
             orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
             autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
@@ -550,6 +552,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
 
     public void updateQueryIndex(int query){
         queryIndex = query;
+        selected = null;
     }
 
     private void setUserSearchFilters() {
@@ -925,17 +928,10 @@ public void test1(){
 
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
-        TenantInfoRepository tenantDao=WebUtil.getBean(TenantInfoRepository.class);
-        Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
-        String tenantUid = tenantInfo.get().getUid();
 
         List<String> orderIds = getVisableMvsAssetSystemId();
-        filters.add(new SearchFilter("tenantUID",SearchFilter.Operator.EQ,tenantUid));
-
-        /*if(!orderIds.isEmpty()){
-
-        }*/
         filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+
         for (SearchFilter searchFilter :searchFilters) {
             if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
                 filters.add(searchFilter);
@@ -946,21 +942,13 @@ public void test1(){
     }
 
     List<String> getVisableMvsAssetSystemId(){
-        List<SearchFilter> filters = new ArrayList<>();
-        filters.add(new SearchFilter("assetInfo.isDeleted", SearchFilter.Operator.EQ, false));
-        filters.add(new SearchFilter("assetInfo.isValid", SearchFilter.Operator.EQ, true));
-        filters.add(new SearchFilter("assetInfo.systemId", SearchFilter.Operator.LIKE, "MVS-"));
+        TenantInfoRepository tenantDao=WebUtil.getBean(TenantInfoRepository.class);
+        Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
+        String tenantUid = tenantInfo.get().getUid();
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        filters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        filters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        filters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        filters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        filters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        filters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        return dao.findBySearchFilter(filters).stream().map(V2_WorkOrder::getId).collect(Collectors.toList());
+        return assetInfoMapper.getMvsWorkOrders(orgUidList,tenantUid);
     }
-
     @Override
     public void setSearchFilter() {
         if (this.searchFilters == null) {
