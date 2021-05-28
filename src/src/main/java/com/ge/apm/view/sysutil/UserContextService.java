@@ -966,6 +966,11 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    public boolean isMvsTenant() {
+        TenantInfo tenantInfo = getTenantInfo();
+        return ApmConstant.MVS_TENANT_NAME.equals(tenantInfo.getName());
+    }
+
     public static boolean isSuperAdminWithPartnerAccount(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.isPartnerAccount();
