@@ -45,22 +45,9 @@
                             <h:outputText value="#{item.loginUrl}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.loginIp}" sortBy="#{item.loginIp}" filterBy="#{item.loginIp}"
-                                  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.loginIp}"/>
-                        </p:column>
-
                         <p:column headerText="#{msg.loginTime}" sortBy="#{item.loginTime}" filterBy="#{item.loginTime}"
                                   filterMatchMode="LIKE">
                             <h:outputText value="#{item.loginTime}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
-                            </h:outputText>
-                        </p:column>
-
-                        <p:column headerText="#{msg.logoutTime}" sortBy="#{item.logoutTime}"
-                                  filterBy="#{item.logoutTime}"
-                                  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.logoutTime}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss"/>
                             </h:outputText>
                         </p:column>
