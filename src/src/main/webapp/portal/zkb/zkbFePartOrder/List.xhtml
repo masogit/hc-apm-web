@@ -66,11 +66,11 @@
                             </f:facet>
                         </p:column>
                         <p:column headerText="#{msg.zkbFePartOrder_urgencyStatus}" filterBy="#{item.urgencyStatus}"  filterMatchMode="EQ">
-                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_casePriority', item.urgencyStatus)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_casePriority1', item.urgencyStatus)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_casePriority')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_casePriority1')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
