@@ -1019,6 +1019,12 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 zkbFePartOrder.setHospitalName(item.getHospitalName());
                 zkbFePartOrder.setHospitalClientName(item.getHospitalRepairer());
                 zkbFePartOrder.setHospitalClientPhone(item.getHospitalRepairerPhone());
+                zkbFePartOrder.setUrgencyStatus(item.getUrgentOrder());
+                if("t".equals(item.getUrgentOrder()))
+                {
+                    zkbFePartOrder.setUrgencyStatus("1");
+                }
+
                 list.add(zkbFePartOrder);
             }
             if(CollectionUtils.isNotEmpty(sparePartsZkbFePartOrderList))
