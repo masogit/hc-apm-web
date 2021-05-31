@@ -14,6 +14,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -54,7 +55,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private boolean showStatusBtn = true;
     private boolean vacationBtn = false;
     private String isVacation;
-
+    private boolean canDelete= false;
+    private boolean operateDelete = false;
 
     @Override
     protected void init() {
@@ -90,6 +92,12 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                     if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) && ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrderUserConfig.getOrderType())){
                         isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
                         vacationBtn = true;
+                    }
+                }
+                for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
+                    if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(c.getConfigType())){
+                        canDelete = true;
+                        break;
                     }
                 }
             }
@@ -358,14 +366,32 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     }
 
     @Override
+    public void prepareEdit() {
+        crudActionName = "Edit";
+        if(StringUtils.isEmpty(selected.getId())){
+            operateDelete = Boolean.TRUE;
+        }else if(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.DirectorReject.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.OrderedReject.toString().equals(selected.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString().equals(selected.getStatus())
+        ){
+            operateDelete = Boolean.FALSE;
+        }else{
+            operateDelete = Boolean.TRUE;
+        }
+    }
+
+
+    @Override
     public void delete() {
-        if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus())){
+        //if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus())){
             zkbPartOrderService.delete(this.selected,currentUser);
             this.selected= null;
-        }else {
-            WebUtil.addErrorMessage("数据已审批不能删除！","");
-            return;
-        }
+        //}else {
+           /* WebUtil.addErrorMessage("数据已审批不能删除！","");
+            return;*/
+        //}
     }
 
     public void saveVacation(){
@@ -386,7 +412,8 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void exportAll(){
         List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
-        List<ZkbPartOrder> zkbPartOrders =  dao.findBySearchFilter(searchFilters);
+        Sort sort=new Sort(Sort.Direction.DESC,"createdDate");
+        List<ZkbPartOrder> zkbPartOrders =  dao.findBySearchFilter(searchFilters,sort);
         HashMap<String, Object> dataMap = zkbPartOrderExcelService.createZkbPartOrderData(zkbPartOrders);
 
         try {
@@ -494,5 +521,21 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     public void setVacationBtn(boolean vacationBtn) {
         this.vacationBtn = vacationBtn;
+    }
+
+    public boolean isCanDelete() {
+        return canDelete;
+    }
+
+    public void setCanDelete(boolean canDelete) {
+        this.canDelete = canDelete;
+    }
+
+    public boolean isOperateDelete() {
+        return operateDelete;
+    }
+
+    public void setOperateDelete(boolean operateDelete) {
+        this.operateDelete = operateDelete;
     }
 }

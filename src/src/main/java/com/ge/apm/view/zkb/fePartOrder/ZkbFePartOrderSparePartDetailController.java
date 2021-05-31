@@ -9,7 +9,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -145,6 +144,11 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      * 坏还
      */
     public static String badReturnValue ="badReturn";
+
+    /**
+     * 最大调整数量
+     */
+    public Integer maxAssetQty = new Integer(0);
 
 
 
@@ -317,6 +321,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public void prepareItemEdit(){
         this.actionItemName = "Edit";
+        if(StringUtils.isNotBlank(this.selectZkbFePartOrderAssetInfo.getId()))
+        this.maxAssetQty =this.zkbFePartOrderAssetInfoRepository.findById(this.selectZkbFePartOrderAssetInfo.getId()).getAssetQty();
     }
 
     public void deleteItem(){
@@ -414,6 +420,37 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         this.selected.setComment(comment);
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
+        Integer beforeAdjustQty = this.zkbFePartOrderAssetInfoRepository.fetchQty(this.selected.getId());
+        beforeAdjustQty=beforeAdjustQty==null?0:beforeAdjustQty;
+        List<ZkbFePartOrderAssetInfo> afterAdjustAssetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
+        Integer adjustApplyCount = new Integer(0);
+        List<ZkbFePartOrderAssetInfo> beforeAdjustAssetList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(this.selected.getId());
+        Map<String,ZkbFePartOrderAssetInfo> beforeAdjustAssetMap = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(beforeAdjustAssetList))
+        {
+            for(ZkbFePartOrderAssetInfo item:beforeAdjustAssetList)
+            {
+                beforeAdjustAssetMap.put(item.getId(),item);
+            }
+        }
+        if(CollectionUtils.isNotEmpty(afterAdjustAssetInfoList))
+        {
+            for(ZkbFePartOrderAssetInfo item:afterAdjustAssetInfoList)
+            {
+                adjustApplyCount=adjustApplyCount+item.getAssetQty();
+                ZkbFePartOrderAssetInfo beforeAdjustAssetInfoItem = beforeAdjustAssetMap.get(item.getId());
+                if(beforeAdjustAssetInfoItem!=null)
+                {
+                    item.setBeforeAdjustAssetQty(beforeAdjustAssetInfoItem.getAssetQty());
+                    this.zkbFePartOrderAssetInfoRepository.save(item);
+                }
+            }
+        }
+        if(adjustApplyCount<beforeAdjustQty)
+        {
+            ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,beforeAdjustQty-adjustApplyCount);
+        }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingApm.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
@@ -736,5 +773,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     public void setShowProblemOrderNumber(boolean showProblemOrderNumber) {
         this.showProblemOrderNumber = showProblemOrderNumber;
+    }
+
+    public Integer getMaxAssetQty() {
+        return maxAssetQty;
+    }
+
+    public void setMaxAssetQty(Integer maxAssetQty) {
+        this.maxAssetQty = maxAssetQty;
     }
 }
