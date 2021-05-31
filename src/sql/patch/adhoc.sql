@@ -20,6 +20,8 @@ update zkb_fe_part_order set function_type= (select product_number from zkb_part
 update zkb_fe_part_order set hospital_name= (select hospital_name from zkb_part_order  u where u.part_order_no=zkb_fe_part_order.father_part_order_no) where order_type in ('SpareParts','Probe') and father_part_order_no like 'PO%';
 update zkb_fe_part_order set hospital_client_name= (select hospital_repairer from zkb_part_order  u where u.part_order_no=zkb_fe_part_order.father_part_order_no) where order_type in ('SpareParts','Probe') and father_part_order_no like 'PO%';
 update zkb_fe_part_order set hospital_client_phone= (select hospital_repairer_phone from zkb_part_order  u where u.part_order_no=zkb_fe_part_order.father_part_order_no) where order_type in ('SpareParts','Probe') and father_part_order_no like 'PO%';
+update zkb_fe_part_order set urgency_status= (select urgent_order from zkb_part_order  u where u.part_order_no=zkb_fe_part_order.father_part_order_no) where order_type in ('SpareParts','Probe') and father_part_order_no like 'PO%';
+UPDATE zkb_fe_part_order set urgency_status='1' where urgency_status='t' and order_type in ('SpareParts','Probe') and father_part_order_no like 'PO%';
 ---初始化GE FE流程列表 end
 
 
