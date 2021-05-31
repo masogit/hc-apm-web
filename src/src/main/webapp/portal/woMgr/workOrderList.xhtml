@@ -24,10 +24,10 @@
                     <p:tab class="ui-g-12" title="MVS工单" id="mvsWorkOrder" rendered="#{!userContextService.isMvsTenant()}">
                         <ui:include src="mvs/woMvsMgrList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="#{msg.ExternalWorkorder}" id="outWorkOrder" rendered="true">
+                    <p:tab class="ui-g-12" title="#{msg.ExternalWorkorder}" id="outWorkOrder" rendered="#{not userContextService.isAccountEndUser() and userContextService.isLocale() or userContextService.isZtbTenant() or userContextService.isHaveIbDeviceUser()}">
                         <ui:include src="woMgrOutList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="#{msg.ExternalRemoteWorkorder}"  id="outRemoteWorkOrder" rendered="true">
+                    <p:tab class="ui-g-12" title="#{msg.ExternalRemoteWorkorder}"  id="outRemoteWorkOrder" rendered="#{not userContextService.isAccountEndUser() and userContextService.isLocale() or userContextService.isZtbTenant() or userContextService.isHaveIbDeviceUser()}">
                         <ui:include src="woMgrOutRemoteList.xhtml"/>
                     </p:tab>
                 </p:tabView>
