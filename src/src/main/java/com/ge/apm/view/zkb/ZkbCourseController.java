@@ -85,7 +85,6 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
         }
 
         zkbCoursePage = zkbCourseServic.findBySearchFilter(searchFilters, pageRequest);
-
         return zkbCoursePage;
     }
 
@@ -144,7 +143,7 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
 
 
     public void exportAll(){
-        List<Map<String, Object>> zkbCourseDataList = zkbCourseImExportService.createZkbCourseData( this.zkbCourseRepository.find());
+        List<Map<String, Object>> zkbCourseDataList = zkbCourseImExportService.createZkbCourseData( this.zkbCourseRepository.fetchAllSortByCreateDate());
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/course/APM_ZKB_Course_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);

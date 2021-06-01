@@ -525,6 +525,7 @@ public class ZkbContractImportService {
     @Transactional(rollbackFor = Exception.class)
     public void importOneContractCourse(ZkbContractCourseVO contractCourseVO){
         ZkbContractCourse zkbContractCourse = new ZkbContractCourse();
+        zkbContractCourse.setCreatedDate(new Date());
         zkbContractCourse.setCourseContractNo(contractCourseVO.getCourseContractNo());
         zkbContractCourse.setMainCourseCount(contractCourseVO.getMainCourseCount());
         zkbContractCourse.setCourseId(contractCourseVO.getZkbCourse().getId());
