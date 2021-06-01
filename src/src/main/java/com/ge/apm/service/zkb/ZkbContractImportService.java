@@ -425,7 +425,7 @@ public class ZkbContractImportService {
         Map<String, ZkbCourse> courseListMap = new HashMap<>();
         List<ZkbCourse> zkbCourses = courseRepository.find();
         for(ZkbCourse course : zkbCourses){
-            courseListMap.put(course.getCid()+"|"+course.getCname(),course);
+            courseListMap.put(course.getCid(),course);
         }
 
         for(int i = 0; i < impMap.size();i++){
@@ -446,10 +446,12 @@ public class ZkbContractImportService {
         ZkbContractCourseVO contractCourseVO =  (ZkbContractCourseVO)item.get("contractCourseVO");
         Integer hashCode = Integer.valueOf(item.get("hashCode").toString());
         ZkbContractCourseRow.clearErrMessage(item);
+        boolean checkCourseId = true;
         if(contractCourseVO != null){
             if(StringUtils.isEmpty(contractCourseVO.getCid())){
                 isValidateData = false;
                 item.put("status", ImportStatus.Failure);
+                checkCourseId=false;
                 ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseIdIsEmpty"));
             }
 
@@ -459,11 +461,11 @@ public class ZkbContractImportService {
                 ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseContractNoEmpty"));
             }
 
-            if(StringUtils.isEmpty(contractCourseVO.getCname())){
-                isValidateData = false;
-                item.put("status", ImportStatus.Failure);
-                ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseNameIsEmpty"));
-            }
+//            if(StringUtils.isEmpty(contractCourseVO.getCname())){
+//                isValidateData = false;
+//                item.put("status", ImportStatus.Failure);
+//                ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseNameIsEmpty"));
+//            }
             if(StringUtils.isEmpty(contractCourseVO.getContractNo())){
                 isValidateData = false;
                 item.put("status", ImportStatus.Failure);
@@ -478,16 +480,19 @@ public class ZkbContractImportService {
                     contractCourseVO.setContractId(zkbContract.getId());
                 }
             }
-
-            ZkbCourse zkbCourse = courseListMap.get(contractCourseVO.getCid()+"|"+contractCourseVO.getCname());
-            if(zkbCourse == null){
-                isValidateData = false;
-                item.put("status", ImportStatus.Failure);
-                ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseIsNotExist"));
-            }else{
-                contractCourseVO.setZkbCourse(zkbCourse);
-                contractCourseVO.setCourseId(zkbCourse.getId());
+            if(checkCourseId)
+            {
+                ZkbCourse zkbCourse = courseListMap.get(contractCourseVO.getCid());
+                if(zkbCourse == null){
+                    isValidateData = false;
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseIsNotExist"));
+                }else{
+                    contractCourseVO.setZkbCourse(zkbCourse);
+                    contractCourseVO.setCourseId(zkbCourse.getId());
+                }
             }
+
 
             if(!StringUtils.isEmpty(contractCourseVO.getContractId()) && !StringUtils.isEmpty(contractCourseVO.getCourseId())){
                 ZkbContractCourse zkbContractCourse = queryContractCourseByContractIdAndCourseId(contractCourseVO.getContractId(),contractCourseVO.getCourseId());
