@@ -196,6 +196,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     public void prepareDetailCreate(){
         actionDetailName="Create";
         zkbContractCourseSelected = new ZkbContractCourse();
+        zkbContractCourseSelected.setCreatedDate(new Date());
         this.reason = "";
     }
 
