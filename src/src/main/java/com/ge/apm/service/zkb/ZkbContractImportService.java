@@ -452,6 +452,13 @@ public class ZkbContractImportService {
                 item.put("status", ImportStatus.Failure);
                 ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseIdIsEmpty"));
             }
+
+            if(StringUtils.isEmpty(contractCourseVO.getCourseContractNo())){
+                isValidateData = false;
+                item.put("status", ImportStatus.Failure);
+                ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseContractNoEmpty"));
+            }
+
             if(StringUtils.isEmpty(contractCourseVO.getCname())){
                 isValidateData = false;
                 item.put("status", ImportStatus.Failure);
@@ -518,6 +525,7 @@ public class ZkbContractImportService {
     @Transactional(rollbackFor = Exception.class)
     public void importOneContractCourse(ZkbContractCourseVO contractCourseVO){
         ZkbContractCourse zkbContractCourse = new ZkbContractCourse();
+        zkbContractCourse.setCreatedDate(new Date());
         zkbContractCourse.setCourseContractNo(contractCourseVO.getCourseContractNo());
         zkbContractCourse.setMainCourseCount(contractCourseVO.getMainCourseCount());
         zkbContractCourse.setCourseId(contractCourseVO.getZkbCourse().getId());
