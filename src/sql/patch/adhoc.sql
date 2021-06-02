@@ -64,5 +64,11 @@ last_modified_date = last_modified_date - interval '100 day',
 start_time = start_time - interval '100 day',
 end_time = end_time - interval '100 day'
 where exists (select * from v2_work_order wo where wo.id = wo_id
-and exists (select * from v2_service_request sr where sr.id = wo.sr_id and sr.sr_num in ('2105266054','2105266053','2105266052','2105266051','2105266048','2105266047','2105266046')));
+and exists (select * from v2_service_request sr where sr.id = wo.sr_id
+and sr.sr_num in ('2105266054','2105266053','2105266052','2105266051','2105266048','2105266047','2105266046')));
+
+update asset_lifecycle_event set create_time = create_time - interval '100 day'
+where exists (select * from v2_work_order wo where wo.id = event_uid
+and exists (select * from v2_service_request sr where sr.id = wo.sr_id
+and sr.sr_num in ('2105266054','2105266053','2105266052','2105266051','2105266048','2105266047','2105266046')));
 -- 2021/6/2 YHAAO-12224 邵逸夫维修工单时间变更 end
