@@ -37,3 +37,6 @@ delete from cms_document_product where modality='XF' or modality='XR';
 update asset_info set asset_dept_id = (select id from org_info where uid = asset_dept_uid )
 WHERE asset_dept_id = 0 AND asset_dept_uid is not null
 -- 2021/6/2 更新asset_dept_id=0的情况  end
+
+update asset_lifecycle_event set description = CONCAT('{"title":"', event_uid,'","messages":["状态:关单"],"status":"Closed"}'), status = 2 where event_uid in ('1-8028069329', '1-7706967725');
+update asset_lifecycle_event set description = CONCAT('{"title":"', event_uid,'","messages":["状态:取消"],"status":"Cancelled"}'), status = 3 where event_uid in ('1-8207235425', '1-9013277409');
