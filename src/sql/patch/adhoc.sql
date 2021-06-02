@@ -33,3 +33,7 @@ delete from cms_channel where name='XF' or name='XR';
 delete from cms_content where tags like '%name":"XF"%' or tags like '%name":"XR"%';
 delete from cms_document_product where modality='XF' or modality='XR';
 
+-- 2021/6/2 更新asset_dept_id=0的情况  start
+update asset_info set asset_dept_id = (select id from org_info where uid = asset_dept_uid )
+WHERE asset_dept_id = 0 AND asset_dept_uid is not null
+-- 2021/6/2 更新asset_dept_id=0的情况  end
