@@ -24,10 +24,6 @@ update zkb_fe_part_order set urgency_status= (select urgent_order from zkb_part_
 UPDATE zkb_fe_part_order set urgency_status='1' where urgency_status='t' and order_type in ('SpareParts','Probe') and father_part_order_no like 'PO%';
 ---初始化GE FE流程列表 end
 
-
---2021/5/28 owoc, us update ib_status = 6
-update asset_info set ib_status = 6 where uid in (select asset_uid from asset_tags where lower(tag) in ('us', 'owoc')) and ge_device_type in (1, 2, 21, 23, 24, 3) and ib_status in (1, 4);
-
 --2021/5/31 删除错误手册数据，和错误频道
 delete from cms_channel where name='XF' or name='XR';
 delete from cms_content where tags like '%name":"XF"%' or tags like '%name":"XR"%';
