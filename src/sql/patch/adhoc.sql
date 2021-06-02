@@ -37,7 +37,7 @@ WHERE asset_dept_id = 0 AND asset_dept_uid is not null
 update asset_lifecycle_event set description = CONCAT('{"title":"', event_uid,'","messages":["状态:关单"],"status":"Closed"}'), status = 2 where event_uid in ('1-8028069329', '1-7706967725');
 update asset_lifecycle_event set description = CONCAT('{"title":"', event_uid,'","messages":["状态:取消"],"status":"Cancelled"}'), status = 3 where event_uid in ('1-8207235425', '1-9013277409');
 
--- 2021/6/2 YHAAO-12224 邵逸夫维修工单时间变更
+-- 2021/6/2 YHAAO-12224 邵逸夫维修工单时间变更 start
 update v2_service_request set
 created_date = created_date - interval '100 day',
 last_modified_date = last_modified_date - interval '100 day',
@@ -65,3 +65,4 @@ start_time = start_time - interval '100 day',
 end_time = end_time - interval '100 day'
 where exists (select * from v2_work_order wo where wo.id = wo_id
 and exists (select * from v2_service_request sr where sr.id = wo.sr_id and sr.sr_num in ('2105266054','2105266053','2105266052','2105266051','2105266048','2105266047','2105266046')));
+-- 2021/6/2 YHAAO-12224 邵逸夫维修工单时间变更 end
