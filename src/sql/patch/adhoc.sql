@@ -36,3 +36,32 @@ WHERE asset_dept_id = 0 AND asset_dept_uid is not null
 
 update asset_lifecycle_event set description = CONCAT('{"title":"', event_uid,'","messages":["状态:关单"],"status":"Closed"}'), status = 2 where event_uid in ('1-8028069329', '1-7706967725');
 update asset_lifecycle_event set description = CONCAT('{"title":"', event_uid,'","messages":["状态:取消"],"status":"Cancelled"}'), status = 3 where event_uid in ('1-8207235425', '1-9013277409');
+
+-- 2021/6/2 YHAAO-12224 邵逸夫维修工单时间变更
+update v2_service_request set
+created_date = created_date - interval '100 day',
+last_modified_date = last_modified_date - interval '100 day',
+request_time = request_time - interval '100 day',
+estimated_close_time = estimated_close_time - interval '100 day',
+close_time = close_time - interval '100 day'
+where sr_num in ('2105266054','2105266053','2105266052','2105266051','2105266048','2105266047','2105266046');
+
+update v2_work_order set
+created_date = created_date - interval '100 day',
+last_modified_date = last_modified_date - interval '100 day',
+accept_step_start_time = accept_step_start_time - interval '100 day',
+close_step_end_time = close_step_end_time - interval '100 day',
+evaluate_step_end_time = evaluate_step_end_time - interval '100 day',
+send_step_start_time = send_step_start_time - interval '100 day',
+work_step_end_time = work_step_end_time - interval '100 day',
+close_time = close_time - interval '100 day'
+where exists(select * from v2_service_request sr where sr.id = sr_id
+and sr.sr_num in ('2105266054','2105266053','2105266052','2105266051','2105266048','2105266047','2105266046'));
+
+update v2_work_order_step set
+created_date = created_date - interval '100 day',
+last_modified_date = last_modified_date - interval '100 day',
+start_time = start_time - interval '100 day',
+end_time = end_time - interval '100 day'
+where exists (select * from v2_work_order wo where wo.id = wo_id
+and exists (select * from v2_service_request sr where sr.id = wo.sr_id and sr.sr_num in ('2105266054','2105266053','2105266052','2105266051','2105266048','2105266047','2105266046')));
