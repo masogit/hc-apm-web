@@ -537,7 +537,8 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage(WebUtil.getMessage("ApprovalSuccess"));
         }
     }
-    public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
+    public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment,
+                                String currentPersonIdBatch) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         if(selectedPmOrder.getSimplify()!=null && selectedPmOrder.getSimplify()==true){
@@ -563,6 +564,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         formData.setDetails(accDetails);
         formData.setCoworkers(coDetails);
         formData.setQualityChecking(selectedPmOrder.getQualityChecking());
+        formData.setAssignee(currentPersonIdBatch); // （修改记录验收人）
         String res = srApi.invokePmOrderAction(token,formData,"保养",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Finish"));
@@ -570,7 +572,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             WebUtil.addSuccessMessage(WebUtil.getMessage("OperationSuccess"));
         }
     }
-    public void repairWorkOrderBatch(Date endTime,Double totalManHours,Map<String, Boolean> hmPmOrder) {
+    public void repairWorkOrderBatch(Date endTime,Double totalManHours,Map<String, Boolean> hmPmOrder,String currentPersonIdBatch) {
         String token = UserContextService.getAccessToken();
         List<String> uidList = new ArrayList<String>();
         hmPmOrder.entrySet().stream().filter(item->item.getValue()).forEach(item->uidList.add(item.getKey()));
@@ -597,6 +599,7 @@ public class V2_PmOrderService extends MicroServiceInvoker {
             //小数点后保留两位小数
             formData.setManHours(Math.round(averageHours*100.0)/100.0);
             formData.setPlanTime(item.getPlanTime().toString());
+            formData.setAssignee(currentPersonIdBatch); // 记录验收人
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });
@@ -769,5 +772,77 @@ public class V2_PmOrderService extends MicroServiceInvoker {
         }
         return hmCheck;
     }
+
+    public void invokeAcceptance(V2_PmOrder selectedPmOrder, String remarks, boolean pass){
+        String token = UserContextService.getAccessToken();
+        PmOrderActionForm formData = new PmOrderActionForm();
+        formData.setStepId(selectedPmOrder.getCurrentStepId());
+        formData.setComments(remarks);
+        String res = null;
+        if(pass) {
+            formData.setActionType("acceptancePass");
+            res = srApi.invokePmOrderAction(token, formData, "acceptancePass", selectedPmOrder.getId());
+
+            if (res==null || !res.equalsIgnoreCase("Ok")) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"));
+            }else{
+                WebUtil.addSuccessMessage(WebUtil.getMessage("AckPass"));
+            }
+        }else {
+            formData.setActionType("acceptanceReject");
+            res = srApi.invokePmOrderAction(token, formData, "acceptanceReject", selectedPmOrder.getId());
+            if (res==null || !res.equalsIgnoreCase("Ok")) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"));
+            }else{
+                WebUtil.addSuccessMessage(WebUtil.getMessage("OperationSuccess"));
+            }
+        }
+    }
+
+    public void invokeAcceptanceInBatch(Map<String,Boolean> hmPmOrder, String remarks, boolean pass){
+        String token = UserContextService.getAccessToken();
+        List<String> uidList = new ArrayList<String>();
+        hmPmOrder.entrySet().stream().filter(item -> item.getValue()).forEach(item -> uidList.add(item.getKey()));
+        List<V2_PmOrder> batchPmOrderList = woDao.getBatchPmOrderList(uidList);
+        batchPmOrderList.stream().forEach(item -> {
+            if (hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true) {
+                hmPmOrder.put(item.getId(), false);
+            }
+        });
+
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+        batchPmOrderList.stream().forEach(item -> {
+            PmOrderActionForm formData = new PmOrderActionForm();
+            if(pass) {
+                formData.setActionType("acceptancePass");
+
+            }else {
+                formData.setActionType("acceptanceReject");
+            }
+            formData.setComments(remarks);
+            formData.setPmOrderId(item.getId());
+            formData.setStepId(item.getCurrentStepId());
+            formDataList.add(formData);
+        });
+
+        String res = null;
+        if(pass){
+            res = srApi.invokePmOrderActionBatch(token, formDataList, "acceptancePass");
+            if (res==null || !res.equalsIgnoreCase("Ok")) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"));
+            }else{
+                WebUtil.addSuccessMessage(WebUtil.getMessage("AckPass"));
+            }
+        }else {
+            res = srApi.invokePmOrderActionBatch(token, formDataList, "acceptanceReject");
+            if (res==null || !res.equalsIgnoreCase("Ok")) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"));
+            }else{
+                WebUtil.addSuccessMessage(WebUtil.getMessage("OperationSuccess"));
+            }
+        }
+
+    }
+
 }
 

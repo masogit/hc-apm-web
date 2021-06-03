@@ -7,6 +7,7 @@ package com.ge.apm.view.wo;
 
 import com.alibaba.fastjson.JSONPath;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
@@ -35,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.TabChangeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -47,6 +49,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -110,10 +113,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private  UserOrgInfoRepository userOrgInfoRepository;
     private BlobObjectRepository blobObjectRepository;
     private V2_ServiceRequest newServiceRequest;
-private  MvsAssetInfoRepository mvsAssetInfoRepository;
+    private MvsAssetInfoRepository mvsAssetInfoRepository;
     private V2_WorkOrder selectedWorkOrder;
     private List<V2_WorkOrder> selectedWorkOrderList;
-
+    private AssetInfoMapper assetInfoMapper;
     private AssetInfo selectedAsset;
     private String assetStatus;
     private Integer currentStatus = 1;
@@ -171,6 +174,9 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
     private String oneSearchStr;
     //选定的院区
     private OrgInfo selectSite;
+    //tab Title
+    @Getter
+    private String tabTitle;
 
     public String faultReason;
     public CustomConfigService customConfigService;
@@ -222,6 +228,7 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
             coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
             woConDao = WebUtil.getBean(WorkflowConfigRepository.class);
             woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
+            assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
             serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
             orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
             autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
@@ -534,6 +541,20 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         }
     }
 
+    //tab切换
+    public void onTabChange(TabChangeEvent event) {
+        FacesMessage msg = new FacesMessage("activeTab", event.getTab().getTitle());
+        tabTitle = msg.getDetail();
+        /*if("MVS工单".equals(tabTitle)){
+        }*/
+        queryIndex = 0;
+    }
+
+    public void updateQueryIndex(int query){
+        queryIndex = query;
+        selected = null;
+    }
+
     private void setUserSearchFilters() {
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         if (terminate) {
@@ -586,8 +607,6 @@ private  MvsAssetInfoRepository mvsAssetInfoRepository;
         }
 
     }
-
-
 
     private Boolean isRating;
 
@@ -892,7 +911,14 @@ public void test1(){
                     searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN, woIdList, "1*"));
                 }
             }
-            bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            //查询Mvs工单
+            if("MVS工单".equals(tabTitle)){
+
+                List<SearchFilter> filters = buildMvsSearchFilter();
+                bySearchFilter = dao.findBySearchFilter(filters, pageRequest);
+            }else{
+                bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            }
         } catch (Exception e) {
             LOGGER.error("load data occur exception,{}", e.getMessage());
             throw e;
@@ -900,6 +926,29 @@ public void test1(){
         return   bySearchFilter;
     }
 
+    public List<SearchFilter> buildMvsSearchFilter(){
+        List<SearchFilter> filters = new ArrayList<>();
+
+        List<String> orderIds = getVisableMvsAssetSystemId();
+        filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("status,currentStepId,approvalStatus,serviceRequest.status,feedbackRating".contains(searchFilter.fieldName)) {
+                filters.add(searchFilter);
+            }
+        }
+
+        return filters;
+    }
+
+    List<String> getVisableMvsAssetSystemId(){
+        TenantInfoRepository tenantDao=WebUtil.getBean(TenantInfoRepository.class);
+        Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
+        String tenantUid = tenantInfo.get().getUid();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        return assetInfoMapper.getMvsWorkOrders(orgUidList,tenantUid);
+    }
     @Override
     public void setSearchFilter() {
         if (this.searchFilters == null) {

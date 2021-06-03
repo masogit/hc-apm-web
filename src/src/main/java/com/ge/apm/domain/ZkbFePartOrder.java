@@ -1,9 +1,11 @@
 package com.ge.apm.domain;
 
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +46,10 @@ public class ZkbFePartOrder {
      */
     public enum workFlowSteps {
         Requested,WaitingAssignment,WaitingApm,WaitingGEAdmin,Complete
+    }
+
+    public enum zkbPoProbeQuotaType {
+        Any,Special,Normal,High
     }
 
     /**
@@ -237,6 +243,52 @@ public class ZkbFePartOrder {
      */
     @Column(name = "tenant_uid")
     private String tenantUid;
+
+    /**
+     * 租户名称
+     */
+    @Transient
+    private String tenantName;
+
+    /**
+     * 合同编号
+     */
+    @Transient
+    private String contractNo;
+
+    /**
+     * 区域
+     */
+    @Transient
+    private String region;
+
+    /**
+     * 合同类型
+     */
+    @Transient
+    private String contractType;
+
+    /**
+     * 备件号
+     */
+    @Transient
+    private String assetNo;
+
+
+    /**
+     * 归还备注
+     */
+    @Transient
+    private String assetDescription;
+
+    /**
+     * 价值类型
+     */
+    @Transient
+    private String valueType;
+
+    @Transient
+    private String catModel;
 
     /**
      * 设备类型（DI）
@@ -471,10 +523,27 @@ public class ZkbFePartOrder {
     private String hasUploadLetter = "f";
 
     /**
+     * 扣除名额类型
+     */
+    @Column(name = "zkb_po_probe_quota_type")
+    private String zkbPoProbeQuotaType;
+
+    @Column(name = "test_status")
+    private String testStatus;
+
+    @Transient
+    private String yesOrNo;
+
+    /**
      * 申请备件列表
      */
     @Transient
     private List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList;
+    /**
+     * 需要归还申请备件列表
+     */
+    @Transient
+    private List<ZkbFePartOrderAssetInfo> zkbReturnFePartOrderAssetInfoList;
 
     /**
      * 申请备件归还列表
@@ -750,6 +819,25 @@ public class ZkbFePartOrder {
 
     public void setZkbFePartOrderAssetInfoList(List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList) {
         this.zkbFePartOrderAssetInfoList = zkbFePartOrderAssetInfoList;
+    }
+
+    public List<ZkbFePartOrderAssetInfo> getZkbReturnFePartOrderAssetInfoList() {
+        List<ZkbFePartOrderAssetInfo> templeList = new ArrayList<>();
+        if(CollectionUtils.isEmpty(zkbFePartOrderAssetInfoList))
+        {
+            return templeList;
+        }
+        for(ZkbFePartOrderAssetInfo item:this.zkbFePartOrderAssetInfoList)
+        {
+            if(0==item.getAssetQty())
+                continue;
+            templeList.add(item);
+        }
+        return templeList;
+    }
+
+    public void setZkbReturnFePartOrderAssetInfoList(List<ZkbFePartOrderAssetInfo> zkbReturnFePartOrderAssetInfoList) {
+        this.zkbReturnFePartOrderAssetInfoList = zkbReturnFePartOrderAssetInfoList;
     }
 
     @Override
@@ -1055,5 +1143,93 @@ public class ZkbFePartOrder {
 
     public void setAssetType(String assetType) {
         this.assetType = assetType;
+    }
+
+    public String getZkbPoProbeQuotaType() {
+        return zkbPoProbeQuotaType;
+    }
+
+    public void setZkbPoProbeQuotaType(String zkbPoProbeQuotaType) {
+        this.zkbPoProbeQuotaType = zkbPoProbeQuotaType;
+    }
+
+    public String getTestStatus() {
+        return testStatus;
+    }
+
+    public void setTestStatus(String testStatus) {
+        this.testStatus = testStatus;
+    }
+
+    public String getTenantName() {
+        return tenantName;
+    }
+
+    public void setTenantName(String tenantName) {
+        this.tenantName = tenantName;
+    }
+
+    public String getContractNo() {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public String getContractType() {
+        return contractType;
+    }
+
+    public void setContractType(String contractType) {
+        this.contractType = contractType;
+    }
+
+    public String getAssetNo() {
+        return assetNo;
+    }
+
+    public void setAssetNo(String assetNo) {
+        this.assetNo = assetNo;
+    }
+
+    public String getAssetDescription() {
+        return assetDescription;
+    }
+
+    public void setAssetDescription(String assetDescription) {
+        this.assetDescription = assetDescription;
+    }
+
+    public String getValueType() {
+        return valueType;
+    }
+
+    public void setValueType(String valueType) {
+        this.valueType = valueType;
+    }
+
+    public String getCatModel() {
+        return catModel;
+    }
+
+    public void setCatModel(String catModel) {
+        this.catModel = catModel;
+    }
+
+    public String getYesOrNo() {
+        return yesOrNo;
+    }
+
+    public void setYesOrNo(String yesOrNo) {
+        this.yesOrNo = yesOrNo;
     }
 }

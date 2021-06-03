@@ -125,26 +125,26 @@
     <filter-name>fixResourcesExpirationFilter</filter-name>
     <filter-class>webapp.framework.web.filter.FixResourcesExpirationFilter</filter-class>
   </filter>
-  
-	<filter-mapping>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<url-pattern>/*</url-pattern>
-		<dispatcher>FORWARD</dispatcher>
-		<dispatcher>REQUEST</dispatcher>
-	</filter-mapping>
-	<filter>
-		<filter-name>WechatUserLoginFilter</filter-name>
-		<filter-class>com.ge.apm.web.wechat.WechatUserLoginFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>WechatUserLoginFilter</filter-name>
-		<url-pattern>/wechat/*</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>WechatUserLoginFilter</filter-name>
-		<url-pattern>/web/*</url-pattern>
-	</filter-mapping> 
-  
+
+  <filter-mapping>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>FORWARD</dispatcher>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter>
+    <filter-name>WechatUserLoginFilter</filter-name>
+    <filter-class>com.ge.apm.web.wechat.WechatUserLoginFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>WechatUserLoginFilter</filter-name>
+    <url-pattern>/wechat/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>WechatUserLoginFilter</filter-name>
+    <url-pattern>/web/*</url-pattern>
+  </filter-mapping>
+
   <filter-mapping>
     <filter-name>fixResourcesExpirationFilter</filter-name>
     <url-pattern>/javax.faces.resource/*</url-pattern>
@@ -229,11 +229,7 @@
   <!-- Spring Security Facelets tag library declaration -->
   <context-param>
     <param-name>javax.faces.FACELETS_LIBRARIES</param-name>
-    <param-value>/WEB-INF/taglib/springsecurity.taglib.xml</param-value>
-  </context-param>
-  <context-param>
-    <param-name>javax.faces.FACELETS_LIBRARIES</param-name>
-    <param-value>/WEB-INF/taglib/webappframework.taglib.xml</param-value>
+    <param-value>/WEB-INF/taglib/springsecurity.taglib.xml;/WEB-INF/taglib/his.taglib.xml;/WEB-INF/taglib/apm.taglib.xml</param-value>
   </context-param>
   <context-param>
     <param-name>com.sun.faces.expressionFactory</param-name>

@@ -40,7 +40,7 @@ public class IBUInfoImageDetailController {
         if (attachements == null) {
             attachements = blobService.findBlobObjectsByBoUid(ibuOffer);
         }
-        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG)).collect(Collectors.toList());
+        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG)  && item.getBoType().equals(V2_BlobObject.BO_TYPE_IBU_INFO) ).collect(Collectors.toList());
         return collect;
     }
 

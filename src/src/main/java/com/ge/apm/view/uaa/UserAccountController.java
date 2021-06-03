@@ -24,6 +24,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.primefaces.ultima.domain.User;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -120,7 +121,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private SysRoleRepository sysRoleRepository;
 
     private CustomRoleRepository customRoleRepository;
-
+    private ZkbIbCrossUserStatusRepository zkbIbCrossUserStatusRepository;
     private UserRoleRepository userRoleRepository;
     private List<OrgInfo> deptList;
 
@@ -235,6 +236,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         userAccountExportService= WebUtil.getBean(UserAccountExportService.class);
         customRoleRepository = WebUtil.getBean(CustomRoleRepository.class);
         userDetailsService = WebUtil.getBean(UserDetailsServiceImpl.class);
+        zkbIbCrossUserStatusRepository = WebUtil.getBean(ZkbIbCrossUserStatusRepository.class);
+        userRoleRepository = WebUtil.getBean(UserRoleRepository.class);
 
         if (UserContextService.isSuperAdminWithPartnerAccount()) {
             //if current user belongs to test tenant, then use the first tenant in non test tenant list
@@ -603,6 +606,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
 
+        if(ti.getType() != null && ti.getType().equals(3)){
+            try{
+                uaaService.addZkbIbCrossUserStatus(selected,assignedRoles);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
         uaaService.setUserRoles(selected, assignedRoles);
         updateUserScope();
         selected.getUserRoleList().clear();
@@ -703,8 +714,18 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (canDelete()) {
             //super.delete();
             log.info("start delete user, uid: {}",this.selected.getUid());
-            userAccountService.deleteUserAccount(this.selected);
             WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
+
+            TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
+            if(ti.getType() != null && ti.getType().equals(3)){
+                try{
+                    uaaService.deleteZkbIbCrossUserStatus(selected);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            userAccountService.deleteUserAccount(this.selected);
+
         }
     }
 

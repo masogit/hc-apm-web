@@ -61,6 +61,12 @@ public class ZkbEngineer {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
+    @Column(name = "sso")
+    private String sso;
+
+    @Column(name = "sso_index")
+    private Integer ssoIndex;
+
     public String getId() {
         return id;
     }
@@ -171,6 +177,22 @@ public class ZkbEngineer {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public String getSso() {
+        return sso;
+    }
+
+    public void setSso(String sso) {
+        this.sso = sso;
+    }
+
+    public Integer getSsoIndex() {
+        return ssoIndex;
+    }
+
+    public void setSsoIndex(Integer ssoIndex) {
+        this.ssoIndex = ssoIndex;
     }
 
     @Override

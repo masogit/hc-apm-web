@@ -1,13 +1,9 @@
 package webapp.framework.web.mvc;
 
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.uaa.UserAccountHistoryService;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import net.sf.ehcache.hibernate.management.impl.BeanUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -27,6 +23,13 @@ import webapp.framework.util.HttpRequestUtil;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 
+import javax.annotation.PostConstruct;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.util.*;
+import java.util.stream.Collectors;
+
 public abstract class JpaCRUDController<E> implements Serializable, ServerEventInterface {
 
     private static final long serialVersionUID = 1L;
@@ -43,6 +46,7 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     public List<SearchFilter> searchFilters;
     protected boolean warnOnEmptySearchFilters = false;
     public String crudActionName;
+    private UserAccountHistoryService userAccountHistoryService;
 
     public boolean hasFilterOnField(String fieldName) {
         for (SearchFilter filter : searchFilters) {
@@ -243,6 +247,7 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     @PostConstruct
     private void doPostConstruct() {
         init();
+        userAccountHistoryService = WebUtil.getBean(UserAccountHistoryService.class);
         onPrepareDataTableModel();
         lazyModel = new GenericDataTableModel<E>() {
             @Override
@@ -423,6 +428,13 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     protected boolean persist(WebUtil.PersistAction persistAction, String successMessage) {
         if (selected != null) {
             try {
+                if (selected instanceof UserAccount){
+                    UserAccount userAccount = (UserAccount)selected;
+                    UserAccount currentUser = UserContextService.getCurrentUserAccount();
+                    userAccount.setLastModifiedBy(currentUser.getLoginName());
+                    userAccount.setLastModifiedDate(new Date());
+                    userAccountHistoryService.save(persistAction, userAccount);
+                }
                 if (persistAction != WebUtil.PersistAction.DELETE) {
                     getDAO().save(selected);
                 } else {

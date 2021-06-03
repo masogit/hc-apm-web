@@ -149,7 +149,7 @@ public class AssetInstallationService {
                     pmService.createPMrequest(newAsset.getUid(), null);
                 }
                 List<V2_BlobObject> assetPicList = Optional.ofNullable(getPicList(itemId)).orElse(new ArrayList<V2_BlobObject>())
-                        .stream().filter(item -> item.getBoSubType().contains("asset")).collect(Collectors.toList());
+                        .stream().filter(item -> item.getBoSubType().contains("asset") || item.getBoSubType().contains("CustomizedAssetAttachmentCategory")).collect(Collectors.toList());
                 assetPicList.addAll(getPicList(temp.getArrivalListId()));
                 assetPicList.forEach(item -> {
                     item.setId(null);
@@ -258,9 +258,9 @@ public class AssetInstallationService {
     public Supplier getSupplierById(Integer supplierId) {
         return Optional.ofNullable(supplierDao.findById(supplierId)).orElse(null);
     }
-    
+
     public Supplier getSupplierByUid(String supplierUid){
-    	return supplierDao.getByUid(supplierUid);
+        return supplierDao.getByUid(supplierUid);
     }
 
     public QrCodeLib getNewQrcode(String tenantUid, String siteUid) {
@@ -335,7 +335,7 @@ public class AssetInstallationService {
             arrivalMap.put("安置地点", arrivalListItem.getLocationName());
             arrivalMap.put("制造商序列号", arrivalListItem.getSerialNum());
             arrivalMap.put("安装工时", arrivalListItem.getWorkHours());
-      }
+        }
 
         return arrivalMap;
     }
