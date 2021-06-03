@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:p="http://primefaces.org/ui"
+				template="/WEB-INF/template.xhtml">
+
+
+	<ui:define name="content">
+<div class="ui-g">
+	<div class="ui-g-12 card cardTitle">
+		<p:outputLabel class="pageTitle" value="备件探头批量归还"/><!--#{msg.ZKBCourseMgt}-->
+	</div>
+	<div class="ui-g-12 card"><br/><br/>
+		<h:form enctype="multipart/form-data">
+			<p:fieldset legend="批量归还信息" id="uploaderContainer">
+				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+					<p:fileUpload fileUploadListener="#{zkbFePartOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
+						invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M"
+						update=":dataListForm" sizeLimit="5242880"
+						allowTypes="/(\.|\/)(xls|xlsx)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
+					<p:growl id="messages" showDetail="true" />
+				</p:panelGrid>
+				<h:panelGroup>
+					<p>说明</p>
+					<p>
+						1.导出需要归还的配件及探头信息<p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbFePartOrderController.exportNeedReturn}" icon="ui-icon-arrowstop-1-s">
+						<p:fileDownload value="#{zkbFePartOrderController.exportFile}"/>
+					</p:commandButton>
+					</p>
+					<p>
+						2.填写excel归还信息
+					</p>
+					<p>3.上传文件进行批量归还</p>
+				</h:panelGroup>
+			</p:fieldset>
+		</h:form>
+		<h:panelGroup>
+			<p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="List.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
+		</h:panelGroup>
+	</div>
+
+
+	<div class="ui-g-12 card">
+		<h:form id="dataListForm">
+			<p:fieldset legend="错误的数据">
+				<p:dataTable id="datalist" rendered="#{not empty zkbFePartOrderController.errorZkbFePartList}"
+					value="#{zkbFePartOrderController.errorZkbFePartList}" var="item" lazy="false" paginator="true" paginatorPosition="both"
+					paginatorAlwaysVisible="true"
+					paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,50,100,500">
+					<p:column headerText="SHEET页">
+						<h:outputText value="#{item.get('zkbFePartOrderVO').sheetName}" />
+					</p:column>
+					<p:column headerText="EXCEL行数">
+						<h:outputText value="#{item.get('zkbFePartOrderVO').lineNum}" />
+					</p:column>
+					<p:column headerText="#{msg.zkbFePartOrder_orderNo}">
+						<h:outputText value="#{item.get('zkbFePartOrderVO').partOrderNo}" />
+					</p:column>
+					<p:column headerText="#{msg.FailureInformation}" >
+						<h:outputText value="#{item.get('errmsg')}"/>
+					</p:column>
+				</p:dataTable>
+			</p:fieldset>
+		</h:form>
+	</div>
+</div>
+	</ui:define>
+</ui:composition>

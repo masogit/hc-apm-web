@@ -34,14 +34,14 @@
                                         <p:overlayPanel id="panelOrg" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                             <p:scrollPanel style="height:300px;border: 0" mode="native">
                                                 <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{assetArrivedListEditController.orgTree}" selection="#{assetArrivedListEditController.selectedNode}" var="node" selectionMode="single">
-                                                    <p:ajax process="@this" event="select" update=":AssetArrivalEditForm:selectedOrgName" listener="#{assetArrivedListEditController.onSelectOrgFromTree}" oncomplete="PF('varPanelOrg').hide();"/>
+                                                    <p:ajax process="@this" event="select" update=":AssetArrivalEditForm:selectedOrgName :AssetArrivalEditForm:arrivalListAttachment" listener="#{assetArrivedListEditController.onSelectOrgFromTree}" oncomplete="PF('varPanelOrg').hide();"/>
                                                     <p:ajax process="@this" event="expand"/>
                                                     <p:ajax process="@this" event="collapse"/>
 
                                                     <p:treeNode type="org">
                                                         <h:outputText value="#{node}"/>
                                                     </p:treeNode>
-													<p:treeNode type="hidden" rendered="false"/>
+                                                    <p:treeNode type="hidden" rendered="false"/>
                                                 </p:tree>
                                             </p:scrollPanel>
                                         </p:overlayPanel>
@@ -61,10 +61,10 @@
                                         <label class="label">#{msg.arrivalDate}*</label>
                                         <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{userContextService.activeSupplier()}">
-                                        <label class="label">#{msg.arrivalDate}</label>
-                                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                                    </h:panelGroup>
+                                    <!--                                    <h:panelGroup rendered="#{userContextService.activeSupplier()}">-->
+                                    <!--                                        <label class="label">#{msg.arrivalDate}</label>-->
+                                    <!--                                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />-->
+                                    <!--                                    </h:panelGroup>-->
                                     <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
                                         <label class="label">#{msg.arrivalListFunctionType}</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.functionType}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
@@ -123,7 +123,7 @@
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                             <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                         </p:autoComplete>
-                                        <p:commandButton id="createSupplierButton4" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+                                        <p:commandButton id="createSupplierButton4" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" disabled="#{assetArrivedListEditController.selected.status eq 3}"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                         <label class="label">供应商责任人</label>
@@ -197,7 +197,7 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['nationalStandardCode']}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.nationalStandardCode}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['nationalStandardCode'].arrivalRequired? '*':''}</span></label>
-                                            <p:autoComplete id="gbname" value="#{assetArrivedListEditController.nationalStandardCode}" required="#{assetArrivedListEditController.customConfig.assetFields['nationalStandardCode'].arrivalRequired}" 
+                                            <p:autoComplete id="gbname" value="#{assetArrivedListEditController.nationalStandardCode}" required="#{assetArrivedListEditController.customConfig.assetFields['nationalStandardCode'].arrivalRequired}"
                                                             requiredMessage="#{msg.nationalStandardCode} #{msg.ValidationRequire}" completeMethod="#{assetArrivedListEditController.completeGbName}" />
                                             <p:commandButton id="btnOrg1"  style="width: 22px;height: 22px; padding-right: 0px;float: next;" process="@this" icon="fa fa-angle-down"/>
                                             <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel"  style="width:300px" modal="false">
@@ -219,7 +219,7 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['functionGroup']}">
                                         <h:panelGroup >
                                             <label class="label">#{msg.functionGroup}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['functionGroup'].arrivalRequired? '*':''}</span></label>
-                                            <p:selectOneMenu id="functionGroup" value="#{assetArrivedListEditController.easyInstallItem.functionGroup}" required="#{assetArrivedListEditController.customConfig.assetFields['functionGroup'].arrivalRequired}" 
+                                            <p:selectOneMenu id="functionGroup" value="#{assetArrivedListEditController.easyInstallItem.functionGroup}" required="#{assetArrivedListEditController.customConfig.assetFields['functionGroup'].arrivalRequired}"
                                                              requiredMessage="#{msg.functionGroup} #{msg.ValidationRequire}"  autoWidth="false" style="width: 100%">
                                                 <p:ajax  listener="#{assetArrivedListEditController.onFunctionGroupChange()}" update="@(.assetCode68)" />
                                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -230,7 +230,7 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['assetCode68']}">
                                         <h:panelGroup >
                                             <label class="label">#{msg.assetCode68}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['assetCode68'].arrivalRequired? '*':''}</span></label>
-                                            <p:selectOneMenu id="assetCode68" value="#{assetArrivedListEditController.easyInstallItem.assetCode68}" required="#{assetArrivedListEditController.customConfig.assetFields['assetCode68'].arrivalRequired}" 
+                                            <p:selectOneMenu id="assetCode68" value="#{assetArrivedListEditController.easyInstallItem.assetCode68}" required="#{assetArrivedListEditController.customConfig.assetFields['assetCode68'].arrivalRequired}"
                                                              requiredMessage="#{msg.assetCode68} #{msg.ValidationRequire}" autoWidth="false" style="width: 100%" class="assetCode68">
                                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                                 <f:selectItems value="#{assetArrivedListEditController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -240,7 +240,7 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['registrationNo']}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.registrationNo}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['registrationNo'].arrivalRequired? '*':''}</span></label>
-                                            <p:inputText id="registrationNo" value="#{assetArrivedListEditController.easyInstallItem.registrationNo}" required="#{assetArrivedListEditController.customConfig.assetFields['registrationNo'].arrivalRequired}" 
+                                            <p:inputText id="registrationNo" value="#{assetArrivedListEditController.easyInstallItem.registrationNo}" required="#{assetArrivedListEditController.customConfig.assetFields['registrationNo'].arrivalRequired}"
                                                          requiredMessage="#{msg.registrationNo} #{msg.ValidationRequire}" />
                                         </h:panelGroup>
                                     </c:if>
@@ -248,7 +248,7 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['maitanance']}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.maitanance}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['maitanance'].arrivalRequired? '*':''}</span></label>
-                                            <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.maitanance}" scrollHeight="300"  forceSelection="true" required="#{assetArrivedListEditController.customConfig.assetFields['maitanance'].arrivalRequired}" 
+                                            <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.maitanance}" scrollHeight="300"  forceSelection="true" required="#{assetArrivedListEditController.customConfig.assetFields['maitanance'].arrivalRequired}"
                                                             requiredMessage="#{msg.maitanance} #{msg.ValidationRequire}" completeMethod="#{assetArrivedListEditController.autoCompleteMaintainer}"
                                                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                                 <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onMaintainerChange}"/>
@@ -262,7 +262,7 @@
                                         <h:panelGroup>
                                             <label class="label">#{msg.purchaseDate}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['purchaseDate'].arrivalRequired? '*':''}</span></label>
                                             <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"  id="purchaseDate" value="#{assetArrivedListEditController.easyInstallItem.purchaseDate}" maxdate="#{assetArrivedListEditController.easyInstallItem.arrivalList.arrivalDate}" required="#{assetArrivedListEditController.customConfig.assetFields['purchaseDate'].arrivalRequired}"
-                                                        requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                                         requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                                         </h:panelGroup>
                                     </c:if>
                                     <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
@@ -276,7 +276,7 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['purchasePrice']}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.purchasePrice}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['purchasePrice'].arrivalRequired? '*':''}</span></label>
-                                            <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" required="#{assetArrivedListEditController.customConfig.assetFields['purchasePrice'].arrivalRequired}" 
+                                            <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" required="#{assetArrivedListEditController.customConfig.assetFields['purchasePrice'].arrivalRequired}"
                                                            requiredMessage="#{msg.purchasePrice} #{msg.ValidationRequire}" value="#{assetArrivedListEditController.easyInstallItem.purchasePrice}" />
                                         </h:panelGroup>
                                     </c:if>
@@ -343,7 +343,7 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['measuringItemCategory']}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.measuringItemCategory}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['measuringItemCategory'].arrivalRequired? '*':''}</span></label>
-                                            <p:selectOneMenu id="measuringItemCategory" value="#{assetArrivedListEditController.easyInstallItem.measuringItemCategory}" required="#{assetArrivedListEditController.customConfig.assetFields['measuringItemCategory'].arrivalRequired}" 
+                                            <p:selectOneMenu id="measuringItemCategory" value="#{assetArrivedListEditController.easyInstallItem.measuringItemCategory}" required="#{assetArrivedListEditController.customConfig.assetFields['measuringItemCategory'].arrivalRequired}"
                                                              requiredMessage="#{msg.measuringItemCategory} #{msg.ValidationRequire}">
                                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                                 <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -353,7 +353,7 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['accountingCategory']}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.accountingCategory}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['accountingCategory'].arrivalRequired? '*':''}</span></label>
-                                            <p:selectOneMenu id="accountingCategory" value="#{assetArrivedListEditController.easyInstallItem.accountingCategory}" required="#{assetArrivedListEditController.customConfig.assetFields['accountingCategory'].arrivalRequired}" 
+                                            <p:selectOneMenu id="accountingCategory" value="#{assetArrivedListEditController.easyInstallItem.accountingCategory}" required="#{assetArrivedListEditController.customConfig.assetFields['accountingCategory'].arrivalRequired}"
                                                              requiredMessage="#{msg.accountingCategory} #{msg.ValidationRequire}">
                                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                                 <f:selectItems value="#{fieldMsg.getFieldValueList('accountingCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -363,21 +363,21 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['salvageValue']}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.salvageValue}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['salvageValue'].arrivalRequired? '*':''}</span></label>
-                                            <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetArrivedListEditController.easyInstallItem.salvageValue}" required="#{assetArrivedListEditController.customConfig.assetFields['salvageValue'].arrivalRequired}" 
+                                            <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetArrivedListEditController.easyInstallItem.salvageValue}" required="#{assetArrivedListEditController.customConfig.assetFields['salvageValue'].arrivalRequired}"
                                                            requiredMessage="#{msg.salvageValue} #{msg.ValidationRequire}"/>
                                         </h:panelGroup>
                                     </c:if>
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['lifecycle']}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.lifecycle}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['lifecycle'].arrivalRequired? '*':''}</span></label>
-                                            <p:inputNumber minValue="0" decimalPlaces="1" value="#{assetArrivedListEditController.easyInstallItem.lifecycleInYear}" required="#{assetArrivedListEditController.customConfig.assetFields['lifecycle'].arrivalRequired}" 
+                                            <p:inputNumber minValue="0" decimalPlaces="1" value="#{assetArrivedListEditController.easyInstallItem.lifecycleInYear}" required="#{assetArrivedListEditController.customConfig.assetFields['lifecycle'].arrivalRequired}"
                                                            requiredMessage="#{msg.lifecycle} #{msg.ValidationRequire}"/>
                                         </h:panelGroup>
                                     </c:if>
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['depreciationMethod']}">
                                         <h:panelGroup>
                                             <label class="label">#{msg.depreciationMethod}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['depreciationMethod'].arrivalRequired? '*':''}</span></label>
-                                            <p:selectOneMenu id="depreciationMethod" value="#{assetArrivedListEditController.easyInstallItem.depreciationMethod}" required="#{assetArrivedListEditController.customConfig.assetFields['depreciationMethod'].arrivalRequired}" 
+                                            <p:selectOneMenu id="depreciationMethod" value="#{assetArrivedListEditController.easyInstallItem.depreciationMethod}" required="#{assetArrivedListEditController.customConfig.assetFields['depreciationMethod'].arrivalRequired}"
                                                              requiredMessage="#{msg.depreciationMethod} #{msg.ValidationRequire}">
                                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                                 <f:selectItems value="#{fieldMsg.getFieldValueList('depreciationMethodList')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -387,7 +387,7 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['isPm']}">
                                         <h:panelGroup >
                                             <label class="label">#{msg.isAssetPMed}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['isPm'].arrivalRequired? '*':''}</span></label>
-                                            <p:selectOneRadio value="#{assetArrivedListEditController.easyInstallItem.isPm}" required="#{assetArrivedListEditController.customConfig.assetFields['isPm'].arrivalRequired}" 
+                                            <p:selectOneRadio value="#{assetArrivedListEditController.easyInstallItem.isPm}" required="#{assetArrivedListEditController.customConfig.assetFields['isPm'].arrivalRequired}"
                                                               requiredMessage="#{msg.isAssetPMed} #{msg.ValidationRequire}">
                                                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                                                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
@@ -398,7 +398,7 @@
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['isChecked']}">
                                         <h:panelGroup >
                                             <label class="label">#{msg.isAssetChecked}<span style="color:red">#{assetArrivedListEditController.customConfig.assetFields['isChecked'].arrivalRequired? '*':''}</span></label>
-                                            <p:selectOneRadio value="#{assetArrivedListEditController.easyInstallItem.isChecked}" required="#{assetArrivedListEditController.customConfig.assetFields['isChecked'].arrivalRequired}" 
+                                            <p:selectOneRadio value="#{assetArrivedListEditController.easyInstallItem.isChecked}" required="#{assetArrivedListEditController.customConfig.assetFields['isChecked'].arrivalRequired}"
                                                               requiredMessage="#{msg.isAssetChecked} #{msg.ValidationRequire}">
                                                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                                                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
@@ -406,7 +406,10 @@
                                             </p:selectOneRadio>
                                         </h:panelGroup>
                                     </c:if>
-
+                                    <h:panelGroup rendered="#{userContextService.activeSupplier()}">
+                                        <label class="label">入库单号</label>
+                                        <p:inputText value="#{assetArrivedListEditController.easyInstallItem.arrivalList.receiptNumber}" />
+                                    </h:panelGroup>
                                 </p:panelGrid>
                                 <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" id="arrivalListAttachment">
                                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -423,7 +426,7 @@
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="typeasset" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                            <p:fileUpload id="typeasset" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                         <h:panelGroup >
@@ -439,7 +442,7 @@
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="typeasset2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                            <p:fileUpload id="typeasset2" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                         <h:panelGroup >
@@ -455,12 +458,19 @@
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="typeasset3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                            <p:fileUpload id="typeasset3" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
                                         <h:panelGroup >
                                             <p:dataList id="accessoryList" value="#{assetArrivedListEditController.getAttachList('asset4')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
+                                                <c:choose>
+                                                    <c:when test="#{userContextService.activeSupplier()}">
+                                                        <f:facet name="header">临床验收确认</f:facet>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
+                                                    </c:otherwise>
+                                                </c:choose>
                                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                                                 <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
                                                     <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
@@ -471,9 +481,27 @@
                                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                                 </p:commandButton>
                                             </p:dataList>
-                                            <p:fileUpload id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                            <p:fileUpload id="typeasset4" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
                                                           multiple="true"  sizeLimit="100000000"  update="accessoryList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                                         </h:panelGroup>
+                                        <c:forEach items="#{assetArrivedListEditController.getAttachmentCategories()}" var="attachmentConfig">
+                                            <h:panelGroup >
+                                                <p:dataList id="#{attachmentConfig.boType.concat('List')}" value="#{assetArrivedListEditController.getAttachList(attachmentConfig.boType)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                                    <f:facet name="header">#{attachmentConfig.label}</f:facet>
+                                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                                    <h:panelGroup rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.verifyFileSuffixName(fileitem.objectName,'.JPEG|.JPG|.PNG')}">
+                                                        <img data-original="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                             src="#{fileDownloadService.getImgUrl(fileitem.objectStorageId)}"
+                                                             style="width:60px; height:40px;margin: 0px 5px 0px 5px;"/>
+                                                    </h:panelGroup>
+                                                    <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="#{attachmentConfig.boType.concat('List')}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" oncomplete="updatePreviewImg()">
+                                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                                    </p:commandButton>
+                                                </p:dataList>
+                                                <p:fileUpload id="#{'type'.concat(attachmentConfig.boType)}" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" oncomplete="updatePreviewImg()"
+                                                              multiple="true"  sizeLimit="100000000"  update="#{attachmentConfig.boType.concat('List')}" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                                            </h:panelGroup>
+                                        </c:forEach>
                                     </p:panelGrid>
                                 </p:fieldset>
                                 <h:panelGroup>
@@ -490,7 +518,7 @@
                                 </h:panelGroup>
                             </p:fieldset>
 
-                            <p:dataTable id="itemList" rendered="#{not empty assetArrivedListEditController.arrivalItemList}" selection="#{assetArrivedItemsController.selected}" 
+                            <p:dataTable id="itemList" rendered="#{not empty assetArrivedListEditController.arrivalItemList}" selection="#{assetArrivedItemsController.selected}"
                                          selectionMode="single" rowKey="#{item.id}" sortBy="#{item.itemNum}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rows="20"
                                          rowsPerPageTemplate="20,50,100,500"  value="#{assetArrivedListEditController.arrivalItemList}" var="item">
@@ -527,7 +555,7 @@
                                 </p:column>
                                 <p:column headerText="操作">
                                     <p:commandLink actionListener="#{assetArrivedListEditController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and not userContextService.activeSupplier()}"  update="itemList" >接单
-                                        <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
+                                        <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
                                     </p:commandLink>
                                     <p:commandLink style="margin-left: 4px;" actionListener="#{assetArrivedListEditController.takeWorkOrderBatch(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and userContextService.activeSupplier()}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>
@@ -572,7 +600,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup>
-                        <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{assetArrivedListEditController.finishChoseContractItem()}" value="#{msg.Confirm}" 
+                        <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{assetArrivedListEditController.finishChoseContractItem()}" value="#{msg.Confirm}"
                                          update=":AssetArrivalEditForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'ChoseContractDlg');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('ChoseContractDlg').hide()"/>
                     </h:panelGroup>

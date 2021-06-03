@@ -5,30 +5,21 @@
  */
 package com.ge.apm.service.pm;
 
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.V2_ServiceRequest;
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
-import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import webapp.framework.web.WebUtil;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -205,7 +196,54 @@ public String invokePmOrderCancel(String token, PmOrderActionForm formData, Stri
         		logger.error("rmi failure,code is {},body is {}",response.getStatusCode(),response.getBody());
         		return null;
         }
-    } 
+    }
+
+    public Map<String, Object> getAcker(String token, String pmOrderId) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+
+        String gatewayURL = getGatewayURL(GatewayURL.PM_GET_ACKER);
+        String url = gatewayURL.replace("{pmOrderId}", pmOrderId);
+
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap;
+        } else {
+            return null;
+        }
+    }
+
+    public Map<String, Object> getAckerForBatchComplete(String token) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+
+        String gatewayURL = getGatewayURL(GatewayURL.PM_GET_ACKER_FOR_BATCH_COMPLETE);
+
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap;
+        } else {
+            return null;
+        }
+    }
+
+    public Map<String, Object> getAckerForMultiplePmOrders(String token, List<String> pmIds) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(JSON.toJSONString(pmIds), header);
+
+        String gatewayURL = getGatewayURL(GatewayURL.PM_GET_ACKER_FOR_MULTIPLE_PM_ORDERS);
+
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap;
+        } else {
+            return null;
+        }
+    }
+
 }
 
 

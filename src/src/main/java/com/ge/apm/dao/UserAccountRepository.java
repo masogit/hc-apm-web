@@ -3,18 +3,14 @@ package com.ge.apm.dao;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserInfo;
-
 import webapp.framework.dao.GenericRepository;
 
 public interface UserAccountRepository extends GenericRepository<UserAccount> {
@@ -196,6 +192,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query("select u from UserAccount u, UserRole r, SysRole s where u.tenantUID=?1 and u.id=r.userId and r.roleId=s.id and s.name=?2")
     List<UserAccount> findByTenantUIDAndRoleName(String tenantUID, String roleName);
 
+    @Query("select distinct u from UserAccount u, UserRole r, SysRole s where u.tenantUID=?1 and u.id=r.userId and r.roleId=s.id and s.name in ?2")
+    List<UserAccount> findByTenantUIDAndRoleNames(String tenantUID, List<String> roleName);
+
     @Query(value= "select exists(select 1 from user_account where tenant_uid = ?1)",nativeQuery = true)
     boolean findRecordByTenantUid(String uid);
 
@@ -218,6 +217,19 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
      */
     @Query(value = "select u from UserAccount u where u.id in (select uu.userId from UserRole uu where uu.roleId in (:roleList))")
     List<UserAccount> getApprovalPersonByRoleId(@Param(value = "roleList") List<Integer> roleList);
+
+
+    /**
+     * 根据租户tenant UID查询
+     * @param tenantUid 租户tenantUID
+     * @return
+     */
+    @Query(value = "SELECT ua.* from user_account ua INNER JOIN user_role u on ua.id= u.user_id " +
+            "INNER JOIN tenant_info t1 on ua.tenant_uid=t1.uid " +
+            "where ua.tenant_uid = ?1 " +
+            "and u.role_id = 3 " +
+            "and t1.type=3", nativeQuery = true)
+    List<UserAccount> getTenantUidAndRoleId(String tenantUid);
 
     /**
      * @param userList

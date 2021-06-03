@@ -415,6 +415,8 @@ public class UserContextService implements Serializable {
      */
     ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
 
+    ZkbCourseTrainUserConfigRepository zkbCourseTrainUserConfigRepository = WebUtil.getBean(ZkbCourseTrainUserConfigRepository.class);
+
     /**
      * 获取 fe part order user config
      */
@@ -926,6 +928,16 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    public boolean isEditCourseScheduleAdmin() {
+        UserAccount user = getLoginUser();
+        if(StringUtils.isBlank(user.getLoginName()))
+            return false;
+        List<ZkbCourseTrainUserConfig>  zkbCourseTrainUserConfigList = this.zkbCourseTrainUserConfigRepository.findByLoginName(user.getLoginName());
+        if(CollectionUtils.isNotEmpty(zkbCourseTrainUserConfigList))
+            return true;
+        return false;
+    }
+
     public boolean isZkbFeUserConfig() {
         UserAccount user = getLoginUser();
         if(StringUtils.isBlank(user.getLoginName()))
@@ -952,6 +964,17 @@ public class UserContextService implements Serializable {
             return true;
         }
         return false;
+    }
+
+    public boolean isMvsTenant() {
+        TenantInfo tenantInfo = getTenantInfo();
+        return ApmConstant.MVS_TENANT_NAME.equals(tenantInfo.getName());
+    }
+
+    public boolean isYiMaiYangGuangTenant() {
+        TenantInfo tenantInfo = getTenantInfo();
+        //这期上线，暂时写死，下个版本改成动态配置
+        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
     }
 
     public static boolean isSuperAdminWithPartnerAccount(){

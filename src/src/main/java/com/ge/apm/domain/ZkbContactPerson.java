@@ -62,6 +62,9 @@ public class ZkbContactPerson {
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 
+    @Column(name = "login_name")
+    private String loginName;
+
     public String getId() {
         return id;
     }
@@ -189,5 +192,13 @@ public class ZkbContactPerson {
     @Override
     public String toString() {
         return "com.ge.apm.domain.ZkbContactPerson[ id=" + id + " ]";
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
     }
 }

@@ -140,6 +140,11 @@ public class ZkbOrderHistoryService {
             orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_orderNo"), "setOrderNo");
             orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_RSESup"), "setRSESup");
             orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("zkbHistory_quantity"), "setQuantity");
+            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("zkbHistory_totalContractProbeCount"), "setTotalContractProbeCount");
+            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("zkbHistory_applyLimitCount"), "setApplyLimitCount");
+            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("zkbHistory_normalLimitCount"), "setNormalLimitCount");
+            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("zkbHistory_specialLimitCount"), "setSpecialLimitCount");
+            orderHistoryInfoRow.setFieldIntegerValue(WebUtil.getMessage("zkbHistory_highValueLimitCount"), "setHighValueLimitCount");
             orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_sr"), "setSr");
             orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_act"), "setAct");
             orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_sparePartsReturn"), "setSparePartsReturn");
@@ -408,6 +413,11 @@ public class ZkbOrderHistoryService {
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_orderNo"),orderHistory.getOrderNo());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_RSESup"),orderHistory.getRSESup());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_quantity"),orderHistory.getQuantity());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_totalContractProbeCount"),orderHistory.getTotalContractProbeCount());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_applyLimitCount"),orderHistory.getApplyLimitCount());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_normalLimitCount"),orderHistory.getNormalLimitCount());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_specialLimitCount"),orderHistory.getSpecialLimitCount());
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_highValueLimitCount"),orderHistory.getHighValueLimitCount());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sr"),orderHistory.getSr());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_act"),orderHistory.getAct());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_sparePartsReturn"),orderHistory.getSparePartsReturn());

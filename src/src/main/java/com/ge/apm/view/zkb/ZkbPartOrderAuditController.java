@@ -174,10 +174,35 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     }
                     if(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(selected.getCurrentStep())){
                         if(StringUtils.isNotEmpty(selected.getCheckApplyNumFlag()) && CopyByInvok.F.equals(selected.getCheckApplyNumFlag())) {
-                            boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
-                            if(r){
-                                WebUtil.addErrorMessage("代理商备件已完成归还，目前未超限，可直接批复。","");
+                            if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                                if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                                    boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
+                                    if(r){
+                                        WebUtil.addErrorMessage("代理商备件已完成归还，目前未超限，可直接批复。","");
+                                    }else{
+                                        WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
+                                    }
+                                }
                             }else{
+                                boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
+                                if(r){
+                                    WebUtil.addErrorMessage("代理商备件已完成归还，目前未超限，可直接批复。","");
+                                }else{
+                                    WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
+                                }
+                            }
+                        }
+                    }else if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(selected.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
+                        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+                            if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                                boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
+                                if(!r){
+                                    WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
+                                }
+                            }
+                        }else{
+                            boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
+                            if(!r){
                                 WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
                             }
                         }
@@ -566,7 +591,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return "";
                 }
             }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
-                if(CopyByInvok.T.equals(selected.getNewCatFlag())){
+                if(CopyByInvok.T.equals(selected.getNewCatFlag()) && StringUtils.isEmpty(selected.getProbeQuotaType())){
                     ZkbContract c = zkbContractRepository.findById(selected.getContractId());
                     if(c.getProbeQuota() < selected.getQty()){
                         WebUtil.addErrorMessage("探头剩余数量不足，请联系供应商！","");
