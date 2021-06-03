@@ -40,7 +40,7 @@ public class USOptionImageDetailController {
         if (attachements == null) {
             attachements = blobService.findBlobObjectsByBoUid(USSegment+"_"+productName);
         }
-        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG)).collect(Collectors.toList());
+        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG) && item.getBoType().equals(V2_BlobObject.BO_TYPE_US_Option) ).collect(Collectors.toList());
         return collect;
     }
 

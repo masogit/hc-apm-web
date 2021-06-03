@@ -97,9 +97,9 @@
                     <p:column headerText="探头特殊剩余名额" >
                         <h:outputText value="#{item.probeQuotaSpecial}"/>
                     </p:column>
-                    <p:column headerText="探头高值剩余名额" >
+                   <!-- <p:column headerText="探头高值剩余名额" >
                         <h:outputText value="#{item.probeQuotaHigh}"/>
-                    </p:column>
+                    </p:column>-->
                     <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
                         <h:outputText value="#{item.geArtificialSupportTimes}"/>
                     </p:column>
@@ -777,7 +777,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">归还日期*</label>
-                            <p:calendar timeZone="GMT+8"  id="returnDate" pattern="yyyy/MM/dd" value="#{zkbPartOrderAuditController.selected.returnDate}" showOn="button" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
+                            <p:calendar timeZone="GMT+8"  id="returnDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.returnDate}" showOn="button" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag)}" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">新探头SN编号*</label>
@@ -801,7 +801,7 @@
                         </p:column>
                         <p:column headerText="归还日期">
                             <h:outputText value="#{it.returnDate}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="配件号">
@@ -903,7 +903,7 @@
                 </p:fieldset>
                 <p:outputLabel id="saveTips" style="color: red" value="#{zkbPartOrderAuditController.saveTips}"/><br/>
                 <p:commandButton validateClient="true" value="保存" action="#{zkbPartOrderAuditController.save}" update=":growl" icon="ui-icon-check" rendered="false" />
-                <p:commandButton validateClient="true" value="提交" action="#{zkbPartOrderAuditController.normalNext}" update=":growl" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.showBtn eq '1' and zkbPartOrderAuditController.canEditFlag}"/>
+                <p:commandButton validateClient="true" value="提交" action="#{zkbPartOrderAuditController.normalNext}" update=":growl" icon="ui-icon-check" rendered="#{zkbPartOrderAuditController.showBtn eq '1' and zkbPartOrderAuditController.canEditFlag and !(zkbPartOrderAuditController.selected.currentStep eq 'ManagePending')}"/>
                 <p:commandButton immediate="false" process="@this" value="拒绝" update=":growl :zkbCancelReasonDlg" oncomplete="PF('zkbCancelReasonDlg').show()" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' or zkbPartOrderAuditController.selected.currentStep eq 'OrderExtraPending' ) and zkbPartOrderAuditController.canEditFlag}"/>
                 <!--<p:commandButton immediate="false" process="@this" value="退回" action="#{zkbPartOrderAuditController.closedBack}" update=":growl" icon="ui-icon-close" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag}"/>-->
                 <p:commandButton validateClient="true" value="审批通过" action="#{zkbPartOrderAuditController.acceptNext}" update=":growl" icon="ui-icon-check" rendered="#{(zkbPartOrderAuditController.showBtn eq '0') and zkbPartOrderAuditController.canEditFlag}"/>
