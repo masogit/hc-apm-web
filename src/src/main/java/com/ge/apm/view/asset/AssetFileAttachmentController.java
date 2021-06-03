@@ -72,6 +72,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     private List<V2_BlobObject> batchBlobObjectList = new ArrayList<>();
     private Set<V2_BlobObject> repeatBlobObjectSet;
     private Set<AssetInfo> repeatAssets;
+    private List<AssetInfo> assetInfoList;
     private String boSubTypeBatch;
 
     //复选的附件数据
@@ -468,9 +469,10 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     public void cancelData(){
         repeatBlobObjectSet = new HashSet<>();
         repeatAssets = new HashSet<>();
+        assetInfoList = new ArrayList<>();
     }
-    public Set<AssetInfo> getAssetInfos() {
-        return repeatAssets;
+    public List<AssetInfo> getAssetInfos() {
+        return assetInfoList;
     }
     public boolean getFlag() {
         if (repeatAssets != null && !repeatAssets.isEmpty()){
@@ -484,6 +486,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         }
         repeatBlobObjectSet = new HashSet<>();
         repeatAssets = new HashSet<>();
+        assetInfoList = new ArrayList();
         for (AssetInfo tempAssetInfo : targetAssets) {
             List<V2_BlobObject> v2BlobObjectList = dao.findByBoUuid(tempAssetInfo.getUid());
             Set<String> objectNameSet = new HashSet<>();
@@ -495,6 +498,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
                     repeatBlobObjectSet.add(batchBlobObject);
                     tempAssetInfo.setErrorMessage(batchBlobObject.getObjectName());
                     repeatAssets.add(tempAssetInfo);
+                    assetInfoList.add(tempAssetInfo);
                 }else {
                     V2_BlobObject tempBlobObject = new V2_BlobObject();
                     tempBlobObject.setBoId(tempAssetInfo.getId());
