@@ -465,7 +465,10 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         dao.save(batchSaveObject);
         return "List.xhtml?faces-redirect=true";
     }
-
+    public void cancelData(){
+        repeatBlobObjectSet = new HashSet<>();
+        repeatAssets = new HashSet<>();
+    }
     public Set<AssetInfo> getAssetInfos() {
         return repeatAssets;
     }
@@ -480,7 +483,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             return ;
         }
         repeatBlobObjectSet = new HashSet<>();
-        repeatAssets = new HashSet<>();;
+        repeatAssets = new HashSet<>();
         for (AssetInfo tempAssetInfo : targetAssets) {
             List<V2_BlobObject> v2BlobObjectList = dao.findByBoUuid(tempAssetInfo.getUid());
             Set<String> objectNameSet = new HashSet<>();
