@@ -14,7 +14,7 @@
                     <p:selectOneMenu  value="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn.assetNo}" required="true" requiredMessage="#{msg.zkbFePartOrder_assetNo} #{msg.ValidationRequire}">
                         <p:ajax update="orderNoa"/>
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                        <f:selectItems value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item" itemLabel="#{item.assetNo}" itemValue="#{item.assetNo}"/>
+                        <f:selectItems value="#{zkbFePartOrderSparePartDetailController.selected.zkbReturnFePartOrderAssetInfoList}" var="item" itemLabel="#{item.assetNo}" itemValue="#{item.assetNo}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
                 <h:panelGroup>

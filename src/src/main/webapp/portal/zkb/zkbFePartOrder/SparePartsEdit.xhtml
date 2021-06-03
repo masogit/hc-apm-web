@@ -99,9 +99,9 @@
                     <p:column headerText="探头特殊剩余名额" >
                         <h:outputText value="#{item.probeQuotaSpecial}"/>
                     </p:column>
-                    <p:column headerText="探头高值剩余名额" >
-                        <h:outputText value="#{item.probeQuotaHigh}"/>
-                    </p:column>
+<!--                    <p:column headerText="探头高值剩余名额" >-->
+<!--                        <h:outputText value="#{item.probeQuotaHigh}"/>-->
+<!--                    </p:column>-->
 
                     <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
                         <h:outputText value="#{item.geArtificialSupportTimes}"/>
@@ -202,7 +202,7 @@
                              widgetVar="zkbFePartOrderAssetInfoList" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderAssetInfo}"
                              lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                    <p:ajax event="rowSelect" update=":zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList:editDetailButton :zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList:deleteDetailButton" />
+                    <p:ajax event="rowSelect" update=":zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList:editDetailButton :zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList:editDetailButton1 :zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList:deleteDetailButton" />
                     <p:column headerText="#{msg.zkbFePartOrder_assetNo}">
                         <h:outputText value="#{item.assetNo}"/>
                     </p:column>
@@ -215,9 +215,13 @@
                     <p:column headerText="#{msg.zkbFePartOrder_remark}">
                         <h:outputText value="#{item.comment}"/>
                     </p:column>
+                    <p:column rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('Requested')}" headerText="修改数量备注">
+                        <h:outputText value="#{item.updateComment}"/>
+                    </p:column>
                     <f:facet name="{Toolbar}">
                         <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  immediate="false" process="@this" id="createDetailButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareItemCreate}"  update="zkbFePartOrderAssetInfoEditForm" oncomplete="PF('zkbFePartOrderAssetInfoEditDlg').show()" />
                         <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  immediate="false" process="@this" id="editDetailButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareItemEdit}" disabled="#{zkbFePartOrderSparePartDetailController.itemDisabled}" update="zkbFePartOrderAssetInfoEditForm"  oncomplete="PF('zkbFePartOrderAssetInfoEditDlg').show()"  />
+                        <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('WaitingAssignment')}"  immediate="false" id="editDetailButton1" process="@this"  icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareItemEdit}" disabled="#{zkbFePartOrderSparePartDetailController.itemDisabled}" update="zkbFePartOrderAssetInfoEditForm"  oncomplete="PF('zkbFePartOrderAssetInfoEditDlg').show()"  />
                         <p:commandButton rendered="#{zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  immediate="false" process="@this"  id="deleteDetailButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteItem}" disabled="#{zkbFePartOrderSparePartDetailController.itemDisabled}" update=":zkbFePartOrderSparePartsEditForm:zkbFePartOrderAssetInfoList">
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                         </p:commandButton>

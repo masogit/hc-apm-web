@@ -153,7 +153,8 @@ public class TenantInfoConfigService {
 			if(edition.equals(AUDIT_VERSION)||edition.equals(SWAP_CENTER_VERSION)){
 				resetAuditOrSwapCenterVersion(tempItem);
 			}else{
-				tempItem.setValue(true);
+//				tempItem.setValue(true);
+				resetNotAuditVersion(tempItem);
 			}
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
@@ -322,6 +323,14 @@ public class TenantInfoConfigService {
 
 		if (root != null) {
 			buildRoot();
+		}
+	}
+
+	void resetNotAuditVersion(TenantInfoConfigItem item){
+		if(Arrays.asList("audit").contains(item.getKey())){
+			item.setValue(false);
+		} else {
+			item.setValue(true);
 		}
 	}
 

@@ -66,11 +66,11 @@
                             </f:facet>
                         </p:column>
                         <p:column headerText="#{msg.zkbFePartOrder_urgencyStatus}" filterBy="#{item.urgencyStatus}"  filterMatchMode="EQ">
-                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_casePriority', item.urgencyStatus)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_casePriority1', item.urgencyStatus)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_casePriority')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_casePriority1')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
@@ -130,12 +130,12 @@
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus"  title="#{msg.Create}" action="#{zkbFePartOrderController.intoCreateModel}" rendered="#{zkbFePartOrderController.fourHundredsTeam}"/>
-                            <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" action="#{zkbFePartOrderController.intoEditModel}" disabled="#{zkbFePartOrderController.selected==null}"/>
-
+                            <p:commandButton id="editButton" icon="ui-icon-pencil"  title="#{msg.Edit}" action="#{zkbFePartOrderController.intoEditModel}"  disabled="#{zkbFePartOrderController.selected==null}"/>
                             <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbFePartOrderController.exportAll}" icon="ui-icon-arrowstop-1-s">
                                 <p:fileDownload value="#{zkbFePartOrderController.exportFile}"/>
                             </p:commandButton>
-
+                            <p:commandButton id="importButton" ajax="false"   title="批量归还" action="#{zkbFePartOrderController.importAction}" rendered="#{zkbFePartOrderController.geAdmin}" icon="ui-icon-arrowstop-1-n">
+                            </p:commandButton>
                         </f:facet>
                     </p:dataTable>
                 </h:form>

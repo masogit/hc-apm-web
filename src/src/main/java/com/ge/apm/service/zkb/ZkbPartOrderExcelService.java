@@ -28,10 +28,11 @@ import java.util.Map;
 @Service
 public class ZkbPartOrderExcelService {
 
-    public static final String SHEET_ZKB_PART_ORDER = "额度信息";
-    public static final String SHEET_ZKB_PART_ORDER_ITEM = "额度明细";
+    public static final String SHEET_ZKB_PART_ORDER = "维修工单";
+    public static final String SHEET_ZKB_PART_ORDER_ITEM = "备件明细";
     public static final String SHEET_ZKB_PART_ORDER_CAT = "探头明细";
-    public static final String SHEET_ZKB_PART_ORDER_RETURN = "归还信息";
+    public static final String SHEET_ZKB_PART_ORDER_RETURN = "归还明细";
+    public static final String SHEET_ZKB_PART_ORDER_REPORT = "维修工单报表";
 
     @Autowired
     ZkbPartOrderItemRepository zkbPartOrderItemRepository;
@@ -62,11 +63,13 @@ public class ZkbPartOrderExcelService {
         }
         List<Map<String, Object>> zkbPartOrderItemDataList = createZkbPartOrderItemData(ids,partOrderNoMap);
         List<Map<String, Object>> zkbPartOrderReturnDataList = createZkbPartOrderReturnData(ids,partOrderNoMap);
-        HashMap<String,Object> map = new HashMap<>(4);
+        List<Map<String, Object>> zkbPartOrderReportDataList = createZkbPartOrderReportData(zkbPartOrderList);
+        HashMap<String,Object> map = new HashMap<>(6);
         map.put("zkbPartOrderDataList",zkbPartOrderDataList);
         map.put("zkbPartOrderItemDataList",zkbPartOrderItemDataList);
         map.put("zkbPartOrderCatDataList",zkbPartOrderCatDataList);
         map.put("zkbPartOrderReturnDataList",zkbPartOrderReturnDataList);
+        map.put("zkbPartOrderReportDataList",zkbPartOrderReportDataList);
         return map;
     }
 
@@ -106,6 +109,41 @@ public class ZkbPartOrderExcelService {
             zkbPartOrderReturnDataList.add(zkbPartOrderReturnDataMap);
         }
         return zkbPartOrderReturnDataList;
+    }
+
+    public  List<Map<String, Object>> createZkbPartOrderReportData(List<ZkbPartOrder> zkbPartOrderList){
+        List<Map<String, Object>> zkbPartOrderReportDataList = new ArrayList<>();
+        for(ZkbPartOrder p : zkbPartOrderList){
+            Map<String, Object> zkbPartOrderDataMap = new HashMap<>();
+            if(ZkbPartOrder.OrderType.Probe.toString().equals(p.getOrderType())){
+                zkbPartOrderDataMap = getPartOrderMap(p);
+                zkbPartOrderDataMap.put("探头号", p.getCatNo());
+                if(p.getZkbPartOrderCat() != null){
+                    zkbPartOrderDataMap.put("探头型号", p.getZkbPartOrderCat().getCatModel());
+                    zkbPartOrderDataMap.put("价值类型", p.getZkbPartOrderCat().getValueType());
+                }
+                zkbPartOrderDataMap.put("旧探头SN号输入框", p.getOldCatSn());
+                zkbPartOrderDataMap.put("数量", p.getCatNum());
+                zkbPartOrderReportDataList.add(zkbPartOrderDataMap);
+            }else if(ZkbPartOrder.OrderType.Parts.toString().equals(p.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(p.getOrderType())){
+                List<ZkbPartOrderItem> zkbPartOrderItemList = zkbPartOrderItemRepository.findByPartOrderId(p.getId());
+                for(ZkbPartOrderItem i : zkbPartOrderItemList){
+                    zkbPartOrderDataMap = getPartOrderMap(p);
+                    zkbPartOrderDataMap.put("配件号/工具号", i.getPartNo());
+                    zkbPartOrderDataMap.put("配件名称", i.getPartName());
+                    zkbPartOrderDataMap.put("配件数量", i.getPartQty());
+                    zkbPartOrderDataMap.put("配件SN(序列号)", i.getSerialNumber());
+                    zkbPartOrderDataMap.put("Order#", i.getOrderNo());
+                    zkbPartOrderDataMap.put("价格", i.getPrice());
+                    zkbPartOrderDataMap.put("备注（说明是否DOA或者Short life）", i.getRemark());
+                    zkbPartOrderReportDataList.add(zkbPartOrderDataMap);
+                }
+            }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(p.getOrderType())){
+                zkbPartOrderDataMap = getPartOrderMap(p);
+                zkbPartOrderReportDataList.add(zkbPartOrderDataMap);
+            }
+        }
+        return zkbPartOrderReportDataList;
     }
 
     public Map<String, Object> getPartOrderMap(ZkbPartOrder p){
@@ -160,6 +198,7 @@ public class ZkbPartOrderExcelService {
     public Map<String, Object> getPartOrderCatMap(ZkbPartOrder p){
         Map<String, Object> zkbPartOrderCatDataMap = new HashMap<>(15);
         zkbPartOrderCatDataMap.put("申请编号", p.getPartOrderNo());
+        zkbPartOrderCatDataMap.put("Order#", p.getOrderNo());
         zkbPartOrderCatDataMap.put("探头号", p.getCatNo());
         if(p.getZkbPartOrderCat() != null){
             zkbPartOrderCatDataMap.put("探头型号", p.getZkbPartOrderCat().getCatModel());
@@ -220,6 +259,7 @@ public class ZkbPartOrderExcelService {
         List<Map<String, Object>> zkbPartOrderItemDataList = (List<Map<String, Object>>) dataMap.get("zkbPartOrderItemDataList");
         List<Map<String, Object>> zkbPartOrderCatDataList = (List<Map<String, Object>>) dataMap.get("zkbPartOrderCatDataList");
         List<Map<String, Object>> zkbPartOrderReturnDataList = (List<Map<String, Object>>) dataMap.get("zkbPartOrderReturnDataList");
+        List<Map<String, Object>> zkbPartOrderReportDataList = (List<Map<String, Object>>) dataMap.get("zkbPartOrderReportDataList");
         for (Map<String, Object> item : zkbPartOrderDataList) {
             doc.writeRowData(SHEET_ZKB_PART_ORDER, keyRow, dataRow++, item);
         }
@@ -234,6 +274,10 @@ public class ZkbPartOrderExcelService {
         dataRow = 2;
         for (Map<String, Object> item : zkbPartOrderReturnDataList) {
             doc.writeRowData(SHEET_ZKB_PART_ORDER_RETURN, keyRow, dataRow++, item);
+        }
+        dataRow = 2;
+        for (Map<String, Object> item : zkbPartOrderReportDataList) {
+            doc.writeRowData(SHEET_ZKB_PART_ORDER_REPORT, keyRow, dataRow++, item);
         }
     }
 

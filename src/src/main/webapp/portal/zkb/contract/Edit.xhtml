@@ -146,7 +146,7 @@
                                 <label class="label">探头特殊已使用名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaSpecialUse}" min="0" max="1000"  />
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <!--<h:panelGroup>
                                 <label class="label">探头高值总名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaHighTotal}" min="0" max="1000"  />
                             </h:panelGroup>
@@ -161,7 +161,7 @@
                             <h:panelGroup>
                                 <label class="label">探头高值已使用名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaHighUse}" min="0" max="1000"  />
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                         </c:if>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_geArtificialSupportTimes_total}</label>
@@ -225,6 +225,13 @@
                             <label class="label">#{msg.zkbContract_adminAddress}</label>
                             <p:inputText id="address" value="#{zkbContractEditController.selected.adminAddress}" />
                         </h:panelGroup>
+                        <h:panelGroup rendered="#{!(empty zkbContractEditController.selected.id)}">
+                            <label class="label">修改类型*</label>
+                            <p:selectOneMenu id="modifyType" value="#{zkbContractEditController.selected.modifyType}" required="true" requiredMessage="修改类型 #{msg.ValidationRequire}" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractModifyType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_remark}</label>
                             <p:inputText id="remark" value="#{zkbContractEditController.selected.remark}" />
@@ -235,7 +242,7 @@
 
                     <p:fieldset id="zkbContractCourseFieldset" legend="相关课程" rendered="#{not empty zkbContractEditController.selected.id}">
                         <p:dataTable id="zkbContractCourseDatalist" value="#{zkbContractEditController.contractCourseList}" var="zkbContractCourseItem"
-                                     widgetVar="zkbContractCourseDatalist" selectionMode="single" selection="#{zkbContractEditController.zkbContractCourseSelected}"
+                                     widgetVar="zkbContractCourseDatalist" selectionMode="single" sortOrder="descending" sortBy="#{zkbContractCourseItem.zkbCourse.createdDate}" selection="#{zkbContractEditController.zkbContractCourseSelected}"
                                      lazy="false" paginator="true" rowKey="#{zkbContractCourseItem.zkbCourse.cname}" sortMode="single"
                                      paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
 

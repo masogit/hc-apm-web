@@ -87,10 +87,6 @@
                     <p:column headerText="#{msg.zkbContract_spareQuota}">
                         <h:outputText value="#{item.spareQuota}"/>
                     </p:column>
-<!--                    <p:column headerText="#{msg.zkbContract_probeQuota}" >-->
-<!--                        <h:outputText value="#{item.probeQuota}"/>-->
-<!--                    </p:column>-->
-
                     <p:column headerText="探头任意剩余名额" >
                         <h:outputText value="#{item.probeQuota}"/>
                     </p:column>
@@ -100,9 +96,9 @@
                     <p:column headerText="探头特殊剩余名额" >
                         <h:outputText value="#{item.probeQuotaSpecial}"/>
                     </p:column>
-                    <p:column headerText="探头高值剩余名额" >
-                        <h:outputText value="#{item.probeQuotaHigh}"/>
-                    </p:column>
+<!--                    <p:column headerText="探头高值剩余名额" >-->
+<!--                        <h:outputText value="#{item.probeQuotaHigh}"/>-->
+<!--                    </p:column>-->
 
                     <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
                         <h:outputText value="#{item.geArtificialSupportTimes}"/>
@@ -130,10 +126,6 @@
                             <label class="label">#{msg.zkbFePartOrder_systemId}</label>
                             <p:inputText   disabled="true" value="#{zkbFePartOrderProbeController.selected.systemId}"    />
                         </h:panelGroup>
-<!--                        <h:panelGroup>-->
-<!--                            <label class="label">报修单号</label>-->
-<!--                            <p:inputText  disabled="true" value="#{zkbFePartOrderProbeController.selected.fatherPartOrderNo}" />-->
-<!--                        </h:panelGroup>-->
                         <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.currentStep.equals('Requested')}">
                             <label class="label">#{msg.zkbFePartOrder_probeOrderNo}</label>
                             <p:inputText disabled="true"  value="#{zkbFePartOrderProbeController.selected.partOrderNo}" />

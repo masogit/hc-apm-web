@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @ManagedBean
@@ -33,6 +34,15 @@ public class PmOrderGlobalController {
 
     public List<UserAccount> getAckerListForBatchComplete() {
         return userCommonService.getPmAckerListForBatchComplete();
+    }
+
+    public List<UserAccount> getAckerForMultiplePmOrders() {
+        V2PmOrderController pmOrderController = WebUtil.getBean(V2PmOrderController.class);
+        if (null == pmOrderController.pmIdList || pmOrderController.pmIdList.size() == 0) {
+            return Collections.emptyList();
+        }
+
+        return userCommonService.getAckerForMultiplePmOrders(pmOrderController.pmIdList);
     }
 
     public boolean isAutoAck(V2_PmOrder pmOrder) {
