@@ -258,9 +258,9 @@ public class AssetInstallationService {
     public Supplier getSupplierById(Integer supplierId) {
         return Optional.ofNullable(supplierDao.findById(supplierId)).orElse(null);
     }
-    
+
     public Supplier getSupplierByUid(String supplierUid){
-    	return supplierDao.getByUid(supplierUid);
+        return supplierDao.getByUid(supplierUid);
     }
 
     public QrCodeLib getNewQrcode(String tenantUid, String siteUid) {
@@ -335,7 +335,7 @@ public class AssetInstallationService {
             arrivalMap.put("安置地点", arrivalListItem.getLocationName());
             arrivalMap.put("制造商序列号", arrivalListItem.getSerialNum());
             arrivalMap.put("安装工时", arrivalListItem.getWorkHours());
-      }
+        }
 
         return arrivalMap;
     }

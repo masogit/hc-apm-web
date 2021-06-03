@@ -5,6 +5,7 @@ import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
 import com.ge.apm.service.zkb.ZkbContractService;
+import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -18,6 +19,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,7 +54,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private String reason;
     private boolean operateFlag = false;
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
-
+    private boolean newContractFlag = false;
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -85,15 +87,26 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }else {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             this.selected = dao.findById(selectedId);
-            contractCourseList = this.selected.getZkbContractCourses() == null ? new ArrayList<>() : this.selected.getZkbContractCourses();
+            contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
+            this.selected.setZkbContractCourses(contractCourseList);
             zkbContractAssetList = zkbContractService.queryAssetByContractId(this.selected.getId());
             prepareEdit();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            if(zkbContractService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(selected.getStartDate()))< 0){
+                newContractFlag = false;
+            }else{
+                newContractFlag = true;
+            }
         }
         targetAssets = new ArrayList();
         queryAsset = new AssetInfo();
         this.getQueryAssetsList();
         if(!userContextService.isZkbUser()){
-            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(),ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+            List<String> userConfigs = new ArrayList<>();
+            userConfigs.add(ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+            userConfigs.add(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+            userConfigs.add(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
+            List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigTypeIsIn(currentUser.getLoginName(),userConfigs);
             if(zkbPartOrderUserConfigs !=null && zkbPartOrderUserConfigs.size() > 0){
                 operateFlag = true;
             }
@@ -128,8 +141,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     @Override
     public void prepareEdit() {
         super.prepareEdit();
-        this.selected.setLastModifiedBy(this.currentUser.getLoginName());
-        this.selected.setLastModifiedDate(new Date());
         this.initCourseList();
     }
 
@@ -178,28 +189,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public List<ZkbCourse> autoCompleteCourse(String query){
         List<ZkbCourse> res = courseList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getCname().contains(query)).collect(Collectors.toList());
-        /*if(contractCourseList != null && contractCourseList.size() > 0){
-            List<ZkbCourse> delCourse = new ArrayList<>();
-            for(ZkbCourse z : res){
-                for(ZkbContractCourse zkbContractCourse : contractCourseList){
-                    if(z.getId().equals(zkbContractCourse.getCourseId())){
-                        if("Create".equals(actionDetailName)){
-                            delCourse.add(z);
-                            break;
-                        }else if("Edit".equals(actionDetailName)){
-                            if(!zkbContractCourse.getId().equals(this.zkbContractCourseSelected.getId())){
-                                delCourse.add(z);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            if(delCourse.size() > 0){
-                res.removeAll(delCourse);
-            }
-        }
-*/
         return res;
     }
 
@@ -207,6 +196,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     public void prepareDetailCreate(){
         actionDetailName="Create";
         zkbContractCourseSelected = new ZkbContractCourse();
+        zkbContractCourseSelected.setCreatedDate(new Date());
         this.reason = "";
     }
 
@@ -232,14 +222,16 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }
         if (!flag){
             WebUtil.addErrorMessage("课程已存在");
+            contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
             return;
         }
 
-        int courseCountTotal = zkbContractCourseSelected.getCourseCountTotal() == null ? 0 : zkbContractCourseSelected.getCourseCountTotal();
-        int courseCount = zkbContractCourseSelected.getCourseCount() == null ? 0 : zkbContractCourseSelected.getCourseCount();
-        int courseCountApply = zkbContractCourseSelected.getCourseCountApply() == null ? 0 : zkbContractCourseSelected.getCourseCountApply();
-        int courseCountUse = zkbContractCourseSelected.getCourseCountUse() == null ? 0 : zkbContractCourseSelected.getCourseCountUse();
+        double courseCountTotal = zkbContractCourseSelected.getMainCourseCountTotal() == null ? 0 : zkbContractCourseSelected.getMainCourseCountTotal();
+        double courseCount = zkbContractCourseSelected.getMainCourseCount() == null ? 0 : zkbContractCourseSelected.getMainCourseCount();
+        double courseCountApply = zkbContractCourseSelected.getMainCourseCountApply() == null ? 0 : zkbContractCourseSelected.getMainCourseCountApply();
+        double courseCountUse = zkbContractCourseSelected.getMainCourseCountUse() == null ? 0 : zkbContractCourseSelected.getMainCourseCountUse();
         if(courseCountTotal != (courseCount + courseCountApply + courseCountUse)){
+            contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
             WebUtil.addErrorMessage("课程总额不等于课程剩余名额、课程申请名额、课程已使用名额之和,");
             return;
         }
@@ -295,6 +287,11 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         zkbContractService.deleteAsset(this.zkbContractAssetSelected,this.selected,currentUser,reason);
         this.zkbContractAssetList.remove(this.zkbContractAssetSelected);
         this.zkbContractAssetSelected = null;
+
+       this.selected.setLastModifiedBy(currentUser.getLoginName());
+       this.selected.setLastModifiedDate(new Date());
+       this.selected.setZkbContractAssets(null);
+       dao.save(this.selected);
    }
 
     public void getQueryAssetsList() {
@@ -309,19 +306,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
             sourceAssets = new ArrayList(sourceAssets);
             sourceAssets.removeAll(targetAssets);
-            //将已选择的设备从查询去除
-            /*if(zkbContractAssetList != null && zkbContractAssetList.size() > 0){
-                List<AssetInfo> exsitAssets = new ArrayList<>();
-                for(ZkbContractAsset asset : zkbContractAssetList){
-                    for (AssetInfo a : sourceAssets){
-                        if(a.getUid().equals(asset.getAssetId())){
-                            exsitAssets.add(a);
-                            break;
-                        }
-                    }
-                }
-                sourceAssets.removeAll(exsitAssets);
-            }*/
         } else {
             sourceAssets = new ArrayList<AssetInfo>();
             targetAssets = new ArrayList<AssetInfo>();
@@ -407,6 +391,8 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             return false;
         }
     }
+
+
 
     public String getActionAssetName() {
         return actionAssetName;
@@ -534,6 +520,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void setOperateFlag(boolean operateFlag) {
         this.operateFlag = operateFlag;
+    }
+
+    public boolean isNewContractFlag() {
+        return newContractFlag;
+    }
+
+    public void setNewContractFlag(boolean newContractFlag) {
+        this.newContractFlag = newContractFlag;
     }
 
     @Override

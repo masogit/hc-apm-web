@@ -68,19 +68,19 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public int fetchCurrentWorkOrders(Integer id);
 
     @Query(value = "select max(a.financingNum) from AssetInfo a where a.siteUID = ?1 and  a.nationalStandardCode=?2"
-    		+ " and a.financingNum like concat('%',?2,'%')")
-	public String fetchMaxAssetFinacingNumWithSiteUID(String uid, String nationalStardCode);
+            + " and a.financingNum like concat('%',?2,'%')")
+    public String fetchMaxAssetFinacingNumWithSiteUID(String uid, String nationalStardCode);
 
     @Query("select max(a.financingNum) from AssetInfo a where a.hospitalUID = ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
-	public String fetchMaxAssetFinacingNumWithHospitalUID(String uid, String nationalStardCode);
+    public String fetchMaxAssetFinacingNumWithHospitalUID(String uid, String nationalStardCode);
 
     @Query("select max(a.financingNum) from AssetInfo a where a.institutionUID = ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
-	public String fetchMaxAssetFinacingNumWithInstitutionUID(String uid, String nationalStardCode);
+    public String fetchMaxAssetFinacingNumWithInstitutionUID(String uid, String nationalStardCode);
 
     @Query("select max(a.financingNum) from AssetInfo a where a.tenantUID = ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
-	public String fetchMaxAssetFinacingNumWithTenantUID(String uid, String nationalStardCode);
+    public String fetchMaxAssetFinacingNumWithTenantUID(String uid, String nationalStardCode);
 
-	public List<AssetInfo> findByTenantUID(String tenantUID);
+    public List<AssetInfo> findByTenantUID(String tenantUID);
 
     @Query("select a from AssetInfo a where a.isDeleted = false and a.financingNum = ?1 and a.tenantUID=?2 order by a.id desc ")
     public List<AssetInfo> findByFinancingNumAndTenantUID(String financingNum, String tenantUID);

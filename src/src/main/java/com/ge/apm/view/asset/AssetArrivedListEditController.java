@@ -42,7 +42,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private OrgInfo selectedOrg;
 
-//    private QrCodeLibRepository qrcodeDao;
+    //    private QrCodeLibRepository qrcodeDao;
     private List<ArrivalListItem> arrivalItemList;
 
     private AssetInstallationService aiService;
@@ -58,7 +58,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private ArrivalListItem easyInstallItem;
 
-//    private OrgInfoService orgService;
+    //    private OrgInfoService orgService;
     private CustomConfigService ccService;
 
     private List<I18nMessage> code68List;
@@ -81,7 +81,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private BlobFileService blobService;
 
-//    private String supplierName;
+    //    private String supplierName;
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
     List<Supplier> manueList;
@@ -152,7 +152,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 //移除标记为已完成的设备合同
                 List<ContractInfo> completeEquipmentContracts = contractList.stream()
                         .filter(item -> (ContractInfo.ContractType.Equipment.toString().equals(item.getContractType()) &&
-                                        ContractInfo.ContractStatus.COMPLETE.toString().equals(item.getContractStatus())))
+                                ContractInfo.ContractStatus.COMPLETE.toString().equals(item.getContractStatus())))
                         .collect(Collectors.toList());
                 contractList.removeAll(completeEquipmentContracts);
 
@@ -296,7 +296,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             generateMap.clear();
         }
         saveEasyItem();
-        
+
     }
 
     public String gennerateFinancingNum(ArrivalListItem item, String prifix) {
@@ -648,11 +648,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.selected.setFunctionType(selectedContractItem.getPattern());
         String manufactureUid=selectedContractItem.getManufacturer();
         if(StringUtils.isNotEmpty(manufactureUid)){
-        	Supplier manufacture=aiService.getSupplierByUid(manufactureUid);
+            Supplier manufacture=aiService.getSupplierByUid(manufactureUid);
             if(manufacture!=null){
-            	this.selected.setManufacture(manufacture.getName());
-            	this.selected.setManufactureId(manufacture.getId().toString());
-            	this.manufacture=manufacture;
+                this.selected.setManufacture(manufacture.getName());
+                this.selected.setManufactureId(manufacture.getId().toString());
+                this.manufacture=manufacture;
             }
         }
         this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
@@ -660,9 +660,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.selected.setOrigin(selectedContractItem.getProductionPlace());
         String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
         if(StringUtils.isNotEmpty(supplierUid)){
-        	Supplier supplier=aiService.getSupplierByUid(supplierUid);
+            Supplier supplier=aiService.getSupplierByUid(supplierUid);
             if(supplier!=null){
-            	this.selected.setVendor(supplier.getName());
+                this.selected.setVendor(supplier.getName());
                 this.selected.setSupplierId(supplier.getId());
                 this.supplier=supplier;
 

@@ -71,9 +71,9 @@ public class AssetInfoDetailController {
     private TreeNode parentsTree;
 
     private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
-    
+
     private String maintanceType = "internal";
-    
+
     private List<AssetLifecycleEvent> assetEvents;
 
     @Getter
@@ -113,7 +113,7 @@ public class AssetInfoDetailController {
                 selected.setVendorTel(supplier.getTel());
             }
         }
-        
+
         maintanceType = aimService.getMaintanceType(selected);
         assetEvents  = aimService.getAssetEventsList(selected);
 
@@ -163,7 +163,7 @@ public class AssetInfoDetailController {
         List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(), type);
         return pmsList;
     }
-    
+
     public List<AssetLifecycleEvent> getOrderList(Integer type){
         List<AssetLifecycleEvent> res =  assetEvents.stream().filter(item->item.getEventType() == type).sorted(new Comparator<AssetLifecycleEvent>(){
             @Override
@@ -171,7 +171,7 @@ public class AssetInfoDetailController {
                 return o1.getCreateTime().compareTo(o2.getCreateTime());
             }
         }).collect(Collectors.toList());
-        
+
         return res.size()>3? res.subList(0, 2):res;
     }
 
@@ -240,7 +240,7 @@ public class AssetInfoDetailController {
     public boolean needShow(String itemKey, String fieldKey) {
         return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
     }
-    
+
     public List<ContractInfo> getContractList(){
         return contractService.getContractListByAsset(selected);
     }
@@ -319,5 +319,5 @@ public class AssetInfoDetailController {
     public int getAssetChangeHistoryCount() {
         return changeHistoryList.size();
     }
-    
+
 }

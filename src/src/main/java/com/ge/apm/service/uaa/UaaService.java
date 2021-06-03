@@ -3,6 +3,8 @@ package com.ge.apm.service.uaa;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -17,27 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.CustomRoleRepository;
-import com.ge.apm.dao.InspectionChecklistRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SysRoleRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
-import com.ge.apm.dao.UserRoleRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.CustomRole;
-import com.ge.apm.domain.InspectionChecklist;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysRole;
-import com.ge.apm.domain.SysRoleVO;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserOrgInfo;
-import com.ge.apm.domain.UserRole;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.context.LocaleHolder;
@@ -72,6 +53,14 @@ public class UaaService {
 
     @Autowired
     private CustomRoleRepository customRoleRepository;
+
+    @Autowired
+    private ZkbIbCrossUserStatusRepository zkbIbCrossUserStatusRepository;
+
+    @Autowired
+    private UserRoleRepository userRoleRepository;
+
+
 
     private void loadSysRoles(){
         if(sysRoles!=null) return;
@@ -320,6 +309,59 @@ public class UaaService {
                 userRole.setRoleType(0);
                 userRoleDao.save(userRole);
             }
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void addZkbIbCrossUserStatus(UserAccount userAccount, List<String> newRoleNames){
+        List<UserRole> old = userRoleRepository.findByUserId(userAccount.getId());
+        String isOldRole = "0";
+        for(UserRole r: old){
+            if(r.getRoleId().equals(3)){
+                isOldRole = "1";
+                break;
+            }
+        }
+        String isNewRole = "0";
+        for(String s :newRoleNames){
+            if("工程师".equals(s)){
+                isNewRole = "1";
+                break;
+            }
+        }
+
+        if(!isOldRole.equals(isNewRole)){
+            zkbIbCrossUserStatusRepository.deleteByLoginName(userAccount.getLoginName());
+            if("0".equals(isNewRole)){
+                ZkbIbCrossUserStatus zkbIbCrossUserStatus = new ZkbIbCrossUserStatus();
+                zkbIbCrossUserStatus.setLoginName(userAccount.getLoginName());
+                zkbIbCrossUserStatus.setStatus("D");
+                zkbIbCrossUserStatusRepository.save(zkbIbCrossUserStatus);
+            }else{
+                ZkbIbCrossUserStatus zkbIbCrossUserStatus = new ZkbIbCrossUserStatus();
+                zkbIbCrossUserStatus.setLoginName(userAccount.getLoginName());
+                zkbIbCrossUserStatus.setStatus("N");
+                zkbIbCrossUserStatusRepository.save(zkbIbCrossUserStatus);
+            }
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteZkbIbCrossUserStatus(UserAccount userAccount){
+        List<UserRole> roles = userRoleRepository.findByUserId(userAccount.getId());
+        boolean isExist = false;
+        for(UserRole r: roles){
+            if(r.getRoleId().equals(3)){
+                isExist = true;
+                break;
+            }
+        }
+        if(isExist){
+            zkbIbCrossUserStatusRepository.deleteByLoginName(userAccount.getLoginName());
+            ZkbIbCrossUserStatus zkbIbCrossUserStatus = new ZkbIbCrossUserStatus();
+            zkbIbCrossUserStatus.setLoginName(userAccount.getLoginName());
+            zkbIbCrossUserStatus.setStatus("D");
+            zkbIbCrossUserStatusRepository.save(zkbIbCrossUserStatus);
         }
     }
 

@@ -1,16 +1,15 @@
 package com.ge.apm.dao.mapper;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
+import com.ge.apm.dao.mapper.provider.AssetInfoProvider;
+import com.ge.apm.domain.AssetCostStatistics;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.Supplier;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
-import com.ge.apm.dao.mapper.provider.AssetInfoProvider;
-import com.ge.apm.domain.AssetCostStatistics;
-import com.ge.apm.domain.AssetInfo;
+
+import java.util.Date;
+import java.util.List;
 
 public interface AssetInfoMapper {
 
@@ -63,4 +62,12 @@ public interface AssetInfoMapper {
 	@SelectProvider(type = AssetInfoProvider.class,method="fetchByAssetInfoBySystemId")
 	List<AssetInfo> fetchByAssetInfoBySystemId(@Param("systemId")String systemId, @Param("contractId")String contractId);
 
+
+	/**
+	 * 根据合同ID和SYSTEM ID获取信息
+	 * @param orgList orgList ID
+	 * @return
+	 */
+	@SelectProvider(type = AssetInfoProvider.class,method="getMvsWorkOrders")
+	List<String> getMvsWorkOrders(@Param("orgList")List<String> orgList,@Param("tenantUid")String tenantUid);
 }

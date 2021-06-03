@@ -41,7 +41,7 @@
                                         2. 文件中填入要导入的合同数据<br/>
                                         其中：<br/>
                                         合同页面：区域、代理商、合同号、合同类型、合同开始日期、合同结束日期为必填字段<br/>
-                                        相关课程页面：合同号、课程ID、课程名称、课程额度为必填字段<br/>
+                                        相关课程页面：合同号、课程ID、课程额度为必填字段<br/>
                                         相关设备页面：合同号、设备二维码为必填字段
                                     </td>
                                 </tr>
@@ -122,12 +122,11 @@
                         <p:column headerText="课程ID">
                             <h:outputText value="#{item.get('contractCourseVO').cid}" />
                         </p:column>
-
-                        <p:column headerText="课程名称">
-                            <h:outputText value="#{item.get('contractCourseVO').cname}" />
-                        </p:column>
+<!--                        <p:column headerText="课程名称">-->
+<!--                            <h:outputText value="#{item.get('contractCourseVO').cname}" />-->
+<!--                        </p:column>-->
                         <p:column headerText="课程额度">
-                            <h:outputText value="#{item.get('contractCourseVO').courseCount}" />
+                            <h:outputText value="#{item.get('contractCourseVO').mainCourseCount}" />
                         </p:column>
                         <p:column headerText="#{msg.FailureInformation}" >
                             <!--<h:outputText value="#{fieldMsg.fieldValue('importStatus',item.get('status'))}"/><br/>-->

@@ -1,9 +1,11 @@
 package com.ge.apm.view.zkb;
 
+import com.ge.apm.dao.ZkbCourseRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbCourse;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbCourseImExportService;
+import com.ge.apm.service.zkb.ZkbCourseScheduleService;
 import com.ge.apm.service.zkb.ZkbCourseService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
@@ -35,6 +37,8 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
 
     private ZkbCourseService zkbCourseServic;
 
+    private ZkbCourseScheduleService zkbCourseScheduleService;
+
     private UserContextService userContextService;
 
     private ZkbCourseImExportService zkbCourseImExportService;
@@ -51,13 +55,17 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
     private UploadedFile file;
     private List<ZkbCourse> importFailedDataList;
 
+    private ZkbCourseRepository zkbCourseRepository;
+
     @Override
     protected void init() {
         super.init();
         zkbCourseServic = WebUtil.getBean(ZkbCourseService.class);
+        zkbCourseScheduleService = WebUtil.getBean(ZkbCourseScheduleService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         zkbCourseImExportService = WebUtil.getBean(ZkbCourseImExportService.class);
+        zkbCourseRepository=WebUtil.getBean(ZkbCourseRepository.class);
 
         if(userContextService.isZkbUser()) {
             this.selectionTenantInfo = currentUser.getTenantUID();
@@ -77,7 +85,6 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
         }
 
         zkbCoursePage = zkbCourseServic.findBySearchFilter(searchFilters, pageRequest);
-
         return zkbCoursePage;
     }
 
@@ -115,6 +122,10 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
             WebUtil.addErrorMessage("该课程在合同已使用，不能删除! ");
             return "";
         }
+        if(zkbCourseScheduleService.isCourseUsed(this.selected)){
+            WebUtil.addErrorMessage("该课程在课程计划已使用，不能删除! ");
+            return "";
+        }
         super.delete();
         this.cancel();
         return "List?faces-redirect=true";
@@ -132,9 +143,7 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
 
 
     public void exportAll(){
-
-        List<Map<String, Object>> zkbCourseDataList = zkbCourseImExportService.createZkbCourseData(zkbCoursePage.getContent());
-
+        List<Map<String, Object>> zkbCourseDataList = zkbCourseImExportService.createZkbCourseData( this.zkbCourseRepository.fetchAllSortByCreateDate());
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/course/APM_ZKB_Course_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);

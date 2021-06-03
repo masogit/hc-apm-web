@@ -78,7 +78,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 
 	@Override
 	protected void init() {
-        filterBySite = false;
+		filterBySite = false;
 		user = UserContextService.getCurrentUserAccount();
 		dao = WebUtil.getBean(WorkflowConfigRepository.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -156,8 +156,8 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 
 	public void delNode(String nodeType) {
 		List<WorkflowConfig.AttachmentCategory> collect =
-		attachmentCategories = attachmentCategories.stream()
-				.filter(node -> nodeType != node.getBoType()).collect(Collectors.toList());
+				attachmentCategories = attachmentCategories.stream()
+						.filter(node -> nodeType != node.getBoType()).collect(Collectors.toList());
 	}
 
 	public String getOrgFullName(OrgInfo org) {
@@ -218,7 +218,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			TreeNodeUtil.expandParentsNodes(selectedUserOrg);
 		}
 	}
-	
+
 /*	private boolean isNullOrBelongs(String uid,Set<String> uids){
 		if(uid == null){
 			return true;
@@ -290,7 +290,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		}*/
 		approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
 	}
-	
+
 	public List<UserInfo> getUserList() {
 		return userList;
 	}
@@ -303,7 +303,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 	protected WorkflowConfigRepository getDAO() {
 		return dao;
 	}
-	
+
 	public String getOrgNameById(Integer orgId){
 		OrgInfo oi = orgInfoRepository.findById(orgId);
 		if(oi == null){
@@ -311,7 +311,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		}
 		return oi.getName();
 	}
-	
+
 	public String getInsNameByUId(String uid){
 		OrgInfo oi =  orgInfoRepository.getByUid(uid);
 		if(oi == null){
@@ -363,7 +363,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 				searchFilters.addAll(this.searchFilters);
 			}
 		}
-        return dao.findBySearchFilter(searchFilters, pageRequest);
+		return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 
 	public void onOwnerChange() {
@@ -372,7 +372,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			selected.setDispatchUserName(owner.getName());
 		}
 	}
-	
+
 	public String getTypeName(Integer deviceType){
 		for (V2_DeviceType dt : deviceTypeList) {
 			if(dt.getId().equals(deviceType)){
@@ -483,31 +483,36 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		if (this.telRepEnd != null) {
 			selected.setTelReportEnd(new DateTime(telRepEnd).toString("HH:mm:ss"));
 		}
+
+		if(null == selected.getAutoAckMaintenance()){
+			selected.setAutoAckMaintenance(false);
+		}
+
 	}
-	
+
 	@Transactional
-    public void applyChange() {
+	public void applyChange() {
 		if(selectedUserOrg == null){
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 			WebUtil.addErrorMessage(WebUtil.getMessage("selectedOrg"));
 			return;
 		}
-    	Boolean isManual = selected.getIsManualEnabled();
-    	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
+		Boolean isManual = selected.getIsManualEnabled();
+		Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
 		Boolean isPmManual = selected.getIsPmManualEnabled();
 		Boolean isPmTakeOrder = selected.getIsPmTakeOrderEnabled();
 		Boolean isMeasureManual = selected.getIsMeasureManualEnabled();
 		Boolean isMeasureTakeOrder = selected.getIsMeasureTakeOrderEnabled();
 
 
-    	if(isManual != null && isManual){
-    		if(selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null){
-    			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-       		 	WebUtil.addErrorMessage(WebUtil.getMessage("WoNeedDispather"));
-       		 	return;
-    		}
-    	}
-    	if(isPmManual != null && isPmManual){
+		if(isManual != null && isManual){
+			if(selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null){
+				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage(WebUtil.getMessage("WoNeedDispather"));
+				return;
+			}
+		}
+		if(isPmManual != null && isPmManual){
 			if(selected.getPmDispatchUserId() == null && selected.getPmDispatchUserId2() == null){
 				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 				WebUtil.addErrorMessage(WebUtil.getMessage("PmNeedDispather"));
@@ -523,13 +528,13 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		}
 
 
-    	if(isManual != null && isTakeOrder != null && !isManual && !isTakeOrder){
-    		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-    		 WebUtil.addErrorMessage(WebUtil.getMessage("WoManualAndGrapMsg"));
-    		 return;
-    	}
+		if(isManual != null && isTakeOrder != null && !isManual && !isTakeOrder){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage(WebUtil.getMessage("WoManualAndGrapMsg"));
+			return;
+		}
 
-    	if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
+		if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 			WebUtil.addErrorMessage(WebUtil.getMessage("PmManualAndGrapMsg"));
 			return;
@@ -552,18 +557,18 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		}*/
 
 		if(selected.getGenerateMethod() != null && selected.getGenerateMethod() ==1){
-    		if(StringUtils.isEmpty(selected.getPrefix())){
+			if(StringUtils.isEmpty(selected.getPrefix())){
 				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 				WebUtil.addErrorMessage(WebUtil.getMessage("prefixIsNull"));
 				return;
 			}else{
-    			if(selected.getPrefix().length() > 3){
+				if(selected.getPrefix().length() > 3){
 					RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 					WebUtil.addErrorMessage(WebUtil.getMessage("moreThanThree"));
 					return;
 				}
-    			List<WorkflowConfig> prefixList = dao.findAllPrefixByTenantUID(user.getTenantUID());
-    			if(CollectionUtils.isNotEmpty(prefixList)){
+				List<WorkflowConfig> prefixList = dao.findAllPrefixByTenantUID(user.getTenantUID());
+				if(CollectionUtils.isNotEmpty(prefixList)){
 					for (WorkflowConfig temp:prefixList) {
 						if((!temp.equals(selected)) && temp.getPrefix().equals(selected.getPrefix())){
 							RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -591,12 +596,12 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		int preLength = selected.getPrefix() == null ? 0 : selected.getPrefix().length();
 		int flowNum = selected.getFormat() == null ? 0 : selected.getFormat().length();
 		if(selected.getGenerateMethod() == 1){//国标码
-            if(preLength + 7 + flowNum > 16){
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                WebUtil.addErrorMessage(WebUtil.getMessage("srNumTooLong"));
-                return;
-            }
-        }
+			if(preLength + 7 + flowNum > 16){
+				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage(WebUtil.getMessage("srNumTooLong"));
+				return;
+			}
+		}
 		if(preLength + 4 + flowNum > 16){
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 			WebUtil.addErrorMessage(WebUtil.getMessage("srNumTooLong"));
@@ -614,18 +619,18 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 			selected.setCustomizedAssetAttachmentCategory(JSON.toJSONString(attachmentCategories));
 		}
 
-        onBeforeSave(selected);
+		onBeforeSave(selected);
 
-        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+		//判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
 //        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
 //            return;
 //        }
 
-        dao.deleteBySiteUID(selected.getSiteUID());
-        super.save();
+		dao.deleteBySiteUID(selected.getSiteUID());
+		super.save();
 		selectedUserOrg = null; //orgInfoRepository.getByUid(user.getOrgInfoUID());
-        selected = null;
-    }
+		selected = null;
+	}
 
 	/**
 	 * 校验被替换的调剂中心时候有未归还设备
@@ -645,7 +650,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 		return false;
 	}
 
-    public void setSwapCenter(){
+	public void setSwapCenter(){
 		Map<String,Object> swapCenterMap = Maps.newHashMap();
 		if(selected.getPeriodStart() != null){
 			DateTime start = new DateTime(selected.getPeriodStart());
@@ -753,7 +758,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
 /*		updateDispater();
 		updateApproverList();*/
 	}
-	
+
 	public void onSelect(){
 		if(selected != null && selected.getId() != null){
 			selected = dao.findById(selected.getId());
