@@ -92,8 +92,10 @@ public interface UserAccountMapper {
 					"</script>"})
 	public List<UserAccount> getUserAccountByNameAndTenantUid(@Param("nameLists")List<String> nameLists, @Param("tenantUid")String tenantUid);
 
-
 	@Select("select * from user_account where telephone = #{telephone}")
 	public List<UserAccount> getUserAccountByTelephone( @Param("telephone")String telephone);
+
+	@Select("select distinct login_name from user_account where site_id = #{siteId}")
+	public List<String> getLoginNameBySiteId(Integer siteId);
 
 }

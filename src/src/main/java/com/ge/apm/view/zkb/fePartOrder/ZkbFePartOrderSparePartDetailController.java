@@ -423,6 +423,12 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         Integer beforeAdjustQty = this.zkbFePartOrderAssetInfoRepository.fetchQty(this.selected.getId());
         beforeAdjustQty=beforeAdjustQty==null?0:beforeAdjustQty;
         List<ZkbFePartOrderAssetInfo> afterAdjustAssetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
+        Integer qty = this.qty(afterAdjustAssetInfoList);
+        if(qty<=0)
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("申请数量合计不能为0"));
+            return "";
+        }
         Integer adjustApplyCount = new Integer(0);
         List<ZkbFePartOrderAssetInfo> beforeAdjustAssetList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(this.selected.getId());
         Map<String,ZkbFePartOrderAssetInfo> beforeAdjustAssetMap = new HashMap<>();
@@ -454,6 +460,15 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingApm.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
+    private Integer qty(List<ZkbFePartOrderAssetInfo> afterAdjustAssetInfoList)
+    {
+        Integer qty = new Integer(0);
+        for(ZkbFePartOrderAssetInfo item:afterAdjustAssetInfoList)
+        {
+            qty=qty+item.getAssetQty();
+        }
+        return qty;
+    }
 
     /**
      * 供应商拒绝同意
@@ -484,6 +499,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfo = this.selected.getZkbFePartOrderAssetInfoList();
         for(ZkbFePartOrderAssetInfo item:zkbFePartOrderAssetInfo)
         {
+            if(item.getAssetQty()==0)
+                continue;
             if(StringUtils.isBlank(item.getOrderNo())||item.getPrice()==null)
             {
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_assetFieldError"));
@@ -519,7 +536,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_returnListCannotBeNull"));
             return "";
         }
-        List<ZkbFePartOrderAssetInfo> assetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
+        List<ZkbFePartOrderAssetInfo> assetInfoList = this.selected.getZkbReturnFePartOrderAssetInfoList();
         Map<String,Integer> assetInfoMap = this.zkbFePartOrderService.getAssetInfoMap(assetInfoList);
         Map<String,Integer> zkbFePartOrderReturnMap = this.zkbFePartOrderService.getZkbFePartOrderReturnMap(zkbFePartOrderReturnList,this.selected);
         boolean returnComplete = true;

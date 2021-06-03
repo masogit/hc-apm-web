@@ -1,9 +1,11 @@
 package com.ge.apm.domain;
 
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -537,6 +539,11 @@ public class ZkbFePartOrder {
      */
     @Transient
     private List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList;
+    /**
+     * 需要归还申请备件列表
+     */
+    @Transient
+    private List<ZkbFePartOrderAssetInfo> zkbReturnFePartOrderAssetInfoList;
 
     /**
      * 申请备件归还列表
@@ -812,6 +819,25 @@ public class ZkbFePartOrder {
 
     public void setZkbFePartOrderAssetInfoList(List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList) {
         this.zkbFePartOrderAssetInfoList = zkbFePartOrderAssetInfoList;
+    }
+
+    public List<ZkbFePartOrderAssetInfo> getZkbReturnFePartOrderAssetInfoList() {
+        List<ZkbFePartOrderAssetInfo> templeList = new ArrayList<>();
+        if(CollectionUtils.isEmpty(zkbFePartOrderAssetInfoList))
+        {
+            return templeList;
+        }
+        for(ZkbFePartOrderAssetInfo item:this.zkbFePartOrderAssetInfoList)
+        {
+            if(0==item.getAssetQty())
+                continue;
+            templeList.add(item);
+        }
+        return templeList;
+    }
+
+    public void setZkbReturnFePartOrderAssetInfoList(List<ZkbFePartOrderAssetInfo> zkbReturnFePartOrderAssetInfoList) {
+        this.zkbReturnFePartOrderAssetInfoList = zkbReturnFePartOrderAssetInfoList;
     }
 
     @Override

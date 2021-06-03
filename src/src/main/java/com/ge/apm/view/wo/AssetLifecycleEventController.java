@@ -10,30 +10,6 @@ import com.ge.apm.view.sysutil.FileDownloadService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
-
-import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.DefaultStreamedContent;
@@ -43,13 +19,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.util.StreamUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.dao.SearchFilter.Operator;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  *
@@ -305,18 +290,21 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 		return service.getMsStatus(alse);
 	}
 
-	public StreamedContent getAnonymousReport(String reportStorageId) {
+	public void getAnonymousReport(String reportStorageId) {
 		try {
 			StreamedContent file = fileDownloadService.getFile(reportStorageId);
-			String fileName = UUID.randomUUID() + "." + FilenameUtils.getExtension(file.getName());
-			String contentType = file.getContentType();
-			InputStream stream = file.getStream();
-			byte[] bytes = IOUtils.toByteArray(stream);
-			return new DefaultStreamedContent((new ByteArrayInputStream(bytes)), contentType, fileName);
-		} catch (IOException e) {
-			WebUtil.addErrorMessage("Fail to download report:" + e.getMessage());
+
+			FacesContext facesContext = FacesContext.getCurrentInstance();
+			HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+			response.setHeader("Content-Disposition", "attachment;filename=" + file.getName());
+
+			StreamUtils.copy(file.getStream(), response.getOutputStream());
+
+			facesContext.responseComplete();
+			facesContext.renderResponse();
+		} catch (Exception e) {
+			WebUtil.addErrorMessage("Fail to download report.");
 		}
-		return null;
 	}
 
 	public void downloadSelectedReport() {

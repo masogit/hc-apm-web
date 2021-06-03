@@ -356,6 +356,10 @@ public class SearchController {
 	}
 
 	public void confirm() {
+		if(listSelectedAssetInfo == null || listSelectedAssetInfo.size() == 0){
+			WebUtil.addErrorMessage("已选设备不能为空!");
+			return;
+		}
 		showDialog = false;
 		if (callingController != null) {
 			if (type == 1) {
