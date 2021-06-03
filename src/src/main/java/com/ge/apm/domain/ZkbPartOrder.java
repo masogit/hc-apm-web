@@ -46,6 +46,10 @@ public class ZkbPartOrder implements Serializable {
         Parts,Probe,Artificial,Tool
     }
 
+    public enum ProbeQuotaTypeEnum{
+        Any,Special,Normal,High
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -514,6 +518,9 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "data_type")
     private String dataType;
 
+    /**
+     * 控制数据是否被重复操作
+     */
     @Column(name = "data_flag")
     private Integer dataFlag = 0;
 
@@ -525,6 +532,17 @@ public class ZkbPartOrder implements Serializable {
      */
     @Transient
     private String systemId;
+
+    @Column(name = "probe_quota_type")
+    private String probeQuotaType;
+
+    public String getProbeQuotaType() {
+        return probeQuotaType;
+    }
+
+    public void setProbeQuotaType(String probeQuotaType) {
+        this.probeQuotaType = probeQuotaType;
+    }
 
     public String getScoreFlag() {
         return scoreFlag;

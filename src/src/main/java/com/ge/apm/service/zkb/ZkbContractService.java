@@ -75,18 +75,34 @@ public class ZkbContractService {
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_endDate"), DateFormatUtils.format(zkbContract.getEndDate(),"yyyy-MM-dd"));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractState"), zkbContract.getContractState());
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_ibNumber"), zkbContract.getIbNumber());
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota"), isEmptyInteger(zkbContract.getSpareQuota()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota"), isEmptyInteger(zkbContract.getProbeQuota()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes"), isEmptyInteger(zkbContract.getGeArtificialSupportTimes()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail"), isEmptyInteger(zkbContract.getSpareArtificail()));
 
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota"), isEmptyInteger(zkbContract.getSpareQuota()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_total"), isEmptyInteger(zkbContract.getSpareQuotaTotal()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_apply"), isEmptyInteger(zkbContract.getSpareQuotaApply()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_use"), isEmptyInteger(zkbContract.getSpareQuotaUse()));
 
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_total"), isEmptyInteger(zkbContract.getProbeQuotaTotal()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_apply"), isEmptyInteger(zkbContract.getProbeQuotaApply()));
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_probeQuota_use"), isEmptyInteger(zkbContract.getProbeQuotaUse()));
+            zkbContractDataMap.put("探头任意总额", isEmptyInteger(zkbContract.getProbeQuotaTotal()));
+            zkbContractDataMap.put("探头任意剩余名额", isEmptyInteger(zkbContract.getProbeQuota()));
+            zkbContractDataMap.put("探头任意申请名额", isEmptyInteger(zkbContract.getProbeQuotaApply()));
+            zkbContractDataMap.put("探头任意已使用名额", isEmptyInteger(zkbContract.getProbeQuotaUse()));
+
+            zkbContractDataMap.put("探头普通总额", isEmptyInteger(zkbContract.getProbeQuotaNormalTotal()));
+            zkbContractDataMap.put("探头普通剩余名额", isEmptyInteger(zkbContract.getProbeQuotaNormal()));
+            zkbContractDataMap.put("探头普通申请名额", isEmptyInteger(zkbContract.getProbeQuotaNormalApply()));
+            zkbContractDataMap.put("探头普通已使用名额", isEmptyInteger(zkbContract.getProbeQuotaNormalUse()));
+
+            zkbContractDataMap.put("探头特殊总额", isEmptyInteger(zkbContract.getProbeQuotaSpecialTotal()));
+            zkbContractDataMap.put("探头特殊剩余名额", isEmptyInteger(zkbContract.getProbeQuotaSpecial()));
+            zkbContractDataMap.put("探头特殊申请名额", isEmptyInteger(zkbContract.getProbeQuotaSpecialApply()));
+            zkbContractDataMap.put("探头特殊已使用名额", isEmptyInteger(zkbContract.getProbeQuotaSpecialUse()));
+
+            /*zkbContractDataMap.put("探头高值总额", isEmptyInteger(zkbContract.getProbeQuotaHighTotal()));
+            zkbContractDataMap.put("探头高值剩余名额", isEmptyInteger(zkbContract.getProbeQuotaHigh()));
+            zkbContractDataMap.put("探头高值申请名额", isEmptyInteger(zkbContract.getProbeQuotaHighApply()));
+            zkbContractDataMap.put("探头高值已使用名额", isEmptyInteger(zkbContract.getProbeQuotaHighUse()));*/
+
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes"), isEmptyInteger(zkbContract.getGeArtificialSupportTimes()));
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareArtificail"), isEmptyInteger(zkbContract.getSpareArtificail()));
 
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes_total"), isEmptyInteger(zkbContract.getGeArtificialSupportTimesTotal()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_geArtificialSupportTimes_apply"), isEmptyInteger(zkbContract.getGeArtificialSupportTimesApply()));
@@ -114,6 +130,14 @@ public class ZkbContractService {
     public Integer isEmptyInteger(Integer value){
         if(value == null){
             return 0;
+        }else{
+            return value;
+        }
+    }
+
+    public Double isEmptyDouble(Double value){
+        if(value == null){
+            return new Double(0);
         }else{
             return value;
         }
@@ -172,10 +196,12 @@ public class ZkbContractService {
             zkbContractCourseDataMap.put(WebUtil.getMessage("zkbContract_contractState"), zkbContract.getContractState());
             zkbContractCourseDataMap.put("课程ID", zkbContractCourse.getZkbCourse().getCid());
             zkbContractCourseDataMap.put("课程名称", zkbContractCourse.getZkbCourse().getCname());
-            zkbContractCourseDataMap.put("课程剩余名额", isEmptyInteger(zkbContractCourse.getCourseCount()));
-            zkbContractCourseDataMap.put("课程总额", isEmptyInteger(zkbContractCourse.getCourseCountTotal()));
-            zkbContractCourseDataMap.put("课程申请名额", isEmptyInteger(zkbContractCourse.getCourseCountApply()));
-            zkbContractCourseDataMap.put("课程已使用名额", isEmptyInteger(zkbContractCourse.getCourseCountUse()));
+            zkbContractCourseDataMap.put("modality", zkbContractCourse.getZkbCourse().getModality());
+            zkbContractCourseDataMap.put("培训合同号", zkbContractCourse.getCourseContractNo());
+            zkbContractCourseDataMap.put("课程剩余名额", isEmptyDouble(zkbContractCourse.getMainCourseCount()));
+            zkbContractCourseDataMap.put("课程总额", isEmptyDouble(zkbContractCourse.getMainCourseCountTotal()));
+            zkbContractCourseDataMap.put("课程申请名额", isEmptyDouble(zkbContractCourse.getMainCourseCountApply()));
+            zkbContractCourseDataMap.put("课程已使用名额", isEmptyDouble(zkbContractCourse.getMainCourseCountUse()));
 
             zkbContractCourseDataList.add(zkbContractCourseDataMap);
         }
@@ -291,6 +317,14 @@ public class ZkbContractService {
             errorLog += "开始时间不能大于结束时间,";
         }
 
+        boolean newContractFlag = false;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        if(getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(zkbContract.getStartDate()))< 0){
+            newContractFlag = false;
+        }else{
+            newContractFlag = true;
+        }
+
         int spareQuotaTotal = zkbContract.getSpareQuotaTotal() == null ? 0 : zkbContract.getSpareQuotaTotal();
         int spareQuota = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
         int spareQuotaApply = zkbContract.getSpareQuotaApply() == null ? 0 : zkbContract.getSpareQuotaApply();
@@ -302,13 +336,47 @@ public class ZkbContractService {
 
         int probeQuotaTotal = zkbContract.getProbeQuotaTotal() == null ? 0 : zkbContract.getProbeQuotaTotal();
         int probeQuota = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
+
         int probeQuotaApply = zkbContract.getProbeQuotaApply() == null ? 0 : zkbContract.getProbeQuotaApply();
         int probeQuotaUse = zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse();
         if(probeQuotaTotal != (probeQuota + probeQuotaApply + probeQuotaUse)){
             flag = false;
-            errorLog += "探头总额不等于探头剩余名额、探头申请名额、探头已使用名额之和,";
+            if(!newContractFlag){
+                errorLog += "探头总额不等于剩余名额、申请名额、已使用名额之和,";
+            }else{
+                errorLog += "探头任意总额不等于任意剩余名额、任意申请名额、任意已使用名额之和,";
+            }
         }
 
+        if(newContractFlag){
+            int probeQuotaNormal = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
+            int probeQuotaNormalTotal = zkbContract.getProbeQuotaNormalTotal() == null ? 0 : zkbContract.getProbeQuotaNormalTotal();
+            int probeQuotaNormalApply = zkbContract.getProbeQuotaNormalApply() == null ? 0 : zkbContract.getProbeQuotaNormalApply();
+            int probeQuotaNormalUse = zkbContract.getProbeQuotaNormalUse() == null ? 0 : zkbContract.getProbeQuotaNormalUse();
+            if(probeQuotaNormalTotal != (probeQuotaNormal + probeQuotaNormalApply + probeQuotaNormalUse)){
+                flag = false;
+                errorLog += "探头普通总额不等于普通剩余名额、普通申请名额、普通已使用名额之和,";
+            }
+
+            int probeQuotaSpecial = zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial();
+            int probeQuotaSpecialTotal = zkbContract.getProbeQuotaSpecialTotal() == null ? 0 : zkbContract.getProbeQuotaSpecialTotal();
+            int probeQuotaSpecialApply = zkbContract.getProbeQuotaSpecialApply() == null ? 0 : zkbContract.getProbeQuotaSpecialApply();
+            int probeQuotaSpecialUse = zkbContract.getProbeQuotaSpecialUse() == null ? 0 : zkbContract.getProbeQuotaSpecialUse();
+            if(probeQuotaSpecialTotal != (probeQuotaSpecial + probeQuotaSpecialApply + probeQuotaSpecialUse)){
+                flag = false;
+                errorLog += "探头特殊总额不等于特殊剩余名额、特殊申请名额、特殊已使用名额之和,";
+            }
+
+            int probeQuotaHigh = zkbContract.getProbeQuotaHigh() == null ? 0 : zkbContract.getProbeQuotaHigh();
+            int probeQuotaHighTotal = zkbContract.getProbeQuotaHighTotal() == null ? 0 : zkbContract.getProbeQuotaHighTotal();
+            int probeQuotaHighApply = zkbContract.getProbeQuotaHighApply() == null ? 0 : zkbContract.getProbeQuotaHighApply();
+            int probeQuotaHighUse = zkbContract.getProbeQuotaHighUse() == null ? 0 : zkbContract.getProbeQuotaHighUse();
+            if(probeQuotaHighTotal != (probeQuotaHigh + probeQuotaHighApply + probeQuotaHighUse)){
+                flag = false;
+                errorLog += "探头高值总额不等于高值剩余名额、高值申请名额、高值已使用名额之和,";
+            }
+        }
+        
         int geArtificialSupportTimesTotal = zkbContract.getGeArtificialSupportTimesTotal() == null ? 0 : zkbContract.getGeArtificialSupportTimesTotal();
         int geArtificialSupportTimes = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
         int geArtificialSupportTimesApply = zkbContract.getGeArtificialSupportTimesApply() == null ? 0 : zkbContract.getGeArtificialSupportTimesApply();
@@ -318,21 +386,21 @@ public class ZkbContractService {
             errorLog += "人工支持总次数不等于人工支持剩余次数、人工支持申请次数、人工支持已使用次数之和,";
         }
 
-        int spareArtificailTotal = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
-        int spareArtificail = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
-        int spareArtificailApply = zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply();
-        int spareArtificailUse = zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse();
-        if(spareArtificailTotal != (spareArtificail + spareArtificailApply + spareArtificailUse)){
+        int spareArtificialTotal = zkbContract.getSpareArtificailTotal() == null ? 0 : zkbContract.getSpareArtificailTotal();
+        int spareArtificial = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+        int spareArtificialApply = zkbContract.getSpareArtificailApply() == null ? 0 : zkbContract.getSpareArtificailApply();
+        int spareArtificialUse = zkbContract.getSpareArtificailUse() == null ? 0 : zkbContract.getSpareArtificailUse();
+        if(spareArtificialTotal != (spareArtificial + spareArtificialApply + spareArtificialUse)){
             flag = false;
             errorLog += "备件/人工/保养总额不等于备件/人工/保养剩余名额、备件/人工/保养申请名额、备件/人工/保养已使用名额之和,";
         }
 
         if(zkbContract.getZkbContractCourses() != null && zkbContract.getZkbContractCourses().size() > 0){
             for(ZkbContractCourse c : zkbContract.getZkbContractCourses()){
-                int courseCountTotal = c.getCourseCountTotal() == null ? 0 : c.getCourseCountTotal();
-                int courseCount = c.getCourseCount() == null ? 0 : c.getCourseCount();
-                int courseCountApply = c.getCourseCountApply() == null ? 0 : c.getCourseCountApply();
-                int courseCountUse = c.getCourseCountUse() == null ? 0 : c.getCourseCountUse();
+                double courseCountTotal = c.getMainCourseCountTotal() == null ? 0 : c.getMainCourseCountTotal();
+                double courseCount = c.getMainCourseCount() == null ? 0 : c.getMainCourseCount();
+                double courseCountApply = c.getMainCourseCountApply() == null ? 0 : c.getMainCourseCountApply();
+                double courseCountUse = c.getMainCourseCountUse() == null ? 0 : c.getMainCourseCountUse();
                 if(courseCountTotal != (courseCount + courseCountApply + courseCountUse)){
                     flag = false;
                     errorLog += "课程总额不等于课程剩余名额、课程申请名额、课程已使用名额之和,";
@@ -347,10 +415,28 @@ public class ZkbContractService {
         return resut;
     }
 
+    public int getBetweenDay(String sd1, String sd2) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date1 = format.parse(sd1);
+            Date date2 = format.parse(sd2);
+            long days = (date2.getTime() - date1.getTime()) / (24*3600*1000);
+            if((date2.getTime() - date1.getTime())% (24*3600*1000) != 0){
+                days++;
+            }
+            return (int)days;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     /**
      * 保存合同
      */
     public ZkbContract saveContract(ZkbContract zkbContract,String actionName,String reason,UserAccount currentUser){
+        zkbContract.setLastModifiedDate(new Date());
+        zkbContract.setLastModifiedBy(currentUser.getLoginName());
         zkbContract = contractRepository.save(zkbContract);
         if("Edit".equals(actionName)){
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractUpdate","","",reason,currentUser);
@@ -389,19 +475,20 @@ public class ZkbContractService {
      */
     @Transactional
     public List<ZkbContractCourse> saveContractCourse(ZkbContractCourse zkbContractCourse,List<ZkbContractCourse> contractCourseList,ZkbContract zkbContract,String actionDetailName,String reason,UserAccount currentUser){
-        contractCourseRepository.save(zkbContractCourse);
-        List<ZkbContractCourse> tempZkbContractCourseList = new ArrayList<>();
         contractCourseList.forEach((item) -> {
-            if(!item.getId().equals(zkbContractCourse.getId())){
-                tempZkbContractCourseList.add(item);
+            if(item.getId().equals(zkbContractCourse.getId())){
+                item=zkbContractCourse;
             }
         });
-        tempZkbContractCourseList.add(zkbContractCourse);
-
+        if(StringUtils.isBlank(zkbContractCourse.getId()))
+        {
+            contractCourseList.add(zkbContractCourse);
+        }
+        contractCourseRepository.save(zkbContractCourse);
         if("Edit".equals(actionDetailName)){
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"courseUpdate",zkbContractCourse.getZkbCourse().getCid(),"",reason,currentUser);
         }
-        return tempZkbContractCourseList;
+        return contractCourseList;
     }
 
     /**
@@ -430,6 +517,11 @@ public class ZkbContractService {
         return list;
     }
 
+    public List<ZkbContractCourse> queryCourseByContractId(String contractId){
+        List<ZkbContractCourse> list = contractCourseRepository.findByContractId(contractId);
+        return list;
+    }
+
     /**
      * 根据选择的设备，保存合同设备数据
      */
@@ -452,6 +544,10 @@ public class ZkbContractService {
             zkbContractAsset.setContractId(zkbContract.getId());
             zkbContractAsset.setAssetId(a.getUid());
             zkbContractAssetRepository.save(zkbContractAsset);
+
+            zkbContract.setLastModifiedDate(new Date());
+            zkbContract.setLastModifiedBy(currentUser.getLoginName());
+            contractRepository.save(zkbContract);
 
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"assetAdd","",a.getQrCode(),"",currentUser);
         }

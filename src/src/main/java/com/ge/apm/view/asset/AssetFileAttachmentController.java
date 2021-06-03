@@ -70,6 +70,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     private List<OrgInfo> clinicalDeptList;
     private V2_BlobObject batchBlobObject;
     private List<V2_BlobObject> batchBlobObjectList = new ArrayList<>();
+    private Set<V2_BlobObject> repeatBlobObjectSet;
+    private Set<AssetInfo> repeatAssets;
     private String boSubTypeBatch;
 
     //复选的附件数据
@@ -423,36 +425,99 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         return selectedMap.containsValue(true);
     }
 
-    public void batchSave() {
+    public String batchSave() {
         if(targetAssets == null || targetAssets.isEmpty()){
             WebUtil.addErrorMessage(WebUtil.getMessage("assetName") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            return;
+            return "List.xhtml?faces-redirect=true";
         }
 
         List<V2_BlobObject> batchSaveObject =new ArrayList<>();
 
         //保存视频链接
         if(!batchSaveVlinkAdd(batchSaveObject)){
-            return;
+            return "List.xhtml?faces-redirect=true";
         }
         //保存上传对象
         batchSaveObjectAdd(batchSaveObject);
 
         this.initBatchData();
-        if(batchSaveObject.isEmpty()){
-            return;
+        if(!batchSaveObject.isEmpty()){
+            dao.save(batchSaveObject);
         }
-        dao.save(batchSaveObject);
-
+        if(repeatAssets!= null && !repeatAssets.isEmpty()){
+            return "";
+        }
+        return "List.xhtml?faces-redirect=true";
     }
 
+    public String repeatSave() {
+        if(repeatAssets == null || repeatAssets.isEmpty()){
+            WebUtil.addErrorMessage(WebUtil.getMessage("assetName") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            return "List.xhtml?faces-redirect=true";
+        }
+        List<V2_BlobObject> batchSaveObject =new ArrayList<>();
+
+        //保存上传对象
+        repeatSaveObjectAdd(batchSaveObject);
+        this.initBatchData();
+        dao.save(batchSaveObject);
+        return "List.xhtml?faces-redirect=true";
+    }
+
+    public Set<AssetInfo> getAssetInfos() {
+        return repeatAssets;
+    }
+    public boolean getFlag() {
+        if (repeatAssets != null && !repeatAssets.isEmpty()){
+            return false;
+        }
+        return true;
+    }
     private void batchSaveObjectAdd(List<V2_BlobObject> batchSaveObject) {
         if(batchBlobObjectList.isEmpty()){
             return ;
         }
+        repeatBlobObjectSet = new HashSet<>();
+        repeatAssets = new HashSet<>();;
         for (AssetInfo tempAssetInfo : targetAssets) {
+            List<V2_BlobObject> v2BlobObjectList = dao.findByBoUuid(tempAssetInfo.getUid());
+            Set<String> objectNameSet = new HashSet<>();
+            for(V2_BlobObject v2BlobObject : v2BlobObjectList){
+                objectNameSet.add(v2BlobObject.getObjectName());
+            }
             for(V2_BlobObject batchBlobObject : batchBlobObjectList){
+                if(!objectNameSet.isEmpty() && objectNameSet.contains(batchBlobObject.getObjectName())){
+                    repeatBlobObjectSet.add(batchBlobObject);
+                    tempAssetInfo.setErrorMessage(batchBlobObject.getObjectName());
+                    repeatAssets.add(tempAssetInfo);
+                }else {
+                    V2_BlobObject tempBlobObject = new V2_BlobObject();
+                    tempBlobObject.setBoId(tempAssetInfo.getId());
+                    tempBlobObject.setBoUuid(tempAssetInfo.getUid());
+                    tempBlobObject.setBoSubType(batchBlobObject.getBoSubType());
+                    tempBlobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+                    tempBlobObject.setObjectName(batchBlobObject.getObjectName());
+                    tempBlobObject.setObjectStorageId(batchBlobObject.getObjectStorageId());
+                    tempBlobObject.setObjectSize(batchBlobObject.getObjectSize());
+                    tempBlobObject.setObjectType(batchBlobObject.getObjectType());
+                    batchSaveObject.add(tempBlobObject);
+                }
+            }
+        }
+    }
+    private void repeatSaveObjectAdd(List<V2_BlobObject> batchSaveObject) {
+        if(repeatBlobObjectSet.isEmpty()){
+            return ;
+        }
+
+        for (AssetInfo tempAssetInfo : repeatAssets) {
+            List<V2_BlobObject> v2BlobObjectList = dao.findByBoUuid(tempAssetInfo.getUid());
+            for(V2_BlobObject v2BlobObject : v2BlobObjectList){
+                dao.delete(v2BlobObject.getId());
+            }
+            for(V2_BlobObject batchBlobObject : repeatBlobObjectSet){
                 V2_BlobObject tempBlobObject = new V2_BlobObject();
                 tempBlobObject.setBoId(tempAssetInfo.getId());
                 tempBlobObject.setBoUuid(tempAssetInfo.getUid());
@@ -466,7 +531,6 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             }
         }
     }
-
     private boolean batchSaveVlinkAdd(List<V2_BlobObject> batchSaveObject) {
         if(StringUtils.isEmpty(vlink)){
             return true;

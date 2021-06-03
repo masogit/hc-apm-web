@@ -108,9 +108,23 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("人工支持总次数", "setGeArtificialSupportTimesTotal");
             contractRow.setFieldNumValue("人工支持剩余次数", "setGeArtificialSupportTimes");
             contractRow.setFieldNumValue("人工支持已使用次数", "setGeArtificialSupportTimesUse");
-            contractRow.setFieldNumValue("探头总额", "setProbeQuotaTotal");
-            contractRow.setFieldNumValue("探头剩余名额", "setProbeQuota");
-            contractRow.setFieldNumValue("探头已使用名额", "setProbeQuotaUse");
+            contractRow.setFieldNumValue("探头任意总额", "setProbeQuotaTotal");
+            contractRow.setFieldNumValue("探头任意剩余名额", "setProbeQuota");
+            contractRow.setFieldNumValue("探头任意已使用名额", "setProbeQuotaUse");
+
+
+            contractRow.setFieldNumValue("探头普通总额", "setProbeQuotaNormalTotal");
+            contractRow.setFieldNumValue("探头普通剩余名额", "setProbeQuotaNormal");
+            contractRow.setFieldNumValue("探头普通已使用名额", "setProbeQuotaNormalUse");
+
+            contractRow.setFieldNumValue("探头特殊总额", "setProbeQuotaSpecialTotal");
+            contractRow.setFieldNumValue("探头特殊剩余名额", "setProbeQuotaSpecial");
+            contractRow.setFieldNumValue("探头特殊已使用名额", "setProbeQuotaSpecialUse");
+
+            /*contractRow.setFieldNumValue("探头高值总额", "setProbeQuotaHighTotal");
+            contractRow.setFieldNumValue("探头高值剩余名额", "setProbeQuotaHigh");
+            contractRow.setFieldNumValue("探头高值已使用名额", "setProbeQuotaHighUse");*/
+
             contractRow.setFieldNumValue("备件+人工+保养总额", "setSpareArtificailTotal");
             contractRow.setFieldNumValue("备件+人工+保养剩余名额", "setSpareArtificail");
             contractRow.setFieldNumValue("备件+人工+保养已使用名额", "setSpareArtificailUse");
@@ -174,16 +188,40 @@ public class ZkbContractImportService {
 
     @Transactional(rollbackFor = Exception.class)
     protected void importOneContract(ZkbContractVO contractInfoVO,UserAccount currentUser) {
-        ZkbContract newZkbContract = new ZkbContract();
-        BeanUtils.copyProperties(contractInfoVO, newZkbContract);
-        newZkbContract.setCreatedBy(currentUser.getLoginName());
-        newZkbContract.setCreatedDate(new Date());
+        ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
+        if(zkbContract != null){
+            zkbContract.setSpareQuotaTotal(contractInfoVO.getSpareQuotaTotal());
+            zkbContract.setSpareQuota(contractInfoVO.getSpareQuota());
+            zkbContract.setSpareQuotaUse(contractInfoVO.getSpareQuotaUse());
 
-        newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
-        newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
-        newZkbContract.setGeArtificialSupportTimesApply(newZkbContract.getGeArtificialSupportTimesTotal() - newZkbContract.getGeArtificialSupportTimesUse() - newZkbContract.getGeArtificialSupportTimes());
-        newZkbContract.setSpareArtificailApply(newZkbContract.getSpareArtificailTotal() - newZkbContract.getSpareArtificailUse() - newZkbContract.getSpareArtificail());
-        zkbContractRepository.save(newZkbContract);
+            zkbContract.setProbeQuotaTotal(contractInfoVO.getProbeQuotaTotal());
+            zkbContract.setProbeQuota(contractInfoVO.getProbeQuota());
+            zkbContract.setProbeQuotaUse(contractInfoVO.getProbeQuotaUse());
+
+            zkbContract.setSpareArtificailTotal(contractInfoVO.getSpareArtificailTotal());
+            zkbContract.setSpareArtificail(contractInfoVO.getSpareArtificail());
+            zkbContract.setSpareArtificailUse(contractInfoVO.getSpareArtificailUse());
+
+            zkbContract.setGeArtificialSupportTimesTotal(contractInfoVO.getGeArtificialSupportTimesTotal());
+            zkbContract.setGeArtificialSupportTimes(contractInfoVO.getGeArtificialSupportTimes());
+            zkbContract.setGeArtificialSupportTimesUse(contractInfoVO.getGeArtificialSupportTimesUse());
+
+            zkbContract.setLastModifiedBy(currentUser.getLoginName());
+            zkbContract.setLastModifiedDate(new Date());
+            zkbContractRepository.save(zkbContract);
+        }else{
+            ZkbContract newZkbContract = new ZkbContract();
+            BeanUtils.copyProperties(contractInfoVO, newZkbContract);
+            newZkbContract.setCreatedBy(currentUser.getLoginName());
+            newZkbContract.setCreatedDate(new Date());
+
+            newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
+            newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
+            newZkbContract.setGeArtificialSupportTimesApply(newZkbContract.getGeArtificialSupportTimesTotal() - newZkbContract.getGeArtificialSupportTimesUse() - newZkbContract.getGeArtificialSupportTimes());
+            newZkbContract.setSpareArtificailApply(newZkbContract.getSpareArtificailTotal() - newZkbContract.getSpareArtificailUse() - newZkbContract.getSpareArtificail());
+            zkbContractRepository.save(newZkbContract);
+        }
+
     }
 
     public boolean checkData(Map<String, Object> item, List<Map<String, Object>> importContractMapList,Map<String, String> tenantInfoMap) {
@@ -198,12 +236,12 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractNoIsEmpty"));
             isValidateData = false;
         }else{
-            ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
+           /* ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
             if(zkbContract != null){
                 item.put("status", ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractNoIsExist"));
                 isValidateData = false;
-            }
+            }*/
         }
 
         if(contractInfoVO.getRegion() == null){
@@ -266,9 +304,36 @@ public class ZkbContractImportService {
         int probeQuotaTotal = contractInfoVO.getProbeQuotaTotal() == null ? 0 : contractInfoVO.getProbeQuotaTotal();
         int probeQuota = contractInfoVO.getProbeQuota() == null ? 0 : contractInfoVO.getProbeQuota();
         int probeQuotaUse = contractInfoVO.getProbeQuotaUse() == null ? 0 : contractInfoVO.getProbeQuotaUse();
-        if(probeQuotaTotal < (probeQuota  + probeQuotaUse)){
+        if(probeQuotaTotal < (probeQuota  + probeQuotaUse )){
             item.put("status", ImportStatus.Failure);
-            ZkbContractRow.addErrMessage(item,  "探头总额小于探头剩余名额、探头已使用名额之和");
+            ZkbContractRow.addErrMessage(item,  "探头任意总额小于任意剩余名额、任意已使用名额之和");
+            isValidateData = false;
+        }
+
+        int probeQuotaNormalTotal = contractInfoVO.getProbeQuotaNormalTotal() == null ? 0 : contractInfoVO.getProbeQuotaNormalTotal();
+        int probeQuotaNormal = contractInfoVO.getProbeQuotaNormal() == null ? 0 : contractInfoVO.getProbeQuotaNormal();
+        int probeQuotaNormalUse = contractInfoVO.getProbeQuotaNormalUse() == null ? 0 : contractInfoVO.getProbeQuotaNormalUse();
+        if(probeQuotaNormalTotal < (probeQuotaNormal  + probeQuotaNormalUse)){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item,  "探头普通总额小于普通剩余名额、普通已使用名额之和");
+            isValidateData = false;
+        }
+
+        int probeQuotaSpecialTotal = contractInfoVO.getProbeQuotaSpecialTotal() == null ? 0 : contractInfoVO.getProbeQuotaSpecialTotal();
+        int probeQuotaSpecial = contractInfoVO.getProbeQuotaSpecial() == null ? 0 : contractInfoVO.getProbeQuotaSpecial();
+        int probeQuotaSpecialUse = contractInfoVO.getProbeQuotaSpecialUse() == null ? 0 : contractInfoVO.getProbeQuotaSpecialUse();
+        if(probeQuotaSpecialTotal < (probeQuotaSpecial + probeQuotaSpecialUse)){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item,  "探头特殊总额小于特殊剩余名额、特殊已使用名额之和");
+            isValidateData = false;
+        }
+
+        int probeQuotaHighTotal = contractInfoVO.getProbeQuotaHighTotal() == null ? 0 : contractInfoVO.getProbeQuotaHighTotal();
+        int probeQuotaHigh = contractInfoVO.getProbeQuotaHigh() == null ? 0 : contractInfoVO.getProbeQuotaHigh();
+        int probeQuotaHighUse = contractInfoVO.getProbeQuotaHighUse() == null ? 0 : contractInfoVO.getProbeQuotaHighUse();
+        if(probeQuotaHighTotal < (probeQuotaHigh  + probeQuotaHighUse)){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item,  "探头高值总额小于高值剩余名额、高值已使用名额之和");
             isValidateData = false;
         }
 
@@ -324,11 +389,12 @@ public class ZkbContractImportService {
             contractCourseVO.setLineNum(i);
             ZkbContractCourseRow contractCourseRow = new ZkbContractCourseRow(contractCourseVO, rowMap);
             contractCourseRow.setFieldStringValue("合同号", "setContractNo");
+            contractCourseRow.setFieldStringValue("培训合同号", "setCourseContractNo");
             contractCourseRow.setFieldStringValue("课程ID","setCid");
             contractCourseRow.setFieldStringValue("课程名称","setCname");
-            contractCourseRow.setFieldIntegerValue("课程总额", "setCourseCountTotal");
-            contractCourseRow.setFieldIntegerValue("课程剩余名额", "setCourseCount");
-            contractCourseRow.setFieldIntegerValue("课程已使用名额", "setCourseCountUse");
+            contractCourseRow.setFieldDoubleValue("课程总额", "setMainCourseCountTotal");
+            contractCourseRow.setFieldDoubleValue("课程剩余名额", "setMainCourseCount");
+            contractCourseRow.setFieldDoubleValue("课程已使用名额", "setMainCourseCountUse");
 
             map.put("contractCourseVO", contractCourseVO);
             map.put("rowData", rowMap);
@@ -359,7 +425,7 @@ public class ZkbContractImportService {
         Map<String, ZkbCourse> courseListMap = new HashMap<>();
         List<ZkbCourse> zkbCourses = courseRepository.find();
         for(ZkbCourse course : zkbCourses){
-            courseListMap.put(course.getCid()+"|"+course.getCname(),course);
+            courseListMap.put(course.getCid(),course);
         }
 
         for(int i = 0; i < impMap.size();i++){
@@ -380,17 +446,26 @@ public class ZkbContractImportService {
         ZkbContractCourseVO contractCourseVO =  (ZkbContractCourseVO)item.get("contractCourseVO");
         Integer hashCode = Integer.valueOf(item.get("hashCode").toString());
         ZkbContractCourseRow.clearErrMessage(item);
+        boolean checkCourseId = true;
         if(contractCourseVO != null){
             if(StringUtils.isEmpty(contractCourseVO.getCid())){
                 isValidateData = false;
                 item.put("status", ImportStatus.Failure);
+                checkCourseId=false;
                 ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseIdIsEmpty"));
             }
-            if(StringUtils.isEmpty(contractCourseVO.getCname())){
+
+            if(StringUtils.isEmpty(contractCourseVO.getCourseContractNo())){
                 isValidateData = false;
                 item.put("status", ImportStatus.Failure);
-                ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseNameIsEmpty"));
+                ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseContractNoEmpty"));
             }
+
+//            if(StringUtils.isEmpty(contractCourseVO.getCname())){
+//                isValidateData = false;
+//                item.put("status", ImportStatus.Failure);
+//                ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseNameIsEmpty"));
+//            }
             if(StringUtils.isEmpty(contractCourseVO.getContractNo())){
                 isValidateData = false;
                 item.put("status", ImportStatus.Failure);
@@ -405,16 +480,19 @@ public class ZkbContractImportService {
                     contractCourseVO.setContractId(zkbContract.getId());
                 }
             }
-
-            ZkbCourse zkbCourse = courseListMap.get(contractCourseVO.getCid()+"|"+contractCourseVO.getCname());
-            if(zkbCourse == null){
-                isValidateData = false;
-                item.put("status", ImportStatus.Failure);
-                ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseIsNotExist"));
-            }else{
-                contractCourseVO.setZkbCourse(zkbCourse);
-                contractCourseVO.setCourseId(zkbCourse.getId());
+            if(checkCourseId)
+            {
+                ZkbCourse zkbCourse = courseListMap.get(contractCourseVO.getCid());
+                if(zkbCourse == null){
+                    isValidateData = false;
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractCourseRow.addErrMessage(item, WebUtil.getMessage("ErrorCourseIsNotExist"));
+                }else{
+                    contractCourseVO.setZkbCourse(zkbCourse);
+                    contractCourseVO.setCourseId(zkbCourse.getId());
+                }
             }
+
 
             if(!StringUtils.isEmpty(contractCourseVO.getContractId()) && !StringUtils.isEmpty(contractCourseVO.getCourseId())){
                 ZkbContractCourse zkbContractCourse = queryContractCourseByContractIdAndCourseId(contractCourseVO.getContractId(),contractCourseVO.getCourseId());
@@ -425,9 +503,9 @@ public class ZkbContractImportService {
                 }
             }
 
-            int courseCountTotal = contractCourseVO.getCourseCountTotal() == null ? 0 : contractCourseVO.getCourseCountTotal();
-            int courseCount = contractCourseVO.getCourseCount() == null ? 0 : contractCourseVO.getCourseCount();
-            int courseCountUse = contractCourseVO.getCourseCountUse() == null ? 0 : contractCourseVO.getCourseCountUse();
+            double courseCountTotal = contractCourseVO.getMainCourseCountTotal() == null ? 0 : contractCourseVO.getMainCourseCountTotal();
+            double courseCount = contractCourseVO.getMainCourseCount() == null ? 0 : contractCourseVO.getMainCourseCount();
+            double courseCountUse = contractCourseVO.getMainCourseCountUse() == null ? 0 : contractCourseVO.getMainCourseCountUse();
             if(courseCountTotal < (courseCount + courseCountUse)){
                 isValidateData = false;
                 item.put("status", ImportStatus.Failure);
@@ -452,12 +530,14 @@ public class ZkbContractImportService {
     @Transactional(rollbackFor = Exception.class)
     public void importOneContractCourse(ZkbContractCourseVO contractCourseVO){
         ZkbContractCourse zkbContractCourse = new ZkbContractCourse();
-        zkbContractCourse.setCourseCount(contractCourseVO.getCourseCount());
+        zkbContractCourse.setCreatedDate(new Date());
+        zkbContractCourse.setCourseContractNo(contractCourseVO.getCourseContractNo());
+        zkbContractCourse.setMainCourseCount(contractCourseVO.getMainCourseCount());
         zkbContractCourse.setCourseId(contractCourseVO.getZkbCourse().getId());
         zkbContractCourse.setContractId(contractCourseVO.getContractId());
-        zkbContractCourse.setCourseCountTotal(contractCourseVO.getCourseCountTotal());
-        zkbContractCourse.setCourseCountUse(contractCourseVO.getCourseCountUse());
-        zkbContractCourse.setCourseCountApply(contractCourseVO.getCourseCountTotal() - contractCourseVO.getCourseCountUse() - contractCourseVO.getCourseCount());
+        zkbContractCourse.setMainCourseCountTotal(contractCourseVO.getMainCourseCountTotal());
+        zkbContractCourse.setMainCourseCountUse(contractCourseVO.getMainCourseCountUse());
+        zkbContractCourse.setMainCourseCountApply(contractCourseVO.getMainCourseCountTotal() - contractCourseVO.getMainCourseCountUse() - contractCourseVO.getMainCourseCount());
         zkbContractCourseRepository.save(zkbContractCourse);
     }
     //endregion
@@ -598,7 +678,7 @@ public class ZkbContractImportService {
                 newZkbContractAsset.setAssetId(zkbContractAssetVO.getAssetId());
                 newZkbContractAsset.setHighLowMachine(zkbContractAssetVO.getHighLowMachine());
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getAssetType())){
-                    zkbContractAsset.setAssetType(getHighLowAssetFromCh(zkbContractAssetVO.getAssetType()));
+                    newZkbContractAsset.setAssetType(getHighLowAssetFromCh(zkbContractAssetVO.getAssetType()));
                 }
                 newZkbContractAsset.setSubRegion(zkbContractAssetVO.getSubRegion());
                 newZkbContractAsset.setModality(zkbContractAssetVO.getModality());

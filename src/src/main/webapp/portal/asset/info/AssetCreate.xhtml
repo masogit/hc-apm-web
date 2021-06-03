@@ -10,7 +10,7 @@
         <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
         <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
-<!--        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css"/>-->
+        <!--        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css"/>-->
         <style>
             div.ui-panelgrid-cell>label+div.ui-selectonemenu {
                 min-width: 75px !important;
@@ -119,7 +119,7 @@
                 <p:tabView id="tab">
                     <p:tab title="#{msg.Create2}">
                         <h:form id="AssetInfoEditForm">
-                            <c:if test="#{assetInfoEditController.CRUDActionName.equals('新增')}">
+                            <c:if test="#{assetInfoEditController.CRUDActionName.equals('新增') or assetInfoEditController.CRUDActionName.equals('')}">
                                 <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
                                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                         <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
@@ -129,7 +129,7 @@
                                 </p:fieldset>
                             </c:if>
                             <c:if test="#{assetInfoEditController.CRUDActionName.equals('修改')}">
-                               <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
+                                <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
                                     <div class="ui-g-8">
                                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                             <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
@@ -141,11 +141,11 @@
 
                                         <h:panelGroup id="pict">
                                             <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{assetInfoEditController.uploadFlag}" />
-<!--                                            <p:galleria value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" panelWidth="320" panelHeight="260"-->
-<!--                                                        showCaption="false"  autoPlay="false" rendered="#{!assetInfoEditController.uploadFlag}" >-->
-<!--                                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"-->
-<!--                                                                onclick="javascript:showthis(this);" />-->
-<!--                                            </p:galleria>-->
+                                            <!--                                            <p:galleria value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" panelWidth="320" panelHeight="260"-->
+                                            <!--                                                        showCaption="false"  autoPlay="false" rendered="#{!assetInfoEditController.uploadFlag}" >-->
+                                            <!--                                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"-->
+                                            <!--                                                                onclick="javascript:showthis(this);" />-->
+                                            <!--                                            </p:galleria>-->
                                             <!--<h:inputText value="#{assetInfoEditController.uploadFlag}"></h:inputText>-->
                                             <div class="container-fluid" style="height: 400px; overflow: auto;">
                                                 <div class="row" id="picDiv">
@@ -181,45 +181,45 @@
                                 </p:panelGrid>
                             </p:fieldset>
                             <p:fieldset legend="#{msg.assetCategory}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCatalogFields}">
-                                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                        <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCatalogFields}" var="fieldItem" >
-                                            <ui:include src="customEditFields.xhtml"/>
-                                        </c:forEach>
-                                        <c:if test="#{userContextService.zkbAccount}" >
-                                            <h:panelGroup>
-                                                <label class="label">#{msg.mainDirectory}<span style="color:red">*</span></label>
-                                                <p:selectOneMenu id="fileMainDirectory" value="#{assetInfoEditController.selected.mainDirectory}" required="true" requiredMessage="#{msg.mainDirectory} #{msg.ValidationRequire}">
-                                                    <p:ajax update="fileSecondDirectory"/>
-                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                    <c:forEach items="#{assetInfoEditController.findMainDirectory()}" var="v">
-                                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
-                                                    </c:forEach>
-                                                </p:selectOneMenu>
-                                            </h:panelGroup>
-                                            <h:panelGroup>
-                                                <label class="label">#{msg.secondDirectory}<span style="color:red">*</span></label>
-                                                <p:selectOneMenu id="fileSecondDirectory" value="#{assetInfoEditController.selected.secondDirectory}" required="true" requiredMessage="#{msg.secondDirectory} #{msg.ValidationRequire}">
-                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                    <c:forEach items="#{assetInfoEditController.subZkbFileDirectoryList}" var="v">
-                                                        <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
-                                                    </c:forEach>
-                                                </p:selectOneMenu>
-                                            </h:panelGroup>
-                                        </c:if>
-                                    </p:panelGrid>
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCatalogFields}" var="fieldItem" >
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
+                                    <c:if test="#{userContextService.zkbAccount}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.mainDirectory}<span style="color:red">*</span></label>
+                                            <p:selectOneMenu id="fileMainDirectory" value="#{assetInfoEditController.selected.mainDirectory}" required="true" requiredMessage="#{msg.mainDirectory} #{msg.ValidationRequire}">
+                                                <p:ajax update="fileSecondDirectory"/>
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <c:forEach items="#{assetInfoEditController.findMainDirectory()}" var="v">
+                                                    <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                                </c:forEach>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.secondDirectory}<span style="color:red">*</span></label>
+                                            <p:selectOneMenu id="fileSecondDirectory" value="#{assetInfoEditController.selected.secondDirectory}" required="true" requiredMessage="#{msg.secondDirectory} #{msg.ValidationRequire}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <c:forEach items="#{assetInfoEditController.subZkbFileDirectoryList}" var="v">
+                                                    <f:selectItem itemLabel="#{v.name}" itemValue="#{v.name}"/>
+                                                </c:forEach>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </c:if>
+                                </p:panelGrid>
                             </p:fieldset>
                             <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageDateFields}">
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageDateFields}" var="fieldItem" >
-                                            <ui:include src="customEditFields.xhtml"/>
-                                        </c:forEach>
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
                                 </p:panelGrid>
                             </p:fieldset>
                             <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageFinicialFields}">
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageFinicialFields}" var="fieldItem" >
-                                            <ui:include src="customEditFields.xhtml"/>
-                                        </c:forEach>
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
 
                                 </p:panelGrid>
                             </p:fieldset>
@@ -302,15 +302,15 @@
                             </p:panel>
 
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <h:panelGroup id="buttonGroup">
-                            <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.applyChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3))}"/>
-                            <p:commandButton value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval()}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3)}"/>
-                            <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
-                            <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and assetInfoEditController.hasScrappedAuthority()}" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
-                            <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus()}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
-                             </h:panelGroup>
+                                <h:panelGroup id="buttonGroup">
+                                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.applyChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3))}"/>
+                                    <p:commandButton value="#{msg.SubmitForApproval}" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval()}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3)}"/>
+                                    <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
+                                    <p:commandButton id="preInactive" rendered="#{assetInfoEditController.selected.isValid and !(assetInfoEditController.selected.status eq 4) and !assetInfoEditController.isStatus() and assetInfoEditController.hasScrappedAuthority()}" value="#{msg.PreInactiveAsset}" action="#{assetInfoEditController.processToBeTerminated}" immediate="true"  update=":growl" style="float:right;"/>
+                                    <p:commandButton id="setIsValid" rendered="#{!assetInfoEditController.selected.isValid and !assetInfoEditController.isStatus()}" value="#{msg.ActiveAsset}" action="#{assetInfoEditController.processToBeValid}" immediate="true"  update=":growl" style="float:right;"/>
+                                </h:panelGroup>
                             </p:panelGrid>
-                          </h:form>
+                        </h:form>
                     </p:tab>
                     <p:tab title="#{msg.RefuseToReturnBack}" rendered="#{assetInfoEditController.isStatus()}">
                         <h:form id="returnback">
@@ -345,7 +345,7 @@
                     <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
                 </span>
                 <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
-                <span class="ui-icon ui-icon-closethick"></span></a>
+                    <span class="ui-icon ui-icon-closethick"></span></a>
                 <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
             </div>
             <div class="ui-dialog-content ui-widget-content"  style="max-width: 1000px;max-height:700px;min-width:800px;min-height:600px;height: available">

@@ -1,0 +1,21 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value=" #{msg.assetModifyRecord}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <p:tabView redirect="true" class="ui-g-12" id="woTab" dynamic="true" cache="false">
+                    <p:tab class="ui-g-12" title="#{msg.View}" id="historyModifiedView">
+                        <ui:include src="../asset/info/HistoryModifiedViewList.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>

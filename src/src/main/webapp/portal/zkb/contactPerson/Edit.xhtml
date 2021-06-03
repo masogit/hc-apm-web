@@ -44,6 +44,14 @@
                     </h:panelGroup>
 
                     <h:panelGroup>
+                        <label class="label">#{msg.zkbContact_loginName}*</label>
+                        <p:selectOneMenu value="#{zkbContactPersonController.selected.loginName}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{zkbContactPersonController.userAccountList}" var="item" itemLabel="#{item.loginName}" itemValue="#{item.loginName}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
                         <label class="label">#{msg.zkbContact_zipcode}</label>
                         <p:inputText id="zipcode" value="#{zkbContactPersonController.selected.zipcode}" required="false" requiredMessage="#{msg.zkbContact_zipcode} #{msg.ValidationRequire}" />
                     </h:panelGroup>

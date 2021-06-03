@@ -31,7 +31,7 @@
                                     <p:treeNode type="org">
                                         <h:outputText value="#{node}"/>
                                     </p:treeNode>
-									<p:treeNode type="hidden" rendered="false"/>
+                                    <p:treeNode type="hidden" rendered="false"/>
                                 </p:tree>
                             </p:scrollPanel>
                         </p:overlayPanel>
@@ -108,7 +108,7 @@
                                 </p:commandButton>
                             </p:dataList>
                             <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatchImage}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                           sizeLimit="500000000" update="objectImages" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
+                                          sizeLimit="500000000" update="objectImages" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
 
                         </p:panel>
 
@@ -121,7 +121,7 @@
                                 </p:commandButton>
                             </p:dataList>
                             <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatchUserManual}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                           sizeLimit="500000000" update="ObjectUpload2" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
+                                          sizeLimit="500000000" update="ObjectUpload2" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
 
                         </p:panel>
                         <p:panel  styleClass="ui-panelgrid-blank" style=" border: 0">
@@ -133,7 +133,7 @@
                                 </p:commandButton>
                             </p:dataList>
                             <p:fileUpload allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps|XLS|XLSX|DOC|DOCX|PDF|JPEG|JPG|PNG|TXT|PS)$/" fileUploadListener="#{assetFileAttachmentController.handleFileUploadBatchTrainingMaterial}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                           sizeLimit="500000000" update="ObjectUpload3" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
+                                          sizeLimit="500000000" update="ObjectUpload3" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}500M"  label="#{msg.Add}" />
 
                         </p:panel>
 
@@ -170,9 +170,33 @@
                 </h:panelGroup>
             </p:fieldset>
             <h:panelGroup>
-                <p:commandButton validateClient="true" actionListener="#{assetFileAttachmentController.batchSave()}" value="#{msg.Save}" update=":AssetFileAttachmentListForm:datalist, :growl"  icon="ui-icon-check"  oncomplete="handleSubmit(args,'FileEditDialog')" />
+                <p:commandButton validateClient="true" action="#{assetFileAttachmentController.batchSave()}" value="#{msg.Save}" update="FileAssetForm importDataForm"  icon="ui-icon-check"   auto="true" rendered="#{assetFileAttachmentController.getFlag()}"/>
+                <p:commandButton validateClient="true" action="#{assetFileAttachmentController.repeatSave()}" value="继续上传" update=":AssetFileAttachmentListForm:datalist, :growl"  icon="ui-icon-check"   auto="true" rendered="#{!assetFileAttachmentController.getFlag()}"/>
+
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('FileEditDialog').hide()"/>
             </h:panelGroup>
+        </h:form>
+        <h:form id="importDataForm">
+            <p:tabView>
+                <p:tab title="之前已上传的重复文件">
+                    <p:dataTable  value="#{assetFileAttachmentController.assetInfos}" var="item" >
+
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column  headerText="#{msg.departNum}">
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.QRCode}">
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+                        <p:column headerText="文件名称" >
+                            <h:outputText value="#{item.errorMessage}"/>
+                        </p:column>
+                    </p:dataTable>
+
+                </p:tab>
+            </p:tabView>
         </h:form>
     </p:dialog>
 

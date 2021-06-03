@@ -130,16 +130,16 @@ public class CustomConfigService {
                 .filter(item -> item.getValue().getExportRoles().stream().anyMatch(itemRole -> configurationRule.contains(itemRole)))
                 .map(Entry::getKey).collect(Collectors.toList());
     }
-    
+
     private List<String> getConfigurantionRules(List<String> userRoles){
         List<String> resRule = new ArrayList();
         resRule.addAll(userRoles);
         if (!userRoles.contains("AssetStaff") && !userRoles.contains("ClinicalStaff") &&
-            (userRoles.contains("NursingStaff") || userRoles.contains("ExternalStaff") || userRoles.contains("SharedAssetMgmt") || userRoles.contains("ITAdmin") || userRoles.contains("LocalITAdmin"))) {
+                (userRoles.contains("NursingStaff") || userRoles.contains("ExternalStaff") || userRoles.contains("SharedAssetMgmt") || userRoles.contains("ITAdmin") || userRoles.contains("LocalITAdmin"))) {
             resRule.add("ClinicalStaff");
         }
         if (!userRoles.contains("AssetStaff") && !userRoles.contains("ClinicalStaff") &&
-            (userRoles.contains(ApmConstant.MVS_ROLE_NAME_ADMIN) || userRoles.contains(ApmConstant.MVS_ROLE_NAME_FE))) {
+                (userRoles.contains(ApmConstant.MVS_ROLE_NAME_ADMIN) || userRoles.contains(ApmConstant.MVS_ROLE_NAME_FE))) {
             resRule.add("AssetStaff");
         }
         return resRule;
@@ -244,7 +244,7 @@ public class CustomConfigService {
         }
         if (JSONPath.containsValue(customConfigObject.getMobilePage(), "$.pageWorkOrder.group[type='assetInfo'].assetInfoFields",key)) {
             JSONPath.set(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields",
-                        ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).fluentRemove(key));
+                    ((JSONArray)JSONPath.eval(customConfigObject, "$.mobilePage.pageWorkOrder.group[type='assetInfo'].assetInfoFields")).fluentRemove(key));
         }
     }
 

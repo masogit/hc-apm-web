@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <facelet-taglib xmlns="http://java.sun.com/xml/ns/javaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facelettaglibrary_2_0.xsd"
-	version="2.0">
-	<namespace>http://www.ge.com/tags/apm</namespace>
-	<tag>
-		<tag-name>selectSiteOrgByOrgTree</tag-name>
-		<source>../tags/edit.site.org.xhtml</source>
-		<attribute>
-			<description>update jsf area</description>
-			<name>update</name>
-			<type>java.lang.String</type>
-		</attribute>
-	</tag>
-	<tag>
-		<tag-name>filterSiteOrgByOrgTree</tag-name>
-		<source>../tags/filter.site.org.xhtml</source>
-		<attribute>
-			<description>update jsf area</description>
-			<name>update</name>
-			<type>java.lang.String</type>
-		</attribute>
-	</tag>
-	<tag>
-		<tag-name>filterMvsSiteOrgByOrgTree</tag-name>
-		<source>../tags/filter.mvs.site.org.xhtml</source>
-		<attribute>
-			<description>update jsf area</description>
-			<name>update</name>
-			<type>java.lang.String</type>
-		</attribute>
-	</tag>
-	<tag>
-		<tag-name>selectMedicalInstrumentsClassification</tag-name>
-		<source>../tags/edit.medical.instruments.classification.xhtml</source>
-		<attribute>
-			<description>update jsf area</description>
-			<name>update</name>
-			<type>java.lang.String</type>
-		</attribute>
-	</tag>
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facelettaglibrary_2_0.xsd"
+                version="2.0">
+    <namespace>http://www.ge.com/tags/apm</namespace>
+    <tag>
+        <tag-name>selectSiteOrgByOrgTree</tag-name>
+        <source>../tags/edit.site.org.xhtml</source>
+        <attribute>
+            <description>update jsf area</description>
+            <name>update</name>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+    <tag>
+        <tag-name>filterSiteOrgByOrgTree</tag-name>
+        <source>../tags/filter.site.org.xhtml</source>
+        <attribute>
+            <description>update jsf area</description>
+            <name>update</name>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+    <tag>
+        <tag-name>filterMvsSiteOrgByOrgTree</tag-name>
+        <source>../tags/filter.mvs.site.org.xhtml</source>
+        <attribute>
+            <description>update jsf area</description>
+            <name>update</name>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+    <tag>
+        <tag-name>selectMedicalInstrumentsClassification</tag-name>
+        <source>../tags/edit.medical.instruments.classification.xhtml</source>
+        <attribute>
+            <description>update jsf area</description>
+            <name>update</name>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
 
 </facelet-taglib>

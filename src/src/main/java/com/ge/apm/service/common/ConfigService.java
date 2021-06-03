@@ -50,7 +50,7 @@ public class ConfigService {
                 return null;
             }
         }
-        
+
         if (null != configList && !configList.isEmpty()) {
             return configList.get(0);
         }
@@ -159,7 +159,7 @@ public class ConfigService {
 
         return false;
     }
-    
+
     public boolean isInsulateTenant(String tenantUid){
         TenantInfo tenant = tenantDao.findByuid(tenantUid);
         return tenant.getInsulate()!=null && tenant.getInsulate();

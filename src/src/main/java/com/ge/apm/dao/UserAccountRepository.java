@@ -218,6 +218,19 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value = "select u from UserAccount u where u.id in (select uu.userId from UserRole uu where uu.roleId in (:roleList))")
     List<UserAccount> getApprovalPersonByRoleId(@Param(value = "roleList") List<Integer> roleList);
 
+
+    /**
+     * 根据租户tenant UID查询
+     * @param tenantUid 租户tenantUID
+     * @return
+     */
+    @Query(value = "SELECT ua.* from user_account ua INNER JOIN user_role u on ua.id= u.user_id " +
+            "INNER JOIN tenant_info t1 on ua.tenant_uid=t1.uid " +
+            "where ua.tenant_uid = ?1 " +
+            "and u.role_id = 3 " +
+            "and t1.type=3", nativeQuery = true)
+    List<UserAccount> getTenantUidAndRoleId(String tenantUid);
+
     /**
      * @param userList
      * @return java.util.List<com.ge.apm.domain.UserAccount>

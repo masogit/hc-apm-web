@@ -314,7 +314,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return configService.getAttachmentCategories(config);
     }
 
-        //判断待报废按钮是否禁用
+    //判断待报废按钮是否禁用
     public boolean hasScrappedAuthority() {
         return acService.hasScrappedAuthority();
     }

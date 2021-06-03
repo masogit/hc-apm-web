@@ -40,6 +40,13 @@
         <intercept-url pattern="/portal/fealert/report/List.xhtml"
                        access="hasAnyRole('SuperAdmin','SiteAdmin','DataMaintainStaff')"/>
 
+        <intercept-url pattern="/admin/IBUInfoImage/**"
+                       access="hasAnyRole('DataMaintainStaff')"/>
+        <intercept-url pattern="/admin/USOptionImage/**"
+                       access="hasAnyRole('DataMaintainStaff')"/>
+        <intercept-url pattern="/admin/probeRecommendImage/**"
+                       access="hasAnyRole('DataMaintainStaff')"/>
+
         <intercept-url pattern="/home.xhtml" access="isAuthenticated()"/>
         <intercept-url pattern="/api/**" access="isAuthenticated()"/>
         <intercept-url pattern="/sysadmin/**" access="hasRole('SuperAdmin')"/>
