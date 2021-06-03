@@ -1,31 +1,19 @@
 package com.ge.apm.domain;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-
-import org.apache.commons.lang3.StringUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.Table;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+
+import static javax.persistence.ConstraintMode.NO_CONSTRAINT;
 
 @Entity
 @Cacheable(false)
@@ -96,13 +84,13 @@ public class AssetOptRecord implements Serializable {
 	private String diagnosticResult;
 
 	//	@Transient
-	@JoinColumn(name = "create_by", referencedColumnName = "uid", insertable = false, updatable = false)
+	@JoinColumn(name = "create_by", referencedColumnName = "uid", insertable = false, updatable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	@ManyToOne(fetch = FetchType.LAZY)
 	@NotFound(action= NotFoundAction.IGNORE)
 	private UserAccount createBy;
 
 	//	@Transient
-	@JoinColumn(name = "modify_by", referencedColumnName = "uid", insertable = false, updatable = false)
+	@JoinColumn(name = "modify_by", referencedColumnName = "uid", insertable = false, updatable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	@ManyToOne(fetch = FetchType.LAZY)
 	@NotFound(action= NotFoundAction.IGNORE)
 	private UserAccount modifyBy;
@@ -133,7 +121,7 @@ public class AssetOptRecord implements Serializable {
 	@Column(name = "comment")
 	private String comment;
 
-	@JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+	@JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	@NotFound(action= NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 //	@Transient

@@ -117,7 +117,7 @@ public class ZkbFePartOrderProvider {
                 " INNER JOIN zkb_contract zkb_con on zkb_con.id = zkb_fe_part.contract_id " +
                 " INNER JOIN tenant_info tenant on zkb_fe_part.tenant_uid = tenant.uid " +
                 " INNER JOIN zkb_fe_part_order_asset_info zkb_fe_asset on zkb_fe_asset.fe_part_order_id = zkb_fe_part.id " +
-                " where zkb_fe_part.current_step = 'WaitingGEAdmin' and  zkb_fe_part.order_type = 'SpareParts' order by zkb_fe_part.report_date desc");
+                " where zkb_fe_part.current_step = 'WaitingGEAdmin' and  zkb_fe_part.order_type = 'SpareParts' and  zkb_fe_asset.asset_qty>0 order by zkb_fe_part.report_date desc");
         return sb.toString();
     }
 
