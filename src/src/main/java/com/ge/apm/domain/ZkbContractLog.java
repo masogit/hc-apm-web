@@ -19,7 +19,7 @@ public class ZkbContractLog {
     private static final long serialVersionUID = 1L;
 
     public enum LogType {
-        contractUpdate,contractDelete,courseUpdate,CourseDelete,assetAdd,assetDelete,zkbPartOrderDelete
+        contractUpdate,contractDelete,courseUpdate,CourseDelete,assetAdd,assetDelete,zkbPartOrderDelete,catUpdate,catDelete
     }
 
     @Id
