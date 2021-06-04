@@ -20,6 +20,7 @@ import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.ObjectUtils;
@@ -496,9 +497,11 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             for(V2_BlobObject batchBlobObject : batchBlobObjectList){
                 if(!objectNameSet.isEmpty() && objectNameSet.contains(batchBlobObject.getObjectName())){
                     repeatBlobObjectSet.add(batchBlobObject);
-                    tempAssetInfo.setErrorMessage(batchBlobObject.getObjectName());
+                    AssetInfo assetInfo = new AssetInfo();
+                    BeanUtils.copyProperties(tempAssetInfo,assetInfo);
+                    assetInfo.setErrorMessage(batchBlobObject.getObjectName());
                     repeatAssets.add(tempAssetInfo);
-                    assetInfoList.add(tempAssetInfo);
+                    assetInfoList.add(assetInfo);
                 }else {
                     V2_BlobObject tempBlobObject = new V2_BlobObject();
                     tempBlobObject.setBoId(tempAssetInfo.getId());
