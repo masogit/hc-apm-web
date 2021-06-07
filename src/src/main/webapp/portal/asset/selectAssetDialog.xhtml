@@ -41,7 +41,7 @@
                             </p:selectOneMenu>-->
                             
                             <p:commandButton value="#{msg.Search}" actionListener="#{selectAssetController.setSearchFilter}" update="selectAssetDatalist"/>
-                            <p:commandButton value="#{msg.Reset}" actionListener="#{selectAssetController.setSearchFilter}" update="selectAssetDatalist searchGrid">
+                            <p:commandButton value="#{msg.Reset}" actionListener="#{selectAssetController.setResetSearchFilter}" update="selectAssetDatalist searchGrid">
                                 <p:resetInput target="searchGrid"/>
                             </p:commandButton>
                         </h:panelGrid>    
