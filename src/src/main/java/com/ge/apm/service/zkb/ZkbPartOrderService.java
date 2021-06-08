@@ -630,7 +630,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             if(nextFlag){
                 ZkbContract c = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
-                    if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(zkbPartOrder.getZkbPartOrderCat().getValueType())){
+                    boolean flag  =false;
+                    if(zkbPartOrder.getZkbPartOrderCat() != null && !ZkbPartOrderCat.ValueType.HighValue.toString().equals(zkbPartOrder.getZkbPartOrderCat().getValueType())){
+                        flag = true;
+                    }else if(StringUtils.isNotEmpty(zkbPartOrder.getHighCatFlag()) && "t".equals(zkbPartOrder.getHighCatFlag())){
+                        flag = true;
+                    }
+                    if(flag){
                         boolean r = checkApplyNumValid(zkbPartOrder,c);
                         if(!r){
                             zkbPartOrder.setCheckApplyNumFlag(CopyByInvok.F);
