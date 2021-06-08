@@ -47,4 +47,4 @@ update asset_info set ib_status = 6 where uid in (select asset_uid from asset_ta
 
 --2021/6/8 delete us data in "iwic_monthly_report" and "di_quarterly_report"
 delete from iwic_monthly_report where ge_device_type = 3;
-delete from di_quarterly_report where ge_device_type = 3
+delete from di_quarterly_report where ge_device_type = 3;
