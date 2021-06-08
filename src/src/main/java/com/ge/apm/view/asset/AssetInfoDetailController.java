@@ -60,7 +60,7 @@ public class AssetInfoDetailController {
     private AssetHistoryService assetHistoryService;
     private SysAuthGroupRepository sysAuthGroupDao;
     private UserAccountRepository userAccountRepository;
-
+    private AssetTerminateHistoryRepository assetTerminateHistoryRepository;
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
@@ -78,6 +78,8 @@ public class AssetInfoDetailController {
 
     @Getter
     private List<JSONObject> changeHistoryList = Collections.emptyList();
+    @Getter
+    private AssetTerminateHistory assetTerminateHistory;
     private SysAuthGroup selectedAuthGroup;
 
     @PostConstruct
@@ -99,6 +101,7 @@ public class AssetInfoDetailController {
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        assetTerminateHistoryRepository = WebUtil.getBean(AssetTerminateHistoryRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
@@ -134,6 +137,7 @@ public class AssetInfoDetailController {
         this.selected.setTags(existingTags);
 
         changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
+        assetTerminateHistory = assetTerminateHistoryRepository.findByAssetUid(selected.getUid());
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {
