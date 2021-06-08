@@ -1,13 +1,7 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -136,6 +130,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     private StreamedContent assetTemplateFile;
     private AssetLifecyleService assetLifecyleService;
+    private AssetTerminateHistoryRepository assetTerminateHistoryRepository;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -162,6 +157,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         uuaService = WebUtil.getBean(UaaService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         parentAssetService = WebUtil.getBean(AssetInfoParentAssetService.class);
+        assetTerminateHistoryRepository = WebUtil.getBean(AssetTerminateHistoryRepository.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap<>();
@@ -517,8 +513,26 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         assetInfo.setIsValid(false);
         assetInfo.setTerminateDate(new Date());
         dao.save(assetInfo);
+        saveTerminationHistory(assetInfo);
         assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
+    }
+
+    /**
+     * 报废信息变更记录
+     * @param assetInfo
+     */
+    private void saveTerminationHistory(AssetInfo assetInfo) {
+        UserAccount loginUser = userContextService.getLoginUser();
+        AssetTerminateHistory assetTerminateHistory = assetTerminateHistoryRepository.findByAssetUid(assetInfo.getUid());
+        if(assetTerminateHistory==null) assetTerminateHistory = new AssetTerminateHistory();
+        assetTerminateHistory.setAssetName(assetInfo.getName());
+        assetTerminateHistory.setAssetUid(assetInfo.getUid());
+        assetTerminateHistory.setChangePerson(loginUser.getName());
+        assetTerminateHistory.setChangeTime(new Date());
+        assetTerminateHistory.setApplyChangeDepartment(assetInfo.getClinicalDeptName());
+        assetTerminateHistory.setAuditTrail(null);
+        assetTerminateHistoryRepository.save(assetTerminateHistory);
     }
 
     public boolean validateTermination(AssetInfo assetInfo) {

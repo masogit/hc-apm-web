@@ -369,6 +369,18 @@
                 </p:dataTable>
             </p:panel>
 
+            <p:panel id="terminateList"
+                     header="报废信息"
+                     rendered="#{not empty assetInfoDetailController.assetTerminateHistory}"
+                     toggleable="true"
+                     toggleSpeed="500" collapsed="#{assetInfoDetailController.assetTerminateHistory == null ? false : true}" widgetVar="panel"
+                     style="margin-bottom:20px;">
+                <p:dataTable var="item" value="#{assetInfoDetailController.assetTerminateHistory}"
+                             emptyMessage="#{msg.noRecordFound}" lazy="true">
+                    <ui:include src="AssetTerminateHistoryFields.xhtml"/>
+                </p:dataTable>
+            </p:panel>
+
             <h:panelGroup >
                 <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoDetailController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
 
