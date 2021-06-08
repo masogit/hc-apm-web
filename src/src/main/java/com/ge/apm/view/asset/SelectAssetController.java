@@ -300,7 +300,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     }
     
      public List<UserAccount> getOwnerList() {
-        return aiService.getWorkerList();pu
+        return aiService.getWorkerList();
     }
 
     public void onOrgExpand(NodeExpandEvent event) {
