@@ -41,3 +41,10 @@ INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_statu
 select '2', FALSE, '12', true, true, false, 'OLE'
 where not exists (select 1 from user_subscription_push where menu_type=12 and role_position='OLE');
 -- end
+
+--2021/6/8 owoc, us update ib_status = 6
+update asset_info set ib_status = 6 where uid in (select asset_uid from asset_tags where lower(tag) in ('us', 'owoc')) and ge_device_type in (1, 2, 21, 23, 24, 3) and ib_status in (1, 4);
+
+--2021/6/8 delete us data in "iwic_monthly_report" and "di_quarterly_report"
+delete from iwic_monthly_report where ge_device_type = 3;
+delete from di_quarterly_report where ge_device_type = 3
