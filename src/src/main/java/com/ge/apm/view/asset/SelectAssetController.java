@@ -296,10 +296,11 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         if(searchFilters.size()>0){
             searchFilters.clear();
         }
+        this.setOneSearchStr("");
     }
     
      public List<UserAccount> getOwnerList() {
-        return aiService.getWorkerList();
+        return aiService.getWorkerList();pu
     }
 
     public void onOrgExpand(NodeExpandEvent event) {
