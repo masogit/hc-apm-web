@@ -267,6 +267,9 @@ public class TenantInfoConfigService {
 			if(key.contains("zkbContract")){
 				tempItem.setValue(false);
 			}
+			if(key.contains("repair.adverseEvents")) {
+				tempItem.setValue(false);
+			}
 			if (edition.equals(VERSION_ASSETMGT)) {
 				if(key.equals("link")){
 					tempItem.setValue(true);
