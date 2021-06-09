@@ -15,17 +15,12 @@
         <div class="ui-g-12 card">
             <h:form id="importForm">
                 <p:fieldset  legend="#{msg.ContractImport}" id="uploaderContainer">
-
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-
-
                         <h:panelGroup>
                             <label class="label">#{msg.choseFileToUpload}</label>
                             <p:fileUpload  id="fileUpload" fileUploadListener="#{zkbContractImpController.uploadDataFile}" value="#{zkbContractImpController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                           multiple="false" sizeLimit="10000000" auto="true" update=":importForm :errorDataListForm" invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"
-                            />
+                                           multiple="false" sizeLimit="10000000" auto="true" update=":importForm :errorDataListForm" invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}"/>
                         </h:panelGroup>
-
                         <h:panelGroup>
                             <table style="width: 100%;padding:0px;margin: 0px;height: 100%;">
                                 <tr>
@@ -59,7 +54,6 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-
                 <p:commandButton value=" #{msg.Return}" icon="ui-icon-arrow-back" action="/portal/zkb/contract/List?faces-redirect=true" immediate="true" />
             </h:form>
         </div>
@@ -174,7 +168,36 @@
 
                     </p:dataTable>
                 </p:fieldset>
+                <p:fieldset  legend="合同高值探头#{msg.ImportFailureData}">
+                    <p:dataTable id="errorCatDatalist" rendered="#{not empty zkbContractImpController.errorContractCatList}" value="#{zkbContractImpController.errorContractCatList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+                        <p:column headerText="#{msg.EXCELRowNumber}">
+                            <h:outputText value="#{item.get('zkbContractCatVO').lineNum}" />
+                        </p:column>
+                        <p:column headerText="合同号">
+                            <h:outputText value="#{item.get('zkbContractCatVO').contractNo}" />
+                        </p:column>
+                        <p:column headerText="SN编号">
+                            <h:outputText value="#{item.get('zkbContractCatVO').snNo}" />
+                        </p:column>
+                        <p:column headerText="状态">
+                            <h:outputText value="#{fieldMsg.fieldValue('zkbContractCatEnabled',item.get('zkbContractCatVO').enabled)}" />
+                        </p:column>
+                        <p:column headerText="#{msg.FailureInformation}" >
+                            <h:outputText value="#{item.get('errmsg')}"/>
+                        </p:column>
 
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton ajax="false" actionListener="#{zkbContractImpController.downloadImportFailureData}"
+                                             icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" update=":growl">
+                                <p:fileDownload value="#{zkbContractImpController.exportFile}"/>
+                            </p:commandButton>
+                        </f:facet>
+
+                    </p:dataTable>
+                </p:fieldset>
             </h:form>
         </div>
     </ui:define>
