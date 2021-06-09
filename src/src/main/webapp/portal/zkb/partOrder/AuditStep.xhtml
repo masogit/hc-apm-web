@@ -359,7 +359,7 @@
                                 </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup id="highGroup" rendered="#{zkbPartOrderAuditController.showCatListFlag eq '2'}" style="text-align: left">
-                                <label class="label">探头型号2*</label>
+                                <label class="label">SN编号*</label>
                                 <p:selectOneMenu value="#{zkbPartOrderAuditController.selected.contractCatId}" required="true" requiredMessage="高值探头 #{msg.ValidationRequire}" disabled="true">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{zkbPartOrderAuditController.highCatList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
