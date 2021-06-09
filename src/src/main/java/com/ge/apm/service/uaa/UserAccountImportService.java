@@ -59,6 +59,7 @@ public class UserAccountImportService {
 	private static final String HEADER_TAGS="标签";
 	private static final String HEADER_PASSWORD= getEncryptedPass();
 	private static final String HEADER_UUID="UUID";
+	private static final String HEADER_DEALERNAME="所属代理商";
 	private static final String SHEET_USER="datalist";
 	private static final String ROLE_GUEST="仅报修权限账号";
 	private static Map<String,Integer> sysRoleMap;
@@ -762,6 +763,7 @@ public class UserAccountImportService {
 		String tagsJoined;
 		String password;
 		String UUID;
+		String dealerName;
 
 		int institutionIndex=header.get(HEADER_INSTITUTION);
 		int hospitalIndex=header.get(HEADER_HOSPITAL);
@@ -781,6 +783,7 @@ public class UserAccountImportService {
 		int tagsIndex=header.get(HEADER_TAGS);
 		Integer passwordIndex=header.get(HEADER_PASSWORD);
 		int uuidIndex=header.get(HEADER_UUID);
+		int dealerNameIndex = header.get(HEADER_DEALERNAME);
 
 		for (int j = 1; j <= sheet.getLastRowNum(); j++) {
 			Row row = sheet.getRow(j);
@@ -845,7 +848,8 @@ public class UserAccountImportService {
 				}
 
 				UUID=ExcelParser.getCellStringValue(row, uuidIndex);
-				
+				dealerName = ExcelParser.getCellStringValue(row, dealerNameIndex);
+
 				if(!pass){
 					importFailedDataList.add(newUser);
 					failedCount++;
@@ -878,7 +882,9 @@ public class UserAccountImportService {
 				newUser.setImportRoleNames(roleName);
 				newUser.setPosition(getPositionKey(position));
 				newUser.setTags(separateTags(tagsJoined));
-
+				if(StringUtils.isNotBlank(dealerName)){
+					newUser.setDealerName(dealerName);
+				}
 				//handle password
 				if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(password.trim())) {
 					String checkResult = PasswordUtil.checkPwd(password.trim());
