@@ -11,6 +11,9 @@
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="名额日志管理"/><!--#{msg.ZKBCourseMgt}-->
             </div>
+            <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
+                <p:commandButton value="TEST"  process="@this"  rendered="true" action="#{zkbContractQuotaLogController.test}" />
+            </h:panelGrid>
 
             <div class="ui-g-12 card">
                 <h:form id="zkbCourseListForm">
