@@ -76,7 +76,7 @@
                 <p:menuitem id="um200" value="#{msg.RepairWorkorderReport}" outcome="/portal/wo/woExport/woReportMain.xhtml" rendered="#{userContextService.accessContains('repair.report')}"/>
                 <p:menuitem id="um201" value="#{msg.WorkScheduleManagement}" outcome="/portal/schedule/workSchedule.xhtml" rendered="#{userContextService.accessContains('repair.workSchedule')}"/>
                 <p:menuitem id="um202" value="#{msg.VacationManagement}" outcome="/portal/schedule/userVacationList.xhtml" rendered="#{userContextService.accessContains('repair.vacationMgt')}"/>
-                <p:menuitem id="um203" value="不良事件"  onclick="window.open('https://maers.adrs.org.cn').location.href = 'https://maers.adrs.org.cn'" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff')}"/>
+                <p:menuitem id="um203" value="不良事件"  outcome="/portal/iframe/mears.xhtml" rendered="#{userContextService.accessContains('repair.adverseEvents')}"/>
                 <p:menuitem id="um220" value="#{msg.ReportTemplateManagement}" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.accessContains('repair.reportMgt')}"/>
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('maintain')}">
