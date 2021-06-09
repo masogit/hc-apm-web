@@ -37,6 +37,6 @@ select '2', FALSE, '12', true, true, false, 'OLE'
 where not exists (select 1 from user_subscription_push where menu_type=12 and role_position='OLE');
 -- end
 
--- 2021-06-08 给医工和医工主任 查看不良事件的权限 start
-UPDATE sys_role SET authorities = ( CASE WHEN authorities IS NULL THEN 'repair.adverseEvents' ELSE authorities || ',repair.adverseEvents' END ), menus = ( CASE WHEN menus IS NULL THEN 'repair.adverseEvents' ELSE menus || ',repair.adverseEvents' END ), authorities_ch = ( CASE WHEN authorities_ch IS NULL THEN '不良事件' ELSE authorities_ch || ',不良事件' END ) WHERE role_desc = '工程师' OR role_desc = '医学工程处主任';
+-- 2021-06-09 给医工和医工主任 查看不良事件的权限 start
+UPDATE sys_role SET authorities = ( CASE WHEN authorities IS NULL THEN 'repair.adverseEvents' WHEN authorities LIKE '%repair.adverseEvents%' THEN authorities ELSE authorities || ',repair.adverseEvents' END ), menus = ( CASE WHEN menus IS NULL THEN 'repair.adverseEvents' WHEN menus LIKE '%repair.adverseEvents%' THEN menus ELSE menus || ',repair.adverseEvents' END ), authorities_ch = ( CASE WHEN authorities_ch IS NULL THEN '不良事件' WHEN authorities_ch LIKE '%不良事件%' THEN authorities_ch ELSE authorities_ch || ',不良事件' END ) WHERE role_desc = '工程师' OR role_desc = '医学工程处主任';
 -- end
