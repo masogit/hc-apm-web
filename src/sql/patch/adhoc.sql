@@ -1,4 +1,42 @@
- -- 2021-05-21 导入GEDictionaryExcel配置权限  start
- delete from role_msg_rel where msg_key = 'GEDictionaryExcel';
- INSERT INTO "public"."role_msg_rel"("msg_key", "msg_type", "role_id", "role_name", "role_type") VALUES ('GEDictionaryExcel', 'batchFileType', (select id from sys_role where name = 'DataMaintainStaff'), 'DataMaintainStaff', 0);
- -- end
+-- 2021-06-04 消息订阅新增ole角色配置 start
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
+select '2', FALSE, '1', true, true, false, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=1 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '2', FALSE, '2', true, false, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=2 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '2', FALSE, '3', true, false, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=3 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '2', FALSE, '4', true, false, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=4 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
+select '2', FALSE, '5', true, true, true, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=5 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,role_position)
+select '2', FALSE, '6', true, false, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=6 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
+select '2', FALSE, '7', true, true, false, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=7 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
+select '2', FALSE, '8', true, true, false, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=8 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
+select '2', FALSE, '9', true, true, true, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=9 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
+select '2', FALSE, '10', true, true, true, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=10 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
+select '2', FALSE, '11', true, true, false, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=11 and role_position='OLE');
+INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
+select '2', FALSE, '12', true, true, false, 'OLE'
+where not exists (select 1 from user_subscription_push where menu_type=12 and role_position='OLE');
+-- end
+
+-- 2021-06-08 给医工和医工主任 查看不良事件的权限 start
+UPDATE sys_role SET authorities = ( CASE WHEN authorities IS NULL THEN 'repair.adverseEvents' ELSE authorities || ',repair.adverseEvents' END ), menus = ( CASE WHEN menus IS NULL THEN 'repair.adverseEvents' ELSE menus || ',repair.adverseEvents' END ), authorities_ch = ( CASE WHEN authorities_ch IS NULL THEN '不良事件' ELSE authorities_ch || ',不良事件' END ) WHERE role_desc = '工程师' OR role_desc = '医学工程处主任';
+-- end
