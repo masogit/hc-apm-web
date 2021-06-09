@@ -59,6 +59,10 @@
                                     <label class="label">#{msg.cataLog}<span style="color:red">*</span></label>
                                     <p:autoComplete id="cataLog" value="#{coilOpportunityImageEditController.selected.cataLog}"
                                                     required="true" requiredMessage="#{msg.cataLog} #{msg.ValidationRequire}"/>
+                                    <label class="label">#{msg.tag}</label>
+                                    <p:autoComplete id="tag" value="#{coilOpportunityImageEditController.selected.tag}" />
+                                    <label class="label">#{msg.sort}</label>
+                                    <p:autoComplete id="sort" value="#{coilOpportunityImageEditController.selected.sort}" />
                                 </h:panelGroup>
                             </c:if>
                             <c:if test="#{coilOpportunityImageEditController.CRUDActionName.equals('修改')}">
@@ -68,6 +72,10 @@
                                             <label class="label">#{msg.cataLog}<span style="color:red">*</span></label>
                                             <p:autoComplete id="cataLog" value="#{coilOpportunityImageEditController.selected.cataLog}"
                                                             required="true" readonly="true" requiredMessage="#{msg.cataLog} #{msg.ValidationRequire}"/>
+                                            <label class="label">#{msg.tag}</label>
+                                            <p:autoComplete id="tag" value="#{coilOpportunityImageEditController.selected.tag}"  />
+                                            <label class="label">#{msg.sort}</label>
+                                            <p:autoComplete id="sort" value="#{coilOpportunityImageEditController.selected.sort}"  />
                                         </h:panelGroup>
                                     </div>
                                     <div class="ui-g-4">
@@ -109,6 +117,7 @@
                             <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <h:panelGroup id="buttonGroup">
                                     <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{coilOpportunityImageEditController.applyChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{coilOpportunityImageEditController.CRUDActionName.equals('新增')}" />
+                                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{coilOpportunityImageEditController.saveChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{coilOpportunityImageEditController.CRUDActionName.equals('修改')}" />
                                     <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{coilOpportunityImageEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
                                 </h:panelGroup>
                             </p:panelGrid>
