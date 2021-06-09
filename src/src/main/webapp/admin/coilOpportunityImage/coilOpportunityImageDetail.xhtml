@@ -34,6 +34,12 @@
                                     <label class="label">#{msg.cataLog}<span style="color:red">*</span></label>
                                     <p:autoComplete id="cataLog" value="#{coilOpportunityImageDetailController.selected.cataLog}"
                                                     required="true" readonly="true" requiredMessage="#{msg.cataLog} #{msg.ValidationRequire}"/>
+                                    <label class="label">#{msg.tag}</label>
+                                    <p:autoComplete id="tag" value="#{coilOpportunityImageDetailController.selected.tag}"
+                                                    readonly="true" />
+                                    <label class="label">#{msg.sort}</label>
+                                    <p:autoComplete id="sort" value="#{coilOpportunityImageDetailController.selected.sort}"
+                                                    readonly="true" />
                                 </h:panelGroup>
                             </p:panelGrid>
                         </div>
