@@ -955,6 +955,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','repair.count','设备维修统计','Equipment Repair Analysis',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','repair.report','维修工单报表','Repair Workorder Report',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','repair.workSchedule','排班管理','Work Schedule Management',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','repair.adverseEvents','不良事件','Adverse Events',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','repair.vacationMgt','休假管理','Vacation Management',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','maintain.workbench','保养工作台','Maintenance Workbench',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','maintain.electricDataImport','电气安全数据导入','Electric Safety Data Import',NULL,-1);
@@ -3396,6 +3397,9 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractModifyType','OC','OC','OC',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractModifyType','NextYearBalance','次年结余','Next Year Balance',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractModifyType','Others','其他','Others',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractCatEnabled',true,'可用','true',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractCatEnabled',false,'不可用','true',NULL,-1);
 
 
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'ErrorCourseNameIsEmpty', '错误：课程名称为空', 'Error: Course Name is empty', NULL, -1);
