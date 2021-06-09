@@ -271,6 +271,9 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "account_creation_type")
 	private Integer accountCreationType;
 
+	@Column(name = "dealer_name")
+	private String dealerName;
+
 	public Integer getAccountCreationType() {
 		return accountCreationType;
 	}
@@ -1189,5 +1192,13 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public String getDealerName() {
+		return dealerName;
+	}
+
+	public void setDealerName(String dealerName) {
+		this.dealerName = dealerName;
 	}
 }
