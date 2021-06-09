@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="名额日志管理"/><!--#{msg.ZKBCourseMgt}-->
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="zkbCourseListForm">
+                   <p:dataTable id="datalist" value="#{zkbContractQuotaLogController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{zkbContractQuotaLogController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createdDate}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="filter" listener="#{zkbContractQuotaLogController.onFilter}" />
+                        <p:column headerText="合同号" filterBy="#{item.contractNo}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.contractNo}"/>
+                        </p:column>
+                       <p:column headerText="申请编号" filterBy="#{item.zkbPartOrderNo}" filterMatchMode="LIKE">
+                           <h:outputText value="#{item.zkbPartOrderNo}"/>
+                       </p:column>
+
+                   <!--     <p:column headerText="业务类型">
+                            <h:outputText value="#{item.businessType}"/>
+                        </p:column>-->
+
+                       <p:column headerText="名额类型">
+                           <h:outputText value="#{fieldMsg.fieldValue('zkbContractQuotaOrderType',item.orderType)}"/>
+                       </p:column>
+                       <p:column headerText="操作类型">
+                           <h:outputText value="#{fieldMsg.fieldValue('zkbContractQuotaOpType',item.opType)}"/>
+                       </p:column>
+                       <p:column headerText="总名额" >
+                           <h:outputText value="#{item.quotaTotal}"/>
+                       </p:column>
+                       <p:column headerText="剩余名额" >
+                           <h:outputText value="#{item.quota}"/>
+                       </p:column>
+                       <p:column headerText="申请名额" >
+                           <h:outputText value="#{item.quotaApply}"/>
+                       </p:column>
+                       <p:column headerText="已使用名额" >
+                           <h:outputText value="#{item.quotaUse}"/>
+                       </p:column>
+
+                       <p:column headerText="操作人" >
+                           <h:outputText value="#{item.createdUserName}"/>
+                       </p:column>
+                       <p:column headerText="操作时间" >
+                           <h:outputText value="#{item.createdDate}">
+                               <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH：mm:ss" />
+                           </h:outputText>
+                       </p:column>
+                       <f:facet name="{Toolbar}">
+                           <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbContractQuotaLogController.exportAll}" icon="ui-icon-arrowthick-1-s">
+                               <p:fileDownload value="#{zkbContractQuotaLogController.exportFile}"/>
+                           </p:commandButton>
+                       </f:facet>
+
+                    </p:dataTable>
+
+                </h:form>
+
+            </div>
+        </div>
+    </ui:define>
+
+
+</ui:composition>
