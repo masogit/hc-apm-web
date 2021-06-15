@@ -513,23 +513,8 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         assetInfo.setIsValid(false);
         assetInfo.setTerminateDate(new Date());
         dao.save(assetInfo);
-        saveTerminationHistory(assetInfo);
         assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
-    }
-
-    /**
-     * 报废信息变更记录
-     * @param assetInfo
-     */
-    private void saveTerminationHistory(AssetInfo assetInfo) {
-        UserAccount loginUser = userContextService.getLoginUser();
-        AssetTerminateHistory assetTerminateHistory = assetTerminateHistoryRepository.findByAssetUid(assetInfo.getUid());
-        if(assetTerminateHistory==null) assetTerminateHistory = new AssetTerminateHistory();
-        assetTerminateHistory.setChangePerson(loginUser.getName());
-        assetTerminateHistory.setChangePersonUid(loginUser.getUid());
-        assetTerminateHistory.setChangeTime(new Date());
-        assetTerminateHistoryRepository.save(assetTerminateHistory);
     }
 
     public boolean validateTermination(AssetInfo assetInfo) {

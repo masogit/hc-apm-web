@@ -734,7 +734,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             assetLifecyleService.saveLifecycle(assetLifecyleStatus,selected,UserContextService.getCurrentUserAccount());
         }
         if (this.selected.getStatus() == 4) {
-            saveTerminateInfo();
             aimService.updateNurseSiteMaintain(this.selected.getUid());
         }
         assetDepreciationService.saveAssetDerpeciation(selected);
@@ -750,23 +749,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         } else {
             return "";
         }
-    }
-
-    /**
-     * 保存报废申请信息
-     */
-    public void saveTerminateInfo() {
-        UserAccount userAccount =  UserContextService.getCurrentUserAccount();
-        AssetTerminateHistory assetTerminateHistory = assetTerminateHistoryRepository.findByAssetUid(selected.getUid());
-        if(assetTerminateHistory == null || assetTerminateHistory.getChangeTime()!=null)  assetTerminateHistory = new AssetTerminateHistory();  // 该设备没有报废过 或者重启设备，要新建一个报废记录
-        assetTerminateHistory.setAssetName(selected.getName());
-        assetTerminateHistory.setAssetUid(selected.getUid());
-        assetTerminateHistory.setApplyChangeDepartment(selected.getClinicalDeptName());
-        assetTerminateHistory.setApplyChangeDepartmentUid(selected.getClinicalDeptUID());
-        assetTerminateHistory.setApplyPerson(userAccount.getName());
-        assetTerminateHistory.setApplyPersonUid(userAccount.getUid());
-        assetTerminateHistory.setApplyTime(new Date());
-        assetTerminateHistoryRepository.save(assetTerminateHistory);
     }
 
     public boolean checkDepartNumUnique() {
