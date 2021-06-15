@@ -400,7 +400,7 @@
                         </h:panelGroup>
                         <h:panelGroup id="catModelGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" >
                             <h:panelGroup  style="text-align: left">
-                                <c:if test="#{zkbPartOrderEditController.probeQuotaFlag and !(zkbPartOrderEditController.selected.probeQuotaType eq 'High')}">
+                                <c:if test="#{zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.probeQuotaType eq 'High'}">
                                     <label class="label">SN编号*</label>
                                     <p:selectOneMenu value="#{zkbPartOrderEditController.selected.contractCatId}" required="true" requiredMessage="高值探头 #{msg.ValidationRequire}" >
                                         <p:ajax event="itemSelect" update="qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
@@ -408,7 +408,7 @@
                                         <f:selectItems value="#{zkbPartOrderEditController.highCatList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>
                                 </c:if>
-                                <c:if test="#{zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.probeQuotaType eq 'High'}">
+                                <c:if test="#{zkbPartOrderEditController.probeQuotaFlag and !(zkbPartOrderEditController.selected.probeQuotaType eq 'High')}">
                                     <label class="label">探头型号*</label>
                                     <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="探头型号 #{msg.ValidationRequire}"
                                                     completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catText}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
