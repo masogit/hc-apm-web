@@ -371,9 +371,9 @@
 
             <p:panel id="terminateList"
                      header="报废信息"
-                     rendered="#{not empty assetInfoDetailController.assetTerminateHistory}"
+                     rendered="#{not empty assetInfoDetailController.assetTerminateHistory and assetInfoDetailController.selected.status == 4}"
                      toggleable="true"
-                     toggleSpeed="500" collapsed="#{assetInfoDetailController.assetTerminateHistory == null ? false : true}" widgetVar="panel"
+                     toggleSpeed="500" collapsed="#{assetInfoDetailController.assetTerminateHistory == null ? false :  true}" widgetVar="panel"
                      style="margin-bottom:20px;">
                 <p:dataTable var="item" value="#{assetInfoDetailController.assetTerminateHistory}"
                              emptyMessage="#{msg.noRecordFound}" lazy="true">
