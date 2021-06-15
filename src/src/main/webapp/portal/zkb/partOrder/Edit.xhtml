@@ -342,6 +342,12 @@
                             <p:column headerText="产品型号">
                                 <h:outputText value="#{item.remark}"/>
                             </p:column>
+                            <p:column headerText="状态">
+                                <h:outputText value="#{zkbPartOrderEditController.vacationRender(item.isVacation)}"/>
+                            </p:column>
+                            <p:column headerText="backUp">
+                                <h:outputText value="#{item.usBackUpName}"/>
+                            </p:column>
                         </p:dataTable>
                     </h:panelGroup>
                 </p:fieldset>
