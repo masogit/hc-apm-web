@@ -15,7 +15,7 @@ public class AssetTerminateHistory {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
-    private String uid;
+    private String id;
 
     @Column(name = "asset_uid", nullable = false)
     private String assetUid;
@@ -23,15 +23,27 @@ public class AssetTerminateHistory {
     @Column(name = "asset_name")
     private String assetName;
 
-    @Column(name = "change_person")   //变更人
+    @Column(name = "change_person")   //变更人 报废操作人
     private String changePerson;
 
-    @Column(name = "change_time")     //变更时间
+    @Column(name = "change_person_uid")   //变更人 报废操作人
+    private String changePersonUid;
+
+    @Column(name = "change_time")     //变更时间  报废操作时间
     private Date changeTime;
 
     @Column(name = "apply_change_department")     //申请变更科室
     private String applyChangeDepartment;
 
-    @Column(name = "audit_trail")      // 审计追踪
-    private String auditTrail;
+    @Column(name = "apply_change_department_uid")
+    private String applyChangeDepartmentUid;
+
+    @Column(name = "apply_time")     //变更时间  报废操作时间
+    private Date applyTime;
+
+    @Column(name = "apply_person")     // 申请人
+    private String applyPerson;
+
+    @Column(name = "apply_person_uid")     // 申请人
+    private String applyPersonUid;
 }

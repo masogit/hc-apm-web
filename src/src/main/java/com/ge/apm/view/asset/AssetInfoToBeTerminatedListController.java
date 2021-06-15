@@ -526,12 +526,9 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         UserAccount loginUser = userContextService.getLoginUser();
         AssetTerminateHistory assetTerminateHistory = assetTerminateHistoryRepository.findByAssetUid(assetInfo.getUid());
         if(assetTerminateHistory==null) assetTerminateHistory = new AssetTerminateHistory();
-        assetTerminateHistory.setAssetName(assetInfo.getName());
-        assetTerminateHistory.setAssetUid(assetInfo.getUid());
         assetTerminateHistory.setChangePerson(loginUser.getName());
+        assetTerminateHistory.setChangePersonUid(loginUser.getUid());
         assetTerminateHistory.setChangeTime(new Date());
-        assetTerminateHistory.setApplyChangeDepartment(assetInfo.getClinicalDeptName());
-        assetTerminateHistory.setAuditTrail(null);
         assetTerminateHistoryRepository.save(assetTerminateHistory);
     }
 
