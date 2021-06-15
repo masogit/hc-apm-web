@@ -1,6 +1,5 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.AssetTerminateHistory;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 

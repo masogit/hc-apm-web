@@ -78,8 +78,6 @@ public class AssetInfoDetailController {
 
     @Getter
     private List<JSONObject> changeHistoryList = Collections.emptyList();
-    @Getter
-    private AssetTerminateHistory assetTerminateHistory;
     private SysAuthGroup selectedAuthGroup;
 
     @PostConstruct
@@ -137,7 +135,6 @@ public class AssetInfoDetailController {
         this.selected.setTags(existingTags);
 
         changeHistoryList = assetHistoryService.getAssetChangeHistoryByJSON(selected.getUid());
-        assetTerminateHistory = assetTerminateHistoryRepository.findByAssetUid(selected.getUid());
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {
