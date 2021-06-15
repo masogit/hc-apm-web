@@ -183,7 +183,7 @@
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.probeQuotaFlag}">
                             <label class="label">扣除名额类型*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.probeQuotaType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
-                                <p:ajax event="change" update="catModelGrid" />
+                                <p:ajax event="change" update="catModelGrid valueTypeGroup" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
@@ -191,7 +191,7 @@
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and !zkbPartOrderEditController.probeQuotaFlag}">
                             <label class="label">是否高值探头*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.highCatFlag}" required="true" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
-                                <p:ajax event="change" update="catModelGrid" />
+                                <p:ajax event="change" update="catModelGrid valueTypeGroup" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="是" itemValue="t"/>
                                 <f:selectItem itemLabel="否" itemValue="f"/>
@@ -433,9 +433,13 @@
                             </h:panelGroup>
                         </h:panelGroup>
                         <h:panelGroup id="valueTypeGroup">
-                            <label class="label">价值类型</label>
-                            <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderEditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
-                            <label style="color: red">#{zkbPartOrderEditController.valueTypeTips}</label>
+                            <c:if test="#{(zkbPartOrderEditController.probeQuotaFlag and !(zkbPartOrderEditController.selected.probeQuotaType eq 'High')) or (!zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.highCatFlag eq 'f')}">
+                                <h:panelGroup>
+                                    <label class="label">价值类型</label>
+                                    <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderEditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
+                                    <label style="color: red">#{zkbPartOrderEditController.valueTypeTips}</label>
+                                </h:panelGroup>
+                            </c:if>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">旧探头SN编号*</label>
