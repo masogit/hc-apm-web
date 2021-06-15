@@ -385,7 +385,9 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
     }
     public void selectSubstatus(){
-        if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
+        if(selectedWorkOrder.getSubStatus() == null){
+            displayTime=false;
+        }else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
             subStatus =1;
             displayTime=true;
         }
