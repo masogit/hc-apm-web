@@ -101,6 +101,28 @@ public class ZkbPartOrderUserConfig implements Serializable {
     @Column(name = "is_vacation")
     private String isVacation = "f";// 是否休假 t f
 
+    @Column(name = "us_back_up_id")
+    private String usBackUpId;
+
+    @Column(name = "us_back_up_name")
+    private String usBackUpName;
+
+    public String getUsBackUpId() {
+        return usBackUpId;
+    }
+
+    public void setUsBackUpId(String usBackUpId) {
+        this.usBackUpId = usBackUpId;
+    }
+
+    public String getUsBackUpName() {
+        return usBackUpName;
+    }
+
+    public void setUsBackUpName(String usBackUpName) {
+        this.usBackUpName = usBackUpName;
+    }
+
     public String getIsVacation() {
         return isVacation;
     }
