@@ -415,9 +415,14 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         int startRow = EXCEL_ASSET_DATA_ROW;
 
+        GetAllElement getAllElement = new GetAllElement(assetList).invoke();
+        Map<String, List<String>> assetMap = getAllElement.getAssetMap();
+        Map parentAssets = getAllElement.getParentAssets();
+        Map supliers = getAllElement.getSupliers();
+
         for (AssetInfo assetInfo: assetList) {
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, supplierDao,userDao,authGroupDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite,null,null, null);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite,assetMap,parentAssets, supliers);
 
             writer.writeRowData(startRow, rowMap);
 
@@ -655,7 +660,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
             List<HashMap> map = assetTagsMapper.getTagsByAssetMap(uids);
 
             assetMap = new HashMap<String, List<String>>();
-            /*
+
             for (int i = 0; i <map.size() ; i++) {
                 //判断assetMap中有没有当前的key
                 List<String> assetTagNow = assetMap.get(map.get(i).get("asset_uid"));//尝试从当前assetMap中获取asset_uid对应的数组
@@ -668,7 +673,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                     assetTagOld.add((String) map.get(i).get("tag"));
                     assetMap.put((String) map.get(i).get("asset_uid"),assetTagOld);
                 }
-            }*/
+            }
 
             List<Integer> parendAssetIdList = new ArrayList<>(parendAssetIds);
             List<AssetInfo> parentAssetMap = new ArrayList();
