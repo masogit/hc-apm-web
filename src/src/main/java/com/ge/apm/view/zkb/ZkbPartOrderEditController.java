@@ -376,6 +376,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public String vacationRender(String isVacation){
+        if(StringUtils.isEmpty(isVacation)){
+            return "正常上班中";
+        }else if("f".equals(isVacation)){
+            return "正常上班中";
+        }else if("t".equals(isVacation)){
+            return "休假中";
+        }
+        return "";
+    }
+
     public void prepareItemCreate(){
         this.actionItemName = "Create";
         this.zkbPartOrderItem = new ZkbPartOrderItem();
@@ -544,7 +555,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                flag=false;
+                //flag=false;
                 errorLog += "附件不能为空！";
             }
         }else{
@@ -674,14 +685,26 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 (!probeQuotaFlag && "f".equals(selected.getHighCatFlag()))){
                 this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
                 if(this.selected.getOnlineEngine() != null){
-                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+                    if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
+                        ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
+                        this.selected.setOnlineEngine(backUp);
+                        this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
+                    }else{
+                        this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+                    }
                 }
             }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             this.selected.setArtificialType(artificialType);
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
             if(this.selected.getOnlineEngine() != null){
-                this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+                if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
+                    ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
+                    this.selected.setOnlineEngine(backUp);
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
+                }else{
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+                }
             }
         }
         HashMap m = selectedWorkFlow;

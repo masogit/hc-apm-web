@@ -545,6 +545,20 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "probe_quota_type")
     private String probeQuotaType;
 
+    /**
+     * t f
+     */
+    @Column(name = "modify_flag")
+    private String modifyFlag;
+
+    public String getModifyFlag() {
+        return modifyFlag;
+    }
+
+    public void setModifyFlag(String modifyFlag) {
+        this.modifyFlag = modifyFlag;
+    }
+
     public String getContractCatId() {
         return contractCatId;
     }

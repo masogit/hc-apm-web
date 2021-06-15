@@ -1634,6 +1634,37 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public List<ZkbPartOrder> usVacationHandle(ZkbPartOrderUserConfig zkbPartOrderUserConfig,String isVacation){
+        ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(zkbPartOrderUserConfig.getUsBackUpId());
+        List<ZkbPartOrder> zkbPartOrderList = new ArrayList<>();
+        if("t".equals(isVacation)){
+            List<SearchFilter> searchFilters = new ArrayList<>();
+            searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getId()));
+            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
+            zkbPartOrderList = zkbPartOrderRepository.findBySearchFilter(searchFilters);
+            for(ZkbPartOrder p : zkbPartOrderList){
+                p.setOnlineEngineer(backUp.getId());
+                p.setOnlineEngine(backUp);
+                p.setModifyFlag("t");
+            }
+            zkbPartOrderRepository.save(zkbPartOrderList);
+        }else{
+            List<SearchFilter> searchFilters = new ArrayList<>();
+            searchFilters.add(new SearchFilter("onlineEngineer", SearchFilter.Operator.EQ, zkbPartOrderUserConfig.getUsBackUpId()));
+            searchFilters.add(new SearchFilter("modifyFlag", SearchFilter.Operator.EQ, "t"));
+            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
+            zkbPartOrderList = zkbPartOrderRepository.findBySearchFilter(searchFilters);
+            for(ZkbPartOrder p : zkbPartOrderList){
+                p.setOnlineEngineer(zkbPartOrderUserConfig.getId());
+                p.setOnlineEngine(zkbPartOrderUserConfig);
+            }
+            zkbPartOrderRepository.save(zkbPartOrderList);
+        }
+
+        return zkbPartOrderList;
+    }
+
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
         List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
