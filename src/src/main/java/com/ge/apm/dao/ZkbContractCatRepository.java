@@ -16,9 +16,9 @@ public interface ZkbContractCatRepository extends GenericRepositoryUUID<ZkbContr
     List<ZkbContractCat> findByContractId(String contractId);
     List<ZkbContractCat> findByContractIdAndIsEnabled(String contractId,boolean enabled);
 
-    @Query("select c from ZkbContractCat c where c.contractId =?1 and c.isEnabled = true ")
+    @Query("select c from ZkbContractCat c where c.contractId =?1 and c.isEnabled = true order by c.createdDate desc")
     List<ZkbContractCat> queryByContractId(String contractId);
 
-    @Query("select c from ZkbContractCat c where c.contractId =?1 ")
+    @Query("select c from ZkbContractCat c where c.contractId =?1 order by c.createdDate desc")
     List<ZkbContractCat> queryAllByContractId(String contractId);
 }
