@@ -297,7 +297,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
            return false;
     }
 */
-    @Getter @Setter
+    @Setter
     public boolean displayTime=false;
 
     public UserAccount getUa1() {
@@ -390,14 +390,20 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
             subStatus =1;
             displayTime=true;
-        }
-        else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS2){
+        }else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS2){
             subStatus =2;
             displayTime=false;
         } else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS3){
             subStatus =3;
             displayTime=false;
         }
+    }
+
+    public boolean getDisplayTime(){
+        if(selectedWorkOrder.getSubStatus() == null){
+            return false;
+        }
+        return this.displayTime;
     }
 
     public void closePrcieUpdate(){
