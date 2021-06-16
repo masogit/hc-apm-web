@@ -37,6 +37,7 @@ public class AssetHistoryService {
     public static final String FIELD_ASSET_DEPT_NAME = "assetDeptName";
     public static final String FILED_CLINICAL_DEPT_NAME = "clinicalDeptName";
     public static final String FILED_DEVICE_STATUS = "deviceStatus";
+    public static final String FILED_STATUS = "status";
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -141,7 +142,7 @@ public class AssetHistoryService {
         Object oldFieldValue = null;
         Object newFieldValue = null;
 
-        if (FILED_DEVICE_STATUS.equals(fieldName)) {
+        if (FILED_DEVICE_STATUS.equals(fieldName)) {   // 资产状态
             Field field = oldAsset.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
 
@@ -159,6 +160,23 @@ public class AssetHistoryService {
                 newFieldValue = i18nMessageService.getMsgLabelByMsgTypeAndMsgKey("deviceStatus", String.valueOf(newFieldValue));
             }
 
+        } else if(FILED_STATUS.equals(fieldName)) {    // 当前状态
+            Field field = oldAsset.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+
+            oldFieldValue = field.get(oldAsset);
+            newFieldValue = field.get(newAsset);
+
+            if (Objects.equals(oldFieldValue, newFieldValue)) {
+                return Optional.empty();
+            }
+
+            if (null != oldFieldValue) {
+                oldFieldValue = i18nMessageService.getMsgLabelByMsgTypeAndMsgKey("assetStatus", String.valueOf(oldFieldValue));
+            }
+            if (null != newFieldValue) {
+                newFieldValue = i18nMessageService.getMsgLabelByMsgTypeAndMsgKey("assetStatus", String.valueOf(newFieldValue));
+            }
         }
 
         if (Objects.equals(oldFieldValue, newFieldValue)) {
@@ -228,6 +246,7 @@ public class AssetHistoryService {
                 Optional<AssetHistory.AssetHistoryInfo> optionalResult;
                 switch (fieldName) {
                     case FILED_DEVICE_STATUS:
+                    case FILED_STATUS:
                         optionalResult = getSpecialFieldValue(oldAsset, newAsset, fieldName);
                         break;
                     case FIELD_ASSET_DEPT_NAME:
@@ -311,6 +330,7 @@ public class AssetHistoryService {
         assetHistory.setHospitalUID(currentUserAccount.getHospitalUID());
         assetHistory.setTenantUID(currentUserAccount.getTenantUID());
         assetHistory.setInstitutionUID(currentUserAccount.getInstitutionUID());
+        assetHistory.setClinicalDeptUid(newAsset.getClinicalDeptUID());
 
         this.save(assetHistory);
     }
