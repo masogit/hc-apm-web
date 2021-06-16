@@ -422,9 +422,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             int i = this.selected.getZkbPartOrderItems().size();
             this.zkbPartOrderItem.setIndex(i);
+            this.zkbPartOrderItem.setPartQty(zkbPartOrderItem.getPrePartQty());
             this.selected.getZkbPartOrderItems().add(zkbPartOrderItem);
         }else{
             this.selected.getZkbPartOrderItems().set(this.zkbPartOrderItem.getIndex(),this.zkbPartOrderItem);
+            this.zkbPartOrderItem.setPartQty(zkbPartOrderItem.getPrePartQty());
         }
         this.zkbPartOrderItem = null;
         this.selected.setQty(calcOrderQty());
@@ -555,7 +557,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                flag=false;
+                //flag=false;
                 errorLog += "附件不能为空！";
             }
         }else{

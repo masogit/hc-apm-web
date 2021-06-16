@@ -331,7 +331,7 @@
                             <h:outputText value="#{item.partName}"/>
                         </p:column>
                         <p:column headerText="配件数量">
-                            <h:outputText value="#{item.partQty}"/>
+                            <h:outputText value="#{item.prePartQty}"/>
                         </p:column>
                         <p:column headerText="配件SN(序列号)">
                             <h:outputText value="#{item.serialNumber}"/>
@@ -402,7 +402,7 @@
                             <h:outputText value="#{item.partName}"/>
                         </p:column>
                         <p:column headerText="配件数量">
-                            <h:outputText value="#{item.partQty}"/>
+                            <h:outputText value="#{item.prePartQty}"/>
                         </p:column>
                        <p:column headerText="备注（说明是否DOA或者Short life）">
                             <h:outputText value="#{item.remark}"/>
@@ -657,7 +657,10 @@
                             <p:inputText value="#{item.partName}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </p:column>
                         <p:column headerText="配件数量">
-                            <h:outputText value="#{item.partQty}"/>
+                            <h:outputText value="#{item.prePartQty}"/>
+                        </p:column>
+                        <p:column headerText="实际配件数量">
+                            <p:spinner value="#{item.partQty}" min="0" max="#{item.prePartQty}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </p:column>
                         <p:column headerText="配件SN(序列号)">
                             <h:outputText value="#{item.serialNumber}"/>
