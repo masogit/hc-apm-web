@@ -265,6 +265,9 @@ public class V2_WorkOrder implements Serializable {
     private String closeStepOwnerName;
     @Column(name="close_Step_End_Time")
     private Date closeStepEndTime;
+
+    @Transient
+    private Integer orderCount;
     
     public Integer getDispatchMode() {
         return dispatchMode;
@@ -828,5 +831,13 @@ public class V2_WorkOrder implements Serializable {
 
     public void setStatusCloseTime(Date statusCloseTime) {
         this.statusCloseTime = statusCloseTime;
+    }
+
+    public Integer getOrderCount() {
+        return orderCount;
+    }
+
+    public void setOrderCount(Integer orderCount) {
+        this.orderCount = orderCount;
     }
 }
