@@ -130,7 +130,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
 
     private StreamedContent assetTemplateFile;
     private AssetLifecyleService assetLifecyleService;
-    private AssetTerminateHistoryRepository assetTerminateHistoryRepository;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -157,7 +156,6 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         uuaService = WebUtil.getBean(UaaService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         parentAssetService = WebUtil.getBean(AssetInfoParentAssetService.class);
-        assetTerminateHistoryRepository = WebUtil.getBean(AssetTerminateHistoryRepository.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap<>();
