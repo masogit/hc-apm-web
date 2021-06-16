@@ -60,7 +60,6 @@ public class AssetInfoDetailController {
     private AssetHistoryService assetHistoryService;
     private SysAuthGroupRepository sysAuthGroupDao;
     private UserAccountRepository userAccountRepository;
-    private AssetTerminateHistoryRepository assetTerminateHistoryRepository;
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
@@ -99,7 +98,6 @@ public class AssetInfoDetailController {
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
-        assetTerminateHistoryRepository = WebUtil.getBean(AssetTerminateHistoryRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
