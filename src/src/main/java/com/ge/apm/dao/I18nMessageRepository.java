@@ -67,4 +67,7 @@ public interface I18nMessageRepository extends GenericRepository<I18nMessage> {
      */
     @Query(value = "select * from I18n_Message i18n where msg_type=?1 and site_id = ?2",nativeQuery = true)
     List<I18nMessage> getByTypeAndSiteId(String msgType, Integer siteId);
+
+    @Query(value = "select value_zh from i18n_message where msg_key = ?1",nativeQuery = true)
+    String findValueZHByKey(String msgKey);
 }

@@ -42,11 +42,12 @@ public class MultiLevelApprovalConfig implements Serializable {
     @Column(name = "business_type")
     private String businessType;
 
+
     /**
-     * 资产类型
+     * 资产类型    备注 : todo ACCT 不需要资产分类字段,稳定后删除
      */
-    @Column(name = "asset_type")
-    private String assetType;
+//    @Column(name = "asset_type")
+//    private String assetType;
 
     /**
      * 是否委托oa审批
