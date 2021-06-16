@@ -66,7 +66,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private AutoCompleteService autoCompleteService;
     private OrgInfoTreeService orgInfoTreeService;
     private AssetHistoryService assetHistoryService;
-    private AssetTerminateHistoryRepository assetTerminateHistoryRepository;
     private MvsUtil mvsUtil;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private MedicalInstrumentsClassificationCompCtrl medicalInstrumentsClassificationCompCtrl;
@@ -205,8 +204,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
-        assetTerminateHistoryRepository = WebUtil.getBean(AssetTerminateHistoryRepository.class);
-
         medicalInstrumentsClassificationCompCtrl.registerController(this);
 
         String encodeStr = WebUtil.getRequestParameter("str");
