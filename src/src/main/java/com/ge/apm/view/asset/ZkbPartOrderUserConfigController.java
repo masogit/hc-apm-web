@@ -83,6 +83,20 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     }
 
     @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        super.prepareCreate();
+        backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+        if(selected != null){
+            for(ZkbPartOrderUserConfig c : backUpList){
+                if(selected.getId().equals(c.getId())){
+                    backUpList.remove(c);
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
     public void prepareEdit() {
         super.prepareEdit();
         backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
