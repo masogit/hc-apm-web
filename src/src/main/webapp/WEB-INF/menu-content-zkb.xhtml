@@ -171,6 +171,10 @@
                 <p:menuitem value="权重配置" outcome="/portal/zkb/keyHehaviorIndex/ConfigList.xhtml" rendered="#{userContextService.geAdmin}"/>
             </p:submenu>
 
+            <p:submenu label="统计" icon="fa fa-wrench" rendered="#{userContextService.geAdmin}">
+                <p:menuitem value="维修工单报表" outcome="/portal/zkb/report/List.xhtml" />
+            </p:submenu>
+
             <!--Super admin and GE OP only-->
             <p:submenu id="um4000" label="#{msg.APMPlatformManagement}" icon="settings" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp,SiteAdmin')}">
                 <p:menuitem id="um45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,GeOp') }"/>
