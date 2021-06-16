@@ -65,6 +65,14 @@ public class SimplePartsRequestLineItem implements Serializable {
     @Transient
     private Integer notTransactionQty;
 
+    // 归还入库数量
+    @Column(name = "return_qty")
+    private Integer returnQty;
+
+    // 未归还入库数量
+    @Transient
+    private Integer noReturnQty;
+
     /**
      * @author csh
      * @createTime 2020/6/11 11:26
