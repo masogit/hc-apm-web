@@ -1,0 +1,391 @@
+package com.ge.apm.view.approval;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.constant.SimplePartsConstant;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.UserContextService;
+import lombok.Getter;
+import lombok.Setter;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.TreeNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@ManagedBean
+@ViewScoped
+public class MultiLevelApprovalConfigController extends GenericCRUDUUIDController<MultiLevelApprovalConfig> {
+
+    private MultiLevelApprovalConfigRepository configDao;
+    private SysAuthGroupRepository sysAuthGroupDao;
+    private UserAccountRepository userAccountDao;
+    private SysAuthGroupRepository authGroupDao;
+    private SysAuthGroupRepository groupDao;
+    private UserRoleRepository userRoleDao;
+    private I18nMessageRepository i18nDao;
+    private OrgInfoRepository orgInfoDao;
+    private SysRoleRepository roleDao;
+    @Setter@Getter
+    private ApprovalNode approvalNode;
+    @Setter
+    private List<ApprovalNode> nodesList;
+    private List<UserAccount> approveUserList;
+    @Getter
+    private String operateType;
+    @Getter
+    private boolean configEnable = true;
+//    @Getter  // TODO ACCT 不需要资产分类字段, 测试后删除
+//    private boolean assetTypeEditable;
+    @Getter
+    private TreeNode orgTree;
+    @Getter
+    private OrgInfo selectedUserOrg;
+
+    @Override
+    protected void init() {
+        configDao = WebUtil.getBean(MultiLevelApprovalConfigRepository.class);
+        sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
+        userAccountDao = WebUtil.getBean(UserAccountRepository.class);
+        authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
+        groupDao = WebUtil.getBean(SysAuthGroupRepository.class);
+        userRoleDao = WebUtil.getBean(UserRoleRepository.class);
+        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
+        roleDao = WebUtil.getBean(SysRoleRepository.class);
+        orgTree= WebUtil.getBean(UaaService.class).buildOrgTree(UserContextService.getCurrentUserAccount().getTenantUID(), "", -1, -1);
+        buildApproveUserList();
+    }
+
+    //获取拥有审核权限的用户
+    public void buildApproveUserList() {
+        approveUserList = new ArrayList<>();
+        int roleId = roleDao.getIdByName(ApprovalConstant.MULTILEVEL_AUDITOR);
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        List<String> userIds = userRoleDao.findUserUidByRoleId(userAccount.getTenantUID(),roleId);
+        userIds.stream().forEach(uid -> {
+            approveUserList.add(userAccountDao.getByUid(uid));
+        });
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event){
+        TreeNode node = event.getTreeNode();
+        selectedUserOrg = (OrgInfo) node.getData();
+        approvalNode.setApproveUsers(null);
+    }
+
+    public List<I18nMessage> getBusinessTypeList(){
+        return i18nDao.findByMsgTypeOrderById(ApprovalConstant.BUSINESS_TYPE);
+    }
+
+//TODO ACCT 不需要资产分类字段, 测试后删除
+    //TODO 资产分类问题,环球和acct是否冲突 ,
+//    public List<SysAuthGroup> getSysAuthGroupList(){
+//        List<SysAuthGroup> sysAuthGroupList = new ArrayList<>();
+//        SysAuthGroup sysAuthGroup = new SysAuthGroup();
+//        sysAuthGroup.setEncoded(ApprovalConstant.ALL_GROUP);
+//        sysAuthGroup.setName(i18nDao.findValueZHByKey(ApprovalConstant.ALL_GROUP));
+//        sysAuthGroupList.add(sysAuthGroup);
+//        sysAuthGroupList.addAll(authGroupDao.getTopAuthGroup() != null ? authGroupDao.getTopAuthGroup() : new ArrayList<>());
+//        return sysAuthGroupList;
+//    }
+
+    public List<UserAccount> getUsers4Approval(){
+        if(selectedUserOrg != null){
+            return approveUserList.stream().filter(user -> user.getOrgInfoUID().equals(selectedUserOrg.getUid())).collect(Collectors.toList());
+        }
+        return this.approveUserList;
+    }
+
+    public void ifSelectbyOrg(){
+        selectedUserOrg = null;
+    }
+
+    @Override
+    protected Page<MultiLevelApprovalConfig> loadData(PageRequest pageRequest) {
+        setSearchFilters();
+        Page<MultiLevelApprovalConfig> bySearchFilter = configDao.findBySearchFilter(searchFilters, pageRequest);
+        return bySearchFilter;
+    }
+
+    public void setSearchFilters() {
+        if(null == searchFilters){
+            searchFilters = new ArrayList<>();
+        }
+        List<String> uids = orgInfoDao.getOrgInfosByParentId(UserContextService.getCurrentUserAccount().getSiteUID()).stream().map(org -> org.getUid()).collect(Collectors.toList());
+        searchFilters.add(new SearchFilter("orgUid", SearchFilter.Operator.IN, uids));
+    }
+
+    public void onSelectOrgForUser(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo selectedOrg = (OrgInfo) node.getData();
+        selected.setOrgUid(selectedOrg.getUid());
+    }
+
+    public void preEdit() {
+        operateType = ApprovalConstant.OPERATE_TYPE_EDIT;
+        setConfigEnable();
+        switchJsontoVo();
+    }
+
+    public void preCreate() {
+        operateType = ApprovalConstant.OPERATE_TYPE_CREATE;
+        configEnable = true;
+        try {
+            super.prepareCreate();
+            //默认启用
+            selected.setEnable(true);
+            //默认所有分组 , TODO ACCT 不需要资产分类字段, 测试后删除
+//            selected.setAssetType(ApprovalConstant.ALL_GROUP);
+            nodesList.clear();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    void switchJsontoVo() {
+        nodesList.clear();
+        String configration = selected.getConfigration();
+        if (null != configration) {
+            Map map = JSON.parseObject(configration, Map.class);
+            selected.setMinAmount((Integer) map.get("minAmount"));
+            selected.setMaxAmount((Integer) map.get("maxAmount"));
+        }
+        String approvalItem = selected.getApprovalItem();
+        if (null != approvalItem) {
+            List<ApprovalNode> approvalNodes = JSON.parseObject(approvalItem, new TypeReference<List<ApprovalNode>>(){
+            });
+            for (int i = 0; i < approvalNodes.size(); i++) {
+                ApprovalNode node = approvalNodes.get(i);
+                if (node.getUsingRole()) {
+                    List<Integer> roleUids = node.getRoleUids();
+                    List<SysRole> roles = new ArrayList();
+                    roleUids.stream().forEach(ruid -> {
+                        roles.add(roleDao.getById(Integer.valueOf(ruid)));
+                    });
+                    node.setApproveRoles(roles);
+                } else {
+                    List<String> userUids = node.getUserUids();
+                    List<UserAccount> users = new ArrayList();
+                    userUids.stream().forEach(useruid -> {
+                        users.add(userAccountDao.getByUid(useruid));
+                    });
+                    node.setApproveUsers(users);
+                }
+                node.setNodeId(i + 1);
+            }
+            nodesList.addAll(approvalNodes);
+        }
+    }
+
+    //保存审批节点
+    public void saveNode() {
+        if (null != approvalNode.getNodeId()) {
+            return;
+        }
+        ApprovalNode node = new ApprovalNode();
+        node.setId(UUID.randomUUID().toString().replace("-", ""));
+        node.setNodeId(nodesList.size());
+        node.setNodeName(approvalNode.getNodeName());
+        node.setUsingRole(approvalNode.getUsingRole());
+        if (approvalNode.getUsingRole()) {
+            node.setApproveRoles(approvalNode.getApproveRoles());
+        } else {
+            node.setApproveUsers(approvalNode.getApproveUsers());
+        }
+        nodesList.add(node);
+    }
+
+    //保存配置
+    public void save() {
+        List<ApprovalNode> collect = nodesList.stream().filter(item -> item.getId() != SimplePartsConstant.PARTS_LOCAL_ORG_ID).collect(Collectors.toList());
+        collect.stream().forEach(item -> {
+            if (item.getUsingRole()) {
+                item.setRoleUids(item.getApproveRoles().stream().map(a -> a.getId()).collect(Collectors.toList()));
+                item.setUserUids(null);
+            } else {
+                item.setUserUids(item.getApproveUsers().stream().map(a -> a.getUid()).collect(Collectors.toList()));
+                item.setRoleUids(null);
+            }
+        });
+        String nodes = JSON.toJSONString(collect);
+        selected.setApprovalItem(nodes);
+
+        Map<String, Object> map = new HashMap();
+        map.put("minAmount", selected.getMinAmount());
+        map.put("maxAmount", selected.getMaxAmount());
+        String configration = JSON.toJSONString(map);
+        selected.setConfigration(configration);
+        super.save();
+    }
+
+    //初始化审批节点
+    public List<ApprovalNode> getNodesList() {
+        ApprovalNode node = new ApprovalNode();
+        node.setId(SimplePartsConstant.PARTS_LOCAL_ORG_ID);
+        if (null == nodesList) {
+            nodesList = new ArrayList<>();
+        } else {
+            List<ApprovalNode> collect = nodesList.stream().filter(item -> item.getId() != SimplePartsConstant.PARTS_LOCAL_ORG_ID).collect(Collectors.toList());
+            nodesList = collect;
+        }
+        nodesList.add(node);
+        return nodesList;
+    }
+
+    public void onAddNode() {
+        approvalNode = new ApprovalNode();
+        selectedUserOrg = null;
+    }
+
+    public void onEditNode(int nodeId) {
+        for (ApprovalNode node : nodesList) {
+            if (null != node.getNodeId() && nodeId == node.getNodeId()) {
+                approvalNode = node;
+            }
+        }
+    }
+
+    public void delNode(int nodeId) {
+        List<ApprovalNode> collect = nodesList.stream().filter(node -> !SimplePartsConstant.PARTS_LOCAL_ORG_ID.equals(node.getId())).filter(node -> nodeId != node.getNodeId()).collect(Collectors.toList());
+        collect.stream().forEach(node -> {
+            if (node.getNodeId() > nodeId) {
+                node.setNodeId(node.getNodeId() - 1);
+            }
+        });
+        nodesList = collect;
+    }
+
+    public void onSelectBusiType() {
+        //    TODO ACCT 不需要资产分类字段, 测试后,稳定可删除
+//        if ((ApprovalConstant.APPROVAL_PARTS_STOCK + ApprovalConstant.APPROVAL_ASSET_INFO_MODIFY).contains(selected.getBusinessType())){
+//            selected.setAssetType(ApprovalConstant.ALL_GROUP);
+//        }
+//        if (null != selected.getAssetType()) {
+//            generateApprovalName();
+//        }
+//        setAssetTypeEditable();
+        setConfigEnable();
+    }
+
+    //配置信息是否展示
+    public void setConfigEnable(){
+        configEnable = "partsStock".contains(selected.getBusinessType());
+    }
+
+    //    TODO ACCT 不需要资产分类字段, 测试后,稳定可删除
+    //资产分类是否可编辑
+//    void setAssetTypeEditable(){
+//        assetTypeEditable =  "partsStock,assetBorrow,assetReceive,assetBorrowReturn,assetReceiveReturn,assetTransfer".contains(selected.getBusinessType());
+//    }
+
+    //    TODO ACCT 不需要资产分类字段, 测试后,稳定可删除
+    /*public void onSelectAssetType() {
+        if (null != selected.getBusinessType()) {
+            generateApprovalName();
+        }
+        updateApproveUserList();
+    }*/
+
+//    TODO ACCT 不需要资产分类字段, 测试后,稳定可删除
+    //TODO 资产分类问题,环球和acct是否冲突
+    //获取拥有审核权限 and 拥有对应资产分类访问权限的用户
+//    public void updateApproveUserList(){
+//        if(ApprovalConstant.ALL_GROUP.equals(selected.getAssetType())){
+//            buildApproveUserList();
+//        }else{
+//            approveUserList = new ArrayList<>();
+//            List<String> userUids = userRoleDao.findUserUidByRoleId(UserContextService.getCurrentUserAccount().getTenantUID(),
+//                                    roleDao.getIdByName(ApprovalConstant.MULTILEVEL_AUDITOR));
+//            List<String> childUids = sysAuthGroupDao.findChildUidsByTopGroup(selected.getAssetType());
+//            UserAuthGroupRepository userAuthGroupDao = WebUtil.getBean(UserAuthGroupRepository.class);
+//            List<String> relevantUserUids = userAuthGroupDao.getRelevantUserUids(childUids);
+//            userUids.retainAll(relevantUserUids);
+//            userUids.stream().forEach(uid -> {
+//                approveUserList.add(userAccountDao.getByUid(uid));
+//            });
+//        }
+//    }
+
+//    TODO ACCT 不需要资产分类字段, 测试后,稳定可删除
+    //TODO 资产分类问题,环球和acct是否冲突
+//    public void generateApprovalName() {
+//        if (ApprovalConstant.OPERATE_TYPE_CREATE.equals(operateType)) {
+//            selected.setApprovalName(i18nDao.findValueZHByKey(selected.getBusinessType()) +
+//                    (selected.getAssetType().equals(ApprovalConstant.ALL_GROUP) ? "" : "-" + groupDao.findByEncoded(selected.getAssetType()).getName()));
+//        }
+//    }
+
+    public void setToUsing(String uid) {
+        selected = configDao.findById(uid);
+        selected.setEnable(true);
+        super.save();
+    }
+
+    public void setNotUsing(String uid) {
+        selected = configDao.findById(uid);
+        selected.setEnable(false);
+        super.save();
+    }
+
+    public String getNameWithOrgName(UserAccount user) {
+        OrgInfo org = orgInfoDao.getByUid(user.getOrgInfoUID());
+        if(4 == org.getOrgType()){
+            return user.getName() + "-" + org.getParentOrg().getName() + "-" + org.getName();
+        }
+        return user.getName() + "-" + org.getName();
+    }
+
+    public String getOrgFullName(String orgUid) {
+        OrgInfo org = orgInfoDao.findByUid(orgUid);
+        if (null == org || org.getId() == -1) {
+            return null;
+        }
+        String name = org.getName();
+        while (org.getParentOrg() != null) {
+            org = org.getParentOrg();
+            name = org.getName() + "/" + name;
+        }
+        return name;
+    }
+
+    public String switchName(String msgKey) {
+        if (null != msgKey) {
+            return i18nDao.findValueZHByKey(msgKey);
+        }
+        return null;
+    }
+
+//    TODO ACCT 不需要资产分类字段, 测试后删除
+    //TODO 资产分类问题,环球和acct是否冲突
+//    public String switchGroupName(String encoded) {
+//        if (null != encoded && !"".equals(encoded)) {
+//            if (ApprovalConstant.ALL_GROUP.equals(encoded)) {
+//                return "所有分组";
+//            } else {
+//                return groupDao.findByEncoded(encoded).getName();
+//            }
+//        }
+//        return null;
+//    }
+
+    @Override
+    protected GenericRepositoryUUID<MultiLevelApprovalConfig> getDAO() {
+        return configDao;
+    }
+}

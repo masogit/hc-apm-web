@@ -182,10 +182,10 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     public boolean isDeleteCanOperate(){
         if(this.selected == null){
-            return true;
+            return false;
         }
         if(StringUtils.isEmpty(this.selected.getId())){
-            return true;
+            return false;
         }else{
             if(operateFlag){
                 return true;

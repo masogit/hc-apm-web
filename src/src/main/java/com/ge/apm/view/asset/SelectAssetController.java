@@ -296,6 +296,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         if(searchFilters.size()>0){
             searchFilters.clear();
         }
+        this.setOneSearchStr("");
     }
     
      public List<UserAccount> getOwnerList() {

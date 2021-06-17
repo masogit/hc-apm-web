@@ -204,7 +204,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
-
         medicalInstrumentsClassificationCompCtrl.registerController(this);
 
         String encodeStr = WebUtil.getRequestParameter("str");

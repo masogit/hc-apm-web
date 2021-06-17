@@ -65,6 +65,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private String currentScoreText;
     private boolean currentScoreFlag =false;
     private boolean probeQuotaFlag = false;
+    private List<HashMap<String, String>> highCatList = new ArrayList<>();
 
     @Override
     protected void init() {
@@ -203,6 +204,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         selected.setNewCatFlag(null);
     }
 
+    public void initHighList(String contractId){
+        highCatList = zkbPartOrderService.queryHighCatByContract(contractId,false);
+    }
+
     public void getQueryWorkFlowList(){
         if(StringUtils.isEmpty(orderType)){
             WebUtil.addErrorMessage("请输入订单类型","");
@@ -293,6 +298,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         return;
                     }
                 }
+                initHighList(zkbContract.getId());
             } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
                 if(!"2".equals(artificialType)){
                     if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
@@ -370,6 +376,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public String vacationRender(String isVacation){
+        if(StringUtils.isEmpty(isVacation)){
+            return "正常上班中";
+        }else if("f".equals(isVacation)){
+            return "正常上班中";
+        }else if("t".equals(isVacation)){
+            return "休假中";
+        }
+        return "";
+    }
+
     public void prepareItemCreate(){
         this.actionItemName = "Create";
         this.zkbPartOrderItem = new ZkbPartOrderItem();
@@ -405,9 +422,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             int i = this.selected.getZkbPartOrderItems().size();
             this.zkbPartOrderItem.setIndex(i);
+            this.zkbPartOrderItem.setPartQty(zkbPartOrderItem.getPrePartQty());
             this.selected.getZkbPartOrderItems().add(zkbPartOrderItem);
         }else{
             this.selected.getZkbPartOrderItems().set(this.zkbPartOrderItem.getIndex(),this.zkbPartOrderItem);
+            this.zkbPartOrderItem.setPartQty(zkbPartOrderItem.getPrePartQty());
         }
         this.zkbPartOrderItem = null;
         this.selected.setQty(calcOrderQty());
@@ -455,13 +474,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())){
                         Integer contractCount = zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial();
                         this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
-                        Integer contractCount = zkbContract.getProbeQuotaHigh() == null ? 0 : zkbContract.getProbeQuotaHigh();
-                        this.selected.setRemainQty(contractCount - 1);
                     }
                 }else{
-                    Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
-                    this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    if(StringUtils.isEmpty(selected.getHighCatFlag()) || CopyByInvok.F.equals(selected.getHighCatFlag())){
+                        Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
+                        this.selected.setRemainQty(contractCount - this.selected.getQty());
+                    }else{
+                        this.selected.setRemainQty(0);
+                    }
                 }
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
                 if(!"2".equals(selected.getArtificialType())) {
@@ -537,7 +557,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                flag=false;
+                //flag=false;
                 errorLog += "附件不能为空！";
             }
         }else{
@@ -613,14 +633,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         err += "探头特殊剩余名额只能选择特殊探头！";
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
-                    if(zkbContract.getProbeQuotaHigh() == null || zkbContract.getProbeQuotaHigh() <= 0){
+                    /*if(zkbContract.getProbeQuotaHigh() == null || zkbContract.getProbeQuotaHigh() <= 0){
                         f = true;
                         err = "合同探头高值剩余名额小于等于0，请检查！";
                     }
                     if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
                         f = true;
                         err += "探头高值剩余名额只能选择高值探头！";
-                    }
+                    }*/
                 }
             }else{
                 if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() < 0){
@@ -663,15 +683,30 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         selected.setDataFlag(0);
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-            this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
-            if(this.selected.getOnlineEngine() != null){
-                this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+            if((probeQuotaFlag && !ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())) ||
+                (!probeQuotaFlag && "f".equals(selected.getHighCatFlag()))){
+                this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
+                if(this.selected.getOnlineEngine() != null){
+                    if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
+                        ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
+                        this.selected.setOnlineEngine(backUp);
+                        this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
+                    }else{
+                        this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+                    }
+                }
             }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             this.selected.setArtificialType(artificialType);
         }else if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
             if(this.selected.getOnlineEngine() != null){
-                this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+                if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
+                    ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
+                    this.selected.setOnlineEngine(backUp);
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
+                }else{
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
+                }
             }
         }
         HashMap m = selectedWorkFlow;
@@ -711,24 +746,33 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void zkbPartOrderCatSelect(){
-        if(this.selected.getZkbPartOrderCat() != null){
-            if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                this.selected.setQty(1);
-                valueTypeTips = "";
-            }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                this.selected.setQty(0);
-                valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
-            }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                ZkbContract c = contractList.get(0);
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                if(zkbPartOrderService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(c.getStartDate()))< 0){
-                    this.selected.setQty(2);
-                }else{
+        if(probeQuotaFlag){
+            if(this.selected.getZkbPartOrderCat() != null){
+                if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
                     this.selected.setQty(1);
+                    valueTypeTips = "";
+                }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    this.selected.setQty(0);
+                    valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
+                }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                    ZkbContract c = contractList.get(0);
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    if(zkbPartOrderService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(c.getStartDate()))< 0){
+                        this.selected.setQty(2);
+                    }else{
+                        this.selected.setQty(1);
+                    }
+                    valueTypeTips = "";
                 }
-                valueTypeTips = "";
+            }
+        }else{
+            if(StringUtils.isEmpty(selected.getHighCatFlag()) || CopyByInvok.F.equals(selected.getHighCatFlag())){
+                this.selected.setQty(1);
+            }else{
+                this.selected.setQty(0);
             }
         }
+
         calcRemainQty();
     }
 
@@ -952,6 +996,16 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     public void setProbeQuotaFlag(boolean probeQuotaFlag) {
         this.probeQuotaFlag = probeQuotaFlag;
     }
+
+    public List<HashMap<String, String>> getHighCatList() {
+        return highCatList;
+    }
+
+    public void setHighCatList(List<HashMap<String, String>> highCatList) {
+        this.highCatList = highCatList;
+    }
+
+
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {

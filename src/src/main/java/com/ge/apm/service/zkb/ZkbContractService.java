@@ -57,6 +57,9 @@ public class ZkbContractService {
     @Autowired
     private ZkbPartOrderCatRepository zkbPartOrderCatRepository;
 
+    @Autowired
+    private ZkbContractQuotaLogService zkbContractQuotaLogService;
+
     public List<TenantInfo> getSourceTenantInfoList(){
 
         List<SearchFilter> searchFilters = new ArrayList<>();
@@ -489,15 +492,119 @@ public class ZkbContractService {
     /**
      * 保存合同
      */
+    @Transactional(rollbackFor = Exception.class)
     public ZkbContract saveContract(ZkbContract zkbContract,String actionName,String reason,UserAccount currentUser){
         zkbContract.setLastModifiedDate(new Date());
         zkbContract.setLastModifiedBy(currentUser.getLoginName());
-        zkbContract = contractRepository.save(zkbContract);
         if("Edit".equals(actionName)){
+            ZkbContract oldContract = contractRepository.findById(zkbContract.getId());
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractUpdate","","",reason,currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Spare.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),currentUser);
+            zkbContract = contractRepository.save(zkbContract);
+        }else {
+            zkbContract = contractRepository.save(zkbContract);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Spare.toString(),ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString(),ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbContract.class.getSimpleName(),currentUser);
         }
         return zkbContract;
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void quotaChange(ZkbContract zkbContract,ZkbContract oldContract,String orderType,UserAccount currentUser){
+        boolean f = false;
+        if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(orderType)){
+            if(oldContract.getSpareQuota() - zkbContract.getSpareQuota() != 0){
+                f = true;
+            }
+            if(oldContract.getSpareQuotaTotal() - zkbContract.getSpareQuotaTotal() != 0){
+                f = true;
+            }
+            if(oldContract.getSpareQuotaApply() - zkbContract.getSpareQuotaApply() != 0){
+                f = true;
+            }
+            if(oldContract.getSpareQuotaUse() - zkbContract.getSpareQuotaUse() != 0){
+                f = true;
+            }
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString().equals(orderType)){
+            if(oldContract.getProbeQuota() - zkbContract.getProbeQuota() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaTotal() - zkbContract.getProbeQuotaTotal() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaApply() - zkbContract.getProbeQuotaApply() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaUse() - zkbContract.getProbeQuotaUse() != 0){
+                f = true;
+            }
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString().equals(orderType)){
+            if(oldContract.getProbeQuotaNormal() - zkbContract.getProbeQuotaNormal() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaNormalTotal() - zkbContract.getProbeQuotaNormalTotal() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaNormalApply() - zkbContract.getProbeQuotaNormalApply() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaNormalUse() - zkbContract.getProbeQuotaNormalUse() != 0){
+                f = true;
+            }
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString().equals(orderType)){
+            if(oldContract.getProbeQuotaSpecial() - zkbContract.getProbeQuotaSpecial() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaSpecialTotal() - zkbContract.getProbeQuotaSpecialTotal() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaSpecialApply() - zkbContract.getProbeQuotaSpecialApply() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaSpecialUse() - zkbContract.getProbeQuotaSpecialUse() != 0){
+                f = true;
+            }
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString().equals(orderType)){
+            if(oldContract.getSpareArtificail() - zkbContract.getSpareArtificail() != 0){
+                f = true;
+            }
+            if(oldContract.getSpareArtificailTotal() - zkbContract.getSpareArtificailTotal() != 0){
+                f = true;
+            }
+            if(oldContract.getSpareArtificailApply() - zkbContract.getSpareArtificailApply() != 0){
+                f = true;
+            }
+            if(oldContract.getSpareArtificailUse() - zkbContract.getSpareArtificailUse() != 0){
+                f = true;
+            }
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(orderType)){
+            if(oldContract.getGeArtificialSupportTimes() - zkbContract.getGeArtificialSupportTimes() != 0){
+                f = true;
+            }
+            if(oldContract.getGeArtificialSupportTimesTotal() - zkbContract.getGeArtificialSupportTimesTotal() != 0){
+                f = true;
+            }
+            if(oldContract.getGeArtificialSupportTimesApply() - zkbContract.getGeArtificialSupportTimesApply() != 0){
+                f = true;
+            }
+            if(oldContract.getGeArtificialSupportTimesUse() - zkbContract.getGeArtificialSupportTimesUse() != 0){
+                f = true;
+            }
+        }
+        if(f){
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractUpdate",orderType,ZkbContract.class.getSimpleName(),currentUser);
+        }
+    }
+
 
     public void deleteContract(ZkbContract zkbContract,String reason,UserAccount currentUser){
         String courseData = "";
@@ -528,7 +635,7 @@ public class ZkbContractService {
     /**
      * 保存合同的课程，并且将合同课程加入列表中
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<ZkbContractCourse> saveContractCourse(ZkbContractCourse zkbContractCourse,List<ZkbContractCourse> contractCourseList,ZkbContract zkbContract,String actionDetailName,String reason,UserAccount currentUser){
         contractCourseList.forEach((item) -> {
             if(item.getId().equals(zkbContractCourse.getId())){
@@ -549,7 +656,7 @@ public class ZkbContractService {
     /**
      * 删除合同课程，并把列表中课程删除
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<ZkbContractCourse> delContractCourse(ZkbContractCourse zkbContractCourse,List<ZkbContractCourse> contractCourseList,ZkbContract zkbContract,UserAccount currentUser,String reason){
         contractCourseRepository.delete(zkbContractCourse);
         zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"courseDelete",zkbContractCourse.getZkbCourse().getCid(),"",reason,currentUser);

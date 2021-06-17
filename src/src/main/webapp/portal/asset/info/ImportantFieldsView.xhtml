@@ -54,6 +54,12 @@
         <h:outputText value="#{item.deviceStatus}" />
     </p:column>
 
+    <!-- 当前状态 -->
+    <p:column headerText="#{msg.status}" width="130"
+              rendered="#{currentCustomConfigController.showImportantField('status')}">
+        <h:outputText value="#{item.status}" />
+    </p:column>
+
     <!-- 采购日期 -->
     <p:column headerText="#{msg.purchaseDate}" width="130"
               rendered="#{currentCustomConfigController.showImportantField('purchaseDate')}">
