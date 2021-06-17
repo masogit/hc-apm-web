@@ -7,4 +7,6 @@ public interface CoilOpportunityImageRepository extends GenericRepository<CoilOp
 
     CoilOpportunityImage findByCataLog(String cataLog);
 
+    CoilOpportunityImage findBySort(Integer sort);
+
 }
