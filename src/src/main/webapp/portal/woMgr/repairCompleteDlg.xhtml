@@ -4,7 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:composition>
 
@@ -238,6 +239,13 @@
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.saveRepairWorkOrder()}" value="#{msg.save}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleValidFields(xhr, status, args);"/>
                         <p:commandButton validateClient="false" immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
+
+                        <c:if test="${not workOrderMgrController.hasConfigMultiLevelApproval}">
+                            <p:commandButton validateClient="false" immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check" />
+                        </c:if>
+                        <c:if test="${workOrderMgrController.hasConfigMultiLevelApproval}">
+                            <p:commandButton validateClient="true" immediate="false"  actionListener="#{workOrderMgrController.submitForApproval()}" value="#{msg.SubmitForApproval}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="PF('repairCompleteDialog').hide()"/>
+                        </c:if>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('repairCompleteDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
