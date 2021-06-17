@@ -1,6 +1,7 @@
 package com.ge.apm.domain.simpleparts;
 
 import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.constant.ApprovalConstant;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -189,9 +190,18 @@ public class SimplePartsRequest implements ApprovableTarget, Serializable {
         return requestCode;
     }
 
+    public BigDecimal getTotalPriceToBigDecimal() {
+        return totalPrice;
+    }
+
     @Override
     public String getBusinessNumber() {
         return getRequestCode();
+    }
+
+    @Override
+    public String getBusinessUid() {
+        return getId();
     }
 
     @Override
