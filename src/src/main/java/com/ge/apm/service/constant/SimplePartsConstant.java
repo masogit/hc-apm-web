@@ -115,8 +115,6 @@ public interface SimplePartsConstant {
     static final String OPERATE_TYPE_EDIT = "edit";
     static final String OPERATE_TYPE_VIEW = "view";
     static final String BUSINESS_TYPE = "businessType";
-    static final String ALL_GROUP = "allGroup";
-
 
     String VIRTUAL_LOCATOR_ID = "VIRTUAL_LOCATOR";
     String VIRTUAL_LOCATOR_NAME = "虚拟仓位";
