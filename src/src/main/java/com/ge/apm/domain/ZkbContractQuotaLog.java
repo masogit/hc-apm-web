@@ -18,7 +18,7 @@ public class ZkbContractQuotaLog implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum OpTypeEnum{
-        ContractAdd,ContractUpdate,ZkbPartOrderDeduct,ZkbPartOrderReturn
+        ContractAdd,ContractUpdate,ZkbPartOrderDeduct,ZkbPartOrderReturn,ZkbFePartOrderDeduct,ZkbFePartOrderReturn
     }
 
     public enum OrderTypeEnum{

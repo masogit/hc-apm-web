@@ -1,11 +1,9 @@
 package com.ge.apm.view.zkb.fePartOrder;
 
+import com.ge.apm.dao.ZkbContractCatRepository;
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbFePartOrderRepository;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.ZkbContract;
-import com.ge.apm.domain.ZkbFePartOrder;
-import com.ge.apm.domain.ZkbPartOrderCat;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
@@ -152,6 +150,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     private Boolean showZkbPoProbeQuotaType = false;
 
+    /**
+     * 是否显示高值探头按钮
+     */
+    private Boolean showZkbhighCatFlag = false;
+
 
     /**
      * 高值
@@ -173,6 +176,15 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     private final static String[] valueNormalAndSpecialValueType = new String[]{ZkbPartOrderCat.ValueType.NormalValue.toString(),ZkbPartOrderCat.ValueType.SpecialValue.toString()};
 
+    private List<HashMap<String, String>> highCatList = new ArrayList<>();
+
+    /**
+     * 价值类型提示
+     */
+    private String noHighCatTips = "";
+
+    private ZkbContractCatRepository zkbContractCatRepository;
+
     @Override
     protected void init() {
         super.init();
@@ -181,6 +193,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         blobService = WebUtil.getBean(BlobFileService.class);
         zkbFePartOrderRepository = WebUtil.getBean(ZkbFePartOrderRepository.class);
         zkbContractRepository = WebUtil.getBean(ZkbContractRepository.class);
+        zkbContractCatRepository = WebUtil.getBean(ZkbContractCatRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         this.loginName=currentUser.getLoginName();
         this.userName=currentUser.getName();
@@ -234,8 +247,12 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         if(item.getStartDate()!=null&&item.getStartDate().compareTo(contractStartDate)>=0)
         {
             this.showZkbPoProbeQuotaType=true;
-        }
+        }else
+            {
+                this.showZkbhighCatFlag=true;
+            }
         this.orderAnnotationChange();
+        initHighList(item.getId(),true);
     }
 
     /**
@@ -262,6 +279,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected = this.zkbFePartOrderService.selectedWorkFlow(this.selected,this.selectZkbFePartOrder);
         this.selected.setProductNumber(this.selectZkbFePartOrder.getFunctionType());
         this.showZkbPoProbeQuotaType=false;
+        this.showZkbhighCatFlag=false;
         this.selected.setZkbPoProbeQuotaType(null);
         if(CollectionUtils.isNotEmpty(this.contractList))
         {
@@ -271,11 +289,27 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             if(item.getStartDate()!=null&&item.getStartDate().compareTo(contractStartDate)>=0)
             {
                 this.showZkbPoProbeQuotaType=true;
-            }
+            }else
+                {
+                    this.showZkbhighCatFlag=true;
+                }
         }
         zkbPartOrderCatSelect();
+        initHighList(this.selectZkbFePartOrder.getContractId(),false);
+        if(CollectionUtils.isEmpty(highCatList))
+        {
+            noHighCatTips="无可用高值探头，请确认合同信息或联系客服";
+        }else
+            {
+                noHighCatTips="";
+            }
 
     }
+
+    public void initHighList(String contractId,boolean isAll){
+        highCatList = zkbPartOrderService.queryHighCatByContract(contractId,isAll);
+    }
+
     public boolean hasLetterViewRight()
     {
         return this.zkbFePartOrderService.hasLetterViewRight(configTypeMap);
@@ -307,21 +341,52 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     public String saveAndToListPage()
     {
-        calcRemainQty();
-        if(this.selected.getRemainQty()<0)
+        if(this.checkShowSN())
         {
-            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
-            return "";
-        }
-        this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
+            this.selected.setQty(0);
+            ZkbContractCat zkbContractCat = this.zkbContractCatRepository.findById(this.selected.getContractCatId());
+            if(!zkbContractCat.getEnabled())
+            {
+                WebUtil.addErrorMessage(WebUtil.getMessage("选中的SN编号探头不可用"));
+                return "";
+            }
+        }else
+            {
+                this.selected.setContractCatId(null);
+                this.selected.setHighCatFlag(null);
+                calcRemainQty();
+                if(this.selected.getRemainQty()<0)
+                {
+                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
+                    return "";
+                }
+                this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
+            }
         if(this.selected.getQty()>0)
         {
-            this.zkbFePartOrderService.moveProbe(1,this.contractList.get(0),this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType());
+            this.zkbFePartOrderService.moveProbe(1,this.contractList.get(0),this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected);
         }
         String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null, GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
+        if(this.checkShowSN())
+        {
+          this.zkbFePartOrderService.updateZkbContractCat(currentUser,false,this.selected.getContractCatId());
+        }
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
+    }
+
+    public Boolean checkShowSN()
+    {
+        if(this.showZkbPoProbeQuotaType&&"High".equals(this.selected.getZkbPoProbeQuotaType()))
+        {
+            return true;
+        }
+        if(this.showZkbhighCatFlag&&"t".equals(this.selected.getHighCatFlag()))
+        {
+            return true;
+        }
+            return false;
     }
 
 
@@ -351,7 +416,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(this.selected.getQty()>0)
         {
-            this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType());
+            this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected);
+        }
+        if(StringUtils.isNotBlank(this.selected.getContractCatId()))
+        {
+            this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
@@ -368,14 +437,14 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(this.selected.getQty()>0){
-            this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType());
+            this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected);
             if("t".equals(this.selected.getNewCatFlag()))
             {
                 zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
                 Date contractStartDate = this.zkbFePartOrderService.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
                 if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)==-1)
                 {
-                    this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType());
+                    this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected);
                     this.selected.setQty(this.getSelected().getQty()*2);
                 }
             }
@@ -391,7 +460,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     public String geAdminReturn()
     {
-        return this.zkbFePartOrderService.geAdminReturn(this.selected,showZkbPoProbeQuotaType,this.userUid,this.userName,this.tenantUID,this.queryStatus);
+        return this.zkbFePartOrderService.geAdminReturn(this.selected,showZkbPoProbeQuotaType,this.userUid,this.userName,this.tenantUID,this.queryStatus,this.currentUser);
     }
 
     public List<ZkbPartOrderCat> autoCompleteCat(String query){
@@ -442,7 +511,6 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             }
         }
     }
-
 
     public void calcRemainQty(){
         if(CollectionUtils.isEmpty(contractList))
@@ -605,5 +673,29 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     public void setShowZkbPoProbeQuotaType(Boolean showZkbPoProbeQuotaType) {
         this.showZkbPoProbeQuotaType = showZkbPoProbeQuotaType;
+    }
+
+    public Boolean getShowZkbhighCatFlag() {
+        return showZkbhighCatFlag;
+    }
+
+    public void setShowZkbhighCatFlag(Boolean showZkbhighCatFlag) {
+        this.showZkbhighCatFlag = showZkbhighCatFlag;
+    }
+
+    public List<HashMap<String, String>> getHighCatList() {
+        return highCatList;
+    }
+
+    public void setHighCatList(List<HashMap<String, String>> highCatList) {
+        this.highCatList = highCatList;
+    }
+
+    public String getNoHighCatTips() {
+        return noHighCatTips;
+    }
+
+    public void setNoHighCatTips(String noHighCatTips) {
+        this.noHighCatTips = noHighCatTips;
     }
 }
