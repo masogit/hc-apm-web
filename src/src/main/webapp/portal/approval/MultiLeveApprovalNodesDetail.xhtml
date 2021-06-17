@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <h:panelGroup>
+            <label class="label">审批节点记录</label>
+            <p:dataTable id="accessList" class="accessList" value="#{multiLevelApprovalController.multiLevelApprovals}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                <p:column headerText="审批单号">
+                    <h:outputText value="#{item.approvalNumber}"/>
+                </p:column>
+                <p:column headerText="业务单号">
+                    <h:outputText value="#{item.businessNumber}"/>
+                </p:column>
+                <p:column headerText="业务类型" >
+                    <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
+                </p:column>
+                <p:column headerText="实际审批人">
+                    <h:outputText value="#{item.actualApproverName}"/>
+                </p:column>
+                <p:column headerText="审批级别">
+                    <h:outputText value="#{item.approvalLevel}级审批人"/>
+                </p:column>
+                <p:column headerText="审批意见">
+                    <h:outputText value="#{item.approvalOpinion}"/>
+                </p:column>
+                <p:column headerText="审批状态">
+                    <h:outputText value="#{multiLevelApprovalGlobalController.getApprovalStatus(item.approvalStatus)}"/>
+                </p:column>
+                <p:column headerText="审批节点状态">
+                    <h:outputText value="#{multiLevelApprovalGlobalController.getApprovalNodeStatus(item.approvalNodeStatus)}"/>
+                </p:column>
+                <p:column headerText="审批时间"  >
+                    <h:outputText value="#{item.actualApproverDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+
+            </p:dataTable>
+        </h:panelGroup>
+
+    </ui:composition>
+</html>

@@ -70,6 +70,9 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
+                        <p:column headerText="UsBackUp" >
+                            <h:outputText  value="#{item.usBackUpName}" />
+                        </p:column>
                         <p:column headerText="备注" filterBy="#{item.remark}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.remark}"/>
                         </p:column>
@@ -95,7 +98,7 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{zkbPartOrderUserConfigController.prepareCreate}" update=":zkbPartOrderUserConfigEditForm" />
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray batch-terminated" title="#{msg.Edit}" actionListener="#{zkbPartOrderUserConfigController.prepareEdit}"  update=":zkbPartOrderUserConfigEditForm" disabled="#{empty zkbPartOrderUserConfigController.selected.id}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="#{msg.BatchDelete}" actionListener="#{zkbPartOrderUserConfigController.delete}" update=":zkbPartOrderUserConfigListForm :zkbPartOrderUserConfigEditForm :growl" disabled="#{empty zkbPartOrderUserConfigController.selected.id}">
+                            <p:commandButton id="deleteButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="删除" actionListener="#{zkbPartOrderUserConfigController.delete}" update=":zkbPartOrderUserConfigListForm :zkbPartOrderUserConfigEditForm :growl" disabled="#{empty zkbPartOrderUserConfigController.selected.id}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.IsConfirmDeleRecord}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </f:facet>

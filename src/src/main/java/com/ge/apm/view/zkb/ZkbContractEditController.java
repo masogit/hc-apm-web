@@ -357,7 +357,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
                     flag=false;
                     break;
                 }else if("Edit".equals(actionCatName)){
-                    if(zkbContractCatSelected.getId().equals(c.getId())){
+                    if(!zkbContractCatSelected.getId().equals(c.getId())){
                         flag=false;
                         break;
                     }
