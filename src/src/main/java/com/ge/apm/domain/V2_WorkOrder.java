@@ -92,6 +92,7 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name = "total_price")
     private Double totalPrice;
 
+    //1：流程中；2：已完成；3：已取消 (生命周期状态 :具体流程需查看步骤表)
     @Column(name = "status")
     private Integer status;
 
@@ -271,7 +272,7 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Transient
     private Integer orderCount;
-    
+
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
         return totalPrice == null ? null : new BigDecimal(totalPrice);

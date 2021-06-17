@@ -12,11 +12,13 @@ import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
+import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -228,13 +230,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String reportUid; //selected table base uid
     private Map<String, Object> selectedObjectMap = new HashMap();
     private PmReportService pmReportService;
+    private MultiLevelApprovalService multiLevelApprovalService;
 
     private String queryAssetUid;
     private ConfigService configService;
 
     private String plannedCompletionTimeFormat = null;
     private String actualCompletionTimeFormat = null;
-
+    @Setter@Getter
+    private boolean hasConfigMultiLevelApproval = false;
     //备注
     @Getter @Setter
     private String remarks;
@@ -1390,6 +1394,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         this.selectedMap = new HashMap();
         pmReportService = WebUtil.getBean(PmReportService.class);
+        multiLevelApprovalService= WebUtil.getBean(MultiLevelApprovalService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
@@ -1941,9 +1946,29 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
+    // 走多级审批流,提交审核
+    public void submitForApproval() throws Exception {
+        if(selectedPmOrder ==null){
+            return;
+        }
+        MultiLevelApproval approval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmit(selectedPmOrder, null, false);
+        if (approval == null) {
+            WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
+            return ;
+        }
+        selectedPmOrder.setApprovalStatus(ApprovalConstant.PM_APPROVAL_STATUS_AGREE);
+        dao.save(selectedPmOrder);
+    }
+
     public void prepareCompleteOrder(String woid) throws Exception {
         accessoryList = getWorkOrderDetail(woid);
         selectedPmOrder = dao.findById(woid);
+        MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedPmOrder);
+        hasConfigMultiLevelApproval = false;
+        if (approval != null) {
+            logger.info("多级审核已激活");
+            hasConfigMultiLevelApproval = true;
+        }
         if (selectedPmOrder.getManHours() == null) {
             selectedPmOrder.setManHours(0.1);
         }

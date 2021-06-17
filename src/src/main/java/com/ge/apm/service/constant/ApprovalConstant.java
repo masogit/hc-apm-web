@@ -134,11 +134,6 @@ public interface ApprovalConstant {
     String OPERATE_TYPE_EDIT = "edit";
     String  OPERATE_TYPE_VIEW = "view";
 
-    int STATE_APPROVAL = 20; //待审核
-    int STATE_APPROVAL_FAIL = 21; //审核不通过
-    String STATE_APPROVAL_STR = "待审核"; //待审核
-    String STATE_APPROVAL_FAIL_STR = "审核不通过"; //审核不通过
-
     public static final String APPROVAL_SEPARATOR = ",";
 
     Integer WO_APPROVAL_STATUS_AGREE = 1;//维修多级审批状态
