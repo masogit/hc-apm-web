@@ -238,10 +238,8 @@
                     <h:panelGroup>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.saveRepairWorkOrder()}" value="#{msg.save}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleValidFields(xhr, status, args);"/>
-                        <p:commandButton validateClient="false" immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
-
                         <c:if test="${not workOrderMgrController.hasConfigMultiLevelApproval}">
-                            <p:commandButton validateClient="false" immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check" />
+                            <p:commandButton validateClient="false" immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check"  rendered="#{!userContextService.hasCurrentTenantName('')}"/>
                         </c:if>
                         <c:if test="${workOrderMgrController.hasConfigMultiLevelApproval}">
                             <p:commandButton validateClient="true" immediate="false"  actionListener="#{workOrderMgrController.submitForApproval()}" value="#{msg.SubmitForApproval}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="PF('repairCompleteDialog').hide()"/>
