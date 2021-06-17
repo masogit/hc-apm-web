@@ -499,26 +499,29 @@ public class ZkbContractService {
         if("Edit".equals(actionName)){
             ZkbContract oldContract = contractRepository.findById(zkbContract.getId());
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractUpdate","","",reason,currentUser);
-            quotaChange(zkbContract,oldContract,"Spare",currentUser);
-            quotaChange(zkbContract,oldContract,"ProbeAny",currentUser);
-            quotaChange(zkbContract,oldContract,"Artificial",currentUser);
-            quotaChange(zkbContract,oldContract,"SpareArtificial",currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Spare.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),currentUser);
+            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),currentUser);
             zkbContract = contractRepository.save(zkbContract);
         }else {
             zkbContract = contractRepository.save(zkbContract);
-            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd","Spare",ZkbContract.class.getSimpleName(),currentUser);
-            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd","Probe",ZkbContract.class.getSimpleName(),currentUser);
-            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd","Artificial",ZkbContract.class.getSimpleName(),currentUser);
-            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd","SpareArtificail",ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Spare.toString(),ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString(),ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),ZkbContract.class.getSimpleName(),currentUser);
+            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbContract.class.getSimpleName(),currentUser);
         }
         return zkbContract;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void quotaChange(ZkbContract zkbContract,ZkbContract oldContract,String orderType,UserAccount currentUser){
-
         boolean f = false;
-        if("Spare".equals(orderType)){
+        if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(orderType)){
             if(oldContract.getSpareQuota() - zkbContract.getSpareQuota() != 0){
                 f = true;
             }
@@ -531,7 +534,7 @@ public class ZkbContractService {
             if(oldContract.getSpareQuotaUse() - zkbContract.getSpareQuotaUse() != 0){
                 f = true;
             }
-        }else if("Probe".equals(orderType)){
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString().equals(orderType)){
             if(oldContract.getProbeQuota() - zkbContract.getProbeQuota() != 0){
                 f = true;
             }
@@ -544,7 +547,33 @@ public class ZkbContractService {
             if(oldContract.getProbeQuotaUse() - zkbContract.getProbeQuotaUse() != 0){
                 f = true;
             }
-        }else if("Artificial".equals(orderType)){
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString().equals(orderType)){
+            if(oldContract.getProbeQuotaNormal() - zkbContract.getProbeQuotaNormal() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaNormalTotal() - zkbContract.getProbeQuotaNormalTotal() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaNormalApply() - zkbContract.getProbeQuotaNormalApply() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaNormalUse() - zkbContract.getProbeQuotaNormalUse() != 0){
+                f = true;
+            }
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString().equals(orderType)){
+            if(oldContract.getProbeQuotaSpecial() - zkbContract.getProbeQuotaSpecial() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaSpecialTotal() - zkbContract.getProbeQuotaSpecialTotal() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaSpecialApply() - zkbContract.getProbeQuotaSpecialApply() != 0){
+                f = true;
+            }
+            if(oldContract.getProbeQuotaSpecialUse() - zkbContract.getProbeQuotaSpecialUse() != 0){
+                f = true;
+            }
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString().equals(orderType)){
             if(oldContract.getSpareArtificail() - zkbContract.getSpareArtificail() != 0){
                 f = true;
             }
@@ -557,7 +586,7 @@ public class ZkbContractService {
             if(oldContract.getSpareArtificailUse() - zkbContract.getSpareArtificailUse() != 0){
                 f = true;
             }
-        }else if("SpareArtificail".equals(orderType)){
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(orderType)){
             if(oldContract.getGeArtificialSupportTimes() - zkbContract.getGeArtificialSupportTimes() != 0){
                 f = true;
             }

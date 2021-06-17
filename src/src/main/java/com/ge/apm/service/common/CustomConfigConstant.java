@@ -255,11 +255,11 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsImportantFieldsAll() {
         return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
-                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType");
+                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType","status");
     }
 
     public static List<String> getTemplateEnableList() {
-        return Arrays.asList("GEIBTableExcel", "AssetInfoImportExcel", "DealerFEAndSalesExcel", "ZKBDealerFEAndSalesExcel");
+        return Arrays.asList("GEIBTableExcel", "AssetInfoImportExcel");
     }
     public static List<String> ninthHospitalNineAuthority() {
         return Arrays.asList("AssetHead","ITAdmin","DataMaintainStaff","AssetStaff","HospitalHead","DeptHead","GEInternalStaff");

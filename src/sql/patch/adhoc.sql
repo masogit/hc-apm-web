@@ -41,11 +41,8 @@ where not exists (select 1 from user_subscription_push where menu_type=12 and ro
 UPDATE sys_role SET authorities = ( CASE WHEN authorities IS NULL THEN 'repair.adverseEvents' WHEN authorities LIKE '%repair.adverseEvents%' THEN authorities ELSE authorities || ',repair.adverseEvents' END ), menus = ( CASE WHEN menus IS NULL THEN 'repair.adverseEvents' WHEN menus LIKE '%repair.adverseEvents%' THEN menus ELSE menus || ',repair.adverseEvents' END ), authorities_ch = ( CASE WHEN authorities_ch IS NULL THEN '不良事件' WHEN authorities_ch LIKE '%不良事件%' THEN authorities_ch ELSE authorities_ch || ',不良事件' END ) WHERE role_desc = '工程师' OR role_desc = '医学工程处主任';
 -- end
 
-
---apm-schedual新增模板導入 zkb代理商fe/sales     start 0610
-delete from i18n_message where msg_key = 'ZKBDealerFEAndSalesExcel';
-delete from role_msg_rel where msg_key = 'ZKBDealerFEAndSalesExcel';
-insert into i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) values ('batchFileType','ZKBDealerFEAndSalesExcel','ZKB代理商FE/Sales列表','ZKB Dealer FE and Sales List',NULL,-1);
-insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','ZKBDealerFEAndSalesExcel',(select id from sys_role where name = 'GEInternalStaff'),'GEInternalStaff',0);
---apm-schedual新增模板導入 zkb代理商fe/sales     end   0610
+-- 2021-06-17  新增多级审批模块,多级审批审核人角色 start
+INSERT INTO sys_role ( "name", "role_desc", "role_desc_en")  select 'MultiLevelAuditor', '多级审批审核人',  'Multi-level approval reviewer'
+where not exists (select 1 from sys_role where name='MultiLevelAuditor');
+-- end
 

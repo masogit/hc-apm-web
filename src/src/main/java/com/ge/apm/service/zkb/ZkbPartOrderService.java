@@ -950,6 +950,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }
         boolean flag = true;
         for(ZkbPartOrderItem zkbPartOrderItem : zkbPartOrder.getZkbPartOrderItems()){
+            if(zkbPartOrderItem.getPartQty() == 0){
+                continue;
+            }
             Integer returnQty = returnMap.get(zkbPartOrderItem.getPartNo());
             if(returnQty == null){
                 flag = false;
