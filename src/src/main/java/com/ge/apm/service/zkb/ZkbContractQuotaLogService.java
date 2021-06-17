@@ -88,26 +88,36 @@ public class ZkbContractQuotaLogService {
         l.setOpType(opType);
         l.setOrderType(orderType);
         l.setBusinessType(businessType);
-        if("Spare".equals(orderType)){
+        if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(orderType)){
             l.setQuota(zkbContract.getSpareQuota());
             l.setQuotaApply(zkbContract.getSpareQuotaApply());
             l.setQuotaTotal(zkbContract.getSpareQuotaTotal());
             l.setQuotaUse(zkbContract.getSpareQuotaUse());
-        }else if("Probe".equals(orderType)){
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString().equals(orderType)){
             l.setQuota(zkbContract.getProbeQuota());
             l.setQuotaApply(zkbContract.getProbeQuotaApply());
             l.setQuotaTotal(zkbContract.getProbeQuotaTotal());
             l.setQuotaUse(zkbContract.getProbeQuotaUse());
-        }else if("Artificial".equals(orderType)){
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(orderType)){
             l.setQuota(zkbContract.getGeArtificialSupportTimes());
             l.setQuotaApply(zkbContract.getGeArtificialSupportTimesApply());
             l.setQuotaTotal(zkbContract.getGeArtificialSupportTimesTotal());
             l.setQuotaUse(zkbContract.getGeArtificialSupportTimesUse());
-        }else if("SpareArtificail".equals(orderType)){
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString().equals(orderType)){
             l.setQuota(zkbContract.getSpareArtificail());
             l.setQuotaApply(zkbContract.getSpareArtificailApply());
             l.setQuotaTotal(zkbContract.getSpareArtificailTotal());
             l.setQuotaUse(zkbContract.getSpareArtificailUse());
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString().equals(orderType)){
+            l.setQuota(zkbContract.getProbeQuotaNormal());
+            l.setQuotaApply(zkbContract.getProbeQuotaNormalApply());
+            l.setQuotaTotal(zkbContract.getProbeQuotaNormalTotal());
+            l.setQuotaUse(zkbContract.getProbeQuotaNormalUse());
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString().equals(orderType)){
+            l.setQuota(zkbContract.getProbeQuotaSpecial());
+            l.setQuotaApply(zkbContract.getProbeQuotaSpecialApply());
+            l.setQuotaTotal(zkbContract.getProbeQuotaSpecialTotal());
+            l.setQuotaUse(zkbContract.getProbeQuotaSpecialUse());
         }
         zkbContractQuotaLogRepository.save(l);
     }

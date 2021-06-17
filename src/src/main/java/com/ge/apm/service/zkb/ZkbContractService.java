@@ -522,87 +522,91 @@ public class ZkbContractService {
     public void quotaChange(ZkbContract zkbContract,ZkbContract oldContract,String orderType,UserAccount currentUser){
         boolean f = false;
         if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(orderType)){
-            if(oldContract.getSpareQuota() - zkbContract.getSpareQuota() != 0){
+            if(nullToZero(oldContract.getSpareQuota()) - nullToZero(zkbContract.getSpareQuota()) != 0){
                 f = true;
             }
-            if(oldContract.getSpareQuotaTotal() - zkbContract.getSpareQuotaTotal() != 0){
+            if(nullToZero(oldContract.getSpareQuotaTotal()) - nullToZero(zkbContract.getSpareQuotaTotal()) != 0){
                 f = true;
             }
-            if(oldContract.getSpareQuotaApply() - zkbContract.getSpareQuotaApply() != 0){
+            if(nullToZero(oldContract.getSpareQuotaApply()) - nullToZero(zkbContract.getSpareQuotaApply()) != 0){
                 f = true;
             }
-            if(oldContract.getSpareQuotaUse() - zkbContract.getSpareQuotaUse() != 0){
+            if(nullToZero(oldContract.getSpareQuotaUse()) - nullToZero(zkbContract.getSpareQuotaUse()) != 0){
                 f = true;
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString().equals(orderType)){
-            if(oldContract.getProbeQuota() - zkbContract.getProbeQuota() != 0){
+            if(nullToZero(oldContract.getProbeQuota()) - nullToZero(zkbContract.getProbeQuota()) != 0){
                 f = true;
             }
-            if(oldContract.getProbeQuotaTotal() - zkbContract.getProbeQuotaTotal() != 0){
+            if(nullToZero(oldContract.getProbeQuotaTotal()) - nullToZero(zkbContract.getProbeQuotaTotal()) != 0){
                 f = true;
             }
-            if(oldContract.getProbeQuotaApply() - zkbContract.getProbeQuotaApply() != 0){
+            if(nullToZero(oldContract.getProbeQuotaApply()) - nullToZero(zkbContract.getProbeQuotaApply()) != 0){
                 f = true;
             }
-            if(oldContract.getProbeQuotaUse() - zkbContract.getProbeQuotaUse() != 0){
+            if(nullToZero(oldContract.getProbeQuotaUse()) - nullToZero(zkbContract.getProbeQuotaUse()) != 0){
                 f = true;
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString().equals(orderType)){
-            if(oldContract.getProbeQuotaNormal() - zkbContract.getProbeQuotaNormal() != 0){
+            if(nullToZero(oldContract.getProbeQuotaNormal()) - nullToZero(zkbContract.getProbeQuotaNormal()) != 0){
                 f = true;
             }
-            if(oldContract.getProbeQuotaNormalTotal() - zkbContract.getProbeQuotaNormalTotal() != 0){
+            if(nullToZero(oldContract.getProbeQuotaNormalTotal()) - nullToZero(zkbContract.getProbeQuotaNormalTotal()) != 0){
                 f = true;
             }
-            if(oldContract.getProbeQuotaNormalApply() - zkbContract.getProbeQuotaNormalApply() != 0){
+            if(nullToZero(oldContract.getProbeQuotaNormalApply()) - nullToZero(zkbContract.getProbeQuotaNormalApply()) != 0){
                 f = true;
             }
-            if(oldContract.getProbeQuotaNormalUse() - zkbContract.getProbeQuotaNormalUse() != 0){
+            if(nullToZero(oldContract.getProbeQuotaNormalUse()) - nullToZero(zkbContract.getProbeQuotaNormalUse()) != 0){
                 f = true;
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString().equals(orderType)){
-            if(oldContract.getProbeQuotaSpecial() - zkbContract.getProbeQuotaSpecial() != 0){
+            if(nullToZero(oldContract.getProbeQuotaSpecial()) - nullToZero(zkbContract.getProbeQuotaSpecial()) != 0){
                 f = true;
             }
-            if(oldContract.getProbeQuotaSpecialTotal() - zkbContract.getProbeQuotaSpecialTotal() != 0){
+            if(nullToZero(oldContract.getProbeQuotaSpecialTotal()) - nullToZero(zkbContract.getProbeQuotaSpecialTotal()) != 0){
                 f = true;
             }
-            if(oldContract.getProbeQuotaSpecialApply() - zkbContract.getProbeQuotaSpecialApply() != 0){
+            if(nullToZero(oldContract.getProbeQuotaSpecialApply()) - nullToZero(zkbContract.getProbeQuotaSpecialApply()) != 0){
                 f = true;
             }
-            if(oldContract.getProbeQuotaSpecialUse() - zkbContract.getProbeQuotaSpecialUse() != 0){
+            if(nullToZero(oldContract.getProbeQuotaSpecialUse()) - nullToZero(zkbContract.getProbeQuotaSpecialUse()) != 0){
                 f = true;
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString().equals(orderType)){
-            if(oldContract.getSpareArtificail() - zkbContract.getSpareArtificail() != 0){
+            if(nullToZero(oldContract.getSpareArtificail()) - nullToZero(zkbContract.getSpareArtificail()) != 0){
                 f = true;
             }
-            if(oldContract.getSpareArtificailTotal() - zkbContract.getSpareArtificailTotal() != 0){
+            if(nullToZero(oldContract.getSpareArtificailTotal()) - nullToZero(zkbContract.getSpareArtificailTotal()) != 0){
                 f = true;
             }
-            if(oldContract.getSpareArtificailApply() - zkbContract.getSpareArtificailApply() != 0){
+            if(nullToZero(oldContract.getSpareArtificailApply()) - nullToZero(zkbContract.getSpareArtificailApply()) != 0){
                 f = true;
             }
-            if(oldContract.getSpareArtificailUse() - zkbContract.getSpareArtificailUse() != 0){
+            if(nullToZero(oldContract.getSpareArtificailUse()) - nullToZero(zkbContract.getSpareArtificailUse()) != 0){
                 f = true;
             }
         }else if(ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString().equals(orderType)){
-            if(oldContract.getGeArtificialSupportTimes() - zkbContract.getGeArtificialSupportTimes() != 0){
+            if(nullToZero(oldContract.getGeArtificialSupportTimes()) - nullToZero(zkbContract.getGeArtificialSupportTimes()) != 0){
                 f = true;
             }
-            if(oldContract.getGeArtificialSupportTimesTotal() - zkbContract.getGeArtificialSupportTimesTotal() != 0){
+            if(nullToZero(oldContract.getGeArtificialSupportTimesTotal()) - nullToZero(zkbContract.getGeArtificialSupportTimesTotal()) != 0){
                 f = true;
             }
-            if(oldContract.getGeArtificialSupportTimesApply() - zkbContract.getGeArtificialSupportTimesApply() != 0){
+            if(nullToZero(oldContract.getGeArtificialSupportTimesApply()) - nullToZero(zkbContract.getGeArtificialSupportTimesApply()) != 0){
                 f = true;
             }
-            if(oldContract.getGeArtificialSupportTimesUse() - zkbContract.getGeArtificialSupportTimesUse() != 0){
+            if(nullToZero(oldContract.getGeArtificialSupportTimesUse()) - nullToZero(zkbContract.getGeArtificialSupportTimesUse()) != 0){
                 f = true;
             }
         }
         if(f){
             zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractUpdate",orderType,ZkbContract.class.getSimpleName(),currentUser);
         }
+    }
+
+    public Integer nullToZero(Integer va){
+        return va == null ? 0 : va;
     }
 
 
