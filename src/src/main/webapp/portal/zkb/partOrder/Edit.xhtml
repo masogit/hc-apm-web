@@ -402,7 +402,7 @@
                             <h:panelGroup  style="text-align: left">
                                 <c:if test="#{zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.probeQuotaType eq 'High'}">
                                     <label class="label">SN编号*</label>
-                                    <p:selectOneMenu value="#{zkbPartOrderEditController.selected.contractCatId}" required="true" requiredMessage="高值探头 #{msg.ValidationRequire}" >
+                                    <p:selectOneMenu value="#{zkbPartOrderEditController.selected.contractCatId}" required="true" requiredMessage="无可用高值探头，请确认合同信息或联系客服" >
                                         <p:ajax event="itemSelect" update="qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItems value="#{zkbPartOrderEditController.highCatList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -417,7 +417,7 @@
                                 </c:if>
                                 <c:if test="#{!zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.highCatFlag eq 't'}">
                                     <label class="label">SN编号*</label>
-                                    <p:selectOneMenu value="#{zkbPartOrderEditController.selected.contractCatId}" required="true" requiredMessage="高值探头 #{msg.ValidationRequire}" >
+                                    <p:selectOneMenu value="#{zkbPartOrderEditController.selected.contractCatId}" required="true" requiredMessage="无可用高值探头，请确认合同信息或联系客服" >
                                         <p:ajax event="itemSelect" update="qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItems value="#{zkbPartOrderEditController.highCatList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>

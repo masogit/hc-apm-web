@@ -76,6 +76,7 @@ public class ZkbIbCrossService {
                     if(userHashMap.containsKey(u.getLoginName())){
                         continue;
                     }
+                    u.setLoginName("ZKB."+u.getLoginName());
                     u.setUserId(Integer.parseInt(u.getId()));
                     u.setId(null);
                     userHashMap.put(u.getLoginName(),u);
