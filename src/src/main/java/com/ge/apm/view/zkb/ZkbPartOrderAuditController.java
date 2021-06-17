@@ -659,6 +659,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         flag = false;
                         errorLog += "Order#不能为空,";
                     }
+                    if(zkbPartOrderItem.getPrePartQty() > zkbPartOrderItem.getPartQty()){
+                        if(StringUtils.isNotEmpty(zkbPartOrderItem.getRemark())){
+                            flag = false;
+                            errorLog += "实际配件数量修改后备注不能为空,";
+                        }
+                    }
                     ZkbPartOrderItem oldItem = zkbPartOrderService.getZkbPartOrderItemRepository().findById(zkbPartOrderItem.getId());
                     if(oldItem != null){
                         if(!oldItem.getPartNo().equals(zkbPartOrderItem.getPartNo()) || !oldItem.getPartName().equals(zkbPartOrderItem.getPartName())){

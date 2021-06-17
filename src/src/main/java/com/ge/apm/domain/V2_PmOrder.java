@@ -3,6 +3,7 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +28,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.constant.ApprovalConstant;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.LazyCollection;
@@ -42,7 +45,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Data
 @Table(name = "v2_pm_order")
-public class V2_PmOrder  implements Serializable {
+public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -214,6 +217,26 @@ public class V2_PmOrder  implements Serializable {
     @JsonIgnore
     private String strFinishTime;
 
+    @Override
+    public BigDecimal getTotalPriceToBigDecimal() {
+        return totalPrice == null ? null : new BigDecimal(totalPrice);
+    }
+
+    @Override
+    public String getBusinessNumber() {
+        return getPmNum();
+    }
+
+    @Override
+    public String getBusinessUid() {
+        return getId();
+    }
+
+    @Override
+    public int getBusinessType() {
+        return  ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT;
+    }
+
     public V2_PmOrder() {
     }
 
@@ -361,7 +384,7 @@ public class V2_PmOrder  implements Serializable {
         return totalPrice;
     }
 
-    public void setTotalPrice(Double totalPrice) {
+    public void setTotalPrice(Double  totalPrice) {
         this.totalPrice = totalPrice;
     }
 
