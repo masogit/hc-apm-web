@@ -20,6 +20,7 @@ import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
+import com.ge.apm.service.wo.WorkOrderPublishRenderService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
@@ -41,6 +42,7 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 public class PmReportService {
+    static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(PmReportService.class);
 
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String SIGNATURE_HOLDER = "审核人签名：";
@@ -258,10 +260,24 @@ public class PmReportService {
             }
         }
 
+        logger.info("---------------wcSignature : "+wcSignature);
+        logger.info("---------------ackSignature : "+ackSignature);
+        logger.info("---------------content : "+content.toString());
+
         if (!content.containsKey(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString())) {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
             content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+        }
+        if (!content.containsKey(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString())) {
+            byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
+            content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.toString(), EMPTY_SIGNATURE_HOLDER);
+            content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+        }
+        if (!content.containsKey(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString())) {
+            byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
+            content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE_TITLE.toString(), EMPTY_SIGNATURE_HOLDER);
+            content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
         }
 
         // Maintenance Workflow Information
