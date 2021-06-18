@@ -39,5 +39,7 @@ public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbCon
     @Query(value = "SELECT zca.* from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id where zkbc.tenant_uid = ?1 and NOT ((zkbc.end_date < ?2) OR (zkbc.start_date > ?3))", nativeQuery = true)
     List<ZkbContractAsset> findZkbContractAssetByTenantUID(String tenantUID,Date firstDate,Date kpiDate);
 
+    @Query(value = "SELECT zca.* from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id where zkbc.tenant_uid = ?1 and zkbc.start_date<=?2 and zkbc.end_date>=?2", nativeQuery = true)
+    List<ZkbContractAsset> findZkbContractAssetByTenantUID(String tenantUID, Date kpiDate);
 
 }

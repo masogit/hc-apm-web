@@ -463,6 +463,12 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "cat_num")
     private Integer catNum;
 
+    @Column(name = "contract_cat_id")
+    private String contractCatId;
+
+    @Column(name = "contract_sn_no")
+    private String contractSnNo;
+
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false, name = "cat_id", referencedColumnName = "id")
     private ZkbPartOrderCat zkbPartOrderCat;
@@ -527,6 +533,9 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "score_flag")
     private String scoreFlag = "f";
 
+    @Column(name = "high_cat_flag")
+    private String highCatFlag;
+
     /**
      * asset_info systemid
      */
@@ -535,6 +544,44 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "probe_quota_type")
     private String probeQuotaType;
+
+    /**
+     * t f
+     */
+    @Column(name = "modify_flag")
+    private String modifyFlag;
+
+    public String getModifyFlag() {
+        return modifyFlag;
+    }
+
+    public void setModifyFlag(String modifyFlag) {
+        this.modifyFlag = modifyFlag;
+    }
+
+    public String getContractCatId() {
+        return contractCatId;
+    }
+
+    public void setContractCatId(String contractCatId) {
+        this.contractCatId = contractCatId;
+    }
+
+    public String getContractSnNo() {
+        return contractSnNo;
+    }
+
+    public void setContractSnNo(String contractSnNo) {
+        this.contractSnNo = contractSnNo;
+    }
+
+    public String getHighCatFlag() {
+        return highCatFlag;
+    }
+
+    public void setHighCatFlag(String highCatFlag) {
+        this.highCatFlag = highCatFlag;
+    }
 
     public String getProbeQuotaType() {
         return probeQuotaType;

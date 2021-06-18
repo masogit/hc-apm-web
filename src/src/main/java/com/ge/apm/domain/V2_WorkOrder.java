@@ -3,6 +3,8 @@ package com.ge.apm.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.constant.ApprovalConstant;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -13,6 +15,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +23,7 @@ import java.util.List;
 @Table(name = "v2_work_order")
 /*@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable(true)*/
-public class V2_WorkOrder implements Serializable {
+public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -89,6 +92,7 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "total_price")
     private Double totalPrice;
 
+    //1：流程中；2：已完成；3：已取消 (生命周期状态 :具体流程需查看步骤表)
     @Column(name = "status")
     private Integer status;
 
@@ -265,7 +269,30 @@ public class V2_WorkOrder implements Serializable {
     private String closeStepOwnerName;
     @Column(name="close_Step_End_Time")
     private Date closeStepEndTime;
-    
+
+    @Transient
+    private Integer orderCount;
+
+    @Override
+    public BigDecimal getTotalPriceToBigDecimal() {
+        return totalPrice == null ? null : new BigDecimal(totalPrice);
+    }
+
+    @Override
+    public String getBusinessNumber() {
+        return getServiceRequest().getSrNum();
+    }
+
+    @Override
+    public String getBusinessUid() {
+        return getId();
+    }
+
+    @Override
+    public int getBusinessType() {
+        return  ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT;
+    }
+
     public Integer getDispatchMode() {
         return dispatchMode;
     }
@@ -828,5 +855,13 @@ public class V2_WorkOrder implements Serializable {
 
     public void setStatusCloseTime(Date statusCloseTime) {
         this.statusCloseTime = statusCloseTime;
+    }
+
+    public Integer getOrderCount() {
+        return orderCount;
+    }
+
+    public void setOrderCount(Integer orderCount) {
+        this.orderCount = orderCount;
     }
 }

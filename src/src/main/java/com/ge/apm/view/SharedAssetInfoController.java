@@ -1,6 +1,7 @@
 package com.ge.apm.view;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.AssetInfo;
@@ -30,7 +31,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     private SharedAssetTypeRepository swapDao;
     private WorkflowConfigRepository wfcDao;
     private UaaService uaaService;
-
+    private OrgInfoRepository orgInfoRepository;
     private String oneSearchStr;
 
     private String filterSatId;
@@ -60,6 +61,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         swapDao = WebUtil.getBean(SharedAssetTypeRepository.class);
         wfcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 
         UserAccount user = UserContextService.getCurrentUserAccount();
         deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
@@ -209,10 +211,13 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         UserAccount user = UserContextService.getCurrentUserAccount();
         if (deptids.size() > 0) {
 //            selected.setClinicalDeptUID(orgIds.get(0));
+            OrgInfo orgInfo = orgInfoRepository.findByUid(deptids.get(0));
             selected.setAssetDeptUID(deptids.get(0));
+            selected.setAssetDeptId(orgInfo != null ? orgInfo.getId() : null);
         }
         if (selected.getSharedAssetTypeUid() == null){
             selected.setAssetDeptUID(null);
+            selected.setAssetDeptId(null);
         }
     }
 

@@ -458,7 +458,7 @@
 
                             <f:facet name="{Toolbar}" rendered="#{contractInfoEditController.canBeEdit}">
                                 <p:commandLink  value="#{msg.AddExistingEquipment}" style="color:#3e87e8;padding: 10px" actionListener="#{searchController.prepareDialogCallback(contractInfoEditController,1,contractInfoEditController.selected.siteUID, ':AssetContractEditForm:itemList')}"
-                                                process="@this" update=":searchDlg" oncomplete="PF('varCommonSearchDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Parts'}"/>
+                                                process="@this" update=":searchDlg :commonSearchForm" oncomplete="PF('varCommonSearchDlg').show()" rendered="#{contractInfoEditController.selected.contractType ne 'Parts'}"/>
                             </f:facet>
 
                         </p:dataTable>

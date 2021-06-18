@@ -1,5 +1,6 @@
 package com.ge.apm.view.zkb;
 
+import com.ge.apm.dao.ZkbCourseRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbCourse;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -54,6 +55,8 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
     private UploadedFile file;
     private List<ZkbCourse> importFailedDataList;
 
+    private ZkbCourseRepository zkbCourseRepository;
+
     @Override
     protected void init() {
         super.init();
@@ -62,6 +65,7 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
         userContextService = WebUtil.getBean(UserContextService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         zkbCourseImExportService = WebUtil.getBean(ZkbCourseImExportService.class);
+        zkbCourseRepository=WebUtil.getBean(ZkbCourseRepository.class);
 
         if(userContextService.isZkbUser()) {
             this.selectionTenantInfo = currentUser.getTenantUID();
@@ -81,7 +85,6 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
         }
 
         zkbCoursePage = zkbCourseServic.findBySearchFilter(searchFilters, pageRequest);
-
         return zkbCoursePage;
     }
 
@@ -140,9 +143,7 @@ public class ZkbCourseController extends GenericCRUDUUIDController<ZkbCourse> {
 
 
     public void exportAll(){
-
-        List<Map<String, Object>> zkbCourseDataList = zkbCourseImExportService.createZkbCourseData(zkbCoursePage.getContent());
-
+        List<Map<String, Object>> zkbCourseDataList = zkbCourseImExportService.createZkbCourseData( this.zkbCourseRepository.fetchAllSortByCreateDate());
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/course/APM_ZKB_Course_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);

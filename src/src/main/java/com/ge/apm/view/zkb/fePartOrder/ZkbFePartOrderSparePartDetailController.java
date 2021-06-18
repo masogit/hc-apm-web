@@ -9,7 +9,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -145,6 +144,11 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      * 坏还
      */
     public static String badReturnValue ="badReturn";
+
+    /**
+     * 最大调整数量
+     */
+    public Integer maxAssetQty = new Integer(0);
 
 
 
@@ -317,6 +321,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public void prepareItemEdit(){
         this.actionItemName = "Edit";
+        if(StringUtils.isNotBlank(this.selectZkbFePartOrderAssetInfo.getId()))
+        this.maxAssetQty =this.zkbFePartOrderAssetInfoRepository.findById(this.selectZkbFePartOrderAssetInfo.getId()).getAssetQty();
     }
 
     public void deleteItem(){
@@ -383,7 +389,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
-            this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount);
+            this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount,this.currentUser,this.selected);
         }
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
@@ -414,8 +420,54 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         this.selected.setComment(comment);
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
+        Integer beforeAdjustQty = this.zkbFePartOrderAssetInfoRepository.fetchQty(this.selected.getId());
+        beforeAdjustQty=beforeAdjustQty==null?0:beforeAdjustQty;
+        List<ZkbFePartOrderAssetInfo> afterAdjustAssetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
+        Integer qty = this.qty(afterAdjustAssetInfoList);
+        if(qty<=0)
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("申请数量合计不能为0"));
+            return "";
+        }
+        Integer adjustApplyCount = new Integer(0);
+        List<ZkbFePartOrderAssetInfo> beforeAdjustAssetList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(this.selected.getId());
+        Map<String,ZkbFePartOrderAssetInfo> beforeAdjustAssetMap = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(beforeAdjustAssetList))
+        {
+            for(ZkbFePartOrderAssetInfo item:beforeAdjustAssetList)
+            {
+                beforeAdjustAssetMap.put(item.getId(),item);
+            }
+        }
+        if(CollectionUtils.isNotEmpty(afterAdjustAssetInfoList))
+        {
+            for(ZkbFePartOrderAssetInfo item:afterAdjustAssetInfoList)
+            {
+                adjustApplyCount=adjustApplyCount+item.getAssetQty();
+                ZkbFePartOrderAssetInfo beforeAdjustAssetInfoItem = beforeAdjustAssetMap.get(item.getId());
+                if(beforeAdjustAssetInfoItem!=null)
+                {
+                    item.setBeforeAdjustAssetQty(beforeAdjustAssetInfoItem.getAssetQty());
+                    this.zkbFePartOrderAssetInfoRepository.save(item);
+                }
+            }
+        }
+        if(adjustApplyCount<beforeAdjustQty)
+        {
+            ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,beforeAdjustQty-adjustApplyCount,this.currentUser,this.selected);
+        }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingApm.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+    }
+    private Integer qty(List<ZkbFePartOrderAssetInfo> afterAdjustAssetInfoList)
+    {
+        Integer qty = new Integer(0);
+        for(ZkbFePartOrderAssetInfo item:afterAdjustAssetInfoList)
+        {
+            qty=qty+item.getAssetQty();
+        }
+        return qty;
     }
 
     /**
@@ -431,7 +483,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
-            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount);
+            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.currentUser,this.selected);
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
@@ -447,6 +499,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfo = this.selected.getZkbFePartOrderAssetInfoList();
         for(ZkbFePartOrderAssetInfo item:zkbFePartOrderAssetInfo)
         {
+            if(item.getAssetQty()==0)
+                continue;
             if(StringUtils.isBlank(item.getOrderNo())||item.getPrice()==null)
             {
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_assetFieldError"));
@@ -463,7 +517,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         {
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
             int applyCount = this.getApplyCount();
-            this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount);
+            this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount,this.currentUser,this.selected);
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
@@ -482,7 +536,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_returnListCannotBeNull"));
             return "";
         }
-        List<ZkbFePartOrderAssetInfo> assetInfoList = this.selected.getZkbFePartOrderAssetInfoList();
+        List<ZkbFePartOrderAssetInfo> assetInfoList = this.selected.getZkbReturnFePartOrderAssetInfoList();
         Map<String,Integer> assetInfoMap = this.zkbFePartOrderService.getAssetInfoMap(assetInfoList);
         Map<String,Integer> zkbFePartOrderReturnMap = this.zkbFePartOrderService.getZkbFePartOrderReturnMap(zkbFePartOrderReturnList,this.selected);
         boolean returnComplete = true;
@@ -508,7 +562,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())&&returnCount>0)
         {
-            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount);
+            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount,this.currentUser,this.selected);
         }
         for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
         {
@@ -736,5 +790,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     public void setShowProblemOrderNumber(boolean showProblemOrderNumber) {
         this.showProblemOrderNumber = showProblemOrderNumber;
+    }
+
+    public Integer getMaxAssetQty() {
+        return maxAssetQty;
+    }
+
+    public void setMaxAssetQty(Integer maxAssetQty) {
+        this.maxAssetQty = maxAssetQty;
     }
 }

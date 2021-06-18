@@ -149,6 +149,12 @@ public class WorkOrderExportPojo {
     private String evaluateStepInfo;
     //关单信息
     private String closeStepInfo;
+    //维修子状态
+    private Integer subStatus;
+
+    public Integer getSubStatus() { return subStatus; }
+
+    public void setSubStatus(Integer subStatus) { this.subStatus = subStatus; }
 
     public Double getMaintenanceValue() {
         return maintenanceValue;

@@ -106,9 +106,9 @@
                     <p:column headerText="探头特殊剩余名额" >
                         <h:outputText value="#{item.probeQuotaSpecial}"/>
                     </p:column>
-                    <p:column headerText="探头高值剩余名额" >
+                    <!--<p:column headerText="探头高值剩余名额" >
                         <h:outputText value="#{item.probeQuotaHigh}"/>
-                    </p:column>
+                    </p:column>-->
                     <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
                         <h:outputText value="#{item.geArtificialSupportTimes}"/>
                     </p:column>
@@ -180,15 +180,23 @@
                                 <f:selectItem itemLabel="超声低端机" itemValue="3"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.probeQuotaFlag}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.probeQuotaFlag}">
                             <label class="label">扣除名额类型*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.probeQuotaType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="catModelGrid valueTypeGroup" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-
-
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and !zkbPartOrderEditController.probeQuotaFlag}">
+                            <label class="label">是否高值探头*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.highCatFlag}" required="true" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
+                                <p:ajax event="change" update="catModelGrid valueTypeGroup" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="是" itemValue="t"/>
+                                <f:selectItem itemLabel="否" itemValue="f"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_region}*</label>
                             <p:selectOneMenu id="region" value="#{zkbPartOrderEditController.selected.region}" required="true" requiredMessage="#{msg.zkbContract_region} #{msg.ValidationRequire}" disabled="true">
@@ -334,6 +342,12 @@
                             <p:column headerText="产品型号">
                                 <h:outputText value="#{item.remark}"/>
                             </p:column>
+                            <p:column headerText="状态">
+                                <h:outputText value="#{zkbPartOrderEditController.vacationRender(item.isVacation)}"/>
+                            </p:column>
+                            <p:column headerText="backUp">
+                                <h:outputText value="#{item.usBackUpName}"/>
+                            </p:column>
                         </p:dataTable>
                     </h:panelGroup>
                 </p:fieldset>
@@ -361,7 +375,7 @@
                             <h:outputText value="#{item.partName}"/>
                         </p:column>
                         <p:column headerText="配件数量">
-                            <h:outputText value="#{item.partQty}"/>
+                            <h:outputText value="#{item.prePartQty}"/>
                         </p:column>
                         <p:column headerText="配件SN(序列号)">
                             <h:outputText value="#{item.serialNumber}"/>
@@ -384,21 +398,49 @@
                             <label class="label">探头号*</label>
                             <p:inputText id="catModel" value="#{zkbPartOrderEditController.selected.catNo}" required="true" requiredMessage="探头号 #{msg.ValidationRequire}" />
                         </h:panelGroup>
-
-                        <h:panelGroup>
-                            <label class="label">探头型号*</label>
-                            <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="探头型号 #{msg.ValidationRequire}"
-                                            completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catText}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
-                                <p:ajax event="itemSelect" update="valueTypeGroup qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
-                            </p:autoComplete>
+                        <h:panelGroup id="catModelGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" >
+                            <h:panelGroup  style="text-align: left">
+                                <c:if test="#{zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.probeQuotaType eq 'High'}">
+                                    <label class="label">SN编号*</label>
+                                    <p:selectOneMenu value="#{zkbPartOrderEditController.selected.contractCatId}" required="true" requiredMessage="无可用高值探头，请确认合同信息或联系客服" >
+                                        <p:ajax event="itemSelect" update="qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItems value="#{zkbPartOrderEditController.highCatList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </c:if>
+                                <c:if test="#{zkbPartOrderEditController.probeQuotaFlag and !(zkbPartOrderEditController.selected.probeQuotaType eq 'High')}">
+                                    <label class="label">探头型号*</label>
+                                    <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="探头型号 #{msg.ValidationRequire}"
+                                                    completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catText}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
+                                        <p:ajax event="itemSelect" update="valueTypeGroup qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
+                                    </p:autoComplete>
+                                </c:if>
+                                <c:if test="#{!zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.highCatFlag eq 't'}">
+                                    <label class="label">SN编号*</label>
+                                    <p:selectOneMenu value="#{zkbPartOrderEditController.selected.contractCatId}" required="true" requiredMessage="无可用高值探头，请确认合同信息或联系客服" >
+                                        <p:ajax event="itemSelect" update="qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItems value="#{zkbPartOrderEditController.highCatList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </c:if>
+                                <c:if test="#{!zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.highCatFlag eq 'f'}">
+                                    <label class="label">探头型号*</label>
+                                    <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="探头型号 #{msg.ValidationRequire}"
+                                                    completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catText}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
+                                        <p:ajax event="itemSelect" update="valueTypeGroup qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
+                                    </p:autoComplete>
+                                </c:if>
+                            </h:panelGroup>
                         </h:panelGroup>
-
                         <h:panelGroup id="valueTypeGroup">
-                            <label class="label">价值类型</label>
-                            <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderEditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
-                            <label style="color: red">#{zkbPartOrderEditController.valueTypeTips}</label>
+                            <c:if test="#{(zkbPartOrderEditController.probeQuotaFlag and !(zkbPartOrderEditController.selected.probeQuotaType eq 'High')) or (!zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.highCatFlag eq 'f')}">
+                                <h:panelGroup>
+                                    <label class="label">价值类型</label>
+                                    <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderEditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
+                                    <label style="color: red">#{zkbPartOrderEditController.valueTypeTips}</label>
+                                </h:panelGroup>
+                            </c:if>
                         </h:panelGroup>
-
                         <h:panelGroup>
                             <label class="label">旧探头SN编号*</label>
                             <p:inputText id="oldCatSn" value="#{zkbPartOrderEditController.selected.oldCatSn}" required="true" requiredMessage="旧探头SN编号 #{msg.ValidationRequire}"/>

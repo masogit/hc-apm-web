@@ -1,10 +1,6 @@
 package com.ge.apm.view.asset;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -14,6 +10,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.view.SupplierController;
 import lombok.Setter;
 import org.primefaces.event.FileUploadEvent;
@@ -45,7 +42,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private OrgInfo selectedOrg;
 
-//    private QrCodeLibRepository qrcodeDao;
+    //    private QrCodeLibRepository qrcodeDao;
     private List<ArrivalListItem> arrivalItemList;
 
     private AssetInstallationService aiService;
@@ -61,7 +58,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private ArrivalListItem easyInstallItem;
 
-//    private OrgInfoService orgService;
+    //    private OrgInfoService orgService;
     private CustomConfigService ccService;
 
     private List<I18nMessage> code68List;
@@ -73,6 +70,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private String nationalStandardCode;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+    private ConfigService configService;
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
     private SupplierController supplierController;
@@ -83,7 +81,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private BlobFileService blobService;
 
-//    private String supplierName;
+    //    private String supplierName;
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
     List<Supplier> manueList;
@@ -137,6 +135,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         orgTree.getChildren().add(subTree);
         attachList = new ArrayList();
         currentUser=UserContextService.getCurrentUserAccount();
+        configService = WebUtil.getBean(ConfigService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -153,7 +152,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 //移除标记为已完成的设备合同
                 List<ContractInfo> completeEquipmentContracts = contractList.stream()
                         .filter(item -> (ContractInfo.ContractType.Equipment.toString().equals(item.getContractType()) &&
-                                        ContractInfo.ContractStatus.COMPLETE.toString().equals(item.getContractStatus())))
+                                ContractInfo.ContractStatus.COMPLETE.toString().equals(item.getContractStatus())))
                         .collect(Collectors.toList());
                 contractList.removeAll(completeEquipmentContracts);
 
@@ -297,7 +296,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             generateMap.clear();
         }
         saveEasyItem();
-        
+
     }
 
     public String gennerateFinancingNum(ArrivalListItem item, String prifix) {
@@ -503,6 +502,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
+    public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
+        if(selectedOrg==null) Collections.emptyList();
+        return configService.getAttachmentCategories(configService.findConfigBySite(selectedOrg.getSiteUID()));
+    }
+
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
         String type = event.getComponent().getId();
@@ -644,11 +648,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.selected.setFunctionType(selectedContractItem.getPattern());
         String manufactureUid=selectedContractItem.getManufacturer();
         if(StringUtils.isNotEmpty(manufactureUid)){
-        	Supplier manufacture=aiService.getSupplierByUid(manufactureUid);
+            Supplier manufacture=aiService.getSupplierByUid(manufactureUid);
             if(manufacture!=null){
-            	this.selected.setManufacture(manufacture.getName());
-            	this.selected.setManufactureId(manufacture.getId().toString());
-            	this.manufacture=manufacture;
+                this.selected.setManufacture(manufacture.getName());
+                this.selected.setManufactureId(manufacture.getId().toString());
+                this.manufacture=manufacture;
             }
         }
         this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
@@ -656,9 +660,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.selected.setOrigin(selectedContractItem.getProductionPlace());
         String supplierUid=selectedContractItem.getContractInfo().getSupplierUid();
         if(StringUtils.isNotEmpty(supplierUid)){
-        	Supplier supplier=aiService.getSupplierByUid(supplierUid);
+            Supplier supplier=aiService.getSupplierByUid(supplierUid);
             if(supplier!=null){
-            	this.selected.setVendor(supplier.getName());
+                this.selected.setVendor(supplier.getName());
                 this.selected.setSupplierId(supplier.getId());
                 this.supplier=supplier;
 

@@ -1,12 +1,10 @@
 package com.ge.apm.dao.mapper.provider;
 
-import java.util.Date;
-import java.util.Map;
-
+import com.ge.apm.service.utils.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ge.apm.service.utils.TimeUtils;
+import java.util.*;
 
 public class AssetInfoProvider {
 	Logger logger = LoggerFactory.getLogger(getClass());
@@ -58,6 +56,37 @@ public class AssetInfoProvider {
 		sb.append(" and ai.system_id = '"+systemId+"'");
 		return sb.toString();
 	}
-	
-	
+
+	public String getMvsWorkOrders(Map<String,Object> param){
+		String orgUidList = getSetValue(param.get("orgList")) ;
+		String tenantUid = (String) param.get("tenantUid");//
+		StringBuilder sb = new StringBuilder();
+		sb.append(" select wo.id from asset_info ai2,v2_work_order wo,asset_info ai where ai.is_deleted ='false' and ai.is_valid = 'true' and ai.system_id like 'MVS-%' ");
+		sb.append(" and (ai.institution_uid in "+orgUidList+" or ai.hospital_uid in "+orgUidList+"or ai.site_uid in "+orgUidList);
+		sb.append(" or ai.clinical_dept_uid in "+orgUidList+" or ai.asset_dept_uid in "+orgUidList+" or ai.tenant_uid in "+orgUidList+")");
+		sb.append(" and wo.tenant_uid  = '"+tenantUid+"'");
+		sb.append(" and ai2.id  = wo.asset_id ");
+		sb.append(" and concat('MVS-',ai2.qr_code) = ai.system_id");
+		return sb.toString();
+	}
+
+	private String getSetValue(Object value) {
+		StringBuilder sb = new StringBuilder();
+		Collection<String> set = (Collection<String>) value;
+		if (set != null) {
+			Iterator<String> it = set.iterator();
+			sb.append("(");
+			while (it.hasNext()) {
+				sb.append("'");
+				sb.append(it.next());
+				sb.append("'");
+				sb.append(",");
+			}
+			sb.append("'");
+			sb.append("'");
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+
 }

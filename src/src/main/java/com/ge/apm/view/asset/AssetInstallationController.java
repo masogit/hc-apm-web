@@ -428,20 +428,20 @@ public class AssetInstallationController {
                 }
             }
             //if(arrivalListItem.getBusinessAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
-                arrivalListItem.setBusinessAckStatus(arrivalListItem.ACK_STATUS_PASS);
-                arrivalListItem.setBusinessAckDate(new Date());
+            arrivalListItem.setBusinessAckStatus(arrivalListItem.ACK_STATUS_PASS);
+            arrivalListItem.setBusinessAckDate(new Date());
             //}
 //            if(arrivalListItem.getTechnicalAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
-                arrivalListItem.setTechnicalAckStatus(arrivalListItem.ACK_STATUS_PASS);
-                arrivalListItem.setTechnicalAckDate(new Date());
+            arrivalListItem.setTechnicalAckStatus(arrivalListItem.ACK_STATUS_PASS);
+            arrivalListItem.setTechnicalAckDate(new Date());
 //            }
 //            if(arrivalListItem.getClinicalAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
-                arrivalListItem.setClinicalAckStatus(arrivalListItem.ACK_STATUS_PASS);
-                arrivalListItem.setClinicalAckDate(new Date());
+            arrivalListItem.setClinicalAckStatus(arrivalListItem.ACK_STATUS_PASS);
+            arrivalListItem.setClinicalAckDate(new Date());
 //            }
 //            if(arrivalListItem.getFixassetAckStatus().equals(arrivalListItem.ACK_STATUS_NONE)){
-                arrivalListItem.setFixassetAckStatus(arrivalListItem.ACK_STATUS_PASS);
-                arrivalListItem.setFixassetAckDate(new Date());
+            arrivalListItem.setFixassetAckStatus(arrivalListItem.ACK_STATUS_PASS);
+            arrivalListItem.setFixassetAckDate(new Date());
 //            }
 
             Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
@@ -519,6 +519,10 @@ public class AssetInstallationController {
     public List<V2_BlobObject> getAttachList(String type) {
         return attachList == null ? null : attachList.stream().filter(item -> type.equals(item.getBoSubType()))
                 .collect(Collectors.toList());
+    }
+
+    public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
+        return configService.getAttachmentCategories(config);
     }
 
     public String returnAction() {

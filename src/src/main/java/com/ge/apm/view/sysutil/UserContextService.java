@@ -966,6 +966,17 @@ public class UserContextService implements Serializable {
         return false;
     }
 
+    public boolean isMvsTenant() {
+        TenantInfo tenantInfo = getTenantInfo();
+        return ApmConstant.MVS_TENANT_NAME.equals(tenantInfo.getName());
+    }
+
+    public boolean isYiMaiYangGuangTenant() {
+        TenantInfo tenantInfo = getTenantInfo();
+        //这期上线，暂时写死，下个版本改成动态配置
+        return "齐齐哈尔一脉阳光医学影像诊断中心有限公司".equals(tenantInfo.getName());
+    }
+
     public static boolean isSuperAdminWithPartnerAccount(){
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         return userContextService.isPartnerAccount();
