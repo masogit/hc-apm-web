@@ -112,18 +112,8 @@ public class ZkbIbCrossService {
                 continue;
             }
             if("D".equals(s.getStatus())){
-                UserAccount ua = userAccountRepository.findByLoginName(s.getLoginName());
                 ZkbIbCrossUser user = new ZkbIbCrossUser();
                 user.setLoginName("ZKB."+s.getLoginName());
-                user.setTenantUid(ua.getTenantUID());
-                user.setUid(ua.getUid());
-                user.setPassword(ua.getPassword());
-                user.setUserId(ua.getId());
-                user.setGeSso(ua.getGeSso());
-                user.setName(ua.getName());
-                user.setPosition(ua.getPosition());
-                user.setWeChatId(ua.getWeChatId());
-                user.setTelephone(ua.getTelephone());
                 user.setDeleted(true);
                 zkbIbCrossUserList.add(user);
             }else{
