@@ -927,7 +927,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     //转入待报废
     public String processToBeTerminated() {
         int originStatus = selected.getStatus();
+        AssetInfo oldAssetInfo = assetHistoryService.depCopy(selected);
         this.selected.setStatus(4);
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
         update();
         assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
         return "AssetList?faces-redirect=true";
@@ -936,9 +938,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     //重新启用
     public String processToBeValid() {
         int originStatus = selected.getStatus();
+        AssetInfo oldAssetInfo = assetHistoryService.depCopy(selected);
         this.selected.setStatus(1);
         this.selected.setIsValid(true);
         this.selected.setTerminateDate(null);
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
         update();
         assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
         return "AssetTerminateEntryList?faces-redirect=true";
