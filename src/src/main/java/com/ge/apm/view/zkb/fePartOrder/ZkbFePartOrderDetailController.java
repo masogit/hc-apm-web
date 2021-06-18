@@ -18,9 +18,10 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author 503202755 2020/9/23
@@ -251,7 +252,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                     return "";
                 }
             }
-            this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,1,this.selected);
+            this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,1,this.selected,this.currentUser);
         }
         String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null,GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
@@ -285,7 +286,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
-        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,3,this.selected);
+        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,3,this.selected,this.currentUser);
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
@@ -298,7 +299,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     {
 
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
-        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,2,this.selected);
+        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,2,this.selected,this.currentUser);
         Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_WECHART);

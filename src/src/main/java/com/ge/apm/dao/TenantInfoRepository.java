@@ -8,6 +8,7 @@ import webapp.framework.dao.GenericRepository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
     
@@ -49,4 +50,11 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
     @Query(value = "SELECT DISTINCT t1.* from tenant_info t1 INNER JOIN zkb_contract z1 on t1.uid = z1.tenant_uid " +
             " where t1.name not like 'ZKB%' and NOT ((end_date < ?1) OR (start_date > ?2)) and t1.type =?3", nativeQuery = true)
     List<TenantInfo> findByAnyContractDate(Date firstDate, Date kpiDate, Integer type);
+
+    /**
+     * 根据租户UID批量获取租户信息
+     * @param uidSet 租户UID
+     * @return
+     */
+    List<TenantInfo> findByUidIn(Set<String> uidSet);
 }

@@ -589,8 +589,8 @@ public class AssetInfoFormatter {
             return null;
         }
 
-        AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
-        //AssetInfo parentAsset = (AssetInfo) parentAssets.get(assetInfo.getParentAssetId());
+        //AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
+        AssetInfo parentAsset = (AssetInfo) parentAssets.get(assetInfo.getParentAssetId());
         if (parentAsset == null) return null;
 
         String departNum = parentAsset.getDepartNum() == null ? "" : parentAsset.getDepartNum();
@@ -750,8 +750,8 @@ public class AssetInfoFormatter {
     }
 
     private String joinTags(Map<String,List<String>> assetMap) {
-        List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
-        //List<String> assetTags = assetMap.get(assetInfo.getUid());
+        //List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
+        List<String> assetTags = assetMap.get(assetInfo.getUid());
         if (assetTags==null || assetTags.isEmpty()) {
             return null;
         }
@@ -801,11 +801,11 @@ public class AssetInfoFormatter {
     public String getVendorTel(Map supliers){
         Integer vendorId = assetInfo.getSupplierId();
         if(vendorId != null){
-            Supplier supplier= supplierDao.getById(vendorId);
-          //return  (String) supliers.get(vendorId);
-            if(null!=supplier && null!=supplier.getTel()){
+            //Supplier supplier= supplierDao.getById(vendorId);
+            /*if(null!=supplier && null!=supplier.getTel()){
                 return  supplier.getTel();
-            }
+            }*/
+            return  (String) supliers.get(vendorId);
         }
         return null;
     }
@@ -931,34 +931,10 @@ public class AssetInfoFormatter {
         if(StringUtils.isEmpty(medicalApparatusClassification)){
             return "";
         }
-        SysAuthGroup authGroup = authGroupDao.findByEncoded(medicalApparatusClassification);
 
-        if(authGroup == null || StringUtils.isEmpty(authGroup.getEncoded())){
-            return "";
-        }
+        String connectedCode = authGroupDao.listSysAuthGroupNamePathInHierarchyByClassificationCode(medicalApparatusClassification);
 
-        String[] split = authGroup.getEncoded().split("-");
-        if(split.length == 1){
-            return authGroup.getName();
-        }
-
-        ArrayList<String> selectParam = new ArrayList<>(split.length);
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(split[0]);
-        selectParam.add(buffer.toString());
-
-        int endIndex = split.length - 1;
-        for (int i = 1; i < endIndex; i++) {
-            buffer.append("-").append(split[i]);
-            selectParam.add(buffer.toString());
-        }
-        List<SysAuthGroup> pSysAuthGroup = authGroupDao.findByEncodedInOrderByEncodedAsc(selectParam);
-        StringBuffer result = new StringBuffer();
-        for (SysAuthGroup group : pSysAuthGroup) {
-            result.append(group.getName()).append("->");
-        }
-        result.append(authGroup.getName());
-        return result.toString();
+        return connectedCode;
     }
 
     private String getMessage(String key) {

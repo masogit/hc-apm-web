@@ -3,6 +3,7 @@ package com.ge.apm.domain;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -18,7 +19,7 @@ public class ZkbContractLog {
     private static final long serialVersionUID = 1L;
 
     public enum LogType {
-        contractUpdate,contractDelete,courseUpdate,CourseDelete,assetAdd,assetDelete
+        contractUpdate,contractDelete,courseUpdate,CourseDelete,assetAdd,assetDelete,zkbPartOrderDelete,catUpdate,catDelete
     }
 
     @Id
@@ -43,7 +44,7 @@ public class ZkbContractLog {
     private Date createdDate;
 
     /**
-     * contractUpdate,contractDelete,courseUpdate,CourseDelete,assetAdd,assetDelete
+     * contractUpdate,contractDelete,courseUpdate,CourseDelete,assetAdd,assetDelete,zkbPartOrderDelete
      */
     @Column(name = "log_type")
     private String logType;
@@ -56,6 +57,17 @@ public class ZkbContractLog {
 
     @Column(name = "reason")
     private String reason;
+
+    @Column(name= "json_data",length = 4000)
+    private String jsonData;
+
+    public String getJsonData() {
+        return jsonData;
+    }
+
+    public void setJsonData(String jsonData) {
+        this.jsonData = jsonData;
+    }
 
     public String getId() {
         return id;

@@ -175,7 +175,7 @@ public class AssetFileImportBaseService {
 
     @Transactional
     public void importAssetData(List<Map<String, Object>> importAssetMap,
-                           Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
+                                Boolean autoGenerateQrcode, Map<String, OrgInfo> orgNamesUriCache) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
@@ -533,20 +533,20 @@ public class AssetFileImportBaseService {
                         continue;
                     }
                 }
-               if(StringUtils.isEmpty(newAsset.getSecondDirectory())){
-                   item.put("status", ImportStatus.CheckFail);
-                   result.add(Boolean.FALSE);
-                   AssetRow.addErrMessage(item, "错误: 子目录名字不能为空");
-                   continue;
-               }else {
-                   List<ZkbFileDirectory> secondDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.SUB_DIRECTORY_LEVEL_VALUE,newAsset.getSecondDirectory());
-                   if (secondDirectoryList.isEmpty()) {
-                       item.put("status", ImportStatus.CheckFail);
-                       result.add(Boolean.FALSE);
-                       AssetRow.addErrMessage(item, "错误: 子目录名字找不到! "+newAsset.getSecondDirectory());
-                       continue;
-                   }
-               }
+                if(StringUtils.isEmpty(newAsset.getSecondDirectory())){
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 子目录名字不能为空");
+                    continue;
+                }else {
+                    List<ZkbFileDirectory> secondDirectoryList = zkbFileDirectoryService.findByLevelAndName(zkbFileDirectoryService.SUB_DIRECTORY_LEVEL_VALUE,newAsset.getSecondDirectory());
+                    if (secondDirectoryList.isEmpty()) {
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
+                        AssetRow.addErrMessage(item, "错误: 子目录名字找不到! "+newAsset.getSecondDirectory());
+                        continue;
+                    }
+                }
             }
             //check clinical dept
             String clinicalDeptName = newAsset.getClinicalDeptName();
@@ -694,7 +694,7 @@ public class AssetFileImportBaseService {
 
 
             if(StringUtils.hasLength(newAsset.getMedicalApparatusClassification())){
-                SysAuthGroup selectedAuthGroup = authGroupDao.findByEncoded(newAsset.getMedicalApparatusClassification());
+                SysAuthGroup selectedAuthGroup = authGroupDao.findByClassificationCode(newAsset.getMedicalApparatusClassification());
                 if (selectedAuthGroup == null) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);

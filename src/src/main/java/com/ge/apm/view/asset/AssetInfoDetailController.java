@@ -14,6 +14,7 @@ import com.ge.apm.service.asset.AssetHistoryService;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.MvsUtil;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -51,6 +52,7 @@ public class AssetInfoDetailController {
     private SupplierRepository supplierDao;
     private CustomConfigService ccService;
     private AssetInfoMgrService aimService;
+    private ConfigService configService;
     private ContractInfoService contractService;
     private ContractInfoItemRepository contractItemDao;
     private AssetTagsMapper assetTagsMapper;
@@ -58,7 +60,6 @@ public class AssetInfoDetailController {
     private AssetHistoryService assetHistoryService;
     private SysAuthGroupRepository sysAuthGroupDao;
     private UserAccountRepository userAccountRepository;
-
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
@@ -69,9 +70,9 @@ public class AssetInfoDetailController {
     private TreeNode parentsTree;
 
     private MvsAssetInfo mvsAssetInfo = new MvsAssetInfo();
-    
+
     private String maintanceType = "internal";
-    
+
     private List<AssetLifecycleEvent> assetEvents;
 
     @Getter
@@ -88,6 +89,7 @@ public class AssetInfoDetailController {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
+        configService = WebUtil.getBean(ConfigService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
         contractService = WebUtil.getBean(ContractInfoService.class);
@@ -110,12 +112,12 @@ public class AssetInfoDetailController {
                 selected.setVendorTel(supplier.getTel());
             }
         }
-        
+
         maintanceType = aimService.getMaintanceType(selected);
         assetEvents  = aimService.getAssetEventsList(selected);
 
         if (null != selected.getMedicalApparatusClassification()) {
-            selectedAuthGroup = sysAuthGroupDao.findByEncoded(selected.getMedicalApparatusClassification());
+            selectedAuthGroup = sysAuthGroupDao.findByClassificationCode(selected.getMedicalApparatusClassification());
         }
 
         //ge mvc data
@@ -149,6 +151,10 @@ public class AssetInfoDetailController {
         return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
     }
 
+    public List<WorkflowConfig.AttachmentCategory> getAttachmentCategories() {
+        return configService.getAttachmentCategories(configService.findConfigBySite(selected.getSiteUID()));
+    }
+
     public List<PmScheduleData> getPmScheduleData(String type) {
         if (this.selected == null) {
             return null;
@@ -156,7 +162,7 @@ public class AssetInfoDetailController {
         List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(), type);
         return pmsList;
     }
-    
+
     public List<AssetLifecycleEvent> getOrderList(Integer type){
         List<AssetLifecycleEvent> res =  assetEvents.stream().filter(item->item.getEventType() == type).sorted(new Comparator<AssetLifecycleEvent>(){
             @Override
@@ -164,7 +170,7 @@ public class AssetInfoDetailController {
                 return o1.getCreateTime().compareTo(o2.getCreateTime());
             }
         }).collect(Collectors.toList());
-        
+
         return res.size()>3? res.subList(0, 2):res;
     }
 
@@ -233,7 +239,7 @@ public class AssetInfoDetailController {
     public boolean needShow(String itemKey, String fieldKey) {
         return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
     }
-    
+
     public List<ContractInfo> getContractList(){
         return contractService.getContractListByAsset(selected);
     }
@@ -312,5 +318,5 @@ public class AssetInfoDetailController {
     public int getAssetChangeHistoryCount() {
         return changeHistoryList.size();
     }
-    
+
 }

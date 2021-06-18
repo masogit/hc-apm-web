@@ -157,6 +157,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 	public void prepareCreate(String type) throws InstantiationException, IllegalAccessException {
 		// TODO Auto-generated method stub
 		super.prepareCreate();
+		selected.setHaveIbDevice(true);
 		tenantConfigService.init();
 		this.type = type;
         this.isTestTenant = Boolean.FALSE;

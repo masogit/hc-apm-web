@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author : 503189362
@@ -63,6 +64,9 @@ public class ZkbContractCourse implements Serializable {
     @Column(name = "contract_id")
     @Size(max = 32)
     private String contractId;
+
+    @Column(name = "created_date")
+    private Date createdDate;
 
     public String getCourseId() {
         return courseId;
@@ -194,5 +198,13 @@ public class ZkbContractCourse implements Serializable {
     @Override
     public String toString() {
         return "com.ge.apm.domain.ZkbContractCourse[ id=" + id + " ]";
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 }

@@ -4,12 +4,14 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:apm="http://www.ge.com/tags/apm">
+
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'serialNum')}">
         <h:panelGroup>
             <label class="label">#{msg.serialNum}</label>
             <p:inputText id="serialNum" value="#{assetInfoBulkEditController.selected.serialNum}"
-                          readonly="#{!assetInfoBulkEditController.needEdit('serialNum')}"/>
+                         readonly="#{!assetInfoBulkEditController.needEdit('serialNum')}"/>
         </h:panelGroup>
     </c:if>
 
@@ -77,7 +79,7 @@
         <h:panelGroup >
             <label class="label">#{msg.assetOwnerTel}</label>
             <p:inputText id="assetOwnerTel" value="#{assetInfoBulkEditController.selected.assetOwnerTel}"
-                          readonly="true" class="assetOwnerNameChange"/>
+                         readonly="true" class="assetOwnerNameChange"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetOwnerName2')}" >
@@ -101,7 +103,7 @@
         <h:panelGroup >
             <label class="label">#{msg.assetOwnerTel2}</label>
             <p:inputText id="assetOwnerTel2" value="#{assetInfoBulkEditController.selected.assetOwnerTel2}"
-                          readonly="true" class="assetOwnerName2Change"/>
+                         readonly="true" class="assetOwnerName2Change"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetOwnerName3')}" >
@@ -225,7 +227,7 @@
         <h:panelGroup>
             <label class="label">#{msg.assetDeptName}</label>
             <p:autoComplete dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['assetDept']}"
-                            readonly="true"
+                            readonly="#{!assetInfoBulkEditController.needEdit('assetDeptName')}"
                             scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onAssetDeptChange('assetDept')}" update="@(.clinicalDeptNameChange)"/>
@@ -239,7 +241,7 @@
             <label class="label">#{msg.clinicalDeptName}</label>
             <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoBulkEditController.selectedObjectMap['clinicalDept']}"
                             scrollHeight="300"  forceSelection="true"
-                            readonly="true"
+                            readonly="#{!assetInfoBulkEditController.needEdit('clinicalDeptName')}"
                             completeMethod="#{assetInfoBulkEditController.autoCompleteDept}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onAssetDeptChangeEdit('clinicalDept')}" update="@(.clinicalDeptNameChange)" />
@@ -282,7 +284,7 @@
         <h:panelGroup>
             <label class="label">#{msg.clinicalOwnerTel}</label>
             <p:inputText id="clinicalOwnerTel" value="#{assetInfoBulkEditController.selected.clinicalOwnerTel}"
-                          readonly="true" class="SiteUIDChange clinicalDeptNameChange clinicalOwnerNameChange"/>
+                         readonly="true" class="SiteUIDChange clinicalDeptNameChange clinicalOwnerNameChange"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'manufacture')}">
@@ -301,7 +303,7 @@
         <h:panelGroup>
             <label class="label">#{msg.makerShortName}</label>
             <p:inputText id="makerShortName" value="#{assetInfoBulkEditController.selected.makerShortName}"
-                          readonly="#{!assetInfoBulkEditController.needEdit('makerShortName')}" />
+                         readonly="#{!assetInfoBulkEditController.needEdit('makerShortName')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'vendor')}" >
@@ -340,7 +342,7 @@
         <h:panelGroup>
             <label class="label">#{msg.maitananceTel}</label>
             <p:inputText id="maitananceTel" value="#{assetInfoBulkEditController.selected.maitananceTel}"
-                          class="maitananceChange" readonly="true" />
+                         class="maitananceChange" readonly="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'nationalStandardCode')}" >
@@ -380,7 +382,7 @@
         <h:panelGroup>
             <label class="label">#{msg.parentAsset}</label>
             <p:autoComplete id="parentAssetList" dropdown="true" scrollHeight="300" value="#{assetInfoBulkEditController.selectedObjectMap['parentAsset']}" completeMethod="#{assetInfoBulkEditController.completeParentAssetIdList}"
-                            forceSelection="true" readonly="true" class="SiteUIDChange clinicalDeptNameChange"
+                            forceSelection="true" readonly="#{!assetInfoBulkEditController.needEdit('parentAssetId')}" class="SiteUIDChange clinicalDeptNameChange"
                             var="t" itemLabel="#{t.getParentAssetDisplayName()}" itemValue="#{t}" converter="assetInfoConverter">
                 <p:ajax event="itemSelect" listener="#{assetInfoBulkEditController.onParentAssetChange()}"/>
                 <p:ajax listener="#{assetInfoBulkEditController.onParentAssetChange()}" />
@@ -391,7 +393,7 @@
         <h:panelGroup>
             <label class="label">#{msg.deviceName}</label>
             <p:inputText id="deviceName" value="#{assetInfoBulkEditController.selected.deviceName}"
-                         readonly="true"  />
+                         readonly="#{!assetInfoBulkEditController.needEdit('deviceName')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'subjectProject')}" >
@@ -433,21 +435,21 @@
         <h:panelGroup>
             <label class="label">#{msg.barcode}</label>
             <p:inputText id="barcode" value="#{assetInfoBulkEditController.selected.barcode}"
-                          readonly="true" />
+                         readonly="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'registrationNo')}" >
         <h:panelGroup>
             <label class="label">#{msg.registrationNo}</label>
             <p:inputText id="registrationNo" value="#{assetInfoBulkEditController.selected.registrationNo}"
-                          readonly="#{!assetInfoBulkEditController.needEdit('registrationNo')}" />
+                         readonly="#{!assetInfoBulkEditController.needEdit('registrationNo')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'modalityId')}" >
         <h:panelGroup>
             <label class="label">#{msg.modalityId}</label>
             <p:inputText id="modalityId" value="#{assetInfoBulkEditController.selected.modalityId}"
-                          readonly="true" />
+                         readonly="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'qrCode')}" >
@@ -472,7 +474,7 @@
         <h:panelGroup >
             <label class="label">#{msg.functionGroup}</label>
             <p:selectOneMenu id="functionGroup" value="#{assetInfoBulkEditController.selected.functionGroup}" style="width: 100%"
-                              disabled="#{!assetInfoBulkEditController.needEdit('functionGroup')}" >
+                             disabled="#{!assetInfoBulkEditController.needEdit('functionGroup')}" >
                 <p:ajax  listener="#{assetInfoBulkEditController.onFunctionGroupChange()}" update="@(.functionGroupChange)" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -489,6 +491,18 @@
             </p:selectOneMenu>
         </h:panelGroup>
     </c:if>
+
+    <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'medicalApparatusClassification')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.medicalApparatusClassification}</label>
+            <apm:selectMedicalInstrumentsClassification
+                    disabled="#{!assetInfoBulkEditController.needEdit('medicalApparatusClassification')}"
+                    update=""
+            />
+
+        </h:panelGroup>
+    </c:if>
+
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'functionGrade')}" >
         <h:panelGroup>
             <label class="label">#{msg.functionGrade}</label>
@@ -513,7 +527,7 @@
         <h:panelGroup>
             <label class="label">#{msg.repairForm}</label>
             <p:selectOneMenu id="repairForm" value="#{assetInfoBulkEditController.selected.repairForm}"
-                              disabled="#{!assetInfoBulkEditController.needEdit('repairForm')}" >
+                             disabled="#{!assetInfoBulkEditController.needEdit('repairForm')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
@@ -523,7 +537,7 @@
         <h:panelGroup>
             <label class="label">#{msg.locationCode}</label>
             <p:inputText id="locationCode" value="#{assetInfoBulkEditController.selected.locationCode}"
-                          readonly="#{!assetInfoBulkEditController.needEdit('locationCode')}" />
+                         readonly="#{!assetInfoBulkEditController.needEdit('locationCode')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'locationName')}" >
@@ -565,7 +579,7 @@
         <h:panelGroup >
             <label class="label">#{msg.isAssetChecked}</label>
             <p:selectOneRadio value="#{assetInfoBulkEditController.selected.isCheckedValue}"
-                               disabled="#{!assetInfoBulkEditController.needEdit('isChecked')}" >
+                              disabled="#{!assetInfoBulkEditController.needEdit('isChecked')}" >
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="1"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="2"/>
             </p:selectOneRadio>
@@ -583,7 +597,7 @@
         <h:panelGroup>
             <label class="label">#{msg.locationNotes}</label>
             <p:inputText id="locationNotes" value="#{assetInfoBulkEditController.selected.locationNotes}"
-                          readonly="#{!assetInfoBulkEditController.needEdit('locationNotes')}" />
+                         readonly="#{!assetInfoBulkEditController.needEdit('locationNotes')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'assetUsage')}" >
@@ -610,7 +624,7 @@
         <h:panelGroup>
             <label class="label">#{msg.capitalSource}</label>
             <p:selectOneMenu id="capitalSource" value="#{assetInfoBulkEditController.selected.capitalSource}"
-                              disabled="#{!assetInfoBulkEditController.needEdit('capitalSource')}" >
+                             disabled="#{!assetInfoBulkEditController.needEdit('capitalSource')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
@@ -620,7 +634,7 @@
         <h:panelGroup>
             <label class="label">#{msg.capitalSource2}</label>
             <p:selectOneMenu id="capitalSource2" value="#{assetInfoBulkEditController.selected.capitalSource2}"
-                              disabled="#{!assetInfoBulkEditController.needEdit('capitalSource2')}" >
+                             disabled="#{!assetInfoBulkEditController.needEdit('capitalSource2')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource2')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
@@ -650,7 +664,7 @@
         <h:panelGroup>
             <label class="label">#{msg.emergencyEquipment}</label>
             <p:selectOneMenu id="emergencyEquipment" value="#{assetInfoBulkEditController.selected.emergencyEquipment}"
-                              disabled="#{!assetInfoBulkEditController.needEdit('emergencyEquipment')}" >
+                             disabled="#{!assetInfoBulkEditController.needEdit('emergencyEquipment')}" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
             </p:selectOneMenu>
@@ -707,7 +721,7 @@
         <h:panelGroup>
             <label class="label">#{msg.arriveDate}</label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="arriveDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.arriveDate}"
-                         maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoBulkEditController.needEdit('arriveDate')}"
+                        maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoBulkEditController.needEdit('arriveDate')}"
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
     </c:if>
@@ -715,7 +729,7 @@
         <h:panelGroup>
             <label class="label">#{msg.acceptDate}</label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.acceptDate}"
-                         maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoBulkEditController.needEdit('acceptDate')}"
+                        maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoBulkEditController.needEdit('acceptDate')}"
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
     </c:if>
@@ -723,7 +737,7 @@
         <h:panelGroup>
             <label class="label">#{msg.warrantyMonth}</label>
             <p:inputNumber minValue="0" decimalPlaces="0" value="#{assetInfoBulkEditController.selected.warrantyMonth}"
-                            readonly="#{!assetInfoBulkEditController.needEdit('warrantyMonth')}" />
+                           readonly="#{!assetInfoBulkEditController.needEdit('warrantyMonth')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'installDate')}" >
@@ -737,7 +751,7 @@
         <h:panelGroup>
             <label class="label">#{msg.factoryWarrantyDate}</label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  id="factoryWarrantyDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.factoryWarrantyDate}"
-                         readonly="#{!assetInfoBulkEditController.needEdit('factoryWarrantyDate')}"
+                        readonly="#{!assetInfoBulkEditController.needEdit('factoryWarrantyDate')}"
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
     </c:if>
@@ -753,14 +767,14 @@
         <h:panelGroup>
             <label class="label">#{msg.terminateDate}</label>
             <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}" id="terminateDate" pattern="#{userContextService.timeFormat()}" value="#{assetInfoBulkEditController.selected.terminateDate}" showOn="button"
-                         readonly="#{!assetInfoBulkEditController.needEdit('terminateDate')}" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                        readonly="#{!assetInfoBulkEditController.needEdit('terminateDate')}" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'warranty')}" >
         <h:panelGroup >
             <label class="label">#{msg.isWarrantyNotice}</label>
             <p:selectOneRadio value="#{assetInfoBulkEditController.selected.warrantyValue}"
-                               disabled="#{!assetInfoBulkEditController.needEdit('warranty')}" >
+                              disabled="#{!assetInfoBulkEditController.needEdit('warranty')}" >
                 <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="1"/>
                 <f:selectItem itemLabel="#{msg.False2No}" itemValue="2"/>
             </p:selectOneRadio>
@@ -770,21 +784,21 @@
         <h:panelGroup>
             <label class="label">#{msg.purchasePrice}</label>
             <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoBulkEditController.selected.purchasePrice}"
-                            readonly="#{!assetInfoBulkEditController.needEdit('purchasePrice')}" />
+                           readonly="#{!assetInfoBulkEditController.needEdit('purchasePrice')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'salvageValue')}" >
         <h:panelGroup>
             <label class="label">#{msg.salvageValue}</label>
             <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoBulkEditController.selected.salvageValue}"
-                            readonly="#{!assetInfoBulkEditController.needEdit('salvageValue')}" />
+                           readonly="#{!assetInfoBulkEditController.needEdit('salvageValue')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'lifecycle')}" >
         <h:panelGroup>
             <label class="label">#{msg.lifecycle}</label>
             <p:inputNumber minValue="0" decimalPlaces="1" id="lifecycle" value="#{assetInfoBulkEditController.selected.lifecycleInYear}"
-                            readonly="#{!assetInfoBulkEditController.needEdit('lifecycle')}" />
+                           readonly="#{!assetInfoBulkEditController.needEdit('lifecycle')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoBulkEditController.needShow(fieldItem, 'depreciationMethod')}" >

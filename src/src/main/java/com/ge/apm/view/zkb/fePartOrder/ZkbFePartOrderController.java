@@ -8,15 +8,18 @@ import com.ge.apm.domain.ZkbFePartOrderUserConfig;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
+import com.ge.apm.view.asset.ContractImportController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.view.zkb.ZkbPartOrderController;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -121,6 +124,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      */
     private Boolean fourHundredsTeam = false;
 
+    private Boolean geAdmin = false;
+
     private List<String> orderTypeList = new ArrayList<>();
 
     /**
@@ -143,12 +148,37 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      */
     private static final String excelPath = "/portal/zkb/zkbFePartOrder/excel/APM_ZKB_FePartOrder_Exp_Template.xlsx";
 
+    /**
+     * 导出excel路径
+     */
+    private static final String excelReturnPath = "/portal/zkb/zkbFePartOrder/excel/APM_ZKB_FePartOrder_Batch_Return_Template.xlsx";
+
     private StreamedContent exportFile;
+
+    /**
+     * 上传的附件
+     */
+    private UploadedFile file;
 
     /**
      * 是否休假
      */
     private String isVacation;
+
+    /**
+     * 错误列表
+     */
+    private List<Map<String, Object>> errorZkbFePartList;
+
+    /**
+     * 当前用户称
+     */
+    private String userName;
+
+    /**
+     * 当前用户UID
+     */
+    private String userUid;
 
     /**
      * 初始化数据
@@ -163,6 +193,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         this.loginName=currentUser.getLoginName();
         this.queryStatus = WebUtil.getRequestParameter("queryStatus");
         this.tenantUID=currentUser.getTenantUID();
+        this.userName=currentUser.getName();
+        this.userUid=currentUser.getUid();
         if(StringUtils.isEmpty(this.queryStatus)){
             this.queryStatus = MY_WORK;
         }
@@ -173,6 +205,10 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         }else if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString()))
         {
             fourHundredsTeam=true;
+        }
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))
+        {
+            this.geAdmin=true;
         }
         orderTypeList.add(ZkbFePartOrder.OrderType.ManMade.toString());
         orderTypeList.add(ZkbFePartOrder.OrderType.SpareParts.toString());
@@ -359,6 +395,14 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         return "List.xhtml?faces-redirect=true&queryStatus="+queryStatus;
     }
 
+    /**
+     * 跳转导入页面
+     * @return
+     */
+    public String importAction() {
+        return "Import?faces-redirect=true";
+    }
+
     public void doubleClick(SelectEvent event){
         String str = "action="+ZkbFePartOrderController.EDIT_ACTION+"&id="+this.selected.getId()+"&queryStatus="+queryStatus;
         String url = "Edit.xhtml?str="+UrlParamUtil.encodeUrlQueryString(str);
@@ -380,6 +424,59 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             java.util.logging.Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    public void handleFileUpload(FileUploadEvent event) throws IOException {
+        ExcelDocument doc = null;
+        this.file = event.getFile();
+        try {
+            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+            int maxRowNum = ZkbFePartOrderService.EXCEL_FE_PART_ORDER_HEADER_ROW + ZkbFePartOrderService.EXCEL_FE_PART_ORDER_IMPORT_MAX_ROW;
+            if(doc.checkMaxRowNumIsFull(ZkbFePartOrderService.excelSheetNameOfProbeReturn, maxRowNum)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel10000"));
+                return;
+            }
+            if(doc.checkMaxRowNumIsFull(ZkbFePartOrderService.excelSheetNameOfSparePartReturn, maxRowNum)){
+                WebUtil.addErrorMessage(WebUtil.getMessage("MaximumFiveThDataLinesInTheExcel10000"));
+                return;
+            }
+            Map<String,String> i18Map = this.zkbFePartOrderService.getI18ToMap("zkbFePartOrder_zkbPoReturnType");
+            List<Map<String, Object>> importSparePartList = this.zkbFePartOrderService.getZkbFePartOrderSparePartMapFromTemplate(doc,i18Map);
+            List<Map<String, Object>> importProbeList = this.zkbFePartOrderService.getZkbFePartOrderProbeMapFromTemplate(doc,i18Map);
+            this.zkbFePartOrderService.importData(importSparePartList,importProbeList,this.userUid,this.userName,this.tenantUID,this.currentUser);
+            errorZkbFePartList = this.zkbFePartOrderService.filterErrorRecords(importSparePartList,importProbeList);
+            if(!errorZkbFePartList.isEmpty()){
+                WebUtil.addErrorMessage("导入失败");
+            }else {
+                WebUtil.addSuccessMessage(WebUtil.getMessage("ImportComplete"));
+            }
+        } catch (IOException ex) {
+            WebUtil.addErrorMessage("File can not be read!");
+            java.util.logging.Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError"));
+            java.util.logging.Logger.getLogger(ContractImportController.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            if (doc != null) {
+                doc.release();
+            }
+        }
+
+    }
+
+    /**
+     * 导出需要
+     */
+    public void exportNeedReturn()
+    {
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(excelReturnPath);
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            zkbFePartOrderService.exportReturnData(doc);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbPartOrderExcel_Export.xlsx");
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public String getQueryStatus() {
@@ -428,5 +525,21 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
 
     public void setIsVacation(String isVacation) {
         this.isVacation = isVacation;
+    }
+
+    public List<Map<String, Object>> getErrorZkbFePartList() {
+        return errorZkbFePartList;
+    }
+
+    public void setErrorZkbFePartList(List<Map<String, Object>> errorZkbFePartList) {
+        this.errorZkbFePartList = errorZkbFePartList;
+    }
+
+    public Boolean getGeAdmin() {
+        return geAdmin;
+    }
+
+    public void setGeAdmin(Boolean geAdmin) {
+        this.geAdmin = geAdmin;
     }
 }

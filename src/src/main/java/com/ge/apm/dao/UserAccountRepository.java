@@ -3,18 +3,14 @@ package com.ge.apm.dao;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserInfo;
-
 import webapp.framework.dao.GenericRepository;
 
 public interface UserAccountRepository extends GenericRepository<UserAccount> {
@@ -196,6 +192,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query("select u from UserAccount u, UserRole r, SysRole s where u.tenantUID=?1 and u.id=r.userId and r.roleId=s.id and s.name=?2")
     List<UserAccount> findByTenantUIDAndRoleName(String tenantUID, String roleName);
 
+    @Query("select distinct u from UserAccount u, UserRole r, SysRole s where u.tenantUID=?1 and u.id=r.userId and r.roleId=s.id and s.name in ?2")
+    List<UserAccount> findByTenantUIDAndRoleNames(String tenantUID, List<String> roleName);
+
     @Query(value= "select exists(select 1 from user_account where tenant_uid = ?1)",nativeQuery = true)
     boolean findRecordByTenantUid(String uid);
 
@@ -245,4 +244,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Modifying
     @Query(value = "delete from user_account where uid = ?1", nativeQuery = true)
     int deleteByUid(String uid);
+
+    UserAccount findByLoginName(String loginName);
+
 }

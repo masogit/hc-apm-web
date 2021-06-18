@@ -160,7 +160,7 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/zkb/contract/excel/APM_ZKB_Contract_Exp_Template.xlsx");
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            zkbContractService.exportData(doc, zkbContractDataList, zkbContractService.createZkbContractCourseData(zkbContractDataList), zkbContractService.createZkbContractAssetData(zkbContractDataList));
+            zkbContractService.exportData(doc, zkbContractDataList);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZKBContractData.xlsx");
         } catch (IOException ex) {
             Logger.getLogger(ZkbContractController.class.getName()).log(Level.SEVERE, null, ex);
@@ -182,10 +182,10 @@ public class ZkbContractController extends GenericCRUDUUIDController<ZkbContract
 
     public boolean isDeleteCanOperate(){
         if(this.selected == null){
-            return true;
+            return false;
         }
         if(StringUtils.isEmpty(this.selected.getId())){
-            return true;
+            return false;
         }else{
             if(operateFlag){
                 return true;

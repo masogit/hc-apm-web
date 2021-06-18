@@ -4,7 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:composition>
 
@@ -40,13 +41,14 @@
                         <h:panelGroup>
                             <label class="label">#{msg.MaintenanceSubStatus}</label>
                             <p:selectOneMenu id="subStatus"  value="#{workOrderMgrController.selectedWorkOrder.subStatus}" required="false" requiredMessage="#{msg.MaintenanceSubStatus} #{msg.ValidationRequire}">
-                                <p:ajax   listener="#{workOrderMgrController.selectSubstatus()}" update="@(.tform)"/>
+                                <p:ajax   listener="#{workOrderMgrController.selectSubstatus()}" update="subStatusStartSubStatusTime"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('subStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
-
-
                         </h:panelGroup>
+                    </p:panelGrid>
+
+                    <p:panelGrid  id="subStatusStartSubStatusTime" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup  rendered="#{workOrderMgrController.displayTime}">
                             <label class="label">#{msg.startTime}</label>
                             <p:calendar timeZone="GMT+8" label="#{msg.StartTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusStartTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
@@ -55,8 +57,8 @@
                             <label class="label">#{msg.endTime}</label>
                             <p:calendar timeZone="GMT+8" label="#{msg.EndTime}" pattern="yyyy/MM/dd" value="#{workOrderMgrController.statusCloseTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
-
                     </p:panelGrid>
+
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup id="assetstatus">
                             <label class="label">#{msg.status}</label>
@@ -236,7 +238,12 @@
                     <h:panelGroup>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.saveRepairWorkOrder()}" value="#{msg.save}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleValidFields(xhr, status, args);"/>
-                        <p:commandButton validateClient="false" immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check" rendered="#{!userContextService.hasCurrentTenantName('')}"/>
+                        <c:if test="${not workOrderMgrController.hasConfigMultiLevelApproval}">
+                            <p:commandButton validateClient="false" immediate="true" onclick="PF('submitCommentsDlg').show()" value="#{msg.SubmitForApproval}" update="woTab:submitCommentsDialogForm" icon="ui-icon-check"  rendered="#{!userContextService.hasCurrentTenantName('')}"/>
+                        </c:if>
+                        <c:if test="${workOrderMgrController.hasConfigMultiLevelApproval}">
+                            <p:commandButton validateClient="true" immediate="false"  actionListener="#{workOrderMgrController.submitForApproval()}" value="#{msg.SubmitForApproval}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="PF('repairCompleteDialog').hide()"/>
+                        </c:if>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('repairCompleteDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>

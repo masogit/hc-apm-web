@@ -6,6 +6,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author 212605082 on 2019/12/16.
@@ -57,5 +58,16 @@ public interface ZkbContractRepository extends GenericRepositoryUUID<ZkbContract
      */
     @Query(value = "SELECT count(ac.id)  from zkb_contract ac  INNER JOIN zkb_contract_asset zca on zca.contract_id = ac.ID and zca.asset_type='highMachine' where tenant_uid = ?1 and  NOT ((end_date < ?2) OR (start_date > ?3))", nativeQuery = true)
     Integer fetchHighMachineCount(String tenantUID,Date firstDate,Date kpiDate);
+
+    /**
+     * 根据ID批量获取
+     * @param contractIdSet 主键集合
+     * @return
+     */
+    List<ZkbContract> findByIdIn(Set<String> contractIdSet);
+
+    @Query(value = "select distinct c.tenant_uid from zkb_contract c where c.start_date <?2 and c.end_date >= ?1 and c.last_modified_date >= ?1 and c.last_modified_date < ?2", nativeQuery = true)
+    List<String> queryByLastModifiedDate(Date d1,Date d2);
+
 
 }

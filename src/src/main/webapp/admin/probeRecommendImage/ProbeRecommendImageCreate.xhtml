@@ -1,0 +1,259 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
+        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
+        <style>
+            div.ui-panelgrid-cell>label+div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+            div.ui-autocomplete.ui-autocomplete-multiple.asset-tags ul.ui-autocomplete-multiple-container{
+                max-width: 200px;
+                max-height: 100px;
+                overflow-y: auto;
+            }
+            .demo-container {
+                border: 1px solid #009BE3;
+                padding:0 20px;
+                font-family: "Myriad Pro Regular","Trebuchet MS";
+            }
+
+            .demo-container a, .demo-container a:link, .demo-container a:visited, .demo-container a:hover, .demo-container a:focus, .demo-container a:active {
+                color: #009BE3;
+            }
+            .demo-container ul {
+                list-style-type:none;
+                padding:0;
+                margin:1em 0;
+                width:100%;
+                overflow:hidden;
+            }
+            .demo-container ul span {
+                color: #A0A600;
+            }
+            .demo-container li {
+                float:left;
+                margin-right:1em;
+            }
+            .demo-container p span.track-name {
+                color: #CC0090;
+            }
+        </style>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{probeRecommendImageEditController.CRUDActionName} #{msg.probeRecommendImage}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <p:tabView id="tab">
+                    <p:tab title="#{msg.Create2}">
+                        <h:form id="AssetInfoEditForm">
+                            <c:if test="#{probeRecommendImageEditController.CRUDActionName.equals('新增')}">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.catNo}<span style="color:red">*</span></label>
+                                    <p:autoComplete id="catNo" value="#{probeRecommendImageEditController.selected.catNo}"
+                                                    required="true" requiredMessage="#{msg.catNo} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </c:if>
+                            <c:if test="#{probeRecommendImageEditController.CRUDActionName.equals('修改')}">
+                                <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:-350px">
+                                    <div class="ui-g-6">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.catNo}<span style="color:red">*</span></label>
+                                            <p:autoComplete id="catNo" value="#{probeRecommendImageEditController.selected.catNo}"
+                                                            required="true" readonly="true" requiredMessage="#{msg.catNo} #{msg.ValidationRequire}"/>
+                                        </h:panelGroup>
+                                    </div>
+                                    <div class="ui-g-4">
+                                        <h:panelGroup id="pict">
+                                            <p:graphicImage url="/portal/uploadPic.png" style="max-width: 320px;height: 260px" rendered="#{probeRecommendImageEditController.uploadFlag}"/>
+                                            <div class="container-flid" style="height: 400px; overflow: auto;">
+                                                <div class="row" id="picDiv">
+                                                    <c:forEach items="#{probeRecommendImageEditController.getAttachList(probeRecommendImageEditController.selected.catNo)}" var="attach" >
+                                                        <div>
+                                                            <img data-original="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                                 src="#{fileDownloadService.getFileUrl(attach.objectStorageId)}"
+                                                                 style="opacity:0; width:1px; height:1px"/>
+                                                        </div>
+                                                    </c:forEach>
+                                                </div>
+                                                <script>
+                                                    new Viewer(document.getElementById('picDiv'), {inline: true});
+                                                </script>
+                                            </div>
+                                        </h:panelGroup>
+                                    </div>
+                                </p:fieldset>
+                            </c:if>
+                            <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px" >
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <h:panelGroup >
+                                        <p:dataList id="pictureList" value="#{probeRecommendImageEditController.getAttachList(probeRecommendImageEditController.selected.catNo)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                            <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
+                                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                            <p:commandButton actionListener="#{probeRecommendImageEditController.removeAttachmentById(fileitem.id)}" update="#{probeRecommendImageEditController.CRUDActionName.equals('修改')?'pictureList tab:AssetInfoEditForm:pict':'pictureList'}" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                            </p:commandButton>
+                                        </p:dataList>
+                                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(jpeg|jpg|png|JPEG|JPG|PNG)$/" fileUploadListener="#{probeRecommendImageEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                                      multiple="true"  sizeLimit="10485760"  update="#{probeRecommendImageEditController.CRUDActionName.equals('修改')?'pictureList AssetInfoEditForm:pict':'pictureList'}"  auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <h:panelGroup id="buttonGroup">
+                                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{probeRecommendImageEditController.applyChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{probeRecommendImageEditController.CRUDActionName.equals('新增')}" />
+                                    <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{probeRecommendImageEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </h:form>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: available;max-height:available;min-width:800px;min-height:600px;overflow: hidden">
+            <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
+                <span id="shwoPicDialog_title" class="ui-dialog-title">#{msg.Image}</span>
+                <span>
+                    <p:commandButton id="spin" value="旋转" styleClass="anticon-plus"/>
+                    <p:commandButton id="enlarge" value="放大" onclick ="ImageSuofang(true)"/>
+                    <p:commandButton id="shrink" value="缩小" onclick ="ImageSuofang(false)"/>
+                </span>
+                <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
+                    <span class="ui-icon ui-icon-closethick"></span></a>
+                <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
+            </div>
+            <div class="ui-dialog-content ui-widget-content"  style="max-width: 1000px;max-height:700px;min-width:800px;min-height:600px;height: available">
+                <p style="text-align: center; vertical-align: middle"><image id="shwoPicDialogImg" src="" style="max-width: 1000px; max-height: 700px"></image></p>
+            </div>
+        </div>
+        <script id="shwoPicDialog_s" type="text/javascript">$(function () {
+            PrimeFaces.cw("Dialog", "shwoPicDialog", {id: "shwoPicDialog", modal: true, appendTo: "@(body)"});
+        });
+        </script>
+        <script>
+            //<![CDATA[
+            function showthis(pic) {
+                var s = $('#shwoPicDialogImg')[0]
+                s.src = pic.src;
+                s.style.transform = 'rotate('+ 0 +'deg)';
+                s.width = pic.width * 1.8;
+                s.height = pic.height * 1.8;
+                PF('shwoPicDialog').show();
+                var dia = $("#shwoPicDialog")[0];
+                dia.style.top = '5px';
+                for (let i = 0; i < 10; i++) {
+                    ImageSuofang(true);
+                }
+            }
+            //旋转
+            var num = 0;
+            $("#spin").click(function () {
+                num++;
+                // $("#shwoPicDialogImg").style.rotate = num * 90;
+                var pic = $("#shwoPicDialogImg")[0];
+                pic.style.transform = 'rotate('+num * 90+'deg)';
+                if(pic.width > pic.height && num%2 ==1){
+                    pic.style.marginTop='140px';
+                }else{
+                    pic.style.marginTop='5px';
+                }
+            })
+
+            function ImageSuofang(args) {
+                var imgsrc =  $("#shwoPicDialogImg")[0];
+                if (args) {
+                    if(imgsrc.width * 1.1 > 1000 ||imgsrc.height * 1.1 > 700 ){
+                        return;
+                    }
+                    imgsrc.width = imgsrc.width * 1.1;
+                    imgsrc.height = imgsrc.height * 1.1;
+                }
+                else {
+                    imgsrc.width = imgsrc.width / 1.1;
+                    imgsrc.height = imgsrc.height / 1.1;
+                }
+            }
+
+            $(document).ready(function () {
+                var $audioUlEle = $("#audioUl");
+                var audioList = $("input[id*='audio']");
+                $.each(audioList, function (index) {
+                    var audioClass = (index == 0 ? "track-default" : "");
+                    var templ = "<li><a href=" + this.value + " class='track " + audioClass + "'>语音" + (index + 1) + "</a></li>";
+                    $audioUlEle.append(templ);
+                });
+
+                // Local copy of jQuery selectors, for performance.
+                var my_jPlayer = $("#jquery_jplayer"),
+                    my_trackName = $("#jp_container .track-name"),
+                    my_playState = $("#jp_container .play-state"),
+                    my_extraPlayInfo = $("#jp_container .extra-play-info");
+
+                // Some options
+                var opt_play_first = false, // If true, will attempt to auto-play the default track on page loads. No effect on mobile devices, like iOS.
+                    opt_auto_play = true, // If true, when a track is selected, it will auto-play.
+                    opt_text_playing = "播放", // Text when playing
+                    opt_text_selected = "选择"; // Text when not playing
+
+                // A flag to capture the first track
+                var first_track = true;
+
+                // Change the time format
+                $.jPlayer.timeFormat.padMin = false;
+                $.jPlayer.timeFormat.padSec = false;
+                $.jPlayer.timeFormat.sepMin = " 分 ";
+                $.jPlayer.timeFormat.sepSec = " 秒";
+
+                // Initialize the play state text
+                my_playState.text(opt_text_selected);
+
+                // Instance jPlayer
+                my_jPlayer.jPlayer({
+                    ready: function () {
+                        $("#jp_container .track-default").click();
+                    },
+                    timeupdate: function (event) {
+                        my_extraPlayInfo.text(parseInt(event.jPlayer.status.currentPercentAbsolute, 10) + "%");
+                    },
+                    play: function (event) {
+                        my_playState.text(opt_text_playing);
+                    },
+                    pause: function (event) {
+                        my_playState.text(opt_text_selected);
+                    },
+                    ended: function (event) {
+                        my_playState.text(opt_text_selected);
+                    },
+                    swfPath: "../../dist/jplayer",
+                    cssSelectorAncestor: "#jp_container",
+                    supplied: "mp3",
+                    wmode: "window"
+                });
+
+                // Create click handlers for the different tracks
+                var temp = $("#jp_container .track");
+                $("#jp_container .track").click(function (e) {
+                    my_trackName.text($(this).text());
+                    my_jPlayer.jPlayer("setMedia", {
+                        mp3: $(this).attr("href")
+                    });
+                    if ((opt_play_first && first_track) || (opt_auto_play && !first_track)) {
+                        my_jPlayer.jPlayer("play");
+                    }
+                    first_track = false;
+                    $(this).blur();
+                    return false;
+                });
+
+            });
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>
