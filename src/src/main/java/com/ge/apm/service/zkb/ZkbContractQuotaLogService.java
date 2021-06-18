@@ -4,6 +4,7 @@ import com.ge.apm.dao.ZkbContractQuotaLogRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -26,7 +27,8 @@ public class ZkbContractQuotaLogService {
     ZkbContractQuotaLogRepository zkbContractQuotaLogRepository;
 
     public List<ZkbContractQuotaLog> queryListByFilter(List<SearchFilter> searchFilter){
-        List<ZkbContractQuotaLog> list = zkbContractQuotaLogRepository.findBySearchFilter(searchFilter);
+        Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
+        List<ZkbContractQuotaLog> list = zkbContractQuotaLogRepository.findBySearchFilter(searchFilter,sort);
         return list;
     }
 
@@ -39,7 +41,7 @@ public class ZkbContractQuotaLogService {
             Map<String, Object> zkbLogDataMap = new HashMap<>();
 
             zkbLogDataMap.put("合同号", q.getContractNo());
-            zkbLogDataMap.put("申请编号", q.getZkbPartOrderId());
+            zkbLogDataMap.put("申请编号", q.getZkbPartOrderNo());
             zkbLogDataMap.put("名额类型", WebUtil.getFieldValueMessage("zkbContractQuotaOrderType",q.getOrderType()));
             zkbLogDataMap.put("操作类型", WebUtil.getFieldValueMessage("zkbContractQuotaOpType",q.getOpType()));
             zkbLogDataMap.put("总名额", q.getQuotaTotal());
