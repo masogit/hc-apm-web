@@ -270,8 +270,8 @@
                                         <p:inputNumber value="#{assetArrivedListEditController.easyInstallItem.warrantyYear}"  minValue="0" decimalPlaces="2"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{userContextService.activeSupplier()}">
-                                        <label class="label">质保日期</label>
-                                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   value="#{assetArrivedListEditController.easyInstallItem.factoryWarrantyDate}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                        <label class="label">质保时间（月）</label>
+                                        <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{assetArrivedListEditController.easyInstallItem.warrantyMonth}"/>
                                     </h:panelGroup>
                                     <c:if test="#{not empty assetArrivedListEditController.customConfig.assetFields['purchasePrice']}">
                                         <h:panelGroup>

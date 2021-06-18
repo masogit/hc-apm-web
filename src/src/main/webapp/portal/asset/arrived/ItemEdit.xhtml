@@ -117,8 +117,8 @@
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.warrantyYear}" />
                             </h:panelGroup>
                             <h:panelGroup rendered="#{userContextService.activeSupplier()}">
-                                <label class="label">质保日期</label>
-                                <h:outputText value="#{assetInstallationController.arrivalListItem.factoryWarrantyDate}" />
+                                <label class="label">质保时间（月）</label>
+                                <h:outputText value="#{assetInstallationController.arrivalListItem.warrantyMonth}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.purchasePrice}</label>
