@@ -443,7 +443,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             Map<String,String> i18Map = this.zkbFePartOrderService.getI18ToMap("zkbFePartOrder_zkbPoReturnType");
             List<Map<String, Object>> importSparePartList = this.zkbFePartOrderService.getZkbFePartOrderSparePartMapFromTemplate(doc,i18Map);
             List<Map<String, Object>> importProbeList = this.zkbFePartOrderService.getZkbFePartOrderProbeMapFromTemplate(doc,i18Map);
-            this.zkbFePartOrderService.importData(importSparePartList,importProbeList,this.userUid,this.userName,this.tenantUID);
+            this.zkbFePartOrderService.importData(importSparePartList,importProbeList,this.userUid,this.userName,this.tenantUID,this.currentUser);
             errorZkbFePartList = this.zkbFePartOrderService.filterErrorRecords(importSparePartList,importProbeList);
             if(!errorZkbFePartList.isEmpty()){
                 WebUtil.addErrorMessage("导入失败");
