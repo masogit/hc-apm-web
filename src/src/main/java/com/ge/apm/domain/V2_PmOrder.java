@@ -121,6 +121,12 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Column(name="signature")
     private String signature;
 
+    @Column(name = "ack_signature")
+    private String ackSignature;
+
+    @Column(name = "wc_signature")
+    private String wcSignature;
+
     @Column(name="int_ext_type")
     private Integer intExtType;
 
@@ -670,5 +676,21 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     public void setAutoAckMaintenance(Boolean autoAckMaintenance) {
         this.autoAckMaintenance = autoAckMaintenance;
+    }
+
+    public String getAckSignature() {
+        return ackSignature;
+    }
+
+    public void setAckSignature(String ackSignature) {
+        this.ackSignature = ackSignature;
+    }
+
+    public String getWcSignature() {
+        return wcSignature;
+    }
+
+    public void setWcSignature(String wcSignature) {
+        this.wcSignature = wcSignature;
     }
 }

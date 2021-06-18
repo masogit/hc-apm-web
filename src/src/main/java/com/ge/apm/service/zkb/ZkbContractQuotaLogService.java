@@ -39,7 +39,7 @@ public class ZkbContractQuotaLogService {
             Map<String, Object> zkbLogDataMap = new HashMap<>();
 
             zkbLogDataMap.put("合同号", q.getContractNo());
-            zkbLogDataMap.put("申请编号", q.getZkbPartOrderId());
+            zkbLogDataMap.put("申请编号", q.getZkbPartOrderNo());
             zkbLogDataMap.put("名额类型", WebUtil.getFieldValueMessage("zkbContractQuotaOrderType",q.getOrderType()));
             zkbLogDataMap.put("操作类型", WebUtil.getFieldValueMessage("zkbContractQuotaOpType",q.getOpType()));
             zkbLogDataMap.put("总名额", q.getQuotaTotal());
