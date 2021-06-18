@@ -389,7 +389,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
-            this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount);
+            this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount,this.currentUser,this.selected);
         }
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
@@ -455,7 +455,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(adjustApplyCount<beforeAdjustQty)
         {
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,beforeAdjustQty-adjustApplyCount);
+            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,beforeAdjustQty-adjustApplyCount,this.currentUser,this.selected);
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingApm.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
@@ -483,7 +483,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
-            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount);
+            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.currentUser,this.selected);
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
@@ -517,7 +517,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         {
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
             int applyCount = this.getApplyCount();
-            this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount);
+            this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount,this.currentUser,this.selected);
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
@@ -562,7 +562,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())&&returnCount>0)
         {
-            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount);
+            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount,this.currentUser,this.selected);
         }
         for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
         {

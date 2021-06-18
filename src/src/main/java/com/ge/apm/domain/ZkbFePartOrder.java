@@ -557,6 +557,15 @@ public class ZkbFePartOrder {
     @Transient
     private String assetType;
 
+    /**
+     * 是否高值探头
+     */
+    @Column(name = "high_cat_flag")
+    private String highCatFlag;
+
+    @Column(name = "contract_cat_id")
+    private String contractCatId;
+
     public String getId() {
         return id;
     }
@@ -1231,5 +1240,21 @@ public class ZkbFePartOrder {
 
     public void setYesOrNo(String yesOrNo) {
         this.yesOrNo = yesOrNo;
+    }
+
+    public String getHighCatFlag() {
+        return highCatFlag;
+    }
+
+    public void setHighCatFlag(String highCatFlag) {
+        this.highCatFlag = highCatFlag;
+    }
+
+    public String getContractCatId() {
+        return contractCatId;
+    }
+
+    public void setContractCatId(String contractCatId) {
+        this.contractCatId = contractCatId;
     }
 }

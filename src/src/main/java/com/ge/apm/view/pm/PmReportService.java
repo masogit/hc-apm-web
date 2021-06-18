@@ -44,6 +44,8 @@ public class PmReportService {
 
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String SIGNATURE_HOLDER = "审核人签名：";
+    private static final String MAINTENANCE_COMPLETION_SIGNATURE_TITLE = "保养完成签名：";
+    private static final String ACCEPTANCE_SIGNATURE_TITLE = "验收签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
 
     @Autowired
@@ -234,6 +236,25 @@ public class PmReportService {
             if (signatureBytes != null) {
                 content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), SIGNATURE_HOLDER);
                 content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(100, 80, "signature.png", signatureBytes));
+            }
+        }
+
+        //保养完成签名
+        String wcSignature = pmOrder.getWcSignature();
+        if (!Strings.isNullOrEmpty(wcSignature)) {
+            byte[] signatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(wcSignature);
+            if (signatureBytes != null) {
+                content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.toString(), MAINTENANCE_COMPLETION_SIGNATURE_TITLE);
+                content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), new PictureRenderData(100, 80, "wcSignature.png", signatureBytes));
+            }
+        }
+        //验收签名
+        String ackSignature = pmOrder.getAckSignature();
+        if (!Strings.isNullOrEmpty(ackSignature)) {
+            byte[] signatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(ackSignature);
+            if (signatureBytes != null) {
+                content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE_TITLE.toString(), ACCEPTANCE_SIGNATURE_TITLE);
+                content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString(), new PictureRenderData(100, 80, "ackSignature.png", signatureBytes));
             }
         }
 
