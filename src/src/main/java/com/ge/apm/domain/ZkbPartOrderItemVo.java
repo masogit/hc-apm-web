@@ -15,6 +15,7 @@ public class ZkbPartOrderItemVo implements Serializable {
     private String serialNumber;
     private String orderNo;
     private String price;
+    private Integer prePartQty;
     private String remark;
 
     private String partOrderNo;
@@ -22,7 +23,7 @@ public class ZkbPartOrderItemVo implements Serializable {
     private String status;
     private String srNum;
 
-    public ZkbPartOrderItemVo(String partNo, String partName, int partQty, String serialNumber, String orderNo, String price, String remark, String partOrderNo, String currentStep, String status, String srNum) {
+    public ZkbPartOrderItemVo(String partNo, String partName, int partQty, String serialNumber, String orderNo, String price, String remark, String partOrderNo, String currentStep, String status, String srNum,Integer prePartQty) {
         this.partNo = partNo;
         this.partName = partName;
         this.partQty = partQty;
@@ -34,6 +35,15 @@ public class ZkbPartOrderItemVo implements Serializable {
         this.currentStep = currentStep;
         this.status = status;
         this.srNum = srNum;
+        this.prePartQty = prePartQty;
+    }
+
+    public Integer getPrePartQty() {
+        return prePartQty;
+    }
+
+    public void setPrePartQty(Integer prePartQty) {
+        this.prePartQty = prePartQty;
     }
 
     public String getRemark() {
