@@ -768,6 +768,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }else{
             if(StringUtils.isEmpty(selected.getHighCatFlag()) || CopyByInvok.F.equals(selected.getHighCatFlag())){
                 this.selected.setQty(1);
+                if(this.selected.getZkbPartOrderCat() != null){
+                    if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                        this.selected.setQty(1);
+                        valueTypeTips = "";
+                    }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                        this.selected.setQty(0);
+                        valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
+                    }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                        this.selected.setQty(2);
+                        valueTypeTips = "";
+                    }
+                }
             }else{
                 this.selected.setQty(0);
             }

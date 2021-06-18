@@ -358,7 +358,10 @@ public class ArrivalListItem implements Serializable {
     private Integer accountingCategory;
     
     @Column(name = "warranty_year")
-    private Double warrantyYear;
+    private Double warrantyYear;//保修时长(年)
+
+    @Column(name = "warranty_month")
+    private Integer warrantyMonth;//质保时间（月）
     
     @Column(name = "is_generate_pmorder")
     private Boolean isGeneratePmOrder;
@@ -1093,6 +1096,14 @@ public class ArrivalListItem implements Serializable {
 
     public void setUsingPersonTel(String usingPersonTel) {
         this.usingPersonTel = usingPersonTel;
+    }
+
+    public Integer getWarrantyMonth() {
+        return warrantyMonth;
+    }
+
+    public void setWarrantyMonth(Integer warrantyMonth) {
+        this.warrantyMonth = warrantyMonth;
     }
 
     @Override
