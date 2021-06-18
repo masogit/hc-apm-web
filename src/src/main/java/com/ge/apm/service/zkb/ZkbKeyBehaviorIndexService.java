@@ -1,6 +1,7 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ZkbKeyBehaviorIndexMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoRow;
@@ -99,6 +100,9 @@ public class ZkbKeyBehaviorIndexService {
      */
     @Autowired
     private V2_PmOrderRepository v2PmOrderRepository;
+
+    @Autowired
+    private AssetInfoMapper assetInfoMapper;
 
     /**
      * 导入模板头部行数
@@ -703,7 +707,7 @@ public class ZkbKeyBehaviorIndexService {
         {
             assetId.add(item.getAssetId());
         }
-        Integer countAssetWithQRcode = this.assetInfoRepository.countAssetWithQRcode(assetId);
+        Integer countAssetWithQRcode = this.assetInfoMapper.countAssetWithQRcode(assetId,tenantUID);
         if(countAssetWithQRcode==null)
         {
             countAssetWithQRcode=0;
