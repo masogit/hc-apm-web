@@ -660,7 +660,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         errorLog += "Order#不能为空,";
                     }
                     if(zkbPartOrderItem.getPrePartQty() > zkbPartOrderItem.getPartQty()){
-                        if(StringUtils.isNotEmpty(zkbPartOrderItem.getRemark())){
+                        if(StringUtils.isEmpty(zkbPartOrderItem.getRemark())){
                             flag = false;
                             errorLog += "实际配件数量修改后备注不能为空,";
                         }
