@@ -29,10 +29,7 @@ import java.util.stream.Collectors;
 public class MultiLevelApprovalConfigController extends GenericCRUDUUIDController<MultiLevelApprovalConfig> {
 
     private MultiLevelApprovalConfigRepository configDao;
-    private SysAuthGroupRepository sysAuthGroupDao;
     private UserAccountRepository userAccountDao;
-    private SysAuthGroupRepository authGroupDao;
-    private SysAuthGroupRepository groupDao;
     private UserRoleRepository userRoleDao;
     private I18nMessageRepository i18nDao;
     private OrgInfoRepository orgInfoDao;
@@ -46,8 +43,6 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     private String operateType;
     @Getter
     private boolean configEnable = true;
-//    @Getter  // TODO ACCT 不需要资产分类字段, 测试后删除
-//    private boolean assetTypeEditable;
     @Getter
     private TreeNode orgTree;
     @Getter
@@ -56,10 +51,7 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     @Override
     protected void init() {
         configDao = WebUtil.getBean(MultiLevelApprovalConfigRepository.class);
-        sysAuthGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         userAccountDao = WebUtil.getBean(UserAccountRepository.class);
-        authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
-        groupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         userRoleDao = WebUtil.getBean(UserRoleRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -88,18 +80,6 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     public List<I18nMessage> getBusinessTypeList(){
         return i18nDao.findByMsgTypeOrderById(ApprovalConstant.BUSINESS_TYPE);
     }
-
-//TODO ACCT 不需要资产分类字段, 测试后删除
-    //TODO 资产分类问题,环球和acct是否冲突 ,
-//    public List<SysAuthGroup> getSysAuthGroupList(){
-//        List<SysAuthGroup> sysAuthGroupList = new ArrayList<>();
-//        SysAuthGroup sysAuthGroup = new SysAuthGroup();
-//        sysAuthGroup.setEncoded(ApprovalConstant.ALL_GROUP);
-//        sysAuthGroup.setName(i18nDao.findValueZHByKey(ApprovalConstant.ALL_GROUP));
-//        sysAuthGroupList.add(sysAuthGroup);
-//        sysAuthGroupList.addAll(authGroupDao.getTopAuthGroup() != null ? authGroupDao.getTopAuthGroup() : new ArrayList<>());
-//        return sysAuthGroupList;
-//    }
 
     public List<UserAccount> getUsers4Approval(){
         if(selectedUserOrg != null){
@@ -146,8 +126,6 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
             super.prepareCreate();
             //默认启用
             selected.setEnable(true);
-            //默认所有分组 , TODO ACCT 不需要资产分类字段, 测试后删除
-//            selected.setAssetType(ApprovalConstant.ALL_GROUP);
             nodesList.clear();
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -272,14 +250,6 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     }
 
     public void onSelectBusiType() {
-        //    TODO ACCT 不需要资产分类字段, 测试后,稳定可删除
-//        if ((ApprovalConstant.APPROVAL_PARTS_STOCK + ApprovalConstant.APPROVAL_ASSET_INFO_MODIFY).contains(selected.getBusinessType())){
-//            selected.setAssetType(ApprovalConstant.ALL_GROUP);
-//        }
-//        if (null != selected.getAssetType()) {
-//            generateApprovalName();
-//        }
-//        setAssetTypeEditable();
         setConfigEnable();
     }
 
@@ -287,49 +257,6 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
     public void setConfigEnable(){
         configEnable = "partsStock".contains(selected.getBusinessType());
     }
-
-    //    TODO ACCT 不需要资产分类字段, 测试后,稳定可删除
-    //资产分类是否可编辑
-//    void setAssetTypeEditable(){
-//        assetTypeEditable =  "partsStock,assetBorrow,assetReceive,assetBorrowReturn,assetReceiveReturn,assetTransfer".contains(selected.getBusinessType());
-//    }
-
-    //    TODO ACCT 不需要资产分类字段, 测试后,稳定可删除
-    /*public void onSelectAssetType() {
-        if (null != selected.getBusinessType()) {
-            generateApprovalName();
-        }
-        updateApproveUserList();
-    }*/
-
-//    TODO ACCT 不需要资产分类字段, 测试后,稳定可删除
-    //TODO 资产分类问题,环球和acct是否冲突
-    //获取拥有审核权限 and 拥有对应资产分类访问权限的用户
-//    public void updateApproveUserList(){
-//        if(ApprovalConstant.ALL_GROUP.equals(selected.getAssetType())){
-//            buildApproveUserList();
-//        }else{
-//            approveUserList = new ArrayList<>();
-//            List<String> userUids = userRoleDao.findUserUidByRoleId(UserContextService.getCurrentUserAccount().getTenantUID(),
-//                                    roleDao.getIdByName(ApprovalConstant.MULTILEVEL_AUDITOR));
-//            List<String> childUids = sysAuthGroupDao.findChildUidsByTopGroup(selected.getAssetType());
-//            UserAuthGroupRepository userAuthGroupDao = WebUtil.getBean(UserAuthGroupRepository.class);
-//            List<String> relevantUserUids = userAuthGroupDao.getRelevantUserUids(childUids);
-//            userUids.retainAll(relevantUserUids);
-//            userUids.stream().forEach(uid -> {
-//                approveUserList.add(userAccountDao.getByUid(uid));
-//            });
-//        }
-//    }
-
-//    TODO ACCT 不需要资产分类字段, 测试后,稳定可删除
-    //TODO 资产分类问题,环球和acct是否冲突
-//    public void generateApprovalName() {
-//        if (ApprovalConstant.OPERATE_TYPE_CREATE.equals(operateType)) {
-//            selected.setApprovalName(i18nDao.findValueZHByKey(selected.getBusinessType()) +
-//                    (selected.getAssetType().equals(ApprovalConstant.ALL_GROUP) ? "" : "-" + groupDao.findByEncoded(selected.getAssetType()).getName()));
-//        }
-//    }
 
     public void setToUsing(String uid) {
         selected = configDao.findById(uid);
@@ -370,19 +297,6 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
         }
         return null;
     }
-
-//    TODO ACCT 不需要资产分类字段, 测试后删除
-    //TODO 资产分类问题,环球和acct是否冲突
-//    public String switchGroupName(String encoded) {
-//        if (null != encoded && !"".equals(encoded)) {
-//            if (ApprovalConstant.ALL_GROUP.equals(encoded)) {
-//                return "所有分组";
-//            } else {
-//                return groupDao.findByEncoded(encoded).getName();
-//            }
-//        }
-//        return null;
-//    }
 
     @Override
     protected GenericRepositoryUUID<MultiLevelApprovalConfig> getDAO() {
