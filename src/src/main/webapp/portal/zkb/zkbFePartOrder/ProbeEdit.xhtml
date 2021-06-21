@@ -191,7 +191,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbFePartOrderProbeController.showZkbhighCatFlag}">
                             <label class="label">是否高值探头*</label>
-                            <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.highCatFlag}" required="true" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
+                            <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.highCatFlag}" required="#{zkbFePartOrderProbeController.hasEditRight('Requested')}" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
                                 <p:ajax event="change" update="valueType valueTypeGroup" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="是" itemValue="t"/>

@@ -63,6 +63,10 @@ public class MaintenanceTemplate {
             this.content.put(Component.ACCESSORY_INFORMATION.toString(), Component.ACCESSORY_INFORMATION.value());
             this.content.put(Component.ACCESSORY_SIGNATURE.toString(), Component.ACCESSORY_SIGNATURE.value());
             this.content.put(Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.value());
+            this.content.put(Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), Component.MAINTENANCE_COMPLETION_SIGNATURE.value());
+            this.content.put(Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.toString(), Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.value());
+            this.content.put(Component.ACCEPTANCE_SIGNATURE.toString(), Component.ACCEPTANCE_SIGNATURE.value());
+            this.content.put(Component.ACCEPTANCE_SIGNATURE_TITLE.toString(), Component.ACCEPTANCE_SIGNATURE_TITLE.value());
             this.content.put(Component.MAINTENANCE_WORKFLOW.toString(), Component.MAINTENANCE_WORKFLOW.value());
             this.content.put(Component.AUDIT_RECORDS.toString(), Component.AUDIT_RECORDS.value());
             this.content.put(Component.CHECK_LIST.toString(), Component.CHECK_LIST.value());
