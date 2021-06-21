@@ -59,20 +59,6 @@
                         </p:selectOneMenu>
                     </h:panelGroup>
 
-                    <!--ACCT 测试后,稳定可删除-->
-                    <!--<h:panelGroup>
-                        <label class="label" style="font-size: medium; font-weight: bold">资产分类</label>
-                        <p:selectOneMenu id="assetGroup"
-                                         value="#{multiLevelApprovalConfigController.selected.assetType}"
-                                         required="true" requiredMessage="资产分类不能为空"
-                                         disabled="#{multiLevelApprovalConfigController.assetTypeEditable}">
-                            <f:selectItems value="#{multiLevelApprovalConfigController.sysAuthGroupList}" var="item"
-                                           itemLabel="#{item.name}" itemValue="#{item.encoded}"/>
-                            <p:ajax listener="#{multiLevelApprovalConfigController.onSelectAssetType()}" process="@this"
-                                    update="ApproveForm:assetGroup approvename "/>
-                        </p:selectOneMenu>
-                    </h:panelGroup>-->
-
                     <h:panelGroup>
                         <label class="label" style="font-size: medium; font-weight: bold">审批流名称</label>
                         <p:inputText id="approvename"
@@ -82,12 +68,6 @@
                         </p:inputText>
                     </h:panelGroup>
 
-                    <h:panelGroup>
-                        <label class="label" style="font-size: medium; font-weight: bold">是否委托OA系统审批</label>
-                        <p:selectBooleanCheckbox value="#{multiLevelApprovalConfigController.selected.entrustOa}">
-                            <p:ajax process="@this"/>
-                        </p:selectBooleanCheckbox>
-                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label" style="font-size: medium; font-weight: bold">是否启用该配置</label>
                         <p:selectOneRadio id="enable" value="#{multiLevelApprovalConfigController.selected.enable}">
