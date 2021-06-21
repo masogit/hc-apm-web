@@ -128,12 +128,12 @@ create view zkb_ib_cross_relation_ship_dblink as  SELECT t.id,
 	t.qr_code,
 	t.syetem_id
 FROM
-	dblink ('hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d' :: TEXT, 'select
+	dblink ('hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d', 'select
 	id,
 	login_name,
 	qr_code,
 	system_id
-	from zkb_ib_cross_relation_ship' :: TEXT ) T (
+	from zkb_ib_cross_relation_ship') T (
 	ID CHARACTER VARYING ( 32 ),
 	login_name CHARACTER VARYING ( 255 ),
 	qr_code CHARACTER VARYING ( 255 ),
