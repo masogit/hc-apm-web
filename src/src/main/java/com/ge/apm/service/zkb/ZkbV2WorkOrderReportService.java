@@ -49,21 +49,31 @@ public class ZkbV2WorkOrderReportService extends MicroServiceInvoker {
      */
     private static final int BEGIN_YEAR = 2019;
 
+    public static final String TEST_LOGIN_NAME="Y";
+
 
     /**
      * @param yearMap 年的title
      * @param yearMonthMap 统计每年平均的title
      * @param monthMap 月的title
+     * @param testLoginName 是否测试租户登录
      * @return
      */
     public List<Map<String, Object>> statisticsOrderCount(Map<String,String> yearMap,
                                                           Map<String,String> yearMonthMap,
-                                                          Map<String,String> monthMap)
+                                                          Map<String,String> monthMap,String testLoginName)
     {
         Date date = new Date();
         String formatDateYear = DateUtil.getFormatStrByDate(date,"yyyy");
         String formatDateMonth = DateUtil.getFormatStrByDate(date,"MM");
-        List<TenantInfo> tenantInfoList = this.tenantInfoRepository.findByType(TENANT_INFO_TYPE);
+        List<TenantInfo> tenantInfoList = null;
+        if(!TEST_LOGIN_NAME.equals(testLoginName))
+        {
+            tenantInfoList=this.tenantInfoRepository.findByTypeAndNameNotLike(TENANT_INFO_TYPE,ZkbFePartOrderService.testLoginNameStartWith);
+        }else
+            {
+                this.tenantInfoRepository.findByType(TENANT_INFO_TYPE);
+            }
         List<Map<String, Object>> zkbV2WorkOrderReportList = this.initZkbV2WorkOrderReportList(tenantInfoList);
         this.statisticsCurrentYearMonthCount(zkbV2WorkOrderReportList,formatDateYear,formatDateMonth,monthMap);
         this.statisticsYearCount(zkbV2WorkOrderReportList,formatDateYear,formatDateMonth,yearMap,yearMonthMap);
