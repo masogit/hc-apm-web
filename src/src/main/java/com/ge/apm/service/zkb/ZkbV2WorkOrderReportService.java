@@ -69,10 +69,10 @@ public class ZkbV2WorkOrderReportService extends MicroServiceInvoker {
         List<TenantInfo> tenantInfoList = null;
         if(!TEST_LOGIN_NAME.equals(testLoginName))
         {
-            tenantInfoList=this.tenantInfoRepository.findByTypeAndNameNotLike(TENANT_INFO_TYPE,ZkbFePartOrderService.testLoginNameStartWith);
+            tenantInfoList=this.tenantInfoRepository.findByTypeAndNameNotLike(TENANT_INFO_TYPE,"ZKB%");
         }else
             {
-                this.tenantInfoRepository.findByType(TENANT_INFO_TYPE);
+                tenantInfoList=this.tenantInfoRepository.findByType(TENANT_INFO_TYPE);
             }
         List<Map<String, Object>> zkbV2WorkOrderReportList = this.initZkbV2WorkOrderReportList(tenantInfoList);
         this.statisticsCurrentYearMonthCount(zkbV2WorkOrderReportList,formatDateYear,formatDateMonth,monthMap);
