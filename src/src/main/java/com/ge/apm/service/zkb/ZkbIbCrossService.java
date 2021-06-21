@@ -102,7 +102,7 @@ public class ZkbIbCrossService {
                 }
             }
         }
-
+        System.out.println("======");
         List<ZkbIbCrossUserStatus> zkbIbCrossUserStatusList = zkbIbCrossUserStatusRepository.find();
         for(ZkbIbCrossUserStatus s : zkbIbCrossUserStatusList){
             if(StringUtils.isEmpty(s.getLoginName())){
@@ -112,6 +112,7 @@ public class ZkbIbCrossService {
                 continue;
             }
             if("D".equals(s.getStatus())){
+                System.out.println(s.getLoginName());
                 ZkbIbCrossUser user = new ZkbIbCrossUser();
                 user.setLoginName("ZKB."+s.getLoginName());
                 user.setDeleted(true);
