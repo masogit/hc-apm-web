@@ -353,7 +353,6 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         }else
             {
                 this.selected.setContractCatId(null);
-                this.selected.setHighCatFlag(null);
                 calcRemainQty();
                 if(this.selected.getRemainQty()<0)
                 {
@@ -362,9 +361,13 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 }
                 this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
             }
+        if(!this.showZkbhighCatFlag)
+        {
+            this.selected.setHighCatFlag(null);
+        }
         if(this.selected.getQty()>0)
         {
-            this.zkbFePartOrderService.moveProbe(1,this.contractList.get(0),this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected);
+            this.zkbFePartOrderService.moveProbe(1,this.contractList.get(0),this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true);
         }
         String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null, GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
@@ -416,7 +419,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(this.selected.getQty()>0)
         {
-            this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected);
+            this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true);
         }
         if(StringUtils.isNotBlank(this.selected.getContractCatId()))
         {
@@ -437,17 +440,35 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(this.selected.getQty()>0){
-            this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected);
+
+            Boolean firstSave = true;
+            Boolean secondSave = false;
             if("t".equals(this.selected.getNewCatFlag()))
             {
                 zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
                 Date contractStartDate = this.zkbFePartOrderService.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
                 if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)==-1)
                 {
-                    this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected);
-                    this.selected.setQty(this.getSelected().getQty()*2);
+                    secondSave=true;
+                    firstSave=false;
                 }
             }
+
+            this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,firstSave);
+//            if("t".equals(this.selected.getNewCatFlag()))
+//            {
+//                zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+//                Date contractStartDate = this.zkbFePartOrderService.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+//                if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)==-1)
+//                {
+                    if(secondSave)
+                    {
+                        this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,secondSave);
+                        this.selected.setQty(this.getSelected().getQty()*2);
+                    }
+
+//                }
+//            }
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
