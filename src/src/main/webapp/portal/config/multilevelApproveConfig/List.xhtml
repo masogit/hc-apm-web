@@ -36,11 +36,6 @@
                             <h:outputText value="#{multiLevelApprovalConfigController.switchName(item.businessType)}"/>
                         </p:column>
 
-                       <!-- <p:column headerText="资产分组" sortBy="#{item.assetType}">
-                            <h:outputText
-                                    value="#{multiLevelApprovalConfigController.switchGroupName(item.assetType)}"/>
-                        </p:column>-->
-
                         <p:column id="org" headerText="组织机构" sortBy="#{item.orgUid}" style="width:26%;text-align: left">
                             <h:outputText value="#{multiLevelApprovalConfigController.getOrgFullName(item.orgUid)}"/>
                         </p:column>
