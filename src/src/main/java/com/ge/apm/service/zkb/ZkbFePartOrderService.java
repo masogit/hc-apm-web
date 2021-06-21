@@ -576,7 +576,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }else if("CCS".equals(zkbContract.getContractType())
                 ||"Biomed".equals(zkbContract.getContractType()))
         {
-            orderType =ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString();;
+            orderType =ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString();
             switch(type){
                 case 1 :
                     zkbContract.setGeArtificialSupportTimes(zkbContract.getGeArtificialSupportTimes()-1);

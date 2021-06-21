@@ -171,7 +171,7 @@
                 <p:menuitem value="权重配置" outcome="/portal/zkb/keyHehaviorIndex/ConfigList.xhtml" rendered="#{userContextService.geAdmin}"/>
             </p:submenu>
 
-            <p:submenu label="报表管理" icon="fa fa-wrench" rendered="#{userContextService.geAdmin}">
+            <p:submenu label="报表管理" icon="fa fa-wrench" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}">
                 <p:menuitem value="维修工单报表" outcome="/portal/zkb/report/List.xhtml" />
             </p:submenu>
 
