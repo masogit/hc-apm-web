@@ -938,11 +938,12 @@ public class UserContextService implements Serializable {
         return false;
     }
 
-    public boolean isZkbFeUserConfig() {
+    public boolean isZkbFeUserConfig(String configType)
+    {
         UserAccount user = getLoginUser();
         if(StringUtils.isBlank(user.getLoginName()))
             return false;
-        List<ZkbFePartOrderUserConfig>  zkbFePartOrderUserConfig= this.zkbFePartOrderUserConfigRepository.findByLoginName(user.getLoginName());
+        List<ZkbFePartOrderUserConfig>  zkbFePartOrderUserConfig= this.zkbFePartOrderUserConfigRepository.findByLoginNameAndConfigType(user.getLoginName(),configType);
         if(CollectionUtils.isNotEmpty(zkbFePartOrderUserConfig))
             return true;
         return false;
