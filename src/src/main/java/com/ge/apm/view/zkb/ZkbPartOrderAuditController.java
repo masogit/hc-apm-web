@@ -641,7 +641,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
                 boolean flag = true;
                 String errorLog = "";
-
+                Integer t= 0;
                 for(ZkbPartOrderItem zkbPartOrderItem : selected.getZkbPartOrderItems()){
                     if(StringUtils.isEmpty(zkbPartOrderItem.getPartNo())){
                         flag = false;
@@ -662,9 +662,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     if(zkbPartOrderItem.getPrePartQty() > zkbPartOrderItem.getPartQty()){
                         if(StringUtils.isEmpty(zkbPartOrderItem.getRemark())){
                             flag = false;
-                            errorLog += "实际配件数量修改后备注不能为空,";
+                            errorLog += "配件号为"+zkbPartOrderItem.getPartNo()+"的实际配件数量修改后备注不能为空,";
                         }
                     }
+                    t += zkbPartOrderItem.getPartQty();
                     ZkbPartOrderItem oldItem = zkbPartOrderService.getZkbPartOrderItemRepository().findById(zkbPartOrderItem.getId());
                     if(oldItem != null){
                         if(!oldItem.getPartNo().equals(zkbPartOrderItem.getPartNo()) || !oldItem.getPartName().equals(zkbPartOrderItem.getPartName())){
@@ -680,6 +681,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     WebUtil.addErrorMessage(errorLog,"");
                     return "";
                 }
+                selected.setQty(t);
             }
         }
         if((ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType()))
