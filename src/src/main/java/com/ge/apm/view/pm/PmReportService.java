@@ -260,10 +260,6 @@ public class PmReportService {
             }
         }
 
-        logger.info("---------------wcSignature : "+wcSignature);
-        logger.info("---------------ackSignature : "+ackSignature);
-        logger.info("---------------content : "+content.toString());
-
         if (!content.containsKey(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString())) {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
