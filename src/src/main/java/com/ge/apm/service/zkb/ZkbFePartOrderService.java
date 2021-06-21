@@ -25,6 +25,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 import java.text.ParseException;
@@ -667,7 +668,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param showZkbPoProbeQuotaType 是否显示按钮
      * @param zkbPoProbeQuotaType 按钮选择
      */
-    public void moveProbe(Integer type,ZkbContract zkbContract,Integer qty,Boolean showZkbPoProbeQuotaType,String zkbPoProbeQuotaType,UserAccount userAccount,ZkbFePartOrder zkbFePartOrder)
+    public void moveProbe(Integer type,ZkbContract zkbContract,Integer qty,Boolean showZkbPoProbeQuotaType,String zkbPoProbeQuotaType,UserAccount userAccount,ZkbFePartOrder zkbFePartOrder,Boolean record)
     {
             Integer probeQuota = zkbContract.getProbeQuota()==null?0:zkbContract.getProbeQuota();
             Integer probeQuotaTotal = zkbContract.getProbeQuotaTotal()==null?0:zkbContract.getProbeQuotaTotal();
@@ -850,7 +851,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     }
                 }
             this.zkbContractRepository.save(zkbContract);
-            this.zkbContractQuotaLogService.saveData(zkbContract,null,zkbFePartOrder,opType,orderType,"zkbFePartOrder",userAccount);
+            if(record&&StringUtils.isNotBlank(orderType))
+            {
+                this.zkbContractQuotaLogService.saveData(zkbContract,null,zkbFePartOrder,opType,orderType,"zkbFePartOrder",userAccount);
+            }
+
     }
 
     public void sendWeChatRemindLetter(ZkbFePartOrder zkbFePartOrder){
@@ -1688,7 +1693,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         ZkbContract zkbContract =  this.zkbContractRepository.findById(zkbFePartOrder.getContractId());
         if(!ZkbFePartOrderSparePartDetailController.badReturnValue.equals(zkbFePartOrder.getReturnType()))
         {
-            this.moveProbe(5,zkbContract,zkbFePartOrder.getQty(),showZkbPoProbeQuotaType,zkbFePartOrder.getZkbPoProbeQuotaType(),userAccount,zkbFePartOrder);
+            this.moveProbe(5,zkbContract,zkbFePartOrder.getQty(),showZkbPoProbeQuotaType,zkbFePartOrder.getZkbPoProbeQuotaType(),userAccount,zkbFePartOrder,true);
             if(StringUtils.isNotBlank(zkbFePartOrder.getContractCatId()))
             {
                 this.updateZkbContractCat(userAccount,true,zkbFePartOrder.getContractCatId());
