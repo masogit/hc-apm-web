@@ -4207,3 +4207,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','loginTime','登陆时间','login time',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','logoutTime','登出时间','logout time',NULL,-1);
 --2021-05-24  end
+
+
+--apm-schedual新增模板導入 zkb代理商fe/sales     start 0610
+insert into i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) values ('batchFileType','ZKBDealerFEAndSalesExcel','ZKB代理商FE/Sales列表','ZKB Dealer FE and Sales List',NULL,-1);
+--apm-schedual新增模板導入 zkb代理商fe/sales     end   0610
+
+
