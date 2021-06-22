@@ -43,7 +43,7 @@ where not exists (select 1 from user_subscription_push where menu_type=12 and ro
 -- end
 
 --2021/6/8 owoc, us update ib_status = 6
-update asset_info set ib_status = 6 where uid in (select asset_uid from asset_tags where lower(tag) in ('us', 'owoc')) and ge_device_type in (1, 2, 21, 23, 24, 3) and ib_status in (1, 4);
+update asset_info set ib_status = 6 where uid in (select asset_uid from asset_tags where lower(tag) in ('us', 'owoc')) and ib_status = 1 and is_deleted =false and ge_device_type is not null and site_id = 46;
 
 --2021/6/8 delete us data in "iwic_monthly_report" and "di_quarterly_report"
 delete from iwic_monthly_report where ge_device_type in (3, 31, 32, 33);
