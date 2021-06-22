@@ -696,7 +696,7 @@ public class ZkbKeyBehaviorIndexService {
             return totalIbNumber;
         }
         List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findZkbContractAssetByTenantUID(tenantUID,firstDate,kpiDate);
-        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList =  this.zkbAssetQrCodeInfoRepository.findByTenantUIDAndCanNotPastQrCode(tenantUID,yes);
+
         if(CollectionUtils.isEmpty(zkbContractAssetList))
         {
             zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
@@ -707,15 +707,14 @@ public class ZkbKeyBehaviorIndexService {
         {
             assetId.add(item.getAssetId());
         }
+        Integer count =  this.zkbAssetQrCodeInfoRepository.findCount(assetId,tenantUID,yes);
         Integer countAssetWithQRcode = this.assetInfoMapper.countAssetWithQRcode(assetId,tenantUID);
         if(countAssetWithQRcode==null)
         {
             countAssetWithQRcode=0;
         }
-        if(CollectionUtils.isNotEmpty(zkbAssetQrCodeInfoList))
-        {
-            countAssetWithQRcode=countAssetWithQRcode+zkbAssetQrCodeInfoList.size();
-        }
+        count=count==null?0:count;
+        countAssetWithQRcode=countAssetWithQRcode+count;
         remark=remark.append("countAssetWithQRcode:").append(countAssetWithQRcode).append(";");
         Integer fullScore = zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore();
         Integer pasteQuickResponseRateScore = new BigDecimal(countAssetWithQRcode).
