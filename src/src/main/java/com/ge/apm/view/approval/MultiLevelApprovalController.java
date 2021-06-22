@@ -130,7 +130,6 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             return;
          }
         multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
-
         selected = null;
     }
 
