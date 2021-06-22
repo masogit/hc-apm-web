@@ -140,4 +140,8 @@ public interface ApprovalConstant {
 
     String PM_APPROVAL_STATUS_AGREE = "2";//保养多级审批同意状态
     String PM_APPROVAL_STATUS_DISAGREE = "3";//保养多级审批不同意状态
+
+    //维修保养工单审批备件,同意状态
+    Integer WORK_DETAIL_STATUS_DISAGREE = 0;//不同意
+    Integer WORK_DETAIL_STATUS_AGREE = 1;//同意
 }
