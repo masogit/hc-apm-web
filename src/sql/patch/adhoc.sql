@@ -47,3 +47,4 @@ where not exists (select 1 from sys_role where name='MultiLevelAuditor');
 -- end
 
 update zkb_part_order_item set pre_part_qty = part_qty  where pre_part_qty is null ;
+update zkb_contract c  set last_modified_date = '2021-06-23' where c.start_date <= '2021-06-23' and c.end_date >= '2021-06-23';
