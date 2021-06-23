@@ -681,6 +681,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     WebUtil.addErrorMessage(errorLog,"");
                     return "";
                 }
+                if(t == 0){
+                    WebUtil.addErrorMessage("实际配件数量不能全部为0","");
+                    return "";
+                }
                 selected.setQty(t);
             }
         }
