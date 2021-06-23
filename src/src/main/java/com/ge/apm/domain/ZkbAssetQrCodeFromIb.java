@@ -44,6 +44,17 @@ public class ZkbAssetQrCodeFromIb {
     @Column(name = "is_qr_code")
     private Boolean isQrCode;
 
+    @Column(name = "one_qr_code")
+    private String oneQrCode;
+
+    public String getOneQrCode() {
+        return oneQrCode;
+    }
+
+    public void setOneQrCode(String oneQrCode) {
+        this.oneQrCode = oneQrCode;
+    }
+
     public String getId() {
         return id;
     }
