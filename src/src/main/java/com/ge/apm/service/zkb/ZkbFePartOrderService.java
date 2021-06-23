@@ -524,6 +524,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public void updateZkbContractCat(UserAccount userAccount,Boolean isEnabled,String id)
     {
         ZkbContractCat zkbContractCat = this.zkbContractCatRepository.findById(id);
+        if(zkbContractCat==null)
+        {
+            return;
+        }
         zkbContractCat.setLastModifiedDate(new Date());
         zkbContractCat.setEnabled(isEnabled);
         zkbContractCat.setLastModifiedBy(userAccount.getName());
