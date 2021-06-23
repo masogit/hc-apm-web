@@ -46,3 +46,4 @@ INSERT INTO sys_role ( "name", "role_desc", "role_desc_en")  select 'MultiLevelA
 where not exists (select 1 from sys_role where name='MultiLevelAuditor');
 -- end
 
+update zkb_part_order_item set pre_part_qty = part_qty  where pre_part_qty is null ;
