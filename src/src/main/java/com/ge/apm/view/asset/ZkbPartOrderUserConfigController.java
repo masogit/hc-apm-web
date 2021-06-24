@@ -1,12 +1,17 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
+import com.ge.apm.domain.ZkbPartOrder;
+import com.ge.apm.domain.ZkbPartOrderCat;
+import com.ge.apm.domain.ZkbPartOrderStep;
 import com.ge.apm.domain.ZkbPartOrderUserConfig;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbPartOrderUserConfigService;
+import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +27,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * @author 503202755 2020/9/25
@@ -60,6 +67,9 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
      */
     private List<Map<String, Object>> errorList;
 
+    private ZkbPartOrderUserConfig backUpUser = new ZkbPartOrderUserConfig();
+    private List<ZkbPartOrderUserConfig> backUpList = new ArrayList<>();
+
 
     /**
      * 初始化
@@ -69,6 +79,40 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         super.init();
         zkbPartOrderUserConfigService = WebUtil.getBean(ZkbPartOrderUserConfigService.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+
+    }
+
+    @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        super.prepareCreate();
+        backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+        if(selected != null){
+            for(ZkbPartOrderUserConfig c : backUpList){
+                if(selected.getId().equals(c.getId())){
+                    backUpList.remove(c);
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void prepareEdit() {
+        super.prepareEdit();
+        backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+        if(selected != null){
+            for(ZkbPartOrderUserConfig c : backUpList){
+                if(selected.getId().equals(c.getId())){
+                    backUpList.remove(c);
+                    break;
+                }
+            }
+        }
+        if(StringUtils.isNotEmpty(selected.getUsBackUpId())){
+            backUpUser = zkbPartOrderUserConfigRepository.findById(selected.getUsBackUpId());
+        }else {
+            backUpUser =new ZkbPartOrderUserConfig();
+        }
     }
 
     @Override
@@ -170,8 +214,34 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
                 return;
             }
         }
+        if(backUpUser != null && StringUtils.isNotEmpty(backUpUser.getId())){
+            selected.setUsBackUpId(backUpUser.getId());
+            selected.setUsBackUpName(backUpUser.getName());
+        }
         super.save();
         this.selected = null;
+        this.backUpUser = null;
+    }
+
+    public List<ZkbPartOrderUserConfig> autoCompleteBackUpList(String query){
+        List<ZkbPartOrderUserConfig> res = backUpList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).collect(Collectors.toList());
+        return res;
+    }
+
+    public ZkbPartOrderUserConfig getBackUpUser() {
+        return backUpUser;
+    }
+
+    public void setBackUpUser(ZkbPartOrderUserConfig backUpUser) {
+        this.backUpUser = backUpUser;
+    }
+
+    public List<ZkbPartOrderUserConfig> getBackUpList() {
+        return backUpList;
+    }
+
+    public void setBackUpList(List<ZkbPartOrderUserConfig> backUpList) {
+        this.backUpList = backUpList;
     }
 
     public List<Map<String, Object>> getErrorList() {

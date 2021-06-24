@@ -20,6 +20,7 @@ import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
 import org.primefaces.model.TreeNode;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.ObjectUtils;
@@ -72,6 +73,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
     private List<V2_BlobObject> batchBlobObjectList = new ArrayList<>();
     private Set<V2_BlobObject> repeatBlobObjectSet;
     private Set<AssetInfo> repeatAssets;
+    private List<AssetInfo> assetInfoList;
     private String boSubTypeBatch;
 
     //复选的附件数据
@@ -465,9 +467,13 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         dao.save(batchSaveObject);
         return "List.xhtml?faces-redirect=true";
     }
-
-    public Set<AssetInfo> getAssetInfos() {
-        return repeatAssets;
+    public void cancelData(){
+        repeatBlobObjectSet = new HashSet<>();
+        repeatAssets = new HashSet<>();
+        assetInfoList = new ArrayList<>();
+    }
+    public List<AssetInfo> getAssetInfos() {
+        return assetInfoList;
     }
     public boolean getFlag() {
         if (repeatAssets != null && !repeatAssets.isEmpty()){
@@ -480,7 +486,8 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             return ;
         }
         repeatBlobObjectSet = new HashSet<>();
-        repeatAssets = new HashSet<>();;
+        repeatAssets = new HashSet<>();
+        assetInfoList = new ArrayList();
         for (AssetInfo tempAssetInfo : targetAssets) {
             List<V2_BlobObject> v2BlobObjectList = dao.findByBoUuid(tempAssetInfo.getUid());
             Set<String> objectNameSet = new HashSet<>();
@@ -490,8 +497,11 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             for(V2_BlobObject batchBlobObject : batchBlobObjectList){
                 if(!objectNameSet.isEmpty() && objectNameSet.contains(batchBlobObject.getObjectName())){
                     repeatBlobObjectSet.add(batchBlobObject);
-                    tempAssetInfo.setErrorMessage(batchBlobObject.getObjectName());
+                    AssetInfo assetInfo = new AssetInfo();
+                    BeanUtils.copyProperties(tempAssetInfo,assetInfo);
+                    assetInfo.setErrorMessage(batchBlobObject.getObjectName());
                     repeatAssets.add(tempAssetInfo);
+                    assetInfoList.add(assetInfo);
                 }else {
                     V2_BlobObject tempBlobObject = new V2_BlobObject();
                     tempBlobObject.setBoId(tempAssetInfo.getId());

@@ -415,9 +415,14 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
 
         int startRow = EXCEL_ASSET_DATA_ROW;
 
+        GetAllElement getAllElement = new GetAllElement(assetList).invoke();
+        Map<String, List<String>> assetMap = getAllElement.getAssetMap();
+        Map parentAssets = getAllElement.getParentAssets();
+        Map supliers = getAllElement.getSupliers();
+
         for (AssetInfo assetInfo: assetList) {
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this, assetDao, orgDao, supplierDao,userDao,authGroupDao);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite,null,null, null);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(this.crossSite,assetMap,parentAssets, supliers);
 
             writer.writeRowData(startRow, rowMap);
 
@@ -652,10 +657,23 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                     suplierIds.add(assetList.get(i).getSupplierId());
                 }
             }
-            List<HashMap> map = assetTagsMapper.getTagsByAssetMap(uids);
+
+            //每次查1万条
+            List<HashMap> map = new ArrayList<>();
+            int size = uids.size();
+            int num = size / 10000;
+            for (int i = 0; i <= num; i++) {
+                List<String> tempList;
+                if(i == num){
+                    tempList = uids.subList(i * 10000, size);
+                }else{
+                    tempList = uids.subList(i * 10000, (i + 1) * 10000 -1);
+                }
+                map.addAll(assetTagsMapper.getTagsByAssetMap(tempList));
+            }
 
             assetMap = new HashMap<String, List<String>>();
-            /*
+
             for (int i = 0; i <map.size() ; i++) {
                 //判断assetMap中有没有当前的key
                 List<String> assetTagNow = assetMap.get(map.get(i).get("asset_uid"));//尝试从当前assetMap中获取asset_uid对应的数组
@@ -668,7 +686,7 @@ public class AssetFileDynamicTemplate extends AssetFileImportBaseService {
                     assetTagOld.add((String) map.get(i).get("tag"));
                     assetMap.put((String) map.get(i).get("asset_uid"),assetTagOld);
                 }
-            }*/
+            }
 
             List<Integer> parendAssetIdList = new ArrayList<>(parendAssetIds);
             List<AssetInfo> parentAssetMap = new ArrayList();

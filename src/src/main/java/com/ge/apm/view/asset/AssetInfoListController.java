@@ -57,6 +57,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private OrgInfoTreeService orgInfoTreeService;
     private I18nMessageRepository i18nDao;
     private TenantOptionConfigRepository tenantOptionConfigRepository;
+    private AssetHistoryService assetHistoryService;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -145,7 +146,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         supplierDao = WebUtil.getBean(SupplierRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
-
+        assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -519,6 +520,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
             String assetUid = entry.getKey();
             AssetInfo assetInfo = dao.getByUid(assetUid);
+            AssetInfo oldAsset = assetHistoryService.depCopy(assetInfo);
             if (assetInfo == null) {
                 continue;
             }
@@ -529,6 +531,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             }
             int originStatus = assetInfo.getStatus();
             assetInfo.setStatus(4);
+            assetHistoryService.saveAssetHistoryIfUpdated(oldAsset,assetInfo);
             dao.save(assetInfo);
             aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());
             assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());

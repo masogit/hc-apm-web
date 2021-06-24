@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:P="http://java.sun.com/jsf/html"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="多级审批配置"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="MultiLevelListForm">
+                    <p:dataTable id="datalist" value="#{multiLevelApprovalConfigController.lazyModel}" var="item"
+                                 widgetVar="varDataList"
+                                 selectionMode="single" selection="#{multiLevelApprovalConfigController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,50,100,500">
+
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{multiLevelApprovalConfigController.onFilter}"
+                                update="createButton"/>
+
+                        <p:column headerText="审批流名称" width="18%" sortBy="#{item.approvalName}"
+                                  filterBy="#{item.approvalName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.approvalName}"/>
+                        </p:column>
+
+                        <p:column headerText="业务类型" sortBy="#{item.businessType}">
+                            <h:outputText value="#{multiLevelApprovalConfigController.switchName(item.businessType)}"/>
+                        </p:column>
+
+                        <p:column id="org" headerText="组织机构" sortBy="#{item.orgUid}" style="width:26%;text-align: left">
+                            <h:outputText value="#{multiLevelApprovalConfigController.getOrgFullName(item.orgUid)}"/>
+                        </p:column>
+
+                        <p:column headerText="是否启用" sortBy="#{item.enable}" filterBy="#{item.enable}"
+                                  filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                    <f:converter converterId="javax.faces.Boolean"/>
+                                    <f:selectItem itemLabel="#{msg.All}" itemValue=""/>
+                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.enable? msg.True2Yes : msg.False2No }"/>
+                        </p:column>
+
+                        <p:column headerText="启用禁用" width="9%" exportable="false">
+                            <p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}"
+                                             actionListener="#{multiLevelApprovalConfigController.setToUsing(item.id)}"
+                                             update=":MultiLevelListForm:datalist" rendered="#{!item.enable}"/>
+                            <p:commandButton icon="ui-icon-close" style="zoom:0.7" title="#{msg.Disabled}"
+                                             actionListener="#{multiLevelApprovalConfigController.setNotUsing(item.id)}"
+                                             update=":MultiLevelListForm:datalist" rendered="#{item.enable}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
+                                             title="#{msg.Create}"
+                                             update="ApproveForm"
+                                             actionListener="#{multiLevelApprovalConfigController.preCreate}"
+                                             oncomplete="PF('ApproveDialog').show()"/>
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
+                                             title="#{msg.Edit}" style="zoom:0.9;"
+                                             disabled="#{empty multiLevelApprovalConfigController.selected}"
+                                             update="ApproveForm"
+                                             actionListener="#{multiLevelApprovalConfigController.preEdit}"
+                                             oncomplete="PF('ApproveDialog').show()"/>
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"
+                                             title="#{msg.Delete}" update="datalist, :growl"
+                                             disabled="#{empty multiLevelApprovalConfigController.selected}"
+                                             actionListener="#{multiLevelApprovalConfigController.delete}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}"
+                                           icon="ui-icon-warning"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="Edit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

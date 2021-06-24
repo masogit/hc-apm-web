@@ -51,11 +51,20 @@
                     <h:panelGroup>
                         <label class="label">资产类型</label>
                         <p:selectOneMenu id="assetType" value="#{zkbPartOrderUserConfigController.selected.assetType}" required="false" requiredMessage="资产类型#{msg.ValidationRequire}">
+                            <p:ajax  update="backUpGroup" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="US" itemValue="US"/>
                             <f:selectItem itemLabel="CT" itemValue="CT"/>
                             <f:selectItem itemLabel="XR" itemValue="XR"/>
                         </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup id="backUpGroup">
+                        <h:panelGroup  rendered="#{zkbPartOrderUserConfigController.selected.assetType eq 'US'}">
+                            <label class="label">usbackUp</label>
+                            <p:autoComplete dropdown="true" value="#{zkbPartOrderUserConfigController.backUpUser}"  scrollHeight="300" forceSelection="true"
+                                            completeMethod="#{zkbPartOrderUserConfigController.autoCompleteBackUpList}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="zkbPartOrderUserConfigConverter">
+                            </p:autoComplete>
+                        </h:panelGroup>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">备注</label>
@@ -76,6 +85,8 @@
                             <f:selectItem itemLabel="否" itemValue="f"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
+
+
                 </p:panelGrid>
                 <h:panelGroup>
                     <p:commandButton validateClient="true" actionListener="#{zkbPartOrderUserConfigController.save}" update=":zkbPartOrderUserConfigListForm :zkbPartOrderUserConfigEditForm :growl" value="#{msg.Save}" icon="ui-icon-check"/>
