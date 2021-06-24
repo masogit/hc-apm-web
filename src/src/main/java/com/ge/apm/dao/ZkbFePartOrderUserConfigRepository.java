@@ -27,4 +27,12 @@ public interface ZkbFePartOrderUserConfigRepository extends GenericRepositoryUUI
      */
     List<ZkbFePartOrderUserConfig> findByLoginNameAndIdNot(String loginName, String id);
 
+    /**
+     * 根据登录用户名和类型查找
+     * @param loginName 登录用户名
+     * @param configType 配置类型
+     * @return
+     */
+    List<ZkbFePartOrderUserConfig> findByLoginNameAndConfigType(String loginName,String configType);
+
 }

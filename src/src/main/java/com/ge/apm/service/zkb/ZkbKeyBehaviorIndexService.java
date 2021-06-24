@@ -1,6 +1,7 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.ZkbKeyBehaviorIndexMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoRow;
@@ -99,6 +100,9 @@ public class ZkbKeyBehaviorIndexService {
      */
     @Autowired
     private V2_PmOrderRepository v2PmOrderRepository;
+
+    @Autowired
+    private AssetInfoMapper assetInfoMapper;
 
     /**
      * 导入模板头部行数
@@ -692,7 +696,7 @@ public class ZkbKeyBehaviorIndexService {
             return totalIbNumber;
         }
         List<ZkbContractAsset> zkbContractAssetList = this.zkbContractAssetRepository.findZkbContractAssetByTenantUID(tenantUID,firstDate,kpiDate);
-        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList =  this.zkbAssetQrCodeInfoRepository.findByTenantUIDAndCanNotPastQrCode(tenantUID,yes);
+
         if(CollectionUtils.isEmpty(zkbContractAssetList))
         {
             zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(0);
@@ -703,20 +707,26 @@ public class ZkbKeyBehaviorIndexService {
         {
             assetId.add(item.getAssetId());
         }
-        Integer countAssetWithQRcode = this.assetInfoRepository.countAssetWithQRcode(assetId);
+        Integer count =  this.zkbAssetQrCodeInfoRepository.findCount(assetId,tenantUID,yes);
+        Integer countAssetWithQRcode = this.assetInfoMapper.countAssetWithQRcode(assetId,tenantUID);
         if(countAssetWithQRcode==null)
         {
             countAssetWithQRcode=0;
         }
-        if(CollectionUtils.isNotEmpty(zkbAssetQrCodeInfoList))
-        {
-            countAssetWithQRcode=countAssetWithQRcode+zkbAssetQrCodeInfoList.size();
-        }
+        count=count==null?0:count;
+        countAssetWithQRcode=countAssetWithQRcode+count;
         remark=remark.append("countAssetWithQRcode:").append(countAssetWithQRcode).append(";");
+        Integer fullScore = zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore();
         Integer pasteQuickResponseRateScore = new BigDecimal(countAssetWithQRcode).
                 divide(new BigDecimal(totalIbNumber),2,BigDecimal.ROUND_HALF_DOWN).
-                multiply(new BigDecimal(zkbKeyBehaviorIndex.getPasteQuickResponseRateFullScore())).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
-        zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(pasteQuickResponseRateScore);
+                multiply(new BigDecimal(fullScore)).setScale(0,BigDecimal.ROUND_HALF_DOWN).intValue();
+        if(pasteQuickResponseRateScore>fullScore)
+        {
+            zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(fullScore);
+        }else
+            {
+                zkbKeyBehaviorIndex.setPasteQuickResponseRateScore(pasteQuickResponseRateScore);
+            }
         return totalIbNumber;
     }
 

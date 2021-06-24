@@ -43,18 +43,6 @@ public class MultiLevelApprovalConfig implements Serializable {
     private String businessType;
 
     /**
-     * 资产类型
-     */
-    @Column(name = "asset_type")
-    private String assetType;
-
-    /**
-     * 是否委托oa审批
-     */
-    @Column(name = "is_entrust_oa")
-    private boolean entrustOa;
-
-    /**
      * 是否启用配置
      */
     @Column(name = "enable")
@@ -134,14 +122,6 @@ public class MultiLevelApprovalConfig implements Serializable {
      */
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
-
-    public boolean getEntrustOa() {
-        return entrustOa;
-    }
-
-    public void setEntrustOa(boolean entrustOa) {
-        this.entrustOa = entrustOa;
-    }
 
     public boolean getEnable() {
         return enable;

@@ -322,7 +322,7 @@ public class AssetInfoBulkEditService {
         Boolean isAllTransfer = isAllParrentAssetAndChildAssetTransfer(parrentAssetUids, assets);
 
         for (AssetInfo item : assets) {
-            AssetInfo oldAssetInfo = depCopy(item);
+            AssetInfo oldAssetInfo = assetHistoryService.depCopy(item);
             item.setSiteUID(targetAsset.getSiteOrg().getSiteUID());
             item.setHospitalUID(targetAsset.getSiteOrg().getHospitalUID());
             item.setInstitutionUID(targetAsset.getSiteOrg().getInstitutionUID());
@@ -350,23 +350,6 @@ public class AssetInfoBulkEditService {
 
         assetInfoDao.save(assets);
 
-    }
-
-    public static <T> T depCopy(T srcList) {
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(byteOut);
-            out.writeObject(srcList);
-            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
-            ObjectInputStream inStream = new ObjectInputStream(byteIn);
-            T destList = (T) inStream.readObject();
-            return destList;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private void commitPmRule(List<AssetInfo> assets, AssetInfo targetAsset) {

@@ -173,7 +173,7 @@
                 <p:commandButton validateClient="true" action="#{assetFileAttachmentController.batchSave()}" value="#{msg.Save}" update="FileAssetForm importDataForm"  icon="ui-icon-check"   auto="true" rendered="#{assetFileAttachmentController.getFlag()}"/>
                 <p:commandButton validateClient="true" action="#{assetFileAttachmentController.repeatSave()}" value="继续上传" update=":AssetFileAttachmentListForm:datalist, :growl"  icon="ui-icon-check"   auto="true" rendered="#{!assetFileAttachmentController.getFlag()}"/>
 
-                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('FileEditDialog').hide()"/>
+                <p:commandButton immediate="true" action="#{assetFileAttachmentController.cancelData()}" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('FileEditDialog').hide()"/>
             </h:panelGroup>
         </h:form>
         <h:form id="importDataForm">

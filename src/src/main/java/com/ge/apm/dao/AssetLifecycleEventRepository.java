@@ -1,25 +1,18 @@
 package com.ge.apm.dao;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
+import com.ge.apm.domain.AssetLifecycleEvent;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.domain.AssetLifecycleEvent;
-
 import webapp.framework.dao.GenericRepositoryUUID;
+import java.util.List;
+import java.util.Set;
 
 public interface AssetLifecycleEventRepository extends GenericRepositoryUUID<AssetLifecycleEvent> {
 
-
 	@Query(value="select ale.* from asset_lifecycle_event ale where ale.event_type = 3 and ale.asset_uid = ?1 limit 4", nativeQuery = true)
 	public List<AssetLifecycleEvent> getLifeCycleEventList(String assetUid);
-        
-        
+
 	public List<AssetLifecycleEvent> findByAssetUid(String assetUid);
 
 	@Transactional
@@ -40,6 +33,7 @@ public interface AssetLifecycleEventRepository extends GenericRepositoryUUID<Ass
 
 	/*public List<ExternalWorkOrder> getExWorkOrderList();*/
 
-
+	@Query(nativeQuery=true, value= "select le.* from v2_work_order wo, asset_lifecycle_event le where wo.ID = le.event_uid and wo.status != le.status and le.description like '%待关单%' and wo.status = 2")
+	public List<AssetLifecycleEvent> getIncorrectedEvent();
 
 }

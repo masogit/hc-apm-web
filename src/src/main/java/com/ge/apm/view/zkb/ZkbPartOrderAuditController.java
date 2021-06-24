@@ -76,6 +76,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private ZkbPartOrderReturn zkbPartOrderReturnModify;
     private String saveTips;
     private String letterTips;
+    private List<HashMap<String, String>> highCatList = new ArrayList<>();
+    private String showCatListFlag = "";//1显示探头 2:显示sn列表
+
+
     @Override
     protected void init() {
         super.init();
@@ -123,7 +127,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     selected.setRemainQty(zkbContract.getSpareArtificail());
                 }
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-                selected.setRemainQty(zkbContract.getProbeQuota());
+                if(StringUtils.isNotEmpty(selected.getProbeQuotaType())){
+                    if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(selected.getProbeQuotaType())){
+                        this.selected.setRemainQty(zkbContract.getProbeQuota());
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(selected.getProbeQuotaType())){
+                        this.selected.setRemainQty(zkbContract.getProbeQuotaNormal());
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())){
+                        this.selected.setRemainQty(zkbContract.getProbeQuotaSpecial());
+                    }
+                }else{
+                    if(StringUtils.isEmpty(selected.getHighCatFlag()) || CopyByInvok.F.equals(selected.getHighCatFlag())){
+                        this.selected.setRemainQty(zkbContract.getProbeQuota());
+                    }else{
+                        this.selected.setRemainQty(0);
+                    }
+                }
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     selected.setRemainQty(zkbContract.getGeArtificialSupportTimes());
@@ -148,6 +166,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
             }
             initReturnList();
+            initHighList(zkbContract.getId());
 
             if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
                 showOrderedFieldsetText = "派工信息";
@@ -194,7 +213,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         }
                     }else if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(selected.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
                         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-                            if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                            boolean f = false;
+                            if(selected.getZkbPartOrderCat() != null && !ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                                f = true;
+                            }else if("t".equals(selected.getHighCatFlag())){
+                                f = true;
+                            }
+                            if(f){
                                 boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
                                 if(!r){
                                     WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
@@ -219,6 +244,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }
             if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
                 initRemindLetterFlag();
+                if(StringUtils.isNotEmpty(selected.getProbeQuotaType()) && ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
+                    showCatListFlag = "2";
+                }else if(StringUtils.isNotEmpty(selected.getHighCatFlag()) && "t".equals(selected.getHighCatFlag())){
+                    showCatListFlag = "2";
+                }else{
+                    showCatListFlag = "1";
+                }
             }
         }
     }
@@ -524,6 +556,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public void initHighList(String contractId){
+        highCatList = zkbPartOrderService.queryHighCatByContract(contractId,true);
+    }
+
     public String closeFieldTitle(){
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             if(CopyByInvok.T.equals(selected.getNeedLetterFlag()) ){
@@ -605,7 +641,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
                 boolean flag = true;
                 String errorLog = "";
-
+                Integer t= 0;
                 for(ZkbPartOrderItem zkbPartOrderItem : selected.getZkbPartOrderItems()){
                     if(StringUtils.isEmpty(zkbPartOrderItem.getPartNo())){
                         flag = false;
@@ -623,6 +659,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         flag = false;
                         errorLog += "Order#不能为空,";
                     }
+                    if(zkbPartOrderItem.getPrePartQty() > zkbPartOrderItem.getPartQty()){
+                        if(StringUtils.isEmpty(zkbPartOrderItem.getRemark())){
+                            flag = false;
+                            errorLog += "配件号为"+zkbPartOrderItem.getPartNo()+"的实际配件数量修改后备注不能为空,";
+                        }
+                    }
+                    t += zkbPartOrderItem.getPartQty();
                     ZkbPartOrderItem oldItem = zkbPartOrderService.getZkbPartOrderItemRepository().findById(zkbPartOrderItem.getId());
                     if(oldItem != null){
                         if(!oldItem.getPartNo().equals(zkbPartOrderItem.getPartNo()) || !oldItem.getPartName().equals(zkbPartOrderItem.getPartName())){
@@ -638,6 +681,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     WebUtil.addErrorMessage(errorLog,"");
                     return "";
                 }
+                if(t == 0){
+                    WebUtil.addErrorMessage("实际配件数量不能全部为0","");
+                    return "";
+                }
+                selected.setQty(t);
             }
         }
         if((ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType()))
@@ -1242,6 +1290,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setLetterTips(String letterTips) {
         this.letterTips = letterTips;
+    }
+
+    public List<HashMap<String, String>> getHighCatList() {
+        return highCatList;
+    }
+
+    public void setHighCatList(List<HashMap<String, String>> highCatList) {
+        this.highCatList = highCatList;
+    }
+    public String getShowCatListFlag() {
+        return showCatListFlag;
+    }
+
+    public void setShowCatListFlag(String showCatListFlag) {
+        this.showCatListFlag = showCatListFlag;
     }
     //endregion
 

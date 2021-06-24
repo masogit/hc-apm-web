@@ -40,6 +40,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private ZkbContractAsset zkbContractAssetSelected;
     private String actionDetailName;
     private String actionAssetName;
+    private String actionCatName;
     private ZkbContractService zkbContractService;
     private UserContextService userContextService;
     private AssetTagService assetTagService;
@@ -51,10 +52,13 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     private List<ZkbContractCourse> contractCourseList ;
     private List<ZkbContractAsset> zkbContractAssetList;
+    private List<ZkbContractCat> zkbContractCatList;
     private String reason;
     private boolean operateFlag = false;
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
     private boolean newContractFlag = false;
+
+    private ZkbContractCat zkbContractCatSelected;
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -90,6 +94,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
             this.selected.setZkbContractCourses(contractCourseList);
             zkbContractAssetList = zkbContractService.queryAssetByContractId(this.selected.getId());
+            zkbContractCatList = zkbContractService.queryCatByContractId(this.selected.getId());
             prepareEdit();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             if(zkbContractService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(selected.getStartDate()))< 0){
@@ -332,6 +337,52 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     }
     //endregion
 
+    //region 探头
+    public void prepareCatCreate(){
+        actionCatName="Create";
+        zkbContractCatSelected = new ZkbContractCat();
+        this.reason = "";
+    }
+
+    public void prepareCatEdit(){
+        actionCatName="Edit";
+        this.reason = "";
+    }
+
+    public void saveCat(){
+        boolean flag=true;
+        for(ZkbContractCat c : zkbContractCatList){
+            if(zkbContractCatSelected.getSnNo().equals(c.getSnNo())){
+                if("Create".equals(actionCatName)){
+                    flag=false;
+                    break;
+                }else if("Edit".equals(actionCatName)){
+                    if(!zkbContractCatSelected.getId().equals(c.getId())){
+                        flag=false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!flag){
+            WebUtil.addErrorMessage("sn编号已存在");
+            contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
+            return;
+        }
+
+        if("Create".equals(actionCatName)) {
+            zkbContractCatSelected.setContractId(this.selected.getId());
+        }
+        zkbContractService.saveCat(zkbContractCatSelected,actionCatName,reason,currentUser,selected);
+        zkbContractCatList = zkbContractService.queryCatByContractId(selected.getId());
+    }
+
+    public void deleteCat(){
+        zkbContractService.deleteCat(zkbContractCatSelected,selected,currentUser,reason);
+        zkbContractCatList = zkbContractService.queryCatByContractId(selected.getId());
+    }
+    //endregion
+
     private String logType;
     public void preForLog(String _logType){
         this.logType = _logType;
@@ -356,6 +407,11 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             case assetDelete:
                 deleteAsset();
                 break;
+            case catUpdate:
+                break;
+            case catDelete:
+                deleteCat();
+                break;
         }
         this.reason="";
     }
@@ -370,6 +426,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public boolean isCourseCanOperate(){
         if(zkbContractCourseSelected == null || zkbContractCourseSelected.getZkbCourse() ==null || userContextService.isZkbUser()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean isCatCanOperate(){
+        if(zkbContractCatSelected == null || zkbContractCatSelected.getId() ==null || userContextService.isZkbUser()){
             return true;
         }else{
             return false;
@@ -528,6 +592,31 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void setNewContractFlag(boolean newContractFlag) {
         this.newContractFlag = newContractFlag;
+    }
+
+    public ZkbContractCat getZkbContractCatSelected() {
+        return zkbContractCatSelected;
+    }
+
+    public void setZkbContractCatSelected(ZkbContractCat zkbContractCatSelected) {
+        this.zkbContractCatSelected = zkbContractCatSelected;
+    }
+
+    public List<ZkbContractCat> getZkbContractCatList() {
+        return zkbContractCatList;
+    }
+
+    public void setZkbContractCatList(List<ZkbContractCat> zkbContractCatList) {
+        this.zkbContractCatList = zkbContractCatList;
+    }
+
+
+    public String getActionCatName() {
+        return actionCatName;
+    }
+
+    public void setActionCatName(String actionCatName) {
+        this.actionCatName = actionCatName;
     }
 
     @Override
