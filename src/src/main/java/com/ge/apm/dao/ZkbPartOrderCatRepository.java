@@ -29,6 +29,6 @@ public interface ZkbPartOrderCatRepository extends GenericRepositoryUUID<ZkbPart
      */
     List<ZkbPartOrderCat> getByStartDateLessThanEqualAndEndDateGreaterThanEqualAndValueTypeIn(Date startDate,Date endDate,List<String> listStr);
 
-
+    List<ZkbPartOrderCat> findByValueType(String valueType);
 
 }

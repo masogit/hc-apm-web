@@ -40,6 +40,7 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
     private List<Map<String, Object>> importContractMapList;
     private List<Map<String, Object>> impContractCourseMapList;
     private List<Map<String, Object>> impContractAssetMapList;
+    private List<Map<String, Object>> impContractCatMapList;
 
 
     private ZkbContractService zkbContractService;
@@ -47,6 +48,7 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
     private List<Map<String, Object>> errorContractList = new ArrayList<>();
     private List<Map<String, Object>> errorContractCourseList = new ArrayList<>();
     private List<Map<String, Object>> errorContractAssetList = new ArrayList<>();
+    private List<Map<String, Object>> errorContractCatList = new ArrayList<>();
     private UserAccount currentUser;
 
     @Override
@@ -74,8 +76,9 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
             impContractOp(doc);
             impContractCourseOp(doc);
             impContractAssetOp(doc);
-            if(!errorContractList.isEmpty() || !errorContractCourseList.isEmpty()){
-                int failCount = errorContractList.size() + errorContractCourseList.size() + errorContractAssetList.size();
+            impContractCatOp(doc);
+            if(!errorContractList.isEmpty() || !errorContractCourseList.isEmpty() || !errorContractAssetList.isEmpty() || !errorContractCatList.isEmpty()){
+                int failCount = errorContractList.size() + errorContractCourseList.size() + errorContractAssetList.size() + errorContractCatList.size();
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, WebUtil.getMessage("ImportCompletedNoteFailureRecord"), WebUtil.getMessage("ThereAreATotalOf")+failCount+WebUtil.getMessage("RecordsOfFailure"));
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }else {
@@ -145,6 +148,25 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
             e.printStackTrace();
         }
     }
+
+
+    public void impContractCatOp(ExcelDocument doc){
+        try {
+            impContractCatMapList = zkbContractImportService.getContractCatMapFromTemplate(doc);
+            if(impContractCatMapList != null && impContractCatMapList.size() > 0){
+                zkbContractImportService.importCatData(impContractCatMapList,currentUser);
+                errorContractCatList = zkbContractImportService.filterErrorRecords(impContractCatMapList);
+                if(errorContractCatList == null){
+                    errorContractCatList = new ArrayList<>();
+                }
+            }else{
+                errorContractCatList = new ArrayList<>();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public String getTemplateName(){
         UserContextService ucs = WebUtil.getBean(UserContextService.class);
@@ -242,5 +264,21 @@ public class ZkbContractImpController extends GenericCRUDUUIDController<ZkbContr
 
     public void setErrorContractAssetList(List<Map<String, Object>> errorContractAssetList) {
         this.errorContractAssetList = errorContractAssetList;
+    }
+
+    public List<Map<String, Object>> getImpContractCatMapList() {
+        return impContractCatMapList;
+    }
+
+    public void setImpContractCatMapList(List<Map<String, Object>> impContractCatMapList) {
+        this.impContractCatMapList = impContractCatMapList;
+    }
+
+    public List<Map<String, Object>> getErrorContractCatList() {
+        return errorContractCatList;
+    }
+
+    public void setErrorContractCatList(List<Map<String, Object>> errorContractCatList) {
+        this.errorContractCatList = errorContractCatList;
     }
 }
