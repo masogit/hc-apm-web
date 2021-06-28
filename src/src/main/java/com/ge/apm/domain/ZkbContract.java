@@ -289,6 +289,8 @@ public class ZkbContract implements ChineseName, Serializable {
     @JoinColumn(insertable=false, updatable=false,name = "contract_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     Set<ZkbContractAsset> zkbContractAssets = new HashSet<>();
 
+    @Transient
+    private String tenantName;
 
     public String getModifyType() {
         return modifyType;
@@ -769,5 +771,13 @@ public class ZkbContract implements ChineseName, Serializable {
             return 0;
         }
         return days;
+    }
+
+    public String getTenantName() {
+        return tenantName;
+    }
+
+    public void setTenantName(String tenantName) {
+        this.tenantName = tenantName;
     }
 }
