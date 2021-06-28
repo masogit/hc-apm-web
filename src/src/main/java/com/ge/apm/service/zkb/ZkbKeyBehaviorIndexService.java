@@ -2,6 +2,7 @@ package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.ZkbContractMapper;
 import com.ge.apm.dao.mapper.ZkbKeyBehaviorIndexMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoRow;
@@ -49,6 +50,12 @@ public class ZkbKeyBehaviorIndexService {
      */
     @Autowired
     private ZkbContractRepository zkbContractRepository;
+
+    /**
+     *合同
+     */
+    @Autowired
+    private ZkbContractMapper zkbContractMapper;
 
     /**
      * KBI数据查询mapper
@@ -418,25 +425,30 @@ public class ZkbKeyBehaviorIndexService {
      */
     public List<Map<String, Object>> createExportKeyBehaviorIndexData(List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList){
         List<Map<String, Object>> keyBehaviorIndexMapList = new ArrayList<>();
-        for (ZkbKeyBehaviorIndex zeyBehaviorIndex : zkbKeyBehaviorIndexList) {
+        for (ZkbKeyBehaviorIndex keyBehaviorIndex : zkbKeyBehaviorIndexList) {
             Map<String, Object> orderHistoryMap = new HashMap<>();
-            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_systemId"),zeyBehaviorIndex.getId());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_tenant"),zeyBehaviorIndex.getTenantName());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_kbiDate"),zeyBehaviorIndex.getKbiDateFormat());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_rank"),zeyBehaviorIndex.getRank());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScore"),zeyBehaviorIndex.getTotalScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnFullScore"),zeyBehaviorIndex.getPartReturnFullScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnScore"),zeyBehaviorIndex.getPartReturnScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeFullScore"),zeyBehaviorIndex.getSatisfactoryDegreeFullScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeScore"),zeyBehaviorIndex.getSatisfactoryDegreeScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_apmBillingRateFullScore"),zeyBehaviorIndex.getApmBillingRateFullScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_apmBillingRateScore"),zeyBehaviorIndex.getApmBillingRateScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore"),zeyBehaviorIndex.getPasteQuickResponseRateFullScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_pasteQuickResponseRateScore"),zeyBehaviorIndex.getPasteQuickResponseRateScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_complianceFullScore"),zeyBehaviorIndex.getComplianceFullScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_complianceScore"),zeyBehaviorIndex.getComplianceScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_engineerFullScore"),zeyBehaviorIndex.getEngineerFullScore());
-            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_engineerScore"),zeyBehaviorIndex.getEngineerScore());
+            List<ZkbContract> zkbContractList = zkbContractRepository.findByTenantUID(keyBehaviorIndex.getTenantUID());
+            if(CollectionUtils.isNotEmpty(zkbContractList))
+            {
+                orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_region"),zkbContractList.get(0).getRegion());
+            }
+            orderHistoryMap.put(WebUtil.getMessage("zkbHistory_systemId"),keyBehaviorIndex.getId());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_tenant"),keyBehaviorIndex.getTenantName());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_kbiDate"),keyBehaviorIndex.getKbiDateFormat());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_rank"),keyBehaviorIndex.getRank());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_totalScore"),keyBehaviorIndex.getTotalScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnFullScore"),keyBehaviorIndex.getPartReturnFullScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_partReturnScore"),keyBehaviorIndex.getPartReturnScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeFullScore"),keyBehaviorIndex.getSatisfactoryDegreeFullScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_satisfactoryDegreeScore"),keyBehaviorIndex.getSatisfactoryDegreeScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_apmBillingRateFullScore"),keyBehaviorIndex.getApmBillingRateFullScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_apmBillingRateScore"),keyBehaviorIndex.getApmBillingRateScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore"),keyBehaviorIndex.getPasteQuickResponseRateFullScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_pasteQuickResponseRateScore"),keyBehaviorIndex.getPasteQuickResponseRateScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_complianceFullScore"),keyBehaviorIndex.getComplianceFullScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_complianceScore"),keyBehaviorIndex.getComplianceScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_engineerFullScore"),keyBehaviorIndex.getEngineerFullScore());
+            orderHistoryMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_engineerScore"),keyBehaviorIndex.getEngineerScore());
             keyBehaviorIndexMapList.add(orderHistoryMap);
         }
         return keyBehaviorIndexMapList;
@@ -823,10 +835,11 @@ public class ZkbKeyBehaviorIndexService {
             tenantUIDMap.put(item.getTenantUID(),item.getTenantUID());
         }
 
-        List<ZkbContract> zkbContractList = this.zkbContractRepository.findByTenantUIDIn(tenantUIDList);
+        List<ZkbContract> zkbContractList = this.zkbContractMapper.getContractByTenantUIDList(tenantUIDList);
         for (ZkbContract zkbContract : zkbContractList) {
             Map<String, Object> zkbContractMap = new HashMap<>();
             zkbContractMap.put(WebUtil.getMessage("zkbHistory_systemId"),zkbContract.getId());
+            zkbContractMap.put(WebUtil.getMessage("zkbKeyBehaviorIndex_tenant"),zkbContract.getTenantName());
             zkbContractMap.put(WebUtil.getMessage("zkbContract_contractNo"),zkbContract.getContractNo());
             zkbContractMap.put(WebUtil.getMessage("zkbContract_contractType"),zkbContract.getContractType());
             zkbContractMap.put(WebUtil.getMessage("zkbContract_ibNumber"),zkbContract.getIbNumber());

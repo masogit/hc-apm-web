@@ -306,6 +306,8 @@ public class ZkbContract implements ChineseName, Serializable {
     public void setQuotaDeductType(String quotaDeductType) {
         this.quotaDeductType = quotaDeductType;
     }
+    @Transient
+    private String tenantName;
 
     public String getModifyType() {
         return modifyType;
@@ -786,5 +788,13 @@ public class ZkbContract implements ChineseName, Serializable {
             return 0;
         }
         return days;
+    }
+
+    public String getTenantName() {
+        return tenantName;
+    }
+
+    public void setTenantName(String tenantName) {
+        this.tenantName = tenantName;
     }
 }
