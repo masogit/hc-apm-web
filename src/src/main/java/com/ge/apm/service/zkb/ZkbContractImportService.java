@@ -105,6 +105,7 @@ public class ZkbContractImportService {
             contractRow.setFieldStringValue("合同类型", "setContractType");
             contractRow.setFieldDateValue("合同开始日期", "setStartDate");
             contractRow.setFieldDateValue("合同结束日期", "setEndDate");
+            contractRow.setFieldStringValue("名额扣除类型", "setQuotaDeductType");
             contractRow.setFieldNumValue("IB数量", "setIbNumber");
             contractRow.setFieldNumValue("备件剩余名额", "setSpareQuota");
             contractRow.setFieldNumValue("备件总额", "setSpareQuotaTotal");
@@ -194,6 +195,14 @@ public class ZkbContractImportService {
     protected void importOneContract(ZkbContractVO contractInfoVO,UserAccount currentUser) {
         ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
         if(zkbContract != null){
+            if(StringUtils.isNotEmpty(contractInfoVO.getQuotaDeductType())){
+                if("旧逻辑".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+                }else if("新逻辑".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
+                }
+            }
+
             zkbContract.setSpareQuotaTotal(contractInfoVO.getSpareQuotaTotal());
             zkbContract.setSpareQuota(contractInfoVO.getSpareQuota());
             zkbContract.setSpareQuotaUse(contractInfoVO.getSpareQuotaUse());
@@ -218,6 +227,14 @@ public class ZkbContractImportService {
             BeanUtils.copyProperties(contractInfoVO, newZkbContract);
             newZkbContract.setCreatedBy(currentUser.getLoginName());
             newZkbContract.setCreatedDate(new Date());
+
+            if(StringUtils.isNotEmpty(newZkbContract.getQuotaDeductType())){
+                if("旧逻辑".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+                }else if("新逻辑".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
+                }
+            }
 
             newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
             newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
