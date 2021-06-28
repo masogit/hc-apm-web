@@ -43,7 +43,7 @@
                         <p:column headerText="APM用户名" filterBy="#{item.loginName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.loginName}"/>
                         </p:column>
-                        <p:column headerText="名称" filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <p:column headerText="姓名" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
                         <p:column headerText="邮箱" filterBy="#{item.email}" filterMatchMode="LIKE">
@@ -52,9 +52,9 @@
                         <p:column headerText="电话" filterBy="#{item.phone}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.phone}"/>
                         </p:column>
-                        <p:column headerText="用户SSO" filterBy="#{item.sso}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.sso}"/>
-                        </p:column>
+<!--                        <p:column headerText="用户SSO" filterBy="#{item.sso}" filterMatchMode="LIKE">-->
+<!--                            <h:outputText value="#{item.sso}"/>-->
+<!--                        </p:column>-->
                         <p:column headerText="角色" filterBy="#{item.configType}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_configType', item.configType)}"/>
                             <f:facet name="filter">
