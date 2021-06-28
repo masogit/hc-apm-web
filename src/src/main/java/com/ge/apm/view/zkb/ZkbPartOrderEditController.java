@@ -284,8 +284,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                if(zkbPartOrderService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(zkbContract.getStartDate()))< 0){
+                if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
                     probeQuotaFlag = false;
                 }else{
                     probeQuotaFlag = true;
@@ -756,8 +755,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
                 }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
                     ZkbContract c = contractList.get(0);
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                    if(zkbPartOrderService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(c.getStartDate()))< 0){
+                    if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(c.getQuotaDeductType())){
                         this.selected.setQty(2);
                     }else{
                         this.selected.setQty(1);
