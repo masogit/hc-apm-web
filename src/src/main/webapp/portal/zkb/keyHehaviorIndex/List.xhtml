@@ -68,57 +68,57 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
                         <p:ajax event="rowSelect" listener="#{zkbKeyBehaviorIndexController.prepareEdit}" update="editButton"/>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_tenant}" >
+                        <p:column  headerText="#{msg.zkbKeyBehaviorIndex_tenant}" >
                             <h:outputText value="#{item.tenantName}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_kbiDate}" >
+                        <p:column  headerText="#{msg.zkbKeyBehaviorIndex_kbiDate}" >
                             <h:outputText value="#{item.kbiDate}">
                                 <f:convertDateTime pattern="yyyy-MM" />
                             </h:outputText>
                         </p:column>
-                        <p:column width="150"  headerText="#{msg.zkbKeyBehaviorIndex_rank}" >
+                        <p:column   headerText="#{msg.zkbKeyBehaviorIndex_rank}" >
                             <h:outputText value="#{item.rank}"/>
                         </p:column>
-                        <p:column width="150"  headerText="是否生效" >
+                        <p:column   headerText="是否生效" >
                             <h:outputText value="#{item.effect}"/>
                         </p:column>
-                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_totalScore}" >
+                        <p:column  style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_totalScore}" >
                             <h:outputText value="#{item.totalScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_partReturnFullScore}" >
+                        <p:column  headerText="#{msg.zkbKeyBehaviorIndex_partReturnFullScore}" >
                             <h:outputText value="#{item.partReturnFullScore}"/>
                         </p:column>
-                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_partReturnScore}" >
+                        <p:column  style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_partReturnScore}" >
                             <h:outputText value="#{item.partReturnScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeFullScore}" >
+                        <p:column  headerText="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeFullScore}" >
                             <h:outputText value="#{item.satisfactoryDegreeFullScore}"/>
                         </p:column>
-                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeScore}" >
+                        <p:column  style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_satisfactoryDegreeScore}" >
                             <h:outputText value="#{item.satisfactoryDegreeScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_apmBillingRateFullScore}" >
+                        <p:column  headerText="#{msg.zkbKeyBehaviorIndex_apmBillingRateFullScore}" >
                             <h:outputText value="#{item.apmBillingRateFullScore}"/>
                         </p:column>
-                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_apmBillingRateScore}" >
+                        <p:column  style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_apmBillingRateScore}" >
                             <h:outputText value="#{item.apmBillingRateScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore}" >
+                        <p:column  headerText="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateFullScore}" >
                             <h:outputText value="#{item.pasteQuickResponseRateFullScore}"/>
                         </p:column>
-                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateScore}" >
+                        <p:column  style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_pasteQuickResponseRateScore}" >
                             <h:outputText value="#{item.pasteQuickResponseRateScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_complianceFullScore}" >
+                        <p:column  headerText="#{msg.zkbKeyBehaviorIndex_complianceFullScore}" >
                             <h:outputText value="#{item.complianceFullScore}"/>
                         </p:column>
-                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_complianceScore}" >
+                        <p:column  style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_complianceScore}" >
                             <h:outputText value="#{item.complianceScore}"/>
                         </p:column>
-                        <p:column width="150" headerText="#{msg.zkbKeyBehaviorIndex_engineerFullScore}" >
+                        <p:column  headerText="#{msg.zkbKeyBehaviorIndex_engineerFullScore}" >
                             <h:outputText value="#{item.engineerFullScore}"/>
                         </p:column>
-                        <p:column width="150" style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_engineerScore}" >
+                        <p:column style="color: red" headerText="#{msg.zkbKeyBehaviorIndex_engineerScore}" >
                             <h:outputText value="#{item.engineerScore}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
