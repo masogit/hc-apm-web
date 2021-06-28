@@ -1599,10 +1599,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbFePartOrder.setReturnDate(item.getReturnDate());
                     zkbFePartOrder.setNewCatSn(item.getNewCatSn());
                     zkbFePartOrder.setGeAdminComment(item.getGeAdminComment());
-                    Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+                    //Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
                     ZkbContract zkbContract = this.zkbContractRepository.findById(zkbFePartOrder.getContractId());
                     boolean showZkbPoProbeQuotaType= false;
-                    if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)>=0)
+                    if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType()))
                     {
                         showZkbPoProbeQuotaType=true;
                     }
