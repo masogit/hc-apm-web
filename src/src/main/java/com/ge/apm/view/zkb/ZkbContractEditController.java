@@ -97,7 +97,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             zkbContractCatList = zkbContractService.queryCatByContractId(this.selected.getId());
             prepareEdit();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            if(zkbContractService.getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(selected.getStartDate()))< 0){
+            if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selected.getQuotaDeductType())){
                 newContractFlag = false;
             }else{
                 newContractFlag = true;
