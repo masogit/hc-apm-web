@@ -84,6 +84,9 @@ public class ZkbContractService {
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_startDate"), DateFormatUtils.format(zkbContract.getStartDate(),"yyyy-MM-dd"));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_endDate"), DateFormatUtils.format(zkbContract.getEndDate(),"yyyy-MM-dd"));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractState"), zkbContract.getContractState());
+            if(StringUtils.isNotEmpty(zkbContract.getQuotaDeductType())){
+                zkbContractDataMap.put("名额扣除类型", WebUtil.getFieldValueMessage("zkbContractQuotaDeductType", zkbContract.getQuotaDeductType()));
+            }
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_ibNumber"), zkbContract.getIbNumber());
 
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota"), isEmptyInteger(zkbContract.getSpareQuota()));
@@ -377,7 +380,7 @@ public class ZkbContractService {
 
         boolean newContractFlag = false;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        if(getBetweenDay(ZkbPartOrderService.NEW_CAT_END_DATE,format.format(zkbContract.getStartDate()))< 0){
+        if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
             newContractFlag = false;
         }else{
             newContractFlag = true;
