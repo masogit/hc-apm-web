@@ -78,7 +78,7 @@
 <!--                                </h:panelGroup>-->
                                 <h:panelGroup rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingAssignment')}">
                                     <label class="label">#{msg.zkbFePartOrder_currentStatus}</label>
-                                    <p:inputText maxlength="20" disabled="true" id="status" value="#{fieldMsg.fieldValue('zkbFePartOrder_status', zkbFePartOrderDetailController.selected.status)}" />
+                                    <p:inputText maxlength="20" disabled="true" id="status" value="#{zkbFePartOrderController.getI18(zkbFePartOrderDetailController.selected.status,zkbFePartOrderDetailController.selected.orderType)}" />
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.zkbFePartOrder_phenomenon}*</label>
