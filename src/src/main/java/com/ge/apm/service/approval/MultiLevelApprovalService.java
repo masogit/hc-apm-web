@@ -11,6 +11,7 @@ import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.UsageStatusConstant;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
@@ -237,6 +238,7 @@ public class MultiLevelApprovalService {
         switch (multiLevelApproval.getBusinessType()) {
             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT:
                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
+                v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_DISAGREE);//审批不同意
                 v2_WorkOrderRepository.save(v2WorkOrder);
                 //审批不通过,修改工单状态
                 generateSparePartsBuyList(v2WorkOrder.getId(), SimplePartsConstant.WORK_ORDER, ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE);
@@ -434,6 +436,7 @@ public class MultiLevelApprovalService {
                         switch (multiLevelApproval.getBusinessType()){
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT://维修
                                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
+                                v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_AGREE);//审批同意
                                 v2_WorkOrderRepository.save(v2WorkOrder);
                                 //审批校验,生成申领申购单
                                 generateSparePartsBuyList(v2WorkOrder.getId(), SimplePartsConstant.WORK_ORDER, ApprovalConstant.WORK_DETAIL_STATUS_AGREE);
