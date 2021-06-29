@@ -35,7 +35,7 @@
 <!--                        <p:inputText id="sso" value="#{zkbFePartOrderUserConfigController.selected.sso}" maxlength="40" required="false" requiredMessage="用户sso#{msg.ValidationRequire}" />-->
 <!--                    </h:panelGroup>-->
                     <h:panelGroup>
-                        <label class="label">角色</label>
+                        <label class="label">角色*</label>
                         <p:selectOneMenu id="configType" disabled="#{!userContextService.zkbAdmin}" value="#{zkbFePartOrderUserConfigController.selected.configType}"  required="true" requiredMessage="角色#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_configType')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
