@@ -180,6 +180,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      */
     private String userUid;
 
+    Map<String,String> map = null;
+
     /**
      * 初始化数据
      */
@@ -366,6 +368,19 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             c.setIsVacation(isVacation);
             this.zkbFePartOrderUserConfigRepository.save(c);
         }
+    }
+
+    public String getI18(String key,String orderType)
+    {
+        if(this.map==null)
+        {
+            this.map = this.zkbFePartOrderService.getI18ToMapEngKey(ZkbFePartOrderService.status);
+        }
+        if(ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString().equals(key)&&ZkbFePartOrder.OrderType.ManMade.toString().equals(orderType))
+        {
+            return "400已开单";
+        }
+        return this.map.get(key);
     }
 
 

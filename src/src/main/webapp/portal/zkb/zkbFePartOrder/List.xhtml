@@ -101,12 +101,17 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.zkbFePartOrder_currentStatus}" filterBy="#{item.status}" filterMatchMode="EQ">
-                            <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_status', item.status)}"/>
+                        <p:column  headerText="#{msg.zkbFePartOrder_currentStatus}" filterBy="#{item.status}" filterMatchMode="EQ">
+                                <h:outputText value="#{zkbFePartOrderController.getI18(item.status,item.orderType)}" />
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_status')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    <f:selectItem itemLabel="已申请" itemValue="Requested"/>
+                                    <f:selectItem itemLabel="代理商同意" itemValue="TenantAccept"/>
+                                    <f:selectItem itemLabel="代理商不同意" itemValue="TenantReject"/>
+                                    <f:selectItem itemLabel="400已下单/开单" itemValue="FourHundredsAccept"/>
+                                    <f:selectItem itemLabel="FE已部分归还" itemValue="GEAdminAcceptPart"/>
+                                    <f:selectItem itemLabel="FE已归还" itemValue="GEAdminAccept"/>
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
