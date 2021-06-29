@@ -1274,6 +1274,7 @@ public void test1(){
             WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
             return ;
         }
+        selectedWorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_PENDING);
         dao.save(selectedWorkOrder);
     }
 
