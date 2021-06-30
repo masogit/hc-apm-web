@@ -19,11 +19,13 @@ import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -32,6 +34,8 @@ import java.util.*;
 
 @Service
 public class MultiLevelApprovalService {
+
+    protected static final Logger logger = Logger.getLogger(MultiLevelApprovalService.class);
 
     @Autowired
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
@@ -276,6 +280,7 @@ public class MultiLevelApprovalService {
      * 根据金额查询审批配置信息
      */
     public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount) {
+        logger.info("-----维修校验开启多级审核请求参数 busiType : "+" , amount : "+amount);
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = new ArrayList<>(Arrays.asList(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID()));
         for (String orgUid: orgUidList) {
