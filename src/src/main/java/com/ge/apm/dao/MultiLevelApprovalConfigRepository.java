@@ -13,7 +13,7 @@ import java.util.List;
 public interface MultiLevelApprovalConfigRepository extends GenericRepositoryUUID<MultiLevelApprovalConfig> {
 
     @Query(value="select m.* from multi_level_approval_config m where m.org_uid=?1 and m.business_type =?2 and m.enable = true union" +
-            " select m.* from multi_level_approval_config m where m.org_uid=?1 and m.business_type =?2 and m.asset_type ='allGroup' and m.enable = true", nativeQuery = true)
+            " select m.* from multi_level_approval_config m where m.org_uid=?1 and m.business_type =?2 and m.enable = true", nativeQuery = true)
     public List<MultiLevelApprovalConfig> getConfigByCondition(String orgUid, String busiType);
 
     @Query("select m from MultiLevelApproval m  where m.approvalUid = ?1 and m.approvalNodeStatus != ?2")
