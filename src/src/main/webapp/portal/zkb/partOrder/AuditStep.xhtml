@@ -675,6 +675,9 @@
                         <p:column headerText="备注（说明是否DOA或者Short life）">
                             <p:inputText value="#{item.remark}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </p:column>
+                        <p:column headerText="操作" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' and !(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending')}">
+                            <p:commandButton value="物流查看"  process="@this" immediate="false" rendered="true" update=":zkbLogisticsDlg" actionListener="#{zkbPartOrderAuditController.preLogistics(item.id)}" oncomplete="PF('zkbLogisticsDlg').show()"/>
+                        </p:column>
                     </p:dataTable>
                 </p:fieldset>
                 <p:fieldset id="orderedCancelFieldset" legend="订货信息" rendered="#{zkbPartOrderAuditController.showRejectOrder}">
@@ -932,6 +935,7 @@
             </h:form>
             <ui:include src="PartOrderReturn.xhtml"/>
             <ui:include src="historyData.xhtml"/>
+            <ui:include src="svclogisticsData.xhtml"/>
             <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts' and zkbPartOrderAuditController.selected.currentStep eq 'Complete'}">
                 <ui:include src="PartOrderReturnModify.xhtml"/>
             </c:if>

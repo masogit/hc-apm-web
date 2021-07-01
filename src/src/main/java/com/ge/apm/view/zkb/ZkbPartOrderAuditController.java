@@ -78,7 +78,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String letterTips;
     private List<HashMap<String, String>> highCatList = new ArrayList<>();
     private String showCatListFlag = "";//1显示探头 2:显示sn列表
-
+    private List<SvcEngineLogisticsLineVO> svcEngineLogisticsLineVOList = new ArrayList<>();
 
     @Override
     protected void init() {
@@ -971,6 +971,31 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     //endregion
 
+    public void preLogistics(String id){
+        ZkbPartOrderItem se = null;
+        for(ZkbPartOrderItem i : selected.getZkbPartOrderItems()){
+            if(id.equals(i.getId())){
+                se = i;
+                break;
+            }
+        }
+        if(se == null){
+            return;
+        }
+        if(StringUtils.isEmpty(se.getOrderNo())){
+            WebUtil.addErrorMessage("Order#不能为空！");
+            return;
+        }
+        if(StringUtils.isEmpty(se.getPartNo())){
+            WebUtil.addErrorMessage("配件号不能为空！");
+            return;
+        }
+        svcEngineLogisticsLineVOList = zkbPartOrderService.querySvcLogistics(selected.getSrNum(),se.getOrderNo(),se.getPartNo());
+        if(svcEngineLogisticsLineVOList == null || svcEngineLogisticsLineVOList.size() == 0){
+            WebUtil.addErrorMessage("查询结果为空！");
+        }
+    }
+
     //region get、set
     public boolean isHaveTrainCourseFlag() {
         return haveTrainCourseFlag;
@@ -1306,6 +1331,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void setShowCatListFlag(String showCatListFlag) {
         this.showCatListFlag = showCatListFlag;
     }
+
+    public List<SvcEngineLogisticsLineVO> getSvcEngineLogisticsLineVOList() {
+        return svcEngineLogisticsLineVOList;
+    }
+
+    public void setSvcEngineLogisticsLineVOList(List<SvcEngineLogisticsLineVO> svcEngineLogisticsLineVOList) {
+        this.svcEngineLogisticsLineVOList = svcEngineLogisticsLineVOList;
+    }
+
     //endregion
 
     @Override
