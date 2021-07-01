@@ -280,7 +280,7 @@ public class MultiLevelApprovalService {
      * 根据金额查询审批配置信息
      */
     public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount) {
-        logger.info("-----维修校验开启多级审核请求参数 busiType : "+" , amount : "+amount);
+        logger.info("-----校验开启多级审核请求参数 busiType : "+" , amount : "+amount);
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = new ArrayList<>(Arrays.asList(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID()));
         for (String orgUid: orgUidList) {
@@ -298,6 +298,7 @@ public class MultiLevelApprovalService {
         }
         List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
         if(null != configList &&configList.size()>0){
+            logger.info("多级审核  configList : "+configList.toString());
             if(ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType)){
                 return getPartsSteam(configList,amount);
             }else{
