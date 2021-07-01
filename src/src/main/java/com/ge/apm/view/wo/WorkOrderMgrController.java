@@ -1205,7 +1205,7 @@ public void test1(){
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedWorkOrder);
         hasConfigMultiLevelApproval = false;
         if (approval != null) {
-            logger.info("多级审核已激活.............");
+            logger.info("维修-----------多级审核已激活");
             hasConfigMultiLevelApproval = true;
         }
 
