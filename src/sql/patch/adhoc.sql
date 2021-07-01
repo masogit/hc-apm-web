@@ -57,3 +57,4 @@ insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values
 --apm-schedual新增模板導入 zkb代理商fe/sales     end   0610
 
 
+INSERT INTO  role_msg_rel("msg_key", "msg_type", "role_id", "role_name", "role_type") VALUES ('ANSSpareExcel', 'gamePlanBatchFileType', (select id from sys_role where name = 'DataMaintainStaff'), 'DataMaintainStaff', 0);
