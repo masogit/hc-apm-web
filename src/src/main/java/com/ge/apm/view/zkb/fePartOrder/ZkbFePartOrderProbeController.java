@@ -132,16 +132,16 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     private String valueTypeTips = "";
 
 
-    /**
-     * 合同日期开始时间
-     */
-    public static final String contractStartDate = "2021-03-01 00:00:00";
-
-
-    /**
-     * 合同日期开始时间格式化
-     */
-    public static final String contractStartDateFormat = "yyyy-MM-dd HH:mm:ss";
+//    /**
+//     * 合同日期开始时间
+//     */
+//    public static final String contractStartDate = "2021-03-01 00:00:00";
+//
+//
+//    /**
+//     * 合同日期开始时间格式化
+//     */
+//    public static final String contractStartDateFormat = "yyyy-MM-dd HH:mm:ss";
 
     private String remindLetterFlag = "0";
 
@@ -242,9 +242,9 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected=this.zkbFePartOrderRepository.findById(this.id);
         this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo(),null,ZkbFePartOrder.OrderType.Probe.toString());
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
-        Date contractStartDate = this.zkbFePartOrderService.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+//        Date contractStartDate = this.zkbFePartOrderService.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
         ZkbContract item = this.contractList.get(0);
-        if(item.getStartDate()!=null&&item.getStartDate().compareTo(contractStartDate)>=0)
+        if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(item.getQuotaDeductType()))
         {
             this.showZkbPoProbeQuotaType=true;
         }else
@@ -285,8 +285,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         {
             ZkbContract item = this.contractList.get(0);
             initZknPartCat();
-            Date contractStartDate = this.zkbFePartOrderService.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
-            if(item.getStartDate()!=null&&item.getStartDate().compareTo(contractStartDate)>=0)
+//            Date contractStartDate = this.zkbFePartOrderService.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+            if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(item.getQuotaDeductType()))
             {
                 this.showZkbPoProbeQuotaType=true;
             }else
@@ -446,8 +446,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             if("t".equals(this.selected.getNewCatFlag()))
             {
                 zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-                Date contractStartDate = this.zkbFePartOrderService.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
-                if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)==-1)
+//                Date contractStartDate = this.zkbFePartOrderService.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+                if(!ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType()))
                 {
                     secondSave=true;
                     firstSave=false;

@@ -1,8 +1,6 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
-import com.ge.apm.domain.ZkbPartOrder;
-import com.ge.apm.domain.ZkbPartOrderCat;
 import com.ge.apm.domain.ZkbPartOrderStep;
 import com.ge.apm.domain.ZkbPartOrderUserConfig;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -11,12 +9,14 @@ import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -27,6 +27,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,11 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     private UploadedFile file;
 
     /**
+     * 导出文件
+     */
+    private StreamedContent exportFile;
+
+    /**
      * 错误列表
      */
     private List<Map<String, Object>> errorList;
@@ -87,10 +93,13 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         super.prepareCreate();
         backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
         if(selected != null){
-            for(ZkbPartOrderUserConfig c : backUpList){
-                if(selected.getId().equals(c.getId())){
-                    backUpList.remove(c);
-                    break;
+            if(CollectionUtils.isNotEmpty(backUpList))
+            {
+                for(ZkbPartOrderUserConfig c : backUpList){
+                    if(c.getId().equals(selected.getId())){
+                        backUpList.remove(c);
+                        break;
+                    }
                 }
             }
         }
@@ -228,6 +237,21 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         return res;
     }
 
+    public void exportAll(){
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        List<ZkbPartOrderUserConfig> zkbFePartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findBySearchFilter(this.searchFilters,sort);
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(ZkbPartOrderUserConfigService.USER_CONFIG_PATH+ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_NAME);
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            List<Map<String, Object>> zkbPartOrderList = this.zkbPartOrderUserConfigService.createExportPartOrderUserConfigData(zkbFePartOrderUserConfigList);
+            zkbPartOrderUserConfigService.exportData(doc, zkbPartOrderList);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_NAME);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ZkbPartOrderUserConfigController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
     public ZkbPartOrderUserConfig getBackUpUser() {
         return backUpUser;
     }
@@ -250,5 +274,13 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
 
     public void setErrorList(List<Map<String, Object>> errorList) {
         this.errorList = errorList;
+    }
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
     }
 }

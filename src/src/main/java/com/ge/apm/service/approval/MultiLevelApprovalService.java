@@ -11,6 +11,7 @@ import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.UsageStatusConstant;
+import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
@@ -18,11 +19,13 @@ import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -31,6 +34,8 @@ import java.util.*;
 
 @Service
 public class MultiLevelApprovalService {
+
+    protected static final Logger logger = Logger.getLogger(MultiLevelApprovalService.class);
 
     @Autowired
     private MultiLevelApprovalRepository multiLevelApprovalRepository;
@@ -237,6 +242,7 @@ public class MultiLevelApprovalService {
         switch (multiLevelApproval.getBusinessType()) {
             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT:
                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
+                v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_DISAGREE);//审批不同意
                 v2_WorkOrderRepository.save(v2WorkOrder);
                 //审批不通过,修改工单状态
                 generateSparePartsBuyList(v2WorkOrder.getId(), SimplePartsConstant.WORK_ORDER, ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE);
@@ -274,6 +280,7 @@ public class MultiLevelApprovalService {
      * 根据金额查询审批配置信息
      */
     public MultiLevelApprovalConfig getApproveConfig(String busiType, BigDecimal amount) {
+        logger.info("-----校验开启多级审核请求参数 busiType : "+" , amount : "+amount);
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = new ArrayList<>(Arrays.asList(user.getSiteUID(),user.getHospitalUID(),user.getInstitutionUID(),user.getTenantUID()));
         for (String orgUid: orgUidList) {
@@ -291,6 +298,7 @@ public class MultiLevelApprovalService {
         }
         List<MultiLevelApprovalConfig> configList = multiApprovalConfigDao.getConfigByCondition(orgUid, busiType);
         if(null != configList &&configList.size()>0){
+            logger.info("多级审核  configList : "+configList.toString());
             if(ApprovalConstant.APPROVAL_PARTS_STOCK.equals(busiType)){
                 return getPartsSteam(configList,amount);
             }else{
@@ -434,6 +442,7 @@ public class MultiLevelApprovalService {
                         switch (multiLevelApproval.getBusinessType()){
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT://维修
                                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
+                                v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_AGREE);//审批同意
                                 v2_WorkOrderRepository.save(v2WorkOrder);
                                 //审批校验,生成申领申购单
                                 generateSparePartsBuyList(v2WorkOrder.getId(), SimplePartsConstant.WORK_ORDER, ApprovalConstant.WORK_DETAIL_STATUS_AGREE);

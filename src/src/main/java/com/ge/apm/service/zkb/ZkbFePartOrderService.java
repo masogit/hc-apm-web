@@ -11,7 +11,6 @@ import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.view.zkb.fePartOrder.ZkbFePartOrderProbeController;
 import com.ge.apm.view.zkb.fePartOrder.ZkbFePartOrderSparePartDetailController;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +24,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 import java.text.ParseException;
@@ -195,7 +193,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     /**
      * 流程状态
      */
-    private static final String status = "zkbFePartOrder_status";
+    public static final String status = "zkbFePartOrder_status";
 
     /**
      * 机型
@@ -1358,6 +1356,24 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     }
 
     /**
+     *
+     * 把I18组成map
+     * @param type
+     * @return
+     */
+    public Map<String,String> getI18ToMapEngKey(String type)
+    {
+        Map<String,String> i18Map = new HashMap<>();
+        List<I18nMessage> i18nMessageList = this.i18nMessageRepository.getByTypeAndSiteId(type ,-1);
+        for(I18nMessage i18nMessage:i18nMessageList)
+        {
+            if(i18Map.containsKey(i18nMessage.getValueZh())) continue;
+            i18Map.put(i18nMessage.getMsgKey(),i18nMessage.getValueZh());
+        }
+        return i18Map;
+    }
+
+    /**
      * 根据人工申请生成HashMap
      * @param zkbFePartOrder 人工申请List
      * @param i18Map i18 Map集合
@@ -1599,10 +1615,10 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbFePartOrder.setReturnDate(item.getReturnDate());
                     zkbFePartOrder.setNewCatSn(item.getNewCatSn());
                     zkbFePartOrder.setGeAdminComment(item.getGeAdminComment());
-                    Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
+                    //Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
                     ZkbContract zkbContract = this.zkbContractRepository.findById(zkbFePartOrder.getContractId());
                     boolean showZkbPoProbeQuotaType= false;
-                    if(zkbContract.getStartDate()!=null&&zkbContract.getStartDate().compareTo(contractStartDate)>=0)
+                    if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType()))
                     {
                         showZkbPoProbeQuotaType=true;
                     }

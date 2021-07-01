@@ -41,16 +41,16 @@
                         <p:column headerText="#{msg.EXCELRowNumber}">
                             <h:outputText value="#{item.get('zkbPartOrderUserConfigVO').lineNum}" />
                         </p:column>
-                        <p:column headerText="APM用户名" >
+                        <p:column headerText="#{msg.zkbKeyUserConfig_apm}" >
                             <h:outputText value="#{item.get('zkbPartOrderUserConfigVO').loginName}"/>
                         </p:column>
-                        <p:column headerText="邮箱" >
+                        <p:column headerText="#{msg.zkbKeyUserConfig_email}" >
                             <h:outputText value="#{item.get('zkbPartOrderUserConfigVO').email}"/>
                         </p:column>
-                        <p:column headerText="资产类型" >
+                        <p:column headerText="#{msg.zkbKeyUserConfig_propertyType}" >
                             <h:outputText value="#{item.get('zkbPartOrderUserConfigVO').assetType}"/>
                         </p:column>
-                        <p:column headerText="类型" >
+                        <p:column headerText="#{msg.zkbKeyUserConfig_type}" >
                             <h:outputText  value="#{item.get('zkbPartOrderUserConfigVO').configTypeName}" />
                         </p:column>
                         <p:column headerText="#{msg.FailureInformation}" >

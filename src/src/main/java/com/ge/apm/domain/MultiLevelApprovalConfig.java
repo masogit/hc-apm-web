@@ -150,4 +150,27 @@ public class MultiLevelApprovalConfig implements Serializable {
         hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
+
+    @Override
+    public String toString() {
+        return "MultiLevelApprovalConfig{" +
+                "id='" + id + '\'' +
+                ", approvalName='" + approvalName + '\'' +
+                ", approvalNum='" + approvalNum + '\'' +
+                ", businessType='" + businessType + '\'' +
+                ", enable=" + enable +
+                ", orgUid='" + orgUid + '\'' +
+                ", configration='" + configration + '\'' +
+                ", approvalItem='" + approvalItem + '\'' +
+                ", minAmount=" + minAmount +
+                ", maxAmount=" + maxAmount +
+                ", equipType='" + equipType + '\'' +
+                ", createdDate=" + createdDate +
+                ", createdBy='" + createdBy + '\'' +
+                ", tenantUID='" + tenantUID + '\'' +
+                ", institutionUID='" + institutionUID + '\'' +
+                ", hospitalUID='" + hospitalUID + '\'' +
+                ", siteUID='" + siteUID + '\'' +
+                '}';
+    }
 }

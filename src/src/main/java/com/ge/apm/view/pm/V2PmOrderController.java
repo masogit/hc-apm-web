@@ -1966,7 +1966,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedPmOrder);
         hasConfigMultiLevelApproval = false;
         if (approval != null) {
-            logger.info("多级审核已激活");
+            logger.info("保养------------多级审核已激活");
             hasConfigMultiLevelApproval = true;
         }
         if (selectedPmOrder.getManHours() == null) {
