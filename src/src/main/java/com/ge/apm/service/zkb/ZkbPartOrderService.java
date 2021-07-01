@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,6 +95,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Autowired
     ZkbContractAssetRepository zkbContractAssetRepository;
+
+    @Autowired
+    SvcEngineLogisticsRepository svcEngineLogisticsRepository;
+
+    @Autowired
+    SvcEngineLogisticsStatusRepository svcEngineLogisticsStatusRepository;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -1680,6 +1687,118 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return zkbPartOrderList;
     }
 
+    public List<SvcEngineLogisticsLineVO> querySvcLogistics(String job,String orderNo,String partNo){
+        List<SearchFilter> searchFilters = new ArrayList<>();
+        if(StringUtils.isNotEmpty(job)){
+            searchFilters.add(new SearchFilter("job", SearchFilter.Operator.EQ, job));
+        }
+        if(StringUtils.isNotEmpty(partNo)){
+            searchFilters.add(new SearchFilter("item", SearchFilter.Operator.EQ, partNo));
+        }
+        if(StringUtils.isNotEmpty(orderNo)){
+            searchFilters.add(new SearchFilter("order", SearchFilter.Operator.EQ, orderNo));
+        }
+        Sort sort=new Sort(Sort.Direction.DESC,"lineID","updateTime");
+        List<SvcEngineLogistics> svcEngineLogisticsList = svcEngineLogisticsRepository.findBySearchFilter(searchFilters,sort);
+        if(svcEngineLogisticsList == null || svcEngineLogisticsList.size() == 0){
+            return new ArrayList<>();
+        }
+
+        List<SvcEngineLogisticsStatus> svcEngineLogisticsStatusList = svcEngineLogisticsStatusRepository.findAll();
+        HashMap<String, SvcEngineLogisticsStatus> statusHashMap = new HashMap<>();
+        for(SvcEngineLogisticsStatus st : svcEngineLogisticsStatusList){
+            statusHashMap.put(st.getDecodedStatus().toLowerCase(),st);
+        }
+        HashMap<String,List<SvcEngineLogistics>> lineLogisticsMap = new HashMap<>();
+        List<SvcEngineLogistics> lineLogisticsList = new ArrayList<>();
+        String oldLineId = svcEngineLogisticsList.get(0).getLineID();
+        for(SvcEngineLogistics s : svcEngineLogisticsList){
+            if(!s.getLineID().equals(oldLineId)){
+                lineLogisticsMap.put(oldLineId,lineLogisticsList);
+                oldLineId = s.getLineID();
+                lineLogisticsList = new ArrayList<>();
+            }
+            //转换成本地状态
+            Optional.ofNullable(s.getDecodedStatus())
+                    .map(ss -> ss = ss.toLowerCase())
+                    .map(statusHashMap :: get)
+                    .ifPresent(t ->{
+                        s.setLocalStatusCode(t.getLocalStatusCode());
+                        s.setLocalStatusName(t.getLocalStatusName());
+                    });
+            lineLogisticsList.add(s);
+        }
+        lineLogisticsMap.put(oldLineId,lineLogisticsList);
+
+
+        List<SvcEngineLogisticsLineVO> results = new ArrayList<>();
+        for(Map.Entry<String,  List<SvcEngineLogistics>> entry: lineLogisticsMap.entrySet()) {
+            List<SvcEngineLogistics> engineLogistics = entry.getValue();
+            if(engineLogistics != null && engineLogistics.size() > 0){
+                SvcEngineLogistics setSvc =  null;
+                for(SvcEngineLogistics s : engineLogistics){
+                    if(s != null && StringUtils.isNotEmpty(s.getLocalStatusCode())){
+                        setSvc = s;
+                        break;
+                    }
+                }
+                if(setSvc == null){
+                    break;
+                }
+                SvcEngineLogisticsLineVO svcEngineLogisticsLineVO = new SvcEngineLogisticsLineVO();
+                svcEngineLogisticsLineVO.setLineID(setSvc.getLineID());
+                svcEngineLogisticsLineVO.setItem(setSvc.getItem());
+                svcEngineLogisticsLineVO.setQty(setSvc.getQty());
+                svcEngineLogisticsLineVO.setDescription(setSvc.getDescription());
+                svcEngineLogisticsLineVO.setDescriptionChinese(setSvc.getDescriptionChinese());
+                svcEngineLogisticsLineVO.setLocalStatusCode(setSvc.getLocalStatusCode());
+                svcEngineLogisticsLineVO.setLocalStatusName(setSvc.getLocalStatusName());
+                List<SvcEngineLogisticsOrderDetailVO> svcEngineLogisticsOrderDetailVOS = getDetailVOs(setSvc.getLineID(),setSvc.getJob());
+                svcEngineLogisticsLineVO.setSvcEngineLogisticsOrderDetails(svcEngineLogisticsOrderDetailVOS);
+                List<SvcEngineLogistics> details = new ArrayList<>();
+                String localStatusCode = setSvc.getLocalStatusCode();
+
+                for(SvcEngineLogistics s : svcEngineLogisticsList) {
+                    if (StringUtils.isEmpty(localStatusCode) || "null".equals(localStatusCode)) {
+                        continue;
+                    }
+                    if(!localStatusCode.equals(s.getLocalStatusCode())){
+                        details.add(setSvc);
+
+                    }
+                    localStatusCode = s.getLocalStatusCode();
+                    setSvc = s;
+                }
+                if(StringUtils.isNotEmpty(localStatusCode)) {
+                    details.add(setSvc);
+                }
+                svcEngineLogisticsLineVO.setSvcEngineLogisticsList(details);
+                results.add(svcEngineLogisticsLineVO);
+            }
+        }
+
+        return results;
+    }
+
+
+    public List<SvcEngineLogisticsOrderDetailVO> getDetailVOs(String lineId,String job){
+        List<SvcEngineLogisticsOrderDetailVO> svcEngineLogisticsOrderDetailVOS = new ArrayList<>();
+        List<Object[]> queryList = svcEngineLogisticsRepository.queryDetailByLineIdFromSql(lineId,job);
+        if (queryList.isEmpty()) {
+            return new ArrayList<>();
+        }
+        for(int i=0;i< queryList.size();i++){
+            Object[] split = queryList.get(i);
+            String awb = split[0] == null ? "" : (String)split[0];
+            String hyperlink = split[0] == null ? "" : (String)split[1];
+            String carrier = split[0] == null ? "" : (String)split[2];
+            String carrierChinese = split[0] == null ? "" : (String)split[3];
+            SvcEngineLogisticsOrderDetailVO s = new SvcEngineLogisticsOrderDetailVO(awb,hyperlink,carrier,carrierChinese);
+            svcEngineLogisticsOrderDetailVOS.add(s);
+        }
+
+        return svcEngineLogisticsOrderDetailVOS;
+    }
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
         List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
