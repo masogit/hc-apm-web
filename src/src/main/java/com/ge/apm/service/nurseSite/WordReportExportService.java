@@ -40,7 +40,9 @@ public class WordReportExportService {
         String name = listMaintain.get(0).getName();
         TreeMap<Date, List<NurseSiteMaintainItem>> map = new TreeMap<>();
         Map<Date,Map<String,List<String>>> stringMap = new HashMap<>();
+        Map<Date,Map<String,String>> commentMapMap = new HashMap<>();
         Map<String,List<String>> assetNameMap = null;
+        Map<String,String> commentMap = null;
         for (NurseSiteMaintain maintain : listMaintain) {
             Date scheduleDate = maintain.getScheduleDate();
             if (scheduleDate == null) {
@@ -48,6 +50,7 @@ public class WordReportExportService {
             }
             List<NurseSiteMaintainItem> items = maintain.getListNurseSiteMaintainItem();
             assetNameMap = new HashMap<>();
+            commentMap = new HashMap<>();
             for (int i = 0;i < items.size();i++) {
                 NurseSiteMaintainItem nurseSiteMaintainItem = items.get(i);
                 AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
@@ -65,9 +68,11 @@ public class WordReportExportService {
                     }
                 }
                 assetNameMap.put(assetInfo.getName(),stringList);
+                commentMap.put(assetInfo.getName(),nurseSiteMaintainItem.getComment());
             }
             map.put(scheduleDate, items);
             stringMap.put(scheduleDate,assetNameMap);
+            commentMapMap.put(scheduleDate,commentMap);
         }
         List<NurseSiteMaintainItem> nurseSiteMaintainItemList= null;
         int num =0;
@@ -114,19 +119,23 @@ public class WordReportExportService {
                 for (int j = 1; j <=count ; j++) {
                     Date date = dataMap.get(j);
                     int day = date.getDate();
-                    if (day<=16){
+                    if(count == 1){
                         size=j;//第一页
                     }else {
-                        isPage=true;
+                        if (day<=16){
+                            size=j;//第一页
+                        }else {
+                            isPage=true;
+                        }
                     }
                 }
                 if (isPage) {
-                    creatPage(1,i,size,dataMap,document,nurseSiteMaintainItemList,stringMap);
+                    creatPage(1,i,size,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
                     document.createParagraph().setPageBreak(true);
                     secondNum=size+1;
-                    creatPage(secondNum,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap);
+                    creatPage(secondNum,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
                 } else {
-                    creatPage(1,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap);
+                    creatPage(1,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
                 }
             }
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -140,7 +149,8 @@ public class WordReportExportService {
         return zip(reportMap ,name);
     }
 
-    public void creatPage( int secondNum,int i,int size,Map<Integer ,Date> dataMap,XWPFDocument document,List<NurseSiteMaintainItem> nurseSiteMaintainItemList,Map<Date,Map<String,List<String>>>  stringMap){
+    public void creatPage( int secondNum,int i,int size,Map<Integer ,Date> dataMap,XWPFDocument document,
+                           List<NurseSiteMaintainItem> nurseSiteMaintainItemList,Map<Date,Map<String,List<String>>>  stringMap,Map<Date,Map<String,String>> commentMapMap){
         XWPFTable table = document.createTable();
         XWPFTableRow tableOneRowOne = table.getRow(0);
         XWPFTableRow tableOneRowTwo = table.createRow();
@@ -171,7 +181,13 @@ public class WordReportExportService {
                     tableOneRow.addNewTableCell().setText(stringList.get(j));
                 }
                 for (int m = 1; m <= 2; m++) {
-                    tableOneRow.addNewTableCell().setText(null);
+                    if( m==2){
+                        Map<String, String> map = commentMapMap.get(date);
+                        String comment = map.get(assetInfoName);
+                        tableOneRow.addNewTableCell().setText(comment);
+                    }else {
+                        tableOneRow.addNewTableCell().setText(null);
+                    }
                 }
             }else {
                 for (int m = 1; m <= num; m++) {
