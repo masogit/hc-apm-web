@@ -1205,7 +1205,7 @@ public void test1(){
         MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedWorkOrder);
         hasConfigMultiLevelApproval = false;
         if (approval != null) {
-            logger.info("多级审核已激活.............");
+            logger.info("维修-----------多级审核已激活");
             hasConfigMultiLevelApproval = true;
         }
 
@@ -1274,6 +1274,7 @@ public void test1(){
             WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
             return ;
         }
+        selectedWorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_PENDING);
         dao.save(selectedWorkOrder);
     }
 
