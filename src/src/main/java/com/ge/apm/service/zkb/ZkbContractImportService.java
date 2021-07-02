@@ -196,9 +196,9 @@ public class ZkbContractImportService {
         ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
         if(zkbContract != null){
             if(StringUtils.isNotEmpty(contractInfoVO.getQuotaDeductType())){
-                if("旧逻辑".equals(contractInfoVO.getQuotaDeductType())){
+                if("旧逻辑扣除".equals(contractInfoVO.getQuotaDeductType())){
                     zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
-                }else if("新逻辑".equals(contractInfoVO.getQuotaDeductType())){
+                }else if("新逻辑扣除".equals(contractInfoVO.getQuotaDeductType())){
                     zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
                 }
             }
@@ -229,9 +229,9 @@ public class ZkbContractImportService {
             newZkbContract.setCreatedDate(new Date());
 
             if(StringUtils.isNotEmpty(newZkbContract.getQuotaDeductType())){
-                if("旧逻辑".equals(newZkbContract.getQuotaDeductType())){
+                if("旧逻辑扣除".equals(newZkbContract.getQuotaDeductType())){
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
-                }else if("新逻辑".equals(newZkbContract.getQuotaDeductType())){
+                }else if("新逻辑扣除".equals(newZkbContract.getQuotaDeductType())){
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
                 }
             }
