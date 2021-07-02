@@ -247,6 +247,30 @@ public class WorkflowConfig implements Serializable {
     private Boolean enableUpdateSwitchingTime;
 
     /**
+     * 是否启用Imaging Insights
+     */
+    @Column(name = "ii_mobile_enable")
+    private Boolean iiMobileEnable;
+
+    /**
+     * ii_mobile_url
+     */
+    @Column(name = "ii_mobile_url")
+    private String iiMobileUrl;
+
+    /**
+     * 是否启用usiot_mobile_enable
+     */
+    @Column(name = "usiot_mobile_enable")
+    private Boolean usiotMobileEnable;
+
+    /**
+     * usiot_mobile_url
+     */
+    @Column(name = "usiot_mobile_url")
+    private String usiotMobileUrl;
+
+    /**
      * 资产附件类型配置
      */
     @Column(name = "customized_asset_attachment_category",columnDefinition="text")
@@ -295,6 +319,38 @@ public class WorkflowConfig implements Serializable {
 
     public void setEnableScrappedControl(boolean enableScrappedControl) {
         this.enableScrappedControl = enableScrappedControl;
+    }
+
+    public Boolean getIiMobileEnable() {
+        return iiMobileEnable;
+    }
+
+    public void setIiMobileEnable(Boolean iiMobileEnable) {
+        this.iiMobileEnable = iiMobileEnable;
+    }
+
+    public String getIiMobileUrl() {
+        return iiMobileUrl;
+    }
+
+    public void setIiMobileUrl(String iiMobileUrl) {
+        this.iiMobileUrl = iiMobileUrl;
+    }
+
+    public Boolean getUsiotMobileEnable() {
+        return usiotMobileEnable;
+    }
+
+    public void setUsiotMobileEnable(Boolean usiotMobileEnable) {
+        this.usiotMobileEnable = usiotMobileEnable;
+    }
+
+    public String getUsiotMobileUrl() {
+        return usiotMobileUrl;
+    }
+
+    public void setUsiotMobileUrl(String usiotMobileUrl) {
+        this.usiotMobileUrl = usiotMobileUrl;
     }
 
     public Integer getAssetDeptHeadWeight() {

@@ -491,6 +491,26 @@
                         </p:column>
                     </p:dataTable>
                 </p:fieldset>
+                <p:fieldset id="weChatModule" legend="微信模块配置">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">是否开启Imaging Insights?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.iiMobileEnable}"/>
+                        </h:panelGroup >
+                        <h:panelGroup>
+                            <label class="label">地址</label>
+                            <p:inputText value="#{workflowConfigController.selected.iiMobileUrl}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">是否开启超声物联loT?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.usiotMobileEnable}"/>
+                        </h:panelGroup >
+                        <h:panelGroup>
+                            <label class="label">地址</label>
+                            <p:inputText value="#{workflowConfigController.selected.usiotMobileUrl}" />
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
 
                 <p:fieldset id="other" legend="#{msg.OtherConfiguration}">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
