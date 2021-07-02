@@ -186,6 +186,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name="pm_wc_need_sign")
     private Boolean pmWcNeedSign; //保养完成是否需要签名
 
+    @Column(name="ai_need_maintenance")
+    private Boolean aiNeedMaintenance; //到货安装是否提示保养设置
+
     /***
      * for measure
      * begin
@@ -1222,6 +1225,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setPmWcNeedSign(Boolean pmWcNeedSign) {
         this.pmWcNeedSign = pmWcNeedSign;
+    }
+
+    public Boolean getAiNeedMaintenance() {
+        return aiNeedMaintenance;
+    }
+
+    public void setAiNeedMaintenance(Boolean aiNeedMaintenance) {
+        this.aiNeedMaintenance = aiNeedMaintenance;
     }
 
     @Override
