@@ -771,6 +771,12 @@
             <groupId>org.tiefaces</groupId>
             <artifactId>tiefaces</artifactId>
             <version>1.0.12</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.primefaces</groupId>
+                    <artifactId>primefaces</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>

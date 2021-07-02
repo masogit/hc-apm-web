@@ -1,9 +1,9 @@
- -- 2021-05-21 瀵煎叆GEDictionaryExcel閰嶇疆鏉冮檺  start
+ -- 2021-05-21 导入GEDictionaryExcel配置权限  start
  delete from role_msg_rel where msg_key = 'GEDictionaryExcel';
  INSERT INTO "public"."role_msg_rel"("msg_key", "msg_type", "role_id", "role_name", "role_type") VALUES ('GEDictionaryExcel', 'batchFileType', (select id from sys_role where name = 'DataMaintainStaff'), 'DataMaintainStaff', 0);
  -- end
 
--- 2021-06-04 娑堟伅璁㈤槄鏂板ole瑙掕壊閰嶇疆 start
+-- 2021-06-04 消息订阅新增ole角色配置 start
 INSERT INTO user_subscription_push (ge_user_type,is_deleted,menu_type,send_status,sub_status,default_send_status,role_position)
 select '2', FALSE, '1', true, true, false, 'OLE'
 where not exists (select 1 from user_subscription_push where menu_type=1 and role_position='OLE');
@@ -51,10 +51,10 @@ delete from di_quarterly_report where ge_device_type in (3, 31, 32, 33);
 
 
 
---apm-schedual鏂板妯℃澘灏庡叆 zkb浠ｇ悊鍟唂e/sales     start 0610
+--apm-schedual新增模板導入 zkb代理商fe/sales     start 0610
 delete from role_msg_rel where msg_key = 'ZKBDealerFEAndSalesExcel';
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','ZKBDealerFEAndSalesExcel',(select id from sys_role where name = 'GEInternalStaff'),'GEInternalStaff',0);
---apm-schedual鏂板妯℃澘灏庡叆 zkb浠ｇ悊鍟唂e/sales     end   0610
+--apm-schedual新增模板導入 zkb代理商fe/sales     end   0610
 
 
 INSERT INTO  role_msg_rel("msg_key", "msg_type", "role_id", "role_name", "role_type") VALUES ('ANSSpareExcel', 'gamePlanBatchFileType', (select id from sys_role where name = 'DataMaintainStaff'), 'DataMaintainStaff', 0);
