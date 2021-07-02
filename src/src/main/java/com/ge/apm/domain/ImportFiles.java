@@ -35,7 +35,7 @@ public class ImportFiles {
         SrExcel, SrReportPdf, SrResetReport, UpTimeExcel, UsConnectStatusExcel, ZKBDealerFEAndSalesExcel,
         UserAccountSendMailExcel, UserAssetCustomerExcel, UserAssetFeExcel, UserAssetOLEExcel, UserAssetSalesExcel,
         ZkbAssetTransferExcel, CarePackageExcel, MSARecommendExcel, PromotionActivityExcel, CoilOpportunityExcel,
-        TrainingQuotaExcel, MVSControlExcel, MVSMatrixExcel, SparePartExcel,IBReportExcel,TubeInfoExcel,IBUInfoExcel,ProbeRecommendExcel}
+        TrainingQuotaExcel, MVSControlExcel, MVSMatrixExcel, SparePartExcel,IBReportExcel,TubeInfoExcel,IBUInfoExcel,ProbeRecommendExcel,ANSSpareExcel}
 
 
     public static final String STATUS_COMPLETED = "COMPLETED";
