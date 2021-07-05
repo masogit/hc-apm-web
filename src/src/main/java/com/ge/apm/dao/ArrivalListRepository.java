@@ -38,4 +38,8 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
     public List<String> getArrivalListNotFinishedIds(List<String> orgUidList);
     @Query(value = "select distinct(list.id) from arrival_list list,arrival_list_item item where list.id=item.arrival_list_id and (list.tenant_uid in(?1) or list.site_uid in(?1) or list.institution_uid in(?1) or list.hospital_uid in(?1)) and list.status=2 and item.install_status in('instorage','finished')",nativeQuery = true)
     public List<String> getArrivalListPartiallyFinishedIds(List<String> orgUidList);
+    @Query(value = "select list.hospital_uid,list.institution_uid,list.site_uid,list.tenant_uid from arrival_list list where id = ?1}",nativeQuery = true)
+    public List<String> getArrivalListHILT(String id);
+    @Query(value = "select * from arrival_list list where id = ?1}",nativeQuery = true)
+    public ArrivalList getById(String id);
 }

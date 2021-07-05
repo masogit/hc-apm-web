@@ -162,7 +162,7 @@ public class ZkbPartOrderUserConfigService {
         {
             for(ZkbPartOrderUserConfig item:zkbPartOrderUserConfigList)
             {
-                if(StringUtils.isNotBlank(item.getId())&&"是".equals(item.getId()))
+                if(StringUtils.isNotBlank(item.getId())&&"是".equals(item.getDelFlag()))
                 {
                     this.zkbPartOrderUserConfigRepository.delete(item.getId());
                     continue;

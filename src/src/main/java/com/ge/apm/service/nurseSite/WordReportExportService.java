@@ -37,116 +37,137 @@ public class WordReportExportService {
         if (listMaintain.isEmpty()) {
             throw new IllegalStateException("所选检查没有完成");
         }
-        String name = listMaintain.get(0).getName();
-        TreeMap<Date, List<NurseSiteMaintainItem>> map = new TreeMap<>();
-        Map<Date,Map<String,List<String>>> stringMap = new HashMap<>();
-        Map<Date,Map<String,String>> commentMapMap = new HashMap<>();
-        Map<String,List<String>> assetNameMap = null;
-        Map<String,String> commentMap = null;
+        List<NurseSiteMaintain> nurseSiteMaintains =null;
+        Map<Integer,List<byte[]>>reportMap = null;
+        Map<String,Map<Integer,List<byte[]>>> reportMapMap = new LinkedHashMap<>();
+        List<byte[]> reports= null;
+        Map<String,List<NurseSiteMaintain>>listMap = new LinkedHashMap<>();
         for (NurseSiteMaintain maintain : listMaintain) {
-            Date scheduleDate = maintain.getScheduleDate();
-            if (scheduleDate == null) {
-                continue;
-            }
-            List<NurseSiteMaintainItem> items = maintain.getListNurseSiteMaintainItem();
-            assetNameMap = new HashMap<>();
-            commentMap = new HashMap<>();
-            for (int i = 0;i < items.size();i++) {
-                NurseSiteMaintainItem nurseSiteMaintainItem = items.get(i);
-                AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
-                List<NurseSiteMaintainData> listData = nurseSiteMaintainItem.getListData();
-                List<String> stringList = new ArrayList<>();
-                for (int j = 0 ;j < listData.size();j++) {
-                    NurseSiteMaintainData nurseSiteMaintainData = listData.get(j);
-                    Boolean checkValue = nurseSiteMaintainData.getCheckValue();
-                    if(checkValue!=null && checkValue){
-                        stringList.add("√");
-                    }else if(checkValue!=null && !checkValue){
-                        stringList.add("x");
-                    }else {
-                        stringList.add(null);
-                    }
-                }
-                assetNameMap.put(assetInfo.getName(),stringList);
-                commentMap.put(assetInfo.getName(),nurseSiteMaintainItem.getComment());
-            }
-            map.put(scheduleDate, items);
-            stringMap.put(scheduleDate,assetNameMap);
-            commentMapMap.put(scheduleDate,commentMap);
-        }
-        List<NurseSiteMaintainItem> nurseSiteMaintainItemList= null;
-        int num =0;
-        int month=0;
-        Map<Integer ,Date> dataMap = new LinkedHashMap<>();;
-        Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap();
-        for (Map.Entry<Date, List<NurseSiteMaintainItem>> i : map.entrySet()) {
-            int secondCount =0;
-            nurseSiteMaintainItemList = i.getValue();
-            num++;
-            Date date = i.getKey();
-            if (num==1){
-                month = date.getMonth()+1;
-                dataMap.put(num,i.getKey());
-                stringMapMap.put(month,dataMap);
+            String name = maintain.getName();
+            if(listMap.containsKey(name)){
+                listMap.get(name).add(maintain);
+                listMap.put(name,listMap.get(name));
             }else {
-                if(month!=date.getMonth()+1){
-                    dataMap = new LinkedHashMap<>();
-                    secondCount++;
-                    month=date.getMonth()+1;
-                    num=secondCount;
-                    dataMap.put(secondCount,i.getKey());
-                    stringMapMap.put(date.getMonth()+1,dataMap);
-                }else {
-                    dataMap.put(num,i.getKey());
-                    stringMapMap.put(month,dataMap);
-                }
+                nurseSiteMaintains = new ArrayList<>();
+                nurseSiteMaintains.add(maintain);
+                listMap.put(name,nurseSiteMaintains);
             }
+
         }
-        Map<Integer,List<byte[]>> reportMap = new LinkedHashMap<>();
-        for (Map.Entry<Integer, Map<Integer, Date>> m : stringMapMap.entrySet()) {
-            List<byte[]> reports= new ArrayList<>();
-            int count = m.getValue().size();
-            dataMap = m.getValue();
-            XWPFDocument document = new XWPFDocument();
-            for (int i=0;i<nurseSiteMaintainItemList.size();i++) {
-                int secondNum =0;
-                int size = 0;
-                boolean isPage = false;
-                if (i > 0) {
-                    //不同设备分页
-                    document.createParagraph().setPageBreak(true);
+        String name=null;
+        for (Map.Entry<String, List<NurseSiteMaintain>> a : listMap.entrySet()) {
+            reportMap = new LinkedHashMap<>();
+            name = a.getKey();
+            TreeMap<Date, List<NurseSiteMaintainItem>> map = new TreeMap<>();
+            Map<Date,Map<String,List<String>>> stringMap = new HashMap<>();
+            Map<Date,Map<String,String>> commentMapMap = new HashMap<>();
+            Map<String,List<String>> assetNameMap = null;
+            Map<String,String> commentMap = null;
+            for (NurseSiteMaintain maintain : a.getValue()) {
+                Date scheduleDate = maintain.getScheduleDate();
+                if (scheduleDate == null) {
+                    continue;
                 }
-                for (int j = 1; j <=count ; j++) {
-                    Date date = dataMap.get(j);
-                    int day = date.getDate();
-                    if(count == 1){
-                        size=j;//第一页
-                    }else {
-                        if (day<=16){
-                            size=j;//第一页
+                List<NurseSiteMaintainItem> items = maintain.getListNurseSiteMaintainItem();
+                assetNameMap = new HashMap<>();
+                commentMap = new HashMap<>();
+                for (int i = 0;i < items.size();i++) {
+                    NurseSiteMaintainItem nurseSiteMaintainItem = items.get(i);
+                    AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
+                    List<NurseSiteMaintainData> listData = nurseSiteMaintainItem.getListData();
+                    List<String> stringList = new ArrayList<>();
+                    for (int j = 0 ;j < listData.size();j++) {
+                        NurseSiteMaintainData nurseSiteMaintainData = listData.get(j);
+                        Boolean checkValue = nurseSiteMaintainData.getCheckValue();
+                        if(checkValue!=null && checkValue){
+                            stringList.add("√");
+                        }else if(checkValue!=null && !checkValue){
+                            stringList.add("x");
                         }else {
-                            isPage=true;
+                            stringList.add(null);
                         }
                     }
+                    assetNameMap.put(assetInfo.getName(),stringList);
+                    commentMap.put(assetInfo.getName(),nurseSiteMaintainItem.getComment());
                 }
-                if (isPage) {
-                    creatPage(1,i,size,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
-                    document.createParagraph().setPageBreak(true);
-                    secondNum=size+1;
-                    creatPage(secondNum,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
-                } else {
-                    creatPage(1,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
+                map.put(scheduleDate, items);
+                stringMap.put(scheduleDate,assetNameMap);
+                commentMapMap.put(scheduleDate,commentMap);
+            }
+            List<NurseSiteMaintainItem> nurseSiteMaintainItemList= null;
+            int num =0;
+            int month=0;
+            Map<Integer ,Date> dataMap = new LinkedHashMap<>();
+            Map<Integer,Map<Integer ,Date>> stringMapMap= new LinkedHashMap();
+            for (Map.Entry<Date, List<NurseSiteMaintainItem>> i : map.entrySet()) {
+                int secondCount =0;
+                nurseSiteMaintainItemList = i.getValue();
+                num++;
+                Date date = i.getKey();
+                if (num==1){
+                    month = date.getMonth()+1;
+                    dataMap.put(num,i.getKey());
+                    stringMapMap.put(month,dataMap);
+                }else {
+                    if(month!=date.getMonth()+1){
+                        dataMap = new LinkedHashMap<>();
+                        secondCount++;
+                        month=date.getMonth()+1;
+                        num=secondCount;
+                        dataMap.put(secondCount,i.getKey());
+                        stringMapMap.put(date.getMonth()+1,dataMap);
+                    }else {
+                        dataMap.put(num,i.getKey());
+                        stringMapMap.put(month,dataMap);
+                    }
                 }
             }
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            document.write(outStream);
-            outStream.close();
-            byte[] bytes = outStream.toByteArray();
-            reports.add(bytes);
-            reportMap.put(m.getKey(),reports);
+            for (Map.Entry<Integer, Map<Integer, Date>> m : stringMapMap.entrySet()) {
+                reports = new ArrayList<>();
+                int count = m.getValue().size();
+                dataMap = m.getValue();
+                XWPFDocument document = new XWPFDocument();
+                for (int i=0;i<nurseSiteMaintainItemList.size();i++) {
+                    int secondNum =0;
+                    int size = 0;
+                    boolean isPage = false;
+                    if (i > 0) {
+                        //不同设备分页
+                        document.createParagraph().setPageBreak(true);
+                    }
+                    for (int j = 1; j <=count ; j++) {
+                        Date date = dataMap.get(j);
+                        int day = date.getDate();
+                        if(count == 1){
+                            size=j;//第一页
+                        }else {
+                            if (day<=16){
+                                size=j;//第一页
+                            }else {
+                                isPage=true;
+                            }
+                        }
+                    }
+                    if (isPage) {
+                        creatPage(1,i,size,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
+                        document.createParagraph().setPageBreak(true);
+                        secondNum=size+1;
+                        creatPage(secondNum,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
+                    } else {
+                        creatPage(1,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
+                    }
+                }
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                document.write(outStream);
+                outStream.close();
+                byte[] bytes = outStream.toByteArray();
+                reports.add(bytes);
+                reportMap.put(m.getKey(),reports);
+            }
+            reportMapMap.put(name,reportMap);
         }
 
-        return zip(reportMap ,name);
+        return zip(reportMapMap);
     }
 
     public void creatPage( int secondNum,int i,int size,Map<Integer ,Date> dataMap,XWPFDocument document,
@@ -217,15 +238,17 @@ public class WordReportExportService {
         tblPr.getTblW().setW(new BigInteger("9370"));
     }
 
-    public byte[] zip(Map<Integer,List<byte[]>> reportMap ,String name) throws IOException {
+    public byte[] zip(Map<String,Map<Integer,List<byte[]>>> reportMapMap) throws IOException {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              ZipOutputStream zos = new ZipOutputStream(out)) {
-            for (Map.Entry<Integer, List<byte[]>> m : reportMap.entrySet()) {
-                List<byte[]> reports = m.getValue();
-                Integer key = m.getKey();
-                for (int i = 0; i < reports.size(); i++) {
-                    zos.putNextEntry(new ZipEntry(name+"-"+key+"月" +".docx"));
-                    IOUtils.write(reports.get(i), zos);
+            for (Map.Entry<String, Map<Integer, List<byte[]>>> n : reportMapMap.entrySet()) {
+                for (Map.Entry<Integer, List<byte[]>> m : n.getValue().entrySet()) {
+                    List<byte[]> reports = m.getValue();
+                    Integer key = m.getKey();
+                    for (int i = 0; i < reports.size(); i++) {
+                        zos.putNextEntry(new ZipEntry(n.getKey()+"-"+key+"月" +".docx"));
+                        IOUtils.write(reports.get(i), zos);
+                    }
                 }
             }
             zos.closeEntry();
