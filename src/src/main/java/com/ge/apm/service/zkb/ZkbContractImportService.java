@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.*;
 import java.util.*;
 
@@ -96,8 +94,6 @@ public class ZkbContractImportService {
 
             Map<String, Object> map = new LinkedHashMap();
             ZkbContractVO contractInfoVO = new ZkbContractVO();
-
-
             contractInfoVO.setLineNum(i);
 
             ZkbContractRow contractRow = new ZkbContractRow(contractInfoVO, rowMap);
@@ -118,7 +114,6 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("探头任意总额", "setProbeQuotaTotal");
             contractRow.setFieldNumValue("探头任意剩余名额", "setProbeQuota");
             contractRow.setFieldNumValue("探头任意已使用名额", "setProbeQuotaUse");
-
 
             contractRow.setFieldNumValue("探头普通总额", "setProbeQuotaNormalTotal");
             contractRow.setFieldNumValue("探头普通剩余名额", "setProbeQuotaNormal");
@@ -196,22 +191,13 @@ public class ZkbContractImportService {
     @Transactional(rollbackFor = Exception.class)
     protected void importOneContract(ZkbContractVO contractInfoVO,UserAccount currentUser) {
         ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
         if(zkbContract != null){
-            Date d = null;
-            try {
-                d = format.parse(ZkbContractService.NEW_CAT_END_DATE);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            if(d == null){
-                d = new Date();
-            }
-            if(CopyByInvok.getBetweenDay(d,zkbContract.getStartDate()) < 0){
-                zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
-            }else{
-                zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+            if(StringUtils.isNotEmpty(contractInfoVO.getQuotaDeductType())){
+                if("旧逻辑扣除".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+                }else if("新逻辑扣除".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
+                }
             }
             zkbContract.setSpareQuotaTotal(contractInfoVO.getSpareQuotaTotal());
             zkbContract.setSpareQuota(contractInfoVO.getSpareQuota());
@@ -237,19 +223,13 @@ public class ZkbContractImportService {
             BeanUtils.copyProperties(contractInfoVO, newZkbContract);
             newZkbContract.setCreatedBy(currentUser.getLoginName());
             newZkbContract.setCreatedDate(new Date());
-            Date d = null;
-            try {
-                d = format.parse(ZkbContractService.NEW_CAT_END_DATE);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            if(d == null){
-                d = new Date();
-            }
-            if(CopyByInvok.getBetweenDay(d,newZkbContract.getStartDate()) < 0){
-                zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
-            }else{
-                zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+
+            if(StringUtils.isNotEmpty(newZkbContract.getQuotaDeductType())){
+                if("旧逻辑扣除".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+                }else if("新逻辑扣除".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
+                }
             }
             newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
             newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
