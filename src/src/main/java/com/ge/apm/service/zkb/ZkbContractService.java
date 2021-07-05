@@ -60,6 +60,9 @@ public class ZkbContractService {
     @Autowired
     private ZkbContractQuotaLogService zkbContractQuotaLogService;
 
+    public static String NEW_CAT_END_DATE= "2021-03-01";
+
+
     public List<TenantInfo> getSourceTenantInfoList(){
 
         List<SearchFilter> searchFilters = new ArrayList<>();
@@ -84,11 +87,8 @@ public class ZkbContractService {
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_startDate"), DateFormatUtils.format(zkbContract.getStartDate(),"yyyy-MM-dd"));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_endDate"), DateFormatUtils.format(zkbContract.getEndDate(),"yyyy-MM-dd"));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_contractState"), zkbContract.getContractState());
-            if(StringUtils.isNotEmpty(zkbContract.getQuotaDeductType())){
-                zkbContractDataMap.put("名额扣除类型", WebUtil.getFieldValueMessage("zkbContractQuotaDeductType", zkbContract.getQuotaDeductType()));
-            }
-            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_ibNumber"), zkbContract.getIbNumber());
 
+            zkbContractDataMap.put(WebUtil.getMessage("zkbContract_ibNumber"), zkbContract.getIbNumber());
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota"), isEmptyInteger(zkbContract.getSpareQuota()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_total"), isEmptyInteger(zkbContract.getSpareQuotaTotal()));
             zkbContractDataMap.put(WebUtil.getMessage("zkbContract_spareQuota_apply"), isEmptyInteger(zkbContract.getSpareQuotaApply()));
@@ -476,22 +476,6 @@ public class ZkbContractService {
         return resut;
     }
 
-    public int getBetweenDay(String sd1, String sd2) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            Date date1 = format.parse(sd1);
-            Date date2 = format.parse(sd2);
-            long days = (date2.getTime() - date1.getTime()) / (24*3600*1000);
-            if((date2.getTime() - date1.getTime())% (24*3600*1000) != 0){
-                days++;
-            }
-            return (int)days;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
     /**
      * 保存合同
      */
@@ -499,6 +483,21 @@ public class ZkbContractService {
     public ZkbContract saveContract(ZkbContract zkbContract,String actionName,String reason,UserAccount currentUser){
         zkbContract.setLastModifiedDate(new Date());
         zkbContract.setLastModifiedBy(currentUser.getLoginName());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = null;
+        try {
+            d = format.parse(NEW_CAT_END_DATE);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if(d == null){
+            d = new Date();
+        }
+        if(CopyByInvok.getBetweenDay(d,zkbContract.getStartDate()) < 0){
+            zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+        }else{
+            zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+        }
         if("Edit".equals(actionName)){
             ZkbContract oldContract = contractRepository.findById(zkbContract.getId());
             zkbContractLogService.addLog(zkbContract.getId(),zkbContract.getContractNo(),"contractUpdate","","",reason,currentUser);

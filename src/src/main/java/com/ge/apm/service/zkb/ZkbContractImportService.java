@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.util.*;
 
@@ -194,15 +196,23 @@ public class ZkbContractImportService {
     @Transactional(rollbackFor = Exception.class)
     protected void importOneContract(ZkbContractVO contractInfoVO,UserAccount currentUser) {
         ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
-        if(zkbContract != null){
-            if(StringUtils.isNotEmpty(contractInfoVO.getQuotaDeductType())){
-                if("旧逻辑扣除".equals(contractInfoVO.getQuotaDeductType())){
-                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
-                }else if("新逻辑扣除".equals(contractInfoVO.getQuotaDeductType())){
-                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
-                }
-            }
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
+        if(zkbContract != null){
+            Date d = null;
+            try {
+                d = format.parse(ZkbContractService.NEW_CAT_END_DATE);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if(d == null){
+                d = new Date();
+            }
+            if(CopyByInvok.getBetweenDay(d,zkbContract.getStartDate()) < 0){
+                zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+            }else{
+                zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+            }
             zkbContract.setSpareQuotaTotal(contractInfoVO.getSpareQuotaTotal());
             zkbContract.setSpareQuota(contractInfoVO.getSpareQuota());
             zkbContract.setSpareQuotaUse(contractInfoVO.getSpareQuotaUse());
@@ -227,15 +237,20 @@ public class ZkbContractImportService {
             BeanUtils.copyProperties(contractInfoVO, newZkbContract);
             newZkbContract.setCreatedBy(currentUser.getLoginName());
             newZkbContract.setCreatedDate(new Date());
-
-            if(StringUtils.isNotEmpty(newZkbContract.getQuotaDeductType())){
-                if("旧逻辑扣除".equals(newZkbContract.getQuotaDeductType())){
-                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
-                }else if("新逻辑扣除".equals(newZkbContract.getQuotaDeductType())){
-                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
-                }
+            Date d = null;
+            try {
+                d = format.parse(ZkbContractService.NEW_CAT_END_DATE);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-
+            if(d == null){
+                d = new Date();
+            }
+            if(CopyByInvok.getBetweenDay(d,newZkbContract.getStartDate()) < 0){
+                zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+            }else{
+                zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+            }
             newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
             newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
             newZkbContract.setGeArtificialSupportTimesApply(newZkbContract.getGeArtificialSupportTimesTotal() - newZkbContract.getGeArtificialSupportTimesUse() - newZkbContract.getGeArtificialSupportTimes());
