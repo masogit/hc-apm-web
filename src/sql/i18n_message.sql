@@ -4203,6 +4203,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SignatureRequiredForPMWorkComplete', '保养完成是否需要签名', 'Signature required for work complete', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'pendingAcceptance', '待验收', 'Waiting for Acceptance', NULL, '-1');
 
+-- 2021.06.29 到货安装是否提示保养设置
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MaintenanceSettingsForArrivalInstallation', '到货安装是否提示保养设置', 'Maintenance Settings For Arrival Installation', NULL, '-1');
+
 -- Mvs工单
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'MvsOrder', 'MVS工单', 'MVS Order', NULL, '-1');
 

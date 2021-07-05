@@ -18,6 +18,7 @@ public interface RelRuleAssetRepository extends GenericRepositoryUUID<RelRuleAss
 	public List<String> findAssetUidsByTenantUID(String tenantUID);
 
 	public RelRuleAsset findByAssetUID(String uid);
+	public RelRuleAsset findBySiteUID(String uid);
 
 
 
