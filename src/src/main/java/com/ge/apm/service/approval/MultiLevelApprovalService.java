@@ -244,15 +244,23 @@ public class MultiLevelApprovalService {
                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
                 v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_DISAGREE);//审批不同意
                 v2_WorkOrderRepository.save(v2WorkOrder);
+                List<V2_WorkOrder_Detail> accessorySparePartsBuyList = null;//申购
+                List<V2_WorkOrder_Detail> accessorySparePartsRequestList = null;//申领
+                this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, accessorySparePartsBuyList, accessorySparePartsRequestList);
+
                 //审批不通过,修改工单状态
-                generateSparePartsBuyList(v2WorkOrder.getId(), SimplePartsConstant.WORK_ORDER, ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE);
+                generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList);
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT:
                 V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
                 v2PmOrder.setApprovalStatus(ApprovalConstant.PM_APPROVAL_STATUS_DISAGREE);
                 v2_PmOrderRepository.save(v2PmOrder);
+
+                List<V2_WorkOrder_Detail> pmAccessorySparePartsBuyList = null;//申购
+                List<V2_WorkOrder_Detail> pmAccessorySparePartsRequestList = null;//申领
+                this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
                 //审批不通过,修改工单状态
-                generateSparePartsBuyList(v2PmOrder.getId(), SimplePartsConstant.PM_ORDER, ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE);
+                generateSparePartsBuyList(SimplePartsConstant.PM_ORDER, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
                 break;
             //备件审批
             default:
@@ -268,6 +276,40 @@ public class MultiLevelApprovalService {
         }
         String message = ApprovalConstant.WX_MESSAGE_DISAGREE_1+businessType+ApprovalConstant.WX_MESSAGE_DISAGREE_2+businessNumber+ApprovalConstant.WX_MESSAGE_DISAGREE_3;
         this.sendWxMsg(weChatIdList,message);
+    }
+
+    public void doWorkDetailByIsAgreeType(String id,int isAgreeType, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList) {
+        List<V2_WorkOrder_Detail> approvedDetailsNew = getWorkOrderDetail(id);
+        if(approvedDetailsNew.isEmpty()){
+            return;
+        }
+        if (isAgreeType == ApprovalConstant.WORK_DETAIL_STATUS_AGREE) {
+            //最后一个审批通过的时候 生成相应单子
+            accessorySparePartsBuyList = new ArrayList<>();//申购
+            accessorySparePartsRequestList = new ArrayList<>();//申领
+            for (int i = 0; i < approvedDetailsNew.size(); i++) {
+                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
+                if (v2_workOrder_detail.getApproved() != null && v2_workOrder_detail.getApproved()) {
+                    continue;
+                }
+                v2_workOrder_detail.setApproved(Boolean.TRUE);
+                v2_WorkOrderDetailRepository.save(v2_workOrder_detail);
+                if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
+                    accessorySparePartsRequestList.add(v2_workOrder_detail);
+                } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
+                    accessorySparePartsBuyList.add(v2_workOrder_detail);
+                }
+            }
+        }else{
+            for (int i = 0; i < approvedDetailsNew.size(); i++) {
+                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
+                if (v2_workOrder_detail.getApproved() != null && v2_workOrder_detail.getApproved()) {
+                    continue;
+                }
+                v2_workOrder_detail.setApproved(Boolean.FALSE);
+                v2_WorkOrderDetailRepository.save(v2_workOrder_detail);
+            }
+        }
     }
 
     /**
@@ -444,15 +486,22 @@ public class MultiLevelApprovalService {
                                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
                                 v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_AGREE);//审批同意
                                 v2_WorkOrderRepository.save(v2WorkOrder);
+
+                                List<V2_WorkOrder_Detail> accessorySparePartsBuyList = null;//申购
+                                List<V2_WorkOrder_Detail> accessorySparePartsRequestList = null;//申领
+                                this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, accessorySparePartsBuyList, accessorySparePartsRequestList);
                                 //审批校验,生成申领申购单
-                                generateSparePartsBuyList(v2WorkOrder.getId(), SimplePartsConstant.WORK_ORDER, ApprovalConstant.WORK_DETAIL_STATUS_AGREE);
+                                generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList);
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT://保养
                                 V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
                                 v2PmOrder.setApprovalStatus(ApprovalConstant.PM_APPROVAL_STATUS_AGREE);
                                 v2_PmOrderRepository.save(v2PmOrder);
+                                List<V2_WorkOrder_Detail> pmAccessorySparePartsBuyList = null;//申购
+                                List<V2_WorkOrder_Detail> pmAccessorySparePartsRequestList = null;//申领
+                                this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
                                 //审批校验,生成申领申购单
-                                generateSparePartsBuyList(v2PmOrder.getId(), SimplePartsConstant.PM_ORDER, ApprovalConstant.WORK_DETAIL_STATUS_AGREE);
+                                generateSparePartsBuyList(SimplePartsConstant.PM_ORDER, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
                                 break;
                             default:
                                 throw new RuntimeException("New Business type not handled yet");
@@ -539,44 +588,15 @@ public class MultiLevelApprovalService {
     }
 
     /**
-     * @param woId
      * @param type 0 维修工单, 1 保养工单
      * @param isAgreeType 0 不同意, 1 同意
      */
-    private void generateSparePartsBuyList(String woId, int type, int isAgreeType) {
-        List<V2_WorkOrder_Detail> approvedDetailsNew = getWorkOrderDetail(woId);
-        if(approvedDetailsNew.isEmpty()){
-            return;
+    private void generateSparePartsBuyList(int type, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList) {
+        if (accessorySparePartsRequestList != null && !accessorySparePartsRequestList.isEmpty()) {
+            simplePartsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, type);//生成申领单
         }
-        if (isAgreeType == ApprovalConstant.WORK_DETAIL_STATUS_AGREE) {
-            //最后一个审批通过的时候 生成相应单子
-            List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
-            List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
-            for (int i = 0; i < approvedDetailsNew.size(); i++) {
-                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
-                v2_workOrder_detail.setApproved(Boolean.TRUE);
-                v2_WorkOrderDetailRepository.save(v2_workOrder_detail);
-                if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
-                    accessorySparePartsRequestList.add(v2_workOrder_detail);
-                } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
-                    accessorySparePartsBuyList.add(v2_workOrder_detail);
-                }
-            }
-            if (!accessorySparePartsRequestList.isEmpty()) {
-                simplePartsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, type);//生成申领单
-            }
-            if (!accessorySparePartsBuyList.isEmpty()) {
-                simplePartsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, type);//生成申购单
-            }
-        }else{
-            for (int i = 0; i < approvedDetailsNew.size(); i++) {
-                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
-                if(v2_workOrder_detail.getApproved() != null && v2_workOrder_detail.getApproved()){
-                    continue;
-                }
-                v2_workOrder_detail.setApproved(Boolean.FALSE);
-                v2_WorkOrderDetailRepository.save(v2_workOrder_detail);
-            }
+        if (accessorySparePartsBuyList != null && !accessorySparePartsBuyList.isEmpty()) {
+            simplePartsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, type);//生成申购单
         }
     }
 
