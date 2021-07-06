@@ -709,3 +709,30 @@ international_version int4,
 have_ib_device bool,
 two_factor_valid bool,
 qrcode_editable bool);
+
+create view acct_guest_user_dblink as select * from dblink('hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d','SELECT
+	t1.wechat_id
+FROM
+	user_account t1,
+	user_role t2,
+	sys_role t3
+WHERE
+	t1. ID = t2.user_id
+AND t3. ID = t2.role_id
+AND t1.wechat_id IS NOT NULL
+AND (t1.is_active = TRUE or t1.is_active is null) and (t1.is_deleted = FALSE or t1.is_deleted is null)
+AND EXISTS (
+	SELECT
+		1
+	FROM
+		user_role t4,
+		sys_role t5
+	WHERE
+		t5. ID = t4.role_id
+	AND t4.user_id = t1. ID
+	GROUP BY
+		1
+	HAVING
+		COUNT (1) = 1
+)
+AND t3. NAME = ''Guest''') AS t(wechat_id varchar(255));
