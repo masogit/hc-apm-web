@@ -482,9 +482,9 @@ public class AssetInstallationController {
 //      通过CurrentPersonUID获取到用户的id值
 //        String currentPersonUID = arrivalListItem.getCurrentPersonUID();
         //通过getArrivalListId获取到arrival_list的id值
-        String arrivalListId = arrivalListItem.getArrivalListId();
+//        String arrivalListId = arrivalListItem.getArrivalListId();
 
-        if(arrivalListId != null ){
+//        if(arrivalListId != null ){
 //            return "/portal/electricSafety/measureElectricSafetyMain?faces-redirect=true";
 //            geapm/portal/electricSafety/measureElectricSafetyMain.xhtml
 //            geapm/portal/asset/arrived/arrivalItemsList.xhtml
@@ -498,17 +498,25 @@ public class AssetInstallationController {
 //
 //            }
             //获取到arrival_list实体类对象
-            ArrivalList arrivalList1 = arrivalListDao.findById(arrivalListId);
+//            ArrivalList arrivalList1 = arrivalListDao.findById(arrivalListId);
             //获取到院区编号
-            String siteId = arrivalList1.getSiteUID();
+//            String siteId = arrivalList1.getSiteUID();
             //获取到医院编号
-            String hospitalId = arrivalList1.getHospitalUID();
+//            String hospitalId = arrivalList1.getHospitalUID();
             //获取到集团编号
-            String institutionId = arrivalList1.getInstitutionUID();
+//            String institutionId = arrivalList1.getInstitutionUID();
             //获取到租户编号
-            String tenantId = arrivalList1.getTenantUID();
+//            String tenantId = arrivalList1.getTenantUID();
             //获取到订单号（同一个合同号会有多个订单号）
-            String orderNumber = arrivalList1.getName();
+//            String orderNumber = arrivalList1.getName();
+        if(arrivalListItem != null ){
+            String siteId = arrivalListItem.getSiteUid();
+            //获取到医院编号
+            String hospitalId = arrivalListItem.getHospitalUid();
+            //获取到集团编号
+            String institutionId = arrivalListItem.getInstitutionUid();
+            //获取到租户编号
+            String tenantId = arrivalListItem.getTenantUid();
             //获取到arrival_list中的指定id值的所有院区，因为多个院区是list，只获取一个
             List<WorkflowConfig> workflowConfigItems = workflowDao.findBySiteUID(siteId);
             WorkflowConfig workflowConfigItem =null;
