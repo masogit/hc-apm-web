@@ -104,13 +104,14 @@ public class MultiLevelApprovalConfigController extends GenericCRUDUUIDControlle
             searchFilters = new ArrayList<>();
         }
         List<String> uids = orgInfoDao.getOrgInfosByParentId(UserContextService.getCurrentUserAccount().getSiteUID()).stream().map(org -> org.getUid()).collect(Collectors.toList());
-        searchFilters.add(new SearchFilter("orgUid", SearchFilter.Operator.IN, uids));
+        searchFilters.add(new SearchFilter("hierOrgUid", SearchFilter.Operator.IN, uids));
     }
 
     public void onSelectOrgForUser(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo selectedOrg = (OrgInfo) node.getData();
-        selected.setOrgUid(selectedOrg.getUid());
+        selected.setHierOrgUid(selectedOrg.getUid());
+        selected.setTenantUID(selectedOrg.getTenantUID());
     }
 
     public void preEdit() {

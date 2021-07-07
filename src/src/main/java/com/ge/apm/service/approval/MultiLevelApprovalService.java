@@ -389,10 +389,6 @@ public class MultiLevelApprovalService {
         return multiLevelApprovals;
     }
 
-
-    public MultiLevelApproval updateByBusinessNumber(Integer approvalStatus,String requestCode) {
-        return multiLevelApprovalRepository.updateByBusinessNumber(approvalStatus,requestCode);
-    }
     //生成审批单号
     public String autoGenerateFinacingNum(){
         DateTime now = new DateTime();
