@@ -48,11 +48,11 @@ public class MultiLevelApprovalConfig implements Serializable {
     @Column(name = "enable")
     private boolean enable;
 
-    /**
-     * 所选业务单元
-     */
-    @Column(name = "org_uid")
-    private String orgUid;
+//    /**
+//     * 所选业务单元
+//     */
+//    @Column(name = "org_uid")
+//    private String orgUid;
 
     /**
      * 审批流配置信息
@@ -100,28 +100,16 @@ public class MultiLevelApprovalConfig implements Serializable {
     private String createdBy;
 
     /**
+     * 组织id
+     */
+    @Column(name = "hier_org_uid", columnDefinition = "CHAR(32)")
+    private String hierOrgUid;
+
+    /**
      * 租户
      */
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
-
-    /**
-     * 集团
-     */
-    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
-    private String institutionUID;
-
-    /**
-     * 医院
-     */
-    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
-    private String hospitalUID;
-
-    /**
-     * 院区
-     */
-    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
-    private String siteUID;
 
     public boolean getEnable() {
         return enable;
@@ -159,7 +147,7 @@ public class MultiLevelApprovalConfig implements Serializable {
                 ", approvalNum='" + approvalNum + '\'' +
                 ", businessType='" + businessType + '\'' +
                 ", enable=" + enable +
-                ", orgUid='" + orgUid + '\'' +
+                ", hierOrgUid='" + hierOrgUid + '\'' +
                 ", configration='" + configration + '\'' +
                 ", approvalItem='" + approvalItem + '\'' +
                 ", minAmount=" + minAmount +
@@ -168,9 +156,6 @@ public class MultiLevelApprovalConfig implements Serializable {
                 ", createdDate=" + createdDate +
                 ", createdBy='" + createdBy + '\'' +
                 ", tenantUID='" + tenantUID + '\'' +
-                ", institutionUID='" + institutionUID + '\'' +
-                ", hospitalUID='" + hospitalUID + '\'' +
-                ", siteUID='" + siteUID + '\'' +
                 '}';
     }
 }
