@@ -401,11 +401,15 @@ public class AssetInstallationController {
                 //获取到workflow中是否售后服务
                 Boolean anBool = workflowConfigItem.getAiNeedMaintenance();
                 if(anBool  == true){
+                    ArrivalList arrivalListToStatus = arrivalListDao.findByName(orderNumber);
+                    if(arrivalListToStatus.getStatus()!=3){
+                        return returnAction();
+                    }
                     List<RelRuleAsset> relRuleAsset = relRuleAssetDao.findBySiteUIDs(siteId);
                     if(relRuleAsset.size()>0){
-                        return "/portal/reporter/schemaList?faces-redirect=true";
-                    }else{
                         return "/portal/pm/relRuleAsset/List?faces-redirect=true";
+                    }else{
+                        return "/portal/reporter/schemaList?faces-redirect=true";
                     }
                 }
             }
@@ -569,6 +573,10 @@ public class AssetInstallationController {
                 //获取到workflow中是否售后服务
                 Boolean anBool = workflowConfigItem.getAiNeedMaintenance();
                 if(anBool  == true){
+                    ArrivalList arrivalListToStatus = arrivalListDao.findByName(orderNumber);
+                    if(arrivalListToStatus.getStatus()!=3){
+                        return returnAction();
+                    }
                     List<RelRuleAsset> relRuleAsset = relRuleAssetDao.findBySiteUIDs(siteId);
                     if(relRuleAsset.size()>0){
                         return "/portal/reporter/schemaList?faces-redirect=true";
