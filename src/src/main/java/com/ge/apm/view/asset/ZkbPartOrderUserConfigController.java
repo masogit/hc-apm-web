@@ -1,6 +1,8 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
+import com.ge.apm.domain.ZkbPartOrder;
 import com.ge.apm.domain.ZkbPartOrderStep;
 import com.ge.apm.domain.ZkbPartOrderUserConfig;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -53,6 +55,8 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
      */
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
 
+    private ZkbPartOrderRepository zkbPartOrderRepository;
+
     /**
      * 目录关系分页数据
      */
@@ -85,6 +89,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         super.init();
         zkbPartOrderUserConfigService = WebUtil.getBean(ZkbPartOrderUserConfigService.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+        zkbPartOrderRepository=WebUtil.getBean(ZkbPartOrderRepository.class);
 
     }
 
@@ -250,6 +255,17 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             java.util.logging.Logger.getLogger(ZkbPartOrderUserConfigController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    @Override
+    public void delete() {
+        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByOnline(this.selected.getId());
+        if(CollectionUtils.isNotEmpty(zkbPartOrderList))
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_deleteError"));
+            return;
+        }
+        super.delete();
     }
 
     public ZkbPartOrderUserConfig getBackUpUser() {
