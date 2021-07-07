@@ -58,6 +58,11 @@ public class ZkbPartOrderUserConfigService {
     public static final String EXCEL_TEMPLATE_NAME="Part_Order_User_Config_Template.xlsx";
 
     /**
+     * excel模板名称
+     */
+    public static final String EXCEL_TEMPLATE_IMPORT_NAME="Part_Order_User_Config_Template_Import.xlsx";
+
+    /**
      * 目录地址
      */
     public static final String USER_CONFIG_PATH="/portal/zkb/partOrderUserConfig/";
@@ -177,8 +182,8 @@ public class ZkbPartOrderUserConfigService {
                 if(StringUtils.isNotBlank(item.getId()))
                 {
                     ZkbPartOrderUserConfig temple = this.zkbPartOrderUserConfigRepository.findById(item.getId());
-                    temple.setUsBackUpId(temple.getUsBackUpId());
-                    temple.setUsBackUpName(temple.getUsBackUpName());
+                    item.setUsBackUpId(temple.getUsBackUpId());
+                    item.setUsBackUpName(temple.getUsBackUpName());
                 }
                 this.zkbPartOrderUserConfigRepository.save(item);
             }
