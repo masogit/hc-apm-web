@@ -401,8 +401,8 @@ public class AssetInstallationController {
                 //获取到workflow中是否售后服务
                 Boolean anBool = workflowConfigItem.getAiNeedMaintenance();
                 if(anBool  == true){
-                    RelRuleAsset relRuleAsset = relRuleAssetDao.findBySiteUID(siteId);
-                    if(relRuleAsset == null){
+                    List<RelRuleAsset> relRuleAsset = relRuleAssetDao.findBySiteUIDs(siteId);
+                    if(relRuleAsset.size()>0){
                         return "/portal/reporter/schemaList?faces-redirect=true";
                     }else{
                         return "/portal/pm/relRuleAsset/List?faces-redirect=true";
@@ -569,8 +569,8 @@ public class AssetInstallationController {
                 //获取到workflow中是否售后服务
                 Boolean anBool = workflowConfigItem.getAiNeedMaintenance();
                 if(anBool  == true){
-                    RelRuleAsset relRuleAsset = relRuleAssetDao.findBySiteUID(siteId);
-                    if(relRuleAsset == null){
+                    List<RelRuleAsset> relRuleAsset = relRuleAssetDao.findBySiteUIDs(siteId);
+                    if(relRuleAsset.size()>0){
                         return "/portal/reporter/schemaList?faces-redirect=true";
                     }else{
                         return "/portal/pm/relRuleAsset/List?faces-redirect=true";
