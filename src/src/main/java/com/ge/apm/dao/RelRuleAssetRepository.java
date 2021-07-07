@@ -18,7 +18,9 @@ public interface RelRuleAssetRepository extends GenericRepositoryUUID<RelRuleAss
 	public List<String> findAssetUidsByTenantUID(String tenantUID);
 
 	public RelRuleAsset findByAssetUID(String uid);
-	public RelRuleAsset findBySiteUID(String uid);
+
+	@Query(value = "select * from rel_rule_asset r where r.site_uid = ?1",nativeQuery = true)
+	List<RelRuleAsset> findBySiteUIDs(String uid);
 
 
 
