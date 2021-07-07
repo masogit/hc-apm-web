@@ -18,7 +18,7 @@
                     <h:panelGroup>
                         <label class="label" style="font-size: medium; font-weight: bold">#{msg.hospitalId}*</label>
                         <p:inputText id="selectedUserOrgName"
-                                     value="#{multiLevelApprovalConfigController.getOrgFullName(multiLevelApprovalConfigController.selected.orgUid)}"
+                                     value="#{multiLevelApprovalConfigController.getOrgFullName(multiLevelApprovalConfigController.selected.hierOrgUid)}"
                                      readonly="true" required="true"
                                      requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
                         <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down"
