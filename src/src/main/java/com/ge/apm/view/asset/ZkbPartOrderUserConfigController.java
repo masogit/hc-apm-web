@@ -2,11 +2,11 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
-import com.ge.apm.domain.ZkbPartOrder;
-import com.ge.apm.domain.ZkbPartOrderStep;
-import com.ge.apm.domain.ZkbPartOrderUserConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.service.zkb.ZkbPartOrderUserConfigService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -80,6 +80,15 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     private ZkbPartOrderUserConfig backUpUser = new ZkbPartOrderUserConfig();
     private List<ZkbPartOrderUserConfig> backUpList = new ArrayList<>();
 
+    /**
+     * 当前登录用户信息service
+     */
+    private UserAccount currentUser;
+    /**
+     * 当前用户登录名
+     */
+    private String loginName = "";
+
 
     /**
      * 初始化
@@ -90,13 +99,15 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         zkbPartOrderUserConfigService = WebUtil.getBean(ZkbPartOrderUserConfigService.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
         zkbPartOrderRepository=WebUtil.getBean(ZkbPartOrderRepository.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        this.loginName=currentUser.getLoginName();
 
     }
 
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
-        backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+        initBackUpList();
         if(selected != null){
             if(CollectionUtils.isNotEmpty(backUpList))
             {
@@ -113,7 +124,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     @Override
     public void prepareEdit() {
         super.prepareEdit();
-        backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+        initBackUpList();
         if(selected != null){
             for(ZkbPartOrderUserConfig c : backUpList){
                 if(selected.getId().equals(c.getId())){
@@ -126,6 +137,17 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             backUpUser = zkbPartOrderUserConfigRepository.findById(selected.getUsBackUpId());
         }else {
             backUpUser =new ZkbPartOrderUserConfig();
+        }
+    }
+
+    private void initBackUpList()
+    {
+        if(this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        {
+            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+        }else
+        {
+            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameNotLike(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US",ZkbFePartOrderService.testLoginNameStartWith+"%");
         }
     }
 
@@ -196,7 +218,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
      * @return
      */
     public String getTemplateName(){
-        return ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_NAME;
+        return ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_IMPORT_NAME;
     }
 
     /**
