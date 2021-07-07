@@ -307,6 +307,11 @@ public class ZkbContractImportService {
                 isValidateData = false;
             }
         }
+        if(StringUtils.isEmpty(contractInfoVO.getQuotaDeductType())){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item, "探头名额扣除类型不能为空！");
+            isValidateData = false;
+        }
 
         int spareQuotaTotal = contractInfoVO.getSpareQuotaTotal() == null ? 0 : contractInfoVO.getSpareQuotaTotal();
         int spareQuota = contractInfoVO.getSpareQuota() == null ? 0 : contractInfoVO.getSpareQuota();
