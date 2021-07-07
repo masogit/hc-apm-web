@@ -1,7 +1,9 @@
 package com.ge.apm.service.zkb;
 
+import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.ZkbPartOrder;
 import com.ge.apm.domain.ZkbPartOrderUserConfig;
 import com.ge.apm.domain.ZkbPartOrderUserConfigVO;
 import com.ge.apm.service.asset.ZkbPartOrderUserConfigRow;
@@ -31,6 +33,9 @@ public class ZkbPartOrderUserConfigService {
 
     @Autowired
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
+
+    @Autowired
+    private ZkbPartOrderRepository zkbPartOrderRepository;
 
     /**
      * 导入模板头部行数
@@ -233,6 +238,7 @@ public class ZkbPartOrderUserConfigService {
         ZkbPartOrderUserConfigVO zkbPartOrderUserConfigVO = (ZkbPartOrderUserConfigVO)item.get("zkbPartOrderUserConfigVO");
         ZkbPartOrderUserConfigRow.clearErrMessage(item);
         boolean checkExistName = true;
+        boolean idExist = true;
         if(StringUtils.isNotBlank(zkbPartOrderUserConfigVO.getId()))
         {
             ZkbPartOrderUserConfig zkbPartOrderUserConfig = this.zkbPartOrderUserConfigRepository.findById(zkbPartOrderUserConfigVO.getId());
@@ -242,6 +248,18 @@ public class ZkbPartOrderUserConfigService {
                 ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_systemIdError"));
                 isValidateData = false;
                 checkExistName=false;
+                idExist=false;
+            }
+        }
+        if(StringUtils.isNotBlank(zkbPartOrderUserConfigVO.getId())&&idExist&&"是".equals(zkbPartOrderUserConfigVO.getDelFlag()))
+        {
+            List<ZkbPartOrder> list =  this.zkbPartOrderRepository.findByOnline(zkbPartOrderUserConfigVO.getId());
+            if(CollectionUtils.isNotEmpty(list))
+            {
+                item.put("status", ZkbPartOrderUserConfigService.ImportStatus.Failure);
+                ZkbPartOrderUserConfigRow.addErrMessage(item, WebUtil.getMessage("zkbKeyUserConfig_deleteError"));
+                isValidateData = false;
+                return isValidateData;
             }
         }
         if(StringUtils.isNotBlank(zkbPartOrderUserConfigVO.getLoginName()))
