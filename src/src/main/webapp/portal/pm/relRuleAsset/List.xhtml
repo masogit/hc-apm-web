@@ -101,8 +101,16 @@
                     <f:facet name="{Toolbar}">
                     	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings" class="btn btn-sm btn-gray"  title="#{msg.SetRulesInBatch}"/>
                     	<p:commandButton id="generatePmOrders" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml?faces-redirect=true" icon="ui-icon-collections" class="btn btn-sm btn-gray"  title="#{msg.GenerateMaintenanceWorkordersInBatch}"/>
-                        <p:commandButton  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+<!--                        <p:commandButton  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="RelRuleAsset_export"/>
+                        </p:commandButton>-->
+                        <p:commandButton title="已配置规则设备导出" icon="ui-icon-arrow-1-s" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.exportRelRuleAssets}" update=":growl"
+                                         onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                            <p:fileDownload value="#{relRuleAssetManagerController.excelFile}" />
+                        </p:commandButton>
+                        <p:commandButton title="全量导出" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.exportAllAssets}" update=":growl"
+                                         onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false" >
+                            <p:fileDownload value="#{relRuleAssetManagerController.excelFile}" />
                         </p:commandButton>
 
                         <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}"
