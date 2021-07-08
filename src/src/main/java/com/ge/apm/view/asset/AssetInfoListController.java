@@ -8,9 +8,12 @@ import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.pm.RelRuleAssetController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -58,6 +61,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private I18nMessageRepository i18nDao;
     private TenantOptionConfigRepository tenantOptionConfigRepository;
     private AssetHistoryService assetHistoryService;
+    private RelRuleAssetRepository relRuleAssetRepository;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -73,6 +77,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     //搜索字串
     private String oneSearchStr;
+    //是否保养
+    @Getter @Setter
+    private String isPmSearch;
+    private List<String> relRuleAssetUids = new ArrayList<>();
 
     private boolean terminate = false;
 
@@ -148,12 +156,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         tenantOptionConfigRepository = WebUtil.getBean(TenantOptionConfigRepository.class);
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
+        relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         this.selectedObject = new HashMap();
         loadCustomConfig();
         loadClinicalDeptList();
-
+        getRelRuleAssetUids();
         warrantyAlertDays = getWarrantyAlertDaysConfig();
     }
     
@@ -298,6 +307,20 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private void setUserSearchFilters() {
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        if(isPmSearch!=null) {
+            if(isPmSearch.equals("ypz")) {
+                this.updateSearchFilter(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+                this.updateSearchFilter(new SearchFilter("uid",SearchFilter.Operator.IN,relRuleAssetUids));
+            } else if(isPmSearch.equals("wpz")) {
+                this.updateSearchFilter(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+                this.updateSearchFilter(new SearchFilter("uid",SearchFilter.Operator.NotIN,relRuleAssetUids));
+            } else if(isPmSearch.equals("bpz")) {
+                this.updateSearchFilter(new SearchFilter("isPm", SearchFilter.Operator.EQ, false));
+            }
+        } else {
+            this.removeFilterOnField("isPm");
+            this.removeFilterOnField("uid");
+        }
         if (terminate) {
             this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
         } else {
@@ -541,6 +564,38 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public boolean isChecked() {
         return selectedMap.containsValue(true);
+    }
+
+    public void getRelRuleAssetUids() {
+        relRuleAssetUids = relRuleAssetRepository.findAssetUidsByTenantUID(userContextService.getLoginUser().getTenantUID());
+    }
+
+    public void setSelectedAssetsUids() {
+        List<String> selectedAssetUids = new ArrayList<>();
+        selectedMap.keySet().stream().forEach(assetUid -> { if(selectedMap.get(assetUid)) selectedAssetUids.add(assetUid); });
+        RelRuleAssetController.assetInfoUids = selectedAssetUids;
+    }
+
+    public List<I18nMessage> getListForRelRule() {
+        List<I18nMessage> result = new ArrayList<>();
+        result.add(new I18nMessage(null,"wpz","未配置规则"));
+        result.add(new I18nMessage(null,"ypz","已配置规则"));
+        result.add(new I18nMessage(null,"bpz","不能配置规则"));
+        return result;
+    }
+
+    public String getRelRuleStatusName(String uid,Boolean isPm) {
+        String result = null;
+        if(isPm==null || isPm == false) {
+            result = "不能配置规则";
+        } else {
+            if(relRuleAssetUids.contains(uid)) {
+                result = "已配置规则";
+            } else {
+                result = "未配置规则";
+            }
+        }
+        return result;
     }
 
     public List<AssetInfo> getExportList() {

@@ -27,9 +27,9 @@ public class RelRuleAsset {
 	private String ruleUID;
 	
 	@Column(name = "rule_uid2")
-	private String ruleUID2;
+	private String ruleUID2;   //二级保养规则
 	
-	@Column(name = "rule_uid1")
+	@Column(name = "rule_uid1")  //一级保养规则
 	private String ruleUID1;
 	
 	 @Column(name = "asset_uid")
