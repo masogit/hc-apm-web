@@ -278,8 +278,6 @@ public class MultiLevelApprovalService {
         }
         if (isAgreeType == ApprovalConstant.WORK_DETAIL_STATUS_AGREE) {
             //最后一个审批通过的时候 生成相应单子
-            accessorySparePartsBuyList = new ArrayList<>();//申购
-            accessorySparePartsRequestList = new ArrayList<>();//申领
             for (int i = 0; i < approvedDetailsNew.size(); i++) {
                 V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
                 if (v2_workOrder_detail.getApproved() != null && v2_workOrder_detail.getApproved()) {
@@ -480,6 +478,7 @@ public class MultiLevelApprovalService {
                                 this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, accessorySparePartsBuyList, accessorySparePartsRequestList);
                                 //审批校验,生成申领申购单
                                 if (partsConfigService.isEnableIntegrationWithWorkOrder()) {
+                                    logger.info("集成维修工单, 发起备件申请 : accessorySparePartsBuyList : "+accessorySparePartsBuyList.toString()+" -----  accessorySparePartsRequestList : "+accessorySparePartsRequestList.toString());
                                     generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList);
                                 }
                                 break;
@@ -492,6 +491,7 @@ public class MultiLevelApprovalService {
                                 this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
                                 //审批校验,生成申领申购单
                                 if (partsConfigService.isEnableIntegrationWithWorkOrder()) {
+                                    logger.info("集成保养工单, 发起备件申请 : accessorySparePartsBuyList : "+pmAccessorySparePartsBuyList.toString()+" -----  accessorySparePartsRequestList : "+pmAccessorySparePartsRequestList.toString());
                                     generateSparePartsBuyList(SimplePartsConstant.PM_ORDER, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
                                 }
                                 break;
