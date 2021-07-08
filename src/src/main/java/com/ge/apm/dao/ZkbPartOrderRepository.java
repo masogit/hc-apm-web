@@ -95,5 +95,8 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "SELECT * from zkb_part_order where order_type = ?3 and ordered_date< ?1  and contract_id in ?2 and (status = 'PartReturned' or status = 'Returned' or status = 'Closed')", nativeQuery = true)
     List<ZkbPartOrder> findReturnId(Date orderedDate,List<String> contractIdList,String orderType);
 
+    @Query(value = "SELECT * from zkb_part_order where online_engineer = ?1", nativeQuery = true)
+    List<ZkbPartOrder> findByOnline(String zkbPartOrderUserConfigId);
+
 }
 

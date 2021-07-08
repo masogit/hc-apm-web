@@ -396,6 +396,50 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "function_type")
     private String functionType;
 
+    @Column(name = "site_uid")
+    private String siteUid;
+
+    @Column(name = "hospital_uid")
+    private String hospitalUid;
+
+    @Column(name = "institution_uid")
+    private String institutionUid;
+
+    @Column(name = "tenant_uid")
+    private String tenantUid;
+
+    public void setSiteUid(String siteUid) {
+        this.siteUid = siteUid;
+    }
+
+    public void setHospitalUid(String hospitalUid) {
+        this.hospitalUid = hospitalUid;
+    }
+
+    public void setInstitutionUid(String institutionUid) {
+        this.institutionUid = institutionUid;
+    }
+
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
+    }
+
+    public String getSiteUid() {
+        return siteUid;
+    }
+
+    public String getHospitalUid() {
+        return hospitalUid;
+    }
+
+    public String getInstitutionUid() {
+        return institutionUid;
+    }
+
+    public String getTenantUid() {
+        return tenantUid;
+    }
+
     public String getBuildingName() {
         return buildingName;
     }
