@@ -1956,7 +1956,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
             return ;
         }
-        selectedPmOrder.setApprovalStatus(ApprovalConstant.PM_APPROVAL_STATUS_AGREE);
+        selectedPmOrder.setApprovalStatus(ApprovalConstant.APPROVAL_STATUS_SUBMIT_FOR_APPROVAL);
         dao.save(selectedPmOrder);
     }
 
