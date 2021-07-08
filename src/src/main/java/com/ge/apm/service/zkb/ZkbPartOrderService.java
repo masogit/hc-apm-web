@@ -1718,8 +1718,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 oldLineId = s.getLineID();
                 lineLogisticsList = new ArrayList<>();
             }
-            if(StringUtils.isNotEmpty(s.getHyperlink()) && "#NULL".equals(s.getHyperlink())){
-                s.setHyperlink("");
+            if(StringUtils.isNotEmpty(s.getHyperlink())){
+                if(s.getHyperlink().indexOf("http") > -1){
+
+                }else{
+                    s.setHyperlink("");
+                }
             }
             //转换成本地状态
             Optional.ofNullable(s.getDecodedStatus())
