@@ -1718,13 +1718,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 oldLineId = s.getLineID();
                 lineLogisticsList = new ArrayList<>();
             }
-            if(StringUtils.isNotEmpty(s.getHyperlink())){
-                if(s.getHyperlink().indexOf("http") > -1){
-
-                }else{
-                    s.setHyperlink("");
-                }
-            }
             //转换成本地状态
             Optional.ofNullable(s.getDecodedStatus())
                     .map(ss -> ss = ss.toLowerCase())
@@ -1798,6 +1791,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             Object[] split = queryList.get(i);
             String awb = split[0] == null ? "" : (String)split[0];
             String hyperlink = split[0] == null ? "" : (String)split[1];
+            if(StringUtils.isNotEmpty(hyperlink)){
+                if(hyperlink.indexOf("http") > -1){
+
+                }else{
+                    hyperlink = "";
+                }
+            }
             String carrier = split[0] == null ? "" : (String)split[2];
             String carrierChinese = split[0] == null ? "" : (String)split[3];
             SvcEngineLogisticsOrderDetailVO s = new SvcEngineLogisticsOrderDetailVO(awb,hyperlink,carrier,carrierChinese);
