@@ -41,4 +41,7 @@ public interface RelRuleAssetRepository extends GenericRepositoryUUID<RelRuleAss
 	@Transactional
 	@Query(value = "delete from rel_rule_asset where asset_uid in ?1",nativeQuery = true)
 	public void deleteByAssetUids(List<String> deleteAssetUids);
+
+	@Query(value = "select * from rel_rule_asset where asset_uid in ?1",nativeQuery = true)
+	public List<RelRuleAsset> findByAssetUids(List<String> deleteAssetUids);
 }

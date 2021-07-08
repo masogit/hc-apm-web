@@ -13,6 +13,7 @@ import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.UsageStatusConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.simpleparts.SimplePartsConfigService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
 import com.ge.apm.service.utils.ApmConstant;
@@ -59,6 +60,8 @@ public class MultiLevelApprovalService {
     private SimplePartsRequestWorkOrderService simplePartsRequestWorkOrderService;
     @Autowired
     private V2_PmOrderService pmOrderService;
+    @Autowired
+    private SimplePartsConfigService partsConfigService;
 
     public MultiLevelApprovalConfig getFirstApprovalList(ApprovableTarget approvableTarget) {
         // 需要调用服务端提供的接口
@@ -244,23 +247,13 @@ public class MultiLevelApprovalService {
                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
                 v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_DISAGREE);//审批不同意
                 v2_WorkOrderRepository.save(v2WorkOrder);
-                List<V2_WorkOrder_Detail> accessorySparePartsBuyList = null;//申购
-                List<V2_WorkOrder_Detail> accessorySparePartsRequestList = null;//申领
-                this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, accessorySparePartsBuyList, accessorySparePartsRequestList);
-
-                //审批不通过,修改工单状态
-                generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList);
+                this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null);
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT:
                 V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
                 v2PmOrder.setApprovalStatus(ApprovalConstant.PM_APPROVAL_STATUS_DISAGREE);
                 v2_PmOrderRepository.save(v2PmOrder);
-
-                List<V2_WorkOrder_Detail> pmAccessorySparePartsBuyList = null;//申购
-                List<V2_WorkOrder_Detail> pmAccessorySparePartsRequestList = null;//申领
-                this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
-                //审批不通过,修改工单状态
-                generateSparePartsBuyList(SimplePartsConstant.PM_ORDER, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
+                this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null);
                 break;
             //备件审批
             default:
@@ -285,8 +278,6 @@ public class MultiLevelApprovalService {
         }
         if (isAgreeType == ApprovalConstant.WORK_DETAIL_STATUS_AGREE) {
             //最后一个审批通过的时候 生成相应单子
-            accessorySparePartsBuyList = new ArrayList<>();//申购
-            accessorySparePartsRequestList = new ArrayList<>();//申领
             for (int i = 0; i < approvedDetailsNew.size(); i++) {
                 V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
                 if (v2_workOrder_detail.getApproved() != null && v2_workOrder_detail.getApproved()) {
@@ -482,22 +473,27 @@ public class MultiLevelApprovalService {
                                 V2_WorkOrder v2WorkOrder = v2_WorkOrderRepository.findById(multiLevelApproval.getBusinessUid());
                                 v2WorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_AGREE);//审批同意
                                 v2_WorkOrderRepository.save(v2WorkOrder);
-
-                                List<V2_WorkOrder_Detail> accessorySparePartsBuyList = null;//申购
-                                List<V2_WorkOrder_Detail> accessorySparePartsRequestList = null;//申领
+                                List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
+                                List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
                                 this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, accessorySparePartsBuyList, accessorySparePartsRequestList);
                                 //审批校验,生成申领申购单
-                                generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList);
+                                if (partsConfigService.isEnableIntegrationWithWorkOrder()) {
+                                    logger.info("集成维修工单, 发起备件申请 : accessorySparePartsBuyList : "+accessorySparePartsBuyList.toString()+" -----  accessorySparePartsRequestList : "+accessorySparePartsRequestList.toString());
+                                    generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList);
+                                }
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT://保养
                                 V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
                                 v2PmOrder.setApprovalStatus(ApprovalConstant.PM_APPROVAL_STATUS_AGREE);
                                 v2_PmOrderRepository.save(v2PmOrder);
-                                List<V2_WorkOrder_Detail> pmAccessorySparePartsBuyList = null;//申购
-                                List<V2_WorkOrder_Detail> pmAccessorySparePartsRequestList = null;//申领
+                                List<V2_WorkOrder_Detail> pmAccessorySparePartsBuyList = new ArrayList<>();//申购
+                                List<V2_WorkOrder_Detail> pmAccessorySparePartsRequestList = new ArrayList<>();//申领
                                 this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
                                 //审批校验,生成申领申购单
-                                generateSparePartsBuyList(SimplePartsConstant.PM_ORDER, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
+                                if (partsConfigService.isEnableIntegrationWithWorkOrder()) {
+                                    logger.info("集成保养工单, 发起备件申请 : accessorySparePartsBuyList : "+pmAccessorySparePartsBuyList.toString()+" -----  accessorySparePartsRequestList : "+pmAccessorySparePartsRequestList.toString());
+                                    generateSparePartsBuyList(SimplePartsConstant.PM_ORDER, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
+                                }
                                 break;
                             default:
                                 throw new RuntimeException("New Business type not handled yet");

@@ -138,6 +138,8 @@ public interface ApprovalConstant {
 
     Integer WO_APPROVAL_STATUS_AGREE = 1;//维修多级审批状态
 
+    String APPROVAL_STATUS_INITIAL = "0";
+    String APPROVAL_STATUS_SUBMIT_FOR_APPROVAL = "1";//提交审核中
     String PM_APPROVAL_STATUS_AGREE = "2";//保养多级审批同意状态
     String PM_APPROVAL_STATUS_DISAGREE = "3";//保养多级审批不同意状态
 

@@ -58,6 +58,7 @@ public class AssetInstallationController {
     private UserAccountRepository userAccountDao;
     private ArrivalListRepository arrivalListDao;
     private RelRuleAssetRepository relRuleAssetDao;
+    private AssetInfoRepository assetInfoRepository;
     private AssetInstallationService aiService;
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
@@ -156,6 +157,7 @@ public class AssetInstallationController {
         userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         arrivalListDao = WebUtil.getBean(ArrivalListRepository.class);
         relRuleAssetDao = WebUtil.getBean(RelRuleAssetRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         assetInstallationReportService = WebUtil.getBean(AssetInstallationReportService.class);
@@ -407,7 +409,21 @@ public class AssetInstallationController {
                     }
                     List<RelRuleAsset> relRuleAsset = relRuleAssetDao.findBySiteUIDs(siteId);
                     if(relRuleAsset.size()>0){
-                        return "/portal/pm/relRuleAsset/List?faces-redirect=true";
+                        //需要判断设备分类是否相同而跳转到资产规则管理页面
+                        //获取到安装设备的分类编号
+                        Integer assetGroupNum1 = arrivalList1.getAssetGroup();
+                        //获取到多个资产规则，循环每一个获取到设备分类的编号和安装设备编号对比
+                        //有相同编号的跳转到资产规则管理也i按
+                        for(RelRuleAsset relRuleAssetItem : relRuleAsset){
+                            String assignUid = relRuleAssetItem.getAssetUID();
+                            AssetInfo assetInfo = assetInfoRepository.findByUid(assignUid);
+                            Integer assetGroupNum2 = assetInfo.getAssetGroup();
+                            if(assetGroupNum1.equals(assetGroupNum2)){
+                                return "/portal/pm/relRuleAsset/List?faces-redirect=true";
+                            }else{
+                                return "/portal/reporter/schemaList?faces-redirect=true";
+                            }
+                        }
                     }else{
                         return "/portal/reporter/schemaList?faces-redirect=true";
                     }
@@ -579,9 +595,23 @@ public class AssetInstallationController {
                     }
                     List<RelRuleAsset> relRuleAsset = relRuleAssetDao.findBySiteUIDs(siteId);
                     if(relRuleAsset.size()>0){
-                        return "/portal/reporter/schemaList?faces-redirect=true";
+                        //需要判断设备分类是否相同而跳转到资产规则管理页面
+                        //获取到安装设备的分类编号
+                        Integer assetGroupNum1 = arrivalList1.getAssetGroup();
+                        //获取到多个资产规则，循环每一个获取到设备分类的编号和安装设备编号对比
+                        //有相同编号的跳转到资产规则管理也i按
+                        for(RelRuleAsset relRuleAssetItem : relRuleAsset){
+                            String assignUid = relRuleAssetItem.getAssetUID();
+                            AssetInfo assetInfo = assetInfoRepository.findByUid(assignUid);
+                            Integer assetGroupNum2 = assetInfo.getAssetGroup();
+                            if(assetGroupNum1.equals(assetGroupNum2)){
+                                return "/portal/pm/relRuleAsset/List?faces-redirect=true";
+                            }else{
+                                return "/portal/reporter/schemaList?faces-redirect=true";
+                            }
+                        }
                     }else{
-                        return "/portal/pm/relRuleAsset/List?faces-redirect=true";
+                        return "/portal/reporter/schemaList?faces-redirect=true";
                     }
                 }
             }
