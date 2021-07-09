@@ -59,6 +59,7 @@ public class AssetInstallationController {
     private ArrivalListRepository arrivalListDao;
     private RelRuleAssetRepository relRuleAssetDao;
     private AssetInfoRepository assetInfoRepository;
+    private TableDefinitionRepository tableDefinitionRepository;
     private AssetInstallationService aiService;
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
@@ -158,6 +159,7 @@ public class AssetInstallationController {
         arrivalListDao = WebUtil.getBean(ArrivalListRepository.class);
         relRuleAssetDao = WebUtil.getBean(RelRuleAssetRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        tableDefinitionRepository = WebUtil.getBean(TableDefinitionRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         assetInstallationReportService = WebUtil.getBean(AssetInstallationReportService.class);
@@ -407,18 +409,16 @@ public class AssetInstallationController {
                     if(arrivalListToStatus.getStatus()!=3){
                         return returnAction();
                     }
-                    List<RelRuleAsset> relRuleAsset = relRuleAssetDao.findBySiteUIDs(siteId);
-                    if(relRuleAsset.size()>0){
-                        //需要判断设备分类是否相同而跳转到资产规则管理页面
+                    List<TableDefinition> tableDefinitions = tableDefinitionRepository.getBySiteUID(siteId);
+                    if(tableDefinitions.size()>0){
+                        //需要判断设备分类是否相同而跳转到I产规则管理
                         //获取到安装设备的分类编号
                         Integer assetGroupNum1 = arrivalList1.getAssetGroup();
-                        //获取到多个资产规则，循环每一个获取到设备分类的编号和安装设备编号对比
-                        //有相同编号的跳转到资产规则管理也i按
-                        for(RelRuleAsset relRuleAssetItem : relRuleAsset){
-                            String assignUid = relRuleAssetItem.getAssetUID();
-                            AssetInfo assetInfo = assetInfoRepository.findByUid(assignUid);
-                            Integer assetGroupNum2 = assetInfo.getAssetGroup();
-                            if(assetGroupNum1.equals(assetGroupNum2)){
+                        //获取到多个保养报告模板，循环每一个获取到设备分类的编号和安装设备编号对比
+                        //有相同编号的跳转到资产规则管理，没有跳转到保养报告模板
+                        for(TableDefinition tableDefinition : tableDefinitions){
+                            Integer assetGroupId = tableDefinition.getAssetGroup();
+                            if(assetGroupNum1.equals(assetGroupId)){
                                 return "/portal/pm/relRuleAsset/List?faces-redirect=true";
                             }else{
                                 return "/portal/reporter/schemaList?faces-redirect=true";
@@ -593,18 +593,16 @@ public class AssetInstallationController {
                     if(arrivalListToStatus.getStatus()!=3){
                         return returnAction();
                     }
-                    List<RelRuleAsset> relRuleAsset = relRuleAssetDao.findBySiteUIDs(siteId);
-                    if(relRuleAsset.size()>0){
-                        //需要判断设备分类是否相同而跳转到资产规则管理页面
+                    List<TableDefinition> tableDefinitions = tableDefinitionRepository.getBySiteUID(siteId);
+                    if(tableDefinitions.size()>0){
+                        //需要判断设备分类是否相同而跳转到I产规则管理
                         //获取到安装设备的分类编号
                         Integer assetGroupNum1 = arrivalList1.getAssetGroup();
-                        //获取到多个资产规则，循环每一个获取到设备分类的编号和安装设备编号对比
-                        //有相同编号的跳转到资产规则管理也i按
-                        for(RelRuleAsset relRuleAssetItem : relRuleAsset){
-                            String assignUid = relRuleAssetItem.getAssetUID();
-                            AssetInfo assetInfo = assetInfoRepository.findByUid(assignUid);
-                            Integer assetGroupNum2 = assetInfo.getAssetGroup();
-                            if(assetGroupNum1.equals(assetGroupNum2)){
+                        //获取到多个保养报告模板，循环每一个获取到设备分类的编号和安装设备编号对比
+                        //有相同编号的跳转到资产规则管理，没有跳转到保养报告模板
+                        for(TableDefinition tableDefinition : tableDefinitions){
+                            Integer assetGroupId = tableDefinition.getAssetGroup();
+                            if(assetGroupNum1.equals(assetGroupId)){
                                 return "/portal/pm/relRuleAsset/List?faces-redirect=true";
                             }else{
                                 return "/portal/reporter/schemaList?faces-redirect=true";

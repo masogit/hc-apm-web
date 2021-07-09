@@ -352,11 +352,13 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 
     public void saveRelFromAssetList() {
         List<RelRuleAsset> rels = new ArrayList<>();
+        boolean hasNoPm = false;
         if(assetInfoUids!=null) {
             int levelCount = 0;
             List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetInfoUids);
             for (AssetInfo ai : assetInfos) {
                 if(ai.getIsPm()==null || ai.getIsPm()==false) {  //不需要配置的pass掉
+                    hasNoPm = true;
                     break;
                 }
                 RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
@@ -388,7 +390,12 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
             pmOrderRule = pmOrderRuleTwoLevel = pmOrderRuleThreeLevel = null;
             relRuleAssetRepository.save(rels);
             assetInfoUids = null;
-            WebUtil.addSuccessMessage("批量设置成功！");
+            if(hasNoPm) {
+                WebUtil.addSuccessMessage("批量设置成功,不需要保养的设备已经被过滤掉！");
+            } else {
+                WebUtil.addSuccessMessage("批量设置成功！");
+            }
+
         }
     }
 
