@@ -29,7 +29,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup rendered="#{workOrderMgrController.itemDetail.approved == null ? false : true}">
-                        <img src="#{fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
+                        <img src="#{workOrderMgrController.itemDetail.detailReviewSignature == null ? '' : fileDownloadService.getFileUrl(workOrderMgrController.itemDetail.detailReviewSignature)}" />
                     </h:panelGroup>
 
                     <h:panelGroup>
