@@ -478,8 +478,7 @@ public class MultiLevelApprovalService {
                                 this.doWorkDetailByIsAgreeType(v2WorkOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, accessorySparePartsBuyList, accessorySparePartsRequestList);
                                 //审批校验,生成申领申购单
                                 if (partsConfigService.isEnableIntegrationWithWorkOrder()) {
-                                    logger.info("集成维修工单, 发起备件申请 : accessorySparePartsBuyList : "+accessorySparePartsBuyList.toString()+" -----  accessorySparePartsRequestList : "+accessorySparePartsRequestList.toString());
-                                    generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList);
+                                    generateSparePartsBuyList(SimplePartsConstant.WORK_ORDER, accessorySparePartsBuyList, accessorySparePartsRequestList, userAccountRepository.findById(v2WorkOrder.getCurrentPersonId()));
                                 }
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT://保养
@@ -491,8 +490,7 @@ public class MultiLevelApprovalService {
                                 this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_AGREE, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
                                 //审批校验,生成申领申购单
                                 if (partsConfigService.isEnableIntegrationWithWorkOrder()) {
-                                    logger.info("集成保养工单, 发起备件申请 : accessorySparePartsBuyList : "+pmAccessorySparePartsBuyList.toString()+" -----  accessorySparePartsRequestList : "+pmAccessorySparePartsRequestList.toString());
-                                    generateSparePartsBuyList(SimplePartsConstant.PM_ORDER, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList);
+                                    generateSparePartsBuyList(SimplePartsConstant.PM_ORDER, pmAccessorySparePartsBuyList, pmAccessorySparePartsRequestList, userAccountRepository.getByUid(v2PmOrder.getCurrentPersonId()));
                                 }
                                 break;
                             default:
@@ -583,12 +581,12 @@ public class MultiLevelApprovalService {
      * @param type 0 维修工单, 1 保养工单
      * @param isAgreeType 0 不同意, 1 同意
      */
-    private void generateSparePartsBuyList(int type, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList) {
+    private void generateSparePartsBuyList(int type, List<V2_WorkOrder_Detail> accessorySparePartsBuyList, List<V2_WorkOrder_Detail> accessorySparePartsRequestList, UserAccount userAccount) {
         if (accessorySparePartsRequestList != null && !accessorySparePartsRequestList.isEmpty()) {
-            simplePartsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, type);//生成申领单
+            simplePartsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, type, userAccount);//生成申领单
         }
         if (accessorySparePartsBuyList != null && !accessorySparePartsBuyList.isEmpty()) {
-            simplePartsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, type);//生成申购单
+            simplePartsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, type, userAccount);//生成申购单
         }
     }
 

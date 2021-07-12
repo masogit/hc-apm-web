@@ -83,11 +83,13 @@ public class SimplePartsRequestWorkOrderService {
      * @param accessoryList
      */
     @Transactional
-    public void savePartsPurchase(List<V2_WorkOrder_Detail> accessoryList,int type){
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+    public void savePartsPurchase(List<V2_WorkOrder_Detail> accessoryList,int type, UserAccount userAccount){
+        if(userAccount == null ){
+            userAccount = UserContextService.getCurrentUserAccount();
+        }
         SimplePartsRequest partsRequest = new SimplePartsRequest();
         //check whether work order is valid parts request
-        if (!checkAndAssignmentAccessoryList(accessoryList, partsRequest, type)) {
+        if (!checkAndAssignmentAccessoryList(accessoryList, partsRequest, type, userAccount)) {
             return;
         }
 
@@ -108,7 +110,7 @@ public class SimplePartsRequestWorkOrderService {
             SimplePartsRequestLineItem partsRequestLineItem = new SimplePartsRequestLineItem();
             partsRequestLineItem.setTotalPrice(oneTotalPrice);
             partsRequestLineItem.setRequestQty(apartsQuantity);
-            assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, currentUserAccount);
+            assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, userAccount);
             // 未入库
             partsRequestLineItem.setStatus(SimplePartsConstant.PARTS_NOT_TRANSACTIONED);
             partsRequestLineItemService.save(partsRequestLineItem);
@@ -166,11 +168,13 @@ public class SimplePartsRequestWorkOrderService {
      * type 工单类型
      */
     @Transactional
-    public void savePartsRequest(List<V2_WorkOrder_Detail> accessoryList,int type){
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+    public void savePartsRequest(List<V2_WorkOrder_Detail> accessoryList,int type, UserAccount userAccount){
+        if(userAccount == null ){
+            userAccount = UserContextService.getCurrentUserAccount();
+        }
         SimplePartsRequest partsRequest = new SimplePartsRequest();
         //check whether work order is valid parts request
-        if (!checkAndAssignmentAccessoryList(accessoryList, partsRequest, type)) {
+        if (!checkAndAssignmentAccessoryList(accessoryList, partsRequest, type, userAccount)) {
             return;
         }
         partsRequest.setRequestCode(partsCodeGenerationService.getNextRequestCode(SimplePartsConstant.PARTS_REQUEST_FORM));//生成备件申领单申购单编号
@@ -190,7 +194,7 @@ public class SimplePartsRequestWorkOrderService {
             partsRequestLineItem.setTotalPrice(oneTotalPrice);
             partsRequestLineItem.setRequestQty(apartsQuantity);
 
-            assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, currentUserAccount);
+            assignmentPartsRequestLineItem(item, partsRequest, partsRequestLineItem, userAccount);
             // 未出库
             partsRequestLineItem.setStatus(SimplePartsConstant.PARTS_NOT_TRANSACTIONED);
             partsRequestLineItemService.save(partsRequestLineItem);
@@ -206,7 +210,7 @@ public class SimplePartsRequestWorkOrderService {
      * @param firstMultiLevelApproval 如果多级审核过来的申请单,需要从第一级审核中获取申请人信息
      * @return
      */
-    private boolean checkAndAssignmentAccessoryList(List<V2_WorkOrder_Detail> accessoryList, SimplePartsRequest partsRequest, int type) {
+    private boolean checkAndAssignmentAccessoryList(List<V2_WorkOrder_Detail> accessoryList, SimplePartsRequest partsRequest, int type, UserAccount userAccount) {
 
         if(accessoryList == null || accessoryList.size() == 0){
             log.error("not find workOrder PartsRequest partsInfo, 没有找到报修备件信息.");
@@ -272,13 +276,15 @@ public class SimplePartsRequestWorkOrderService {
         partsRequest.setTotalPrice(allTotalPrice);
         partsRequest.setRequestQty(requestQuantityTotal);
         partsRequest.setCreatedDate(TimeUtils.localDateTimeConverterToDate(LocalDateTime.now()));
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        partsRequest.setCreatedBy(currentUserAccount.getLoginName());
-        partsRequest.setProposerId(currentUserAccount.getId());
-        partsRequest.setTenantUID(currentUserAccount.getTenantUID());
-        partsRequest.setInstitutionUID(currentUserAccount.getInstitutionUID());
-        partsRequest.setHospitalUID(currentUserAccount.getHospitalUID());
-        partsRequest.setSiteUID(currentUserAccount.getSiteUID());
+        if(userAccount == null){
+            userAccount = UserContextService.getCurrentUserAccount();
+        }
+        partsRequest.setCreatedBy(userAccount.getLoginName());
+        partsRequest.setProposerId(userAccount.getId());
+        partsRequest.setTenantUID(userAccount.getTenantUID());
+        partsRequest.setInstitutionUID(userAccount.getInstitutionUID());
+        partsRequest.setHospitalUID(userAccount.getHospitalUID());
+        partsRequest.setSiteUID(userAccount.getSiteUID());
         return true;
     }
 
