@@ -505,7 +505,6 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     }
 
     public String getColumnNameList() {
-        logger.error("************** WARNING: getColumnNameList() not overrided");
         return null;
     }
 
