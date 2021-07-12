@@ -244,7 +244,7 @@ public class WorkOrderReportExportController implements Serializable {
     public void previewData(ActionEvent actionEvent) {
 
         this.selectedItems = null;
-        if(actionEvent==null) filterMap.clear();
+        if(actionEvent!=null) filterMap.clear();
 
         if (null == startTime && null == endTime && null == closedStartTime && null == closedEndTime) {
             showMsgBox(WebUtil.getMessage("ApplyTimeErrTip"));
