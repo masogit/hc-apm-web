@@ -144,28 +144,28 @@ public class WorkOrderExportService {
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
             boolean isReturn = true;
             if(isReturn && workOrderExportPojo.getSrNum()!=null && filterMap.get("srNum")!=null && filterMap.get("srNum").length()>0) {   //报修单号
-               isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("srNum"));
+               isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("srNum").trim());
             }
             if(isReturn && workOrderExportPojo.getAssetDepartNum()!=null && filterMap.get("assetDepartNum")!=null && filterMap.get("assetDepartNum").length()>0) {  //设备编号
-                isReturn = workOrderExportPojo.getAssetDepartNum().contains(filterMap.get("assetDepartNum"));
+                isReturn = workOrderExportPojo.getAssetDepartNum().contains(filterMap.get("assetDepartNum").trim());
             }
             if(isReturn && workOrderExportPojo.getAssetName()!=null && filterMap.get("assetName")!=null && filterMap.get("assetName").length()>0) {    //设备名称
-                isReturn = workOrderExportPojo.getAssetName().contains(filterMap.get("assetName"));
+                isReturn = workOrderExportPojo.getAssetName().contains(filterMap.get("assetName").trim());
             }
             if(isReturn && workOrderExportPojo.getAssetFunctionType()!=null && filterMap.get("assetFunctionType")!=null && filterMap.get("assetFunctionType").length()>0) {  //设备型号
-                isReturn = workOrderExportPojo.getAssetFunctionType().contains(filterMap.get("assetFunctionType"));
+                isReturn = workOrderExportPojo.getAssetFunctionType().contains(filterMap.get("assetFunctionType").trim());
             }
             if(isReturn && workOrderExportPojo.getRequestorName()!=null && filterMap.get("requestorName")!=null && filterMap.get("requestorName").length()>0) {  //报修人
-                isReturn = workOrderExportPojo.getRequestorName().contains(filterMap.get("requestorName"));
+                isReturn = workOrderExportPojo.getRequestorName().contains(filterMap.get("requestorName").trim());
             }
             if(isReturn && workOrderExportPojo.getRequestReason()!=null && filterMap.get("requestReason")!=null && filterMap.get("requestReason").length()>0) {  //故障描述
-                isReturn = workOrderExportPojo.getRequestReason().contains(filterMap.get("requestReason"));
+                isReturn = workOrderExportPojo.getRequestReason().contains(filterMap.get("requestReason").trim());
             }
             if(isReturn && workOrderExportPojo.getCurrentStepName()!=null && filterMap.get("currentStepName")!=null && filterMap.get("currentStepName").length()>0) {  //当前步骤
-                isReturn = workOrderExportPojo.getCurrentStepName().contains(filterMap.get("currentStepName"));
+                isReturn = workOrderExportPojo.getCurrentStepName().contains(filterMap.get("currentStepName").trim());
             }
             if(isReturn && workOrderExportPojo.getStatusName()!=null && filterMap.get("statusName")!=null && filterMap.get("statusName").length()>0) {   // 工单状态
-                isReturn = workOrderExportPojo.getStatusName().contains(filterMap.get("statusName"));
+                isReturn = workOrderExportPojo.getStatusName().contains(filterMap.get("statusName").trim());
             }
             return isReturn;
         }).collect(Collectors.toList());
