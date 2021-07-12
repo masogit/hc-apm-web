@@ -1,0 +1,43 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+    <ui:define name="content">
+        <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
+        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
+        <div class="ui-g">
+
+            <div class="ui-g-12 card cardTitle" id="aa">
+
+                <p:outputLabel class="pageTitle" value="配置保养规则"/>
+
+            </div>
+
+        </div>
+        <ui:include src="RelRuleAsset.xhtml"/>
+
+        <script type="text/javascript">
+            window.onload=function(){
+                  setTimeout("go()",100);
+
+            }
+
+            function changeDiaLog() {
+                PF('relRuleAssetDialog').hide();
+                PF('redirectDialog').show();
+            }
+            function go(){
+               PF('relRuleAssetDialog').show();
+            }
+        </script>
+
+    </ui:define>
+
+
+</ui:composition>
