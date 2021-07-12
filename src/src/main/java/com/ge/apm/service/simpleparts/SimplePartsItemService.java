@@ -91,4 +91,8 @@ public class SimplePartsItemService {
         List<SimplePartsItem> list = partsItemRepository.findByTenantUid(tenantUID);
         return list != null && list.size() > 0 ? list : Lists.newArrayList();
     }
+
+    public void saveSelectedPartsEdit(Set<String> partsItemIds,SimplePartsCategory partsCategory) {
+        partsItemRepository.updatePartsItemPartsCategoryByIds(partsItemIds,partsCategory.getName(),partsCategory.getEncoded());
+    }
 }
