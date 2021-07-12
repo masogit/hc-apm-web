@@ -178,7 +178,6 @@ public class SimplePartsRequestWorkOrderService {
             return;
         }
         partsRequest.setRequestCode(partsCodeGenerationService.getNextRequestCode(SimplePartsConstant.PARTS_REQUEST_FORM));//生成备件申领单申购单编号
-        partsRequest.setRequestQty(accessoryList.size());
         partsRequest.setType(SimplePartsConstant.PARTS_REQUEST_FORM);        // 申领单类型
         partsRequest.setStatus(SimplePartsConstant.PARTS_NOT_TRANSACTIONED);       // 未出库
         partsRequest.setProposerStatus(ApprovalConstant.MULTI_LEVEL_STATUS_APPROVAL_AGREE); // 已审批
