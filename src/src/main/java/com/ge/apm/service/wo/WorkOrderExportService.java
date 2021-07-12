@@ -143,29 +143,54 @@ public class WorkOrderExportService {
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
             boolean isReturn = true;
-            if(isReturn && workOrderExportPojo.getSrNum()!=null && filterMap.get("srNum")!=null && filterMap.get("srNum").length()>0) {   //报修单号
-               isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("srNum").trim());
+            if(isReturn && filterMap.get("srNum")!=null && filterMap.get("srNum").length()>0) {   //报修单号
+                if(workOrderExportPojo.getSrNum()!=null) {
+                    isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("srNum").trim());
+                } else {
+                    isReturn = false;
+                }
             }
-            if(isReturn && workOrderExportPojo.getAssetDepartNum()!=null && filterMap.get("assetDepartNum")!=null && filterMap.get("assetDepartNum").length()>0) {  //设备编号
-                isReturn = workOrderExportPojo.getAssetDepartNum().contains(filterMap.get("assetDepartNum").trim());
+            if(isReturn && filterMap.get("assetDepartNum")!=null && filterMap.get("assetDepartNum").length()>0) {  //设备编号
+                if(workOrderExportPojo.getAssetDepartNum()!=null) {
+                    isReturn = workOrderExportPojo.getAssetDepartNum().contains(filterMap.get("assetDepartNum").trim());
+                } else {
+                    isReturn = false;
+                }
             }
-            if(isReturn && workOrderExportPojo.getAssetName()!=null && filterMap.get("assetName")!=null && filterMap.get("assetName").length()>0) {    //设备名称
-                isReturn = workOrderExportPojo.getAssetName().contains(filterMap.get("assetName").trim());
+            if(isReturn  && filterMap.get("assetName")!=null && filterMap.get("assetName").length()>0) {    //设备名称
+                if(workOrderExportPojo.getAssetName()!=null) {
+                    isReturn = workOrderExportPojo.getAssetName().contains(filterMap.get("assetName").trim());
+                } else {
+                    isReturn = false;
+                }
             }
-            if(isReturn && workOrderExportPojo.getAssetFunctionType()!=null && filterMap.get("assetFunctionType")!=null && filterMap.get("assetFunctionType").length()>0) {  //设备型号
-                isReturn = workOrderExportPojo.getAssetFunctionType().contains(filterMap.get("assetFunctionType").trim());
+            if(isReturn && filterMap.get("assetFunctionType")!=null && filterMap.get("assetFunctionType").length()>0) {  //设备型号
+                if(workOrderExportPojo.getAssetFunctionType()!=null) {
+                    isReturn = workOrderExportPojo.getAssetFunctionType().contains(filterMap.get("assetFunctionType").trim());
+                } else {
+                    isReturn = false;
+                }
             }
-            if(isReturn && workOrderExportPojo.getRequestorName()!=null && filterMap.get("requestorName")!=null && filterMap.get("requestorName").length()>0) {  //报修人
-                isReturn = workOrderExportPojo.getRequestorName().contains(filterMap.get("requestorName").trim());
+            if(isReturn  && filterMap.get("requestorName")!=null && filterMap.get("requestorName").length()>0) {  //报修人
+                if(workOrderExportPojo.getRequestorName()!=null && filterMap.get("requestorName")!=null) {
+                    isReturn = workOrderExportPojo.getRequestorName().contains(filterMap.get("requestorName").trim());
+                } else {
+                    isReturn = false;
+                }
             }
-            if(isReturn && workOrderExportPojo.getRequestReason()!=null && filterMap.get("requestReason")!=null && filterMap.get("requestReason").length()>0) {  //故障描述
-                isReturn = workOrderExportPojo.getRequestReason().contains(filterMap.get("requestReason").trim());
+            if(isReturn && filterMap.get("requestReason")!=null && filterMap.get("requestReason").length()>0) {  //故障描述
+                if(workOrderExportPojo.getRequestReason()!=null) {
+                    isReturn = workOrderExportPojo.getRequestReason().contains(filterMap.get("requestReason").trim());
+                } else {
+                    isReturn = false;
+                }
             }
-            if(isReturn && workOrderExportPojo.getCurrentStepName()!=null && filterMap.get("currentStepName")!=null && filterMap.get("currentStepName").length()>0) {  //当前步骤
-                isReturn = workOrderExportPojo.getCurrentStepName().contains(filterMap.get("currentStepName").trim());
-            }
-            if(isReturn && workOrderExportPojo.getStatusName()!=null && filterMap.get("statusName")!=null && filterMap.get("statusName").length()>0) {   // 工单状态
-                isReturn = workOrderExportPojo.getStatusName().contains(filterMap.get("statusName").trim());
+            if(isReturn && filterMap.get("currentStepId")!=null && filterMap.get("currentStepId").length()>0) {  //当前步骤
+                if(workOrderExportPojo.getCurrentStepId()!=null) {
+                    isReturn = Integer.parseInt(filterMap.get("currentStepId"))==workOrderExportPojo.getCurrentStepId();
+                } else {
+                    isReturn = false;
+                }
             }
             return isReturn;
         }).collect(Collectors.toList());
