@@ -134,14 +134,15 @@
     <h:form id="dataListForm">
         <p:dataTable id="datalist" value="#{workOrderReportExportController.workOrderList}" var="item"
                      selection="#{workOrderReportExportController.selectedItems}"
-                     rowKey="#{item.woId}" lazy="false" paginator="true" paginatorPosition="both"
+                     rowKey="#{item.woId}" lazy="true" paginator="true" paginatorPosition="both"
                      paginatorAlwaysVisible="true"
                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20"
                      emptyMessage="#{msg.noRecordFound}"
                      rowsPerPageTemplate="20,50,100,500">
             <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
-            <p:column headerText="#{msg.srNum}">
+            <p:ajax event="filter" listener="#{workOrderReportExportController.reflashData()}" update="datalist"/>
+            <p:column headerText="#{msg.srNum}" filterBy="#{item.报修单号}" filterValue="#{workOrderReportExportController.filterMap.srNum}">
                 <a href="/geapm/portal/wo/woList.xhtml?woId=#{item.woId}" target="_Blank">
                     <c:if test="#{userContextService.isLocale()}">
                     <h:outputText value="#{item.报修单号}"/>
@@ -151,7 +152,7 @@
                     </c:if>
                 </a>
             </p:column>
-            <p:column headerText="#{msg.EquipmentID}">
+            <p:column headerText="#{msg.EquipmentID}" filterBy="#{item.设备编号}" filterValue="#{workOrderReportExportController.filterMap.assetDepartNum}">
                 <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备编号}"/>
                 </c:if>
@@ -159,7 +160,7 @@
                     <h:outputText value="#{item.EquipmentID}"/>
                 </c:if>
             </p:column>
-            <p:column headerText="#{msg.arrivalListAssetName}">
+            <p:column headerText="#{msg.arrivalListAssetName}" filterBy="#{item.设备名称}" filterValue="#{workOrderReportExportController.filterMap.assetName}">
                 <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备名称}"/>
                 </c:if>
@@ -167,7 +168,7 @@
                     <h:outputText value="#{item.EquipmentName}"/>
                 </c:if>
             </p:column>
-            <p:column headerText="#{msg.functionType}">
+            <p:column headerText="#{msg.functionType}" filterBy="#{item.设备型号}" filterValue="#{workOrderReportExportController.filterMap.assetFunctionType}">
                 <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.设备型号}"/>
                 </c:if>
@@ -191,7 +192,7 @@
                     <h:outputText value="#{item.Department}"/>
                 </c:if>
             </p:column>
-            <p:column headerText="#{msg.requestorId}">
+            <p:column headerText="#{msg.requestorId}" filterBy="#{item.报修人}" filterValue="#{workOrderReportExportController.filterMap.requestorName}">
                 <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.报修人}"/>
                 </c:if>
@@ -199,7 +200,7 @@
                     <h:outputText value="#{item.Requestor}"/>
                 </c:if>
             </p:column>
-            <p:column headerText="#{msg.requestTime}">
+            <p:column headerText="#{msg.requestTime}" >
                 <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.报修时间}"/>
                 </c:if>
@@ -215,7 +216,7 @@
                     <h:outputText value="#{item.CurrentOwner}"/>
                 </c:if>
             </p:column>
-            <p:column headerText="#{msg.FaultDescription}">
+            <p:column headerText="#{msg.FaultDescription}" filterBy="#{item.故障描述}" filterValue="#{workOrderReportExportController.filterMap.requestReason}">
                 <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.故障描述}"/>
                 </c:if>
@@ -223,7 +224,7 @@
                     <h:outputText value="#{item.FaultDescription}"/>
                 </c:if>
             </p:column>
-            <p:column headerText="#{msg.CurrentStep}">
+            <p:column headerText="#{msg.CurrentStep}" filterBy="#{item.当前步骤}" filterValue="#{workOrderReportExportController.filterMap.currentStepName}">
                 <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.当前步骤}"/>
                 </c:if>
@@ -231,7 +232,7 @@
                     <h:outputText value="#{item.CurrentStep}"/>
                 </c:if>
             </p:column>
-            <p:column headerText="#{msg.WorkorderStatus}">
+            <p:column headerText="#{msg.WorkorderStatus}" filterBy="#{item.工单状态}" filterValue="#{workOrderReportExportController.filterMap.statusName}">
                 <c:if test="#{userContextService.isLocale()}">
                 <h:outputText value="#{item.工单状态}"/>
                 </c:if>
