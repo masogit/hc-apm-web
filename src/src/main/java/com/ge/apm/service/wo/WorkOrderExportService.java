@@ -72,7 +72,7 @@ public class WorkOrderExportService {
     @Autowired
     private WorkOrderReportMapper worDao;
 
-    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice){
+    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap){
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
@@ -141,6 +141,34 @@ public class WorkOrderExportService {
         }
 
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
+        workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
+            boolean isReturn = true;
+            if(isReturn && filterMap.get("srNum")!=null && filterMap.get("srNum").length()>0) {   //报修单号
+               isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("srNum"));
+            }
+            if(isReturn && filterMap.get("assetDepartNum")!=null && filterMap.get("assetDepartNum").length()>0) {  //设备编号
+                isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("assetDepartNum"));
+            }
+            if(isReturn && filterMap.get("assetName")!=null && filterMap.get("assetName").length()>0) {    //设备名称
+                isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("assetName"));
+            }
+            if(isReturn && filterMap.get("assetFunctionType")!=null && filterMap.get("assetFunctionType").length()>0) {  //设备型号
+                isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("assetFunctionType"));
+            }
+            if(isReturn && filterMap.get("requestorName")!=null && filterMap.get("requestorName").length()>0) {  //报修人
+                isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("requestorName"));
+            }
+            if(isReturn && filterMap.get("requestReason")!=null && filterMap.get("requestReason").length()>0) {  //故障描述
+                isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("requestReason"));
+            }
+            if(isReturn && filterMap.get("currentStepName")!=null && filterMap.get("currentStepName").length()>0) {  //当前步骤
+                isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("currentStepName"));
+            }
+            if(isReturn && filterMap.get("statusName")!=null && filterMap.get("statusName").length()>0) {   // 工单状态
+                isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("statusName"));
+            }
+            return isReturn;
+        }).collect(Collectors.toList());
 
         for(WorkOrderExportPojo workOrderExportPojo : workOrderList){
             Map<String, Object> workOrderMap = new HashedMap();
