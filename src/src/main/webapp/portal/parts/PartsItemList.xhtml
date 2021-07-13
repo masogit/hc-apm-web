@@ -19,7 +19,7 @@
             </div>
             <div class="ui-g-12 card">
                     <h:form id="basicListForm">
-                        <p:dataTable id="datalist" value="#{simplePartsItemController.partsItemList}"
+                        <!--<p:dataTable id="datalist" value="#{simplePartsItemController.partsItemList}"
                                      var="item"
                                      widgetVar="varDataList"
                                      lazy="true" paginator="true" paginatorPosition="bottom"
@@ -27,6 +27,19 @@
                                      selectionMode="single" selection="#{simplePartsItemController.selected}"
                                      rowKey="#{item.id}" sortMode="single" sortOrder="descending"
                                      sortBy="#{item.createdDate}"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     rows="20" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="20,50,100,500">-->
+
+                        <p:dataTable id="datalist" value="#{simplePartsItemController.lazyModel}"
+                                     var="item"
+                                     widgetVar="varDataList"
+                                     lazy="true" paginator="true"
+                                     paginatorAlwaysVisible="true"
+                                     selectionMode="single" selection="#{simplePartsItemController.selected}"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                                     sortBy="#{item.id}"
                                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      rows="20" emptyMessage="#{msg.noRecordFound}"

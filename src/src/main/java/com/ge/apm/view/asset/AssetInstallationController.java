@@ -19,6 +19,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.view.pm.RelRuleAssetController;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -69,7 +70,6 @@ public class AssetInstallationController {
     private CustomConfigService ccService;
 
     private List<V2_BlobObject> attachList;
-
     @Getter
     @Setter
     private List<I18nMessage> code68List;
@@ -419,7 +419,11 @@ public class AssetInstallationController {
                         for(TableDefinition tableDefinition : tableDefinitions){
                             Integer assetGroupId = tableDefinition.getAssetGroup();
                             if(assetGroupNum1.equals(assetGroupId)){
-                                return "/portal/pm/relRuleAsset/List?faces-redirect=true";
+                                //获取到assetinfo表中设备想对应的uid值
+                                List<String> assetIds = itemDao.getAssetUid(arrivalListId);
+                                //通过assetinfo中的uid值，获取到id值保存到集合
+                                RelRuleAssetController.assetInfoUids=assetIds;
+                                return "/portal/asset/arrived/ItemEdit2?faces-redirect=true";
                             }else{
                                 return "/portal/reporter/schemaList?faces-redirect=true";
                             }
@@ -603,7 +607,11 @@ public class AssetInstallationController {
                         for(TableDefinition tableDefinition : tableDefinitions){
                             Integer assetGroupId = tableDefinition.getAssetGroup();
                             if(assetGroupNum1.equals(assetGroupId)){
-                                return "/portal/pm/relRuleAsset/List?faces-redirect=true";
+                                //获取到assetinfo表中设备想对应的uid值
+                                List<String> assetIds = itemDao.getAssetUid(arrivalListId);
+                                //通过assetinfo中的uid值，获取到id值保存到集合
+                                RelRuleAssetController.assetInfoUids=assetIds;
+                                return "/portal/asset/arrived/ItemEdit2?faces-redirect=true";
                             }else{
                                 return "/portal/reporter/schemaList?faces-redirect=true";
                             }

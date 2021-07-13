@@ -161,7 +161,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private String token;
     private OrgInfoTreeService orgInfoTreeService;
     private AutoCompleteService autoCompleteService;
-
     private AssetInfoMgrService aimService;
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private Map<String, Object> selectedObjectMap = new HashMap();
@@ -1969,12 +1968,12 @@ public void test1(){
                         }
                     }
                     if (!accessorySparePartsRequestList.isEmpty()) {
-                        LOGGER.info("维修工单生成申领单start!!!!");
-                        partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER);//生成申领单
+                        V2_WorkOrder v2_WorkOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                        partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER, userDao.findById(v2_WorkOrder.getCurrentPersonId()));//生成申领单
                     }
                     if (!accessorySparePartsBuyList.isEmpty()) {
-                        LOGGER.info("维修工单生成申购单start!!!!");
-                        partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER);//生成申购单
+                        V2_WorkOrder v2_WorkOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                        partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER, userDao.findById(v2_WorkOrder.getCurrentPersonId()));//生成申购单
                     }
                 }
             }
