@@ -19,6 +19,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.constant.PmConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -1954,7 +1955,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
             return ;
         }
-        selectedPmOrder.setApprovalStatus(ApprovalConstant.APPROVAL_STATUS_SUBMIT_FOR_APPROVAL);
+        selectedPmOrder.setApprovalStatus(PmConstant.PM_APPROVAL_STATUS_PENDING);
         dao.save(selectedPmOrder);
     }
 
