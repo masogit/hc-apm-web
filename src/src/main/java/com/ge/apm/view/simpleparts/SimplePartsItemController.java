@@ -28,28 +28,18 @@ import java.util.*;
 public class SimplePartsItemController extends GenericCRUDUUIDController<SimplePartsItem> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplePartsItemController.class);
-    private static final long serialVersionUID = -483251039974336475L;
 
     private UserContextService userContextService;
-
-    @Getter
-    @Setter
     private SimplePartsItemRepository partsItemRepository;
-
-    @Getter
-    @Setter
     private SimplePartsCategoryRepository partsCategoryRepository;
-
     private SimplePartsItemService partsItemService;
 
     @Getter
     @Setter
     private TreeNode partsCategoryTree;
-
     @Getter
     @Setter
     private SimplePartsCategory selectedPartsCategory;
-
     @Override
     protected GenericRepositoryUUID<SimplePartsItem> getDAO() {
         return null;
@@ -59,26 +49,16 @@ public class SimplePartsItemController extends GenericCRUDUUIDController<SimpleP
     @Getter @Setter
     private Set<String> selectedPartsIds = new HashSet<>();
 
-
     @Override
     protected void init() {
         partsItemService = WebUtil.getBean(SimplePartsItemService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         partsItemRepository = WebUtil.getBean(SimplePartsItemRepository.class);
         partsCategoryRepository = WebUtil.getBean(SimplePartsCategoryRepository.class);
-
-//        initPartsCategoryTree();
-//        try {
-//            if (selected == null) {
-//                prepareCreate();
-//            }
-//        } catch (Exception e) {
-//            LOGGER.error(e.getMessage(), e);
-//        }
     }
 
-    private void initPartsCategoryTree() {
-        partsCategoryTree = partsItemService.buildPartsCategoryTree(userContextService.getLoginUser().getTenantUID());
+    public void initPartsCategoryTree() {
+        if(partsCategoryTree==null) partsCategoryTree = partsItemService.buildPartsCategoryTree(userContextService.getLoginUser().getTenantUID());
     }
 
     public TreeNode getCurrentPartsCategoryTree() {
@@ -92,14 +72,6 @@ public class SimplePartsItemController extends GenericCRUDUUIDController<SimpleP
         Page<SimplePartsItem> res = partsItemRepository.findBySearchFilter(this.searchFilters, pageRequest);
         return res;
     }
-
-    public List<SimplePartsItem> getPartsItemList() {
-        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-        // 通过租户id获取备件信息列表
-        List<SimplePartsItem> partsItemLists = partsItemService.getPartsItemList(tenantUID);
-        return partsItemLists;
-    }
-
 
     public SimplePartsItem onSelectPartsItem() {
         return selected;
