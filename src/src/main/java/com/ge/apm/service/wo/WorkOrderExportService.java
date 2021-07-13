@@ -72,7 +72,7 @@ public class WorkOrderExportService {
     @Autowired
     private WorkOrderReportMapper worDao;
 
-    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap){
+    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap,String currentStep){
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
@@ -185,9 +185,9 @@ public class WorkOrderExportService {
                     isReturn = false;
                 }
             }
-            if(isReturn && filterMap.get("currentStepId")!=null && filterMap.get("currentStepId").length()>0) {  //当前步骤
+            if(isReturn && currentStep!=null) {  //当前步骤
                 if(workOrderExportPojo.getCurrentStepId()!=null) {
-                    isReturn = Integer.parseInt(filterMap.get("currentStepId"))==workOrderExportPojo.getCurrentStepId();
+                    isReturn = Integer.parseInt(currentStep)==workOrderExportPojo.getCurrentStepId();
                 } else {
                     isReturn = false;
                 }
