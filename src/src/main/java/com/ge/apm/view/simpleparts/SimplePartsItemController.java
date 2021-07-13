@@ -12,13 +12,16 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.List;
+import java.util.*;
 
 @ManagedBean
 @ViewScoped
@@ -51,6 +54,11 @@ public class SimplePartsItemController extends GenericCRUDUUIDController<SimpleP
     protected GenericRepositoryUUID<SimplePartsItem> getDAO() {
         return null;
     }
+    @Getter @Setter
+    private Map<String,Boolean> selectedPartsMap = new HashMap<>();
+    @Getter @Setter
+    private Set<String> selectedPartsIds = new HashSet<>();
+
 
     @Override
     protected void init() {
@@ -59,14 +67,14 @@ public class SimplePartsItemController extends GenericCRUDUUIDController<SimpleP
         partsItemRepository = WebUtil.getBean(SimplePartsItemRepository.class);
         partsCategoryRepository = WebUtil.getBean(SimplePartsCategoryRepository.class);
 
-        initPartsCategoryTree();
-        try {
-            if (selected == null) {
-                prepareCreate();
-            }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+//        initPartsCategoryTree();
+//        try {
+//            if (selected == null) {
+//                prepareCreate();
+//            }
+//        } catch (Exception e) {
+//            LOGGER.error(e.getMessage(), e);
+//        }
     }
 
     private void initPartsCategoryTree() {
@@ -77,6 +85,13 @@ public class SimplePartsItemController extends GenericCRUDUUIDController<SimpleP
         return partsCategoryTree;
     }
 
+    @Override
+    protected Page<SimplePartsItem> loadData(PageRequest pageRequest) {
+        if(searchFilters==null) searchFilters = new ArrayList<>();
+        this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        Page<SimplePartsItem> res = partsItemRepository.findBySearchFilter(this.searchFilters, pageRequest);
+        return res;
+    }
 
     public List<SimplePartsItem> getPartsItemList() {
         String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
@@ -93,15 +108,14 @@ public class SimplePartsItemController extends GenericCRUDUUIDController<SimpleP
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
-
-        selectedPartsCategory = null;
+        initPartsCategoryTree();
     }
 
 
     @Override
     public void prepareEdit() {
         super.prepareEdit();
-
+        initPartsCategoryTree();
         if (null != selected.getCategoryCode()) {
             selectedPartsCategory = partsCategoryRepository.findByEncoded(selected.getCategoryCode());
         } else {
@@ -135,6 +149,21 @@ public class SimplePartsItemController extends GenericCRUDUUIDController<SimpleP
         this.selectedPartsCategory = (SimplePartsCategory) node.getData();
     }
 
+
+    public void saveSelectedPartsEdit() {
+        if(selectedPartsIds.size()<1) {
+            WebUtil.addErrorMessage("请选择备件！");
+            return;
+        }
+        if(null==selectedPartsCategory) {
+            WebUtil.addErrorMessage("备件分类选项不能为空！");
+            return;
+        }
+        partsItemService.saveSelectedPartsEdit(selectedPartsIds,selectedPartsCategory);
+        WebUtil.addSuccessMessage("修改成功！");
+        selectedPartsMap = new HashMap<>();
+        selectedPartsIds = new HashSet<>();
+    }
 
     public void savePartsItem() {
         if (null != selectedPartsCategory) {

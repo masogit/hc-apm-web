@@ -41,7 +41,7 @@
         <h:form id="redirectForm" class="bcls">
             <h:panelGroup>
                 <p:commandButton validateClient="true" action="/portal/pm/relRuleAsset/List.xhtml?faces-redirect=true" value="是" icon="ui-icon-check" update=":growl" />
-                <p:commandButton id="returnButtonTwo" value="否" icon="ui-icon-arrow-back" onclick="PF('redirectDialog').hide()" immediate="true" />
+                <p:commandButton id="returnButtonTwo" action="/portal/asset/info/AssetList.xhtml?faces-redirect=true" value="否" icon="ui-icon-arrow-back" onclick="PF('redirectDialog').hide()" immediate="true" />
             </h:panelGroup>
             <br/>
         </h:form>
