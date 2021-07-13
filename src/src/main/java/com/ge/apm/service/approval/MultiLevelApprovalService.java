@@ -8,10 +8,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsRequest;
 import com.ge.apm.domain.pure.ApprovableTarget;
 import com.ge.apm.service.common.WechatSendMsgService;
-import com.ge.apm.service.constant.ApprovalConstant;
-import com.ge.apm.service.constant.SimplePartsConstant;
-import com.ge.apm.service.constant.UsageStatusConstant;
-import com.ge.apm.service.constant.WorkOrderConstant;
+import com.ge.apm.service.constant.*;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.simpleparts.SimplePartsConfigService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestService;
@@ -251,7 +248,7 @@ public class MultiLevelApprovalService {
                 break;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT:
                 V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
-                v2PmOrder.setApprovalStatus(ApprovalConstant.PM_APPROVAL_STATUS_DISAGREE);
+                v2PmOrder.setApprovalStatus(PmConstant.PM_APPROVAL_STATUS_DISAGREE);
                 v2_PmOrderRepository.save(v2PmOrder);
                 this.doWorkDetailByIsAgreeType(v2PmOrder.getId(), ApprovalConstant.WORK_DETAIL_STATUS_DISAGREE, null, null);
                 break;
@@ -483,7 +480,7 @@ public class MultiLevelApprovalService {
                                 break;
                             case ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT://保养
                                 V2_PmOrder v2PmOrder = v2_PmOrderRepository.findById(multiLevelApproval.getBusinessUid());
-                                v2PmOrder.setApprovalStatus(ApprovalConstant.PM_APPROVAL_STATUS_AGREE);
+                                v2PmOrder.setApprovalStatus(PmConstant.PM_APPROVAL_STATUS_AGREE);
                                 v2_PmOrderRepository.save(v2PmOrder);
                                 List<V2_WorkOrder_Detail> pmAccessorySparePartsBuyList = new ArrayList<>();//申购
                                 List<V2_WorkOrder_Detail> pmAccessorySparePartsRequestList = new ArrayList<>();//申领
