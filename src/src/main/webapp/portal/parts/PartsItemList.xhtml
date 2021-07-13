@@ -19,19 +19,6 @@
             </div>
             <div class="ui-g-12 card">
                     <h:form id="basicListForm">
-                        <!--<p:dataTable id="datalist" value="#{simplePartsItemController.partsItemList}"
-                                     var="item"
-                                     widgetVar="varDataList"
-                                     lazy="true" paginator="true" paginatorPosition="bottom"
-                                     paginatorAlwaysVisible="true"
-                                     selectionMode="single" selection="#{simplePartsItemController.selected}"
-                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending"
-                                     sortBy="#{item.createdDate}"
-                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
-                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
-                                     rows="20" emptyMessage="#{msg.noRecordFound}"
-                                     rowsPerPageTemplate="20,50,100,500">-->
-
                         <p:dataTable id="datalist" value="#{simplePartsItemController.lazyModel}"
                                      var="item"
                                      widgetVar="varDataList"
@@ -46,7 +33,7 @@
                                      rowsPerPageTemplate="20,50,100,500">
 
                             <p:ajax event="rowSelect" listener="#{simplePartsItemController.onSelectPartsItem()}" update="createButton editButton deleteButton"/>
-                            <p:ajax event="filter" listener="#{simplePartsItemController.onFilter}" oncomplete="rc();"/>
+                            <p:ajax event="filter" listener="#{simplePartsItemController.onFilter}"/>
 
 
                             <p:column headerText="#{msg.PartsName}" >
@@ -90,7 +77,6 @@
                       resizable="true" draggable="true" appendTo="@this" header="备件信息">
                 <h:form id="basicEditForm">
                     <p:fieldset legend="备件信息">
-
                                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group"
                                              rendered="true">
                                     <h:panelGroup>

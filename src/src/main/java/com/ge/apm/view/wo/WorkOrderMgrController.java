@@ -864,7 +864,7 @@ public void test1(){
                 searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
                 if(!(userContextService.hasRole("AssetHead")||userContextService.hasRole("DeptHead"))){
                     searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-}
+                }
                 if(userContextService.hasRole("DeptHead")){
                     List<String> clinicalUidList =  orgDao.findClinicalUidBySiteUid(Arrays.asList(userContextService.getCurrentUserAccount().getSiteUID()));
                     searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
