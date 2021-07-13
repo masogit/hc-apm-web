@@ -12,7 +12,10 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -82,6 +85,13 @@ public class SimplePartsItemController extends GenericCRUDUUIDController<SimpleP
         return partsCategoryTree;
     }
 
+    @Override
+    protected Page<SimplePartsItem> loadData(PageRequest pageRequest) {
+        if(searchFilters==null) searchFilters = new ArrayList<>();
+        this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getTenantUID()));
+        Page<SimplePartsItem> res = partsItemRepository.findBySearchFilter(this.searchFilters, pageRequest);
+        return res;
+    }
 
     public List<SimplePartsItem> getPartsItemList() {
         String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
