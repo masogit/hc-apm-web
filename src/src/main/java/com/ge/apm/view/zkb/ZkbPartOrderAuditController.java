@@ -714,9 +714,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 for(ZkbPartOrderReturn r : auditReturnList){
                     if(ZkbPartOrderReturn.DataStatusEnum.Reject.toString().equals(r.getDataStatus())){
                         isAllYes = false;
+                    } else if(r.getDataStatus() == null){
+                        isAllYes = false;
                     }
                 }
-                if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus()) && !isAllYes){
+                if(!isAllYes){
                     zkbPartOrderService.closedBack(selected,currentUser);
                 }else{
                     zkbPartOrderService.partsClosed(selected,currentUser);
