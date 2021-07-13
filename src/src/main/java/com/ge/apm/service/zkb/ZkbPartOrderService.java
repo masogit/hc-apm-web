@@ -928,6 +928,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         HashMap<String, Integer> returnMap = new HashMap<String, Integer>();
         List<ZkbPartOrderReturn> zkbPartOrderReturnList = zkbPartOrderReturnRepository.findByPartOrderId(zkbPartOrder.getId());
         for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
+            if(!ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
+                continue;
+            }
             if(returnMap.containsKey(r.getPartNo())){
                 Integer vv = returnMap.get(r.getPartNo());
                 vv += r.getQty();
