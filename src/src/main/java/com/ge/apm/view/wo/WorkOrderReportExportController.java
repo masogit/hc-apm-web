@@ -104,6 +104,8 @@ public class WorkOrderReportExportController implements Serializable {
     private String filterParts;
     private String filterTotalPrice;
     @Getter @Setter
+    private String currentStepId;
+    @Getter @Setter
     private Map<String,String> filterMap;
 
     @PostConstruct
@@ -287,7 +289,7 @@ public class WorkOrderReportExportController implements Serializable {
 
 
             //workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
-            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap);
+            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap,currentStepId);
         }
 
     }
