@@ -131,22 +131,7 @@
                     <!--6 表示 step_name 是待关单-->
                     <h:outputText value="#{workOrderMgrController.getRepairResponer(item.id,6)}"/>
                 </p:column>
-                <!--当前处理步骤--><!--调试作用-->
-                <!-- <p:column headerText="#{msg.currentStep}" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
-                     <f:facet name="filter">
-                         <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0}">
-                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 2)}" itemValue="#{fieldMsg.fieldValue('woSteps', 2)}"  />
-                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps',
-                             3)}" itemValue="#{fieldMsg.fieldValue('woSteps', 3)}" />
-                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 4)}" itemValue="#{fieldMsg.fieldValue('woSteps', 4)}" />
-                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 5)}" itemValue="#{fieldMsg.fieldValue('woSteps', 5)}" />
-                             <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 6)}" itemValue="#{fieldMsg.fieldValue('woSteps', 6)}" />
-                         </p:selectOneMenu>
-                     </f:facet>
-                     <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
-                     <h:outputText value="#{item.currentStepId}"/>
-                 </p:column>-->
+
                 <!--当前处理步骤 for 待办-->
                 <p:column rendered="#{workOrderMgrController.queryIndex eq 0}" headerText="#{msg.currentStep}" width="186" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
 
@@ -220,9 +205,9 @@
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
                     <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
-                    <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="#{item.approvalStatus eq '1'? '':'transferOrderDialogForm'}" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
-                    <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="#{item.approvalStatus eq '1'? '':'@(.x0) @(.pictureListCls) woTab:repairCompleteDialogForm'}" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
-                    <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="#{item.approvalStatus eq '1'? '':'woTab:newWorkorderDlgForm  :growl'}"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                    <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'? '':'transferOrderDialogForm'}" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'}"/>
+                    <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="#{item.approvalStatus eq '1'  or item.approvalStatus eq '5'? '':'@(.x0) @(.pictureListCls) woTab:repairCompleteDialogForm'}" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'}"/>
+                    <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="#{item.approvalStatus eq '1'  or item.approvalStatus eq '5'? '':'woTab:newWorkorderDlgForm  :growl'}"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5'}"/>
                     <!--报修后，被接单的工单 医工主任有权限能够取消 -->
                     <p:commandButton  value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" rendered="#{userContextService.hasRole('AssetHead') and !userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
                 </p:column>
