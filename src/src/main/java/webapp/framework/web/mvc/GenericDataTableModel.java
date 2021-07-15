@@ -2,18 +2,15 @@ package webapp.framework.web.mvc;
 
 import java.util.List;
 import java.util.Map;
-
-import com.ge.apm.domain.simpleparts.SimplePartsItem;
+import org.apache.log4j.Logger;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 
 public abstract class GenericDataTableModel<T> extends LazyDataModel<T> {
-
-    protected static final Logger logger = LoggerFactory.getLogger(GenericDataTableModel.class);
+    
+    protected static final Logger logger = Logger.getLogger(GenericDataTableModel.class);
     
     private static final long serialVersionUID = 1L;
     private T selectedRow;
@@ -66,15 +63,8 @@ public abstract class GenericDataTableModel<T> extends LazyDataModel<T> {
     public T getRowData(String rowKey) {
         try{
             for (T item : ((List<T>) getWrappedData())) {
-                if (item instanceof SimplePartsItem) {
-                    logger.info("id: {}, rowkey: {}, rowKey hashcode: {}, hashcode: {}", ((SimplePartsItem) item).getId(), rowKey, rowKey.hashCode(), item.hashCode());
-                    if (((SimplePartsItem) item).getId().equals(rowKey)) {
-                        return item;
-                    }
-                } else {
-                    if (rowKey.equals("" + item.hashCode()) || rowKey.hashCode()==item.hashCode()) {
-                        return item;
-                    }
+                if (rowKey.equals("" + item.hashCode()) || rowKey.hashCode()==item.hashCode()) {
+                    return item;
                 }
             }
         }
