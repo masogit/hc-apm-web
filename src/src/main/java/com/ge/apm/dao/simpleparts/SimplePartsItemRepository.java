@@ -14,10 +14,10 @@ public interface SimplePartsItemRepository extends GenericRepositoryUUID<SimpleP
 
     SimplePartsItem findById(String id);
 
-    Optional<SimplePartsItem> findByName(String name);
+//    Optional<SimplePartsItem> findByName(String name);
 
-    @Query(value = "select * from simple_parts_item where category_code = ?1", nativeQuery = true)
-    List<SimplePartsItem> findByCategoryCode(String encoded);
+    @Query(value = "select * from simple_parts_item where category_code = ?1 and tenant_uid = ?2", nativeQuery = true)
+    List<SimplePartsItem> findByCategoryCode(String encoded, String tenantUid);
 
     @Query(value = "select * from simple_parts_item where tenant_uid = ?1", nativeQuery = true)
     List<SimplePartsItem> findByTenantUid(String tenantUID);

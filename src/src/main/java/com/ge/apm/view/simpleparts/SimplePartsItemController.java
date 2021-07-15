@@ -89,7 +89,7 @@ public class SimplePartsItemController extends GenericCRUDUUIDController<SimpleP
         super.prepareEdit();
         initPartsCategoryTree();
         if (null != selected.getCategoryCode()) {
-            selectedPartsCategory = partsCategoryRepository.findByEncoded(selected.getCategoryCode());
+            selectedPartsCategory = partsCategoryRepository.findByEncoded(selected.getCategoryCode(), userContextService.getLoginUser().getTenantUID());
         } else {
             selectedPartsCategory = null;
         }
