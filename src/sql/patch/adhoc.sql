@@ -1,0 +1,2 @@
+--智康保探头
+update zkb_part_order_cat set is_vaild='N' where lower(cat_model) like '%3v%' or lower(cat_model) like '%4v%' or lower(cat_model) like '%10t-d%' or lower(cat_model) like '%6vt-d%' or lower(cat_model) like '%9t%' or lower(cat_model) like '%9t-rs%' or lower(cat_model) like '%6tc-rs%' or lower(cat_model) like '%6tc%' or lower(cat_model) like '%rm6c%' or lower(cat_model) like '%em6c%'  ;
