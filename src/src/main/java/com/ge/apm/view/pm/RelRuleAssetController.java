@@ -1,6 +1,5 @@
 package com.ge.apm.view.pm;
 
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,7 +14,6 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.OrgInfoComparator;
-import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
@@ -34,18 +32,11 @@ import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.domain.pure.AssetRuleModel;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
-import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.StringUtil;
-import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
-import webapp.framework.web.mvc.JpaCRUDController;
-
 @ManagedBean
 @ViewScoped
 public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAsset> {
@@ -53,8 +44,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private Date varInstallDateTo = null;
     private Date installDateFrom;
     private Date installDateTo;
-private Date startInstallDate;
-private Date endInstallDate;
+    private Date startInstallDate;
+    private Date endInstallDate;
     private static final long serialVersionUID = -1L;
     private DualListModel<AssetInfo> availableAssets;
     private List<AssetInfo> sourceAssets;
@@ -73,6 +64,11 @@ private Date endInstallDate;
     private Integer loginUserOrgType;
     private UserCommonService userCommonService;
     private PmOrderRule pmOrderRule;
+    public static List<String> assetInfoUids = null;
+    @Getter @Setter
+    private PmOrderRule pmOrderRuleTwoLevel;
+    @Getter @Setter
+    private PmOrderRule pmOrderRuleThreeLevel;
     private String ruleUid;
     //private SupplierRepository supplierDao;
     private SupplierService supplierService;
@@ -354,6 +350,55 @@ private Date endInstallDate;
         }
     }
 
+    public void saveRelFromAssetList() {
+        List<RelRuleAsset> rels = new ArrayList<>();
+        boolean hasNoPm = false;
+        if(assetInfoUids!=null) {
+            int levelCount = 0;
+            List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetInfoUids);
+            for (AssetInfo ai : assetInfos) {
+                if(ai.getIsPm()==null || ai.getIsPm()==false) {  //不需要配置的pass掉
+                    hasNoPm = true;
+                    break;
+                }
+                RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
+                if (rel == null) rel = new RelRuleAsset();
+                rel.setAssetUID(ai.getUid());
+                rel.setCreatedDate(new Date());
+                rel.setTenantUID(ai.getTenantUID());
+                rel.setInstitutionUID(ai.getInstitutionUID());
+                rel.setHospitalUID(ai.getHospitalUID());
+                rel.setSiteUID(ai.getSiteUID());
+                if(pmOrderRule!=null) {  //一级
+                    rel.setRuleUID1(pmOrderRule.getUid());
+                    levelCount++;
+                }
+                if(pmOrderRuleTwoLevel!=null) { //二级
+                    rel.setRuleUID2(pmOrderRuleTwoLevel.getUid());
+                    levelCount++;
+                }
+                if(pmOrderRuleThreeLevel!=null) {
+                    rel.setRuleUID(pmOrderRuleThreeLevel.getUid());
+                    levelCount++;
+                }
+                if(levelCount==0) {
+                    WebUtil.addErrorMessage("请至少选择一种保养规则！");
+                    return;
+                }
+                rels.add(rel);
+            }
+            pmOrderRule = pmOrderRuleTwoLevel = pmOrderRuleThreeLevel = null;
+            relRuleAssetRepository.save(rels);
+            assetInfoUids = null;
+            if(hasNoPm) {
+                WebUtil.addSuccessMessage("批量设置成功,不需要保养的设备已经被过滤掉！");
+            } else {
+                WebUtil.addSuccessMessage("批量设置成功！");
+            }
+
+        }
+    }
+
     @Transactional
     public void saveRel() {
         if (targetAssets.isEmpty()) {
@@ -382,8 +427,8 @@ private Date endInstallDate;
                     }
                     rels.add(rel);
                 }
-                relRuleAssetRepository.save(rels);
             }
+            relRuleAssetRepository.save(rels);
             this.level = null;
             this.ruleUid = null;
             this.pmOrderRule = null;
@@ -415,6 +460,18 @@ private Date endInstallDate;
             assetFilters.add(new SearchFilter("level", SearchFilter.Operator.EQ, level));
         }
         return pmOrderRuleRepository.findBySearchFilter(assetFilters);
+    }
+
+    public List<PmOrderRule> geLevelTwoRuleList(String name) {
+        queryAsset = new QueryAsset();
+        level = 2;
+        return getRuleList(name);
+    }
+
+    public List<PmOrderRule> getLevelThreeRuleList(String name) {
+        queryAsset = new QueryAsset();
+        level = 3;
+        return getRuleList(name);
     }
 
     public List<PmOrderRule> getRuleList(String name) {

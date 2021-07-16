@@ -33,6 +33,7 @@ public interface TableDefinitionRepository extends GenericRepositoryUUID<TableDe
     public List<TableDefinition> findTD(String name,String SiteUid);
 
     public List<TableDefinition> getByBaseId(String baseId);
+    public List<TableDefinition> getBySiteUID(String ID);
 
 	@Query(value = "select td.* from table_definition td where td.status='Released' and td.base_id in (\n" +
 			"\tselect performance_report from pm_order_rule where uid=?1 union select safety_report from pm_order_rule where uid=?1)",nativeQuery = true)

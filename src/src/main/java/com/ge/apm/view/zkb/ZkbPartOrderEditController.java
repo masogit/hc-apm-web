@@ -1,6 +1,7 @@
 package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.ZkbContractAssetRepository;
 import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
@@ -66,6 +67,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private boolean currentScoreFlag =false;
     private boolean probeQuotaFlag = false;
     private List<HashMap<String, String>> highCatList = new ArrayList<>();
+    private ZkbContractAssetRepository zkbContractAssetRepository;
 
     @Override
     protected void init() {
@@ -76,6 +78,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         zkbIntegralService = WebUtil.getBean(ZkbIntegralService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+        zkbContractAssetRepository = WebUtil.getBean(ZkbContractAssetRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -267,6 +270,17 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return;
         }else if(contractList.size() == 1){
             ZkbContract zkbContract = contractList.get(0);
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
+                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
+                if(zkbContractAsset != null && StringUtils.isNotEmpty(zkbContractAsset.getAssetType())){
+                    if("highMachine".equals(zkbContractAsset.getAssetType())){
+                        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "设备为高端机，请检查！", "");
+                        FacesContext.getCurrentInstance().addMessage(null, message);
+                        contractList = new ArrayList<>();
+                        return;
+                    }
+                }
+            }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                     if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() < 0){

@@ -30,4 +30,7 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
     @Transactional
     @Query(value = "UPDATE arrival_list_item SET comments=?1 WHERE arrival_list_id=?2", nativeQuery = true)
     public void updateComments(String comments, String arrivalListId);
+
+    @Query(value = "select asset_uid from arrival_list_item where arrival_list_id=?1",nativeQuery=true)
+    List<String> getAssetUid(String arrivalListId);
 }
