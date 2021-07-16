@@ -42,4 +42,9 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
     public List<String> getArrivalListHILT(String id);
     @Query(value = "select * from arrival_list list where id = ?1}",nativeQuery = true)
     public ArrivalList getById(String id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE arrival_list SET is_edit=true where id=?1", nativeQuery = true)
+    public void updateIsEdit(String id);
 }

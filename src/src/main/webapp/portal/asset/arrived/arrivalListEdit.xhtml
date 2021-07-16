@@ -57,27 +57,29 @@
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
-                                        <label class="label">#{msg.arrivalDate}*</label>
-                                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                                    </h:panelGroup>
-                                    <!--                                    <h:panelGroup rendered="#{userContextService.activeSupplier()}">-->
-                                    <!--                                        <label class="label">#{msg.arrivalDate}</label>-->
-                                    <!--                                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />-->
-                                    <!--                                    </h:panelGroup>-->
-                                    <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
-                                        <label class="label">#{msg.arrivalListFunctionType}</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.functionType}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
-                                    </h:panelGroup>
-                                    <h:panelGroup rendered="#{not userContextService.activeSupplier()}">
-                                        <label class="label">#{msg.manufacture}</label>
-                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.manufacture}"  scrollHeight="300"  forceSelection="true"
-                                                        disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onManufactureChange}" />
-                                            <p:ajax listener="#{assetArrivedListEditController.onManufactureChange}" />
-                                        </p:autoComplete>
-                                        <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('manufacturer')}" update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
-                                    </h:panelGroup>
+                                    <c:if test="#{not userContextService.activeSupplier()}">
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.arrivalDate}*</label>
+                                            <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                                        </h:panelGroup>
+                                        <!--                                    <h:panelGroup rendered="#{userContextService.activeSupplier()}">-->
+                                        <!--                                        <label class="label">#{msg.arrivalDate}</label>-->
+                                        <!--                                        <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}"   disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" value="#{assetArrivedListEditController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" converterMessage="#{msg.InvalidDateInputFormat}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />-->
+                                        <!--                                    </h:panelGroup>-->
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.arrivalListFunctionType}</label>
+                                            <p:inputText value="#{assetArrivedListEditController.selected.functionType}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                        </h:panelGroup>
+                                        <h:panelGroup>
+                                            <label class="label">#{msg.manufacture}</label>
+                                            <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.manufacture}"  scrollHeight="300"  forceSelection="true"
+                                                            disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                                <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onManufactureChange}" />
+                                                <p:ajax listener="#{assetArrivedListEditController.onManufactureChange}" />
+                                            </p:autoComplete>
+                                            <p:commandButton id="createManuButton" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('manufacturer')}" update="@(.typepanel) SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
+                                        </h:panelGroup>
+                                    </c:if>
                                     <h:panelGroup>
                                         <label class="label">#{msg.quantity}*</label>
                                         <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{assetArrivedListEditController.selected.quantity}"  readonly="#{assetArrivedListEditController.selected.status ne '1'}" required="true" requiredMessage="#{msg.quantity} #{msg.ValidationRequire}"/>
@@ -568,6 +570,9 @@
                                 <p:commandButton validateClient="true"  actionListener="#{assetArrivedListEditController.applyChange}" value="#{msg.Save}" update=":AssetArrivalEditForm  :growl" icon="ui-icon-check" rendered="#{assetArrivedListEditController.selected.status eq '1'}"/>
                                 <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="arrivalList?faces-redirect=true" update="display,:AssetArrivalEditForm :growl"/>
                                 <p:commandButton validateClient="true" value="#{msg.Submit}"  actionListener="#{assetArrivedListEditController.submitArrivalList}" update=":AssetArrivalEditForm :growl" disabled="#{assetArrivedListEditController.selected.status ne 1}" rendered="#{assetArrivedListEditController.selected.status eq '1'}"/>
+                                <p:commandButton validateClient="true" value="允许供应商编辑" style="" title="已完成或部分安装完成的允许编辑修改信息"  action="#{assetArrivedListEditController.updateIsEdit}" update=":AssetArrivalEditForm :growl" disabled="#{not empty assetArrivedListEditController.selected.isEdit}" rendered="#{userContextService.activeSupplier() and assetArrivedListEditController.getInstalledCount() gt 0}">
+                                    <p:confirm header="允许编辑" message="点击按钮后会置灰，待供应商在小程序上修改信息提交后复原" icon="ui-icon-warning"/>
+                                </p:commandButton>
                             </h:panelGroup>
 
                         </h:panelGroup>

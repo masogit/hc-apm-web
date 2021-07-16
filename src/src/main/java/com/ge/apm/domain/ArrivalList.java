@@ -223,6 +223,9 @@ public class ArrivalList implements Serializable {
     @Column(name = "approval_no")
     private String approvalNo;
 
+    @Column(name = "is_edit")
+    private Boolean isEdit;
+
     public String getId() {
         return id;
     }
@@ -582,6 +585,15 @@ public class ArrivalList implements Serializable {
     public void setSupplierStatus(String supplierStatus) {
         this.supplierStatus = supplierStatus;
     }
+
+    public Boolean getIsEdit() {
+        return isEdit;
+    }
+
+    public void setIsEdit(Boolean isEdit) {
+        this.isEdit = isEdit;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;
