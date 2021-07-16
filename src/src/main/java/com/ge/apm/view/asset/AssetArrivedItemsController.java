@@ -340,8 +340,10 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 //        }
 //        mergeContractNum = contractNumList.stream().distinct().collect(Collectors.toList()).toString();
         List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
-        List<String> arrivalListContractNum = dao.getArrivalListNotInstalledContractNum(orgUidList,UserContextService.getCurrentUserAccount().getUid(),ArrivalList.SupplierStatus.Saved.name());
-        mergeContractNum = arrivalListContractNum.toString().replace("[","").replace("]","");
+        if(orgUidList != null && !orgUidList.isEmpty()){
+            List<String> arrivalListContractNum = dao.getArrivalListNotInstalledContractNum(orgUidList,UserContextService.getCurrentUserAccount().getUid(),ArrivalList.SupplierStatus.Saved.name());
+            mergeContractNum = arrivalListContractNum.toString().replace("[","").replace("]","");
+        }
     }
     public String getMergeContractNum() {
         return mergeContractNum;
