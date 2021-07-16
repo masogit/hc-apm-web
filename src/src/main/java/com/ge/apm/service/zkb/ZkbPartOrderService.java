@@ -928,6 +928,11 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         HashMap<String, Integer> returnMap = new HashMap<String, Integer>();
         List<ZkbPartOrderReturn> zkbPartOrderReturnList = zkbPartOrderReturnRepository.findByPartOrderId(zkbPartOrder.getId());
         for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
+            if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+                if(!ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
+                    continue;
+                }
+            }
             if(returnMap.containsKey(r.getPartNo())){
                 Integer vv = returnMap.get(r.getPartNo());
                 vv += r.getQty();
@@ -1108,7 +1113,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                     zkbContract.setProbeQuotaSpecial((zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial()) - qty);
                     zkbContract.setProbeQuotaSpecialApply((zkbContract.getProbeQuotaSpecialApply() == null ? 0 : zkbContract.getProbeQuotaSpecialApply()) + qty);
                     zkbContractRepository.save(zkbContract);
-                    zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),ZkbPartOrder.class.getSimpleName(),userAccount);
+                    zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount);
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
                     ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
                     if(zkbContractCat != null){
@@ -1227,7 +1232,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(zkbPartOrder.getProbeQuotaType())){
                     zkbContract.setProbeQuotaSpecialUse((zkbContract.getProbeQuotaSpecialUse() == null ? 0 : zkbContract.getProbeQuotaSpecialUse()) + qty);
                     zkbContract.setProbeQuotaSpecialApply((zkbContract.getProbeQuotaSpecialApply() == null ? 0 : zkbContract.getProbeQuotaSpecialApply()) - qty);
-                    zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),ZkbPartOrder.class.getSimpleName(),userAccount);
+                    zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,opType,ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount);
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
                    /* zkbContract.setProbeQuotaHighUse((zkbContract.getProbeQuotaHighUse() == null ? 0 : zkbContract.getProbeQuotaHighUse()) + 1);
                     zkbContract.setProbeQuotaHighApply((zkbContract.getProbeQuotaHighApply() == null ? 0 : zkbContract.getProbeQuotaHighApply()) - 1);*/
@@ -1319,7 +1324,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         zkbContract.setProbeQuotaSpecialUse((zkbContract.getProbeQuotaSpecialUse() == null ? 0 : zkbContract.getProbeQuotaSpecialUse()) - qty);
                         zkbContract.setProbeQuotaSpecial((zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial()) + qty);
                         zkbContractRepository.save(zkbContract);
-                        zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),ZkbPartOrder.class.getSimpleName(),userAccount);
+                        zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),ZkbPartOrder.class.getSimpleName(),userAccount);
                     }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(zkbPartOrder.getProbeQuotaType())){
                         ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
                         if(zkbContractCat != null){
@@ -1791,6 +1796,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             Object[] split = queryList.get(i);
             String awb = split[0] == null ? "" : (String)split[0];
             String hyperlink = split[0] == null ? "" : (String)split[1];
+            if(StringUtils.isNotEmpty(hyperlink)){
+                if(hyperlink.indexOf("http") > -1){
+
+                }else{
+                    hyperlink = "";
+                }
+            }
             String carrier = split[0] == null ? "" : (String)split[2];
             String carrierChinese = split[0] == null ? "" : (String)split[3];
             SvcEngineLogisticsOrderDetailVO s = new SvcEngineLogisticsOrderDetailVO(awb,hyperlink,carrier,carrierChinese);
@@ -1806,8 +1818,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     public List<ZkbPartOrderCat> queryPartOrderCat(Date contractDate){
-        return zkbPartOrderCatRepository.queryByDate(contractDate,contractDate);
-        //return zkbPartOrderCatRepository.findByValueTypeIsNot(ZkbPartOrderCat.ValueType.HighValue.toString());
+        //return zkbPartOrderCatRepository.queryByDate(contractDate,contractDate);
+        return zkbPartOrderCatRepository.findByIsVaildIsNullOrIsVaild("Y");
     }
 
     public List<ZkbPartOrderCat> queryPartOrderCat(Date contractDate,List<String> typeList){

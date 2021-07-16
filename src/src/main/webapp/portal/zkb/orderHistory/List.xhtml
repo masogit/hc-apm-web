@@ -142,6 +142,9 @@
                         <p:column width="150" headerText="#{msg.zkbHistory_countQuantity}" >
                             <h:outputText value="#{item.countQuantity}"/>
                         </p:column>
+                        <p:column width="150" headerText="#{msg.zkbFePartOrder_remark}" >
+                            <h:outputText value="#{item.remark}"/>
+                        </p:column>
                         <p:column width="150" headerText="#{msg.zkbHistory_eventDate}" >
                             <h:outputText value="#{item.eventDate}">
                                 <f:convertDateTime pattern="yyyy-MM-dd" />

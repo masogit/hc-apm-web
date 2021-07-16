@@ -157,6 +157,7 @@ public class ZkbOrderHistoryService {
             orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_ownerName"), "setOwnerName");
             orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbHistory_status"), "setStatus");
             orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("Delete"),"setDelete");
+            orderHistoryInfoRow.setFieldStringValue(WebUtil.getMessage("zkbFePartOrder_remark"),"setRemark");
             if(orderHistoryVO.isNull()){
                 break;
             }
@@ -429,6 +430,7 @@ public class ZkbOrderHistoryService {
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_rowner"),orderHistory.getRowner());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_ownerName"),orderHistory.getOwnerName());
             orderHistoryMap.put(WebUtil.getMessage("zkbHistory_status"),orderHistory.getStatus());
+            orderHistoryMap.put(WebUtil.getMessage("zkbFePartOrder_remark"),orderHistory.getRemark());
             orderHistoryMapList.add(orderHistoryMap);
         }
         return orderHistoryMapList;

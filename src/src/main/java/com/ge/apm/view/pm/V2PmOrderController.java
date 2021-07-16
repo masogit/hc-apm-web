@@ -19,6 +19,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.constant.PmConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -231,7 +232,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Map<String, Object> selectedObjectMap = new HashMap();
     private PmReportService pmReportService;
     private MultiLevelApprovalService multiLevelApprovalService;
-
     private String queryAssetUid;
     private ConfigService configService;
 
@@ -1360,7 +1360,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         supplierController = WebUtil.getBean(SupplierController.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-
         token = UserContextService.getAccessToken();
         pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
@@ -1925,12 +1924,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                    }
                }
                if (!accessorySparePartsRequestList.isEmpty()) {
-                   LOGGER.info("保养工单生成申领单start!!!!");
-                   partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER);//生成申领单
+                   V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                   partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申领单
                }
                if (!accessorySparePartsBuyList.isEmpty()) {
-                   LOGGER.info("保养工单生成申购单start!!!!");
-                   partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER);//生成申购单
+                   V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                   partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申购单
                }
            }
             approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(true));
@@ -1956,7 +1955,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
             return ;
         }
-        selectedPmOrder.setApprovalStatus(ApprovalConstant.PM_APPROVAL_STATUS_AGREE);
+        selectedPmOrder.setApprovalStatus(PmConstant.PM_APPROVAL_STATUS_PENDING);
         dao.save(selectedPmOrder);
     }
 

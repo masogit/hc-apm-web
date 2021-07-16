@@ -277,11 +277,11 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractTypeIsEmpty"));
             isValidateData = false;
         }else{
-            if(!EnumUtils.isValidEnum(ZkbContract.ContractType.class,contractInfoVO.getContractType())){
+            /*if(!EnumUtils.isValidEnum(ZkbContract.ContractType.class,contractInfoVO.getContractType())){
                 item.put("status", ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTypeIsNotRange"));
                 isValidateData = false;
-            }
+            }*/
         }
 
         if(contractInfoVO.getStartDate() == null){
@@ -306,6 +306,11 @@ public class ZkbContractImportService {
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTenantUIDExist"));
                 isValidateData = false;
             }
+        }
+        if(StringUtils.isEmpty(contractInfoVO.getQuotaDeductType())){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item, "探头名额扣除类型不能为空！");
+            isValidateData = false;
         }
 
         int spareQuotaTotal = contractInfoVO.getSpareQuotaTotal() == null ? 0 : contractInfoVO.getSpareQuotaTotal();

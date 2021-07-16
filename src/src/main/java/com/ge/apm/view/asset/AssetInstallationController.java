@@ -19,6 +19,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.view.pm.RelRuleAssetController;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -58,6 +59,8 @@ public class AssetInstallationController {
     private UserAccountRepository userAccountDao;
     private ArrivalListRepository arrivalListDao;
     private RelRuleAssetRepository relRuleAssetDao;
+    private AssetInfoRepository assetInfoRepository;
+    private TableDefinitionRepository tableDefinitionRepository;
     private AssetInstallationService aiService;
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
@@ -67,7 +70,6 @@ public class AssetInstallationController {
     private CustomConfigService ccService;
 
     private List<V2_BlobObject> attachList;
-
     @Getter
     @Setter
     private List<I18nMessage> code68List;
@@ -156,6 +158,8 @@ public class AssetInstallationController {
         userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         arrivalListDao = WebUtil.getBean(ArrivalListRepository.class);
         relRuleAssetDao = WebUtil.getBean(RelRuleAssetRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+        tableDefinitionRepository = WebUtil.getBean(TableDefinitionRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         assetInstallationReportService = WebUtil.getBean(AssetInstallationReportService.class);
@@ -361,6 +365,75 @@ public class AssetInstallationController {
             }
 
         }
+        String arrivalListId = arrivalListItem.getArrivalListId();
+
+        if(arrivalListId != null ){
+            //获取到arrival_list实体类对象
+            ArrivalList arrivalList1 = arrivalListDao.findById(arrivalListId);
+            //获取到院区编号
+            String siteId = arrivalList1.getSiteUID();
+            //获取到医院编号
+            String hospitalId = arrivalList1.getHospitalUID();
+            //获取到集团编号
+            String institutionId = arrivalList1.getInstitutionUID();
+            //获取到租户编号
+            String tenantId = arrivalList1.getTenantUID();
+            //获取到订单号（同一个合同号会有多个订单号）
+            String orderNumber = arrivalList1.getName();
+            List<WorkflowConfig> workflowConfigItems = workflowDao.findBySiteUID(siteId);
+            WorkflowConfig workflowConfigItem =null;
+            if(workflowConfigItems.size()>0){
+                workflowConfigItem = workflowConfigItems.get(0);
+            }else{
+                workflowConfigItems = workflowDao.findByHospitalUID(hospitalId);
+                if(workflowConfigItems.size()>0){
+                    workflowConfigItem = workflowConfigItems.get(0);
+                }else{
+                    workflowConfigItems = workflowDao.findByInstitutionUID(institutionId);
+                    if(workflowConfigItems.size()>0){
+                        workflowConfigItem = workflowConfigItems.get(0);
+                    }else{
+                        workflowConfigItems = workflowDao.findByTenantUID(tenantId);
+                        if(workflowConfigItems.size()>0){
+
+                            workflowConfigItem = workflowConfigItems.get(0);
+                        }
+                    }
+                }
+            }
+            if(workflowConfigItem != null){
+                //获取到workflow中是否售后服务
+                Boolean anBool = workflowConfigItem.getAiNeedMaintenance();
+                if(anBool  == true){
+                    ArrivalList arrivalListToStatus = arrivalListDao.findByName(orderNumber);
+                    if(arrivalListToStatus.getStatus()!=3){
+                        return returnAction();
+                    }
+                    List<TableDefinition> tableDefinitions = tableDefinitionRepository.getBySiteUID(siteId);
+                    if(tableDefinitions.size()>0){
+                        //需要判断设备分类是否相同而跳转到I产规则管理
+                        //获取到安装设备的分类编号
+                        Integer assetGroupNum1 = arrivalList1.getAssetGroup();
+                        //获取到多个保养报告模板，循环每一个获取到设备分类的编号和安装设备编号对比
+                        //有相同编号的跳转到资产规则管理，没有跳转到保养报告模板
+                        for(TableDefinition tableDefinition : tableDefinitions){
+                            Integer assetGroupId = tableDefinition.getAssetGroup();
+                            if(assetGroupNum1.equals(assetGroupId)){
+                                //获取到assetinfo表中设备想对应的uid值
+                                List<String> assetIds = itemDao.getAssetUid(arrivalListId);
+                                //通过assetinfo中的uid值，获取到id值保存到集合
+                                RelRuleAssetController.assetInfoUids=assetIds;
+                                return "/portal/asset/arrived/ItemEdit2?faces-redirect=true";
+                            }else{
+                                return "/portal/reporter/schemaList?faces-redirect=true";
+                            }
+                        }
+                    }else{
+                        return "/portal/reporter/schemaList?faces-redirect=true";
+                    }
+                }
+            }
+        }
         return returnAction();
     }
     public String finishInstallBatch() {
@@ -479,44 +552,22 @@ public class AssetInstallationController {
         }
 
         finishInstallHandle(itemList);
-//      通过CurrentPersonUID获取到用户的id值
-//        String currentPersonUID = arrivalListItem.getCurrentPersonUID();
         //通过getArrivalListId获取到arrival_list的id值
-//        String arrivalListId = arrivalListItem.getArrivalListId();
+        String arrivalListId = arrivalListItem.getArrivalListId();
 
-//        if(arrivalListId != null ){
-//            return "/portal/electricSafety/measureElectricSafetyMain?faces-redirect=true";
-//            geapm/portal/electricSafety/measureElectricSafetyMain.xhtml
-//            geapm/portal/asset/arrived/arrivalItemsList.xhtml
-//            UserAccount userAccount=userAccountDao.getByUid(currentPersonUID);
-//            Integer userId = userAccount.getId();
-//            获取到合同的id值
-//            String arrivalListId = arrivalListItem.getArrivalListId();
-//            //通过合同值获取到医院，租户，分院等等信息
-//            List<String> arrivalList =arrivalListDao.getArrivalListHILT(arrivalListId);
-//            if(anBool == true){
-//
-//            }
+        if(arrivalListId != null ){
             //获取到arrival_list实体类对象
-//            ArrivalList arrivalList1 = arrivalListDao.findById(arrivalListId);
+            ArrivalList arrivalList1 = arrivalListDao.findById(arrivalListId);
             //获取到院区编号
-//            String siteId = arrivalList1.getSiteUID();
+            String siteId = arrivalList1.getSiteUID();
             //获取到医院编号
-//            String hospitalId = arrivalList1.getHospitalUID();
+            String hospitalId = arrivalList1.getHospitalUID();
             //获取到集团编号
-//            String institutionId = arrivalList1.getInstitutionUID();
+            String institutionId = arrivalList1.getInstitutionUID();
             //获取到租户编号
-//            String tenantId = arrivalList1.getTenantUID();
+            String tenantId = arrivalList1.getTenantUID();
             //获取到订单号（同一个合同号会有多个订单号）
-//            String orderNumber = arrivalList1.getName();
-        if(arrivalListItem != null ){
-            String siteId = arrivalListItem.getSiteUid();
-            //获取到医院编号
-            String hospitalId = arrivalListItem.getHospitalUid();
-            //获取到集团编号
-            String institutionId = arrivalListItem.getInstitutionUid();
-            //获取到租户编号
-            String tenantId = arrivalListItem.getTenantUid();
+            String orderNumber = arrivalList1.getName();
             //获取到arrival_list中的指定id值的所有院区，因为多个院区是list，只获取一个
             List<WorkflowConfig> workflowConfigItems = workflowDao.findBySiteUID(siteId);
             WorkflowConfig workflowConfigItem =null;
@@ -525,15 +576,15 @@ public class AssetInstallationController {
             }else{
                 workflowConfigItems = workflowDao.findByHospitalUID(hospitalId);
                 if(workflowConfigItems.size()>0){
-                    workflowConfigItem = workflowDao.findByHospitalUID(hospitalId).get(0);
+                    workflowConfigItem = workflowConfigItems.get(0);
                 }else{
                     workflowConfigItems = workflowDao.findByInstitutionUID(institutionId);
                     if(workflowConfigItems.size()>0){
-                        workflowConfigItem = workflowDao.findByInstitutionUID(institutionId).get(0);
+                        workflowConfigItem = workflowConfigItems.get(0);
                     }else{
                         workflowConfigItems = workflowDao.findByTenantUID(tenantId);
                         if(workflowConfigItems.size()>0){
-                            workflowConfigItem = workflowDao.findByTenantUID(tenantId).get(0);
+                            workflowConfigItem = workflowConfigItems.get(0);
                         }
                     }
                 }
@@ -542,11 +593,31 @@ public class AssetInstallationController {
                 //获取到workflow中是否售后服务
                 Boolean anBool = workflowConfigItem.getAiNeedMaintenance();
                 if(anBool  == true){
-                    RelRuleAsset relRuleAsset = relRuleAssetDao.findBySiteUID(siteId);
-                    if(relRuleAsset == null){
-                        return "/portal/reporter/schemaList?faces-redirect=true";
+                    ArrivalList arrivalListToStatus = arrivalListDao.findByName(orderNumber);
+                    if(arrivalListToStatus.getStatus()!=3){
+                        return returnAction();
+                    }
+                    List<TableDefinition> tableDefinitions = tableDefinitionRepository.getBySiteUID(siteId);
+                    if(tableDefinitions.size()>0){
+                        //需要判断设备分类是否相同而跳转到I产规则管理
+                        //获取到安装设备的分类编号
+                        Integer assetGroupNum1 = arrivalList1.getAssetGroup();
+                        //获取到多个保养报告模板，循环每一个获取到设备分类的编号和安装设备编号对比
+                        //有相同编号的跳转到资产规则管理，没有跳转到保养报告模板
+                        for(TableDefinition tableDefinition : tableDefinitions){
+                            Integer assetGroupId = tableDefinition.getAssetGroup();
+                            if(assetGroupNum1.equals(assetGroupId)){
+                                //获取到assetinfo表中设备想对应的uid值
+                                List<String> assetIds = itemDao.getAssetUid(arrivalListId);
+                                //通过assetinfo中的uid值，获取到id值保存到集合
+                                RelRuleAssetController.assetInfoUids=assetIds;
+                                return "/portal/asset/arrived/ItemEdit2?faces-redirect=true";
+                            }else{
+                                return "/portal/reporter/schemaList?faces-redirect=true";
+                            }
+                        }
                     }else{
-                        return "/portal/pm/relRuleAsset/List?faces-redirect=true";
+                        return "/portal/reporter/schemaList?faces-redirect=true";
                     }
                 }
             }

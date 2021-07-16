@@ -32,6 +32,8 @@ public class SimplePartsItemService {
 
     @Autowired
     private SimplePartsInventoryService partsInventoryService;
+    @Autowired
+    private SimplePartsCategoryService partsCategoryService;
 
     public void save(SimplePartsItem parts) {
         partsItemRepository.save(parts);
@@ -42,29 +44,8 @@ public class SimplePartsItemService {
         }
     }
 
-
     public TreeNode buildPartsCategoryTree(String tenantUid) {
-        List<SimplePartsCategory> resultList = partsDao.listPartsCategoryInHierarchy(tenantUid);
-        Map<String, TreeNode> treeNodeMap = new HashMap<>();
-        for (SimplePartsCategory partsGroup : resultList) {
-            TreeNode node = new DefaultTreeNode("partsCategory", partsGroup, null);
-            node.setRowKey(partsGroup.getId());
-            treeNodeMap.put(partsGroup.getId(), node);
-        }
-        TreeNode root = new DefaultTreeNode("root", null, null);
-        for (Map.Entry<String, TreeNode> entry : treeNodeMap.entrySet()) {
-            TreeNode currentNode = entry.getValue();
-            SimplePartsCategory currentData = (SimplePartsCategory) currentNode.getData();
-            if (null == currentData.getParentUid()) {
-                root.getChildren().add(currentNode);
-            } else {
-                TreeNode parentNode = treeNodeMap.get(currentData.getParentUid());
-                if (null != parentNode) {
-                    parentNode.getChildren().add(currentNode);
-                }
-            }
-        }
-        return root;
+        return partsCategoryService.buildPartsCategoryInTree(tenantUid);
     }
 
     public List<SimplePartsItem> findAll() {
@@ -90,5 +71,9 @@ public class SimplePartsItemService {
     public List<SimplePartsItem> getPartsItemList(String tenantUID) {
         List<SimplePartsItem> list = partsItemRepository.findByTenantUid(tenantUID);
         return list != null && list.size() > 0 ? list : Lists.newArrayList();
+    }
+
+    public void saveSelectedPartsEdit(Set<String> partsItemIds,SimplePartsCategory partsCategory) {
+        partsItemRepository.updatePartsItemPartsCategoryByIds(partsItemIds,partsCategory.getName(),partsCategory.getEncoded());
     }
 }

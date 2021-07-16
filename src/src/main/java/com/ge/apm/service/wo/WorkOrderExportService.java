@@ -72,7 +72,7 @@ public class WorkOrderExportService {
     @Autowired
     private WorkOrderReportMapper worDao;
 
-    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice){
+    public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap,String currentStep){
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
@@ -141,6 +141,59 @@ public class WorkOrderExportService {
         }
 
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
+        workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
+            boolean isReturn = true;
+            if(isReturn && filterMap.get("srNum")!=null && filterMap.get("srNum").length()>0) {   //报修单号
+                if(workOrderExportPojo.getSrNum()!=null) {
+                    isReturn = workOrderExportPojo.getSrNum().contains(filterMap.get("srNum").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn && filterMap.get("assetDepartNum")!=null && filterMap.get("assetDepartNum").length()>0) {  //设备编号
+                if(workOrderExportPojo.getAssetDepartNum()!=null) {
+                    isReturn = workOrderExportPojo.getAssetDepartNum().contains(filterMap.get("assetDepartNum").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn  && filterMap.get("assetName")!=null && filterMap.get("assetName").length()>0) {    //设备名称
+                if(workOrderExportPojo.getAssetName()!=null) {
+                    isReturn = workOrderExportPojo.getAssetName().contains(filterMap.get("assetName").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn && filterMap.get("assetFunctionType")!=null && filterMap.get("assetFunctionType").length()>0) {  //设备型号
+                if(workOrderExportPojo.getAssetFunctionType()!=null) {
+                    isReturn = workOrderExportPojo.getAssetFunctionType().contains(filterMap.get("assetFunctionType").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn  && filterMap.get("requestorName")!=null && filterMap.get("requestorName").length()>0) {  //报修人
+                if(workOrderExportPojo.getRequestorName()!=null && filterMap.get("requestorName")!=null) {
+                    isReturn = workOrderExportPojo.getRequestorName().contains(filterMap.get("requestorName").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn && filterMap.get("requestReason")!=null && filterMap.get("requestReason").length()>0) {  //故障描述
+                if(workOrderExportPojo.getRequestReason()!=null) {
+                    isReturn = workOrderExportPojo.getRequestReason().contains(filterMap.get("requestReason").trim());
+                } else {
+                    isReturn = false;
+                }
+            }
+            if(isReturn && currentStep!=null) {  //当前步骤
+                if(workOrderExportPojo.getCurrentStepId()!=null) {
+                    isReturn = Integer.parseInt(currentStep)==workOrderExportPojo.getCurrentStepId();
+                } else {
+                    isReturn = false;
+                }
+            }
+            return isReturn;
+        }).collect(Collectors.toList());
 
         for(WorkOrderExportPojo workOrderExportPojo : workOrderList){
             Map<String, Object> workOrderMap = new HashedMap();

@@ -110,6 +110,9 @@ public class ZkbPartOrderUserConfig implements Serializable {
     @Transient
     private String delFlag;
 
+    @Column(name = "test_status")
+    private String testStatus;
+
     public String getUsBackUpId() {
         return usBackUpId;
     }
@@ -303,5 +306,13 @@ public class ZkbPartOrderUserConfig implements Serializable {
 
     public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
+    }
+
+    public String getTestStatus() {
+        return testStatus;
+    }
+
+    public void setTestStatus(String testStatus) {
+        this.testStatus = testStatus;
     }
 }

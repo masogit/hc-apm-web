@@ -711,7 +711,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
                 zkbPartOrderService.returnAudit(selected,auditReturnList,currentUser);
                 boolean isAllYes = true;
-                for(ZkbPartOrderReturn r : auditReturnList){
+                for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
                     if(ZkbPartOrderReturn.DataStatusEnum.Reject.toString().equals(r.getDataStatus())){
                         isAllYes = false;
                     }
