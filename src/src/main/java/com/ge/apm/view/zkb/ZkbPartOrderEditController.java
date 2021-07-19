@@ -56,6 +56,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private String artificialType;
     private List<ZkbPartOrderCat> zkbPartOrderCatList ;
     private List<V2_BlobObject> v2_blobObjectList;
+    private List<V2_BlobObject> v2_probe_blobObjectList;
     private BlobFileService blobService;
     private List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList =new ArrayList<>();
     private AssetInfo assetInfo;
@@ -117,6 +118,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 assetInfo = new AssetInfo();
             }
             v2_blobObjectList = m.get("v2_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_blobObjectList");
+            v2_probe_blobObjectList = m.get("v2_probe_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_probe_blobObjectList");
             if (c != null) {
                 initZknPartCat(c.getStartDate());
             }
@@ -582,6 +584,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
         }
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
+            if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
+                flag=false;
+                errorLog += "院方合同证明不能为空！";
+            }else if(this.v2_blobObjectList.size() > 1){
+                flag=false;
+                errorLog += "院方合同证明只能上传单个！";
+            }
+        }
         if(selected.getRemainQty() < 0){
             flag=false;
             errorLog += "剩余数量不能小于0！";
@@ -725,6 +736,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         HashMap m = selectedWorkFlow;
         selected = zkbPartOrderService.create(m.get("id").toString(),m.get("assetId").toString(),zkbContract,this.selected,currentUser,selectionTenantInfo,m.get("srNum").toString());
         zkbPartOrderService.saveUploadFile(v2_blobObjectList,this.selected.getId());
+        if(v2_probe_blobObjectList != null && v2_probe_blobObjectList.size() > 0){
+            zkbPartOrderService.saveUploadFile(v2_probe_blobObjectList,this.selected.getId());
+        }
         zkbPartOrderService.sendEmail(selected,"",UserContextService.getAccessToken());
         zkbPartOrderService.sendMessage(selected,UserContextService.getAccessToken());
         if(zkbPartOrderService.checkContractLastDay(zkbContract,orderType)){
@@ -827,6 +841,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
             v2_blobObject.setBoUuid(selected.getId());
             v2_blobObjectList.add(v2_blobObject);
+            WebUtil.addSuccessMessage(v2_blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+    public void handleProveFileUpload(FileUploadEvent event){
+        V2_BlobObject v2_blobObject = blobService.uploadFile(event);
+        if (null != v2_blobObject) {
+            v2_blobObject.setBoType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
+            v2_blobObject.setBoSubType(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_PROVE);
+            v2_blobObject.setBoUuid(selected.getId());
+            v2_probe_blobObjectList.add(v2_blobObject);
             WebUtil.addSuccessMessage(v2_blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
@@ -1029,7 +1055,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.highCatList = highCatList;
     }
 
+    public List<V2_BlobObject> getV2_probe_blobObjectList() {
+        return v2_probe_blobObjectList;
+    }
 
+    public void setV2_probe_blobObjectList(List<V2_BlobObject> v2_probe_blobObjectList) {
+        this.v2_probe_blobObjectList = v2_probe_blobObjectList;
+    }
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {

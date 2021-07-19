@@ -300,13 +300,20 @@
                             <p:inputTextarea id="faultDescription" value="#{zkbPartOrderAuditController.selected.faultDescription}" disabled="true" />
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:panelGrid rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
+                    <p:panelGrid rendered="#{!(zkbPartOrderAuditController.orderType eq 'Artificial')}">
                         <h:panelGroup>
                             <p:dataList id="uploadList" value="#{zkbPartOrderAuditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">故障图片上传</f:facet>
                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                             </p:dataList>
-
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid  rendered="#{zkbPartOrderAuditController.orderType eq 'Probe'}">
+                        <h:panelGroup>
+                            <p:dataList  value="#{zkbPartOrderAuditController.v2_probe_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">院方合同证明</f:facet>
+                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            </p:dataList>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>

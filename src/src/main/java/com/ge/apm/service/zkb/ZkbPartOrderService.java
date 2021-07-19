@@ -599,7 +599,15 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             v2_blobObjectList = blobObjectRepository.findBySearchFilter(sfs);
             map.put("v2_blobObjectList",v2_blobObjectList);
         }
-
+        if(zkbPartOrder != null && ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
+            List<V2_BlobObject> v2_probe_blobObjectList = new ArrayList<>();
+            List<SearchFilter> sfs = new ArrayList();
+            sfs.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, zkbPartOrder.getId()));
+            sfs.add(new SearchFilter("boType", SearchFilter.Operator.EQ, V2_BlobObject.BO_TYPE_ZKB_PART_ORDER));
+            sfs.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_PROVE));
+            v2_probe_blobObjectList = blobObjectRepository.findBySearchFilter(sfs);
+            map.put("v2_probe_blobObjectList",v2_probe_blobObjectList);
+        }
         map.put("zkbPartOrder",zkbPartOrder);
         return map;
     }
