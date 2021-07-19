@@ -37,6 +37,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String orderType;
     private String artificialType;
     private List<V2_BlobObject> v2_blobObjectList;
+    private List<V2_BlobObject> v2_probe_blobObjectList;
     private boolean showTech=false;
     private boolean showManage=false;
     private boolean showDirector = false;
@@ -117,6 +118,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 v2_listHashMap.add(mm);
             }
             v2_blobObjectList = m.get("v2_blobObjectList") == new ArrayList<>() ? null : (List<V2_BlobObject>)m.get("v2_blobObjectList");
+            v2_probe_blobObjectList = m.get("v2_probe_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_probe_blobObjectList");
             fieldRendered();
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selectedId,isChoseAdmin);
 
@@ -1340,7 +1342,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         this.svcEngineLogisticsLineVOList = svcEngineLogisticsLineVOList;
     }
 
-    //endregion
+    public List<V2_BlobObject> getV2_probe_blobObjectList() {
+        return v2_probe_blobObjectList;
+    }
+
+    public void setV2_probe_blobObjectList(List<V2_BlobObject> v2_probe_blobObjectList) {
+        this.v2_probe_blobObjectList = v2_probe_blobObjectList;
+    }
+//endregion
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {
