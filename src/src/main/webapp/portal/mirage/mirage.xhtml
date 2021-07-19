@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <iframe id="chartFrame" src="" width="100%" height="900">
+
+        </iframe>
+        <script type="text/javascript">
+            window.onload = function() {
+                const search = window.location.search
+                const paramsUrl = decodeURIComponent(search).replace(/^\?/, '')
+                const paramArr = paramsUrl.split('&amp;')
+                let route = ''
+                let routeParam = '?'
+                paramArr.forEach(param=>{
+                    const nameValue = param.split('=')
+                    if(nameValue[0] === 'route' ){
+                        route = nameValue[1]
+                    }else{
+                        routeParam += param;
+                    }
+                })
+
+                const origin = window.location.origin
+                const url = origin + "/mirage" + route + routeParam
+                console.log("Going to: ", url)
+                document.getElementById("chartFrame").src = url
+            }
+        </script>
+    </ui:define>
+</ui:composition>
