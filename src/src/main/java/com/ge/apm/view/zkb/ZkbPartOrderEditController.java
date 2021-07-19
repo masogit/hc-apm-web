@@ -95,6 +95,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             selected.setRequestUser(currentUser.getName());
             selected.setRequestPhone(currentUser.getTelephone());
             v2_blobObjectList = new ArrayList<>();
+            v2_probe_blobObjectList = new ArrayList<>();
         } else if("Copy".equals(actionName)){
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             HashMap m = zkbPartOrderService.queryEditInfo(selectedId);
