@@ -20,7 +20,7 @@ public interface ArrivalListItemRepository extends GenericRepositoryUUID<Arrival
 
     public List<ArrivalListItem> findByArrivalListId(String arrivalListId);
 
-    @Query(value = "select listItem.* from arrival_list list,arrival_list_item listItem where list.id=listItem.arrival_list_id and list.contract_num=?1 and listItem.clinical_dept_uid=?2 and listItem.install_status=?3",nativeQuery=true)
+    @Query(value = "select listItem.* from arrival_list list,arrival_list_item listItem where list.id=listItem.arrival_list_id and list.contract_num=?1 and listItem.clinical_dept_uid=?2 and listItem.install_status=?3 order by listItem.function_type",nativeQuery=true)
     List<ArrivalListItem> getArrivalListItem(String contractNum, String clinicalDeptUID, String installStatus);
 
     @Query(value = "select distinct(list.contract_num) from arrival_list list,arrival_list_item item where list.id=item.arrival_list_id and (list.site_uid in(?1) or list.tenant_uid in(?1) or list.institution_uid in(?1) or list.hospital_uid in(?1) or item.current_person_uid=?2 ) and list.process_type='Normal' and list.supplier_status =?3 and list.contract_num !='' and item.install_status='new'",nativeQuery=true)
