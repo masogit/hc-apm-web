@@ -886,6 +886,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
     }
 
+    public void updateIsEdit(){
+        selected.setIsEdit(true);
+        dao.updateIsEdit(selected.getId());
+    }
 
     public void saveNewSupplier() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
