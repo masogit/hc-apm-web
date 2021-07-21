@@ -160,6 +160,17 @@ public class TenantInfo implements Serializable {
     @Column(name = "qrcode_editable")
     private Boolean qrCodeEditable;
 
+    @Column(name = "is_support_multi_language")
+    private Boolean isSupportMultiLanguage;//是否支持同租户多语言 0、不支持 1、支持
+
+    public Boolean getIsSupportMultiLanguage() {
+        return isSupportMultiLanguage;
+    }
+
+    public void setIsSupportMultiLanguage(Boolean isSupportMultiLanguage) {
+        isSupportMultiLanguage = isSupportMultiLanguage;
+    }
+
     public boolean getQrCodeEditable() {
         if(null == qrCodeEditable){
             return false;
