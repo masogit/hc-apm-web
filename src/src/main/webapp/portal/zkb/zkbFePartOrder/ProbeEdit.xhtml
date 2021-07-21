@@ -231,7 +231,7 @@
                             <label class="label">#{msg.zkbFePartOrder_zkbPartOrderCat}*</label>
                             <p:autoComplete disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" dropdown="true" value="#{zkbFePartOrderProbeController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="#{msg.zkbFePartOrder_zkbPartOrderCat} #{msg.ValidationRequire}"
                                             completeMethod="#{zkbFePartOrderProbeController.autoCompleteCat}" var="t" itemLabel="#{t.catModel}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
-                                <p:ajax event="itemSelect" update="valueTypeGroup" listener="#{zkbFePartOrderProbeController.zkbPartOrderCatSelect}" />
+<!--                                <p:ajax event="itemSelect" update="valueTypeGroup" listener="#{zkbFePartOrderProbeController.zkbPartOrderCatSelect}" />-->
                             </p:autoComplete>
                         </c:if>
                     </h:panelGroup>
