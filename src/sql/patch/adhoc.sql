@@ -10,3 +10,7 @@ DELETE FROM  sys_role WHERE name in ('SupplierAdmin','SupplierSales','SupplierFE
 --ACCT维修消息配置添加两个选项
 INSERT INTO msg_config (id,msg_bind_field,msg_name,msg_status,msg_name_en) VALUES ((select count(*)+1 from msg_config),'functionType', '设备型号', '0', 'Device model');
 INSERT INTO msg_config (id,msg_bind_field,msg_name,msg_status,msg_name_en) VALUES ((select count(*)+1 from msg_config),'serialNum', '制造商序列号', '0', 'Manufacturer serial number');
+
+--测试数据隔离
+UPDATE zkb_part_order_user_config set test_status = 'f';
+UPDATE zkb_part_order_user_config set test_status = 't' where login_name like 'test.%';
