@@ -557,7 +557,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         String opType=ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderDeduct.toString();
         String orderType =null;
         if("DI".equals(zkbContract.getContractType())
-                ||"PCB".equals(zkbContract.getContractType()))
+                ||"PCB".equals(zkbContract.getContractType())
+                ||"PCB MVS".equals(zkbContract.getContractType()))
         {
             orderType =ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString();
             switch(type){
@@ -610,7 +611,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         String opType=ZkbContractQuotaLog.OpTypeEnum.ZkbFePartOrderDeduct.toString();
         String orderType =null;
         if("DI".equals(zkbContract.getContractType())
-                ||"PCB".equals(zkbContract.getContractType()))
+                ||"PCB".equals(zkbContract.getContractType())
+                ||"PCB MVS".equals(zkbContract.getContractType()))
         {
             orderType =ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString();
             switch(type){
