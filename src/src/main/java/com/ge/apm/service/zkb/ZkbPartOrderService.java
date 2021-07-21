@@ -1830,8 +1830,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         return zkbPartOrderCatRepository.findByIsVaildIsNullOrIsVaild("Y");
     }
 
-    public List<ZkbPartOrderCat> queryPartOrderCat(Date contractDate,List<String> typeList){
-        return zkbPartOrderCatRepository.getByStartDateLessThanEqualAndEndDateGreaterThanEqualAndValueTypeIn(contractDate,contractDate,typeList);
+    public List<ZkbPartOrderCat> queryPartOrderCat(List<String> typeList){
+        return zkbPartOrderCatRepository.getByValueTypeInAndIsVaildIsNot(typeList,"N");
     }
 
     public ZkbPartOrderRepository getZkbPartOrderRepository() {
