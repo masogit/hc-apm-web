@@ -152,6 +152,8 @@ public class TenantInfoConfigService {
 		}
 		for (int i = 0; i < menuList.size(); ++i) {
 			TenantInfoConfigItem tempItem = menuList.get(i);
+			//默认不勾选 菜单
+			defaultNotSelectedMenu(tempItem);
 			if(edition.equals(AUDIT_VERSION)||edition.equals(SWAP_CENTER_VERSION)){
 				resetAuditOrSwapCenterVersion(tempItem);
 			}else{
@@ -330,6 +332,18 @@ public class TenantInfoConfigService {
 
 		if (root != null) {
 			buildRoot();
+		}
+	}
+
+	private void defaultNotSelectedMenu(TenantInfoConfigItem item) {
+		String key = item.getKey();
+		switch (key){
+			case "supplierManagement":
+			case "supplierManagement.supplierUser":
+			case "supplierManagement.tenantSupplierMapping":
+			case "supplierManagement.assetBindSupplier":
+			case "supplierManagement.assetBindSupplierFE":
+				item.setValue(false);
 		}
 	}
 
