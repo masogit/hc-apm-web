@@ -362,7 +362,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         Integer reaminApplyCount = null;
         if("DI".equals(zkbContract.getContractType())
-                ||"PCB".equals(zkbContract.getContractType()))
+                ||"PCB".equals(zkbContract.getContractType())
+                ||"PCB MVS".equals(zkbContract.getContractType()))
         {
             reaminApplyCount=zkbContract.getSpareArtificail();
         }else if("CCS".equals(zkbContract.getContractType())
