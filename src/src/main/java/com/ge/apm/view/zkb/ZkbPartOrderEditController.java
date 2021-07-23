@@ -658,19 +658,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         err += "探头特殊剩余名额只能选择特殊探头！";
                     }
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
-                    /*if(zkbContract.getProbeQuotaHigh() == null || zkbContract.getProbeQuotaHigh() <= 0){
-                        f = true;
-                        err = "合同探头高值剩余名额小于等于0，请检查！";
-                    }
-                    if(!ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
-                        f = true;
-                        err += "探头高值剩余名额只能选择高值探头！";
-                    }*/
+
                 }
             }else{
-                if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() < 0){
-                    f = true;
-                    err = "合同探头任意剩余名额小于等于0，请检查！";
+                if(CopyByInvok.F.equals(selected.getHighCatFlag())){
+                    if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
+                        f = true;
+                        err = "不能选择高值探头！";
+                    }
+                    if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() < 0){
+                        f = true;
+                        err = "合同探头任意剩余名额小于等于0，请检查！";
+                    }
                 }
             }
             if(f){
