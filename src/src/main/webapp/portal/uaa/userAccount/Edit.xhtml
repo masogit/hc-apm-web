@@ -68,6 +68,14 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">#{msg.defaultLang}</label>
+                            <p:selectOneMenu value="#{userAccountController.selected.defaultLanguage}">
+                                <f:selectItem itemLabel="zh" itemValue="zh"/>
+                                <f:selectItem itemLabel="en" itemValue="en"/>
+                                <!--<f:selectItem itemLabel="tw" itemValue="tw"/>-->
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">#{msg.userPosition}</label>
                             <p:selectOneMenu value="#{userAccountController.selected.position}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="" noSelectionOption="true" />

@@ -534,6 +534,9 @@ public class ZkbFePartOrder {
     @Transient
     private String yesOrNo;
 
+    @Column(name = "double_qty")
+    private Boolean doubleQty;
+
     /**
      * 申请备件列表
      */
@@ -1256,5 +1259,13 @@ public class ZkbFePartOrder {
 
     public void setContractCatId(String contractCatId) {
         this.contractCatId = contractCatId;
+    }
+
+    public Boolean getDoubleQty() {
+        return doubleQty;
+    }
+
+    public void setDoubleQty(Boolean doubleQty) {
+        this.doubleQty = doubleQty;
     }
 }

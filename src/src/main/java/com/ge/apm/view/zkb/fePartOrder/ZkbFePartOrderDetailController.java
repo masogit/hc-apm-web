@@ -236,7 +236,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         {
             ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
             if("DI".equals(zkbContract.getContractType())
-                    ||"PCB".equals(zkbContract.getContractType()))
+                    ||"PCB".equals(zkbContract.getContractType())
+                    ||"PCB MVS".equals(zkbContract.getContractType()))
             {
                 if(zkbContract.getSpareArtificail()==null||zkbContract.getSpareArtificail()<=0)
                 {
