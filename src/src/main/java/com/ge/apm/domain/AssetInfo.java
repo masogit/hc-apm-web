@@ -149,6 +149,12 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "clinical_dept_name")
     private String clinicalDeptName;//所属科室
 
+    @Column(name = "accounting_dept_uid", columnDefinition = "CHAR(32)")
+    private String accountingDeptUID;//账号科室
+
+    @Column(name = "modality_type")
+    private String modalityType;
+
     @Transient
     private String assetDeptName;//使用科室
 
@@ -1002,6 +1008,22 @@ public class AssetInfo implements ChineseName,Serializable {
             this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
         }
 
+    }
+
+    public String getAccountingDeptUID() {
+        return accountingDeptUID;
+    }
+
+    public void setAccountingDeptUID(String accountingDeptUID) {
+        this.accountingDeptUID = accountingDeptUID;
+    }
+
+    public String getModalityType() {
+        return modalityType;
+    }
+
+    public void setModalityType(String modalityType) {
+        this.modalityType = modalityType;
     }
 
     public String getAliasName() {
