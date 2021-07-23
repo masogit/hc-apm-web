@@ -598,7 +598,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             }
         }
         this.zkbContractRepository.save(zkbContract);
-        this.zkbContractQuotaLogService.saveData(zkbContract,null,zkbFePartOrder,opType,orderType,"zkbFePartOrder",userAccount);
+        this.zkbContractQuotaLogService.saveData(zkbContract,null,zkbFePartOrder,opType,orderType,"zkbFePartOrder",userAccount,null);
     }
 
     /**
@@ -662,7 +662,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             }
         }
         this.zkbContractRepository.save(zkbContract);
-        this.zkbContractQuotaLogService.saveData(zkbContract,null,zkbFePartOrder,opType,orderType,"zkbFePartOrder",userAccount);
+        this.zkbContractQuotaLogService.saveData(zkbContract,null,zkbFePartOrder,opType,orderType,"zkbFePartOrder",userAccount,null);
     }
 
     /**
@@ -863,7 +863,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             this.zkbContractRepository.save(zkbContract);
             if(record&&StringUtils.isNotBlank(orderType))
             {
-                this.zkbContractQuotaLogService.saveData(zkbContract,null,zkbFePartOrder,opType,orderType,"zkbFePartOrder",userAccount);
+                this.zkbContractQuotaLogService.saveData(zkbContract,null,zkbFePartOrder,opType,orderType,"zkbFePartOrder",userAccount,null);
             }
 
     }
