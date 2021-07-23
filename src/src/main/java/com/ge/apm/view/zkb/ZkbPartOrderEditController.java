@@ -315,7 +315,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
                 initHighList(zkbContract.getId());
-            } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
+            } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){ 
                 if(!"2".equals(artificialType)){
                     if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
                         if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 0){
@@ -586,10 +586,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-            if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
+            if(this.v2_probe_blobObjectList == null || this.v2_probe_blobObjectList.size() == 0){
                 flag=false;
                 errorLog += "院方合同证明不能为空！";
-            }else if(this.v2_blobObjectList.size() > 1){
+            }else if(this.v2_probe_blobObjectList.size() > 1){
                 flag=false;
                 errorLog += "院方合同证明只能上传单个！";
             }
