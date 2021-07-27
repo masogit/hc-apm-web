@@ -110,6 +110,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             if(zkbContract != null){
                 contractList = new ArrayList<>();
                 contractList.add(zkbContract);
+            }else{
+                zkbContract = new ZkbContract();
+                return;
             }
             selectedWorkFlow = m.get("V2_WorkOrder") == null ? null : (V2_WorkOrder)m.get("V2_WorkOrder");
             HashMap<String, Object> mm = m.get("v2") == null ? null : (HashMap<String, Object>)m.get("v2");

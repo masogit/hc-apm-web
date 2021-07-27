@@ -51,6 +51,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private HashMap<String, Object> selectedWorkFlow;
     private List<HashMap<String, Object>> v2_listHashMap;
     private List<ZkbContract> contractList;
+    private ZkbContract selectedContract;
     private ZkbPartOrderItem zkbPartOrderItem;
     private String orderType;
     private String artificialType;
@@ -66,7 +67,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     private Integer currentScore = 0;
     private String currentScoreText;
     private boolean currentScoreFlag =false;
-    private boolean probeQuotaFlag = false;
+    //private boolean probeQuotaFlag = false;
     private List<HashMap<String, String>> highCatList = new ArrayList<>();
     private ZkbContractAssetRepository zkbContractAssetRepository;
 
@@ -105,10 +106,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 orderType = this.selected.getOrderType();
             }
             artificialType = this.selected.getArtificialType();
-            ZkbContract c = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
-            if(c != null){
+            selectedContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
+            if(selectedContract != null){
                 contractList = new ArrayList<>();
-                contractList.add(c);
+                contractList.add(selectedContract);
             }
             HashMap<String, Object> mm = m.get("v2") == null ? null : (HashMap<String, Object>)m.get("v2");
             v2_listHashMap = new ArrayList<>();
@@ -120,15 +121,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             v2_blobObjectList = m.get("v2_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_blobObjectList");
             v2_probe_blobObjectList = m.get("v2_probe_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_probe_blobObjectList");
-            if (c != null) {
-                initZknPartCat(c.getStartDate());
+            if (selectedContract != null) {
+                initZknPartCat(selectedContract.getStartDate());
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
                 zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType("TechnicalPending",ZkbPartOrder.CONFIG_US);
             }
             calcRemainQty();
             orderAnnotationChange();
-            if(zkbPartOrderService.checkContractLastDay(c,orderType)){
+            if(zkbPartOrderService.checkContractLastDay(selectedContract,orderType)){
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请电话联络400先开出工单，避免由于次日审批结束无法订购备件！", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 FacesMessage message2 = new FacesMessage(FacesMessage.SEVERITY_ERROR, "电话：400-812-8188。", "");
@@ -141,10 +142,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(StringUtils.isNotEmpty(this.selected.getOrderType())){
                 orderType = this.selected.getOrderType();
             }
-            ZkbContract c = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
-            if(c != null){
+            selectedContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
+            if(selectedContract != null){
                 contractList = new ArrayList<>();
-                contractList.add(c);
+                contractList.add(selectedContract);
+                initZknPartCat(selectedContract.getStartDate());
             }
             HashMap<String, Object> mm = m.get("v2") == null ? null : (HashMap<String, Object>)m.get("v2");
             v2_listHashMap = new ArrayList<>();
@@ -153,9 +155,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             selectedWorkFlow = mm;
             v2_blobObjectList = m.get("v2_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_blobObjectList");
-            if (c != null) {
-                initZknPartCat(c.getStartDate());
-            }
         }
     }
 
@@ -272,9 +271,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             contractList = new ArrayList<>();
             return;
         }else if(contractList.size() == 1){
-            ZkbContract zkbContract = contractList.get(0);
+            selectedContract = contractList.get(0);
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
+                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(selectedContract.getId(),assetInfo.getUid());
                 if(zkbContractAsset != null && StringUtils.isNotEmpty(zkbContractAsset.getAssetType())){
                     if("highMachine".equals(zkbContractAsset.getAssetType())){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "设备为高端机，请检查！", "");
@@ -285,15 +284,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }
             }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
-                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                    if(zkbContract.getSpareQuota() == null || zkbContract.getSpareQuota() < 0){
+                if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
+                    if(selectedContract.getSpareQuota() == null || selectedContract.getSpareQuota() < 0){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件数量小于0，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         contractList = new ArrayList<>();
                         return;
                     }
                 }else{
-                    if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() < 0){
+                    if(selectedContract.getSpareArtificail() == null || selectedContract.getSpareArtificail() < 0){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同备件+人工+保养剩余名额小于0，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         contractList = new ArrayList<>();
@@ -301,31 +300,28 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
-                    probeQuotaFlag = false;
-                }else{
-                    probeQuotaFlag = true;
-                }
-                if(!probeQuotaFlag){
-                    if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() <= 0){
+                if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selectedContract.getQuotaDeductType())){
+                    if(selectedContract.getProbeQuota() == null || selectedContract.getProbeQuota() <= 0){
                         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同探头数量小于等于0，请检查！", "");
                         FacesContext.getCurrentInstance().addMessage(null, message);
                         contractList = new ArrayList<>();
                         return;
                     }
+                }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType())){
+
                 }
-                initHighList(zkbContract.getId());
+                initHighList(selectedContract.getId());
             } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){ 
                 if(!"2".equals(artificialType)){
-                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                        if(zkbContract.getGeArtificialSupportTimes() == null || zkbContract.getGeArtificialSupportTimes() <= 0){
+                    if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
+                        if(selectedContract.getGeArtificialSupportTimes() == null || selectedContract.getGeArtificialSupportTimes() <= 0){
                             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "人工支持次数小于等于0，请检查！", "");
                             FacesContext.getCurrentInstance().addMessage(null, message);
                             contractList = new ArrayList<>();
                             return;
                         }
                     }else{
-                        if(zkbContract.getSpareArtificail() == null || zkbContract.getSpareArtificail() <= 0){
+                        if(selectedContract.getSpareArtificail() == null || selectedContract.getSpareArtificail() <= 0){
                             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "备件+人工+保养剩余名额小于等于0，请检查！", "");
                             FacesContext.getCurrentInstance().addMessage(null, message);
                             contractList = new ArrayList<>();
@@ -361,9 +357,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     zkbPartOrderUserConfigList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameIsNotContaining("TechnicalPending",ZkbPartOrder.CONFIG_US,ZkbPartOrder.DATA_TYPE_TEST);
                 }
             }
-            selected.setRegion(zkbContract.getRegion());
-            initZknPartCat(zkbContract.getStartDate());
-            if(zkbPartOrderService.checkContractLastDay(zkbContract,orderType)){
+            selected.setRegion(selectedContract.getRegion());
+            initZknPartCat(selectedContract.getStartDate());
+            if(zkbPartOrderService.checkContractLastDay(selectedContract,orderType)){
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "请电话联络400先开出工单，避免由于次日审批结束无法订购备件!", "");
                 FacesContext.getCurrentInstance().addMessage(null, message);
                 FacesMessage message2 = new FacesMessage(FacesMessage.SEVERITY_ERROR, "电话：400-812-8188。", "");
@@ -376,10 +372,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         }
         calcRemainQty();
-
-    }
-
-    public void contractRowSelected(SelectEvent event){
 
     }
 
@@ -459,44 +451,49 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void calcRemainQty(){
-        if(contractList != null && contractList.size() > 0){
-            ZkbContract zkbContract = contractList.get(0);
+        if(selectedContract != null){
+            if(this.selected.getQty() == null){
+                this.selected.setRemainQty(null);
+                return;
+            }
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
                 if(!"2".equals(selected.getArtificialType())) {
-                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                        Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
+                    if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
+                        Integer contractCount = selectedContract.getSpareQuota() == null ? 0 : selectedContract.getSpareQuota();
                         this.selected.setRemainQty(contractCount - this.selected.getQty());
                     }else{
-                        Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                        Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
                         this.selected.setRemainQty(contractCount - this.selected.getQty());
                     }
                 }else {
-                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                        Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
+                    if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
+                        Integer contractCount = selectedContract.getSpareQuota() == null ? 0 : selectedContract.getSpareQuota();
                         this.selected.setRemainQty(contractCount);
                     }else{
-                        Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                        Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
                         this.selected.setRemainQty(contractCount);
                     }
                 }
             }else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-                if(probeQuotaFlag){
-                    if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(selected.getProbeQuotaType())){
-                        Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(selected.getProbeQuotaType())){
-                        Integer contractCount = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())){
-                        Integer contractCount = zkbContract.getProbeQuotaSpecial() == null ? 0 : zkbContract.getProbeQuotaSpecial();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }
-                }else{
-                    if(StringUtils.isEmpty(selected.getHighCatFlag()) || CopyByInvok.F.equals(selected.getHighCatFlag())){
-                        Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
-                        this.selected.setRemainQty(contractCount - this.selected.getQty());
-                    }else{
-                        this.selected.setRemainQty(0);
+                if(StringUtils.isNotEmpty(selectedContract.getQuotaDeductType())){
+                    if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType())){
+                        if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(selected.getProbeQuotaType())){
+                            Integer contractCount = selectedContract.getProbeQuota() == null ? 0 : selectedContract.getProbeQuota();
+                            this.selected.setRemainQty(contractCount - this.selected.getQty());
+                        }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(selected.getProbeQuotaType())){
+                            Integer contractCount = selectedContract.getProbeQuotaNormal() == null ? 0 : selectedContract.getProbeQuotaNormal();
+                            this.selected.setRemainQty(contractCount - this.selected.getQty());
+                        }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())){
+                            Integer contractCount = selectedContract.getProbeQuotaSpecial() == null ? 0 : selectedContract.getProbeQuotaSpecial();
+                            this.selected.setRemainQty(contractCount - this.selected.getQty());
+                        }
+                    }else if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selectedContract.getQuotaDeductType())){
+                        if(StringUtils.isEmpty(selected.getHighCatFlag()) || CopyByInvok.F.equals(selected.getHighCatFlag())){
+                            Integer contractCount = selectedContract.getProbeQuota() == null ? 0 : selectedContract.getProbeQuota();
+                            this.selected.setRemainQty(contractCount - this.selected.getQty());
+                        }else{
+                            this.selected.setRemainQty(0);
+                        }
                     }
                 }
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
@@ -504,11 +501,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(CopyByInvok.T.equals(selected.getScoreFlag())){
                         this.selected.setRemainQty(0);
                     }else {
-                        if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                            Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
+                        if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
+                            Integer contractCount = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
                             this.selected.setRemainQty(contractCount);
                         }else{
-                            Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                            Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
                             this.selected.setRemainQty(contractCount);
                         }
                     }
@@ -516,11 +513,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(CopyByInvok.T.equals(selected.getScoreFlag())){
                         this.selected.setRemainQty(0);
                     }else {
-                        if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                            Integer contractCount = zkbContract.getGeArtificialSupportTimes() == null ? 0 : zkbContract.getGeArtificialSupportTimes();
+                        if(ZkbContract.ContractType.CCS.toString().equals(selectedContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(selectedContract.getContractType())){
+                            Integer contractCount = selectedContract.getGeArtificialSupportTimes() == null ? 0 : selectedContract.getGeArtificialSupportTimes();
                             this.selected.setRemainQty(contractCount - this.selected.getQty());
                         }else{
-                            Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                            Integer contractCount = selectedContract.getSpareArtificail() == null ? 0 : selectedContract.getSpareArtificail();
                             this.selected.setRemainQty(contractCount - this.selected.getQty());
                         }
                     }
@@ -586,15 +583,20 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
         }
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-            if(this.v2_probe_blobObjectList == null || this.v2_probe_blobObjectList.size() == 0){
-                flag=false;
-                errorLog += "院方合同证明不能为空！";
-            }else if(this.v2_probe_blobObjectList.size() > 1){
-                flag=false;
-                errorLog += "院方合同证明只能上传单个！";
+            if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType()) && CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
+                if(this.v2_probe_blobObjectList == null || this.v2_probe_blobObjectList.size() == 0){
+                    flag=false;
+                    errorLog += "院方合同证明不能为空！";
+                }else if(this.v2_probe_blobObjectList.size() > 1){
+                    flag=false;
+                    errorLog += "院方合同证明只能上传单个！";
+                }
             }
         }
-        if(selected.getRemainQty() < 0){
+        if(selected.getRemainQty() == null){
+            flag=false;
+            errorLog += "剩余数量不能为空！";
+        }else if(selected.getRemainQty() < 0){
             flag=false;
             errorLog += "剩余数量不能小于0！";
         }
@@ -604,8 +606,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             return "";
         }
 
-        ZkbContract zkbContract = contractList.get(0);
-        zkbContract = zkbPartOrderService.getZkbContractRepository().findById(zkbContract.getId());
+        //实时获取合同进行校验数量
+        ZkbContract zkbContract = zkbPartOrderService.getZkbContractRepository().findById(selectedContract.getId());
         if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
             if(!"2".equals(selected.getArtificialType())){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
@@ -629,7 +631,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         } else if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             boolean f = false;
             String err = "";
-            if(probeQuotaFlag){
+            if(StringUtils.isEmpty(zkbContract.getQuotaDeductType())){
+                f = true;
+                err = "合同探头扣除类型为空，请检查！";
+            }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())){
                 if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(selected.getProbeQuotaType())){
                     if(zkbContract.getProbeQuota() == null || zkbContract.getProbeQuota() <= 0){
                         f = true;
@@ -660,7 +665,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                 }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
 
                 }
-            }else{
+            }else if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())){
                 if(CopyByInvok.F.equals(selected.getHighCatFlag())){
                     if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(selected.getZkbPartOrderCat().getValueType())){
                         f = true;
@@ -707,8 +712,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         selected.setDataFlag(0);
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
-            if((probeQuotaFlag && !ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())) ||
-                (!probeQuotaFlag && "f".equals(selected.getHighCatFlag()))){
+            boolean onlineEngineFlag= false;
+            if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType()) && !ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
+                onlineEngineFlag = true;
+            }
+            if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType()) && CopyByInvok.F.equals(selected.getHighCatFlag())){
+                onlineEngineFlag = true;
+            }
+            if(onlineEngineFlag){
                 this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
                 if(this.selected.getOnlineEngine() != null){
                     if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
@@ -773,27 +784,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void zkbPartOrderCatSelect(){
-        if(probeQuotaFlag){
-            if(this.selected.getZkbPartOrderCat() != null){
-                if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                    this.selected.setQty(1);
-                    valueTypeTips = "";
-                }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                    this.selected.setQty(0);
-                    valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
-                }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                    ZkbContract c = contractList.get(0);
-                    if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(c.getQuotaDeductType())){
-                        this.selected.setQty(2);
-                    }else{
-                        this.selected.setQty(1);
-                    }
-                    valueTypeTips = "";
-                }
-            }
-        }else{
-            if(StringUtils.isEmpty(selected.getHighCatFlag()) || CopyByInvok.F.equals(selected.getHighCatFlag())){
-                this.selected.setQty(1);
+        if(StringUtils.isNotEmpty(selectedContract.getQuotaDeductType())){
+            if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType())){
                 if(this.selected.getZkbPartOrderCat() != null){
                     if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
                         this.selected.setQty(1);
@@ -802,15 +794,37 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                         this.selected.setQty(0);
                         valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
                     }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
-                        this.selected.setQty(2);
+                        ZkbContract c = contractList.get(0);
+                        if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(c.getQuotaDeductType())){
+                            this.selected.setQty(2);
+                        }else{
+                            this.selected.setQty(1);
+                        }
                         valueTypeTips = "";
                     }
                 }
-            }else{
-                this.selected.setQty(0);
+            }else if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selectedContract.getQuotaDeductType())) {
+                if(StringUtils.isEmpty(selected.getHighCatFlag()) || CopyByInvok.F.equals(selected.getHighCatFlag())){
+                    this.selected.setQty(1);
+                    if(this.selected.getZkbPartOrderCat() != null){
+                        if(ZkbPartOrderCat.ValueType.NormalValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                            this.selected.setQty(1);
+                            valueTypeTips = "";
+                        }else if(ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                            this.selected.setQty(0);
+                            valueTypeTips = "您的选择为高值探头，请确认合同中是否有此权益！";
+                        }else if(ZkbPartOrderCat.ValueType.SpecialValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType())){
+                            this.selected.setQty(2);
+                            valueTypeTips = "";
+                        }
+                    }
+                }else{
+                    this.selected.setQty(0);
+                }
             }
+        }else {
+            this.selected.setQty(null);
         }
-
         calcRemainQty();
     }
 
@@ -1039,14 +1053,6 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         this.saveTips = saveTips;
     }
 
-    public boolean isProbeQuotaFlag() {
-        return probeQuotaFlag;
-    }
-
-    public void setProbeQuotaFlag(boolean probeQuotaFlag) {
-        this.probeQuotaFlag = probeQuotaFlag;
-    }
-
     public List<HashMap<String, String>> getHighCatList() {
         return highCatList;
     }
@@ -1061,6 +1067,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void setV2_probe_blobObjectList(List<V2_BlobObject> v2_probe_blobObjectList) {
         this.v2_probe_blobObjectList = v2_probe_blobObjectList;
+    }
+
+    public ZkbContract getSelectedContract() {
+        return selectedContract;
+    }
+
+    public void setSelectedContract(ZkbContract selectedContract) {
+        this.selectedContract = selectedContract;
     }
 
     @Override
