@@ -182,6 +182,8 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     private List<V2_BlobObject> v2_blobObjectList = new ArrayList<>();
 
+    private Map<String,String> i18Map;
+
     @Override
     protected void init() {
         super.init();
@@ -214,6 +216,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             e.printStackTrace();
         }
         configTypeMap=this.zkbFePartOrderService.getMapConfigByLoginName(this.loginName);
+        this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.zkbFePartOrder_status);
 
     }
 
@@ -371,7 +374,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         }
         if(this.selected.getQty()>0)
         {
-            this.zkbFePartOrderService.moveProbe(1,this.contractList.get(0),this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true);
+            this.zkbFePartOrderService.moveProbe(1,this.contractList.get(0),this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,"探头申请");
         }
         String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null, GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
@@ -430,7 +433,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             }
             if(this.selected.getQty()!=null&&this.selected.getQty()>0)
             {
-                this.zkbFePartOrderService.moveProbe(1,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true);
+                this.zkbFePartOrderService.moveProbe(1,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("WaitingAssignment"));
                 this.selected.setQty(this.selected.getQty()*2);
                 this.selected.setDoubleQty(true);
             }
@@ -461,7 +464,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(this.selected.getQty()>0)
         {
-            this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true);
+            this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("WaitingAssignment"));
         }else if(StringUtils.isNotBlank(this.selected.getContractCatId())&&!four_in_one.equals(this.selected.getContractCatId()))
         {
             this.zkbFePartOrderService.updateZkbContractCat(currentUser,true,this.selected.getContractCatId());
@@ -485,7 +488,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             {
                 if(this.selected.getDoubleQty()!=null&&this.selected.getDoubleQty())
                 {
-                    this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true);
+                    this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("WaitingApm"));
                 }else
                     {
                         Boolean firstSave = true;
@@ -505,10 +508,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                                 return "";
                             }
                         }
-                        this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,firstSave);
+                        this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,firstSave,this.i18Map.get("WaitingApm"));
                         if(secondSave)
                         {
-                            this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,secondSave);
+                            this.zkbFePartOrderService.moveProbe(3,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,secondSave,this.i18Map.get("WaitingApm"));
                             this.selected.setQty(this.getSelected().getQty()*2);
                             this.selected.setDoubleQty(true);
                         }
@@ -517,13 +520,13 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 {
                     if(this.selected.getDoubleQty()!=null&&this.selected.getDoubleQty())
                     {
-                        this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty()/2,showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true);
-                        this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty()/2,showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true);
+                        this.zkbFePartOrderService.moveProbe(4,zkbContract,this.selected.getQty()/2,showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("WaitingApm"));
+                        this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty()/2,showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("WaitingApm"));
                         this.selected.setQty(this.selected.getQty()/2);
                         this.selected.setDoubleQty(false);
                     }else
                     {
-                        this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true);
+                        this.zkbFePartOrderService.moveProbe(2,zkbContract,this.selected.getQty(),showZkbPoProbeQuotaType,this.selected.getZkbPoProbeQuotaType(),this.currentUser,this.selected,true,this.i18Map.get("WaitingApm"));
                     }
                 }
         }
@@ -538,7 +541,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     public String geAdminReturn()
     {
-        return this.zkbFePartOrderService.geAdminReturn(this.selected,showZkbPoProbeQuotaType,this.userUid,this.userName,this.tenantUID,this.queryStatus,this.currentUser);
+        return this.zkbFePartOrderService.geAdminReturn(this.selected,showZkbPoProbeQuotaType,this.userUid,this.userName,this.tenantUID,this.queryStatus,this.currentUser,this.i18Map);
     }
 
     public List<ZkbPartOrderCat> autoCompleteCat(String query){
