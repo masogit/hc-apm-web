@@ -18,6 +18,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -132,13 +133,17 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
             String userUid = currentUserAccount.getUid();
             List<String> partsWarehouses = partsWarehouseUserService.findAllByPartsWarehouseByUserUid(userUid);
             Set<String> warehouses = new HashSet<>(partsWarehouses);
+            searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, partsWarehouses));
 //          List<SimplePartsInventory> res= partsInventoryRepository.findByPartsWarehouseIds(warehouses);
-            searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, warehouses, ""));
+//            searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, warehouses, ""));
             Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
             return res;
         }else{
-            return null;
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, null));
+            Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+            return res;
         }
+
     }
 
     @Override
