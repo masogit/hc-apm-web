@@ -350,6 +350,12 @@ public class ZkbFePartOrder {
     private String newCatFlag;
 
     /**
+     * 是否全新探头
+     */
+    @Column(name = "second_new_cat_flag")
+    private String secondNewCatFlag;
+
+    /**
      * 收货人
      */
     @Column(name = "receiver")
@@ -1267,5 +1273,13 @@ public class ZkbFePartOrder {
 
     public void setDoubleQty(Boolean doubleQty) {
         this.doubleQty = doubleQty;
+    }
+
+    public String getSecondNewCatFlag() {
+        return secondNewCatFlag;
+    }
+
+    public void setSecondNewCatFlag(String secondNewCatFlag) {
+        this.secondNewCatFlag = secondNewCatFlag;
     }
 }

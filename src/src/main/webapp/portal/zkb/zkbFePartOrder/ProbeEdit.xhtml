@@ -306,7 +306,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.zkbFePartOrder_newProbe}*</label>
-                        <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.newCatFlag}" required="true" requiredMessage="#{msg.zkbFePartOrder_newProbe} #{msg.ValidationRequire}">
+                        <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.secondNewCatFlag}" required="true" requiredMessage="#{msg.zkbFePartOrder_newProbe} #{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_yesOrNo')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
