@@ -240,6 +240,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     public void prepareEdit() {
         super.prepareEdit();
         this.selected=this.zkbFePartOrderRepository.findById(this.id);
+        if(StringUtils.isBlank(this.selected.getSecondNewCatFlag()) )
+        {
+            this.selected.setSecondNewCatFlag(this.selected.getNewCatFlag());
+        }
         this.sparePartsZkbFePartOrderList = this.zkbFePartOrderService.getSparePartsZkbFePartOrder(null,null,this.selected.getFatherPartOrderNo(),null,ZkbFePartOrder.OrderType.Probe.toString());
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selected.getContractId());
         ZkbContract item = this.contractList.get(0);
@@ -484,7 +488,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.selected.setFullApmInfoDate(new Date());
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(this.selected.getQty()>0){
-            if("t".equals(this.selected.getNewCatFlag()))
+            if("t".equals(this.selected.getSecondNewCatFlag()))
             {
                 if(this.selected.getDoubleQty()!=null&&this.selected.getDoubleQty())
                 {
@@ -595,7 +599,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
                 qty=zkbContract.getProbeQuotaNormal();
             }else if(ZkbFePartOrder.zkbPoProbeQuotaType.High.toString().equals(this.selected.getZkbPoProbeQuotaType()))
             {
-                qty=zkbContract.getProbeQuotaHigh();
+                qty=zkbContract.getProbeQuotaNormal();
             }
         }else
             {
