@@ -163,15 +163,21 @@
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and !(zkbPartOrderEditController.artificialType eq '2')}">
                             <label class="label">是否使用积分抵扣*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.scoreFlag}" required="true" requiredMessage="是否使用积分抵扣 #{msg.ValidationRequire}" disabled="#{zkbPartOrderEditController.currentScoreFlag}">
-                                <!--<p:ajax event="change"  listener="#{zkbPartOrderEditController.scoreFlagChange}" update="zkbwkEditForm cscore"/>-->
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="是" itemValue="t"/>
                                 <f:selectItem itemLabel="否" itemValue="f"/>
                             </p:selectOneMenu>
                             <p:outputLabel id="cscore" value="#{zkbPartOrderEditController.currentScoreText}" disabled="true"  style="margin-left: 10px;color: red;font-size: larger"/>
-
                         </h:panelGroup>
-
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe'}">
+                            <label class="label">是否全新探头</label>
+                            <p:selectOneMenu id="newCatFlag" value="#{zkbPartOrderEditController.selected.tenantNewCatFlag}"  >
+                                <p:ajax event="change" update=":zkbPartOrderEditForm:proveFile"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="是" itemValue="t"/>
+                                <f:selectItem itemLabel="否" itemValue="f"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' and zkbPartOrderEditController.assetInfo.assetGroup eq 2 }">
                             <label class="label">机型*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.artificialType}" required="true" disabled="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}">
@@ -180,7 +186,7 @@
                                 <f:selectItem itemLabel="超声低端机" itemValue="3"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.probeQuotaFlag}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType == 'New'}">
                             <label class="label">扣除名额类型*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.probeQuotaType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
                                 <p:ajax event="change" update="catModelGrid valueTypeGroup" />
@@ -188,7 +194,7 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and !zkbPartOrderEditController.probeQuotaFlag}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType == 'Old'}">
                             <label class="label">是否高值探头*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.highCatFlag}" required="true" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
                                 <p:ajax event="change" update="catModelGrid valueTypeGroup" />
@@ -328,8 +334,8 @@
                                       multiple="true"  sizeLimit="100000000"  update="uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:panelGrid  rendered="#{zkbPartOrderEditController.orderType eq 'Probe'}">
-                        <h:panelGroup>
+                    <p:panelGrid id="proveFile">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType eq 'New' and zkbPartOrderEditController.selected.tenantNewCatFlag eq 't'}">
                             <p:dataList  id="uploadProveList" value="#{zkbPartOrderEditController.v2_probe_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">院方合同证明</f:facet>
                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
@@ -412,7 +418,7 @@
                         </h:panelGroup>
                         <h:panelGroup id="catModelGrid" columns="1" layout="grid" styleClass="ui-panelgrid-blank" >
                             <h:panelGroup  style="text-align: left">
-                                <c:if test="#{zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.probeQuotaType eq 'High'}">
+                                <c:if test="#{zkbPartOrderEditController.selectedContract.quotaDeductType eq 'New' and zkbPartOrderEditController.selected.probeQuotaType eq 'High'}">
                                     <label class="label">SN编号*</label>
                                     <p:selectOneMenu value="#{zkbPartOrderEditController.selected.contractCatId}" required="true" requiredMessage="无可用高值探头，请确认合同信息或联系客服" >
                                         <p:ajax event="itemSelect" update="qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
@@ -420,14 +426,14 @@
                                         <f:selectItems value="#{zkbPartOrderEditController.highCatList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>
                                 </c:if>
-                                <c:if test="#{zkbPartOrderEditController.probeQuotaFlag and !(zkbPartOrderEditController.selected.probeQuotaType eq 'High')}">
+                                <c:if test="#{zkbPartOrderEditController.selectedContract.quotaDeductType eq 'New' and !(zkbPartOrderEditController.selected.probeQuotaType eq 'High')}">
                                     <label class="label">探头型号*</label>
                                     <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="探头型号 #{msg.ValidationRequire}"
                                                     completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catText}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
                                         <p:ajax event="itemSelect" update="valueTypeGroup qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
                                     </p:autoComplete>
                                 </c:if>
-                                <c:if test="#{!zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.highCatFlag eq 't'}">
+                                <c:if test="#{zkbPartOrderEditController.selectedContract.quotaDeductType eq 'Old' and zkbPartOrderEditController.selected.highCatFlag eq 't'}">
                                     <label class="label">SN编号*</label>
                                     <p:selectOneMenu value="#{zkbPartOrderEditController.selected.contractCatId}" required="true" requiredMessage="无可用高值探头，请确认合同信息或联系客服" >
                                         <p:ajax event="itemSelect" update="qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}" />
@@ -435,7 +441,7 @@
                                         <f:selectItems value="#{zkbPartOrderEditController.highCatList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneMenu>
                                 </c:if>
-                                <c:if test="#{!zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.highCatFlag eq 'f'}">
+                                <c:if test="#{zkbPartOrderEditController.selectedContract.quotaDeductType eq 'Old' and zkbPartOrderEditController.selected.highCatFlag eq 'f'}">
                                     <label class="label">探头型号*</label>
                                     <p:autoComplete dropdown="true" value="#{zkbPartOrderEditController.selected.zkbPartOrderCat}"  scrollHeight="300" forceSelection="true" required="true" requiredMessage="探头型号 #{msg.ValidationRequire}"
                                                     completeMethod="#{zkbPartOrderEditController.autoCompleteCat}" var="t" itemLabel="#{t.catText}" itemValue="#{t}" converter="zkbPartOrderCatConverter">
@@ -445,7 +451,7 @@
                             </h:panelGroup>
                         </h:panelGroup>
                         <h:panelGroup id="valueTypeGroup">
-                            <c:if test="#{(zkbPartOrderEditController.probeQuotaFlag and !(zkbPartOrderEditController.selected.probeQuotaType eq 'High')) or (!zkbPartOrderEditController.probeQuotaFlag and zkbPartOrderEditController.selected.highCatFlag eq 'f')}">
+                            <c:if test="#{(zkbPartOrderEditController.selectedContract.quotaDeductType eq 'New' and !(zkbPartOrderEditController.selected.probeQuotaType eq 'High')) or (zkbPartOrderEditController.selectedContract.quotaDeductType eq 'Old' and zkbPartOrderEditController.selected.highCatFlag eq 'f')}">
                                 <h:panelGroup>
                                     <label class="label">价值类型</label>
                                     <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderEditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
