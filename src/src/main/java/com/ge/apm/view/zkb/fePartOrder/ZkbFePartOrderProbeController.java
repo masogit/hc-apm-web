@@ -454,7 +454,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     {
         if(StringUtils.isBlank(comment))
         {
-            WebUtil.addErrorMessage(WebUtil.getMessage("代理商审批备注能为空"));
+            WebUtil.addErrorMessage(WebUtil.getMessage("代理商审批备注不能为空"));
             return "";
         }
         Date date = new Date();
