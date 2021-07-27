@@ -1964,18 +1964,17 @@ public void test1(){
             RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
             return;
         }
-        if(this.isEnableIntegrationWithWorkOrder()){
-            for (int i = 0; i < approvedDetails.size(); i++) {
-                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
-                if (selectedMap.get(v2_workOrder_detail.getId())) {
-                    if (v2_workOrder_detail.getApproved() == null || !v2_workOrder_detail.getApproved()) {
-                        approvedDetailsNew.add(v2_workOrder_detail);
-                    }
-                    v2_workOrder_detail.setApproved(true);
-                }else{
-                    v2_workOrder_detail.setApproved(false);
+
+        for (int i = 0; i < approvedDetails.size(); i++) {
+            V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
+            if (selectedMap.get(v2_workOrder_detail.getId())) {
+                if (v2_workOrder_detail.getApproved() == null || !v2_workOrder_detail.getApproved()) {
                     approvedDetailsNew.add(v2_workOrder_detail);
                 }
+                v2_workOrder_detail.setApproved(true);
+            }else{
+                v2_workOrder_detail.setApproved(false);
+                approvedDetailsNew.add(v2_workOrder_detail);
             }
         }
         woService.approveAction(selectedWorkOrder, approvedDetails, comments);
