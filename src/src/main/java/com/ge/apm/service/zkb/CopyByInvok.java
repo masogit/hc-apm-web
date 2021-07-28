@@ -1,6 +1,8 @@
 package com.ge.apm.service.zkb;
 
 import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -31,4 +33,37 @@ public class CopyByInvok {
         }
         return tarObj;
     }
+
+    public static int getBetweenDay(Date date1, Date date2) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String sd1 = format.format(date1);
+        String sd2 = format.format(date2);
+        try {
+            date1 = format.parse(sd1);
+            date2 = format.parse(sd2);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        long days = (date2.getTime() - date1.getTime()) / (24*3600*1000);
+        if((date2.getTime() - date1.getTime())% (24*3600*1000) != 0){
+            days++;
+        }
+        return (int)days;
+    }
+    public int getBetweenDay(String sd1, String sd2) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date1 = format.parse(sd1);
+            Date date2 = format.parse(sd2);
+            long days = (date2.getTime() - date1.getTime()) / (24*3600*1000);
+            if((date2.getTime() - date1.getTime())% (24*3600*1000) != 0){
+                days++;
+            }
+            return (int)days;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 }

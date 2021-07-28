@@ -72,6 +72,11 @@ public class ZkbAssetStatistic {
      */
     private String reason;
 
+    /**
+     * 是否粘贴二维码
+     */
+    private Boolean isQrCode;
+
     public String getSystemId() {
         return systemId;
     }
@@ -125,6 +130,10 @@ public class ZkbAssetStatistic {
                 return "Y";
             }
 
+        }
+        if(this.isQrCode!=null&&this.isQrCode)
+        {
+            return "Y";
         }
         return "N";
     }
@@ -187,5 +196,13 @@ public class ZkbAssetStatistic {
 
     public void setFunctionType(String functionType) {
         this.functionType = functionType;
+    }
+
+    public Boolean getQrCode() {
+        return isQrCode;
+    }
+
+    public void setQrCode(Boolean qrCode) {
+        isQrCode = qrCode;
     }
 }

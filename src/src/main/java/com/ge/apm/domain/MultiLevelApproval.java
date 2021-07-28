@@ -5,10 +5,13 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+
+import static com.ge.apm.service.constant.ApprovalConstant.APPROVAL_SEPARATOR;
 
 /**
  *
@@ -47,6 +50,10 @@ public class MultiLevelApproval implements Serializable {
      */
     @Column(name = "business_type")
     private int businessType;
+
+    @Column(name = "business_type_name")
+    private String businessTypeName;
+
     /**
      * 是否正在审批
      */
@@ -131,28 +138,16 @@ public class MultiLevelApproval implements Serializable {
     private String createdBy;
 
     /**
+     * 组织id
+     */
+    @Column(name = "hier_org_uid", columnDefinition = "CHAR(32)")
+    private String hierOrgUid;
+
+    /**
      * 租户
      */
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
-
-    /**
-     * 集团
-     */
-    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
-    private String institutionUID;
-
-    /**
-     * 医院
-     */
-    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
-    private String hospitalUID;
-
-    /**
-     * 院区
-     */
-    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
-    private String siteUID;
 
     public boolean getApprovalIng() {
         return approvalIng;
@@ -160,5 +155,39 @@ public class MultiLevelApproval implements Serializable {
 
     public void setApprovalIng(boolean approvalIng) {
         this.approvalIng = approvalIng;
+    }
+
+    /**
+     * surrounding multiple approval uids with both front end and back end commas;
+     * @param approvalUid
+     */
+    public void setApprovalUid(String approvalUid) {
+        if (StringUtils.isEmpty(approvalUid)) {
+            return;
+        }
+        if (approvalUid.startsWith(APPROVAL_SEPARATOR)) {
+            return;
+        }
+
+        this.approvalUid = APPROVAL_SEPARATOR + approvalUid + APPROVAL_SEPARATOR;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof MultiLevelApproval)) {
+            return false;
+        }
+        MultiLevelApproval other = (MultiLevelApproval) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
     }
 }

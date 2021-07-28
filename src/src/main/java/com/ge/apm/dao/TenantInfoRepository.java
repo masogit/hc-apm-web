@@ -41,6 +41,14 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
      */
     List<TenantInfo> findByType(Integer type);
 
+    /**
+     * 根据类型和名称获取
+     * @param type  类型
+     * @param name 名称
+     * @return
+     */
+    List<TenantInfo> findByTypeAndNameNotLike(Integer type,String name);
+
     TenantInfo findByUid(String uid);
 
     @Modifying

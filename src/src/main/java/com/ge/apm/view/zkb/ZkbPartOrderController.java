@@ -93,6 +93,10 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
                         isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
                         vacationBtn = true;
                     }
+                    if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrderUserConfig.getConfigType()) && "US".equals(zkbPartOrderUserConfig.getAssetType())){
+                        isVacation = StringUtils.isEmpty(zkbPartOrderUserConfig.getIsVacation()) ? CopyByInvok.F : zkbPartOrderUserConfig.getIsVacation();
+                        vacationBtn = true;
+                    }
                 }
                 for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
                     if(ZkbPartOrderStep.PartOrderStep.ClosePending.toString().equals(c.getConfigType())){
@@ -395,9 +399,22 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     }
 
     public void saveVacation(){
+        boolean flag = false;
+        ZkbPartOrderUserConfig zkbPartOrderUserConfig = new ZkbPartOrderUserConfig();
         for(ZkbPartOrderUserConfig c : zkbPartOrderUserConfigList){
             c.setIsVacation(isVacation);
             zkbPartOrderService.getZkbPartOrderUserConfigRepository().save(c);
+            if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(c.getConfigType()) && "US".equals(c.getAssetType())){
+                flag = true;
+                zkbPartOrderUserConfig = c;
+            }
+        }
+        if(flag){
+            List<ZkbPartOrder> zkbPartOrders = zkbPartOrderService.usVacationHandle(zkbPartOrderUserConfig,isVacation);
+            for(ZkbPartOrder o : zkbPartOrders){
+                zkbPartOrderService.sendEmail(o,"",UserContextService.getAccessToken());
+                zkbPartOrderService.sendMessage(o,UserContextService.getAccessToken());
+            }
         }
     }
 

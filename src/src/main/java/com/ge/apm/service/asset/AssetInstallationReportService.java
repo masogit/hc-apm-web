@@ -141,7 +141,7 @@ public class AssetInstallationReportService {
             arrivalItemMap.put("import_equipment", FieldValueMessageController.doGetFieldValue("importEquipment",importEquipment.toString()));//是否进口设备[1:进口,2:国产]
             arrivalItemMap.put("item_num", 1);//数量
 //            arrivalItemMap.put("guarantee", arrivalListItem.getGuarantee());
-            arrivalItemMap.put("factory_warranty_date", arrivalListItem.getFactoryWarrantyDate());
+            arrivalItemMap.put("factory_warranty_date", arrivalListItem.getWarrantyMonth());//质保时间（月）
             arrivalItemMap.put("annual_maintenance_times", arrivalListItem.getAnnualMaintenanceTimes());//年保修次数
             arrivalItemMap.put("manufact_num", arrivalListItem.getSerialNum());//出厂SN编号
             arrivalItemMap.put("hospital_num", arrivalListItem.getDepartNum());//医院编号

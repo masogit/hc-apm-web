@@ -70,7 +70,9 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     private List<AssetInfo> assets5Maintain;
 
     private Set<AssetInfo> selectedAssets;
-    
+
+    private Set<AssetInfo> selectedAssetsed;
+
     private Set<AssetInfo> selectedAssets5;
 
     private Map<String, Boolean> selectedAssetUids;
@@ -94,6 +96,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         searchFilters = new ArrayList<>(8);
         selectedAssetUids = new HashMap<>(32);
         selectedAssets = new HashSet<>();
+        selectedAssetsed = new HashSet<>();
         selectedAssetUids5 = new HashMap<>(32);
         selectedAssets5 = new HashSet<>();
         currentUser = UserContextService.getCurrentUserAccount();
@@ -109,6 +112,7 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         //TODO
         this.selectedAssetUids.clear();
         this.selectedAssets.clear();
+        this.selectedAssetsed.clear();
         this.selectedAssetUids5.clear();
         this.selectedAssets5.clear();
         this.assets4Maintain = null;
@@ -171,6 +175,11 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     }
     
     public void addAssetInfo(){
+        for(AssetInfo assetInfo: selectedAssetsed){
+            if(!selectedAssets.contains(assetInfo)){
+                selectedAssets.add(assetInfo);
+            }
+        }
     	for(AssetInfo assetInfo: selectedAssets){
     		if(!assets5Maintain.contains(assetInfo)){
     			assets5Maintain.add(assetInfo);
@@ -180,12 +189,18 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
     }
     
     public void removeAssetInfo(){
-    	assets5Maintain.removeAll(selectedAssets5);
-    	this.tiggerEvent();
+        selectedAssets.removeAll(selectedAssets5);
+        assets5Maintain.removeAll(selectedAssets5);
+        selectedAssets5.clear();
+        selectedAssetUids5.clear();
+        this.tiggerEvent();
     }
     
     public void clearAssetInfo(){
-    	assets5Maintain.clear();
+        this.selectedAssets.clear();
+        assets5Maintain.clear();
+        selectedAssets5.clear();
+        selectedAssetUids5.clear();
     }
 
     public void addAssetsOfCurrentPage(AjaxBehaviorEvent event) {
@@ -193,12 +208,12 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         if(isAllSelected) {
             assets4Maintain.stream().forEach(t -> {
                 selectedAssetUids.put(t.getUid(), Boolean.TRUE);
-                selectedAssets.add(t);
+                selectedAssetsed.add(t);
             });
         } else {
             assets4Maintain.stream().forEach(t -> {
                 selectedAssetUids.put(t.getUid(), Boolean.FALSE);
-                selectedAssets.remove(t);
+                selectedAssetsed.remove(t);
             });
         }
         isAllSelected = !isAllSelected;
@@ -227,9 +242,9 @@ public class AssetSelectController extends GenericCRUDUUIDController<AssetInfo> 
         SelectBooleanCheckbox box = (SelectBooleanCheckbox)event.getSource();
         AssetInfo asset = (AssetInfo)box.getAttributes().get("assetObj");
         if(box.isSelected()) {
-            selectedAssets.add(asset);
+            selectedAssetsed.add(asset);
         } else {
-            selectedAssets.remove(asset);
+            selectedAssetsed.remove(asset);
         }
     }
     

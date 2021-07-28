@@ -1,6 +1,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ZkbAssetQrCodeInfo;
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.List;
@@ -24,5 +25,8 @@ public interface ZkbAssetQrCodeInfoRepository extends GenericRepositoryUUID<ZkbA
      * @return
      */
     List<ZkbAssetQrCodeInfo> findByTenantUIDAndCanNotPastQrCode(String tenantUID,String canNotPastQrCode);
+
+    @Query(value = "SELECT count(zkba.id) from zkb_asset_qr_code_info zkba INNER JOIN asset_info ai on zkba.system_id = ai.system_id where ai.uid IN ?1 and zkba.tenant_uid= ?2 and zkba.can_not_past_qr_code=?3 ", nativeQuery = true)
+    Integer findCount(List<String> uidList,String tenantUID,String canNotPastQrCode);
 
 }

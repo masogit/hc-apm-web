@@ -21,4 +21,9 @@ public interface SysRoleRepository extends GenericRepository<SysRole> {
 
     @Query(value="select * from sys_role where id in(select role_id from user_role where user_id = ?1 and role_type = 0)",nativeQuery = true)
     List<SysRole> getSysRoles(Integer userId);
+
+    @Query(value="select id from sys_role where name = ?1",nativeQuery = true)
+    public int getIdByName(String name);
+
+    public SysRole getById(Integer id);
 }

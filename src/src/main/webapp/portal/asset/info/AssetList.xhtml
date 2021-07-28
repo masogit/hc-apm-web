@@ -122,7 +122,7 @@
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
-                                    <p:ajax listener="#{assetInfoListController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist:batchToBeTerminatedButton" oncomplete="updateSelectAllCheckBox();"/>
+                                    <p:ajax listener="#{assetInfoListController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist batchToRelRule" oncomplete="updateSelectAllCheckBox();"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
@@ -139,6 +139,15 @@
                             <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="#{msg.CancelWarrantyReminder}" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
                                 <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                             </p:commandButton>
+                        </p:column>
+                        <p:column  headerText="是否已配置保养规则" filterBy="#{item.isPm}" filterMatchMode="EQ">
+                            <h:outputText value="#{assetInfoListController.getRelRuleStatusName(item.uid,item.isPm)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="handleAssetGroupChange()" value="#{assetInfoListController.isPmSearch}"  autoWidth="false" style="max-width: 300px;" height="300" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{assetInfoListController.getListForRelRule()}" var="item" itemLabel="#{item.valueZh}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                         </p:column>
                         <c:forEach items="#{assetInfoListController.customedColumns}" var="columnItem" >
                             <c:if test="#{columnItem eq 'name'}">
@@ -670,6 +679,7 @@
                             </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
+                            <p:commandButton id="batchToRelRule" oncomplete="PF('relRuleAssetDialog').show()" actionListener="#{assetInfoListController.setSelectedAssetsUids()}" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated"  title="#{msg.SetRulesInBatch}" disabled="#{not assetInfoListController.isChecked()}"/>
                             <p:commandButton id="editButton" icon="fa fa-cogs" class="btnEdit" title="批量修改" actionListener="#{assetInfoListController.getAssetInfoBatchEdit()}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff,MvsAdmin,SuperAdmin,SiteAdmin')}"/>
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('AssetCreate.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff,SuperAdmin,SiteAdmin')}"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoListController.exportExcel}" update=":growl"
@@ -770,6 +780,7 @@
                 </p:tree>
             </p:scrollPanel>
         </p:overlayPanel>-->
+        <ui:include src="RelRuleAsset.xhtml"/>
         <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.ExportQRCode}">
             <h:form id="exportQrCodeForm" >
                 <h:panelGroup id="display" >
@@ -848,6 +859,11 @@
             }
             function openAssetViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
+            }
+
+            function changeDiaLog() {
+                PF('relRuleAssetDialog').hide();
+                PF('redirectDialog').show();
             }
 
             function updateSelectAllCheckBox() {

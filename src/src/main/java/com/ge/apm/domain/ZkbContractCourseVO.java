@@ -10,9 +10,9 @@ import javax.persistence.Column;
  * @description :
  */
 public class ZkbContractCourseVO extends ZkbContractCourse {
-
-    //excel行数
     private int lineNum;
+    //excel行数
+
 
     private String contractNo;
     private String cid;

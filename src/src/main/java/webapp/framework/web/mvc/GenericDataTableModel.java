@@ -2,6 +2,8 @@ package webapp.framework.web.mvc;
 
 import java.util.List;
 import java.util.Map;
+
+import com.ge.apm.domain.simpleparts.SimplePartsItem;
 import org.apache.log4j.Logger;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
@@ -63,8 +65,14 @@ public abstract class GenericDataTableModel<T> extends LazyDataModel<T> {
     public T getRowData(String rowKey) {
         try{
             for (T item : ((List<T>) getWrappedData())) {
-                if (rowKey.equals("" + item.hashCode()) || rowKey.hashCode()==item.hashCode()) {
-                    return item;
+                if (item instanceof SimplePartsItem) {
+                    if (((SimplePartsItem) item).getId().equals(rowKey)) {
+                        return item;
+                    }
+                } else {
+                    if (rowKey.equals("" + item.hashCode()) || rowKey.hashCode()==item.hashCode()) {
+                        return item;
+                    }
                 }
             }
         }

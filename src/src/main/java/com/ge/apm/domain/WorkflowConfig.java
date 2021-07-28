@@ -186,6 +186,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name="pm_wc_need_sign")
     private Boolean pmWcNeedSign; //保养完成是否需要签名
 
+    @Column(name="ai_need_maintenance")
+    private Boolean aiNeedMaintenance; //到货安装是否提示保养设置
+
     /***
      * for measure
      * begin
@@ -247,6 +250,30 @@ public class WorkflowConfig implements Serializable {
     private Boolean enableUpdateSwitchingTime;
 
     /**
+     * 是否启用Imaging Insights
+     */
+    @Column(name = "ii_mobile_enable")
+    private Boolean iiMobileEnable;
+
+    /**
+     * ii_mobile_url
+     */
+    @Column(name = "ii_mobile_url")
+    private String iiMobileUrl;
+
+    /**
+     * 是否启用usiot_mobile_enable
+     */
+    @Column(name = "usiot_mobile_enable")
+    private Boolean usiotMobileEnable;
+
+    /**
+     * usiot_mobile_url
+     */
+    @Column(name = "usiot_mobile_url")
+    private String usiotMobileUrl;
+
+    /**
      * 资产附件类型配置
      */
     @Column(name = "customized_asset_attachment_category",columnDefinition="text")
@@ -295,6 +322,38 @@ public class WorkflowConfig implements Serializable {
 
     public void setEnableScrappedControl(boolean enableScrappedControl) {
         this.enableScrappedControl = enableScrappedControl;
+    }
+
+    public Boolean getIiMobileEnable() {
+        return iiMobileEnable;
+    }
+
+    public void setIiMobileEnable(Boolean iiMobileEnable) {
+        this.iiMobileEnable = iiMobileEnable;
+    }
+
+    public String getIiMobileUrl() {
+        return iiMobileUrl;
+    }
+
+    public void setIiMobileUrl(String iiMobileUrl) {
+        this.iiMobileUrl = iiMobileUrl;
+    }
+
+    public Boolean getUsiotMobileEnable() {
+        return usiotMobileEnable;
+    }
+
+    public void setUsiotMobileEnable(Boolean usiotMobileEnable) {
+        this.usiotMobileEnable = usiotMobileEnable;
+    }
+
+    public String getUsiotMobileUrl() {
+        return usiotMobileUrl;
+    }
+
+    public void setUsiotMobileUrl(String usiotMobileUrl) {
+        this.usiotMobileUrl = usiotMobileUrl;
     }
 
     public Integer getAssetDeptHeadWeight() {
@@ -1166,6 +1225,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setPmWcNeedSign(Boolean pmWcNeedSign) {
         this.pmWcNeedSign = pmWcNeedSign;
+    }
+
+    public Boolean getAiNeedMaintenance() {
+        return aiNeedMaintenance;
+    }
+
+    public void setAiNeedMaintenance(Boolean aiNeedMaintenance) {
+        this.aiNeedMaintenance = aiNeedMaintenance;
     }
 
     @Override

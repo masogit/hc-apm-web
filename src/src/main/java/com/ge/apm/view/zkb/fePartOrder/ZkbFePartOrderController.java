@@ -180,6 +180,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      */
     private String userUid;
 
+    Map<String,String> map = null;
+
     /**
      * 初始化数据
      */
@@ -368,6 +370,19 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         }
     }
 
+    public String getI18(String key,String orderType)
+    {
+        if(this.map==null)
+        {
+            this.map = this.zkbFePartOrderService.getI18ToMapEngKey(ZkbFePartOrderService.status);
+        }
+        if(ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString().equals(key)&&ZkbFePartOrder.OrderType.ManMade.toString().equals(orderType))
+        {
+            return "400已开单";
+        }
+        return this.map.get(key);
+    }
+
 
     @Override
     protected GenericRepositoryUUID<ZkbFePartOrder> getDAO() {
@@ -443,7 +458,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
             Map<String,String> i18Map = this.zkbFePartOrderService.getI18ToMap("zkbFePartOrder_zkbPoReturnType");
             List<Map<String, Object>> importSparePartList = this.zkbFePartOrderService.getZkbFePartOrderSparePartMapFromTemplate(doc,i18Map);
             List<Map<String, Object>> importProbeList = this.zkbFePartOrderService.getZkbFePartOrderProbeMapFromTemplate(doc,i18Map);
-            this.zkbFePartOrderService.importData(importSparePartList,importProbeList,this.userUid,this.userName,this.tenantUID);
+            this.zkbFePartOrderService.importData(importSparePartList,importProbeList,this.userUid,this.userName,this.tenantUID,this.currentUser);
             errorZkbFePartList = this.zkbFePartOrderService.filterErrorRecords(importSparePartList,importProbeList);
             if(!errorZkbFePartList.isEmpty()){
                 WebUtil.addErrorMessage("导入失败");
