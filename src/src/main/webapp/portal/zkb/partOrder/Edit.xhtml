@@ -169,15 +169,6 @@
                             </p:selectOneMenu>
                             <p:outputLabel id="cscore" value="#{zkbPartOrderEditController.currentScoreText}" disabled="true"  style="margin-left: 10px;color: red;font-size: larger"/>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe'}">
-                            <label class="label">是否全新探头</label>
-                            <p:selectOneMenu id="newCatFlag" value="#{zkbPartOrderEditController.selected.tenantNewCatFlag}"  >
-                                <p:ajax event="change" update=":zkbPartOrderEditForm:proveFile"/>
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItem itemLabel="是" itemValue="t"/>
-                                <f:selectItem itemLabel="否" itemValue="f"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' and zkbPartOrderEditController.assetInfo.assetGroup eq 2 }">
                             <label class="label">机型*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.artificialType}" required="true" disabled="true" requiredMessage="#{msg.zkbPartOrder_artificialType} #{msg.ValidationRequire}">
@@ -186,7 +177,7 @@
                                 <f:selectItem itemLabel="超声低端机" itemValue="3"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType == 'New'}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType != null and zkbPartOrderEditController.selectedContract.quotaDeductType eq 'New'}">
                             <label class="label">扣除名额类型*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.probeQuotaType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
                                 <p:ajax event="change" update="catModelGrid valueTypeGroup" />
@@ -194,7 +185,7 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType == 'Old'}">
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType != null and zkbPartOrderEditController.selectedContract.quotaDeductType eq 'Old'}">
                             <label class="label">是否高值探头*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.highCatFlag}" required="true" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
                                 <p:ajax event="change" update="catModelGrid valueTypeGroup" />
@@ -388,7 +379,7 @@
                                 </p:column>
                             </c:when>
                         </c:choose>
-                       
+
                         <p:column headerText="配件名称">
                             <h:outputText value="#{item.partName}"/>
                         </p:column>
@@ -458,6 +449,15 @@
                                     <label style="color: red">#{zkbPartOrderEditController.valueTypeTips}</label>
                                 </h:panelGroup>
                             </c:if>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe'}">
+                            <label class="label">是否全新探头</label>
+                            <p:selectOneMenu id="newCatFlag" value="#{zkbPartOrderEditController.selected.tenantNewCatFlag}"  >
+                                <p:ajax event="change" update="proveFile qty remainQty" listener="#{zkbPartOrderEditController.tenantNewCatFlagChange}"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="是" itemValue="t"/>
+                                <f:selectItem itemLabel="否" itemValue="f"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">旧探头SN编号*</label>

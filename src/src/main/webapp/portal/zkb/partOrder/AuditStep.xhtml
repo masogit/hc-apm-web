@@ -379,7 +379,14 @@
                             <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
                             <label style="color: red">#{zkbPartOrderAuditController.valueTypeTips}</label>
                         </h:panelGroup>
-
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe'}">
+                            <label class="label">是否全新探头</label>
+                            <p:selectOneMenu id="tenantNewCatFlag" value="#{zkbPartOrderEditController.selected.tenantNewCatFlag}" disabled="true" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="是" itemValue="t"/>
+                                <f:selectItem itemLabel="否" itemValue="f"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">旧探头SN编号*</label>
                             <p:inputText id="oldCatSn" value="#{zkbPartOrderAuditController.selected.oldCatSn}" disabled="true" />
