@@ -60,7 +60,6 @@ public class AssetInfoDetailController {
     private AssetHistoryService assetHistoryService;
     private SysAuthGroupRepository sysAuthGroupDao;
     private UserAccountRepository userAccountRepository;
-
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;

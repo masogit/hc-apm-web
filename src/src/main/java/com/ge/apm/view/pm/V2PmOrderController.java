@@ -12,11 +12,14 @@ import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
+import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.constant.ApprovalConstant;
+import com.ge.apm.service.constant.PmConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -228,13 +231,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String reportUid; //selected table base uid
     private Map<String, Object> selectedObjectMap = new HashMap();
     private PmReportService pmReportService;
-
+    private MultiLevelApprovalService multiLevelApprovalService;
     private String queryAssetUid;
     private ConfigService configService;
 
     private String plannedCompletionTimeFormat = null;
     private String actualCompletionTimeFormat = null;
-
+    @Setter@Getter
+    private boolean hasConfigMultiLevelApproval = false;
     //备注
     @Getter @Setter
     private String remarks;
@@ -1356,7 +1360,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         supplierController = WebUtil.getBean(SupplierController.class);
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
-
         token = UserContextService.getAccessToken();
         pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
@@ -1390,6 +1393,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         this.selectedMap = new HashMap();
         pmReportService = WebUtil.getBean(PmReportService.class);
+        multiLevelApprovalService= WebUtil.getBean(MultiLevelApprovalService.class);
         blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
         //如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
         String query = WebUtil.getRequestParameter("query");
@@ -1920,12 +1924,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                    }
                }
                if (!accessorySparePartsRequestList.isEmpty()) {
-                   LOGGER.info("保养工单生成申领单start!!!!");
-                   partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER);//生成申领单
+                   V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                   partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申领单
                }
                if (!accessorySparePartsBuyList.isEmpty()) {
-                   LOGGER.info("保养工单生成申购单start!!!!");
-                   partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER);//生成申购单
+                   V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                   partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申购单
                }
            }
             approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(true));
@@ -1941,9 +1945,29 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
+    // 走多级审批流,提交审核
+    public void submitForApproval() throws Exception {
+        if(selectedPmOrder ==null){
+            return;
+        }
+        MultiLevelApproval approval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmit(selectedPmOrder, null, false);
+        if (approval == null) {
+            WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
+            return ;
+        }
+        selectedPmOrder.setApprovalStatus(PmConstant.PM_APPROVAL_STATUS_PENDING);
+        dao.save(selectedPmOrder);
+    }
+
     public void prepareCompleteOrder(String woid) throws Exception {
         accessoryList = getWorkOrderDetail(woid);
         selectedPmOrder = dao.findById(woid);
+        MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedPmOrder);
+        hasConfigMultiLevelApproval = false;
+        if (approval != null) {
+            logger.info("保养------------多级审核已激活");
+            hasConfigMultiLevelApproval = true;
+        }
         if (selectedPmOrder.getManHours() == null) {
             selectedPmOrder.setManHours(0.1);
         }

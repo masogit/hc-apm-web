@@ -1,17 +1,24 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
-import com.ge.apm.domain.ZkbPartOrderUserConfig;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.service.zkb.ZkbPartOrderUserConfigService;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -22,9 +29,12 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * @author 503202755 2020/9/25
@@ -45,6 +55,8 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
      */
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
 
+    private ZkbPartOrderRepository zkbPartOrderRepository;
+
     /**
      * 目录关系分页数据
      */
@@ -56,9 +68,26 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     private UploadedFile file;
 
     /**
+     * 导出文件
+     */
+    private StreamedContent exportFile;
+
+    /**
      * 错误列表
      */
     private List<Map<String, Object>> errorList;
+
+    private ZkbPartOrderUserConfig backUpUser = new ZkbPartOrderUserConfig();
+    private List<ZkbPartOrderUserConfig> backUpList = new ArrayList<>();
+
+    /**
+     * 当前登录用户信息service
+     */
+    private UserAccount currentUser;
+    /**
+     * 当前用户登录名
+     */
+    private String loginName = "";
 
 
     /**
@@ -69,6 +98,57 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
         super.init();
         zkbPartOrderUserConfigService = WebUtil.getBean(ZkbPartOrderUserConfigService.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
+        zkbPartOrderRepository=WebUtil.getBean(ZkbPartOrderRepository.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        this.loginName=currentUser.getLoginName();
+
+    }
+
+    @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        super.prepareCreate();
+        initBackUpList();
+        if(selected != null){
+            if(CollectionUtils.isNotEmpty(backUpList))
+            {
+                for(ZkbPartOrderUserConfig c : backUpList){
+                    if(c.getId().equals(selected.getId())){
+                        backUpList.remove(c);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void prepareEdit() {
+        super.prepareEdit();
+        initBackUpList();
+        if(selected != null){
+            for(ZkbPartOrderUserConfig c : backUpList){
+                if(selected.getId().equals(c.getId())){
+                    backUpList.remove(c);
+                    break;
+                }
+            }
+        }
+        if(StringUtils.isNotEmpty(selected.getUsBackUpId())){
+            backUpUser = zkbPartOrderUserConfigRepository.findById(selected.getUsBackUpId());
+        }else {
+            backUpUser =new ZkbPartOrderUserConfig();
+        }
+    }
+
+    private void initBackUpList()
+    {
+        if(this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        {
+            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetType(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US");
+        }else
+        {
+            backUpList = zkbPartOrderUserConfigRepository.findByConfigTypeAndAssetTypeAndLoginNameNotLike(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString(),"US",ZkbFePartOrderService.testLoginNameStartWith+"%");
+        }
     }
 
     @Override
@@ -138,7 +218,7 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
      * @return
      */
     public String getTemplateName(){
-        return ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_NAME;
+        return ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_IMPORT_NAME;
     }
 
     /**
@@ -170,8 +250,60 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
                 return;
             }
         }
+        if(backUpUser != null && StringUtils.isNotEmpty(backUpUser.getId())){
+            selected.setUsBackUpId(backUpUser.getId());
+            selected.setUsBackUpName(backUpUser.getName());
+        }
         super.save();
         this.selected = null;
+        this.backUpUser = null;
+    }
+
+    public List<ZkbPartOrderUserConfig> autoCompleteBackUpList(String query){
+        List<ZkbPartOrderUserConfig> res = backUpList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).collect(Collectors.toList());
+        return res;
+    }
+
+    public void exportAll(){
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        List<ZkbPartOrderUserConfig> zkbFePartOrderUserConfigList = this.zkbPartOrderUserConfigRepository.findBySearchFilter(this.searchFilters,sort);
+        try {
+            InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(ZkbPartOrderUserConfigService.USER_CONFIG_PATH+ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_NAME);
+            ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+            List<Map<String, Object>> zkbPartOrderList = this.zkbPartOrderUserConfigService.createExportPartOrderUserConfigData(zkbFePartOrderUserConfigList);
+            zkbPartOrderUserConfigService.exportData(doc, zkbPartOrderList);
+            exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", ZkbPartOrderUserConfigService.EXCEL_TEMPLATE_NAME);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ZkbPartOrderUserConfigController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    @Override
+    public void delete() {
+        List<ZkbPartOrder> zkbPartOrderList = this.zkbPartOrderRepository.findByOnline(this.selected.getId());
+        if(CollectionUtils.isNotEmpty(zkbPartOrderList))
+        {
+            WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_deleteError"));
+            return;
+        }
+        super.delete();
+    }
+
+    public ZkbPartOrderUserConfig getBackUpUser() {
+        return backUpUser;
+    }
+
+    public void setBackUpUser(ZkbPartOrderUserConfig backUpUser) {
+        this.backUpUser = backUpUser;
+    }
+
+    public List<ZkbPartOrderUserConfig> getBackUpList() {
+        return backUpList;
+    }
+
+    public void setBackUpList(List<ZkbPartOrderUserConfig> backUpList) {
+        this.backUpList = backUpList;
     }
 
     public List<Map<String, Object>> getErrorList() {
@@ -180,5 +312,13 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
 
     public void setErrorList(List<Map<String, Object>> errorList) {
         this.errorList = errorList;
+    }
+
+    public StreamedContent getExportFile() {
+        return exportFile;
+    }
+
+    public void setExportFile(StreamedContent exportFile) {
+        this.exportFile = exportFile;
     }
 }

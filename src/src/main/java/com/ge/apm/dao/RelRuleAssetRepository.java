@@ -19,6 +19,9 @@ public interface RelRuleAssetRepository extends GenericRepositoryUUID<RelRuleAss
 
 	public RelRuleAsset findByAssetUID(String uid);
 
+	@Query(value = "select * from rel_rule_asset r where r.site_uid = ?1",nativeQuery = true)
+	List<RelRuleAsset> findBySiteUIDs(String uid);
+
 
 
 	@Query(value = "select r.asset_uid from rel_rule_asset r where r.tenant_uid = ?1 and r.rule_uid1 is not null",nativeQuery = true)
@@ -38,4 +41,7 @@ public interface RelRuleAssetRepository extends GenericRepositoryUUID<RelRuleAss
 	@Transactional
 	@Query(value = "delete from rel_rule_asset where asset_uid in ?1",nativeQuery = true)
 	public void deleteByAssetUids(List<String> deleteAssetUids);
+
+	@Query(value = "select * from rel_rule_asset where asset_uid in ?1",nativeQuery = true)
+	public List<RelRuleAsset> findByAssetUids(List<String> deleteAssetUids);
 }

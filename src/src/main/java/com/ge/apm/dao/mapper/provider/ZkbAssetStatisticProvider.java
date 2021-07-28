@@ -33,13 +33,15 @@ public class ZkbAssetStatisticProvider {
                 " ai.uid AS asset_uid," +
                 " ac.contract_no,"+
                 " qr_code_info.reason AS reason," +
-                " qr_code_info.can_not_past_qr_code AS can_not_past_qr_code"+
+                " qr_code_info.can_not_past_qr_code AS can_not_past_qr_code,"+
+                " ib_qr_code.is_qr_code"+
                 " FROM" +
                 " zkb_contract ac" +
                 " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
                 " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
                 " INNER JOIN asset_info ai ON ai.uid= zca.asset_id" +
                 " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
+                " LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code on ib_qr_code.asset_uid = ai.uid and ib_qr_code.tenant_uid = ti.uid " +
                 " where ac.contract_no is not null and ai.system_id is not null"+
                         " and to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date"
                 );

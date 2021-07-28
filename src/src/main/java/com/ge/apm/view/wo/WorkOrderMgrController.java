@@ -13,7 +13,9 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
 import com.ge.apm.domain.simpleparts.SimplePartsInventory;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
+import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
@@ -159,7 +161,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private String token;
     private OrgInfoTreeService orgInfoTreeService;
     private AutoCompleteService autoCompleteService;
-
     private AssetInfoMgrService aimService;
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private Map<String, Object> selectedObjectMap = new HashMap();
@@ -196,11 +197,14 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter
     @Setter
     private Integer currentQuantity;
+    @Setter@Getter
+    private boolean hasConfigMultiLevelApproval = false;
     private SimplePartsRequestService partsRequestService;
     private SimplePartsInventoryService partsInventoryService;
     private SimplePartsItemService partsItemService;
     private SimplePartsRequestWorkOrderService partsRequestWorkOrderService;
     private SimplePartsConfigService partsConfigService;
+    private MultiLevelApprovalService multiLevelApprovalService;
     @Override
     protected void init() {
         try {
@@ -237,6 +241,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             partsItemService = WebUtil.getBean(SimplePartsItemService.class);
             partsRequestWorkOrderService = WebUtil.getBean(SimplePartsRequestWorkOrderService.class);
             partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
+            multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -297,7 +302,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
            return false;
     }
 */
-    @Getter @Setter
+    @Setter
     public boolean displayTime=false;
 
     public UserAccount getUa1() {
@@ -385,17 +390,25 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
     }
     public void selectSubstatus(){
-        if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
+        if(selectedWorkOrder.getSubStatus() == null){
+            displayTime=false;
+        }else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
             subStatus =1;
             displayTime=true;
-        }
-        else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS2){
+        }else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS2){
             subStatus =2;
             displayTime=false;
         } else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS3){
             subStatus =3;
             displayTime=false;
         }
+    }
+
+    public boolean getDisplayTime(){
+        if(selectedWorkOrder.getSubStatus() == null){
+            return false;
+        }
+        return this.displayTime;
     }
 
     public void closePrcieUpdate(){
@@ -851,7 +864,7 @@ public void test1(){
                 searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
                 if(!(userContextService.hasRole("AssetHead")||userContextService.hasRole("DeptHead"))){
                     searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-}
+                }
                 if(userContextService.hasRole("DeptHead")){
                     List<String> clinicalUidList =  orgDao.findClinicalUidBySiteUid(Arrays.asList(userContextService.getCurrentUserAccount().getSiteUID()));
                     searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
@@ -1187,8 +1200,14 @@ public void test1(){
 
 
     public void prepareCompleteOrder(String woid) {
-
         selectedWorkOrder = dao.findById(woid);
+        MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedWorkOrder);
+        hasConfigMultiLevelApproval = false;
+        if (approval != null) {
+            logger.info("维修-----------多级审核已激活");
+            hasConfigMultiLevelApproval = true;
+        }
+
         acker=woService.getAckerList(selectedWorkOrder.getId());
         //如果子状态为1 说明是等待备件 需要显示日期
 
@@ -1219,13 +1238,10 @@ public void test1(){
        }
 
         //获取当前工单的所属流程配置
-
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
         hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
-
-
 
         if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
@@ -1233,7 +1249,6 @@ public void test1(){
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
         statusStartTime=selectedWorkOrder.getStatusStartTime();
         statusCloseTime=selectedWorkOrder.getStatusCloseTime();
-      //  currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
@@ -1246,6 +1261,20 @@ public void test1(){
                 selectedWorkOrder.getAssetId());
         return Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("isCasetypeRequired")).orElse(false);
+    }
+
+    // 走多级审批流,提交审核
+    public void submitForApproval() throws Exception {
+        if(selectedWorkOrder == null){
+            return;
+        }
+        MultiLevelApproval approval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmit(selectedWorkOrder, null, false);
+        if (approval == null) {
+            WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
+            return ;
+        }
+        selectedWorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_PENDING);
+        dao.save(selectedWorkOrder);
     }
 
     //  提交审核前的计算
@@ -1939,12 +1968,12 @@ public void test1(){
                         }
                     }
                     if (!accessorySparePartsRequestList.isEmpty()) {
-                        LOGGER.info("维修工单生成申领单start!!!!");
-                        partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER);//生成申领单
+                        V2_WorkOrder v2_WorkOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                        partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER, userDao.findById(v2_WorkOrder.getCurrentPersonId()));//生成申领单
                     }
                     if (!accessorySparePartsBuyList.isEmpty()) {
-                        LOGGER.info("维修工单生成申购单start!!!!");
-                        partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER);//生成申购单
+                        V2_WorkOrder v2_WorkOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                        partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER, userDao.findById(v2_WorkOrder.getCurrentPersonId()));//生成申购单
                     }
                 }
             }

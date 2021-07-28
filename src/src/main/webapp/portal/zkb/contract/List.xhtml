@@ -114,7 +114,7 @@
                             <!--  <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{zkbContractController.delete}" update=":zkbContractListForm:datalist, :growl" disabled="#{empty zkbContractController.selected.id}">
                                   <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                               </p:commandButton>-->
-                            <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" oncomplete="PF('zkbConfigDlg').show()" update=":growl :zkbConfigDlg" disabled="#{!zkbContractController.deleteCanOperate}">
+                            <p:commandButton id="deleteButton" style="margin-left: 0px" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" oncomplete="PF('zkbConfigDlg').show()" update=":growl :zkbConfigDlg" disabled="#{!(zkbContractController.deleteCanOperate)}">
                                 <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>-->
                             </p:commandButton>
                             <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbContractController.exportAll}" icon="ui-icon-arrowstop-1-s">
