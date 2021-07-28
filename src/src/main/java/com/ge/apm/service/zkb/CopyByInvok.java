@@ -17,6 +17,7 @@ public class CopyByInvok {
 
     public static String T = "t";
     public static String F = "f";
+    public static String FOUR_TO_ONE = "fourToOne";
 
     public static <T> T translateField(Object souce, Class<T> target) throws Exception {
         T tarObj = target.newInstance();
