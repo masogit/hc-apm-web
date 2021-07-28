@@ -995,7 +995,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             WebUtil.addErrorMessage("配件号不能为空！");
             return;
         }
-        svcEngineLogisticsLineVOList = zkbPartOrderService.querySvcLogistics(selected.getSrNum(),se.getOrderNo(),se.getPartNo());
+        svcEngineLogisticsLineVOList = zkbPartOrderService.querySvcLogistics(selected.getSrNo(),se.getOrderNo(),se.getPartNo());
         if(svcEngineLogisticsLineVOList == null || svcEngineLogisticsLineVOList.size() == 0){
             WebUtil.addErrorMessage("查询结果为空！");
         }
