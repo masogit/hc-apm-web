@@ -432,7 +432,7 @@ public class AssetInstallationController {
                         return "/portal/reporter/schemaList?faces-redirect=true";
                     }
                 }else{
-                    return "/portal/reporter/schemaList?faces-redirect=true";
+                    return returnAction();
                 }
             }
         }
