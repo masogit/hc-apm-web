@@ -67,7 +67,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String showOrderedFieldsetText = "";
     private String queryStatus;
     private List<ZkbPartOrderItemVo> zkbPartOrderItemVoList = new ArrayList<>();
-    private List<ZkbContract> contractList;
     private HashMap<String,String> conditionMap = new HashMap<>();
     private List<ZkbPoHistoryQueryVo> zkbHistoryDataList;
     private List<ZkbPoHistoryQueryVo> geHistoryDataList;
@@ -107,10 +106,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             Optional.ofNullable(this.selected.getArtificialType()).ifPresent(t -> artificialType = this.selected.getArtificialType());
 
             zkbContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
-            if(zkbContract != null){
-                contractList = new ArrayList<>();
-                contractList.add(zkbContract);
-            }else{
+            if(zkbContract == null){
                 zkbContract = new ZkbContract();
                 return;
             }
@@ -1216,14 +1212,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     public void setV2_listHashMap(List<HashMap<String, Object>> v2_listHashMap) {
         this.v2_listHashMap = v2_listHashMap;
-    }
-
-    public List<ZkbContract> getContractList() {
-        return contractList;
-    }
-
-    public void setContractList(List<ZkbContract> contractList) {
-        this.contractList = contractList;
     }
 
     public List<ZkbPoHistoryQueryVo> getZkbHistoryDataList() {
