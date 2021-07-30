@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -143,6 +144,20 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         }
 
     }
+
+    public String getSrNum() {
+        String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE).concat("/getSrNum");
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return String.valueOf(responseMap.get("data"));
+        } else {
+            return null;
+        }
+    }
+
     public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
         ServiceRequestForm formData = new ServiceRequestForm();
         formData.setAssetId(asset.getId());

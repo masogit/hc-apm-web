@@ -582,7 +582,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                //flag=false;
+                flag=false;
                 errorLog += "附件不能为空！";
             }
         }else{
@@ -597,10 +597,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(ZkbPartOrder.OrderType.Probe.toString().equals(orderType)){
             if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType()) && CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
                 if(this.v2_probe_blobObjectList == null || this.v2_probe_blobObjectList.size() == 0){
-                    //flag=false;
+                    flag=false;
                     errorLog += "院方合同证明不能为空！";
                 }else if(this.v2_probe_blobObjectList.size() > 1){
-                    //flag=false;
+                    flag=false;
                     errorLog += "院方合同证明只能上传单个！";
                 }
             }
@@ -789,7 +789,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selectedContract.getQuotaDeductType())){
             if(CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
                 this.selected.setQty(selected.getQty() * 2);
-            }else if(CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
+            }else if(CopyByInvok.F.equals(selected.getTenantNewCatFlag())){
                 this.selected.setQty(selected.getQty() / 2);
             }
         }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType())){
