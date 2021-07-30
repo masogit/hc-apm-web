@@ -68,21 +68,20 @@ public class WorkOrderImportService {
                         if(i==2) departNumNull = true;
                         continue;
                     }
-                    String cellValule = cell.getCellType()==0? (new BigDecimal(row.getCell(i).getNumericCellValue())).toString():cell.getStringCellValue();
                     switch (cell.getColumnIndex()) {
-                        case 0: importWorkOrderForm.setAssetName(cellValule);break;
-                        case 1: importWorkOrderForm.setFinancingNum(cellValule);break;
-                        case 2: importWorkOrderForm.setDepartNum(cellValule);break;
-                        case 3: importWorkOrderForm.setSrNum(cellValule);break;
-                        case 4: importWorkOrderForm.setCasePriority(cellValule.equals("紧急")?"1":cellValule.equals("重要")? "2":cellValule.equals("一般")? "3":"4");break;
-                        case 5: importWorkOrderForm.setRequestReason(cellValule);break;
+                        case 0: importWorkOrderForm.setAssetName(cell.getStringCellValue());break;
+                        case 1: importWorkOrderForm.setFinancingNum(cell.getStringCellValue());break;
+                        case 2: importWorkOrderForm.setDepartNum(cell.getStringCellValue());break;
+                        case 3: importWorkOrderForm.setSrNum(cell.getStringCellValue());break;
+                        case 4: importWorkOrderForm.setCasePriority(cell.getStringCellValue().equals("紧急")?"1":cell.getStringCellValue().equals("重要")? "2":cell.getStringCellValue().equals("一般")? "3":"4");break;
+                        case 5: importWorkOrderForm.setRequestReason(cell.getStringCellValue());break;
                         case 6: importWorkOrderForm.setRequestTime(cell.getDateCellValue());break;
-                        case 7: importWorkOrderForm.setRepairType(cellValule.equals("上门维修")?"1":cellValule.equals("送到维修中心")?"2":"3");break;
+                        case 7: importWorkOrderForm.setRepairType(cell.getStringCellValue().equals("上门维修")?"1":cell.getStringCellValue().equals("送到维修中心")?"2":"3");break;
                         case 8: importWorkOrderForm.setConfirmedUpDate(cell.getDateCellValue());break;
-                        case 9: importWorkOrderForm.setAssetStatus(cellValule.equals("正常")?"1":cellValule.equals("停机")?"2":cellValule.equals("限制功能使用")?"3":"4");break;
-                        case 10: importWorkOrderForm.setRepairResult(cellValule.equals("完全修复")?"1":cellValule.equals("部分修复")?"2":cellValule.equals("无法修复")?"3":cellValule.equals("需外送修复")?"4":cellValule.equals("误报")?"5":"6");break;
-                        case 11: importWorkOrderForm.setCaseType(cellValule.equals("自然故障")?"1":cellValule.equals("人为故障")?"2":cellValule.equals("环境故障")?"3":cellValule.equals("设计故障")?"4":cellValule.equals("其它")?"5":"6");break;
-                        case 12: importWorkOrderForm.setManhours(cellValule);break;
+                        case 9: importWorkOrderForm.setAssetStatus(cell.getStringCellValue().equals("正常")?"1":cell.getStringCellValue().equals("停机")?"2":cell.getStringCellValue().equals("限制功能使用")?"3":"4");break;
+                        case 10: importWorkOrderForm.setRepairResult(cell.getStringCellValue().equals("完全修复")?"1":cell.getStringCellValue().equals("部分修复")?"2":cell.getStringCellValue().equals("无法修复")?"3":cell.getStringCellValue().equals("需外送修复")?"4":cell.getStringCellValue().equals("误报")?"5":"6");break;
+                        case 11: importWorkOrderForm.setCaseType(cell.getStringCellValue().equals("自然故障")?"1":cell.getStringCellValue().equals("人为故障")?"2":cell.getStringCellValue().equals("环境故障")?"3":cell.getStringCellValue().equals("设计故障")?"4":cell.getStringCellValue().equals("其它")?"5":"6");break;
+                        case 12: importWorkOrderForm.setManhours(cell.getStringCellValue());break;
                         case 13: importWorkOrderForm.setCloseTime(cell.getDateCellValue());break;
                     }
                 }
