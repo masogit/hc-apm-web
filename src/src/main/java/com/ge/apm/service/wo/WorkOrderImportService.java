@@ -55,7 +55,8 @@ public class WorkOrderImportService {
         Workbook b = new HSSFWorkbook(file.getInputstream());
         Sheet sheet = b.getSheetAt(0);
         List<ImportWorkOrderForm> importWorkOrderForms = new ArrayList<>();
-        boolean hasSkipRow = false;
+        boolean departNumNull = false;
+        boolean financingNumNull = false;
         for(Row row:sheet) {
             if(row==null) continue;
             if(row.getRowNum()!=0) {
@@ -63,7 +64,8 @@ public class WorkOrderImportService {
                 for (int i = 0;i<14;i++) {   //字段数14
                     Cell cell = row.getCell(i);
                     if(cell==null) {
-                        hasSkipRow = true;
+                        if(i==1) financingNumNull = true;
+                        if(i==2) departNumNull = true;
                         continue;
                     }
                     String cellValule = cell.getCellType()==0? (new BigDecimal(row.getCell(i).getNumericCellValue())).toString():cell.getStringCellValue();
@@ -87,7 +89,7 @@ public class WorkOrderImportService {
                 importWorkOrderForms.add(importWorkOrderForm);
             }
         }
-        if(hasSkipRow) WebUtil.addSuccessMessage("所有字段均为必填，请完整填写后再导入！");
+        if(departNumNull && financingNumNull) WebUtil.addSuccessMessage("资产编号和卡片号至少填写一个，请完整填写后再导入！");
         importWorkOrderByForm(importWorkOrderForms);
     }
 
@@ -98,11 +100,11 @@ public class WorkOrderImportService {
             AssetInfo assetInfo = null;
             List<AssetInfo> assetInfos = null;
             if(importWorkOrderForm.getDepartNum()!=null && importWorkOrderForm.getFinancingNum()!=null) {
-                assetInfos = assetInfoRepository.findByDepartNumAndFinancingNumAndSiteUID(importWorkOrderForm.getDepartNum(),importWorkOrderForm.getFinancingNum(),userAccount.getSiteUID());
+                assetInfos = assetInfoRepository.findByDepartNumAndFinancingNum(importWorkOrderForm.getDepartNum(),importWorkOrderForm.getFinancingNum());
             } else if(importWorkOrderForm.getFinancingNum()!=null) {
-                assetInfos = assetInfoRepository.findByFinancingNumAndSiteUID(importWorkOrderForm.getFinancingNum(),userAccount.getSiteUID());
+                assetInfos = assetInfoRepository.findByFinancingNum(importWorkOrderForm.getFinancingNum(),userAccount.getSiteUID());
             } else if(importWorkOrderForm.getDepartNum()!=null) {
-                assetInfos = assetInfoRepository.findByDepartNumAndSiteUID(importWorkOrderForm.getDepartNum(),userAccount.getSiteUID());
+                assetInfos = assetInfoRepository.findByDepartNum(importWorkOrderForm.getDepartNum());
             } else {
                 continue;
             }
