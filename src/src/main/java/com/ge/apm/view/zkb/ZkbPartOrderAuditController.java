@@ -34,6 +34,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String actionName;
     private V2_WorkOrder selectedWorkFlow;
     private ZkbContract zkbContract;
+    private List<ZkbContract> contractList;
     private String orderType;
     private String artificialType;
     private List<V2_BlobObject> v2_blobObjectList;
@@ -109,6 +110,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             if(zkbContract == null){
                 zkbContract = new ZkbContract();
                 return;
+            }else{
+                contractList = new ArrayList<>();
+                contractList.add(zkbContract);
             }
             selectedWorkFlow = m.get("V2_WorkOrder") == null ? null : (V2_WorkOrder)m.get("V2_WorkOrder");
             HashMap<String, Object> mm = m.get("v2") == null ? null : (HashMap<String, Object>)m.get("v2");
@@ -1340,7 +1344,15 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void setV2_probe_blobObjectList(List<V2_BlobObject> v2_probe_blobObjectList) {
         this.v2_probe_blobObjectList = v2_probe_blobObjectList;
     }
-//endregion
+
+    public List<ZkbContract> getContractList() {
+        return contractList;
+    }
+
+    public void setContractList(List<ZkbContract> contractList) {
+        this.contractList = contractList;
+    }
+    //endregion
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {

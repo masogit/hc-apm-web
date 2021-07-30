@@ -789,7 +789,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selectedContract.getQuotaDeductType())){
             if(CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
                 this.selected.setQty(selected.getQty() * 2);
-            }else if(CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
+            }else if(CopyByInvok.F.equals(selected.getTenantNewCatFlag())){
                 this.selected.setQty(selected.getQty() / 2);
             }
         }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType())){
