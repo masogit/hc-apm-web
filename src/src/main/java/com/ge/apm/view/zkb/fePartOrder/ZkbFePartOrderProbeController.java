@@ -430,7 +430,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())&&ZkbFePartOrderService.testStatusTrueValue.equals(this.selected.getNewCatFlag()))
         {
             this.calcRemainQty();
-            if(this.selected.getRemainQty()<0)
+            if(this.selected.getQty()!=null&&this.selected.getQty()>0&&this.selected.getRemainQty()<0)
             {
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSupportTimesCannotBeZero"));
                 return "";
