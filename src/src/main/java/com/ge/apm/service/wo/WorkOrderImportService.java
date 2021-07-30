@@ -59,7 +59,7 @@ public class WorkOrderImportService {
         boolean financingNumNull = false;
         for(Row row:sheet) {
             if(row==null) continue;
-            if(row.getRowNum()!=0) {
+            if(row.getRowNum()!=0 && row.getRowNum()!=1) {
                 ImportWorkOrderForm importWorkOrderForm = new ImportWorkOrderForm();
                 for (int i = 0;i<14;i++) {   //字段数14
                     Cell cell = row.getCell(i);
