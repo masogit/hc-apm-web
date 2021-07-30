@@ -222,7 +222,6 @@
                             <label class="label">SN编号*</label>
                             <p:selectOneMenu disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" value="#{zkbFePartOrderProbeController.selected.contractCatId}" required="true" requiredMessage="SN编号 #{msg.ValidationRequire}" >
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItem itemLabel="探头4合一兑换" itemValue="fourInOne"/>
                                 <f:selectItems value="#{zkbFePartOrderProbeController.highCatList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                             <label style="color: red">#{zkbFePartOrderProbeController.noHighCatTips}</label>

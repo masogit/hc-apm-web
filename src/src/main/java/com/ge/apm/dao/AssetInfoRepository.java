@@ -127,7 +127,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public List<AssetInfo> findByDepartNumAndSiteUID(String num, String siteUID);
     public List<AssetInfo> findByFinancingNumAndSiteUID(String num, String siteUID);
     public List<AssetInfo> findByQrCodeAndSiteUID(String qrCode, String siteUID);
-
+    public List<AssetInfo> findByDepartNumAndFinancingNumAndSiteUID(String num1,String num2,String siteUid);
     @Modifying
     @Transactional
     @Query("update AssetInfo ai set ai.swapTypeState = :swapTypeState where ai.id = :id")

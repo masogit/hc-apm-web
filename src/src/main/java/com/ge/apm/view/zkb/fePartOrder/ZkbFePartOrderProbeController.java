@@ -175,7 +175,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     private ZkbContractCatRepository zkbContractCatRepository;
 
-    public static final String four_in_one = "fourInOne";
+    public static final String four_in_one = "fourToOne";
 
     /**
      * PDF上传列表

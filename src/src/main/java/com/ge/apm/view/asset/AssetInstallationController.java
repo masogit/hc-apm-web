@@ -404,7 +404,7 @@ public class AssetInstallationController {
             if(workflowConfigItem != null){
                 //获取到workflow中是否售后服务
                 Boolean anBool = workflowConfigItem.getAiNeedMaintenance();
-                if(anBool  == true){
+                if(anBool != null && anBool  == true){
                     ArrivalList arrivalListToStatus = arrivalListDao.findByName(orderNumber);
                     if(arrivalListToStatus.getStatus()!=3){
                         return returnAction();
@@ -431,6 +431,8 @@ public class AssetInstallationController {
                     }else{
                         return "/portal/reporter/schemaList?faces-redirect=true";
                     }
+                }else{
+                    return returnAction();
                 }
             }
         }
