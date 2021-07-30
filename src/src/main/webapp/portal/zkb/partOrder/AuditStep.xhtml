@@ -308,7 +308,7 @@
                             </p:dataList>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:panelGrid  rendered="#{zkbPartOrderAuditController.orderType eq 'Probe'}">
+                    <p:panelGrid  rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and zkbPartOrderAuditController.zkbContract.quotaDeductType eq 'New' and zkbPartOrderAuditController.selected.tenantNewCatFlag eq 't'}">
                         <h:panelGroup>
                             <p:dataList  value="#{zkbPartOrderAuditController.v2_probe_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">院方合同证明</f:facet>
