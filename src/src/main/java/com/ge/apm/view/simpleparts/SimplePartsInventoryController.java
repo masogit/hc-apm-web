@@ -133,6 +133,11 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
             String userUid = currentUserAccount.getUid();
             List<String> partsWarehouses = partsWarehouseUserService.findAllByPartsWarehouseByUserUid(userUid);
             Set<String> warehouses = new HashSet<>(partsWarehouses);
+            if(warehouses.size() == 0){
+                searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, null));
+                Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+                return res;
+            }
             searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, partsWarehouses));
 //          List<SimplePartsInventory> res= partsInventoryRepository.findByPartsWarehouseIds(warehouses);
 //            searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, warehouses, ""));

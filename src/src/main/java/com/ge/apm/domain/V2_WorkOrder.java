@@ -274,6 +274,9 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="close_Step_End_Time")
     private Date closeStepEndTime;
 
+    @Column(name = "data_source")
+    private String dataSource; // 数据来源  如果是导入的工单: import ，系统创建的 null
+
     @Transient
     private Integer orderCount;
 
@@ -392,6 +395,10 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     public void setV2_workOrder_detail_list(List<V2_WorkOrder_Detail> v2_workOrder_detail_list) {
         this.v2_workOrder_detail_list = v2_workOrder_detail_list;
     }
+
+    public String getDataSource() { return dataSource; }
+
+    public void setDataSource(String dataSource) { this.dataSource = dataSource; }
 
     public AssetInfo getAssetInfo() {
         return assetInfo;
