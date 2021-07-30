@@ -325,7 +325,7 @@
                                       multiple="true"  sizeLimit="100000000"  update="uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:panelGrid id="proveFile">
+                    <h:panelGroup id="proveFile">
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType eq 'New' and zkbPartOrderEditController.selected.tenantNewCatFlag eq 't'}">
                             <p:dataList  id="uploadProveList" value="#{zkbPartOrderEditController.v2_probe_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">院方合同证明</f:facet>
@@ -337,7 +337,7 @@
                             <p:fileUpload allowTypes="/(\.|\/)(pdf|PDF)$/" fileUploadListener="#{zkbPartOrderEditController.handleProveFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                           multiple="true"  sizeLimit="31000000"  update="uploadProveList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}3M" label="#{msg.Add}"/>
                         </h:panelGroup>
-                    </p:panelGrid>
+                    </h:panelGroup>
                 </p:fieldset>
                 <p:fieldset id="zkbPartOrderOnlineFieldset" legend="在线工程师" rendered="#{(zkbPartOrderEditController.orderType eq 'Parts' or zkbPartOrderEditController.orderType eq 'Probe') and zkbPartOrderEditController.assetInfo.assetGroup eq 2 }" >
                     <h:panelGroup>
