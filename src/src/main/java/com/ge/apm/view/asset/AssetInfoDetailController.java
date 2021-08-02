@@ -35,6 +35,7 @@ import javax.faces.bean.ViewScoped;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +45,7 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class AssetInfoDetailController {
-
+    private Logger log = Logger.getLogger(AssetInfoController.class.getName());
     private AeMapper aeMapper;
     private AssetInfoRepository assetDao;
     private MvsAssetInfoRepository mvsAssetInfoDao;
@@ -227,10 +228,13 @@ public class AssetInfoDetailController {
             List<String> list = aeMapper.selectAeWorkloadBeanByDashboardPage(str);
             if(list!=null && !list.isEmpty()){
                 String dashboardPage = list.get(0);
+                String dashboardPageStart = dashboardPage.substring(0,dashboardPage.indexOf("#"));
+                String dashboardPageEnd = dashboardPage.substring(dashboardPage.indexOf("#"));
                 InetAddress addr = InetAddress.getLocalHost();
                 String hostAddress = addr.getHostAddress();
-                String token = UserContextService.getAccessToken();
-                String url="http://"+hostAddress+ "/"+dashboardPage +"?"+"token="+token+"/device";
+                String token = UserContextService.getAccessToken().substring(7);
+                String url="http://"+hostAddress+ "/"+dashboardPageStart +"?"+"token="+token+dashboardPageEnd+"/device";
+                log.info("url="+url);
                 return url;
             }
 
