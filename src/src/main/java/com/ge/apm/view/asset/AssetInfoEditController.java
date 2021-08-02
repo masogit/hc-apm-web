@@ -285,6 +285,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 readableFieldsList.remove("createdBy");
             }
         }
+        if(selected.getUnitPriceElectricity()==null){
+            WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
+            selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
+        }
         initGbTree();
         initOrgTree();
 
@@ -652,7 +656,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage("设备编号已被占用");
             return "";
         }
-
+        if(selected.getUnitPriceElectricity()==null){
+            WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
+            selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
+        }
         //设置质保时间
         if (null == selected.getFactoryWarrantyDate()) {
             if (selected.getAcceptDate() != null && selected.getWarrantyMonth() != null) {
