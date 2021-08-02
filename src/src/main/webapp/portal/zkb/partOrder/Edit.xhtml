@@ -334,7 +334,7 @@
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </p:dataList>
-                            <p:fileUpload allowTypes="/(\.|\/)(pdf|PDF)$/" fileUploadListener="#{zkbPartOrderEditController.handleProveFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                            <p:fileUpload allowTypes="/(\.|\/)(pdf|PDF)$/" fileUploadListener="#{zkbPartOrderEditController.handleProveFileUpload}" disabled="#{zkbPartOrderEditController.v2_probe_blobObjectList != null and zkbPartOrderEditController.v2_probe_blobObjectList.size() == 1}" mode="advanced" dragDropSupport="false" style="width:100%"
                                           multiple="true"  sizeLimit="31000000"  update="uploadProveList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}3M" label="#{msg.Add}"/>
                         </h:panelGroup>
                     </h:panelGroup>
