@@ -519,7 +519,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-                <p:fieldset id="equipmentPerformance" legend="设备绩效">
+                <p:fieldset id="equipmentPerformance" legend="设备绩效" rendered="false">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                         <h:panelGroup>
                             <label class="label">#{msg.unitPriceElectricity}(元)</label>
