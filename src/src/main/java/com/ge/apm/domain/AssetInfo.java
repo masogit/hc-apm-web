@@ -14,6 +14,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.format.annotation.DateTimeFormat;
 import webapp.framework.util.TimeUtil;
 
 import javax.persistence.*;
@@ -582,6 +583,15 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "visible_status")
     private Integer visibleStatus = 1;
 
+    @Column(name = "monitor_rate")//主机功率
+    private Double monitorRate;
+
+    @Column(name = "other_power")//其他功率
+    private Double otherPower;
+
+    @Column(name = "unit_price_electricity")//电费单价
+    private Double unitPriceElectricity;
+
     @Transient
     private int lineNum;
 
@@ -621,9 +631,112 @@ public class AssetInfo implements ChineseName,Serializable {
     @Getter
     @Setter
     private String errorMessage;
-
+    @Transient
+    private String aet;
+    @Transient
+    private Date studydate;
+    @Transient
+    private Date startTime;
+    @Transient
+    private Date endTime;
+    @Transient
+    private Double studyexposuretime;
+    @Transient
+    private String usageRate;
+    @Transient
+    private Double energyConsumption;
+    @Transient
+    private String dashboardPage;
     @Transient
     private List<String> tags = new ArrayList<>();
+
+    public String getDashboardPage() {
+        return dashboardPage;
+    }
+
+    public void setDashboardPage(String dashboardPage) {
+        this.dashboardPage = dashboardPage;
+    }
+
+    public String getUsageRate() {
+        return usageRate;
+    }
+
+    public void setUsageRate(String usageRate) {
+        this.usageRate = usageRate;
+    }
+
+    public Double getEnergyConsumption() {
+        return energyConsumption;
+    }
+
+    public void setEnergyConsumption(Double energyConsumption) {
+        this.energyConsumption = energyConsumption;
+    }
+
+    public String getAet() {
+        return aet;
+    }
+
+    public void setAet(String aet) {
+        this.aet = aet;
+    }
+
+    public Date getStudydate() {
+        return studydate;
+    }
+
+    public void setStudydate(Date studydate) {
+        this.studydate = studydate;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public Double getStudyexposuretime() {
+        return studyexposuretime;
+    }
+
+    public void setStudyexposuretime(Double studyexposuretime) {
+        this.studyexposuretime = studyexposuretime;
+    }
+
+    public Double getMonitorRate() {
+        return monitorRate;
+    }
+
+    public void setMonitorRate(Double monitorRate) {
+        this.monitorRate = monitorRate == null ? 0D : monitorRate;
+    }
+
+    public Double getUnitPriceElectricity() {
+        return unitPriceElectricity;
+    }
+
+    public void setUnitPriceElectricity(Double unitPriceElectricity) {
+        this.unitPriceElectricity = unitPriceElectricity;
+    }
+
+    public Double getOtherPower() {
+        return otherPower;
+    }
+
+    public void setOtherPower(Double otherPower) {
+        this.otherPower = otherPower == null ? 0D : otherPower;
+    }
 
     public String getIsCheckedValue() {
         return isCheckedValue;
