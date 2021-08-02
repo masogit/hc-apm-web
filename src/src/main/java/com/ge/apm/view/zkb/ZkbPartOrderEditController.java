@@ -870,9 +870,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         return res;
     }
 
-    public void removeFile(V2_BlobObject v2_blobObject) {
-        v2_blobObjectList = v2_blobObjectList.stream().filter(item -> !item.getId().equals(v2_blobObject.getId())).collect(Collectors.toList());
-
+    public void removeFile(V2_BlobObject v2_blobObject,String type) {
+        if(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER.equals(type)){
+            v2_blobObjectList = v2_blobObjectList.stream().filter(item -> !item.getId().equals(v2_blobObject.getId())).collect(Collectors.toList());
+        }else if(V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_PROVE.equals(type)){
+            v2_probe_blobObjectList = v2_probe_blobObjectList.stream().filter(item -> !item.getId().equals(v2_blobObject.getId())).collect(Collectors.toList());
+        }
     }
 
     public void handleFileUpload(FileUploadEvent event){
