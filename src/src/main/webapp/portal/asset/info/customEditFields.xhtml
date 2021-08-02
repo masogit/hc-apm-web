@@ -801,6 +801,27 @@
                            requiredMessage="#{msg.salvageValue} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('salvageValue')}" />
         </h:panelGroup>
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'monitorRate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.monitorRate}(W)</label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="monitorRate" value="#{assetInfoEditController.selected.monitorRate}" required="#{assetInfoEditController.customConfig.assetFields['monitorRate'].required}"
+                            readonly="#{!assetInfoEditController.needEdit('monitorRate')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'otherPower')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.otherPower}(W)</label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="otherPower" value="#{assetInfoEditController.selected.otherPower}" required="#{assetInfoEditController.customConfig.assetFields['otherPower'].required}"
+                            readonly="#{!assetInfoEditController.needEdit('otherPower')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'otherPower')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.unitPriceElectricity}(元)</label>
+            <p:inputNumber minValue="0.00" decimalPlaces="2" id="unitPriceElectricity" value="#{assetInfoEditController.selected.unitPriceElectricity}" required="#{assetInfoEditController.customConfig.assetFields['unitPriceElectricity'].required}"
+                            readonly="#{!assetInfoEditController.needEdit('unitPriceElectricity')}" />
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'lifecycle')}" >
         <h:panelGroup>
             <label class="label">#{msg.lifecycle}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['lifecycle'].required? '*':''}</span></label>
