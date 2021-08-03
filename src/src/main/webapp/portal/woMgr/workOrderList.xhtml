@@ -30,7 +30,7 @@
                     <p:tab class="ui-g-12" title="#{msg.ExternalRemoteWorkorder}"  id="outRemoteWorkOrder" rendered="#{not userContextService.isAccountEndUser() and userContextService.isLocale() or userContextService.isZtbTenant() or userContextService.isHaveIbDeviceUser()}">
                         <ui:include src="woMgrOutRemoteList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="工单导入" rendered="#{userContextService.accessContains('supplierManagement')}" id="importWorkOrder">
+                    <p:tab class="ui-g-12" title="工单导入" rendered="false" id="importWorkOrder">
                         <ui:include src="WorkOderImport.xhtml"/>
                     </p:tab>
                 </p:tabView>
