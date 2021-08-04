@@ -244,7 +244,6 @@ public class SimplePartsRequestWorkOrderService {
                     if(v2_serviceRequest != null){
                         partsRequest.setMaintenanceWorkOrderNumber(v2_serviceRequest.getSrNum());
                     }else {
-                        log.error("报修主表没找到，添加维修工单号，报修单id为："+v2_workOrder.getSrId()+",报修单号为："+v2_serviceRequest.getSrNum());
                         partsRequest.setMaintenanceWorkOrderNumber(v2_workOrder.getId());
                     }
                 }
