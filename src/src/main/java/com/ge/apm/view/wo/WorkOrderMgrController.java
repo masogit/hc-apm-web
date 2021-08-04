@@ -1993,11 +1993,11 @@ public void test1(){
                 }
                 if (!accessorySparePartsRequestList.isEmpty()) {
                     V2_WorkOrder v2_WorkOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
-                    partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER, userDao.getById(v2_WorkOrder.getCurrentPersonId()));//生成申领单
+                    partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER, userDao.getById(v2_WorkOrder.getCurrentPersonId()));//生成申领单
                 }
                 if (!accessorySparePartsBuyList.isEmpty()) {
                     V2_WorkOrder v2_WorkOrder = dao.findById(accessorySparePartsBuyList.get(0).getWoId());
-                    partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER, userDao.getById(v2_WorkOrder.getCurrentPersonId()));//生成申购单
+                    partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER, userDao.getById(v2_WorkOrder.getCurrentPersonId()));//生成申购单
                 }
             }
         }
