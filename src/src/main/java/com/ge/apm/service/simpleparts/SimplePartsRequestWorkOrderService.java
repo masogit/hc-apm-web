@@ -258,7 +258,6 @@ public class SimplePartsRequestWorkOrderService {
                 if(v2_pmOrder != null){
                     partsRequest.setMaintenanceWorkOrderNumber(v2_pmOrder.getPmNum());
                 }else {
-                    log.error("保养工单没找到，添加保养工单号,工单id为"+woId+",保养工单号="+v2_pmOrder.getPmNum());
                     partsRequest.setMaintenanceWorkOrderNumber(woId);
                 }
             }
