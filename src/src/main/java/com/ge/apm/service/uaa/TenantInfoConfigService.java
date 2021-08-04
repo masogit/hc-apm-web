@@ -152,14 +152,14 @@ public class TenantInfoConfigService {
 		}
 		for (int i = 0; i < menuList.size(); ++i) {
 			TenantInfoConfigItem tempItem = menuList.get(i);
-			//默认不勾选 菜单
-			defaultNotSelectedMenu(tempItem);
 			if(edition.equals(AUDIT_VERSION)||edition.equals(SWAP_CENTER_VERSION)){
 				resetAuditOrSwapCenterVersion(tempItem);
 			}else{
 //				tempItem.setValue(true);
 				resetNotAuditVersion(tempItem);
 			}
+			//默认不勾选 菜单
+			defaultNotSelectedMenu(tempItem);
 			String key = tempItem.getKey();
 			if (edition.equals(VERSION_COMMON)) {
 				//默认不勾选”质控评审“菜单
@@ -445,6 +445,7 @@ public class TenantInfoConfigService {
 		this.cpmURL="";
 		menuList = getListVersions();
 		setEdition(VERSION_COMMON);
+		resetVersion();
 	}
 
 	// public static void main(String[] args) {
