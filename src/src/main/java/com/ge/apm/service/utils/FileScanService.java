@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.UUID;
 import org.primefaces.model.UploadedFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class FileScanService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileScanService.class);
 
     private static Long TIME_OUT = 5000l;
 
@@ -37,6 +41,7 @@ public class FileScanService {
 
     public String saveBatchUploadedFile(UploadedFile file, String fileType) throws Exception {
         String folderName = BATCH_FILE_Folder.concat(File.separator).concat(fileType == null ? "" : fileType).concat(String.valueOf(System.currentTimeMillis()));
+        LOGGER.info("=====>FileScanService.saveBatchUploadedFile folderName={},BATCH_FILE_Folder={}",folderName,BATCH_FILE_Folder);
         return saveFile(file, folderName, "batchfile").replaceFirst(BATCH_FILE_Folder, "");
     }
     

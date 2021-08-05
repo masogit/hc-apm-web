@@ -1521,6 +1521,9 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'AconnectPerformanceExcel', '基础互通-用', 'Aconnect Performance', NULL,'-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'ZoneManagerInfoExcel', 'ZoneManager列表', 'Zone Manager List', NULL,'-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'GEDictionaryExcel', 'GEDictionary列表', 'GE Dictionary List', NULL,'-1');
+
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileType', 'SrCancelList', '删除工单', 'delete Lifecycle', NULL,'-1');
+
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileProcessStatus','FAILEDUPLOAD','上传失败','Failed Upload',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileProcessStatus','STARTING','待处理','Starting',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('batchFileProcessStatus','STARTED','已开始','Started',NULL,-1);
@@ -4110,7 +4113,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','cataLog','货号','cata Log',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','USOptionImage','USOption图片上传','USOption Image',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ProbeRecommendImage','探头图片上传','ProbeRecommend Image',NULL,-1);
-
+--  0804 添加QuestionNaire
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','QuestionNaire','问卷调查维护','QuestionNaire',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','geibTable_installedTime','装机时间','geibTable installed Time',NULL,-1);
 
