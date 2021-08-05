@@ -1,7 +1,7 @@
 create extension dblink;
 
 DROP VIEW IF EXISTS acc_userasset_info_dblink;
-create view acc_userasset_info_dblink as select * from dblink('hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d','select t1.system_id,t2.wechat_id from asset_info t1,user_account t2,user_org t3 where t2.uid = t3.user_uid and t1.is_deleted = FALSE and t1.is_valid = TRUE
+create view acc_userasset_info_dblink as select * from dblink('hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d','select t1.system_id,t2.wechat_id from asset_info t1,user_account t2,user_org t3 where t2.uid = t3.user_uid and t1.is_deleted = FALSE and t1.is_valid = TRUE
 and t1.tenant_uid = t3.org_uid and t3.org_type = 0 AND t1.system_id like ''0824%'' and t2.wechat_id is not NULL and (t2.is_active = TRUE or t2.is_active is null) and (t2.is_deleted = FALSE or t2.is_deleted is null)
 UNION
 select t1.system_id,t2.wechat_id from asset_info t1,user_account t2,user_org t3 where t2.uid = t3.user_uid and t1.is_deleted = FALSE and t1.is_valid = TRUE
@@ -21,7 +21,7 @@ CREATE VIEW acc_org_info_dblink AS SELECT
 	*
 FROM
 	dblink (
-'hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
+'hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
 'select id,
 created_by,
 created_date,
@@ -89,7 +89,7 @@ CREATE VIEW acc_user_org_dblink AS SELECT
 	*
 FROM
 	dblink (
-'hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
+'hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
 'select id,
 org_type,
 org_uid,
@@ -106,7 +106,7 @@ CREATE VIEW acc_user_account_dblink AS SELECT
 	*
 FROM
 	dblink (
-'hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
+'hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
 'select id,
 created_by,
 created_date,
@@ -220,7 +220,7 @@ CREATE VIEW acc_asset_info_dblink AS SELECT
 	*
 FROM
 	dblink (
-'hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
+'hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
 'select id,
 site_id,
 name,
@@ -558,7 +558,7 @@ CREATE VIEW acc_message_subscriber_dblink AS SELECT
 	*
 FROM
 	dblink (
-'hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
+'hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
 'select
 t1.id,
 t1.site_id,
@@ -623,7 +623,7 @@ CREATE VIEW acc_tenant_info_dblink AS SELECT
 	*
 FROM
 	dblink (
-'hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
+'hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d',
 'select
 id,
 name,
@@ -710,7 +710,8 @@ have_ib_device bool,
 two_factor_valid bool,
 qrcode_editable bool);
 
-create view acct_guest_user_dblink as select * from dblink('hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d','SELECT
+DROP VIEW IF EXISTS acct_guest_user_dblink;
+create view acct_guest_user_dblink as select * from dblink('hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d','SELECT
 	t1.wechat_id
 FROM
 	user_account t1,
@@ -740,7 +741,7 @@ AND t3. NAME = ''Guest''') AS t(wechat_id varchar(255));
 DROP VIEW IF EXISTS zkb_ib_cross_user_dblink;
 create view zkb_ib_cross_user_dblink as  SELECT *
 FROM
-	dblink ('hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d' ,
+	dblink ('hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d' ,
 	'select id,
 	account_creation_type,
 	admin_mode,
@@ -850,7 +851,7 @@ create view zkb_ib_cross_relation_ship_dblink as  SELECT t.id,
 	t.qr_code,
 	t.syetem_id
 FROM
-	dblink ('hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d', 'select
+	dblink ('hostaddr=172.18.9.27 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d', 'select
 	id,
 	login_name,
 	qr_code,
