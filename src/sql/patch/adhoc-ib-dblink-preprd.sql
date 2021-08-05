@@ -710,6 +710,7 @@ have_ib_device bool,
 two_factor_valid bool,
 qrcode_editable bool);
 
+DROP VIEW IF EXISTS acct_guest_user_dblink;
 create view acct_guest_user_dblink as select * from dblink('hostaddr=172.20.9.11 port=5432 dbname=dfa4d250ca24740e52acbe4193f03d236 user=u25311cc705bad494ab334556a0c7670e password=pc8daf2a0436c33f9a1bd08c555cd647d','SELECT
 	t1.wechat_id
 FROM
