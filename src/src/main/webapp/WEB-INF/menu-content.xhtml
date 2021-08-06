@@ -217,6 +217,10 @@
 
             <p:menuitem value="设备数据概览" icon="fa fa-bar-chart" outcome="/portal/nine.xhtml"/>
 
+            <p:submenu id="um24_supplier" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('supplierMaintain')}">
+                <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/supplier/pmSupplierOrderListAll.xhtml" rendered="#{userContextService.accessContains('supplierMaintain.workbench')}"/>
+            </p:submenu>
+
             <p:submenu label="供应商管理" icon="settings"  rendered="#{userContextService.accessContains('supplierManagement')}"  >
                 <p:menuitem id="mirage_userAccount" rendered="#{userContextService.accessContains('supplierManagement.supplierUser')}"  value="供应商用户管理" outcome="/portal/mirage/mirage.xhtml?route=/userAccount/page"    />
                 <p:menuitem id="mirage_tenantSupplierMapping" rendered="#{userContextService.accessContains('supplierManagement.tenantSupplierMapping')}" value="租户供应商绑定" outcome="/portal/mirage/mirage.xhtml?route=/orgSupplierMapping"    />
