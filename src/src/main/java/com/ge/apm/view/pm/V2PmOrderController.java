@@ -1148,8 +1148,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return orgDao.getByUid(orgUid);
     }
 
-    public void savePM() {
-        PmOrderActionForm formData = new PmOrderActionForm();
+    public void savePM(){
+        this.savePM(new PmOrderActionForm());
+    }
+
+    public void savePM(PmOrderActionForm formData) {
         if (selectedAsset.getStatus() == 5) {
             WebUtil.addErrorMessage(WebUtil.getMessage("DeactivatedCantRepair"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -1792,7 +1795,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return result;
     }
 
-    private Sort returnSort(PageRequest pageRequest){
+    protected Sort returnSort(PageRequest pageRequest){
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
         orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
         orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));

@@ -290,18 +290,26 @@
                             <label class = "label">#{msg.Level2SimplifiedMaintenance}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmSimplify}"/>
                         </h:panelGroup >
-                        <h:panelGroup rendered="true">
+                        <h:panelGroup rendered="#{ workflowConfigController.getViewShowTenantBox()}" >
                             <label class = "label">#{msg.AutomaticallySendWorkers}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmAutoEnabled}"/>
                         </h:panelGroup >
-                        <h:panelGroup rendered="true">
+                        <h:panelGroup rendered="#{ workflowConfigController.getViewShowTenantBox()}" >
                             <label class = "label">#{msg.WorkorderCompetitionAllowed}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmTakeOrderEnabled}"/>
                         </h:panelGroup >
-                        <h:panelGroup rendered="true">
+                        <h:panelGroup rendered="#{ workflowConfigController.getViewShowTenantBox()}">
                             <label class = "label">#{msg.ManuallySendWorkers}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmManualEnabled}"/>
                         </h:panelGroup >
+
+                        <h:panelGroup rendered="true">
+                            <label class = "label">供应商抢单?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmSupplierTakeOrderEnabled}">
+                                <p:ajax update=":V2_WorkflowConfigEditForm" />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup >
+
                         <h:panelGroup>
                             <label class="label">#{msg.PriorDaysOfMaintenanceReminder}</label>
                             <p:inputNumber id="pmReminderTime" value="#{workflowConfigController.selected.pmReminderTime}" minValue="0" decimalPlaces="0"/>

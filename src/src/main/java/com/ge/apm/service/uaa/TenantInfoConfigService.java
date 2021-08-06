@@ -343,6 +343,8 @@ public class TenantInfoConfigService {
 			case "supplierManagement.tenantSupplierMapping":
 			case "supplierManagement.assetBindSupplier":
 			case "supplierManagement.assetBindSupplierFE":
+			case "supplierMaintain":
+			case "supplierMaintain.workbench":
 				item.setValue(false);
 		}
 	}
@@ -355,6 +357,8 @@ public class TenantInfoConfigService {
 			case "supplierManagement":
 			case "supplierManagement.supplierUser":
 			case "supplierManagement.assetBindSupplierFE":
+			case "supplierMaintain":
+			case "supplierMaintain.workbench":
 				item.setValue(true);
 				return;
 			default:

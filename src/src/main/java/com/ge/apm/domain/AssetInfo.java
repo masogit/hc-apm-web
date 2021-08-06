@@ -738,6 +738,21 @@ public class AssetInfo implements ChineseName,Serializable {
         this.otherPower = otherPower == null ? 0D : otherPower;
     }
 
+    /**
+     * 新供应商uid 关联 tenant_info
+     */
+    @Column(name = "supplier_new_uid")
+    private String supplierNewUID;
+
+
+    public String getSupplierNewUID() {
+        return supplierNewUID;
+    }
+
+    public void setSupplierNewUID(String supplierNewUID) {
+        this.supplierNewUID = supplierNewUID;
+    }
+
     public String getIsCheckedValue() {
         return isCheckedValue;
     }
