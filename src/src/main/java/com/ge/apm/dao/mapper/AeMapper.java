@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface AeMapper  {
 
-    @Select("select DW_AE_ID from ae_mpping where ASSET_ID = #{assetId}")
+    @Select("select DW_AE_ID from ae_mapping where ASSET_ID = #{assetId}")
     public String  selectAeMapperBean(String assetId);
 
     @Select("select * from ae_workload where aet = #{aet} and studydate = #{studydate}")
