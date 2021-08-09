@@ -72,8 +72,8 @@ public class PmOrderImportService {
                             case 4: importPmOrderForm.setPmType(cell.getStringCellValue().equals("周期性")?"1":cell.getStringCellValue().equals("一次性")? "2":"3");break;
                             case 5: importPmOrderForm.setRuleLevel(cell.getStringCellValue().equals("2级规则")?"2":"3");break;
                             case 6: importPmOrderForm.setManhours(cell.getStringCellValue());break;
-                            case 7: importPmOrderForm.setRequestTime(cell.getDateCellValue());
-                            case 8: importPmOrderForm.setCloseTime(cell.getDateCellValue());
+                            case 7: importPmOrderForm.setRequestTime(cell.getDateCellValue());break;
+                            case 8: importPmOrderForm.setCloseTime(cell.getDateCellValue());break;
                         }
 
                     }
