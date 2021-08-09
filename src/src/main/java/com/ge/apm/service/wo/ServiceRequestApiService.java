@@ -145,8 +145,15 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
 
     }
 
-    public String getSrNum() {
-        String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE).concat("/getSrNum");
+    public String getSrNum(String numType) {
+        String gatewayURL = null;
+        if(numType.equals("pm")) {
+            gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE).concat("/getPmNum");
+        } else if(numType.equals("work")) {
+            gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE).concat("/getSrNum");
+        } else {
+            return null;
+        }
         HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, LinkedHashMap.class);
