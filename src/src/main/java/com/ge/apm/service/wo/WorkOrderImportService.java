@@ -18,9 +18,6 @@ import webapp.framework.web.service.UserContext;
 
 import javax.faces.context.FacesContext;
 import java.io.*;
-import java.math.BigDecimal;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 @Service
@@ -148,7 +145,7 @@ public class WorkOrderImportService {
             serviceRequest.setSrRepairType("2");  //暂时不知道用处
             serviceRequest.setReportSource("1");
             serviceRequest.setOriginSrNum(importWorkOrderForm.getSrNum());
-            String srNUm = serviceRequestApiService.getSrNum();
+            String srNUm = serviceRequestApiService.getSrNum("work");
             serviceRequest.setSrNum(srNUm);
             serviceRequest.setEstimatedCloseTime(importWorkOrderForm.getCloseTime());
             serviceRequest.setCloseTime(importWorkOrderForm.getCloseTime());
