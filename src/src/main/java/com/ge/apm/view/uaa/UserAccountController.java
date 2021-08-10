@@ -1435,36 +1435,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 	public void setExportFile(StreamedContent exportFile) {
 		this.exportFile = exportFile;
 	}
-        
-    public List<String> autoCompleteDeptName(String query) {
-//        if (deptList == null) {
-            return Collections.emptyList();
-//        }
-//
-//        List<OrgInfo> res = this.deptList.stream()
-//                .filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-//                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase())))
-//                .collect(Collectors.toList());
-//        res.sort(new PinYinComparatorByName());
-//        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
-    }
 
-    private  String filterClinicalDeptOrg = null;
-
-    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
-        if (event instanceof SelectEvent) {
-            filterClinicalDeptOrg = (String) ((SelectEvent) event).getObject();
-        }
-        if(filterClinicalDeptOrg==null) return;
-        
-        List<OrgInfo> orgListByName = Collections.emptyList();//this.deptList.stream().filter(item -> item.getName().equals(filterClinicalDeptOrg)).collect(Collectors.toList());
-        if(orgListByName.size()<1)
-            selectedUserOrg = null;
-        else{
-            selectedUserOrg = orgListByName.get(0);
-        }
-    }
-    
     public String getSelectedOrgName(){
         if(selectedUserOrg==null)  return "";
         
@@ -1522,10 +1493,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             return false;
         }
         return 46 == selected.getSiteId();
-    }
-
-    public boolean getIsSelect46Account() {
-        return selectedTenant != null && selectedTenant.getId() == 46;
     }
 
     public void filterTreeNodeByUid(){
