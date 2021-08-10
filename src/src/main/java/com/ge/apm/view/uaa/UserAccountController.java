@@ -1495,6 +1495,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         return 46 == selected.getSiteId();
     }
 
+    public boolean getIsSelect46Account() {
+        return selectedTenant != null && selectedTenant.getId() == 46;
+    }
+
     public void filterTreeNodeByUid(){
         if (selectedTenant!=null&&selectedTenant.getId()== 46&&selectedUserOrg!=null&& !StringUtils.isEmpty(selectedUserOrg.getInstitutionUID())) {
             List<OrgInfo> siteList = uaaService.getUserAccessibleSiteListByUid(selectedUserOrg.getInstitutionUID());
