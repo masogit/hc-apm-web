@@ -7,7 +7,8 @@ import java.util.Date;
 @Data
 public class ImportWorkOrderForm {
     private String assetName;//设备名称
-    private String qrCode;   //设备二维码
+    private String financingNum;   //资产编号
+    private String departNum; //卡片号  设备编号（院方）
     private String srNum;    //报修单号
     private String casePriority; //紧急程度
     private String requestReason; //故障现象
