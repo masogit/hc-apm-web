@@ -264,10 +264,6 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public void saveZkbFePartOrderAssetInfoTemp()
     {
-        if(StringUtils.isNotBlank(this.selectZkbFePartOrderAssetInfo.getAssetNo()))
-        {
-            this.selectZkbFePartOrderAssetInfo.setAssetNo(this.selectZkbFePartOrderAssetInfo.getAssetNo().trim());
-        }
         if("Create".equals(this.actionItemName)){
             if(CollectionUtils.isEmpty(this.selected.getZkbFePartOrderAssetInfoList())){
                 this.selected.setZkbFePartOrderAssetInfoList(new ArrayList<>());
