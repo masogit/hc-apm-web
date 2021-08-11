@@ -76,6 +76,17 @@ public class ZkbContractQuotaLog implements Serializable {
     @Column(name = "created_date")
     private Date createdDate;
 
+    @Column(name = "step")
+    private String step;
+
+    public String getStep() {
+        return step;
+    }
+
+    public void setStep(String step) {
+        this.step = step;
+    }
+
     public String getContractId() {
         return contractId;
     }

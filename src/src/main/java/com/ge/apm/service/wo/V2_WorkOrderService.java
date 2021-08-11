@@ -570,4 +570,26 @@ public class V2_WorkOrderService {
         return msgDao.findBySrIdOrderBySendTime(id);
     }
 
+    /**
+     * @param
+     * @return void
+     * @date 2020/6/29 11:00
+     * 设置总单据信息
+     */
+    public void approveHighLevelAction(V2_WorkOrder selectedWorkOrder, List<V2_WorkOrder_Detail> approvedDetails, String comments,String approverUid) {
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setStepDetail(approvedDetails);
+        formData.setDesc(comments);
+        formData.setAssigneeId(approverUid);
+        String approvalType = "approval";
+        String res = srApi.invokeWorkOrderAction(token, formData, approvalType, selectedWorkOrder.getId());
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "提交"));
+        } else {
+            WebUtil.addSuccessMessage("已提交");
+        }
+    }
+
 }

@@ -44,6 +44,7 @@ public class ZkbContractQuotaLogService {
             zkbLogDataMap.put("申请编号", q.getZkbPartOrderNo());
             zkbLogDataMap.put("名额类型", WebUtil.getFieldValueMessage("zkbContractQuotaOrderType",q.getOrderType()));
             zkbLogDataMap.put("操作类型", WebUtil.getFieldValueMessage("zkbContractQuotaOpType",q.getOpType()));
+            zkbLogDataMap.put("步骤", q.getStep());
             zkbLogDataMap.put("总名额", q.getQuotaTotal());
             zkbLogDataMap.put("剩余名额", q.getQuota());
             zkbLogDataMap.put("申请名额", q.getQuotaApply());
@@ -70,7 +71,7 @@ public class ZkbContractQuotaLogService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveData(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder, ZkbFePartOrder zkbFePartOrder, String opType, String orderType, String businessType, UserAccount userAccount){
+    public void saveData(ZkbContract zkbContract, ZkbPartOrder zkbPartOrder, ZkbFePartOrder zkbFePartOrder, String opType, String orderType, String businessType, UserAccount userAccount,String step){
         ZkbContractQuotaLog l = new ZkbContractQuotaLog();
         l.setCreatedDate(new Date());
         l.setCreatedUserName(userAccount.getName());
@@ -90,6 +91,7 @@ public class ZkbContractQuotaLogService {
         l.setOpType(opType);
         l.setOrderType(orderType);
         l.setBusinessType(businessType);
+        l.setStep(step);
         if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(orderType)){
             l.setQuota(zkbContract.getSpareQuota());
             l.setQuotaApply(zkbContract.getSpareQuotaApply());

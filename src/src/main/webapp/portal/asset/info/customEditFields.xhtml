@@ -249,6 +249,25 @@
         </h:panelGroup>
 
     </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'accountingDeptName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.accountingDeptName}</label>
+            <p:autoComplete id="accountingDeptName" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['accountingDept']}"  readonly="#{!assetInfoEditController.needEdit('clinicalDeptName') or not empty assetInfoEditController.selected.sharedAssetTypeUid}"
+                            scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['accountingDeptName'].required}" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteDept}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoUidConverter" class="SiteUIDChange">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onAssetDeptChange('accountingDept')}" update="@(.clinicalDeptNameChange)" />
+                <p:ajax listener="#{assetInfoEditController.onAssetDeptChange('accountingDept')}" update="@(.clinicalDeptNameChange)" />
+            </p:autoComplete>
+        </h:panelGroup>
+
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'modalityType')}" >
+        <h:panelGroup>
+            <label class="label">设备modality</label>
+            <p:autoComplete id="modalityType" value="#{assetInfoEditController.selected.modalityType}" readonly="#{!assetInfoEditController.needEdit('modalityType')}"
+                            required="#{assetInfoEditController.customConfig.assetFields['modalityType'].required}" />
+        </h:panelGroup>
+    </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'clinicalOwnerName')}" >
         <h:panelGroup>
             <label class="label">#{msg.clinicalOwnerName}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['clinicalOwnerName'].required? '*':''}</span></label>
@@ -780,6 +799,27 @@
             <label class="label">#{msg.salvageValue}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['salvageValue'].required? '*':''}</span></label>
             <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoEditController.selected.salvageValue}" required="#{assetInfoEditController.customConfig.assetFields['salvageValue'].required}"
                            requiredMessage="#{msg.salvageValue} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('salvageValue')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'monitorRate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.monitorRate}(W)</label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="monitorRate" value="#{assetInfoEditController.selected.monitorRate}" required="#{assetInfoEditController.customConfig.assetFields['monitorRate'].required}"
+                            readonly="#{!assetInfoEditController.needEdit('monitorRate')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'otherPower')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.otherPower}(W)</label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="otherPower" value="#{assetInfoEditController.selected.otherPower}" required="#{assetInfoEditController.customConfig.assetFields['otherPower'].required}"
+                            readonly="#{!assetInfoEditController.needEdit('otherPower')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'otherPower')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.unitPriceElectricity}(元)</label>
+            <p:inputNumber minValue="0.00" decimalPlaces="2" id="unitPriceElectricity" value="#{assetInfoEditController.selected.unitPriceElectricity}" required="#{assetInfoEditController.customConfig.assetFields['unitPriceElectricity'].required}"
+                            readonly="#{!assetInfoEditController.needEdit('unitPriceElectricity')}" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'lifecycle')}" >

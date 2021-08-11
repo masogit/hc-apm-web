@@ -3,8 +3,8 @@
     <div class="menu-content" tabindex="0">
         <pu:menu widgetVar="me">
 
-           <!-- <p:menuitem style=" font-size: 30" id="um000" value="ChangeToEnglish" rendered="#{localeService.language eq 'zh'}" icon="language" url="#{request.requestURI}?locale=en"/>
-            <p:menuitem style=" font-size: 30" id="um001" value="切换成中文"  rendered="#{localeService.language eq 'en'}" icon="language" url="#{request.requestURI}?locale=zh"/>-->
+            <p:menuitem style=" font-size: 30" id="um9001" value="ChangeToEnglish" rendered="#{(localeService.language eq 'zh') and (userContextService.getTenantInfo().isSupportMultiLanguage)}" icon="language" url="#{request.requestURI}?locale=en"/>
+            <p:menuitem style=" font-size: 30" id="um9002" value="切换成中文"  rendered="#{(localeService.language eq 'en') and (userContextService.getTenantInfo().isSupportMultiLanguage)}" icon="language" url="#{request.requestURI}?locale=zh"/>
             <p:menuitem style=" font-size: 30" id="um01" value="#{msg.HomePage}" icon="&#xE871;" outcome="#{userContextService.userDefaultHomePage}" rendered="#{(not userContextService.isIBorUltraSoundIBEndUser()) and userContextService.accessContains('homePage')}"/>
             
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.accessContains('asset')}">
@@ -216,6 +216,13 @@
             </p:submenu>
 
             <p:menuitem value="设备数据概览" icon="fa fa-bar-chart" outcome="/portal/nine.xhtml"/>
+
+            <p:submenu label="供应商管理" icon="settings"  rendered="#{userContextService.accessContains('supplierManagement')}"  >
+                <p:menuitem id="mirage_userAccount" rendered="#{userContextService.accessContains('supplierManagement.supplierUser')}"  value="供应商用户管理" outcome="/portal/mirage/mirage.xhtml?route=/userAccount/page"    />
+                <p:menuitem id="mirage_tenantSupplierMapping" rendered="#{userContextService.accessContains('supplierManagement.tenantSupplierMapping')}" value="租户供应商绑定" outcome="/portal/mirage/mirage.xhtml?route=/orgSupplierMapping"    />
+                <p:menuitem id="mirage_AssetBindSupplier" rendered="#{userContextService.accessContains('supplierManagement.assetBindSupplier')}" value="供应商设备绑定" outcome="/portal/mirage/mirage.xhtml?route=/assetBindSupplier"    />
+                <p:menuitem id="mirage_AssetBindSupplierFE" rendered="#{userContextService.accessContains('supplierManagement.assetBindSupplierFE')}" value="维修工程师绑定" outcome="/portal/mirage/mirage.xhtml?route=/assetBindSupplierFE"    />
+            </p:submenu>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
             <p:menuitem id="logout" value="#{msg.Logout}" icon="&#xe8ac;" url="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"/>

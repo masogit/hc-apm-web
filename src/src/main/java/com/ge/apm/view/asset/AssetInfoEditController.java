@@ -285,6 +285,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 readableFieldsList.remove("createdBy");
             }
         }
+        if(selected.getUnitPriceElectricity()==null){
+            WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
+            selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
+        }
         initGbTree();
         initOrgTree();
 
@@ -436,6 +440,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
         selectedObjectMap.put("clinicalDept", selected.getClinicalDeptUID() == null ? null : orgDao.findByUid(selected.getClinicalDeptUID()));
         selectedObjectMap.put("assetDept", selected.getAssetDeptUID() == null ? null : orgDao.findByUid(selected.getAssetDeptUID()));
+        selectedObjectMap.put("accountingDept", selected.getAccountingDeptUID() == null ? null : orgDao.findByUid(selected.getAccountingDeptUID()));
         selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
         selectedObjectMap.put("maintainer", selected.getMaitananceId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getMaitananceId())));
         selectedObjectMap.put("manufacturer", selected.getManufactureId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getManufactureId())));
@@ -651,7 +656,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage("设备编号已被占用");
             return "";
         }
-
+        if(selected.getUnitPriceElectricity()==null){
+            WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
+            selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
+        }
         //设置质保时间
         if (null == selected.getFactoryWarrantyDate()) {
             if (selected.getAcceptDate() != null && selected.getWarrantyMonth() != null) {
