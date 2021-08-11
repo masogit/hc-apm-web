@@ -209,6 +209,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private String highlevelApprovalComments;
     @Override
     protected void init() {
+        super.init();
         try {
             supplierController = WebUtil.getBean(SupplierController.class);
             ccService = WebUtil.getBean(CustomConfigService.class);
@@ -911,8 +912,12 @@ public void test1(){
             boolean isId= false;
             for (SearchFilter searchFilter :searchFilters) {
                 if ("id".equals(searchFilter.fieldName)) {
-                    value = (String)searchFilter.value;
-                    isId = true;
+                    if(searchFilter.value instanceof java.util.List){
+                        isId = false;
+                    }else{
+                        value = (String)searchFilter.value;
+                        isId = true;
+                    }
                 }
             }
             if(isId) {
@@ -1099,6 +1104,27 @@ public void test1(){
         }
 
    }
+    public String getRepairPersonName(String woId,Integer step){
+        List <V2_WorkOrder_Step >vs=null;
+        vs =woService.getWorkOrderRepaireName(woId,step);
+        if(vs !=null && vs.size()>0){
+            if(vs.size()==1){
+                return vs.get(0).getOwnerName();
+            }else{
+                V2_WorkOrder_Step lastRepaireName = vs.get(0);
+                for(V2_WorkOrder_Step woStep : vs){
+                    boolean before = lastRepaireName.getStartTime().before(woStep.getStartTime());
+                    if(before){
+                        lastRepaireName = woStep;
+                    }
+                }
+                return lastRepaireName.getOwnerName();
+            }
+        }else {
+            return "";
+        }
+
+    }
 
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {

@@ -105,6 +105,11 @@
                 <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{item.serviceRequest.requestorName}"/>
                 </p:column>
+
+                <p:column headerText="#{msg.requireName}" sortBy="#{item.id}"  filterBy="#{item.id}" filterMatchMode="IN" rendered="#{!userContextService.hasCurrentTenantName('')}">
+                    <h:outputText value="#{workOrderMgrController.getRepairPersonName(item.id,4)}"/>
+                </p:column>
+
                 <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" rendered="#{!userContextService.hasCurrentTenantName('')}">
                     <h:outputText value="#{item.serviceRequest.requestTime}">
                         <f:convertDateTime timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat12()}"/>
