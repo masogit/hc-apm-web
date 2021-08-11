@@ -34,9 +34,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String actionName;
     private V2_WorkOrder selectedWorkFlow;
     private ZkbContract zkbContract;
+    private List<ZkbContract> contractList;
     private String orderType;
     private String artificialType;
     private List<V2_BlobObject> v2_blobObjectList;
+    private List<V2_BlobObject> v2_probe_blobObjectList;
     private boolean showTech=false;
     private boolean showManage=false;
     private boolean showDirector = false;
@@ -66,7 +68,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private String showOrderedFieldsetText = "";
     private String queryStatus;
     private List<ZkbPartOrderItemVo> zkbPartOrderItemVoList = new ArrayList<>();
-    private List<ZkbContract> contractList;
     private HashMap<String,String> conditionMap = new HashMap<>();
     private List<ZkbPoHistoryQueryVo> zkbHistoryDataList;
     private List<ZkbPoHistoryQueryVo> geHistoryDataList;
@@ -106,7 +107,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             Optional.ofNullable(this.selected.getArtificialType()).ifPresent(t -> artificialType = this.selected.getArtificialType());
 
             zkbContract = m.get("zkbContract") ==null ? null : (ZkbContract)m.get("zkbContract");
-            if(zkbContract != null){
+            if(zkbContract == null){
+                zkbContract = new ZkbContract();
+                return;
+            }else{
                 contractList = new ArrayList<>();
                 contractList.add(zkbContract);
             }
@@ -117,6 +121,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 v2_listHashMap.add(mm);
             }
             v2_blobObjectList = m.get("v2_blobObjectList") == new ArrayList<>() ? null : (List<V2_BlobObject>)m.get("v2_blobObjectList");
+            v2_probe_blobObjectList = m.get("v2_probe_blobObjectList") == null ? new ArrayList<>() : (List<V2_BlobObject>)m.get("v2_probe_blobObjectList");
             fieldRendered();
             zkbPartOrderReturnList = zkbPartOrderService.queryReturnListByPartOrderId(selectedId,isChoseAdmin);
 
@@ -990,7 +995,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             WebUtil.addErrorMessage("配件号不能为空！");
             return;
         }
-        svcEngineLogisticsLineVOList = zkbPartOrderService.querySvcLogistics(selected.getSrNum(),se.getOrderNo(),se.getPartNo());
+        svcEngineLogisticsLineVOList = zkbPartOrderService.querySvcLogistics(selected.getSrNo(),se.getOrderNo(),se.getPartNo());
         if(svcEngineLogisticsLineVOList == null || svcEngineLogisticsLineVOList.size() == 0){
             WebUtil.addErrorMessage("查询结果为空！");
         }
@@ -1213,14 +1218,6 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         this.v2_listHashMap = v2_listHashMap;
     }
 
-    public List<ZkbContract> getContractList() {
-        return contractList;
-    }
-
-    public void setContractList(List<ZkbContract> contractList) {
-        this.contractList = contractList;
-    }
-
     public List<ZkbPoHistoryQueryVo> getZkbHistoryDataList() {
         return zkbHistoryDataList;
     }
@@ -1340,6 +1337,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         this.svcEngineLogisticsLineVOList = svcEngineLogisticsLineVOList;
     }
 
+    public List<V2_BlobObject> getV2_probe_blobObjectList() {
+        return v2_probe_blobObjectList;
+    }
+
+    public void setV2_probe_blobObjectList(List<V2_BlobObject> v2_probe_blobObjectList) {
+        this.v2_probe_blobObjectList = v2_probe_blobObjectList;
+    }
+
+    public List<ZkbContract> getContractList() {
+        return contractList;
+    }
+
+    public void setContractList(List<ZkbContract> contractList) {
+        this.contractList = contractList;
+    }
     //endregion
 
     @Override

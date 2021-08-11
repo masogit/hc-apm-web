@@ -164,6 +164,13 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
     @Override
     protected Page<ZkbPartOrderUserConfig> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = this.searchFilters;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+        if(!this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        {
+            searchFilters.add(new SearchFilter("testStatus", SearchFilter.Operator.EQ, "f"));
+        }
         zkbPartOrderUserConfigPage=zkbPartOrderUserConfigRepository.findBySearchFilter(searchFilters, pageRequest);
         return zkbPartOrderUserConfigPage;
     }
@@ -235,6 +242,13 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             WebUtil.addErrorMessage("保存失败,不能保存空数据!");
             return;
         }
+        if(this.selected.getLoginName()!=null&&this.selected.getLoginName().startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        {
+            this.selected.setTestStatus("t");
+        }else
+            {
+                this.selected.setTestStatus("f");
+            }
         if(!("OrderExtraPending".equals(this.selected.getConfigType())||"OrderPending".equals(this.selected.getConfigType())))
         {
             List<ZkbPartOrderUserConfig> zkbPartOrderUserConfigList = null;

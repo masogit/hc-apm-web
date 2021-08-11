@@ -193,9 +193,9 @@ public class ZkbContractImportService {
         ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
         if(zkbContract != null){
             if(StringUtils.isNotEmpty(contractInfoVO.getQuotaDeductType())){
-                if("旧逻辑扣除".equals(contractInfoVO.getQuotaDeductType())){
+                if("旧逻辑扣减".equals(contractInfoVO.getQuotaDeductType())){
                     zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
-                }else if("新逻辑扣除".equals(contractInfoVO.getQuotaDeductType())){
+                }else if("新逻辑扣减".equals(contractInfoVO.getQuotaDeductType())){
                     zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
                 }
             }
@@ -225,9 +225,9 @@ public class ZkbContractImportService {
             newZkbContract.setCreatedDate(new Date());
 
             if(StringUtils.isNotEmpty(newZkbContract.getQuotaDeductType())){
-                if("旧逻辑扣除".equals(newZkbContract.getQuotaDeductType())){
+                if("旧逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
-                }else if("新逻辑扣除".equals(newZkbContract.getQuotaDeductType())){
+                }else if("新逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
                 }
             }
@@ -277,11 +277,11 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractTypeIsEmpty"));
             isValidateData = false;
         }else{
-            if(!EnumUtils.isValidEnum(ZkbContract.ContractType.class,contractInfoVO.getContractType())){
+            /*if(!EnumUtils.isValidEnum(ZkbContract.ContractType.class,contractInfoVO.getContractType())){
                 item.put("status", ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTypeIsNotRange"));
                 isValidateData = false;
-            }
+            }*/
         }
 
         if(contractInfoVO.getStartDate() == null){

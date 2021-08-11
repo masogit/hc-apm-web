@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -176,6 +177,10 @@ public class ZkbFePartOrderUserConfig implements Serializable {
     }
 
     public String getIsVacation() {
+        if(StringUtils.isBlank(this.isVacation))
+        {
+            return  "f";
+        }
         return isVacation;
     }
 

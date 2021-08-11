@@ -635,6 +635,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "aa_default_lease_man_hour")
     private Double defaultLeaseManHour = 0.0D;
 
+    @Column(name = "unit_price_electricity")
+    private Double unitPriceElectricity;
+
     @Getter
     @Setter
     @Column(name = "aa_enable_return_man_hour")
@@ -943,6 +946,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setDispatchUserName2(String dispatchUserName2) {
         this.dispatchUserName2 = dispatchUserName2;
+    }
+
+    public Double getUnitPriceElectricity() {
+        return unitPriceElectricity;
+    }
+
+    public void setUnitPriceElectricity(Double unitPriceElectricity) {
+        this.unitPriceElectricity = unitPriceElectricity == null ? 0.56D : unitPriceElectricity;
     }
 
     public WorkflowConfig() {
