@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
+
+    <ui:composition>
+
+        <p:dialog class ="pmrepairCompleteDialog" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="550" width="1000"  resizable="true" draggable="true" appendTo="@this" header="#{msg.MaintenanceComplete}">
+            <h:form id="pmrepairCompleteDialogForm" class="pmrepairCompleteDialogFormcls" >
+                <h:panelGroup  id="display5" style="height:500px" rendered="#{not empty v2SupplierPmOrderController.selectedPmOrder}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.PlannedCompletionTime}*</label>
+                            <p:calendar   timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="fillDate"   value="#{v2SupplierPmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" required="true" requiredMessage="计划完成时间#{msg.ValidationRequire}"></p:calendar>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.MaintenanceEndTime}*</label>
+                            <p:calendar  timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="#{userContextService.timeFormat()}" id="fillDate1"   value="#{v2SupplierPmOrderController.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false"   requiredMessage="#{msg.EndTime} #{msg.ValidationRequire}"></p:calendar>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                    <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细-->
+                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.manhours}*</label>
+                                <p:inputNumber id="manHoursId" validatorMessage="#{msg.ManhoursCannotL1}" value="#{v2SupplierPmOrderController.selectedPmOrder.manHours}"  required="true" requiredMessage="#{msg.ManhoursHours} #{msg.ValidationRequire}">
+                                </p:inputNumber>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.addAcce}</label><!--增加备件-->
+                                <p:dataTable id="accessList" class="uiTransparent accessCls" value="#{v2SupplierPmOrderController.accessoryList}" var="item" widgetVar="varAccessListList2" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                                    <p:column headerText="#{msg.PartName}">
+                                        <h:outputText value="#{item.parts}"/>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg.accessoryQuantity}">
+                                        <h:outputText value="#{item.apartsQuantity}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.EstimatedUnitPriceRMB}">
+                                        <h:outputText disabled="#{v2SupplierPmOrderController.nochange}" value="#{item.partsPrice}">
+                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.ContractPriceRMB}">
+                                        <h:outputText value="#{item.closedPrice}">
+                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                        </h:outputText>
+
+                                    </p:column>
+                                    <p:column headerText="#{msg.PartType}">
+                                        <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.SerialNumber}">
+                                        <h:outputText value="#{item.serialNum}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.WarrantyDate}">
+                                        <h:outputText value="#{item.warrantyDate}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.ApplyTime}">
+                                        <h:outputText value="#{item.applyTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.EstimatedArrivalTime}">
+                                        <h:outputText value="#{item.estimatedArriveTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.ArrivalConfirmationTime}">
+                                        <h:outputText value="#{item.arrivedTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.Arrival}">
+                                        <h:outputText value="#{item.arrived?msg.Arrived:msg.NonArrived}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg.InvoiceNumber}">
+                                        <h:outputText value="#{item.invoiceNum}" />
+                                    </p:column>
+
+                                    <p:column headerText="#{msg.Actions}">
+                                        <p:commandButton process="@this" icon="ui-icon-add" actionListener="#{v2SupplierPmOrderController.prepareEditAccDetail('new')}"  oncomplete="PF('pmmoreAccDialogDlg').show()" update="@(.pmmoreAccDialogDlgCls)" rendered="#{item.id eq '000'}" />
+
+                                        <!--<p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2SupplierPmOrderController.prepareEditAccDetail(item.id)}" update="@(.pmmoreAccDialogFormCls)" oncomplete="PF('pmmoreAccDialogDlg').show()"  rendered="#{item.id ne '000' and (item.approved? false:true)}"/>-->
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2SupplierPmOrderController.prepareEditAccDetail(item.id)}" update="@(.pmmoreAccDialogFormCls)" oncomplete="PF('pmmoreAccDialogDlg').show()"  rendered="#{item.id ne '000'}"/>
+                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" update="accessList @(.cmd1)" actionListener="#{v2SupplierPmOrderController.removeWoDetail(item.id,1)}"   rendered="#{item.id ne '000' and (item.approved?false:true)}">
+                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                                         </p:commandButton>
+                                        <h:outputText value="#{msg.Approved}" rendered="#{item.id ne '000' and (item.approved?true:false)}" />
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.AddCoworker}</label>
+                                <p:dataTable id="pmcoworkerList" class="uiTransparent" value="#{v2SupplierPmOrderController.coWorkerList}" var="item" widgetVar="pmcoworkerDataList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                                    <p:column headerText="#{msg.coworker}">
+                                        <h:outputText value="#{item.cowokerUserName}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.manHours}">
+                                        <h:outputText value="#{item.manHours}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.Actions}">
+                                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"  actionListener="#{v2SupplierPmOrderController.prepareEditCoWorkerDetail('new')}" update="@(.pmcoworkerDlgClass) pmTab:pmcoworkerDlgForm" oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id eq '000'}"/>
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2SupplierPmOrderController.prepareEditCoWorkerDetail(item.id)}" update="@(.pmcoworkerDlgClass)"  oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id ne '000'}" />
+                                        <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{v2SupplierPmOrderController.removeWoDetail(item.id,2)}" update="@(.pmcoworkerList) pmTab:pmrepairCompleteDialogForm:pmcoworkerList" rendered="#{item.id ne '000'}">
+                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+                        <p:dataGrid id="pictureList" var="fileitem" value="#{v2SupplierPmOrderController.picList}" columns="5" layout="grid">
+                            <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
+                            <p:panel  style="text-align:center">
+                                <h:panelGrid columns="1" style="width:100%" >
+                                    <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                    <p:commandButton actionListener="#{v2SupplierPmOrderController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:dataGrid>
+                        <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{v2SupplierPmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    </p:fieldset>
+
+                    <p:growl id="msgs" showDetail="true" />
+                    <p:fieldset legend="#{msg.MaintenanceList}"  toggleable="true" toggleSpeed="500">
+                        <p:ajax event="toggle" listener="#{v2SupplierPmOrderController.handleToggle}" update="msgs" />
+                        <p:fieldset legend="#{msg.MaintenanceReport}" >
+                            <h:panelGroup id="addReport">
+                                <p:selectOneMenu value="#{v2SupplierPmOrderController.reportUid}">
+                                    <p:ajax update="addReport" />
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{v2SupplierPmOrderController.getTablesName(v2SupplierPmOrderController.selectedPmOrder)}" var="item" itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
+                                </p:selectOneMenu>
+                                <p:commandLink value="#{msg.AddReport}"  class="addLink" validateClient="false" process="addReport" actionListener="#{v2SupplierPmOrderController.addReporter(v2SupplierPmOrderController.selectedPmOrder.id)}"  update="@(.rpClass) @(.addLink)" disabled="#{empty v2SupplierPmOrderController.reportUid or v2SupplierPmOrderController.hasRepairReport() }"/>
+                            </h:panelGroup>
+                            <p:dataList class="rpClass" id="reportDatalist" value="#{v2SupplierPmOrderController.findByBoUuidNoPMCheckList(v2SupplierPmOrderController.selectedPmOrder.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
+                                #{v2SupplierPmOrderController.getTableDefName(reportItem.schemaId)}
+                                <h:outputText id="installDate" value="#{reportItem.createdDate}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </h:outputText>
+
+                                <h:outputLabel> | </h:outputLabel>
+                                <p:link value="#{msg.Edit}" target="_blank" href="#{request.contextPath}#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                               <!-- <h:outputLabel> | </h:outputLabel>
+                                <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>-->
+                                <h:outputLabel> | </h:outputLabel>
+                                <p:link value="#{msg.View}" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
+                                <h:outputLabel> | </h:outputLabel>
+                                <p:commandLink value="#{msg.Delete}" validateClient="false" process="@this" actionListener="#{v2SupplierPmOrderController.deleteReporter(reportItem.id)}" update="@(.rpClass) @(.addLink)" disabled="#{reportItem.status eq 'Archived'}"/>
+                            </p:dataList>
+                        </p:fieldset>
+                        <p:fieldset  legend="#{msg.CheckItem}"  rendered="#{not empty v2SupplierPmOrderController.selectedPmOrder}">
+                            <c:forEach  items="#{v2SupplierPmOrderController.pmCheckItemList}" var="item">
+                                <h:panelGroup>
+                                    <label class="label" style="word-wrap: break-word">#{item.name}</label>
+                                </h:panelGroup>
+                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <h:panelGroup>
+                                        <p:selectOneMenu  value="#{v2SupplierPmOrderController.hmCheck[item.uid].value}">
+                                            <p:ajax listener="#{v2SupplierPmOrderController.hmCheckSet(item.uid)}"></p:ajax>
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItem itemValue="#{'pass'}" itemLabel="#{fieldMsg.fieldValue('checkItem','pass')}"></f:selectItem>
+                                            <f:selectItem itemValue="#{'n/a'}" itemLabel="#{fieldMsg.fieldValue('checkItem','n/a')}"></f:selectItem>
+                                            <f:selectItem itemValue="#{'fail'}" itemLabel="#{fieldMsg.fieldValue('checkItem','fail')}"></f:selectItem>
+                                        </p:selectOneMenu>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+
+                                        <p:inputTextarea rows="3" style="width:100%;height:100px" readonly="true" value="#{item.remark}"></p:inputTextarea><br/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </c:forEach>
+                        </p:fieldset>
+                    </p:fieldset>
+                    <p:selectOneRadio id="console"  value="#{v2SupplierPmOrderController.qaStatus}" >
+                        <p:ajax process="console"  update="@(.rpb) @(.rpt) @(.x3) @(.buttonG)"></p:ajax>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('qualityChecking')}"  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"></f:selectItems>
+                    </p:selectOneRadio>
+
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup rendered="#{!pmOrderGlobalController.isAutoAck(v2SupplierPmOrderController.selectedPmOrder)}">
+                            <label class="label">验收人*</label>
+                            <p:selectOneMenu  value="#{v2SupplierPmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
+                                <f:selectItems value="#{pmOrderGlobalController.getAckerList(v2SupplierPmOrderController.selectedPmOrder.id)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                    <!--维修完成 转单 新建工单-->
+                    <h:panelGroup class="buttonG">
+                        <p:commandButton class="rpb" validateClient="true" disabled="#{v2SupplierPmOrderController.qaStatus eq '2'}" actionListener="#{v2SupplierPmOrderController.repairPmOrder()}" value="#{msg.MaintenanceComplete}" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleRepairComplete(xhr, status, args)"/>
+                        <p:commandButton class="rpt" disabled="#{v2SupplierPmOrderController.qaStatus eq '1'}" actionListener="#{v2SupplierPmOrderController.createServiceRequest(v2SupplierPmOrderController.selectedPmOrder,1)}" value="#{msg.ToRepair}" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm pmTab:pmOrderDetailForm :growl" icon="ui-icon-check" oncomplete="handleToRepair(xhr, status, args)"/>
+
+                        <p:commandButton validateClient="false"  actionListener="#{v2SupplierPmOrderController.stagingPmOrder()}" value="#{msg.TemporaryStorage}"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
+                        <c:if test="${not v2SupplierPmOrderController.hasConfigMultiLevelApproval}">
+                            <p:commandButton id="cmd1" class="cmd1" validateClient="false" disabled="#{v2SupplierPmOrderController.selectedPmOrder.approvalStatus==1 or v2SupplierPmOrderController.accessoryListEmpty()}" immediate="true"  value= "#{msg.SubmitForApproval}" icon="ui-icon-check" update=":growl @(.approveDialogClass)" oncomplete="PF('approveDialog').show()"/>
+                        </c:if>
+                        <c:if test="${v2SupplierPmOrderController.hasConfigMultiLevelApproval}">
+                            <p:commandButton id="cmd1" validateClient="true" immediate="false"  disabled="#{v2SupplierPmOrderController.selectedPmOrder.approvalStatus==5 or v2SupplierPmOrderController.accessoryListEmpty()}" actionListener="#{v2SupplierPmOrderController.submitForApproval()}"  update=":growl pmTab:pmOrderListForm:datalist"  value="#{msg.SubmitForApproval}" icon="ui-icon-check" oncomplete="PF('pmrepairCompleteDialog').hide()"/>
+                        </c:if>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2SupplierPmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmrepairCompleteDialog').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog class ="approveDialogClass" id="approveDialog" widgetVar="approveDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.SelectApprover}">
+            <h:form id="approveDialogForm" >
+                <h:panelGroup id="display2" rendered="#{v2SupplierPmOrderController.selectedPmOrder !=null}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.approveUserId}*</label>
+                            <p:autoComplete id="approver" value="#{v2SupplierPmOrderController.approvaler}" dropdown="true" scrollHeight="300"
+                                            forceSelection="true" required="true" requiredMessage="#{msg.approveUserId}#{msg.ValidationRequire}"
+                                            completeMethod="#{v2SupplierPmOrderController.getApproveList}"
+                                            var="t" itemLabel="#{t.name}" itemValue="#{t.uid}">
+                                <p:ajax process="@this" event="itemSelect" listener="#{v2SupplierPmOrderController.setNothing()}"/>
+                                <p:ajax process="@this" listener="#{v2SupplierPmOrderController.setNothing()}"/>
+                            </p:autoComplete>
+                        </h:panelGroup>
+
+<!--                        <label class="label">审核人</label>
+                        <p:selectOneMenu value="#{v2SupplierPmOrderController.approvaler}"  required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
+                            <f:selectItems value="#{v2SupplierPmOrderController.getApproveList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                        </p:selectOneMenu>-->
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.ReasonForApprovalRequest}</label>
+                            <p:inputTextarea  placeholder="#{msg.QuotationApproval}" value="#{v2SupplierPmOrderController.comments}" maxlength="256" />
+                        </h:panelGroup>
+
+                    </p:panelGrid>
+                    <br/>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{v2SupplierPmOrderController.submitAppvalPmOrder}" value="#{msg.Confirm}"  icon="ui-icon-check" update=":growl pmTab:pmOrderListForm:datalist" oncomplete="PF('pmrepairCompleteDialog').hide();handleSubmit(args, 'approveDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('approveDialog').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+
+
+
+            <script>
+                function handleToRepair(xhr, status, args) {
+                    if(args.needManhours){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:manHoursId').addClass("ui-state-error");
+                    }
+                    else if(args.needendtime){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:fillDate1').addClass("ui-state-error");
+                    }else{
+                        handleSubmit(args, 'pmrepairCompleteDialog');
+                        PF('createSRDialog').show()
+                    }
+                }
+                function handleRepairComplete(xhr, status, args) {
+                    if(args.reports){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:reportDatalist').addClass("ui-state-error");
+                    }else if(args.needManhours){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:manHoursId').addClass("ui-state-error");
+                    }else if(args.needendtime){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:fillDate1').addClass("ui-state-error");
+                    }
+                    else if(args.needplanTime){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:fillDate').addClass("ui-state-error");
+                    }else{
+                        handleSubmit(args, 'pmrepairCompleteDialog');
+                    }
+                }
+            </script>
+
+            <style type="text/css">
+               /* body{
+                    color:red;
+                }*/
+                body .ui-fieldset .ui-fieldset-legend .ui-fieldset-toggler{
+                    color:black;
+                    box-shadow:none;
+                    background-color:white;
+                }
+                body .ui-fieldset .ui-fieldset-legend .ui-fieldset-toggler:hover{
+                    background-color:white;
+                }
+               /*body.layout-compact .ui-fieldset .ui-fieldset-legend{
+                   text-align: center;
+                   font-weight: 600;
+               }*/
+            </style>
+
+
+        </p:dialog>
+
+        <!--PF('pmrepairCompleteDialog').hide()
+        -->
+        <ui:include src="pmSupplierMoreAccDialog.xhtml"/>
+        <ui:include src="pmSupplierCoWorkDialog.xhtml"/>
+
+    </ui:composition>
+</html>

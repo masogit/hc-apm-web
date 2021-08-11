@@ -2003,6 +2003,30 @@ public void test1(){
                 approvedDetailsNew.add(v2_workOrder_detail);
             }
         }
+
+        if(this.isEnableIntegrationWithWorkOrder()){
+            //最后一个审批通过的时候 生成相应单子
+            List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
+            List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
+            if (!approvedDetailsNew.isEmpty()) {
+                for (int i = 0; i < approvedDetailsNew.size(); i++) {
+                    V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
+                    if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
+                        accessorySparePartsRequestList.add(v2_workOrder_detail);
+                    } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
+                        accessorySparePartsBuyList.add(v2_workOrder_detail);
+                    }
+                }
+                if (!accessorySparePartsRequestList.isEmpty()) {
+                    V2_WorkOrder v2_WorkOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                    partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER, userDao.getById(v2_WorkOrder.getCurrentPersonId()));//生成申领单
+                }
+                if (!accessorySparePartsBuyList.isEmpty()) {
+                    V2_WorkOrder v2_WorkOrder = dao.findById(accessorySparePartsBuyList.get(0).getWoId());
+                    partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER, userDao.getById(v2_WorkOrder.getCurrentPersonId()));//生成申购单
+                }
+            }
+        }
         woService.approveAction(selectedWorkOrder, approvedDetails, comments);
         cancel();
     }

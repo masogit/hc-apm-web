@@ -317,7 +317,7 @@
                             <p:dataList id="uploadList" value="#{zkbPartOrderEditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">故障图片上传</f:facet>
                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                <p:commandButton actionListener="#{zkbPartOrderEditController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:commandButton actionListener="#{zkbPartOrderEditController.removeFile(fileitem,'ZkbPartOrder')}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </p:dataList>
@@ -325,19 +325,19 @@
                                       multiple="true"  sizeLimit="100000000"  update="uploadList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:panelGrid id="proveFile">
+                    <h:panelGroup id="proveFile">
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType eq 'New' and zkbPartOrderEditController.selected.tenantNewCatFlag eq 't'}">
                             <p:dataList  id="uploadProveList" value="#{zkbPartOrderEditController.v2_probe_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">院方合同证明</f:facet>
                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
-                                <p:commandButton actionListener="#{zkbPartOrderEditController.removeFile(fileitem)}" update="uploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                <p:commandButton actionListener="#{zkbPartOrderEditController.removeFile(fileitem,'ZkbPartOrderProve')}" update="uploadProveList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </p:dataList>
-                            <p:fileUpload allowTypes="/(\.|\/)(pdf|PDF)$/" fileUploadListener="#{zkbPartOrderEditController.handleProveFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                            <p:fileUpload allowTypes="/(\.|\/)(pdf|PDF)$/" fileUploadListener="#{zkbPartOrderEditController.handleProveFileUpload}" disabled="#{zkbPartOrderEditController.v2_probe_blobObjectList != null and zkbPartOrderEditController.v2_probe_blobObjectList.size() == 1}" mode="advanced" dragDropSupport="false" style="width:100%"
                                           multiple="true"  sizeLimit="31000000"  update="uploadProveList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}3M" label="#{msg.Add}"/>
                         </h:panelGroup>
-                    </p:panelGrid>
+                    </h:panelGroup>
                 </p:fieldset>
                 <p:fieldset id="zkbPartOrderOnlineFieldset" legend="在线工程师" rendered="#{(zkbPartOrderEditController.orderType eq 'Parts' or zkbPartOrderEditController.orderType eq 'Probe') and zkbPartOrderEditController.assetInfo.assetGroup eq 2 }" >
                     <h:panelGroup>
