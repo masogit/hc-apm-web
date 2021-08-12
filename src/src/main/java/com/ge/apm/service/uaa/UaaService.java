@@ -103,11 +103,8 @@ public class UaaService {
     public void setFullName(UserAccount user) {
         OrgInfo node = orgInfoMapper.getByUid(user.getOrgInfoUID());
         user.setOrgInfo(node);
-        while (node != null && node.getOrgType() != 0 && node.getParentUID() != null) {
+        while (node != null && node.getOrgType() != 0 && node.getParentUID() != null && !StringUtils.equals(node.getUid(), node.getParentUID())) {
             OrgInfo parentNode = orgInfoMapper.getByUid(node.getParentUID());
-            if (StringUtils.equals(node.getUid(), parentNode.getUid())) {
-                break;
-            }
             node.setParentOrg(parentNode);
             node = parentNode;
         }
