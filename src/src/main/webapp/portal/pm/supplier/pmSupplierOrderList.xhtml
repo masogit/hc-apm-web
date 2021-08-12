@@ -48,6 +48,9 @@
                          </p:selectBooleanCheckbox>
                      </f:facet>-->
                 </p:column>
+                <p:column headerText="所属医院">
+                    <h:outputText value="#{v2SupplierPmOrderController.getSiteOrgName(item.tenantUID)}"/>
+                </p:column>
                 <p:column headerText="#{msg.hospitalId}">
                     <h:outputText value="#{v2SupplierPmOrderController.getSiteOrgName(item.siteUID)}"/>
                     <!--<f:facet name="filter">
