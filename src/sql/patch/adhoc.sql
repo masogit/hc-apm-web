@@ -9,3 +9,6 @@ id, asset_uid, config_type, create_by, create_date, lower_limit, upper_limit, is
 '8370b8vmr1f9431zyj72ff9va06b9fy6', null, 111, null, now(), 4, null, true, true, 1, 1, '冷却水流量', 20160, '冷却水流量异常，流量过低会导致氦压缩机停机，请立刻报修。', 'LPM', null, '冷却水流量异常，流量过低会导致氦压缩机停机，请立刻报修。',true, false, true, true, false,true);
 
 update asset_alert_config set wechat_message = '液氦液位已低于推荐阈值，请确保远程监控联通并提前计划液氦预定及添加。' where config_type = 113 and upper_limit = 70.0;
+
+-- YHAAO-12853 刷cms_psi_mapdata字段数据
+update cms_psi_mapdata pm set modality=t.modality  from (select modality,map_data from cms_document_product group by modality,map_data) as t where pm.map_data=t.map_data;
