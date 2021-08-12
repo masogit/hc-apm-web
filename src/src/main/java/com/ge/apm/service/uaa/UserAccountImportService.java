@@ -23,6 +23,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -950,13 +951,33 @@ public class UserAccountImportService {
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.ROLE,"角色不能为空;");
 					pass=false;
 				}
-				
-				if(handleNewUser(newUser, institution, hospital, site, department,department2,department3)==false){
-					importFailedDataList.add(newUser);
-					failedCount++;
-				}
-				else{
-					successCount++;
+
+				//判断该用户是否存在,存在，则更新 所属代理商 字段 smm
+				UserAccount oldUser = userAccountRepository.findByLoginName(loginName);
+				//更新用户
+				if(oldUser != null){
+					Integer id = oldUser.getId();
+					String uid = oldUser.getUid();
+					logger.info(">>>>>>该用户已存在，更新用户信息。loginName: {}", oldUser.getLoginName());
+					BeanUtils.copyProperties(newUser,oldUser);
+					oldUser.setDealerName(dealerName);
+					oldUser.setId(id);
+					oldUser.setUid(uid);
+					if(handleUser(oldUser)){
+						successCount++;
+					}else{
+						importFailedDataList.add(newUser);
+						failedCount++;
+					}
+				}else{
+				//新建用户
+					if(handleNewUser(newUser, institution, hospital, site, department,department2,department3)==false){
+						importFailedDataList.add(newUser);
+						failedCount++;
+					}
+					else{
+						successCount++;
+					}
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -1240,4 +1261,32 @@ public class UserAccountImportService {
 		}
 		return result;
 	}
+
+	/**
+	 *更新用户信息
+	 * @param userAccount
+	 * @return
+	 */
+	private boolean handleUser(UserAccount userAccount){
+		if(!supplementUserRole(userAccount)){
+			return false;
+		}
+		if(checkData(userAccount)){
+			String institutionName = userAccount.getInstitutionName();
+			String hospitalName = userAccount.getHospitalName();
+			String siteName = userAccount.getSiteName();
+			String department = userAccount.getDepartName();
+			String department2 = userAccount.getDepartName2();
+			String department3 = userAccount.getDepartName3();
+
+			setUIDs(userAccount, institutionName, hospitalName, siteName, department,department2,department3);
+			supplementAccessScope(userAccount);
+			if(checkData(userAccount)){
+				createUser(userAccount);
+				return true;
+			}
+		}
+		return false;
+	}
+
 }
