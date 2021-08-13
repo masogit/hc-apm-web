@@ -118,9 +118,8 @@
                                     </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
-
                         </p:panelGrid>
-                        <p:dataGrid id="pictureList" rendered="false" var="fileitem" value="#{v2SupplierPmOrderController.picList}" columns="5" layout="grid">
+                        <p:dataGrid id="pictureList" rendered="true" var="fileitem" value="#{v2SupplierPmOrderController.picList}" columns="5" layout="grid" >
                             <f:facet name="header">#{msg.AttachmentUpload}</f:facet>
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
