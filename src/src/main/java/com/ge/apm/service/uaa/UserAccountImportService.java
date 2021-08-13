@@ -958,12 +958,13 @@ public class UserAccountImportService {
 				if(oldUser != null){
 					Integer id = oldUser.getId();
 					String uid = oldUser.getUid();
+					String oldTel = oldUser.getTelephone();
 					logger.info(">>>>>>该用户已存在，更新用户信息。loginName: {}", oldUser.getLoginName());
 					BeanUtils.copyProperties(newUser,oldUser);
 					oldUser.setDealerName(dealerName);
 					oldUser.setId(id);
 					oldUser.setUid(uid);
-					if(handleUser(oldUser)){
+					if(handleUser(oldUser, oldTel)){
 						successCount++;
 					}else{
 						importFailedDataList.add(newUser);
@@ -1267,8 +1268,11 @@ public class UserAccountImportService {
 	 * @param userAccount
 	 * @return
 	 */
-	private boolean handleUser(UserAccount userAccount){
-		telephoneValid(userAccount);
+	private boolean handleUser(UserAccount userAccount, String oldTel){
+		//如果手机号发生变动，则校验手机号
+		if(null == oldTel || !oldTel.equals(userAccount.getTelephone())){
+			telephoneValid(userAccount);
+		}
 		if(!supplementUserRole(userAccount)){
 			return false;
 		}
