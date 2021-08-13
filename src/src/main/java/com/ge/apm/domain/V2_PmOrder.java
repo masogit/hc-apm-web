@@ -223,6 +223,12 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Column(name = "auto_ack_maintenance")
     private Boolean autoAckMaintenance;
 
+    /**
+     * 供应商派工时  供应商uid
+     */
+    @Column(name = "supplier_uid")
+    private String supplierUid;
+
     @Transient
     @JsonIgnore
     private String strPlanTime;
