@@ -952,7 +952,7 @@ public class UserAccountImportService {
 					pass=false;
 				}
 
-				//判断该用户是否存在,存在，则更新 所属代理商 字段 smm
+				//判断该用户是否存在,存在，则更新 所属代理商 字段
 				UserAccount oldUser = userAccountRepository.findByLoginName(loginName);
 				//更新用户
 				if(oldUser != null){
@@ -1268,6 +1268,7 @@ public class UserAccountImportService {
 	 * @return
 	 */
 	private boolean handleUser(UserAccount userAccount){
+		telephoneValid(userAccount);
 		if(!supplementUserRole(userAccount)){
 			return false;
 		}
@@ -1288,5 +1289,4 @@ public class UserAccountImportService {
 		}
 		return false;
 	}
-
 }
