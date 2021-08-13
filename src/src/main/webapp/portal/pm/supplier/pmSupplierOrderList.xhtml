@@ -16,6 +16,8 @@
                 <p:commandButton value="#{msg.CreateMaintenance}" rendered="#{userContextService.hasRole('SupplierFE') or userContextService.hasRole('SupplierAdmin')}" actionListener="#{v2SupplierPmOrderController.createPMRequest()}" process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm pmTab:PmRequestCreateForm"  oncomplete="PF('createPMDialog').show()" />
                 <p:commandButton value="#{msg.WorkorderToPickUp}"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmSupplierOrderListAll.xhtml?faces-redirect=true&amp;query=3" disabled="#{v2PmOrderController.queryIndex==3}"  rendered="#{userContextService.hasRole('SupplierFE') }"  />
                 <p:commandButton value="#{msg.Planned}"  process="@this" update="datalist buttonSet :pmTab:pmOrderDetailForm" action="pmSupplierOrderListAll.xhtml?faces-redirect=true&amp;query=0" disabled="#{v2SupplierPmOrderController.queryIndex==0}"  rendered="#{userContextService.hasRole('SupplierFE') }"  />
+                <p:commandButton value="#{msg.Finished}"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmSupplierOrderListAll.xhtml?faces-redirect=true&amp;query=7" disabled="#{v2SupplierPmOrderController.queryIndex==7}"  rendered="#{(userContextService.hasRole('SupplierFE') or userContextService.hasRole('SupplierAdmin'))}"  />
+
             </h:panelGrid>
 
             <p:dataTable id="datalist" value="#{v2SupplierPmOrderController.lazyModel}" var="item" widgetVar="varDataListgl"

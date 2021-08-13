@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.ge.apm.view.pm;
 
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -24,9 +20,7 @@ import java.util.Map;
 
 
 /**
- * v
- *
- * @author 212579464
+ * @author
  */
 @ManagedBean
 @ViewScoped
@@ -38,9 +32,12 @@ public class V2SupplierPmOrderController extends V2PmOrderController {
         this.setSearchFilter();
         super.filterOutPm(searchFilters);
         String currentStepId = getCurrentStepId(super.getQueryIndex());
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        searchFilters.add(new SearchFilter("supplierUid", SearchFilter.Operator.EQ, currentUserAccount.getTenantUID()));
         searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, currentStepId));
-        searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
-
+        if (!"Closed".equals(currentStepId)) {
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentUserAccount.getUid()));
+        }
         Sort sort = returnSort(pageRequest);
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         result = super.getDAO().findBySearchFilter(this.searchFilters, pageRequest);
@@ -64,6 +61,9 @@ public class V2SupplierPmOrderController extends V2PmOrderController {
             case 0:
                 //已计划
                 return "Maintain";
+            case 7:
+                //已关单
+                return "Closed";
         }
         throw new BusinessException("未定义状态值:" + intValue);
     }
