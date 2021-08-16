@@ -345,11 +345,40 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
             mergeContractNum = arrivalListContractNum.toString().replace("[","").replace("]","");
         }
     }
+
+    public String saveCompletedArrivedList(){
+        ArrivalListItem item = dao.findById(selected.getId());
+        ArrivalList arrivalList = item.getArrivalList();
+        arrivalList.setAssetName(selected.getArrivalList().getAssetName());
+        item.setBrand(selected.getBrand());
+        item.setFunctionType(selected.getFunctionType());
+        item.setImportEquipment(selected.getImportEquipment());
+        item.setWarrantyMonth(selected.getWarrantyMonth());
+        item.setAnnualMaintenanceTimes(selected.getAnnualMaintenanceTimes());
+        item.setSerialNum(selected.getSerialNum());
+        item.setLocationName(selected.getLocationName());
+        arrivalListDao.save(arrivalList);
+        dao.save(item);
+        if(StringUtils.isNotBlank(item.getAssetUID())){
+            aiService.updateAssetInfo(item);
+        }
+        return "arrivalItemsList?faces-redirect=true";
+    }
+
     public String getMergeContractNum() {
         return mergeContractNum;
     }
 
     public void setMergeContractNum(String mergeContractNum) {
         this.mergeContractNum = mergeContractNum;
+    }
+
+    public void beforeUpdateInfo(){
+        if(selected != null){
+            if(StringUtils.isBlank(selected.getBrand())){
+                selected.setBrand(selected.getArrivalList().getBrand());
+            }
+        }
+
     }
 }

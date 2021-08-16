@@ -691,7 +691,7 @@
                         <p:commandButton immediate="true" style="margin-left: 4px;margin-right: 5px" actionListener="#{assetInstallationController.rejectInstall}" value="退货" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
                             <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>
                         </p:commandButton>
-                        <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" actionListener="#{assetInstallationController.returnAction}" immediate="true" />
+                        <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="#{assetInstallationController.returnAction}" immediate="true" />
                     </h:panelGroup>
 
                 </h:form>
