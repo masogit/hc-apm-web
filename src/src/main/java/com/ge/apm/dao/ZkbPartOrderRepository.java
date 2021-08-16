@@ -98,5 +98,12 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query(value = "SELECT * from zkb_part_order where online_engineer = ?1", nativeQuery = true)
     List<ZkbPartOrder> findByOnline(String zkbPartOrderUserConfigId);
 
+    /**
+     * 根据租户uid 查找
+     * @param tenantUid
+     * @return
+     */
+    List<ZkbPartOrder> findByTenantUID(String tenantUid);
+
 }
 

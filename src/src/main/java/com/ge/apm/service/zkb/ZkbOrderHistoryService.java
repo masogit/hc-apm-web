@@ -442,6 +442,13 @@ public class ZkbOrderHistoryService {
         }
     }
 
+    public List<ZkbOrderHistory> findByTenantUid(String tenantUid)
+    {
+        if(StringUtils.isNotBlank(tenantUid))
+            return this.zkbOrderHistoryRepository.findByTenantUid(tenantUid);
+        return this.zkbOrderHistoryRepository.find();
+    }
+
 
 
 }
