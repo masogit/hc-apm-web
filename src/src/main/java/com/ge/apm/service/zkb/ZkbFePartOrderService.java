@@ -79,12 +79,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     @Autowired
     private ZkbContractRepository zkbContractRepository;
 
-    /**
-     * 获取资产信息
-     */
-    @Autowired
-    private AssetInfoRepository assetInfoRepository;
-
     @Autowired
     private AssetInfoMapper assetInfoMapper;
 
@@ -179,17 +173,17 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     /**
      * 机器状态i18值
      */
-    private static final String machineStatus = "zkbFePartOrder_machineStatus";
+     public static final String machineStatus = "zkbFePartOrder_machineStatus";
 
     /**
      * 紧急类型
      */
-    private static final String urgencyStatus = "zkbFePartOrder_casePriority";
+    public static final String urgencyStatus = "zkbFePartOrder_casePriority";
 
     /**
      * 是否扣除名额
      */
-    private static final String subtractTotalStatus = "zkbFePartOrder_isSubtractTotalStatus";
+    public static final String subtractTotalStatus = "zkbFePartOrder_isSubtractTotalStatus";
 
     /**
      * 流程状态
@@ -199,61 +193,63 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     /**
      * 机型
      */
-    private static final String artificialType = "zkbFePartOrder_artificialType";
+    public static final String artificialType = "zkbFePartOrder_artificialType";
 
     /**
      * 订单标注
      */
-    private static final String sparePartsOrderAnnotation = "zkbFePartOrder_sparePartsOrderAnnotation";
+    public static final String sparePartsOrderAnnotation = "zkbFePartOrder_sparePartsOrderAnnotation";
 
     /**
      * 设备类型（DI）
      */
-    private static final String assetTypeDi = "zkbFePartOrder_assetTypeDi";
+    public static final String assetTypeDi = "zkbFePartOrder_assetTypeDi";
 
     /**
      * 订单紧急的原因
      */
-    private static final String zkbUrgentReasonType = "zkbUrgentReasonType";
+    public static final String zkbUrgentReasonType = "zkbUrgentReasonType";
 
     /**
      * 归还类型
      */
-    private static final String zkbPoReturnType="zkbFePartOrder_zkbPoReturnType";
+    public static final String zkbPoReturnType="zkbFePartOrder_zkbPoReturnType";
 
     /**
      * 故障描述
      */
-    private static final String partQualityIssue="zkbFePartOrder_partQualityIssue";
+    public static final String partQualityIssue="zkbFePartOrder_partQualityIssue";
 
     /**
      * 是否需要探头说明函
      */
-    private static final String needLetterFlag="zkbFePartOrder_needLetterFlag";
+    public static final String needLetterFlag="zkbFePartOrder_needLetterFlag";
 
     /**
      * 是还是否
      */
-    private static final String yesOrNo="zkbFePartOrder_yesOrNo";
+    public static final String yesOrNo="zkbFePartOrder_yesOrNo";
 
     /**
      * 是否紧急
      */
-    private static final String emergency="zkbFePartOrder_emergency";
+    public static final String emergency="zkbFePartOrder_emergency";
 
-    private static final String zkbPoValueType = "zkbPoValueType";
+    public static final String zkbPoValueType = "zkbPoValueType";
+
+    public static final String gefeOrderType = "zkbFePartOrder_orderType";
 
     /**
      * 日期格式
      */
-    private static final String dateFormat = "yyyy-MM-dd HH:mm:ss";
+    public static final String dateFormat = "yyyy-MM-dd HH:mm:ss";
 
-    private static final String dateFormat_month = "yyyy-MM-dd";
+    public static final String dateFormat_month = "yyyy-MM-dd";
 
     /**
      * 合同超声高端机
      */
-    private static final String assetTypeHighMachineValue = "highMachine";
+    public static final String assetTypeHighMachineValue = "highMachine";
 
     public static final String testLoginNameStartWith = "test.";
 
@@ -1335,6 +1331,52 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         return tenantInfoMap;
     }
 
+    /**
+     * 批量获取合同信息
+     * @param zkbFePartOrderList 流程列表
+     * @return
+     */
+    public Map<String, ZkbContract> getContractMapForZkbPartOrder(List<ZkbPartOrder> zkbFePartOrderList)
+    {
+        Map<String,ZkbContract> contractMap = new HashMap<>();
+        if(CollectionUtils.isEmpty(zkbFePartOrderList))
+            return contractMap;
+        Set<String> contractIdSet = new HashSet<>();
+        for(ZkbPartOrder item:zkbFePartOrderList)
+            contractIdSet.add(item.getContractId());
+        if(CollectionUtils.isEmpty(contractIdSet))
+            return contractMap;
+        List<ZkbContract> zkbContractList = this.zkbContractRepository.findByIdIn(contractIdSet);
+        if(CollectionUtils.isEmpty(zkbContractList))
+            return contractMap;
+        for(ZkbContract item:zkbContractList)
+            contractMap.put(item.getId(),item);
+        return contractMap;
+    }
+
+    /**
+     * 批量获取租户信息
+     * @param zkbFePartOrderList
+     * @return
+     */
+    public Map<String, TenantInfo> getTenantInfoMapForZkbPartOrder(List<ZkbPartOrder> zkbFePartOrderList)
+    {
+        Map<String,TenantInfo> tenantInfoMap = new HashMap<>();
+        if(CollectionUtils.isEmpty(zkbFePartOrderList))
+            return tenantInfoMap;
+        Set<String> tenantUidSet = new HashSet<>();
+        for(ZkbPartOrder item:zkbFePartOrderList)
+            tenantUidSet.add(item.getTenantUID());
+        if(CollectionUtils.isEmpty(tenantUidSet))
+            return tenantInfoMap;
+        List<TenantInfo> tenantInfoList = this.tenantInfoRepository.findByUidIn(tenantUidSet);
+        if(CollectionUtils.isEmpty(tenantInfoList))
+            return tenantInfoMap;
+        for(TenantInfo item:tenantInfoList)
+            tenantInfoMap.put(item.getUid(),item);
+        return tenantInfoMap;
+    }
+
 
     /**
      * 根据订单列表生成MAP
@@ -1345,21 +1387,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         List<Map<String, Object>> zkbManMadeFePartOrderDataList = new ArrayList<>();
         List<Map<String, Object>> zkbProbeFePartOrderDataList = new ArrayList<>();
         List<Map<String, Object>> zkbSparePartFePartOrderDataList = new ArrayList<>();
-        List<String> typeList = new ArrayList<>();
-        typeList.add(machineStatus);
-        typeList.add(urgencyStatus);
-        typeList.add(subtractTotalStatus);
-        typeList.add(status);
-        typeList.add(artificialType);
-        typeList.add(sparePartsOrderAnnotation);
-        typeList.add(assetTypeDi);
-        typeList.add(zkbUrgentReasonType);
-        typeList.add(zkbPoReturnType);
-        typeList.add(partQualityIssue);
-        typeList.add(needLetterFlag);
-        typeList.add(yesOrNo);
-        typeList.add(emergency);
-        Map<String,Map<String,String>> i18Map = this.getI18ToMap(typeList);
+        Map<String,Map<String,String>> i18Map=batchI18MapForPartOrder();
         Map<String,ZkbContract> contractMap=this.getContractMap(zkbFePartOrderList);
         Map<String,TenantInfo> tenantInfoMap=this.getTenantInfoMap(zkbFePartOrderList);
         if(CollectionUtils.isNotEmpty(zkbFePartOrderList))
@@ -1398,12 +1426,33 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         return map;
     }
 
+    public Map<String,Map<String,String>> batchI18MapForPartOrder()
+    {
+        List<String> typeList = new ArrayList<>();
+        typeList.add(machineStatus);
+        typeList.add(urgencyStatus);
+        typeList.add(subtractTotalStatus);
+        typeList.add(status);
+        typeList.add(artificialType);
+        typeList.add(sparePartsOrderAnnotation);
+        typeList.add(assetTypeDi);
+        typeList.add(zkbUrgentReasonType);
+        typeList.add(zkbPoReturnType);
+        typeList.add(partQualityIssue);
+        typeList.add(needLetterFlag);
+        typeList.add(yesOrNo);
+        typeList.add(emergency);
+        typeList.add(gefeOrderType);
+        Map<String,Map<String,String>> i18Map = this.getI18ToMap(typeList);
+        return i18Map;
+    }
+
     /**
      *
      * @param strList
      * @return
      */
-    private Map<String,Map<String,String>> getI18ToMap(List<String> strList)
+    public Map<String,Map<String,String>> getI18ToMap(List<String> strList)
     {
         Map<String,Map<String,String>> i18Map = new HashMap<>();
         if(CollectionUtils.isEmpty(strList))
@@ -1474,7 +1523,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(zkbFePartOrder==null){
             return manMadeMap;
         }
-        this.fullContractAndTenantInfo(contractMap,tenantInfoMap,manMadeMap,zkbFePartOrder);
+        this.fullContractAndTenantInfo(contractMap,tenantInfoMap,manMadeMap,zkbFePartOrder.getContractId(),zkbFePartOrder.getTenantUid());
         manMadeMap.put(WebUtil.getMessage("zkbFePartOrder_systemId"),zkbFePartOrder.getSystemId());
         manMadeMap.put(WebUtil.getMessage("zkbFePartOrder_orderNo"),zkbFePartOrder.getPartOrderNo());
         manMadeMap.put(WebUtil.getMessage("zkbFePartOrder_reportUser"),zkbFePartOrder.getReportUser());
@@ -2041,18 +2090,19 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param contractMap 合同集合
      * @param tenantInfoMap 租户集合
      * @param map 导出数据集合
-     * @param zkbFePartOrder 当前流程数据
+     * @param contractId 合同ID
+     * @param tenantUid 租户tenant uid
      */
-    public void fullContractAndTenantInfo(Map<String,ZkbContract> contractMap,Map<String,TenantInfo> tenantInfoMap,HashMap<String,Object> map,ZkbFePartOrder zkbFePartOrder)
+    public void fullContractAndTenantInfo(Map<String,ZkbContract> contractMap,Map<String,TenantInfo> tenantInfoMap,Map<String,Object> map,String contractId,String tenantUid)
     {
-        ZkbContract zkbContract = contractMap.get(zkbFePartOrder.getContractId());
+        ZkbContract zkbContract = contractMap.get(contractId);
         if(zkbContract!=null)
         {
             map.put(WebUtil.getMessage("zkbContract_contractNo"),zkbContract.getContractNo());
             map.put(WebUtil.getMessage("zkbContract_region"),zkbContract.getRegion());
             map.put(WebUtil.getMessage("zkbContract_contractType"),zkbContract.getContractType());
         }
-        TenantInfo tenantInfo = tenantInfoMap.get(zkbFePartOrder.getTenantUid());
+        TenantInfo tenantInfo = tenantInfoMap.get(tenantUid);
         if(tenantInfo!=null)
         {
             map.put(WebUtil.getMessage("zkbContact_tenant"),tenantInfo.getName());
@@ -2070,7 +2120,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(zkbFePartOrder==null){
             return probeMap;
         }
-        this.fullContractAndTenantInfo(contractMap,tenantInfoMap,probeMap,zkbFePartOrder);
+        this.fullContractAndTenantInfo(contractMap,tenantInfoMap,probeMap,zkbFePartOrder.getContractId(),zkbFePartOrder.getTenantUid());
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_systemId"),zkbFePartOrder.getSystemId());
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_probeOrderNo"),zkbFePartOrder.getPartOrderNo());
         probeMap.put(WebUtil.getMessage("zkbFePartOrder_reportUser"),zkbFePartOrder.getReportUser());
@@ -2158,7 +2208,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return sparePartMap;
         }
         sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_systemId"),zkbFePartOrder.getSystemId());
-        this.fullContractAndTenantInfo(contractMap,tenantInfoMap,sparePartMap,zkbFePartOrder);
+        this.fullContractAndTenantInfo(contractMap,tenantInfoMap,sparePartMap,zkbFePartOrder.getContractId(),zkbFePartOrder.getTenantUid());
         if(i18Map.containsKey(artificialType )&&i18Map.get(artificialType ).containsKey(zkbFePartOrder.getArtificialType()))
         {
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_artificialType"),i18Map.get(artificialType).get(zkbFePartOrder.getArtificialType()));
@@ -2205,7 +2255,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param dateFormat 日期格式
      * @return
      */
-    private String dateFormat(Date date,String dateFormat)
+    public String dateFormat(Date date,String dateFormat)
     {
         if(date==null)
         {
