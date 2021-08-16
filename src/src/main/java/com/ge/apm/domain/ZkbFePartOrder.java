@@ -350,6 +350,12 @@ public class ZkbFePartOrder {
     private String newCatFlag;
 
     /**
+     * 是否全新探头
+     */
+    @Column(name = "second_new_cat_flag")
+    private String secondNewCatFlag;
+
+    /**
      * 收货人
      */
     @Column(name = "receiver")
@@ -533,6 +539,9 @@ public class ZkbFePartOrder {
 
     @Transient
     private String yesOrNo;
+
+    @Column(name = "double_qty")
+    private Boolean doubleQty;
 
     /**
      * 申请备件列表
@@ -1256,5 +1265,21 @@ public class ZkbFePartOrder {
 
     public void setContractCatId(String contractCatId) {
         this.contractCatId = contractCatId;
+    }
+
+    public Boolean getDoubleQty() {
+        return doubleQty;
+    }
+
+    public void setDoubleQty(Boolean doubleQty) {
+        this.doubleQty = doubleQty;
+    }
+
+    public String getSecondNewCatFlag() {
+        return secondNewCatFlag;
+    }
+
+    public void setSecondNewCatFlag(String secondNewCatFlag) {
+        this.secondNewCatFlag = secondNewCatFlag;
     }
 }

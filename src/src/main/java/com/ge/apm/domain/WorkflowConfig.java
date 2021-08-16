@@ -136,6 +136,12 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_pm_manual_enabled")
     private Boolean isPmManualEnabled; //是否人工派工
 
+    @Column(name = "is_pm_supplier_take_order_enabled")
+    private Boolean isPmSupplierTakeOrderEnabled; //是否供应商抢单
+
+    @Column(name = "is_pm_supplier_manual_enabled")
+    private Boolean isPmSupplierManualEnabled; //是否供应商派工
+
     @Column(name = "is_pm_auto_enabled")
     private Boolean isPmAutoEnabled; //是否自动派工
 
@@ -635,6 +641,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "aa_default_lease_man_hour")
     private Double defaultLeaseManHour = 0.0D;
 
+    @Column(name = "unit_price_electricity")
+    private Double unitPriceElectricity;
+
     @Getter
     @Setter
     @Column(name = "aa_enable_return_man_hour")
@@ -945,6 +954,14 @@ public class WorkflowConfig implements Serializable {
         this.dispatchUserName2 = dispatchUserName2;
     }
 
+    public Double getUnitPriceElectricity() {
+        return unitPriceElectricity;
+    }
+
+    public void setUnitPriceElectricity(Double unitPriceElectricity) {
+        this.unitPriceElectricity = unitPriceElectricity == null ? 0.56D : unitPriceElectricity;
+    }
+
     public WorkflowConfig() {
     }
 
@@ -1233,6 +1250,35 @@ public class WorkflowConfig implements Serializable {
 
     public void setAiNeedMaintenance(Boolean aiNeedMaintenance) {
         this.aiNeedMaintenance = aiNeedMaintenance;
+    }
+
+
+    public Boolean getIsPmSupplierManualEnabled() {
+        return this.isPmSupplierManualEnabled;
+    }
+
+    public void setIsPmSupplierManualEnabled(Boolean isPmSupplierManualEnabled) {
+        if(Boolean.TRUE.equals(isPmSupplierManualEnabled)){
+            this.isPmTakeOrderEnabled =false;
+            this.isPmManualEnabled =false;
+            this.isPmAutoEnabled =false;
+            this.isPmSupplierTakeOrderEnabled =false;
+        }
+        this.isPmSupplierManualEnabled = isPmSupplierManualEnabled;
+    }
+
+    public Boolean getIsPmSupplierTakeOrderEnabled() {
+        return  this.isPmSupplierTakeOrderEnabled;
+    }
+
+    public void setIsPmSupplierTakeOrderEnabled(Boolean isPmSupplierTakeOrderEnabled) {
+        if(Boolean.TRUE.equals(isPmSupplierTakeOrderEnabled)){
+            this.isPmTakeOrderEnabled =false;
+            this.isPmManualEnabled =false;
+            this.isPmAutoEnabled =false;
+            this.isPmSupplierManualEnabled = false;
+        }
+        this.isPmSupplierTakeOrderEnabled = isPmSupplierTakeOrderEnabled;
     }
 
     @Override

@@ -223,6 +223,16 @@
 
                                 </p:panelGrid>
                             </p:fieldset>
+
+                            <p:fieldset legend="设备绩效" style="margin-bottom:20px" rendered="false">
+                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                    <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageEquipmentPerformanceFields}" var="fieldItem" >
+                                        <ui:include src="customEditFields.xhtml"/>
+                                    </c:forEach>
+                                </p:panelGrid>
+                            </p:fieldset>
+
+
                             <p:fieldset legend="GE MVS" style="margin-bottom:20px" rendered="#{userContextService.isMVSRole()}">
                                 <ui:include src="MvsEditFields.xhtml"/>
                             </p:fieldset>

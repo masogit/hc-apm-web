@@ -193,9 +193,9 @@ public class ZkbContractImportService {
         ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
         if(zkbContract != null){
             if(StringUtils.isNotEmpty(contractInfoVO.getQuotaDeductType())){
-                if("旧逻辑扣除".equals(contractInfoVO.getQuotaDeductType())){
+                if("旧逻辑扣减".equals(contractInfoVO.getQuotaDeductType())){
                     zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
-                }else if("新逻辑扣除".equals(contractInfoVO.getQuotaDeductType())){
+                }else if("新逻辑扣减".equals(contractInfoVO.getQuotaDeductType())){
                     zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
                 }
             }
@@ -225,9 +225,9 @@ public class ZkbContractImportService {
             newZkbContract.setCreatedDate(new Date());
 
             if(StringUtils.isNotEmpty(newZkbContract.getQuotaDeductType())){
-                if("旧逻辑扣除".equals(newZkbContract.getQuotaDeductType())){
+                if("旧逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
-                }else if("新逻辑扣除".equals(newZkbContract.getQuotaDeductType())){
+                }else if("新逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
                 }
             }
@@ -802,10 +802,19 @@ public class ZkbContractImportService {
             }
         }
 
-        if(zkbContractCatVO.getSnNo() == null){
+        if(StringUtils.isEmpty(zkbContractCatVO.getSnNo())){
             item.put("status", ImportStatus.Failure);
             ZkbContractCatRow.addErrMessage(item, "SN编号不能为空");
             isValidateData = false;
+        }else{
+            if(StringUtils.isNotEmpty(zkbContractCatVO.getContractId())){
+                ZkbContractCat zkbContractCat = zkbContractCatRepository.findFirstByContractIdAndSnNo(zkbContractCatVO.getContractId(),zkbContractCatVO.getSnNo());
+                if(zkbContractCat != null){
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractCatRow.addErrMessage(item, "SN编号不能重复");
+                    isValidateData = false;
+                }
+            }
         }
 
         if(zkbContractCatVO.getEnabledName() == null){

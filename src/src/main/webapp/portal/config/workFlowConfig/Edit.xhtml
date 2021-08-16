@@ -274,6 +274,7 @@
                             <label class="label">#{msg.staff_tile_preventive}#{msg.dispatchUserName}</label>
                             <p:selectOneMenu id="pmDispatchUserId" value="#{workflowConfigController.selected.pmDispatchUserId}"
                                              required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
+                                <p:ajax process="@this" />
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{workflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
@@ -282,41 +283,66 @@
                             <label class="label">#{msg.staff_tile_preventive}#{msg.dispatchUserName}2</label>
                             <p:selectOneMenu id="pmDispatchUserId2" value="#{workflowConfigController.selected.pmDispatchUserId2}"
                                              required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
+                                <p:ajax process="@this" />
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{workflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="true">
                             <label class = "label">#{msg.Level2SimplifiedMaintenance}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmSimplify}"/>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmSimplify}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                        <h:panelGroup rendered="true">
+                        <h:panelGroup rendered="#{ workflowConfigController.getViewShowTenantBox()}" >
                             <label class = "label">#{msg.AutomaticallySendWorkers}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmAutoEnabled}"/>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmAutoEnabled}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                        <h:panelGroup rendered="true">
+                        <h:panelGroup rendered="#{ workflowConfigController.getViewShowTenantBox()}" >
                             <label class = "label">#{msg.WorkorderCompetitionAllowed}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmTakeOrderEnabled}"/>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmTakeOrderEnabled}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                        <h:panelGroup rendered="true">
+                        <h:panelGroup rendered="#{ workflowConfigController.getViewShowTenantBox()}">
                             <label class = "label">#{msg.ManuallySendWorkers}?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmManualEnabled}"/>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmManualEnabled}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup >
+
+                        <h:panelGroup rendered="true">
+                            <label class = "label">供应商抢单?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmSupplierTakeOrderEnabled}">
+                                <p:ajax process="@this"  update="V2_WorkflowConfigEditForm:pm"      />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup >
+
                         <h:panelGroup>
                             <label class="label">#{msg.PriorDaysOfMaintenanceReminder}</label>
-                            <p:inputNumber id="pmReminderTime" value="#{workflowConfigController.selected.pmReminderTime}" minValue="0" decimalPlaces="0"/>
+                            <p:inputNumber id="pmReminderTime" value="#{workflowConfigController.selected.pmReminderTime}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.FrequencyOfMaintenanceReminder}</label>
-                            <p:inputNumber id="pmReminderTimes" value="#{workflowConfigController.selected.pmReminderTimes}" minValue="0" decimalPlaces="0"/>
+                            <p:inputNumber id="pmReminderTimes" value="#{workflowConfigController.selected.pmReminderTimes}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.MaintenanceRelatedLaborCost}(#{msg.rmb_hour})</label>
-                            <p:inputNumber id="pmManHourPrice" value="#{workflowConfigController.selected.pmManhourPrice}" minValue="0" decimalPlaces="0"/>
+                            <p:inputNumber id="pmManHourPrice" value="#{workflowConfigController.selected.pmManhourPrice}" minValue="0" decimalPlaces="0">
+                                <p:ajax process="@this" />
+                            </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class = "label">#{msg.PmIsSupportBatchFinish}</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmIsSupportBatchFinish}"/>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmIsSupportBatchFinish}">
+                                <p:ajax process="@this" />
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup >
                         <!-- 工单完工需要验收?-->
                         <h:panelGroup>
@@ -519,7 +545,14 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-
+                <p:fieldset id="equipmentPerformance" legend="设备绩效" rendered="false">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">#{msg.unitPriceElectricity}(元)</label>
+                            <p:inputNumber id="unitPriceElectricity" value="#{workflowConfigController.selected.unitPriceElectricity}" minValue="0" decimalPlaces="2"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
                 <p:fieldset id="other" legend="#{msg.OtherConfiguration}">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{workflowConfigController.selected != null}">
                         <h:panelGroup >

@@ -27,10 +27,7 @@ import com.ge.apm.service.pm.PmFileExportTemplate;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
-import com.ge.apm.service.simpleparts.SimplePartsInventoryService;
-import com.ge.apm.service.simpleparts.SimplePartsItemService;
-import com.ge.apm.service.simpleparts.SimplePartsRequestService;
-import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
+import com.ge.apm.service.simpleparts.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.FileScanService;
@@ -234,6 +231,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private MultiLevelApprovalService multiLevelApprovalService;
     private String queryAssetUid;
     private ConfigService configService;
+    private SimplePartsConfigService partsConfigService;
 
     private String plannedCompletionTimeFormat = null;
     private String actualCompletionTimeFormat = null;
@@ -1150,8 +1148,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return orgDao.getByUid(orgUid);
     }
 
-    public void savePM() {
-        PmOrderActionForm formData = new PmOrderActionForm();
+    public void savePM(){
+        this.savePM(new PmOrderActionForm());
+    }
+
+    public void savePM(PmOrderActionForm formData) {
         if (selectedAsset.getStatus() == 5) {
             WebUtil.addErrorMessage(WebUtil.getMessage("DeactivatedCantRepair"));
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -1361,6 +1362,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         customConfigService=WebUtil.getBean(CustomConfigService.class);
         currentCustomConfig = customConfigService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         token = UserContextService.getAccessToken();
+        partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
         pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -1793,7 +1795,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return result;
     }
 
-    private Sort returnSort(PageRequest pageRequest){
+    protected Sort returnSort(PageRequest pageRequest){
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
         orders.add(new Sort.Order(Sort.Direction.DESC,"planTime"));
         orders.add(new Sort.Order(Sort.Direction.DESC,"pmNum"));
@@ -1911,25 +1913,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                    }
                }
            }
-           //最后一个审批通过的时候 生成相应单子
-           List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
-           List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
-           if (!approvedDetailsNew.isEmpty()) {
-               for (int i = 0; i < approvedDetailsNew.size(); i++) {
-                   V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
-                   if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
-                       accessorySparePartsRequestList.add(v2_workOrder_detail);
-                   } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
-                       accessorySparePartsBuyList.add(v2_workOrder_detail);
+           if(partsConfigService.isEnableIntegrationWithWorkOrder()){
+               //最后一个审批通过的时候 生成相应单子
+               List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
+               List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
+               if (!approvedDetailsNew.isEmpty()) {
+                   for (int i = 0; i < approvedDetailsNew.size(); i++) {
+                       V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
+                       if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
+                           accessorySparePartsRequestList.add(v2_workOrder_detail);
+                       } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
+                           accessorySparePartsBuyList.add(v2_workOrder_detail);
+                       }
                    }
-               }
-               if (!accessorySparePartsRequestList.isEmpty()) {
-                   V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
-                   partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申领单
-               }
-               if (!accessorySparePartsBuyList.isEmpty()) {
-                   V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
-                   partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申购单
+                   if (!accessorySparePartsRequestList.isEmpty()) {
+                       V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                       partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申领单
+                   }
+                   if (!accessorySparePartsBuyList.isEmpty()) {
+                       V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsBuyList.get(0).getWoId());
+                       partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申购单
+                   }
                }
            }
             approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(true));

@@ -300,13 +300,20 @@
                             <p:inputTextarea id="faultDescription" value="#{zkbPartOrderAuditController.selected.faultDescription}" disabled="true" />
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:panelGrid rendered="#{!(zkbPartOrderEditController.orderType eq 'Artificial')}">
+                    <p:panelGrid rendered="#{!(zkbPartOrderAuditController.orderType eq 'Artificial')}">
                         <h:panelGroup>
                             <p:dataList id="uploadList" value="#{zkbPartOrderAuditController.v2_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                 <f:facet name="header">故障图片上传</f:facet>
                                 <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
                             </p:dataList>
-
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid  rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe' and zkbPartOrderAuditController.zkbContract.quotaDeductType eq 'New' and zkbPartOrderAuditController.selected.tenantNewCatFlag eq 't'}">
+                        <h:panelGroup>
+                            <p:dataList  value="#{zkbPartOrderAuditController.v2_probe_blobObjectList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">院方合同证明</f:facet>
+                                <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                            </p:dataList>
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
@@ -372,7 +379,14 @@
                             <p:inputText id="valueType" value="#{fieldMsg.fieldValue('zkbPoValueType',zkbPartOrderAuditController.selected.zkbPartOrderCat.valueType)}" disabled="true" />
                             <label style="color: red">#{zkbPartOrderAuditController.valueTypeTips}</label>
                         </h:panelGroup>
-
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe'}">
+                            <label class="label">是否全新探头</label>
+                            <p:selectOneMenu id="tenantNewCatFlag" value="#{zkbPartOrderEditController.selected.tenantNewCatFlag}" disabled="true" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="是" itemValue="t"/>
+                                <f:selectItem itemLabel="否" itemValue="f"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">旧探头SN编号*</label>
                             <p:inputText id="oldCatSn" value="#{zkbPartOrderAuditController.selected.oldCatSn}" disabled="true" />

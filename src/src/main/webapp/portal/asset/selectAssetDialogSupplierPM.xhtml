@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:dialog id="selectAssetDlgPM" widgetVar="varSelectAssetDlgPM" modal="true" resizable="true" draggable="true" header="#{msg.selectAsset}" appendTo="@(body)" width="80%" showHeader="false">
+            <h:form id="selectAssetPMForm" rendered="#{supplierAssetController.showDialog}">
+                <p:tabView style="height:460px; overflow: auto;">
+                    <p:tab title="设备查询" id="tabSerch">
+                        <h:panelGrid id="searchGrid" columns="8">
+                            <p:inputText id="search_LIKE_name" placeholder="#{msg.assetName}"/>
+                            <p:inputText id="idOneSearchStr" value="#{supplierAssetController.oneSearchStr}" placeholder="#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}" maxlength="100" style="width: 300px"/>
+
+                            <p:selectOneMenu id="search_EQ_tenantUID">
+                                <f:selectItem itemLabel="请选择医院"/>
+                                <f:selectItems value="#{supplierWorkOrderController.getCurSupplierJoinTenant()}" var="item"
+                                               itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                            
+                            <p:commandButton value="#{msg.Search}" actionListener="#{supplierAssetController.setSearchFilter}" update="selectAssetDatalist"/>
+                            <p:commandButton value="#{msg.Reset}" actionListener="#{supplierAssetController.setSearchFilter}" update="selectAssetDatalist searchGrid">
+                                <p:resetInput target="searchGrid"/>
+                            </p:commandButton>
+                        </h:panelGrid>    
+                        
+                        <p:dataTable id="selectAssetDatalist" value="#{supplierAssetController.lazyModel}" var="item" widgetVar="varSelectAssetDatalist"
+                                     selectionMode="single" selection="#{supplierAssetController.selected}"
+                                     lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="false"
+                                     rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                     rows="5" emptyMessage="#{msg.noRecordFound}">
+
+                            <p:ajax event="rowSelect" listener="#{supplierAssetController.onSelectRow()}" update="@(.confirmCls)"/>
+
+                            <p:column headerText="#{msg.name}" sortBy="#{item.name}">
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}">
+                                <h:outputText value="#{item.manufacture}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.vendor}" sortBy="#{item.vendor}">
+                                <h:outputText value="#{item.vendor}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.maitanance}" sortBy="#{item.maitanance}">
+                                <h:outputText value="#{item.maitanance}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.maitananceTel}" sortBy="#{item.maitananceTel}">
+                                <h:outputText value="#{item.maitananceTel}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}">
+                                <h:outputText value="#{item.serialNum}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}">
+                                <h:outputText value="#{item.departNum}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.financingNum}" sortBy="#{item.financingNum}">
+                                <h:outputText value="#{item.financingNum}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.locationName}" sortBy="#{item.locationName}">
+                                <h:outputText value="#{item.locationName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}">
+                                <h:outputText value="#{item.clinicalDeptName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}">
+                                <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetOwnerName}" sortBy="#{item.assetOwnerName}">
+                                <h:outputText value="#{item.assetOwnerName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetOwnerTel}" sortBy="#{item.assetOwnerTel}">
+                                <h:outputText value="#{item.assetOwnerTel}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                </p:tabView>
+                <br/>
+                <p:commandButton value="#{msg.Confirm}" class="confirmCls" icon="ui-icon-check" update="growl   #{supplierAssetController.updateViewIDs}"   actionListener="#{supplierAssetController.confirmSelection()}"    oncomplete="handleSubmit(args, 'varSelectAssetDlgPM');"/>
+                <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('varSelectAssetDlgPM').hide()"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>
