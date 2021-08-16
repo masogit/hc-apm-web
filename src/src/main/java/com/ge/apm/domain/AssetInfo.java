@@ -576,6 +576,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "visible_status")
     private Integer visibleStatus = 1;
 
+    // 年保养次数
+    @Column(name = "annual_maintenance_times")
+    private Integer annualMaintenanceTimes;
+
     @Transient
     private int lineNum;
 
@@ -2137,5 +2141,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setQrCodeLib(QrCodeLib qrCodeLib) {
         this.qrCodeLib = qrCodeLib;
+    }
+
+    public Integer getAnnualMaintenanceTimes() {
+        return annualMaintenanceTimes;
+    }
+
+    public void setAnnualMaintenanceTimes(Integer annualMaintenanceTimes) {
+        this.annualMaintenanceTimes = annualMaintenanceTimes;
     }
 }
