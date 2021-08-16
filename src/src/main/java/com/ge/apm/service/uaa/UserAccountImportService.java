@@ -1,18 +1,14 @@
 package com.ge.apm.service.uaa;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.utils.ExcelParser;
+import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -28,11 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.mapper.AssetInfoMapper;
-import com.ge.apm.dao.mapper.UserAccountMapper;
-import com.ge.apm.service.utils.ExcelParser;
-import com.ge.apm.service.utils.PasswordUtil;
-import com.ge.apm.view.sysutil.UserContextService;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserAccountImportService {
@@ -108,6 +106,9 @@ public class UserAccountImportService {
 
 	@Autowired
 	UserTagsRepository userTagsDao;
+
+	@Autowired
+	AssetServiceMemberRepository assetServiceMemberRepository;
 
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
@@ -960,14 +961,16 @@ public class UserAccountImportService {
 					String uid = oldUser.getUid();
 					String oldTel = oldUser.getTelephone();
 					logger.info(">>>>>>该用户已存在，更新用户信息。loginName: {}", oldUser.getLoginName());
-					BeanUtils.copyProperties(newUser,oldUser);
+					BeanUtils.copyProperties(newUser, oldUser);
 					oldUser.setDealerName(dealerName);
 					oldUser.setId(id);
 					oldUser.setUid(uid);
 					if(handleUser(oldUser, oldTel)){
+						//根据用户名清空旧的代理商关系
+						assetServiceMemberRepository.deleteByUserUid(uid);
 						successCount++;
 					}else{
-						importFailedDataList.add(newUser);
+						importFailedDataList.add(oldUser);
 						failedCount++;
 					}
 				}else{
@@ -1023,7 +1026,6 @@ public class UserAccountImportService {
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
 		//TODO nickName
 		try {
-
 
 			user.setCreatedBy(currentUser.getLoginName());
 			user.setCreatedDate(new Date());
