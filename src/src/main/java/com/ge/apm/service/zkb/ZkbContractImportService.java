@@ -802,10 +802,19 @@ public class ZkbContractImportService {
             }
         }
 
-        if(zkbContractCatVO.getSnNo() == null){
+        if(StringUtils.isEmpty(zkbContractCatVO.getSnNo())){
             item.put("status", ImportStatus.Failure);
             ZkbContractCatRow.addErrMessage(item, "SN编号不能为空");
             isValidateData = false;
+        }else{
+            if(StringUtils.isNotEmpty(zkbContractCatVO.getContractId())){
+                ZkbContractCat zkbContractCat = zkbContractCatRepository.findFirstByContractIdAndSnNo(zkbContractCatVO.getContractId(),zkbContractCatVO.getSnNo());
+                if(zkbContractCat != null){
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractCatRow.addErrMessage(item, "SN编号不能重复");
+                    isValidateData = false;
+                }
+            }
         }
 
         if(zkbContractCatVO.getEnabledName() == null){
