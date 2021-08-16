@@ -61,6 +61,8 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
      */
     private UserAccount currentUser;
 
+    private Boolean supplier = false;
+
     /**
      * 初始化
      */
@@ -74,6 +76,12 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
         if(!userContextService.isZkbAdmin())
         {
             this.tenantUID=currentUser.getTenantUID();
+        }
+        String loginName = currentUser.getLoginName();
+        List<ZkbFePartOrderUserConfig> zkbFePartOrderUserConfigList = this.zkbFePartOrderUserConfigRepository.findByLoginNameAndConfigType(loginName,ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString());
+        if(CollectionUtils.isNotEmpty(zkbFePartOrderUserConfigList))
+        {
+            supplier=true;
         }
 
     }
@@ -168,5 +176,13 @@ public class ZkbFePartOrderUserConfigController extends GenericCRUDUUIDControlle
 
     public void setTenantUID(String tenantUID) {
         this.tenantUID = tenantUID;
+    }
+
+    public Boolean getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Boolean supplier) {
+        this.supplier = supplier;
     }
 }

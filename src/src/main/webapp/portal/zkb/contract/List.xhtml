@@ -35,6 +35,7 @@
                                  rowsPerPageTemplate="20,50,100,500" >
 
                         <p:ajax event="rowSelect" listener="#{zkbContractController.prepareEdit}" update="deleteButton editButton exportButton"/>
+                        <p:ajax event="rowDblselect" listener="#{zkbContractController.doubleClick}" oncomplete="openViewWindow(xhr, status, args)"/>
                         <p:ajax event="filter" listener="#{zkbContractController.onFilter}" />
 
                         <p:column headerText="#{msg.zkbContact_tenant}">
@@ -166,6 +167,11 @@
             </p:dialog>
         </div>
 
-
+        <script>
+            function openViewWindow(xhr, status, args) {
+                window.document.body.innerHTML = '加载中...';
+                window.location.href = args.url;
+            }
+        </script>
     </ui:define>
 </ui:composition>

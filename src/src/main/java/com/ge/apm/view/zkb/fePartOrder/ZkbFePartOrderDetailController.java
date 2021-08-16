@@ -99,6 +99,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 
     private static final String dateFormat = "yyyyMMddHHmmss";
 
+    private Map<String,String> i18Map;
+
     @Override
     protected void init() {
         super.init();
@@ -127,6 +129,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             e.printStackTrace();
         }
         configTypeMap=this.zkbFePartOrderService.getMapConfigByLoginName(this.loginName);
+        this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.zkbFePartOrder_status);
     }
 
     @Override
@@ -187,33 +190,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             this.contractError=true;
             return;
         }
-       // ZkbContract zkbContract = this.contractList.get(0);
-//        Date startDate = zkbContract.getStartDate();
-//        Date endDate = zkbContract.getEndDate();
-//        Date date = new Date();
-//        //合同过期
-//        if(!(date.compareTo(startDate)>=0&&this.adjustDate(date).compareTo(endDate)<=0))
-//        {
-//            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractOverdueError"));
-//            this.contractError=true;
-//        }
     }
-
-//    private Date adjustDate(Date date)
-//    {
-//        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-//        String lastDay = format.format(date.getTime());
-//        lastDay = lastDay+"000000";
-//        SimpleDateFormat formatter = new SimpleDateFormat(ZkbFePartOrderDetailController.dateFormat);
-//        Date date1 = null;
-//        try {
-//            date1 = formatter.parse(lastDay);
-//        } catch (ParseException e) {
-//            logger.info(e.getMessage());
-//        }
-//        return date1;
-//    }
-
 
     public String backList(){
         return this.zkbFePartOrderService.backList(this.queryStatus);
@@ -236,7 +213,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         {
             ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
             if("DI".equals(zkbContract.getContractType())
-                    ||"PCB".equals(zkbContract.getContractType()))
+                    ||"PCB".equals(zkbContract.getContractType())
+                    ||"PCB MVS".equals(zkbContract.getContractType()))
             {
                 if(zkbContract.getSpareArtificail()==null||zkbContract.getSpareArtificail()<=0)
                 {
@@ -252,7 +230,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
                     return "";
                 }
             }
-            this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,1,this.selected,this.currentUser);
+            this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,1,this.selected,this.currentUser,"人工申请");
         }
         String url = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.Requested.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString(),new Date(),null,GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
@@ -286,7 +264,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         this.selected.setTenantAssignUser(this.userName);
         this.selected.setTenantAssignDate(new Date());
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
-        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,3,this.selected,this.currentUser);
+        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,3,this.selected,this.currentUser,this.i18Map.get("WaitingAssignment"));
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
@@ -299,7 +277,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     {
 
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
-        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,2,this.selected,this.currentUser);
+        this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,2,this.selected,this.currentUser,this.i18Map.get("WaitingApm"));
         Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_WECHART);

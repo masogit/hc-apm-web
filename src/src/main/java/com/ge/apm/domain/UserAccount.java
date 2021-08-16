@@ -147,6 +147,9 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "position")
 	private String position;//职务
 
+	@Column(name = "default_language")
+	private String defaultLanguage;//默认语言
+
 	@CreatedBy
 	@Column(name = "created_by", nullable = true, length = 50, updatable = false)
 	@JsonIgnore
@@ -359,6 +362,14 @@ public class UserAccount implements ChineseName, Serializable {
 		isLocalAdmin = false;
 		isActive = false;
 		isOnline = false;
+	}
+
+	public String getDefaultLanguage() {
+		return defaultLanguage;
+	}
+
+	public void setDefaultLanguage(String defaultLanguage) {
+		this.defaultLanguage = defaultLanguage;
 	}
 
 	public Integer getRegion() {

@@ -1,6 +1,11 @@
 package webapp.framework.web.mvc;
 
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.V2_WorkOrderRepository;
+import com.ge.apm.dao.V2_WorkOrderStepRepository;
+import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import java.io.Serializable;
@@ -26,6 +31,8 @@ import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil.PersistAction;
 
 public abstract class GenericCRUDUUIDController<E> implements Serializable {
+    private V2_WorkOrderStepRepository workOrderStepDao;
+    private V2_WorkOrderService workOrderService;
     private static final long serialVersionUID = 1L;
 
     protected boolean filterBySite = false;
@@ -277,7 +284,29 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
                 }
                 continue;
             }
-
+            String strId ="id";
+            if(fieldName.equals(strId)){
+                if(filterValue != null){
+                    String filterName = filterValue.toString();
+//                    List<String> stepIds = workOrderStepDao.findWorkIds(filterName);
+                    List<V2_WorkOrder_Step> steps = workOrderService.getWorkIds(filterName);
+                    List<String> stepIds = new ArrayList<>();
+                    for(V2_WorkOrder_Step s : steps){
+                        String workAfterId = s.getWoId();
+                        for(V2_WorkOrder_Step s2 : steps){
+                            if(s.getWoId() == s2.getWoId()){
+                                if(s.getStartTime().before(s2.getStartTime())){
+                                    workAfterId = s2.getWoId();
+                                }
+                            }
+                        }
+                        stepIds.add(workAfterId);
+                    }
+                    removeFilterOnField("id");
+                    searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepIds));
+                }
+                continue;
+            }
             String matchMode = filterMatchModes.get(fieldName);
             addFilter(fieldName, matchMode, filterValue);
         }
@@ -311,7 +340,14 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
     protected LazyDataModel gamePlanLazyModel;
     protected E selected;
 
-    protected void init(){};
+    protected void init(){
+        try{
+            workOrderStepDao = WebUtil.getBean(V2_WorkOrderStepRepository.class);
+            workOrderService = WebUtil.getBean(V2_WorkOrderService.class);
+        } catch (Exception e) {
+            throw e;
+        }
+    };
     
     protected void onPrepareDataTableModel(){}
 
