@@ -960,14 +960,17 @@ public class UserAccountImportService {
 					Integer id = oldUser.getId();
 					String uid = oldUser.getUid();
 					String oldTel = oldUser.getTelephone();
+					String oldDealerName = oldUser.getDealerName();
 					logger.info(">>>>>>该用户已存在，更新用户信息。loginName: {}", oldUser.getLoginName());
 					BeanUtils.copyProperties(newUser, oldUser);
 					oldUser.setDealerName(dealerName);
 					oldUser.setId(id);
 					oldUser.setUid(uid);
 					if(handleUser(oldUser, oldTel)){
-						//根据用户名清空旧的代理商关系
-						assetServiceMemberRepository.deleteByUserUid(uid);
+						//如果代理商变动了，则根据用户名清空旧的代理商关系
+						if(oldDealerName != null && !oldDealerName.equals(dealerName)){
+							assetServiceMemberRepository.deleteByUserUid(uid);
+						}
 						successCount++;
 					}else{
 						importFailedDataList.add(oldUser);
