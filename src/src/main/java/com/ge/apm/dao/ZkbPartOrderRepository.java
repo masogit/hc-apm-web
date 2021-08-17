@@ -18,15 +18,6 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
     @Query("select max(p.partOrderIndex) from ZkbPartOrder p where p.partOrderNo like ?1 ")
     Object getMaxIndex(String dateCondition);
 
-//    /**
-//     * 根据合同ID获取所有归还单
-//     * @param contractIdList
-//     * @param firstday 某月第一天
-//     * @param lastday 某月最后一天
-//     * @return
-//     */
-//    List<ZkbPartOrder> findByContractIdInAndReturnAuditDateGreaterThanEqualAndReturnAuditDateLessThanEqualAndOrderedDateGreaterThanEqualAndOrderedDateLessThanEqual(List<String> contractIdList, Date firstday, Date lastday, Date firstday1, Date lastday1);
-
     /**
      * 根据多个合同ID，获取总申请数
      * @param contractIdList
@@ -83,15 +74,6 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
             "zkbc.tenant_uid = ?3 and zkbc.start_date<=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd')  and zkbc.end_date>=to_date(to_char(zkbp.ordered_date, 'yyyy-MM-dd'),'yyyy-MM-dd') ", nativeQuery = true)
     Integer fetchApplyPartsQty(Date orderedDate,String orderType,String tenantUID);
 
-//    /**
-//     * 获取配件
-//     * @param orderedDate 下单日期
-//     * @param contractIdList 合同列表
-//     * @param orderType 订单类型
-//     * @return
-//     */
-//    List<ZkbPartOrder> findByOrderedDateBeforeAndContractIdInAndOrderType(Date orderedDate,List<String> contractIdList,String orderType);
-
     @Query(value = "SELECT * from zkb_part_order where order_type = ?3 and ordered_date< ?1  and contract_id in ?2 and (status = 'PartReturned' or status = 'Returned' or status = 'Closed')", nativeQuery = true)
     List<ZkbPartOrder> findReturnId(Date orderedDate,List<String> contractIdList,String orderType);
 
@@ -103,7 +85,11 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @param tenantUid
      * @return
      */
-    List<ZkbPartOrder> findByTenantUID(String tenantUid);
+    List<ZkbPartOrder> findByTenantUIDOrderByRequestDateDesc(String tenantUid);
+
+    @Query(value = "SELECT * from zkb_part_order order by request_date desc ", nativeQuery = true)
+    List<ZkbPartOrder> findAllPartOrder();
+
 
 }
 
