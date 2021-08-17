@@ -968,7 +968,7 @@ public class UserAccountImportService {
 					oldUser.setUid(uid);
 					if(handleUser(oldUser, oldTel)){
 						//如果代理商变动了，则根据用户名清空旧的代理商关系
-						if(!oldDealerName.equals(dealerName)){
+						if(oldDealerName != null && !oldDealerName.equals(dealerName)){
 							assetServiceMemberRepository.deleteByUserUid(uid);
 						}
 						successCount++;
