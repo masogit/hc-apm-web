@@ -424,7 +424,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         if(userId != null){
             UserAccount userAccount = uaaService.getUserById(userId);
             if(userAccount != null){
-                return userAccount.getLoginName();
+                return userAccount.getName();
             }
         }
         return null;
