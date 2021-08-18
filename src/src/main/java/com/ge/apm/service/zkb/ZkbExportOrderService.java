@@ -38,7 +38,7 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
     /**
      * FE
      */
-    private static final String FE = "FE";
+    private static final String FE = "ZKB FE";
 
     /**
      * FE
@@ -140,6 +140,11 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
      * FE归还类型
      */
     private static final String zkbFePoReturnType = "zkbPoReturnType";
+
+    /**
+     * 审核备注
+     */
+    private static final String zkbPoReturnDataStatus = "zkbPoReturnDataStatus";
 
     /**
      * 导出fepartorder
@@ -255,16 +260,16 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         this.zkbFePartOrderService.fullContractAndTenantInfo(contractMap,tenantInfoMap,map,zkbPartOrder.getContractId(),zkbPartOrder.getTenantUID());
         if(i18Map.containsKey(zkbPartOrderType)&&i18Map.get(zkbPartOrderType).containsKey(zkbPartOrder.getOrderType()))
             map.put("订单类型",i18Map.get(zkbPartOrderType).get(zkbPartOrder.getOrderType()));
-        map.put("申请号",i18Map.get(zkbPartOrderType).get(zkbPartOrder.getPartOrderNo()));
+        map.put("申请号",zkbPartOrder.getPartOrderNo());
         if(i18Map.containsKey(zkbPoStatus)&&i18Map.get(zkbPoStatus).containsKey(zkbPartOrder.getStatus()))
-            map.put("订单类型",i18Map.get(zkbPoStatus).get(zkbPartOrder.getStatus()));
+            map.put("当前状态",i18Map.get(zkbPoStatus).get(zkbPartOrder.getStatus()));
         map.put("System ID",zkbPartOrder.getAssetInfo().getSystemId());
         map.put("报修单号",zkbPartOrder.getSrNum());
         map.put("申请人",zkbPartOrder.getRequestUser());
         map.put("申请人电话",zkbPartOrder.getRequestPhone());
         map.put("申请时间",this.zkbFePartOrderService.dateFormat(zkbPartOrder.getRequestDate(),ZkbFePartOrderService.dateFormat));
         map.put("设备类型（DI）",zkbPartOrder.getAssetTypeDi());
-        if(i18Map.containsKey(yesOrNo)&&i18Map.get(yesOrNo).containsKey(zkbPartOrder.getStatus()))
+        if(i18Map.containsKey(yesOrNo)&&i18Map.get(yesOrNo).containsKey(zkbPartOrder.getScoreFlag()))
             map.put("是否使用积分抵扣",i18Map.get(yesOrNo).get(zkbPartOrder.getScoreFlag()));
         if("2".equals(zkbPartOrder.getArtificialType()))
             map.put("机型","超声高端机");
@@ -285,7 +290,6 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         if(i18Map.containsKey(zkbUrgentReasonType)&&i18Map.get(zkbUrgentReasonType).containsKey(zkbPartOrder.getUrgencyReasons()))
             map.put("订单紧急的原因",i18Map.get(zkbUrgentReasonType).get(zkbPartOrder.getUrgencyReasons()));
         map.put("订单数量/订单名额",zkbPartOrder.getQty());
-        map.put("剩余数量",zkbPartOrder.getRemainQty());
         map.put("ZKB工程师姓名",zkbPartOrder.getZkbEngineerName());
         map.put("ZKB工程师电话",zkbPartOrder.getZkbEngineerPhone());
         map.put("收货人",zkbPartOrder.getReceiver());
@@ -413,6 +417,8 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
                 newMap.put("归还类型",this.zkbFePartOrderService.dateFormat(zkbPartOrderReturn.getReturnDate(),ZkbFePartOrderService.dateFormat));
                 if(i18Map.containsKey(zkbFePoReturnType)&&i18Map.get(zkbFePoReturnType).containsKey(zkbPartOrderReturn.getReturnType()))
                     map.put("归还类型",i18Map.get(zkbFePoReturnType).get(zkbPartOrderReturn.getReturnType()));
+                if(i18Map.containsKey(zkbPoReturnDataStatus)&&i18Map.get(zkbPoReturnDataStatus).containsKey(zkbPartOrderReturn.getDataStatus()))
+                    map.put("状态",i18Map.get(zkbPoReturnDataStatus).get(zkbPartOrderReturn.getDataStatus()));
                 map.put("Part Serial Number",zkbPartOrderReturn.getPartSerialNumber());
                 map.put("归还故障描述",zkbPartOrderReturn.getPartQualityIssue());
                 map.put("归还数量",zkbPartOrderReturn.getQty());
@@ -518,9 +524,9 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         List<Map<String, Object>> fePartOrderList = new ArrayList<>();
         List<ZkbFePartOrder> list = null;
         if(StringUtils.isNotBlank(tenantUid))
-            list=this.zkbFePartOrderRepository.findByTenantUid(tenantUid);
+            list=this.zkbFePartOrderRepository.findByTenantUidOrderByReportDateDesc(tenantUid);
         else
-            list=this.zkbFePartOrderRepository.find();
+            list=this.zkbFePartOrderRepository.findAllFePartOrder();
         if(CollectionUtils.isEmpty(list))
             return fePartOrderList;
         Map<String,Map<String,String>> i18Map=this.zkbFePartOrderService.batchI18MapForPartOrder();
@@ -546,9 +552,9 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         List<Map<String, Object>> partOrderList = new ArrayList<>();
         List<ZkbPartOrder> list = null;
         if(StringUtils.isNotBlank(tenantUid))
-            list=this.zkbPartOrderRepository.findByTenantUID(tenantUid);
+            list=this.zkbPartOrderRepository.findByTenantUIDOrderByRequestDateDesc(tenantUid);
         else
-            list=this.zkbPartOrderRepository.find();
+            list=this.zkbPartOrderRepository.findAllPartOrder();
         if(CollectionUtils.isEmpty(list))
             return partOrderList;
         Map<String,Map<String,String>> i18Map=this.batchI18MapForPartOrder();
@@ -582,6 +588,7 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         typeList.add(zkbPoValueType);
         typeList.add(needLetterFlag);
         typeList.add(zkbFePoReturnType);
+        typeList.add(zkbPoReturnDataStatus);
         Map<String,Map<String,String>> i18Map = this.zkbFePartOrderService.getI18ToMap(typeList);
         return i18Map;
     }
