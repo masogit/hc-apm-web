@@ -154,15 +154,15 @@
                     <p:fieldset id="orderedFieldset" legend="派工信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingApm')}">
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
-                                    <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingApm')}">
-                                        <label class="label">#{msg.zkbFePartOrder_orderedPerson}*：</label>
-                                        <p:inputText  readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.fullApmInfoUser}"  />
-                                    </h:panelGroup>
-                                    <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingApm')}">
-                                        <label class="label">#{msg.zkbFePartOrder_orderedDate}*：</label>
-                                        <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderDetailController.selected.fullApmInfoDate}"
-                                                    showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-                                    </h:panelGroup>
+<!--                                    <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingApm')}">-->
+<!--                                        <label class="label">#{msg.zkbFePartOrder_orderedPerson}*：</label>-->
+<!--                                        <p:inputText  readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.fullApmInfoUser}"  />-->
+<!--                                    </h:panelGroup>-->
+<!--                                    <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingApm')}">-->
+<!--                                        <label class="label">#{msg.zkbFePartOrder_orderedDate}*：</label>-->
+<!--                                        <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderDetailController.selected.fullApmInfoDate}"-->
+<!--                                                    showOn="button" showButtonPanel="true" navigator="true" mask="true"/>-->
+<!--                                    </h:panelGroup>-->
 
                                     <h:panelGroup >
                                         <label class="label">#{msg.zkbFePartOrder_sr}*</label>
