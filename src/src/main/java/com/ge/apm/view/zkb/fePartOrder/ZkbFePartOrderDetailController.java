@@ -277,6 +277,8 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     {
 
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+        this.selected.setTenantAssignUser(this.userName);
+        this.selected.setTenantAssignDate(new Date());
         this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,2,this.selected,this.currentUser,this.i18Map.get("WaitingApm"));
         Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
