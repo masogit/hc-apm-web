@@ -3,3 +3,6 @@ update cms_psi_mapdata pm set modality=t.modality  from (select modality,map_dat
 
 -- YHAAO-12742
 update asset_alert_config set check_type = 7,valid_values = 'Shutdown;关闭;Paused;暂停;Failed' where config_type = 204;
+
+-- 刷新asset_service_member表，定时任务加的类型从DealerFEAndSalesExcel改成GEIBTableExcel
+update asset_service_member set import_file_type = 'GEIBTableExcel' where import_file_type='DealerFEAndSalesExcel' and ge_user_type='9'
