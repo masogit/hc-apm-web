@@ -276,7 +276,9 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         map.put("申请人电话",zkbPartOrder.getRequestPhone());
         map.put("申请时间",this.zkbFePartOrderService.dateFormat(zkbPartOrder.getRequestDate(),ZkbFePartOrderService.dateFormat));
         map.put("设备类型（DI）",zkbPartOrder.getAssetTypeDi());
-        if(i18Map.containsKey(yesOrNo)&&i18Map.get(yesOrNo).containsKey(zkbPartOrder.getScoreFlag()))
+        if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getScoreFlag())
+                &&i18Map.containsKey(yesOrNo)
+                &&i18Map.get(yesOrNo).containsKey(zkbPartOrder.getScoreFlag()))
             map.put("是否使用积分抵扣",i18Map.get(yesOrNo).get(zkbPartOrder.getScoreFlag()));
         if("2".equals(zkbPartOrder.getArtificialType()))
             map.put("机型","超声高端机");
@@ -324,7 +326,7 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         if(i18Map.containsKey(zkbPoValueType)&&zkbPartOrder.getZkbPartOrderCat()!=null&&i18Map.get(zkbPoValueType).containsKey(zkbPartOrder.getZkbPartOrderCat().getValueType()))
             map.put("价值类型",i18Map.get(zkbPoValueType).get(zkbPartOrder.getZkbPartOrderCat().getValueType()));
         if(i18Map.containsKey(yesOrNo)&&i18Map.get(yesOrNo).containsKey(zkbPartOrder.getTenantNewCatFlag()))
-            map.put("是否全新探头",i18Map.get(yesOrNo).get(zkbPartOrder.getTenantNewCatFlag()));
+            map.put("是否全新探头(代理商)",i18Map.get(yesOrNo).get(zkbPartOrder.getTenantNewCatFlag()));
         map.put("旧探头SN编号",zkbPartOrder.getOldCatSn());
         map.put("探头数量",zkbPartOrder.getCatNum());
         map.put("技术支持审批人",zkbPartOrder.getTechAuditer());
@@ -345,8 +347,10 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         map.put("Order#",zkbPartOrder.getOrderNo());
         map.put("价格",zkbPartOrder.getPrice());
         if(i18Map.containsKey(yesOrNo)&&i18Map.get(yesOrNo).containsKey(zkbPartOrder.getNewCatFlag()))
-            map.put("是否全新探头",i18Map.get(yesOrNo).get(zkbPartOrder.getNewCatFlag()));
-        if(i18Map.containsKey(needLetterFlag)&&i18Map.get(needLetterFlag).containsKey(zkbPartOrder.getNeedLetterFlag()))
+            map.put("是否全新探头(400)",i18Map.get(yesOrNo).get(zkbPartOrder.getNewCatFlag()));
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())
+                &&i18Map.containsKey(needLetterFlag)
+                &&i18Map.get(needLetterFlag).containsKey(zkbPartOrder.getNeedLetterFlag()))
             map.put("是否需要探头说明函",i18Map.get(needLetterFlag).get(zkbPartOrder.getNeedLetterFlag()));
         map.put("GE工程师姓名",zkbPartOrder.getGeEngineerName());
         map.put("GE工程师电话",zkbPartOrder.getGeEngineerPhone());
@@ -429,6 +433,7 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
                 map.put("Part Serial Number",zkbPartOrderReturn.getPartSerialNumber());
                 map.put("归还故障描述",zkbPartOrderReturn.getPartQualityIssue());
                 map.put("归还数量",zkbPartOrderReturn.getQty());
+                map.put("归还备注",zkbPartOrderReturn.getRemark());
                 returnPartlist.add(newMap);
             }
         }
