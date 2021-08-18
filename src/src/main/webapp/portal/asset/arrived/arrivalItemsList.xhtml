@@ -26,7 +26,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm datalist"/>
+                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm editCompletedArrivedList"/>
                         <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="datalist" />
                         <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.name}"/>
@@ -132,7 +132,7 @@
                         <f:facet name="{Toolbar}">
                             <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" update=":ItemViewDlgForm" oncomplete="PF('ItemViewDlg').show()" disabled="#{empty assetArrivedItemsController.selected}"/>-->
                             <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetArrivedItemsController.prepareEdit}" disabled="#{empty assetArrivedItemsController.selected}"/>-->
-                            <p:commandButton title="允许编辑（已安装入库）的工单" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated" action="#{assetArrivedItemsController.beforeUpdateInfo}" disabled="#{empty assetArrivedItemsController.selected or assetArrivedItemsController.selected.installStatus eq 'new'}" rendered="#{userContextService.activeSupplier()}" update="editCompletedArrivedListDlg" oncomplete="PF('editCompletedArrivedListDlg').show()"/>
+                            <p:commandButton id="editCompletedArrivedList" title="允许编辑（已安装入库）的工单" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated" action="#{assetArrivedItemsController.beforeUpdateInfo}" disabled="#{empty assetArrivedItemsController.selected or assetArrivedItemsController.selected.installStatus eq 'new'}" rendered="#{userContextService.activeSupplier()}" update="editCompletedArrivedListDlg" oncomplete="PF('editCompletedArrivedListDlg').show()"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
                             </p:commandButton>
