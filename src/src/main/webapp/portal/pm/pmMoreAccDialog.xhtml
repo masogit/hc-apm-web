@@ -150,7 +150,10 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.PartQuantity}*</label>
-                            <p:inputNumber  decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}"/>
+                           <p:inputNumber  decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">
+                                <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
+                                </p:ajax>
+                           </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup id="remainingStock" rendered="#{v2PmOrderController.statusFlag==1}">
                             <label class="label">所剩库存</label>
