@@ -114,6 +114,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      */
     private String tenantUID="";
 
+    private String queryTenantUID="";
+
     /**
      * 当前用户在config中的配置权限
      */
@@ -241,6 +243,10 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         List<SearchFilter> searchFilters = csearchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
+        }
+        if(StringUtils.isNotBlank(this.queryTenantUID))
+        {
+            searchFilters.add((new SearchFilter("tenantUid", SearchFilter.Operator.EQ,this.queryTenantUID)));
         }
         if(StringUtils.isNotBlank(this.loginName)&&this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
         {
@@ -559,5 +565,13 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
 
     public void setGeAdmin(Boolean geAdmin) {
         this.geAdmin = geAdmin;
+    }
+
+    public String getQueryTenantUID() {
+        return queryTenantUID;
+    }
+
+    public void setQueryTenantUID(String queryTenantUID) {
+        this.queryTenantUID = queryTenantUID;
     }
 }
