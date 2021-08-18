@@ -61,6 +61,7 @@ public class UserAccountImportService {
 	private static final String HEADER_DEALERNAME="所属代理商";
 	private static final String SHEET_USER="datalist";
 	private static final String ROLE_GUEST="仅报修权限账号";
+	public static final String ZKB_DEALER_FE_SALES_EXCEL = "ZKBDealerFEAndSalesExcel";
 	private static Map<String,Integer> sysRoleMap;
 	private Map<String,OrgInfo> mapOrgInfo=new HashMap<String,OrgInfo>();
 	private Map<String,OrgInfo> mapUidOrgInfo=new HashMap<String,OrgInfo>();
@@ -969,7 +970,7 @@ public class UserAccountImportService {
 					if(handleUser(oldUser, oldTel)){
 						//如果代理商变动了，则根据用户名清空旧的代理商关系
 						if(oldDealerName != null && !oldDealerName.equals(dealerName)){
-							assetServiceMemberRepository.deleteByUserUid(uid);
+							assetServiceMemberRepository.deleteByUserUid(uid, ZKB_DEALER_FE_SALES_EXCEL);
 						}
 						successCount++;
 					}else{
