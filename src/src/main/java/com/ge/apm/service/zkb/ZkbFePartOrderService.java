@@ -1296,8 +1296,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(CollectionUtils.isEmpty(zkbFePartOrderList))
             return contractMap;
         Set<String> contractIdSet = new HashSet<>();
-        for(ZkbFePartOrder item:zkbFePartOrderList)
+        for(ZkbFePartOrder item:zkbFePartOrderList){
+            if(StringUtils.isBlank(item.getContractId()))
+                continue;
             contractIdSet.add(item.getContractId());
+        }
         if(CollectionUtils.isEmpty(contractIdSet))
             return contractMap;
         List<ZkbContract> zkbContractList = this.zkbContractRepository.findByIdIn(contractIdSet);
@@ -1319,8 +1322,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(CollectionUtils.isEmpty(zkbFePartOrderList))
             return tenantInfoMap;
         Set<String> tenantUidSet = new HashSet<>();
-        for(ZkbFePartOrder item:zkbFePartOrderList)
+        for(ZkbFePartOrder item:zkbFePartOrderList) {
+            if (StringUtils.isBlank(item.getTenantUid()))
+                continue;
             tenantUidSet.add(item.getTenantUid());
+        }
         if(CollectionUtils.isEmpty(tenantUidSet))
             return tenantInfoMap;
         List<TenantInfo> tenantInfoList = this.tenantInfoRepository.findByUidIn(tenantUidSet);
@@ -1342,8 +1348,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(CollectionUtils.isEmpty(zkbFePartOrderList))
             return contractMap;
         Set<String> contractIdSet = new HashSet<>();
-        for(ZkbPartOrder item:zkbFePartOrderList)
+        for(ZkbPartOrder item:zkbFePartOrderList) {
+            if (StringUtils.isBlank(item.getContractId()))
+                continue;
             contractIdSet.add(item.getContractId());
+        }
         if(CollectionUtils.isEmpty(contractIdSet))
             return contractMap;
         List<ZkbContract> zkbContractList = this.zkbContractRepository.findByIdIn(contractIdSet);
@@ -1365,8 +1374,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(CollectionUtils.isEmpty(zkbFePartOrderList))
             return tenantInfoMap;
         Set<String> tenantUidSet = new HashSet<>();
-        for(ZkbPartOrder item:zkbFePartOrderList)
+        for(ZkbPartOrder item:zkbFePartOrderList) {
+            if(StringUtils.isBlank(item.getTenantUID()))
+                continue;
             tenantUidSet.add(item.getTenantUID());
+        }
         if(CollectionUtils.isEmpty(tenantUidSet))
             return tenantInfoMap;
         List<TenantInfo> tenantInfoList = this.tenantInfoRepository.findByUidIn(tenantUidSet);
