@@ -956,7 +956,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         List<ZkbPartOrderReturn> zkbPartOrderReturnList = zkbPartOrderReturnRepository.findByPartOrderId(zkbPartOrder.getId());
         for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
             if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
-                if(!ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
+                if(ZkbPartOrderReturn.DataStatusEnum.Reject.toString().equals(r.getDataStatus())){
                     continue;
                 }
             }
