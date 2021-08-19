@@ -345,6 +345,8 @@ public class TenantInfoConfigService {
 			case "supplierManagement.assetBindSupplierFE":
 			case "supplierMaintain":
 			case "supplierMaintain.workbench":
+			case "supplierRepair":
+			case "supplierRepair.workbench":
 				item.setValue(false);
 		}
 	}
@@ -359,6 +361,8 @@ public class TenantInfoConfigService {
 			case "supplierManagement.assetBindSupplierFE":
 			case "supplierMaintain":
 			case "supplierMaintain.workbench":
+            case "supplierRepair":
+            case "supplierRepair.workbench":
 				item.setValue(true);
 				return;
 			default:
