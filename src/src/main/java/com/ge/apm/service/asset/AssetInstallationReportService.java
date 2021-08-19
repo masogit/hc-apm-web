@@ -68,7 +68,11 @@ public class AssetInstallationReportService {
             functionType = arrivalListItem.getArrivalList().getFunctionType();
         }
         reportData.put("function_type", functionType);//型号规格
-        reportData.put("brand", arrivalListItem.getArrivalList().getBrand());//品牌
+        String brand = arrivalListItem.getBrand();
+        if(StringUtils.isBlank(brand)){
+            brand = arrivalListItem.getArrivalList().getBrand();
+        }
+        reportData.put("brand", brand);//品牌
         reportData.put("manufact_num", arrivalListItem.getSerialNum());//出厂编号
         reportData.put("clinical_dept_name", orgInfoDao.findByUid(arrivalListItem.getClinicalDeptUID()));//设备所属科室
         reportData.put("import_equipment", arrivalListItem.getImportEquipment()==null?"":FieldValueMessageController.doGetFieldValue("importEquipment",arrivalListItem.getImportEquipment()+""));//是否进口设备[1:进口,2:国产]
@@ -132,7 +136,11 @@ public class AssetInstallationReportService {
             Map<String, Object> arrivalItemMap = new HashMap<>();
             ArrivalList arrivalList = arrivalListItem.getArrivalList();
             arrivalItemMap.put("asset_name", arrivalList.getAssetName());//设备名称
-            arrivalItemMap.put("brand", arrivalList.getBrand());//品牌
+            String brand = arrivalListItem.getBrand();
+            if(StringUtils.isBlank(brand)){
+                brand = arrivalList.getBrand();
+            }
+            arrivalItemMap.put("brand", brand);//品牌
             arrivalItemMap.put("function_type", arrivalListItem.getFunctionType());//型号规格
             Integer importEquipment = arrivalListItem.getImportEquipment();
             if(importEquipment == null || importEquipment !=1){

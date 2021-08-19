@@ -64,7 +64,6 @@ public class PmOrderGlobalController {
         steps.add("待接单");
         steps.add("已计划");
         steps.add("待验收");
-        steps.add("待关单");
 
         return steps;
     }

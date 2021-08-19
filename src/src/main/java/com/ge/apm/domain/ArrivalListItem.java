@@ -395,6 +395,10 @@ public class ArrivalListItem implements Serializable {
     //设备型号
     @Column(name = "function_type")
     private String functionType;
+    //品牌
+    @Size(max = 64)
+    @Column(name = "brand")
+    private String brand;
 
     @Column(name = "site_uid")
     private String siteUid;
@@ -1176,5 +1180,13 @@ public class ArrivalListItem implements Serializable {
 
     public void setFunctionType(String functionType) {
         this.functionType = functionType;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 }

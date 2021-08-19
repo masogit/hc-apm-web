@@ -27,9 +27,6 @@
                     <p:tab class="ui-g-12" title="#{msg.outerRemotePm}"  id="pmOrderListRemote" rendered="#{not userContextService.isAccountEndUser() or userContextService.isZtbTenant() or userContextService.isHaveIbDeviceUser()}">
                         <ui:include src="pmOrderListRemote.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="工单导入" id="importWorkOrder">
-                        <ui:include src="PmOderImport.xhtml"/>
-                    </p:tab>
                 </p:tabView>
             </div>
         </div>

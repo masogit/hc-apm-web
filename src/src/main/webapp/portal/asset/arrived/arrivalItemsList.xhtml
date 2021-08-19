@@ -26,7 +26,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
 
-                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm"/>
+                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm editCompletedArrivedList"/>
                         <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="datalist" />
                         <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.name}"/>
@@ -132,7 +132,7 @@
                         <f:facet name="{Toolbar}">
                             <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" update=":ItemViewDlgForm" oncomplete="PF('ItemViewDlg').show()" disabled="#{empty assetArrivedItemsController.selected}"/>-->
                             <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetArrivedItemsController.prepareEdit}" disabled="#{empty assetArrivedItemsController.selected}"/>-->
-
+                            <p:commandButton id="editCompletedArrivedList" title="允许编辑（已安装入库）的工单" icon="ui-icon-settings" class="btn btn-sm btn-gray batch-terminated" action="#{assetArrivedItemsController.beforeUpdateInfo}" disabled="#{empty assetArrivedItemsController.selected}" rendered="#{userContextService.activeSupplier()}" update="editCompletedArrivedListDlg" oncomplete="PF('editCompletedArrivedListDlg').show()"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
                             </p:commandButton>
@@ -159,6 +159,49 @@
                             <p:commandButton validateClient="true" actionListener="#{assetArrivedItemsController.reassignWorkOrder()}" value="#{msg.TransferOrder}" update=":transferOrderDialogForm :growl :AssetArrivalItemListForm:datalist ItemViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferOrderDialog');"/>
                             <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetArrivedItemsController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
                         </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+                <p:dialog id="editCompletedArrivedListDlg" height="60%" width="70%" widgetVar="editCompletedArrivedListDlg" modal="true" resizable="false" draggable="true" appendTo="@this" header="修改已入库的工单信息" closable="false">
+                    <h:form id="editCompletedArrivedListForm">
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetName}<span style="color:red">*</span></label>
+                                    <p:inputText value="#{assetArrivedItemsController.selected.arrivalList.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">品牌</label>
+                                    <p:inputText value="#{assetArrivedItemsController.selected.brand}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.functionType}</label>
+                                    <p:inputText value="#{assetArrivedItemsController.selected.functionType}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.importEquipment}</label>
+                                    <p:selectOneMenu id="importEquipment" value="#{assetArrivedItemsController.selected.importEquipment}">
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">质保时间（月）</label>
+                                    <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{assetArrivedItemsController.selected.warrantyMonth}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">年保养次数</label>
+                                    <p:inputText value="#{assetArrivedItemsController.selected.annualMaintenanceTimes}"></p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.serialNum}</label>
+                                    <p:inputText value="#{assetArrivedItemsController.selected.serialNum}" id="serialNum"></p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.locationName}</label>
+                                    <p:inputText id="locationName" value="#{assetArrivedItemsController.selected.locationName}"></p:inputText>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                            <p:commandButton validateClient="true" action="#{assetArrivedItemsController.saveCompletedArrivedList}" value="#{msg.Save}" update=":AssetArrivalItemListForm:datalist :growl" icon="ui-icon-check"/>
+                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('editCompletedArrivedListDlg').hide()"/>
                     </h:form>
                 </p:dialog>
             </div>

@@ -48,4 +48,9 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
     @Transactional
     @Query(value = "UPDATE arrival_list SET is_edit=true where id=?1", nativeQuery = true)
     public void updateIsEdit(String id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE arrival_list SET vendor=?1,supplier_id=?2,supplier_user_id=?3 WHERE id in ?4", nativeQuery = true)
+    public void updateBatchSupplier(String vendor, Integer supplierId, Integer SupplierUserId, List<String> ids);
 }

@@ -13,6 +13,16 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="zkbFePartOrderListForm">
+
+                    <h:panelGrid id="tenantInfoGrid" columns="4" style="margin-bottom:10px" cellpadding="5" rendered="#{userContextService.geAdmin or userContextService.isZkbFeUserConfig('FourHundredsTeam_Probe') or userContextService.isZkbFeUserConfig('FourHundredsTeam')}">
+                        <p:outputLabel value="#{msg.zkbContact_tenant}*:"/>
+                        <p:selectOneMenu style="transform: scale(1.2)"  id="selectionTenantInfo" value="#{zkbFePartOrderController.queryTenantUID}">
+                            <p:ajax  update="datalist"/>
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{zkbPartOrderController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+
                     <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
                         <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
                         <p:commandButton value="待代理商确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingAssignment'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingAssignment')}" />
@@ -124,12 +134,6 @@
                         <p:column headerText="#{msg.zkbFePartOrder_hospitalClientPhone}" filterBy="#{item.hospitalClientPhone}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.hospitalClientPhone}"/>
                         </p:column>
-<!--                        <p:column headerText="#{msg.zkbFePartOrder_position}" filterBy="#{item.position}" filterMatchMode="LIKE">-->
-<!--                            <h:outputText value="#{item.position}"/>-->
-<!--                        </p:column>-->
-<!--                        <p:column headerText="#{msg.zkbFePartOrder_location}" filterBy="#{item.location}" filterMatchMode="LIKE">-->
-<!--                            <h:outputText value="#{item.location}"/>-->
-<!--                        </p:column>-->
                         <p:column headerText="#{msg.zkbFePartOrder_phenomenon}" filterBy="#{item.phenomenon}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.phenomenon}"/>
                         </p:column>
