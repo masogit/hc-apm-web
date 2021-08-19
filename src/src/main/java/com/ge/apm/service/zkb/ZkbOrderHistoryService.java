@@ -441,14 +441,4 @@ public class ZkbOrderHistoryService {
             doc.writeRowData(SHEET_SERVICE_ORDER_HISTORY, 1, dataRow++, item);
         }
     }
-
-    public List<ZkbOrderHistory> findByTenantUid(String tenantUid)
-    {
-        if(StringUtils.isNotBlank(tenantUid))
-            return this.zkbOrderHistoryRepository.findByTenantUid(tenantUid);
-        return this.zkbOrderHistoryRepository.find();
-    }
-
-
-
 }

@@ -104,7 +104,7 @@ public class ZkbExportController extends GenericCRUDUUIDController {
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
             List<Map<String, Object>> fePartOrderList = this.zkbExportOrderService.getZkbFePartOrder(tenantUid);
             List<Map<String, Object>> partOrderList = this.zkbExportOrderService.getZkbPartOrder(tenantUid);
-            List<ZkbOrderHistory> zkbOrderHistoryList = zkbOrderHistoryService.findByTenantUid(tenantUid);
+            List<ZkbOrderHistory> zkbOrderHistoryList = zkbOrderHistoryService.loadZkbOrderHistoryData(null,null,null,null,null,null,null,null,tenantUid);
             List<Map<String, Object>> orderHistoryMapList = zkbOrderHistoryService.createExportOrderHistoryData(zkbOrderHistoryList,this.userContextService);
             zkbExportOrderService.exportData(doc, fePartOrderList,partOrderList,orderHistoryMapList);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "Order_History_And_Part_Order_Export.xlsx");
