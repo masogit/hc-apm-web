@@ -85,6 +85,7 @@ public interface ZkbPartOrderRepository extends GenericRepositoryUUID<ZkbPartOrd
      * @param tenantUid
      * @return
      */
+    @Query(value = "SELECT * from zkb_part_order where tenant_uid = ?1  order by request_date desc ", nativeQuery = true)
     List<ZkbPartOrder> findByTenantUIDOrderByRequestDateDesc(String tenantUid);
 
     @Query(value = "SELECT * from zkb_part_order order by request_date desc ", nativeQuery = true)
