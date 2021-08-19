@@ -276,6 +276,11 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     @Column(name = "data_source")
     private String dataSource; // 数据来源  如果是导入的工单: import ，系统创建的 null
+    /**
+     * 供应商派工时  供应商uid
+     */
+    @Column(name = "supplier_uid")
+    private String supplierUid;
 
     @Transient
     private Integer orderCount;
@@ -306,6 +311,14 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     public void setDispatchMode(Integer dispatchMode) {
         this.dispatchMode = dispatchMode;
+    }
+
+    public String getSupplierUid() {
+        return supplierUid;
+    }
+
+    public void setSupplierUid(String supplierUid) {
+        this.supplierUid = supplierUid;
     }
 
     public String getTenantUID() {
