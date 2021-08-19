@@ -546,6 +546,10 @@ public class AssetInstallationController {
             } else {
                 arrivalListItem.setUsageStatus(3);
             }
+            //保存品牌
+            if(StringUtils.isBlank(arrivalListItem.getBrand())){
+                arrivalListItem.setBrand(arrivalListItem.getArrivalList().getBrand());
+            }
         }
 
         if(StringUtils.isNotBlank(errorMessage)){

@@ -121,19 +121,19 @@
                                     <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                         <label class="label">#{msg.vendor}</label>
                                         <p:autoComplete id="vendor" dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true"
-                                                        disabled="#{assetArrivedListEditController.selected.status eq 3}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                                        completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                             <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" update=":AssetArrivalEditForm:supplierUser" />
                                         </p:autoComplete>
-                                        <p:commandButton id="createSupplierButton4" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" disabled="#{assetArrivedListEditController.selected.status eq 3}"/>
+                                        <p:commandButton id="createSupplierButton4" icon="ui-icon-plus" title="#{msg.Create}" process="@this" actionListener="#{assetArrivedListEditController.prepareCreateSupplier('supplier')}" update="SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{userContextService.activeSupplier()}">
                                         <label class="label">供应商责任人</label>
-                                        <p:selectOneMenu id="supplierUser" value="#{assetArrivedListEditController.selected.supplierUserId}" style="width:125px" required="false" requiredMessage="#{msg.PersonnelCannotBeEmpty}" disabled="#{assetArrivedListEditController.selected.status eq 3}">
+                                        <p:selectOneMenu id="supplierUser" value="#{assetArrivedListEditController.selected.supplierUserId}" style="width:125px" required="false" requiredMessage="#{msg.PersonnelCannotBeEmpty}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{assetArrivedListEditController.supplierUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                         </p:selectOneMenu>
-                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新供应商责任人" action="#{assetArrivedListEditController.updateSupplierUser()}" update=":AssetArrivalEditForm:vendor" disabled="#{assetArrivedListEditController.selected.status eq 3}" style="margin-left: 5px;" rendered="#{assetArrivedListEditController.selected.status > 1}"/>
+                                        <p:commandButton icon="ui-icon-save" class="btn btn-sm btn-gray" title="更新供应商责任人" action="#{assetArrivedListEditController.updateSupplierUser()}" update=":AssetArrivalEditForm:vendor" style="margin-left: 5px;"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.ArrivalProcessType}*</label>

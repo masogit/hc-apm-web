@@ -1296,8 +1296,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(CollectionUtils.isEmpty(zkbFePartOrderList))
             return contractMap;
         Set<String> contractIdSet = new HashSet<>();
-        for(ZkbFePartOrder item:zkbFePartOrderList)
+        for(ZkbFePartOrder item:zkbFePartOrderList){
+            if(StringUtils.isBlank(item.getContractId()))
+                continue;
             contractIdSet.add(item.getContractId());
+        }
         if(CollectionUtils.isEmpty(contractIdSet))
             return contractMap;
         List<ZkbContract> zkbContractList = this.zkbContractRepository.findByIdIn(contractIdSet);
@@ -1319,8 +1322,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(CollectionUtils.isEmpty(zkbFePartOrderList))
             return tenantInfoMap;
         Set<String> tenantUidSet = new HashSet<>();
-        for(ZkbFePartOrder item:zkbFePartOrderList)
+        for(ZkbFePartOrder item:zkbFePartOrderList) {
+            if (StringUtils.isBlank(item.getTenantUid()))
+                continue;
             tenantUidSet.add(item.getTenantUid());
+        }
         if(CollectionUtils.isEmpty(tenantUidSet))
             return tenantInfoMap;
         List<TenantInfo> tenantInfoList = this.tenantInfoRepository.findByUidIn(tenantUidSet);
@@ -1342,8 +1348,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(CollectionUtils.isEmpty(zkbFePartOrderList))
             return contractMap;
         Set<String> contractIdSet = new HashSet<>();
-        for(ZkbPartOrder item:zkbFePartOrderList)
+        for(ZkbPartOrder item:zkbFePartOrderList) {
+            if (StringUtils.isBlank(item.getContractId()))
+                continue;
             contractIdSet.add(item.getContractId());
+        }
         if(CollectionUtils.isEmpty(contractIdSet))
             return contractMap;
         List<ZkbContract> zkbContractList = this.zkbContractRepository.findByIdIn(contractIdSet);
@@ -1365,8 +1374,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if(CollectionUtils.isEmpty(zkbFePartOrderList))
             return tenantInfoMap;
         Set<String> tenantUidSet = new HashSet<>();
-        for(ZkbPartOrder item:zkbFePartOrderList)
+        for(ZkbPartOrder item:zkbFePartOrderList) {
+            if(StringUtils.isBlank(item.getTenantUID()))
+                continue;
             tenantUidSet.add(item.getTenantUID());
+        }
         if(CollectionUtils.isEmpty(tenantUidSet))
             return tenantInfoMap;
         List<TenantInfo> tenantInfoList = this.tenantInfoRepository.findByUidIn(tenantUidSet);
@@ -1408,13 +1420,13 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     {
                         for(ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo:zkbFePartOrderAssetInfoList)
                         {
-                            HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map,zkbFePartOrderAssetInfo,contractMap,tenantInfoMap);
-                            zkbSparePartFePartOrderDataList.add(map);
+                            List<HashMap<String,Object>> map = this.getSparePartHashMap(item,i18Map,zkbFePartOrderAssetInfo,contractMap,tenantInfoMap);
+                            zkbSparePartFePartOrderDataList.addAll(map);
                         }
                     }else
                         {
-                            HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map,null,contractMap,tenantInfoMap);
-                            zkbSparePartFePartOrderDataList.add(map);
+                            List<HashMap<String,Object>> map = this.getSparePartHashMap(item,i18Map,null,contractMap,tenantInfoMap);
+                            zkbSparePartFePartOrderDataList.addAll(map);
                         }
                 }
             }
@@ -2201,11 +2213,13 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbFePartOrderAssetInfo 申请信息
      * @return
      */
-    public HashMap<String,Object> getSparePartHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map,ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo,Map<String,ZkbContract> contractMap,Map<String,TenantInfo> tenantInfoMap)
+    public List<HashMap<String,Object>> getSparePartHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map,ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo,Map<String,ZkbContract> contractMap,Map<String,TenantInfo> tenantInfoMap)
     {
+        List<HashMap<String,Object>> list = new ArrayList<>();
         HashMap sparePartMap = new HashMap();
         if(zkbFePartOrder==null){
-            return sparePartMap;
+            list.add(sparePartMap);
+            return list;
         }
         sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_systemId"),zkbFePartOrder.getSystemId());
         this.fullContractAndTenantInfo(contractMap,tenantInfoMap,sparePartMap,zkbFePartOrder.getContractId(),zkbFePartOrder.getTenantUid());
@@ -2245,8 +2259,35 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_orderNoa"),zkbFePartOrderAssetInfo.getOrderNo());
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_assetPrice"),zkbFePartOrderAssetInfo.getPrice());
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_spareParts"),zkbFePartOrderAssetInfo.getSparePart());
+            if(sparePartMap.get(WebUtil.getMessage("zkbFePartOrder_assetNo"))==null
+                    ||sparePartMap.get(WebUtil.getMessage("zkbFePartOrder_orderNoa"))==null)
+            {
+                list.add(sparePartMap);
+                return list;
+            }
+            List<ZkbFePartOrderReturn> zkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderIdAndAssetNoAndOrderNo(
+                    zkbFePartOrder.getId(),
+                    sparePartMap.get(WebUtil.getMessage("zkbFePartOrder_assetNo")).toString(),
+                    sparePartMap.get(WebUtil.getMessage("zkbFePartOrder_orderNoa")).toString());
+            if(CollectionUtils.isEmpty(zkbFePartOrderReturnList))
+            {
+                list.add(sparePartMap);
+                return list;
+            }
+            for(ZkbFePartOrderReturn zkbFePartOrderReturn:zkbFePartOrderReturnList)
+            {
+                HashMap<String,Object> newMap = sparePartMap;
+                if(i18Map.containsKey(zkbPoReturnType)&&i18Map.get(zkbPoReturnType).containsKey(zkbFePartOrderReturn.getReturnType()))
+                {
+                    newMap.put(WebUtil.getMessage("zkbFePartOrder_returnType"),i18Map.get(zkbPoReturnType).get(zkbFePartOrderReturn.getReturnType()));
+                }
+                newMap.put(WebUtil.getMessage("zkbFePartOrder_returnDate"),this.dateFormat(zkbFePartOrderReturn.getReturnDate(),ZkbFePartOrderService.dateFormat));
+                newMap.put("归还"+WebUtil.getMessage("zkbFePartOrder_remark"),zkbFePartOrderReturn.getComment());
+                newMap.put("归还"+WebUtil.getMessage("zkbFePartOrder_assetQty"),zkbFePartOrderReturn.getQty());
+                list.add(newMap);
+            }
         }
-        return sparePartMap;
+        return list;
     }
 
     /**

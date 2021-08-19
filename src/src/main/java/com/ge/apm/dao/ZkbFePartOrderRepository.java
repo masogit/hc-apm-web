@@ -53,10 +53,13 @@ public interface ZkbFePartOrderRepository extends GenericRepositoryUUID<ZkbFePar
     List<ZkbFePartOrder> findNeedReturnPartOrder(String partOrderNo, String orderNo, String assetNo);
 
     /**
-     * 根据租户tenantUID 获取所有订单信息
+     * 根据租户tenantUID 获取所有订单信息 倒序
      * @param tenantUid
      * @return
      */
-    List<ZkbFePartOrder> findByTenantUid(String tenantUid);
+    List<ZkbFePartOrder> findByTenantUidOrderByReportDateDesc(String tenantUid);
+
+    @Query(value = "SELECT * from zkb_fe_part_order order by report_date desc ", nativeQuery = true)
+    List<ZkbFePartOrder> findAllFePartOrder();
 
 }

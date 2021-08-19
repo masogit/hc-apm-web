@@ -592,6 +592,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "unit_price_electricity")//电费单价
     private Double unitPriceElectricity;
 
+    // 年保养次数
+    @Column(name = "annual_maintenance_times")
+    private Integer annualMaintenanceTimes;
+
     @Transient
     private int lineNum;
 
@@ -2287,5 +2291,13 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setQrCodeLib(QrCodeLib qrCodeLib) {
         this.qrCodeLib = qrCodeLib;
+    }
+
+    public Integer getAnnualMaintenanceTimes() {
+        return annualMaintenanceTimes;
+    }
+
+    public void setAnnualMaintenanceTimes(Integer annualMaintenanceTimes) {
+        this.annualMaintenanceTimes = annualMaintenanceTimes;
     }
 }

@@ -89,6 +89,7 @@
                             </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
+                            <p:commandButton id="batchEditButton" icon="fa fa-cogs" class="btnEdit" title="绑定供应商（批量）" action="#{assetArrivedListController.batchDistribute}" update="datalist" rendered="#{userContextService.activeSupplier()}"/>
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{assetArrivedListController.createAction}" update="datalist"  />
                             <p:commandButton id="viewButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{assetArrivedListController.editAction}" update="datalist " disabled="#{empty assetArrivedListController.selected}"/>
                             <p:commandButton id="saveAsButton" icon="ui-icon-save" class="btn btn-sm btn-gray" title="另存为" action="#{assetArrivedListController.saveAsAction}" update="datalist" disabled="#{empty assetArrivedListController.selected}"/>
