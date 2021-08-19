@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition><!--维修工单关单对话框-->
+        <p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="#{msg.closeWo}" height="500">
+            <h:form id="toCloseDialogForm" >
+                <h:panelGroup id="display3" rendered="#{not empty workOrderMgrSupplierController.selectedWorkOrder}">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.caseType}</label>
+                            <p:selectOneMenu id="caseType"  value="#{workOrderMgrSupplierController.selectedWorkOrder.caseType}" required="false" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('faultType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.patProblems}</label>
+                            <p:inputTextarea value="#{workOrderMgrSupplierController.selectedWorkOrder.patProblems}" rows="2"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.patActions}</label>
+                            <p:inputTextarea value="#{workOrderMgrSupplierController.selectedWorkOrder.patActions}" rows="2"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.patTests}</label>
+                            <p:inputTextarea value="#{workOrderMgrSupplierController.selectedWorkOrder.patTests}" rows="3"  cols="40"  queryDelay="750" maxlength="500" minQueryLength="4"/>
+                        </h:panelGroup>
+                        <h:panelGroup  id="equipmentTaker" >
+                            <label class="label">#{msg.equipmentTaker}</label>
+                            <p:inputText id="taker" value="#{workOrderMgrSupplierController.equipmentTaker}"  maxlength="40" readonly="#{not empty workOrderMgrSupplierController.equipmentTaker and not empty workOrderMgrSupplierController.takeTime}"/>
+                            <label class="label">#{msg.equiptaketime}</label>
+                            <p:calendar timeZone="GMT+8" label="#{msg.equiptaketime}" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrSupplierController.takeTime}" showOn="button"
+                                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{not empty workOrderMgrSupplierController.equipmentTaker and not empty workOrderMgrSupplierController.takeTime}"/>
+                            <p:commandButton title="#{msg.equiptake}" process="@(equipmentTaker)" actionListener="#{workOrderMgrSupplierController.takeEquip}" update="woSupplierTab:toCloseDialogForm:equipmentTaker :growl" disabled="#{not empty workOrderMgrSupplierController.equipmentTaker and not empty workOrderMgrSupplierController.takeTime}"/>
+                        </h:panelGroup>
+
+
+                    </p:panelGrid>
+                    <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrSupplierController.picList}" columns="7" layout="grid">
+                        <f:facet name="header">#{msg.addPic}</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
+                                <p:commandButton actionListener="#{workOrderMgrSupplierController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>   
+                            </h:panelGrid>
+
+                        </p:panel>
+
+                    </p:dataGrid>
+                    <p:fileUpload id="type1" allowTypes="/(\.|\/)(xls|xlsx|doc|docx|pdf|jpeg|jpg|png|txt|ps)$/" fileUploadListener="#{workOrderMgrSupplierController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                  multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+
+
+                    <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细 维修工单:关单 -->
+
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.manhours}</label>
+                                <p:inputText value="#{workOrderMgrSupplierController.selectedWorkOrder.manHours}" readonly="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.otherExpense}</label>
+                                <p:inputNumber maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrSupplierController.selectedWorkOrder.otherExpense}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.ExternalExpenses}</label><!--外部费用-->
+                                <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrSupplierController.selectedWorkOrder.externalExpense}" readonly="true"/>
+                            </h:panelGroup>
+                            <p:spacer />
+                            <h:panelGroup>
+                                <p:dataTable id="accessList" class="uiTransparent" value="#{workOrderMgrSupplierController.getWorkOrderDetail(workOrderMgrSupplierController.selectedWorkOrder.id)}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                                    <p:column headerText="#{msg.accessory}">
+                                        <h:outputText value="#{item.parts}"/>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg.accessoryQuantity}">
+                                        <h:outputText value="#{item.apartsQuantity}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.ContractPriceRMB}">
+                                        <h:outputText value="#{item.closedPrice}">
+                                            <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.type}">
+                                        <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.assetsDashboardclm2}">
+                                        <h:outputText value="#{item.serialNum}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.qualityexpirdate}">
+                                        <h:outputText value="#{item.warrantyDate}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.expectarrivaldate}">
+                                        <h:outputText value="#{item.estimatedArriveTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg.ArrivalState}">
+                                        <h:outputText value="#{item.arrived?'#':'#{msg.NonArrived}'}" />
+                                    </p:column>
+
+                                </p:dataTable>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p:dataTable id="coworkerList" class="uiTransparent" value="#{workOrderMgrSupplierController.getWorkOrderCoworker(workOrderMgrSupplierController.selectedWorkOrder.id)}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
+                                             rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                                    <p:column headerText="#{msg.coworker}">
+                                        <h:outputText value="#{item.cowokerUserName}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.manHours}">
+                                        <h:outputText value="#{item.manHours}" />
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+                    </p:fieldset>
+
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrSupplierController.closeWorkOrder}" value="#{msg.closeWo}" update="woSupplierTab:woMgrSupplierListForm woSupplierTab:woMgrSupplierDetailForm" icon="ui-icon-check" oncomplete="handleToClose(xhr, status, args);"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrSupplierController.cancel()}" icon="ui-icon-cancel" onclick="PF('toCloseDialog').hide()"/>
+                    </h:panelGroup>
+
+                    <br/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+        <script type="text/javascript">
+            function handleToClose(xhr,status,args){
+                var valid =true;
+                 if(args.caseType){
+                     $('#woSupplierTab\\:toCloseDialogForm\\:caseType').addClass("ui-state-error");
+                     valid=false;
+                 }
+
+                if(valid){
+                    handleSubmit(args,'toCloseDialog');
+                }
+            }
+        </script>
+    </ui:composition>
+</html>

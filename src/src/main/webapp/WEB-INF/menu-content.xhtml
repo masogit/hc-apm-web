@@ -219,6 +219,11 @@
 
             <p:submenu id="um24_supplier" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('supplierMaintain')}">
                 <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/supplier/pmSupplierOrderListAll.xhtml" rendered="#{userContextService.accessContains('supplierMaintain.workbench')}"/>
+
+            </p:submenu>
+            <p:submenu id="um25_supplier" label="#{msg.WorkOrderMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('supplierRepair')}">
+                <p:menuitem value="#{msg.RepairWorkbench}" outcome="/portal/woMgr/supplier/workOrderSupplierList.xhtml" rendered="#{userContextService.accessContains('supplierRepair.workbench')}"/>
+
             </p:submenu>
 
             <p:submenu label="供应商管理" icon="settings"  rendered="#{userContextService.accessContains('supplierManagement')}"  >

@@ -207,6 +207,12 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         }
         return true;
     }
+    public boolean getWoViewShowTenantBox() {
+        if (Boolean.TRUE.equals(this.selected.getIsWoSupplierTakeOrderEnabled())) {
+            return false;
+        }
+        return true;
+    }
 
     public void setTenantUid(String tenantUid) {
         //searchFilters.clear();

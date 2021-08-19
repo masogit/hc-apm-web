@@ -694,7 +694,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public void partsPriceUpdate() {
-       itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+       if(itemDetail.getPartsPrice() == null || itemDetail.getApartsQuantity() == null){
+           itemDetail.setClosedPrice(0.0);
+       }else{
+           itemDetail.setClosedPrice(itemDetail.getPartsPrice()*itemDetail.getApartsQuantity());
+       }
     }
 
     public void closePrcieUpdate() {
