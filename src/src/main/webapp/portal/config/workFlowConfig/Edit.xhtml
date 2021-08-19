@@ -134,18 +134,24 @@
                             </p:inputNumber>
                         </h:panelGroup >
                         <h:panelGroup rendered="true">
+                            <label class = "label">供应商自动派工?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isWoSupplierTakeOrderEnabled}">
+                                <p:ajax process="@this"  update="V2_WorkflowConfigEditForm:wo"      />
+                            </p:selectBooleanCheckbox>
+                        </h:panelGroup >
+                        <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
                             <label class = "label">#{msg.AutomaticallySendWorkers}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isAutoEnabled}">
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                        <h:panelGroup rendered="true">
+                        <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
                             <label class = "label">#{msg.WorkorderCompetitionAllowed}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isTakeOrderEnabled}">
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
-                        <h:panelGroup rendered="true">
+                        <h:panelGroup rendered="#{ workflowConfigController.getWoViewShowTenantBox()}">
                             <label class = "label">#{msg.ManuallySendWorkers}?</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isManualEnabled}">
                                 <p:ajax process="@this" />
@@ -339,7 +345,7 @@
                             </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class = "label">#{msg.PmIsSupportBatchFinish}</label>
+                            <label class = "label">#{msg.PmIsSupportBatchFinish}44</label>
                             <p:selectBooleanCheckbox value="#{workflowConfigController.selected.pmIsSupportBatchFinish}">
                                 <p:ajax process="@this" />
                             </p:selectBooleanCheckbox>

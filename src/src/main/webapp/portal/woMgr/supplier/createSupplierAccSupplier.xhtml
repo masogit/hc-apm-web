@@ -1,0 +1,85 @@
+<html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="SupplierEditDlg" class="SupplierEditDlgCls" width="1000" widgetVar="SupplierEditDialog" modal="true" resizable="true"
+              draggable="true" appendTo="@(body)" header="#{msg.NewSuuplierInformation}">
+        <h:form id="SupplierEditForm">
+            <h:panelGroup id="display">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="true">
+                    <h:panelGroup>
+                        <label class="label">#{msg.name}*</label>
+                        <p:inputText id="name" value="#{workOrderMgrSupplierController.newSupplier.name}"
+                                     required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.city}</label>
+                        <p:inputText id="city" value="#{workOrderMgrSupplierController.newSupplier.city}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.address}</label>
+                        <p:inputText id="address"
+                                     value="#{workOrderMgrSupplierController.newSupplier.address}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.zipcode}</label>
+                        <p:inputText id="zipcode"
+                                     value="#{workOrderMgrSupplierController.newSupplier.zipcode}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.contactor}</label>
+                        <p:inputText id="contactor"
+                                     value="#{workOrderMgrSupplierController.newSupplier.contactor}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.tel}</label>
+                        <p:inputText id="tel" value="#{workOrderMgrSupplierController.newSupplier.tel}"/>
+                    </h:panelGroup>
+                    <h:panelGroup class="test1">
+                        <label class="label">#{msg.type}*</label>
+                        <h:panelGrid columns="3">
+                            <h:panelGrid columns="3">
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2">
+                                        <p:selectBooleanCheckbox id="wxs" value="#{workOrderMgrSupplierController.newSupplier.maintainerT}"/>
+                                        <p:outputLabel value="#{msg.maitanance} "/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2">
+                                        <p:selectBooleanCheckbox
+                                                value="#{workOrderMgrSupplierController.newSupplier.manufacturerT}"/>
+                                        <p:outputLabel value="#{msg.manufacture} "/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:panelGrid columns="2">
+                                        <p:selectBooleanCheckbox
+                                                value="#{workOrderMgrSupplierController.newSupplier.supplierT}"/>
+                                        <p:outputLabel value="#{msg.vendor} "/>
+                                    </h:panelGrid>
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGroup>
+                </p:panelGrid>
+
+                <br/>
+                <p:commandButton validateClient="true"
+                                 actionListener="#{workOrderMgrSupplierController.saveNewSupplier}"
+                                 value="#{msg.Save}"
+                                 icon="ui-icon-check"
+                                 update="@(.inputManufacture) @(.inputVendor3) @(.inputVendor) :growl"
+                                 oncomplete="handleSubmit(args, 'SupplierEditDialog');"/>
+                <p:commandButton immediate="true"
+                                 value="#{msg.Cancel}"
+                                 icon="ui-icon-cancel"
+                                 onclick="PF('SupplierEditDialog').hide()"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>
