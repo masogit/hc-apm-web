@@ -320,8 +320,8 @@
                         </h:panelGroup >
 
                         <h:panelGroup rendered="true">
-                            <label class = "label">供应商抢单?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmSupplierTakeOrderEnabled}">
+                            <label class = "label">供应商自动派工?</label>
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isPmSupplierAutoEnabled}">
                                 <p:ajax process="@this"  update="V2_WorkflowConfigEditForm:pm"      />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >
