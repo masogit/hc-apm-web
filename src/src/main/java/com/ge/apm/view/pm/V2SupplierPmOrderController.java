@@ -17,6 +17,7 @@ import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -79,7 +80,12 @@ public class V2SupplierPmOrderController extends V2PmOrderController {
     protected void init() {
         super.init();
         String query = WebUtil.getRequestParameter("query");
-        super.setQueryIndex(StringUtils.isEmpty(query) ? 3 : Integer.parseInt(query));
+        if (StringUtils.isEmpty(query)) {
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            boolean isSupplierFE = currentUserAccount.getRoleNames().contains("SupplierFE");
+            query = isSupplierFE ? "3" : "7";
+        }
+        super.setQueryIndex( Integer.parseInt(query));
     }
 
     @Override
