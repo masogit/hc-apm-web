@@ -293,12 +293,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         this.mvsAssetInfo = mvsAssetInfo;
     }
     public void partsPriceUpdate(){
-        if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
-            if(itemDetail.getApartsQuantity() == null || itemDetail.getPartsPrice() == null ){
-                itemDetail.setClosedPrice(0.0);
-            }else{
-                itemDetail.setClosedPrice(itemDetail.getPartsPrice()*itemDetail.getApartsQuantity());
-            }
+        if(itemDetail.getApartsQuantity() == null || itemDetail.getPartsPrice() == null ){
+            itemDetail.setClosedPrice(0.0);
+        }else{
+            itemDetail.setClosedPrice(itemDetail.getPartsPrice()*itemDetail.getApartsQuantity());
         }
     }
 
