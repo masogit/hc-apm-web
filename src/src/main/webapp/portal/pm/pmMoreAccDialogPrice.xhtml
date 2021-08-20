@@ -16,7 +16,10 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.PartQuantity}*</label>
-                        <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}"/>
+                        <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="#{msg.PartQuantity} #{msg.ValidationRequire}">
+                            <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
+                            </p:ajax>
+                        </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
@@ -56,7 +59,10 @@
 
                     <h:panelGroup>
                         <label class="label">#{msg.ContractPriceRMB}*</label>
-                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.closedPrice}" required="true" requiredMessage="#{msg.ActualPriceRMB} #{msg.ValidationRequire}" />
+                        <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  class="hetongjia" value="#{v2PmOrderController.itemDetail.closedPrice}" required="true" requiredMessage="#{msg.ActualPriceRMB} #{msg.ValidationRequire}">
+                            <p:ajax listener="#{v2PmOrderController.closePrcieUpdate()}">
+                            </p:ajax>
+                        </p:inputNumber>
                     </h:panelGroup>
 
                     <h:panelGroup>
