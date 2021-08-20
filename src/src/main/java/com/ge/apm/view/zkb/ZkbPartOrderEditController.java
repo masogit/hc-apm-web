@@ -835,7 +835,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                             valueTypeTips = "";
                         }
                     }
-                    if(CopyByInvok.T.equals(selected.getContractCatId())){
+                    if(CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
                         this.selected.setQty(selected.getQty() * 2);
                     }
                 }else{
