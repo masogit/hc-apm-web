@@ -133,12 +133,17 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.PartQuantity}*</label>
-                        <p:inputNumber  maxValue="999999" decimalPlaces="0" disabled="true" id="apartsQuantityView" value="#{v2PmOrderController.itemDetail.apartsQuantity}" readonly="true"/>
+                        <p:inputNumber  maxValue="999999" decimalPlaces="0" disabled="true" id="apartsQuantityView" value="#{v2PmOrderController.itemDetail.apartsQuantity}" readonly="true">
+                            <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
+                            </p:ajax>
+                        </p:inputNumber>
                     </h:panelGroup>
 
                     <h:panelGroup>
                         <label class="label">#{msg.EstimatedUnitPriceRMB}*</label>
                         <p:inputNumber  decimalPlaces="0" maxValue="999999" id="partsPrice_view"  value="#{v2PmOrderController.itemDetail.partsPrice}" disabled="true" requiredMessage="#{msg.EstimatedUnitPriceRMB} #{msg.ValidationRequire}">
+                            <p:ajax listener="#{v2PmOrderController.partsPriceUpdate()}" update="@(.hetongjia)" >
+                            </p:ajax>
                             <f:convertNumber pattern="0" type="number"/>
                         </p:inputNumber>
                     </h:panelGroup>
@@ -168,7 +173,10 @@
 
                     <h:panelGroup>
                         <label class="label">#{msg.ContractPriceRMB}*</label>
-                        <p:inputNumber disabled="true" decimalPlaces="4" maxValue="99999999" id="closedPrice_view"  value="#{v2PmOrderController.itemDetail.closedPrice}" readonly="true" />
+                        <p:inputNumber disabled="true" decimalPlaces="4" maxValue="99999999" id="closedPrice_view"  class="hetongjia"  value="#{v2PmOrderController.itemDetail.closedPrice}" readonly="true">
+                            <p:ajax listener="#{v2PmOrderController.closePrcieUpdate()}">
+                            </p:ajax>
+                        </p:inputNumber>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.ContractNumber}</label>
