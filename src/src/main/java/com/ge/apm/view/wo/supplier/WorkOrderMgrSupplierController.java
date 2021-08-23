@@ -247,16 +247,14 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
                             .getValueFromMap(enCodeParameters, "query");
                 }
             }
-            if (Strings.isNullOrEmpty(query)) {
-                if(userContextService.hasCurrentTenantName("")){
-                    queryIndex = 11;
-                }else {
-                    queryIndex = 0;
-                }
-            } else {
-                queryIndex = Integer.valueOf(query);
-                searchList(queryIndex);
+            if (org.springframework.util.StringUtils.isEmpty(query)) {
+                UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+                boolean isSupplierFE = currentUserAccount.getRoleNames().contains("SupplierFE");
+                query = isSupplierFE ? "3" : "8";
             }
+            queryIndex = Integer.valueOf(query);
+            searchList(queryIndex);
+
             this.filterBySite = false;
             this.filterByHospital = false;
             terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
