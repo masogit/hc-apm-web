@@ -135,7 +135,7 @@
                         </h:panelGroup >
                         <h:panelGroup rendered="true">
                             <label class = "label">供应商自动派工?</label>
-                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isWoSupplierTakeOrderEnabled}">
+                            <p:selectBooleanCheckbox value="#{workflowConfigController.selected.isWoSupplierAutoEnabled}">
                                 <p:ajax process="@this"  update="V2_WorkflowConfigEditForm:wo"      />
                             </p:selectBooleanCheckbox>
                         </h:panelGroup >

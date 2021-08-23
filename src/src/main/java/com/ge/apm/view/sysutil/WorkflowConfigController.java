@@ -201,7 +201,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         return true;
     }
     public boolean getWoViewShowTenantBox() {
-        if (Boolean.TRUE.equals(this.selected.getIsWoSupplierTakeOrderEnabled())) {
+        if (Boolean.TRUE.equals(this.selected.getIsWoSupplierAutoEnabled())) {
             return false;
         }
         return true;
@@ -516,6 +516,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         Boolean isPmTakeOrder = selected.getIsPmTakeOrderEnabled();
         Boolean isMeasureManual = selected.getIsMeasureManualEnabled();
         Boolean isPmSupplierAutoEnabled = selected.getIsPmSupplierAutoEnabled();
+        Boolean isWoSupplierAutoEnabled = selected.getIsWoSupplierAutoEnabled();
         Boolean isMeasureTakeOrder = selected.getIsMeasureTakeOrderEnabled();
 
 
@@ -542,7 +543,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         }
 
 
-        if (isManual != null && isTakeOrder != null && !isManual && !isTakeOrder) {
+        if (isManual != null && isTakeOrder != null && isWoSupplierAutoEnabled != null && !isWoSupplierAutoEnabled && !isManual && !isTakeOrder) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage(WebUtil.getMessage("WoManualAndGrapMsg"));
             return;
