@@ -69,8 +69,8 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_auto_enabled")
     private Boolean isAutoEnabled; //是否自动派工
 
-    @Column(name = "is_wo_supplier_take_order_enabled")
-    private Boolean isWoSupplierTakeOrderEnabled; //是否供应商抢单(维修)
+    @Column(name = "is_wo_supplier_auto_enabled")
+    private Boolean isWoSupplierAutoEnabled; //是否供应商自动抢单(维修)
 
     @Column(name = "is_temp_user_report")
     private Boolean isTempUserReport;
@@ -1265,17 +1265,17 @@ public class WorkflowConfig implements Serializable {
         this.isPmSupplierAutoEnabled = isPmSupplierTakeOrderEnabled;
     }
 
-    public Boolean getIsWoSupplierTakeOrderEnabled() {
-        return isWoSupplierTakeOrderEnabled;
+    public Boolean getIsWoSupplierAutoEnabled() {
+        return isWoSupplierAutoEnabled;
     }
 
-    public void setIsWoSupplierTakeOrderEnabled(Boolean woSupplierTakeOrderEnabled) {
-        if(Boolean.TRUE.equals(isPmSupplierAutoEnabled)){
+    public void setIsWoSupplierAutoEnabled(Boolean isWoSupplierAutoEnabled) {
+        if(Boolean.TRUE.equals(isWoSupplierAutoEnabled)){
             this.isTakeOrderEnabled =false;
             this.isManualEnabled =false;
             this.isAutoEnabled =false;
         }
-        this.isWoSupplierTakeOrderEnabled = woSupplierTakeOrderEnabled;
+        this.isWoSupplierAutoEnabled = isWoSupplierAutoEnabled;
     }
 
 
