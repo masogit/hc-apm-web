@@ -625,6 +625,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public String normalNext(){
+        ZkbContract c = zkbContractRepository.findById(selected.getContractId());
         if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
             if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.ReturnPending.toString())){
                 if(selected.getReturnQty() > selected.getQty()){
@@ -632,11 +633,44 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return "";
                 }
             }else if(selected.getCurrentStep().equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
-                if(CopyByInvok.T.equals(selected.getNewCatFlag()) && StringUtils.isEmpty(selected.getProbeQuotaType())){
-                    ZkbContract c = zkbContractRepository.findById(selected.getContractId());
-                    if(c.getProbeQuota() < selected.getQty()){
-                        WebUtil.addErrorMessage("探头剩余数量不足，请联系供应商！","");
+                if(StringUtils.isEmpty(c.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(c.getQuotaDeductType())) {
+                    if(!selected.getNewCatFlag().equals(selected.getTenantNewCatFlag())){
+                        if (CopyByInvok.T.equals(selected.getNewCatFlag())) {
+                            if(CopyByInvok.T.equals(selected.getNewCatFlag()) && StringUtils.isEmpty(selected.getProbeQuotaType())){
+                                if(c.getProbeQuota() < selected.getQty()){
+                                    WebUtil.addErrorMessage("探头剩余名额不足，请联系供应商！","");
+                                    return "";
+                                }
+                            }
+                        }
+                    }
+                    if(c.getProbeQuotaApply() < selected.getQty()){
+                        WebUtil.addErrorMessage("探头申请名额不足，请联系供应商！","");
                         return "";
+                    }
+                }else{
+                    if(ZkbPartOrder.ProbeQuotaTypeEnum.Any.toString().equals(selected.getProbeQuotaType())){
+                        if(c.getProbeQuotaApply() < selected.getQty()){
+                            WebUtil.addErrorMessage("探头任意申请名额不足，请联系供应商！","");
+                            return "";
+                        }
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Normal.toString().equals(selected.getProbeQuotaType())){
+                        if(c.getProbeQuotaNormalApply() < selected.getQty()){
+                            WebUtil.addErrorMessage("探头普通申请名额不足，请联系供应商！","");
+                            return "";
+                        }
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())){
+                        if(c.getProbeQuotaSpecialApply() < selected.getQty()){
+                            WebUtil.addErrorMessage("探头特殊申请名额不足，请联系供应商！","");
+                            return "";
+                        }
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())) {
+                        if (CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())) {
+                            if(c.getProbeQuotaNormalApply() < selected.getQty()){
+                                WebUtil.addErrorMessage("探头高值名额不足，请联系供应商！","");
+                                return "";
+                            }
+                        }
                     }
                 }
             }
@@ -688,6 +722,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
                 if(t == 0){
                     WebUtil.addErrorMessage("实际配件数量不能全部为0","");
+                    return "";
+                }
+
+                if(c.getSpareQuotaApply() < selected.getQty()){
+                    WebUtil.addErrorMessage("备件申请名额不足，请联系供应商！","");
                     return "";
                 }
                 selected.setQty(t);
