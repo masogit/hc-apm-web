@@ -221,6 +221,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.ManageReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.OrderedReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.DirectorReject.toString()));
         filters.add(new SearchFilter("requestDate", SearchFilter.Operator.LT,zkbPartOrder.getRequestDate()));
         List<ZkbPartOrder> historyList = zkbPartOrderRepository.findBySearchFilter(filters);
         Integer historyQty = 0;
@@ -242,6 +243,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         filters.add(new SearchFilter("contractId", SearchFilter.Operator.EQ,zkbPartOrder.getContractId()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.TechnicalReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.ManageReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.DirectorReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.OrderedReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString()));
         filters.add(new SearchFilter("requestDate", SearchFilter.Operator.GTE,DateUtils.addDays(zkbContract.getEndDate(),-6)));
