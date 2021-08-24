@@ -2043,34 +2043,34 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_returnType")+errorMessage);
             isValidateData = false;
         }
-        if("DOA".equals(zkbFePartOrderVO.getReturnType()))
-        {
-            if(StringUtils.isBlank(zkbFePartOrderVO.getPartSerialNumber())){
-                item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_partSerialNumber")+errorMessage);
-                isValidateData = false;
-            }
-            if(StringUtils.isBlank(zkbFePartOrderVO.getPartQualityIssue())){
-                item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_partQualityIssue")+errorMessage);
-                isValidateData = false;
-            }
-        }
-        if(StringUtils.isBlank(zkbFePartOrderVO.getWaybillNo())){
-            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_airWayBillNo")+errorMessage);
-            isValidateData = false;
-        }
-        if(zkbFePartOrderVO.getReturnDate()==null){
-            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_returnDate1")+errorMessage);
-            isValidateData = false;
-        }
-        if(StringUtils.isBlank(zkbFePartOrderVO.getNewCatSn())){
-            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_newCatSn")+errorMessage);
-            isValidateData = false;
-        }
+//        if("DOA".equals(zkbFePartOrderVO.getReturnType()))
+//        {
+//            if(StringUtils.isBlank(zkbFePartOrderVO.getPartSerialNumber())){
+//                item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+//                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_partSerialNumber")+errorMessage);
+//                isValidateData = false;
+//            }
+//            if(StringUtils.isBlank(zkbFePartOrderVO.getPartQualityIssue())){
+//                item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+//                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_partQualityIssue")+errorMessage);
+//                isValidateData = false;
+//            }
+//        }
+//        if(StringUtils.isBlank(zkbFePartOrderVO.getWaybillNo())){
+//            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+//            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_airWayBillNo")+errorMessage);
+//            isValidateData = false;
+//        }
+//        if(zkbFePartOrderVO.getReturnDate()==null){
+//            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+//            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_returnDate1")+errorMessage);
+//            isValidateData = false;
+//        }
+//        if(StringUtils.isBlank(zkbFePartOrderVO.getNewCatSn())){
+//            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
+//            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_newCatSn")+errorMessage);
+//            isValidateData = false;
+//        }
         if(StringUtils.isNotBlank(zkbFePartOrderVO.getPartOrderNo())) {
             List<ZkbFePartOrder> zkbFePartOrderList = this.zkbFePartOrderRepository.findByPartOrderNoAndOrderType(
                     zkbFePartOrderVO.getPartOrderNo(),
