@@ -409,7 +409,8 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
             return list;
         for(ZkbPartOrderItem item:zkbPartOrderItemList)
         {
-            Map<String,Object> newMap = map;
+            Map<String,Object> newMap = new HashMap<>();
+            newMap.putAll(map);
             newMap.put("配件号/工具号",item.getPartNo());
             newMap.put("配件名称",item.getPartName());
             newMap.put("配件数量",item.getPrePartQty());
@@ -423,6 +424,7 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         if(CollectionUtils.isEmpty(list))
             return list;
         List<Map<String,Object>> list1 = new ArrayList<>();
+        Map<String,String> returnPartOrder = new HashMap<>();
         for(Map<String,Object> item:list)
         {
             list1.add(item);
@@ -434,6 +436,14 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
             int i = 0;
             for(ZkbPartOrderReturn zkbPartOrderReturn:zkbPartOrderReturnList)
             {
+                if(returnPartOrder.containsKey(zkbPartOrderReturn.getId()))
+                {
+                    continue;
+                }
+                if(i>=1)
+                {
+                    item=this.copyMap(item);
+                }
                 item.put("运单号",zkbPartOrderReturn.getWaybillNo());
                 item.put("归还日期",this.zkbFePartOrderService.dateFormat(zkbPartOrderReturn.getReturnDate(),ZkbFePartOrderService.dateFormat));
                 item.put("归还类型",this.zkbFePartOrderService.dateFormat(zkbPartOrderReturn.getReturnDate(),ZkbFePartOrderService.dateFormat));
@@ -448,12 +458,21 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
                 if(i>=1)
                     list1.add(item);
                 i++;
+                returnPartOrder.put(zkbPartOrderReturn.getId(),zkbPartOrderReturn.getId());
             }
         }
         return list1;
     }
 
-
+    public Map<String,Object> copyMap(Map<String,Object> map)
+    {
+        Map<String,Object> itemMap = new HashMap();
+        for(String key:map.keySet())
+        {
+            itemMap.put(key,map.get(key));
+        }
+        return itemMap;
+    }
 
     /**
      *
@@ -471,7 +490,8 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
             return list;
         for(ZkbFePartOrderAssetInfo item:zkbFePartOrderAssetInfoList)
         {
-            Map<String,Object> newMap = map;
+            Map<String,Object> newMap =  new HashMap<>();
+            newMap.putAll(map);
             newMap.put(WebUtil.getMessage("zkbFePartOrder_assetNo"),item.getAssetNo());
             newMap.put(WebUtil.getMessage("zkbFePartOrder_assetDescription"),item.getAssetDescription());
             newMap.put(WebUtil.getMessage("zkbFePartOrder_assetQty"),item.getAssetQty());
@@ -482,6 +502,7 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         if(CollectionUtils.isEmpty(list))
             return list;
         List<Map<String,Object>> list1 = new ArrayList<>();
+        Map<String,String> returnPartOrder = new HashMap<>();
         for(Map<String,Object> item:list)
         {
             list1.add(item);
@@ -497,6 +518,14 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
             int i =0;
             for(ZkbFePartOrderReturn zkbFePartOrderReturn:zkbFePartOrderReturnList)
             {
+                if(returnPartOrder.containsKey(zkbFePartOrderReturn.getId()))
+                {
+                    continue;
+                }
+                if(i>=1)
+                {
+                    item=this.copyMap(item);
+                }
                 if(i18Map.containsKey(zkbPoReturnType)&&i18Map.get(zkbPoReturnType).containsKey(zkbFePartOrderReturn.getReturnType()))
                 {
                     item.put(WebUtil.getMessage("zkbFePartOrder_returnType"),i18Map.get(zkbPoReturnType).get(zkbFePartOrderReturn.getReturnType()));
@@ -507,6 +536,7 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
                 if(i>=1)
                     list1.add(item);
                 i++;
+                returnPartOrder.put(zkbFePartOrderReturn.getId(),zkbFePartOrderReturn.getId());
             }
         }
         return list1;
