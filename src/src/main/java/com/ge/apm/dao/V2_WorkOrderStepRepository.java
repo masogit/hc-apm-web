@@ -31,7 +31,7 @@ public interface V2_WorkOrderStepRepository extends GenericRepositoryUUID<V2_Wor
     @Query("select s.ownerName from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%') and s.stepId = 4")
     public List<String> findOwerNames(String owerName);
 
-    @Query(value="select s from V2_WorkOrder_Step s where s.woId in (select s.woId from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%') and s.stepId = 4)")
+    @Query(value="select s from V2_WorkOrder_Step s where s.woId in (select s.woId from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%') and s.stepId = 4) and s.stepId = 4")
     public List<V2_WorkOrder_Step>  findWorkSteps(String owerName);
 
     @Query("select s from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%')")
