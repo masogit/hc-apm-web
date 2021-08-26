@@ -109,6 +109,10 @@ public class V2_WorkOrderService {
         return  stepDao.findOwerNames(owerName);
     }
 
+    public List<V2_WorkOrder_Step> findWorkSteps(String owerName){
+        return  stepDao.findWorkSteps(owerName);
+    }
+
     public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName){
        return  stepDao.getWorkOrderDetailByownerName(ownerName);
     }
