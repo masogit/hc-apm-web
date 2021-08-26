@@ -354,8 +354,6 @@ public class TenantInfoConfigService {
 	private void supplierVersionMenuValueSet(TenantInfoConfigItem item) {
 		String key = item.getKey();
 		switch (key){
-			case "repair":
-			case "repair.workbench":
 			case "supplierManagement":
 			case "supplierManagement.supplierUser":
 			case "supplierManagement.assetBindSupplierFE":
