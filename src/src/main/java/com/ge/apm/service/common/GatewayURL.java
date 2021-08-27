@@ -112,6 +112,8 @@ public enum GatewayURL {
     COURSE_TRAIN_SEND_WE_CHART("/hcapmassetservice/api/apm/zkb/courseTrain/sendWeChatMessages"),
     COURSE_TRAIN_SEND_EMAIL_AUDIT("/hcapmreportservice/api/apm/report/courseTrain/sendHtmlForAudit"),
 
+    SUPPLIER_FE_BY_ASSETUID("/hcapmsuppliermanager/api/apm/supplierManager/userAccount/findSupplierFE/{assetUid}"),
+
     SMS_VERIFICATION_CODE("/hcapmreportservice/api/apm/report/partOrder/sendTheVerificationCode"),
     SMS_SEND_MAIL("/hcapmreportservice/api/apm/report/partOrder/sendMail"),
     FE_PART_ORDER_SEND_EMAIL("/hcapmreportservice/api/apm/report/fepartOrder/sendMail"),

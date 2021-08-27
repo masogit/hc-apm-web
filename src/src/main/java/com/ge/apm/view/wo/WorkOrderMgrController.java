@@ -1582,7 +1582,7 @@ public void test1(){
         } else {
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(locationName);
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picList,null);
             cancel();
         }
     }

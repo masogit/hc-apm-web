@@ -852,7 +852,7 @@ public class V2MeasureController extends GenericCRUDUUIDController<MeasuringOrde
                 newServiceRequest.setCasePriority(casePriority);
             }
 
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP,null);
             //报修完后直接关单
             //measureOrderService.closePM(selectedMeasureOrder,picList);
             cancel();

@@ -20,6 +20,7 @@ import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -39,6 +40,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -90,6 +92,7 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
     private List<OrgInfo> clinicalDeptList;
     private boolean terminate = false;
     private OrgInfoRepository orgDao;
+    private WorkflowService workflowService;
     private UserAccountRepository userDao;
     private V2_WorkOrderService woService;
     private UaaService uaaService;
@@ -201,6 +204,7 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
             loginUser = UserContextService.getCurrentUserAccount();
             supplierController = WebUtil.getBean(SupplierController.class);
             tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+            workflowService = WebUtil.getBean(WorkflowService.class);
             ccService = WebUtil.getBean(CustomConfigService.class);
             blobObjectRepository = WebUtil.getBean(BlobObjectRepository.class);
             customConfigService = WebUtil.getBean(CustomConfigService.class);
@@ -332,6 +336,14 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
             itemDetail.setPartsItemId(partsItem.getId());
         }
     }
+    public String getSiteOrgName(String siteUID) {
+        OrgInfo org = orgDao.getByUid(siteUID);
+        if (org != null) {
+            return org.getName();
+        }
+        return null;
+    }
+
     public void onSparePartsMasterValueChange(SelectEvent event) {
         SimplePartsItem partsItem = (SimplePartsItem) event.getObject();
         if (partsItem == null) return;
@@ -1294,7 +1306,33 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         }else{
             newServiceRequest.setRequestReason(faultReason);
         }
+        WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(selectedAsset.getId());
+        if (woc == null) {
+            WebUtil.addErrorMessage("医院未配置流程配置项,无法创建工单");
+            return;
+        }
 
+        Boolean isWoSupplierAutoEnabled = woc.getIsWoSupplierAutoEnabled();
+        boolean isSupplierOrder = Boolean.TRUE.equals(isWoSupplierAutoEnabled);
+        if (!isSupplierOrder) {
+            WebUtil.addErrorMessage("医院已禁止供应商创建保养工单");
+            return;
+        }
+        if(selectedAsset.getSupplierNewUID() == null){
+            WebUtil.addErrorMessage("设备未关联供应商,无法使用供应商派工");
+            return;
+        }
+        Map<String, Object> map = woService.findSupplierFEByAssetUid(selectedAsset);
+        List<UserAccount>  data = (List<UserAccount>)map.get("data");
+        if(ObjectUtils.isEmpty(data)){
+            WebUtil.addErrorMessage("设备未绑定供应商维修工程师");
+            return;
+        }
+        int size = data.size();
+        if(size>1){
+            WebUtil.addErrorMessage("设备绑定工程师过多(" + data.stream().map(UserAccount::getName).collect(Collectors.joining(",")) +")");
+            return;
+        }
         if (null == selectedAsset) {
             WebUtil.addErrorMessage(WebUtil.getMessage("NoEquipmentSelectedNoRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -1312,7 +1350,7 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         } else {
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(locationName);
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picList,2);
             cancel();
         }
     }
