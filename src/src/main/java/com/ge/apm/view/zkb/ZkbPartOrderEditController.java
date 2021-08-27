@@ -720,14 +720,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             if(onlineEngineFlag){
                 this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
-                if(this.selected.getOnlineEngine() != null){
-                    if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
-                        ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
-                        this.selected.setOnlineEngine(backUp);
-                        this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
-                    }else{
-                        this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
-                    }
+            }
+            if(this.selected.getOnlineEngine() != null){
+                if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
+                    ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
+                    this.selected.setOnlineEngine(backUp);
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
+                }else{
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
                 }
             }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
