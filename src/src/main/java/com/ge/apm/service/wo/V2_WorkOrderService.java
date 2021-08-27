@@ -109,6 +109,10 @@ public class V2_WorkOrderService {
         return  stepDao.findOwerNames(owerName);
     }
 
+    public List<V2_WorkOrder_Step> findWorkSteps(String owerName){
+        return  stepDao.findWorkSteps(owerName);
+    }
+
     public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName){
        return  stepDao.getWorkOrderDetailByownerName(ownerName);
     }
@@ -130,9 +134,12 @@ public class V2_WorkOrderService {
     }
 
 
-    public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
+    public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList,Integer createType) {
         String token = UserContextService.getAccessToken();
-        Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset, picList);
+        Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset, picList,createType);
+    }
+    public  Map<String, Object> findSupplierFEByAssetUid( AssetInfo asset) {
+       return srApi.findSupplierFEByAssetUid(asset);
     }
 
     public List<V2_BlobObject> getAttachByBoSubType(String srUid,String bosubType) {

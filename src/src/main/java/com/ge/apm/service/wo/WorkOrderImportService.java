@@ -48,54 +48,59 @@ public class WorkOrderImportService {
         return ret;
     }
 
-    public void importWorkOrder(UploadedFile file) throws IOException {
+    public List<ImportWorkOrderForm> importWorkOrder(UploadedFile file) throws IOException {
+        List<ImportWorkOrderForm> result = new ArrayList<>();
         Workbook b = new HSSFWorkbook(file.getInputstream());
         Sheet sheet = b.getSheetAt(0);
         List<ImportWorkOrderForm> importWorkOrderForms = new ArrayList<>();
-        boolean departNumNull = false;
-        boolean financingNumNull = false;
         for(Row row:sheet) {
-            if(row==null) continue;
-            try {
-                if(row.getRowNum()!=0 && row.getRowNum()!=1) {
-                    ImportWorkOrderForm importWorkOrderForm = new ImportWorkOrderForm();
-                    for (int i = 0;i<14;i++) {   //字段数14
+            if(row.getRowNum()!=0 && row.getRowNum()!=1) {
+                if(row==null) continue;
+                ImportWorkOrderForm importWorkOrderForm = new ImportWorkOrderForm();
+                try {
+                    boolean departNumNull = false;
+                    boolean financingNumNull = false;
+                    for (int i = 0; i < 14; i++) {   //字段数14
                         Cell cell = row.getCell(i);
-                        if(cell==null) {
-                            if(i==1) financingNumNull = true;
-                            if(i==2) departNumNull = true;
-                            continue;
-                        }
-                            switch (cell.getColumnIndex()) {
-                                case 0: importWorkOrderForm.setAssetName(cell.getStringCellValue());break;
-                                case 1: importWorkOrderForm.setFinancingNum(cell.getStringCellValue());break;
-                                case 2: importWorkOrderForm.setDepartNum(cell.getStringCellValue());break;
-                                case 3: importWorkOrderForm.setSrNum(cell.getStringCellValue());break;
-                                case 4: importWorkOrderForm.setCasePriority(cell.getStringCellValue().equals("紧急")?"1":cell.getStringCellValue().equals("重要")? "2":cell.getStringCellValue().equals("一般")? "3":"4");break;
-                                case 5: importWorkOrderForm.setRequestReason(cell.getStringCellValue());break;
-                                case 6: importWorkOrderForm.setRequestTime(cell.getDateCellValue());break;
-                                case 7: importWorkOrderForm.setRepairType(cell.getStringCellValue().equals("上门维修")?"1":cell.getStringCellValue().equals("送到维修中心")?"2":"3");break;
-                                case 8: importWorkOrderForm.setConfirmedUpDate(cell.getDateCellValue());break;
-                                case 9: importWorkOrderForm.setAssetStatus(cell.getStringCellValue().equals("正常")?"1":cell.getStringCellValue().equals("停机")?"2":cell.getStringCellValue().equals("限制功能使用")?"3":"4");break;
-                                case 10: importWorkOrderForm.setRepairResult(cell.getStringCellValue().equals("完全修复")?"1":cell.getStringCellValue().equals("部分修复")?"2":cell.getStringCellValue().equals("无法修复")?"3":cell.getStringCellValue().equals("需外送修复")?"4":cell.getStringCellValue().equals("误报")?"5":"6");break;
-                                case 11: importWorkOrderForm.setCaseType(cell.getStringCellValue().equals("自然故障")?"1":cell.getStringCellValue().equals("人为故障")?"2":cell.getStringCellValue().equals("环境故障")?"3":cell.getStringCellValue().equals("设计故障")?"4":cell.getStringCellValue().equals("其它")?"5":"6");break;
-                                case 12: importWorkOrderForm.setManhours(cell.getStringCellValue());break;
-                                case 13: importWorkOrderForm.setCloseTime(cell.getDateCellValue());break;
+                        if (cell == null) {
+                            if (i == 1) financingNumNull = true;
+                            if (i == 2) departNumNull = true;
+                            if(financingNumNull && departNumNull) {
+                                result.add(importWorkOrderForm);
+                                continue;
                             }
+                        }
+                        switch (cell.getColumnIndex()) {
+                            case 0: importWorkOrderForm.setAssetName(cell.getStringCellValue());break;
+                            case 1: importWorkOrderForm.setFinancingNum(cell.getStringCellValue());break;
+                            case 2: importWorkOrderForm.setDepartNum(cell.getStringCellValue());break;
+                            case 3: importWorkOrderForm.setSrNum(cell.getStringCellValue());break;
+                            case 4: importWorkOrderForm.setCasePriority(cell.getStringCellValue().equals("紧急") ? "1" : cell.getStringCellValue().equals("重要") ? "2" : cell.getStringCellValue().equals("一般") ? "3" : "4");break;
+                            case 5: importWorkOrderForm.setRequestReason(cell.getStringCellValue());break;
+                            case 6: importWorkOrderForm.setRequestTime(cell.getDateCellValue());break;
+                            case 7: importWorkOrderForm.setRepairType(cell.getStringCellValue().equals("上门维修") ? "1" : cell.getStringCellValue().equals("送到维修中心") ? "2" : "3");break;
+                            case 8: importWorkOrderForm.setConfirmedUpDate(cell.getDateCellValue());break;
+                            case 9: importWorkOrderForm.setAssetStatus(cell.getStringCellValue().equals("正常") ? "1" : cell.getStringCellValue().equals("停机") ? "2" : cell.getStringCellValue().equals("限制功能使用") ? "3" : "4");break;
+                            case 10: importWorkOrderForm.setRepairResult(cell.getStringCellValue().equals("完全修复") ? "1" : cell.getStringCellValue().equals("部分修复") ? "2" : cell.getStringCellValue().equals("无法修复") ? "3" : cell.getStringCellValue().equals("需外送修复") ? "4" : cell.getStringCellValue().equals("误报") ? "5" : "6");break;
+                            case 11: importWorkOrderForm.setCaseType(cell.getStringCellValue().equals("自然故障") ? "1" : cell.getStringCellValue().equals("人为故障") ? "2" : cell.getStringCellValue().equals("环境故障") ? "3" : cell.getStringCellValue().equals("设计故障") ? "4" : cell.getStringCellValue().equals("其它") ? "5" : "6");break;
+                            case 12: importWorkOrderForm.setManhours(cell.getStringCellValue());break;
+                            case 13: importWorkOrderForm.setCloseTime(cell.getDateCellValue());break;
+                        }
 
                     }
                     importWorkOrderForms.add(importWorkOrderForm);
-                }}
-            catch (Exception exception) {
-                continue; //可能是时间格式不一样导致的报错
+                } catch (Exception exception) {
+                    result.add(importWorkOrderForm);
+                    continue; //可能是时间格式不一样导致的报错
+                }
             }
+
         }
-        if(departNumNull && financingNumNull) WebUtil.addSuccessMessage("资产编号和卡片号至少填写一个，请完整填写后再导入！");
-        importWorkOrderByForm(importWorkOrderForms);
+        return importWorkOrderByForm(importWorkOrderForms,result);
     }
 
     @Transactional
-    public void importWorkOrderByForm(List<ImportWorkOrderForm> importWorkOrderForms) {
+    public List<ImportWorkOrderForm> importWorkOrderByForm(List<ImportWorkOrderForm> importWorkOrderForms,List<ImportWorkOrderForm> result) {
         UserAccount userAccount = UserContext.getCurrentLoginUser();
         for(ImportWorkOrderForm importWorkOrderForm : importWorkOrderForms) {
             AssetInfo assetInfo = null;
@@ -107,16 +112,16 @@ public class WorkOrderImportService {
             } else if(importWorkOrderForm.getDepartNum()!=null) {
                 assetInfos = assetInfoRepository.findByDepartNum(importWorkOrderForm.getDepartNum());
             } else {
-                continue;
+                result.add(importWorkOrderForm);continue;
             }
-            if(assetInfos.size()!=1) continue;
+            if(assetInfos.size()!=1) { result.add(importWorkOrderForm); continue;}
             assetInfo = assetInfos.get(0);
             boolean isContinue = false;
             List<V2_WorkOrder> findByIds = workOrderReportRepository.findByAssetId(assetInfo.getId());
             for(V2_WorkOrder workOrder:findByIds) {
                 if(importWorkOrderForm.getSrNum().equals(workOrder.getServiceRequest().getOriginSrNum())) isContinue = true;   //申请编号重复，说明已经导入过了该工单
             };
-            if(isContinue) continue;
+            if(isContinue) {result.add(importWorkOrderForm); continue;}
             V2_ServiceRequest serviceRequest = new V2_ServiceRequest();
             serviceRequest.setCasePriority(Integer.parseInt(importWorkOrderForm.getCasePriority()));
             serviceRequest.setRequestReason(importWorkOrderForm.getRequestReason());
@@ -189,7 +194,7 @@ public class WorkOrderImportService {
             workOrder.setRepairResult(importWorkOrderForm.getRepairResult());
             workOrder.setCloseTime(importWorkOrderForm.getCloseTime());
             workOrder.setCreatedDate(importWorkOrderForm.getRequestTime());// 计算响应时间，暂时省略
-            workOrder.setDataSource("import");
+            workOrder.setImportBy(userAccount.getUid());
             workOrderReportRepository.save(workOrder);
             V2_WorkOrder_Step workOrder_step = new V2_WorkOrder_Step();
             workOrder_step.setOwnerId(userAccount.getId());
@@ -217,6 +222,7 @@ public class WorkOrderImportService {
             assetLifecycleEvent.setDescription(getDescriptionByWorkOrder(workOrder,serviceRequest));
             assetLifecycleEventRepository.save(assetLifecycleEvent);
         }
+        return result;
     }
 
     public String getDescriptionByWorkOrder(V2_WorkOrder workOrder,V2_ServiceRequest serviceRequest) {
