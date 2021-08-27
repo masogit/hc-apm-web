@@ -1330,7 +1330,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 newServiceRequest.setCasePriority(casePriority);
             }
 
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP,null);
             //报修完后直接关单
             //pmOrderService.closePM(selectedPmOrder,picList);
             cancel();

@@ -13,7 +13,7 @@
                 <p:outputLabel class="pageTitle" value="#{msg.MaintenanceWorkorder}"/>
             </div>
             <div class="ui-g-12 ">
-                <p:tabView class="ui-g-12" id="pmTab" dynamic="false" cache="false" activeIndex="#{pmOrderTabController.queryTab}" binding="#{pmOrderTabController.tabView}">
+                <p:tabView class="ui-g-12" id="pmTab" dynamic="true" cache="false" activeIndex="#{pmOrderTabController.queryTab}" binding="#{pmOrderTabController.tabView}">
                     <p:tab class="ui-g-12" title="保养工单" id="pmOrderList" >
                         <ui:include src="pmSupplierOrderList.xhtml"/>
                     </p:tab>
