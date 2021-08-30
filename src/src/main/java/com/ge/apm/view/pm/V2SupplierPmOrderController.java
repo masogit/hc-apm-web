@@ -42,6 +42,7 @@ public class V2SupplierPmOrderController extends V2PmOrderController {
         Sort sort = returnSort(pageRequest);
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         result = super.getDAO().findBySearchFilter(this.searchFilters, pageRequest);
+        super.setCurrentPagePmOrders(result.getContent());
         this.searchFilters.clear();
         List<V2_PmOrder> currentPagePmOrders = result.getContent();
         Map<String, Boolean> selectedMap = super.getSelectedMap();
