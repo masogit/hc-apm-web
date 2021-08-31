@@ -557,6 +557,9 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         this.setSearchFilter();
         UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
         searchFilters.add(new SearchFilter("supplierUid", SearchFilter.Operator.EQ, currentUserAccount.getTenantUID()));
+        if (3==queryIndex) {
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+        }
         searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
         searchFilters.add(new SearchFilter("createType", SearchFilter.Operator.EQ, 2));
         if (8!=queryIndex) {
