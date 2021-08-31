@@ -103,6 +103,11 @@ public class SupplierAssetController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void resetFindParam(){
+        this.oneSearchStr = null;
+        this.searchFilters.clear();
+    }
+
     public String getOneSearchStr() {
         return oneSearchStr;
     }
