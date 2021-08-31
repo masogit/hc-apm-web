@@ -749,7 +749,7 @@
                         <c:choose>
                             <c:when test="#{userContextService.zkbUser}">
                                 <h:panelGroup id="namepanel" >
-                                    <p:commandButton immediate="false" process="@this" value="已上传说明函" update="growl zkbPartOrderEditForm" icon="fa fa-arrow-up" action="#{zkbPartOrderAuditController.handleFileUpload2}" disabled="#{zkbPartOrderAuditController.selected.uploadLetterFlag eq 't'}" />
+                                    <p:commandButton immediate="false" process="@this" value="已邮件发送给400探头专员" update="growl zkbPartOrderEditForm" icon="fa fa-arrow-up" action="#{zkbPartOrderAuditController.handleFileUpload2}" disabled="#{zkbPartOrderAuditController.selected.uploadLetterFlag eq 't'}" />
                                     <p:outputLabel id="letterTips" style="color: red;font-weight:bold;margin-left: 30px;font-size: larger" rendered="#{zkbPartOrderAuditController.selected.uploadLetterFlag eq 'f' or (empty zkbPartOrderAuditController.selected.uploadLetterFlag)}" value="#{zkbPartOrderAuditController.letterTips}"/>
                                 </h:panelGroup>
                             </c:when>
