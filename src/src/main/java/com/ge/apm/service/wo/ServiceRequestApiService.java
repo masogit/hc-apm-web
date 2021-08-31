@@ -195,7 +195,8 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setCustomerName(newServiceRequest.getCustomerName());
         formData.setCustomerTel(newServiceRequest.getCustomerTel());
         formData.setCustomerPosition(newServiceRequest.getCustomerPosition());
-        formData.setCreateType(createType);
+        formData.setCreateType(createType!= null ?createType :1);
+        formData.setSupplierUid(asset.getSupplierNewUID());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
@@ -268,7 +269,15 @@ class ServiceRequestForm {
      * 创建方式 1:医院创建  2:供应商创建
      */
     Integer createType = 1;
+    String supplierUid;
 
+    public String getSupplierUid() {
+        return supplierUid;
+    }
+
+    public void setSupplierUid(String supplierUid) {
+        this.supplierUid = supplierUid;
+    }
 
     public Integer getCreateType() {
         return createType;
