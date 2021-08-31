@@ -38,7 +38,7 @@ public class ZkbContract implements ChineseName, Serializable {
     }
 
     public enum QuotaDeductTypeEnum{
-        New,Old
+        New,Old,Null
     }
 
     @Id

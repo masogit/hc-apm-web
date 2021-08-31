@@ -4273,6 +4273,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('businessType', 'assetMaintain', '设备保养', 'assetMaintain', NULL, '-1');
     -- end
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaDeductType','Null','N/A','Null',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaDeductType','New','新逻辑扣减','New',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractQuotaDeductType','Old','旧逻辑扣减','Old',NULL,-1);
 
