@@ -2014,7 +2014,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 pmIdList.add(k);
 
         });
-        System.out.println();
     }
 
     public void onItemSelected() {

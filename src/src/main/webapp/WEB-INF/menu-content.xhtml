@@ -221,7 +221,7 @@
                 <p:menuitem value="#{msg.MaintenanceWorkbench}" outcome="/portal/pm/supplier/pmSupplierOrderListAll.xhtml" rendered="#{userContextService.accessContains('supplierMaintain.workbench')}"/>
 
             </p:submenu>
-            <p:submenu id="um25_supplier" label="#{msg.WorkOrderMgmt}" icon="fa fa-check-square-o" rendered="#{userContextService.accessContains('supplierRepair')}">
+            <p:submenu id="um25_supplier" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.accessContains('supplierRepair')}">
                 <p:menuitem value="#{msg.RepairWorkbench}" outcome="/portal/woMgr/supplier/workOrderSupplierList.xhtml" rendered="#{userContextService.accessContains('supplierRepair.workbench')}"/>
 
             </p:submenu>

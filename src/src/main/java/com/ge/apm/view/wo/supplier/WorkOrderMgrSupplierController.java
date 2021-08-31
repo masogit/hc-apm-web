@@ -554,193 +554,22 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
     /*stepName:StepId 报修:1 待派工: 2 , 待接单:3, 维修中:4 , 待验收:5 待关单:6 ， 待评价:7  , 待审核:8 ， 已计划: 0*/
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
-        Page<V2_WorkOrder> bySearchFilter = null;
-        try {
-            this.setSearchFilter();
-            removeFilterOnField("status");
-            removeFilterOnField("currentStepId");
-            removeFilterOnField("currentStepName");
-            removeFilterOnField("currentPersonId");
-            removeFilterOnField("dispatchMode");
-            removeFilterOnField("srId");
-            removeFilterOnField("feedbackRating");
-            removeFilterOnField("assetId");
-            removeFilterOnField("approvalStatus");
-            removeFilterOnField("assetInfo.assetOwnerId");
-            removeFilterOnField("assetInfo.assetOwnerId2");
-            removeFilterOnField("assetInfo.assetOwnerId3");
-            removeFilterOnField("assetInfo.uid");
-            Integer  fillterStepId;
-            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-            searchFilters.add(new SearchFilter("supplierUid", SearchFilter.Operator.EQ, currentUserAccount.getTenantUID()));
-            if (queryIndex == 1) {//已报修 可取消
-                if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
-                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
-                }
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.LTE, 3));
-            } else if (queryIndex == 2) { //待派工
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
-                searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
-
-            } else if (queryIndex == 3) { //待接单
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
-                searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*A+"));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*A+B*"));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+4*A+B*"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*5+owner*6+"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*5+owner*6+"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*5+owner*6+"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner1*"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner1*"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner2*"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner2*"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner3*"));
-                searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner3*"));
-                //去除派工模式4且待派工的单子
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+7*"));
-//            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(4,5), "1*3+7*"));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+7*"));
-                //当前责任人是自己且已经派工的单子
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+9*"));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));
-                List<Integer> tagGroupAssets = getTagGroupAssets();
-                if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
-                    searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
-                } else {
-                    searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*3+4*5+"));
-                }
-                tagGroupAssets = getNoTagGroupAssets();
-                if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
-                    searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+owner*"));
-                } else {
-                    searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*3+4*5+owner*"));
-                }
-
-            } else if (queryIndex == 4) { //维修中
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-            } else if (queryIndex == 5) { //待验收
-                /*工程师和主任， 如果两个角色同时存在，则优先以主任角色.*/
-                if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
-                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
-                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
-                } else {
-                    searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-                    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
-                }
-            } else if (queryIndex == 6) { //待评价
-                if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
-                    searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1, 2))));
-                }
-                searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.EQ, 0));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
-            } else if (queryIndex == 7) { //待关单
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-            } else if (queryIndex == 8) { //已关单
-                if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
-                    if (userContextService.hasRole("AssetStaff")) {
-                        searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                        searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-                    }
-                }
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
-            } else if (queryIndex == 9) { //已取消
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
-            } else if (queryIndex == 10) { //待审批
-
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
-                searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
-                searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
-                if(!(userContextService.hasRole("AssetHead")||userContextService.hasRole("DeptHead"))){
-                    searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-                }
-                if(userContextService.hasRole("DeptHead")){
-                    List<String> clinicalUidList =  orgDao.findClinicalUidBySiteUid(Arrays.asList(userContextService.getCurrentUserAccount().getSiteUID()));
-                    searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-                    searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, clinicalUidList,"1*2+"));
-                }
-
-            } else if (queryIndex == 11) { //全部维修单
-                if(stepFileter!=null) {
-                    fillterStepId = woStatus.get(stepFileter);
-                    if (fillterStepId > 6) {
-                        if(userContextService.hasCurrentTenantName("")) {
-                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(7,9)));
-                        }else {
-                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
-                        }
-                    } else {
-                        if( fillterStepId == 3 && userContextService.hasCurrentTenantName("")) {
-                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
-                        }else{
-                            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
-                        }
-                    }
-                }
-
-            } else if (queryIndex == 12) { //指定设备queryAssetUid 工单 设备详细页面跳转
-                if (!Strings.isNullOrEmpty(queryAssetUid)) {
-                    searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
-                }
-            } else {//待办
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-                if(stepFileter!=null) {
-                    fillterStepId = woStatus.get(stepFileter);
-                    if (fillterStepId > 6) {
-                        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 7));
-                    } else {
-                        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, fillterStepId));
-                    }
-                }
-            }
-            this.selected = null;
-            String value = null;
-            boolean isId= false;
-            for (SearchFilter searchFilter :searchFilters) {
-                if ("id".equals(searchFilter.fieldName)) {
-                    if(searchFilter.value instanceof List){
-                        isId = false;
-                    }else{
-                        value = (String)searchFilter.value;
-                        isId = true;
-                    }
-                }
-            }
-            if(isId) {
-                List<V2_WorkOrder_Step> vs = woService.getWorkOrderDetailByownerName(value);
-                List<String> woIdList = new ArrayList<>();
-                if (!vs.isEmpty()) {
-                    for (V2_WorkOrder_Step step : vs) {
-                        woIdList.add(step.getWoId());
-                    }
-                    searchFilters.removeIf(e -> e.fieldName.equals("id"));
-                    searchFilters.add(new SearchFilter("id", SearchFilter.Operator.IN, woIdList, "1*"));
-                }
-            }
-            //查询Mvs工单
-            if("MVS工单".equals(tabTitle)){
-
-                List<SearchFilter> filters = buildMvsSearchFilter();
-                bySearchFilter = dao.findBySearchFilter(filters, pageRequest);
-            }else{
-                bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
-            }
-        } catch (Exception e) {
-            LOGGER.error("load data occur exception,{}", e.getMessage());
-            throw e;
+        this.setSearchFilter();
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        searchFilters.add(new SearchFilter("supplierUid", SearchFilter.Operator.EQ, currentUserAccount.getTenantUID()));
+        if (3==queryIndex) {
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
         }
-        return   bySearchFilter;
+        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
+        searchFilters.add(new SearchFilter("createType", SearchFilter.Operator.EQ, 2));
+        if (8!=queryIndex) {
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentUserAccount.getId()));
+        }
+        pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize());
+        Page<V2_WorkOrder> bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        this.searchFilters.clear();
+        return bySearchFilter;
     }
-
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
 
@@ -768,6 +597,19 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
+        removeFilterOnField("status");
+        removeFilterOnField("currentStepId");
+        removeFilterOnField("currentStepName");
+        removeFilterOnField("currentPersonId");
+        removeFilterOnField("dispatchMode");
+        removeFilterOnField("srId");
+        removeFilterOnField("feedbackRating");
+        removeFilterOnField("assetId");
+        removeFilterOnField("approvalStatus");
+        removeFilterOnField("assetInfo.assetOwnerId");
+        removeFilterOnField("assetInfo.assetOwnerId2");
+        removeFilterOnField("assetInfo.assetOwnerId3");
+        removeFilterOnField("assetInfo.uid");
 
         if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
