@@ -282,9 +282,22 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
      */
     @Column(name = "supplier_uid")
     private String supplierUid;
+    /**
+     * 工单创建类型  1:医院创建   2:供应商创建
+     */
+    @Column(name = "create_type",columnDefinition=" integer default 1 ")
+    private Integer createType = 1;
 
     @Transient
     private Integer orderCount;
+
+    public Integer getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(Integer createType) {
+        this.createType = createType;
+    }
 
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
