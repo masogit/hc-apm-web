@@ -771,6 +771,7 @@ public void test1(){
             removeFilterOnField("assetInfo.assetOwnerId3");
             removeFilterOnField("assetInfo.uid");
             Integer  fillterStepId;
+            searchFilters.add(new SearchFilter("createType", SearchFilter.Operator.EQ, 1));//医院创建
             if (queryIndex == 1) {//已报修 可取消
                 if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                     searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
