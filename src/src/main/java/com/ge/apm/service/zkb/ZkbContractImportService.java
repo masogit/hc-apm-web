@@ -197,6 +197,8 @@ public class ZkbContractImportService {
                     zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
                 }else if("新逻辑扣减".equals(contractInfoVO.getQuotaDeductType())){
                     zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
+                }else if("N/A".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
                 }
             }
             zkbContract.setSpareQuotaTotal(contractInfoVO.getSpareQuotaTotal());
@@ -229,6 +231,8 @@ public class ZkbContractImportService {
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
                 }else if("新逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
+                }else if("N/A".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
                 }
             }
             newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
@@ -375,7 +379,13 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item,  "备件/人工/保养总额小于备件/人工/保养剩余名额、备件/人工/保养已使用名额之和");
             isValidateData = false;
         }
-
+        if(ZkbContract.ContractType.Biomed.toString().equals(contractInfoVO.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(contractInfoVO.getContractType())) {
+            if (ZkbContract.QuotaDeductTypeEnum.Null.toString().equals(contractInfoVO.getQuotaDeductType())) {
+                item.put("status", ImportStatus.Failure);
+                ZkbContractRow.addErrMessage(item, "合同扣除类型不能为N/A");
+                isValidateData = false;
+            }
+        }
         for (Map<String, Object> tempContractMap: importContractMapList) {
             ZkbContractVO tempZkbContractVO = (ZkbContractVO)tempContractMap.get("contractInfoVO");
             Integer tempHashCode = Integer.valueOf(tempContractMap.get("hashCode").toString());

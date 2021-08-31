@@ -308,6 +308,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType())){
 
+                }else if(ZkbContract.QuotaDeductTypeEnum.Null.toString().equals(selectedContract.getQuotaDeductType())){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "探头申请中名额扣除类型不能为N/A！", "");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                    contractList = new ArrayList<>();
+                    return;
                 }
                 initHighList(selectedContract.getId());
             } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){ 

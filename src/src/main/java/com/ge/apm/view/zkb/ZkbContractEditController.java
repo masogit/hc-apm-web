@@ -1,11 +1,13 @@
 package com.ge.apm.view.zkb;
 
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
 import com.ge.apm.service.zkb.ZkbContractService;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -59,6 +61,8 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private boolean newContractFlag = false;
 
     private ZkbContractCat zkbContractCatSelected;
+    private List<I18nMessage> quotaDeductTypeList = new ArrayList<>();
+    I18nMessageRepository i18nMessageRepository;
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -73,6 +77,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         zkbContractService = WebUtil.getBean(ZkbContractService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         assetTagService = WebUtil.getBean(AssetTagService.class);
+        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
@@ -87,7 +92,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             } catch (InstantiationException e) {
                 e.printStackTrace();
             }
-
         }else {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             this.selected = dao.findById(selectedId);
@@ -103,6 +107,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
                 newContractFlag = true;
             }
         }
+        queryQuota();
         targetAssets = new ArrayList();
         queryAsset = new AssetInfo();
         this.getQueryAssetsList();
@@ -138,6 +143,32 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         this.initCourseList();
         contractCourseList = new ArrayList<>();
         zkbContractAssetList = new ArrayList<>();
+    }
+
+
+    public void queryQuota(){
+        if(StringUtils.isEmpty(selected.getContractType())){
+            quotaDeductTypeList = i18nMessageRepository.getByMsgType("zkbContractQuotaDeductType");
+        }else if(ZkbContract.ContractType.Biomed.toString().equals(selected.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(selected.getContractType())){
+            quotaDeductTypeList = i18nMessageRepository.getByMsgType("zkbContractQuotaDeductType");
+            for(I18nMessage i : quotaDeductTypeList){
+                if(i.getMsgKey().equals(ZkbContract.QuotaDeductTypeEnum.Null.toString())){
+                    quotaDeductTypeList.remove(i);
+                    break;
+                }
+            }
+        }else{
+            quotaDeductTypeList = i18nMessageRepository.getByMsgType("zkbContractQuotaDeductType");
+        }
+    }
+
+    public void contractTypeSelect(){
+        queryQuota();
+        if ("Create".equalsIgnoreCase(actionName)) {
+            if(ZkbContract.ContractType.Biomed.toString().equals(selected.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(selected.getContractType())){
+                selected.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
+            }
+        }
     }
 
     /**
@@ -617,6 +648,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void setActionCatName(String actionCatName) {
         this.actionCatName = actionCatName;
+    }
+
+    public List<I18nMessage> getQuotaDeductTypeList() {
+        return quotaDeductTypeList;
+    }
+
+    public void setQuotaDeductTypeList(List<I18nMessage> quotaDeductTypeList) {
+        this.quotaDeductTypeList = quotaDeductTypeList;
     }
 
     @Override

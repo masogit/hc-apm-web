@@ -41,6 +41,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.zkbContract_contractType}*</label>
                             <p:selectOneMenu id="status" value="#{zkbContractEditController.selected.contractType}" required="true" requiredMessage="#{msg.zkbContract_contractType} #{msg.ValidationRequire}">
+                                <p:ajax event="itemSelect" update="quotaDeductType" listener="#{zkbContractEditController.contractTypeSelect}" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                             </p:selectOneMenu>
@@ -60,7 +61,7 @@
                             <label class="label">名额扣除类型*</label>
                             <p:selectOneMenu id="quotaDeductType" value="#{zkbContractEditController.selected.quotaDeductType}" required="true" requiredMessage="名额扣除类型 #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractQuotaDeductType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <f:selectItems value="#{zkbContractEditController.quotaDeductTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
