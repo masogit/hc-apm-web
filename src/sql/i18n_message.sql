@@ -4213,4 +4213,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 insert into i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) values ('batchFileType','ZKBDealerFEAndSalesExcel','ZKB代理商FE/Sales列表','ZKB Dealer FE and Sales List',NULL,-1);
 --apm-schedual新增模板導入 zkb代理商fe/sales     end   0610
 
-
+--apm-schedual新增模板導入 lcs用户信息导入模板     start 2021-09-01
+insert into i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) values ('batchFileType','UserAccountImportExcel','用戶信息导入列表','user import excel',NULL,-1);
+--apm-schedual新增模板導入 lcs用户信息导入模板     end 2021-09-01
