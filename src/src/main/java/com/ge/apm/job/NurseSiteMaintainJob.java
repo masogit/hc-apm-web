@@ -92,7 +92,6 @@ public class NurseSiteMaintainJob {
 	@Scheduled(cron = "20/20 * * * * *")
 	public void execute() {
 		try {
-			System.out.println("aa");
 			checkJob();
 			doJob();
 		} catch (Exception e) {
