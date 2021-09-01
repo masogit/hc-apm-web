@@ -8,8 +8,6 @@
     <ui:define name="content">
         <h:outputStylesheet name="css/assetUsageAll.css"/>
         <h:outputScript name="js/assetUsageAll.js"/>
-        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
         <!--        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css"/>-->
         <style>
             div.ui-autocomplete.ui-autocomplete-multiple.asset-tags ul.ui-autocomplete-multiple-container{
@@ -523,7 +521,7 @@
 
         </script>
         <script>
-            const gallery = new Viewer(document.getElementById('picDiv'), {inline: true});
+            new Viewer(document.getElementById('picDiv'), {inline: true});
         </script>
     </ui:define>
 </ui:composition>
