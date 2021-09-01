@@ -559,12 +559,10 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         searchFilters.add(new SearchFilter("supplierUid", SearchFilter.Operator.EQ, currentUserAccount.getTenantUID()));
         if (3==queryIndex) {
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+        }else {
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
         }
-        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
         searchFilters.add(new SearchFilter("createType", SearchFilter.Operator.EQ, 2));
-        if (8!=queryIndex) {
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentUserAccount.getId()));
-        }
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize());
         Page<V2_WorkOrder> bySearchFilter = dao.findBySearchFilter(this.searchFilters, pageRequest);
         this.searchFilters.clear();
@@ -611,22 +609,6 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         removeFilterOnField("assetInfo.assetOwnerId3");
         removeFilterOnField("assetInfo.uid");
 
-        if (clinicalDeptOrgUidSet != null && !clinicalDeptOrgUidSet.isEmpty()) {
-            this.updateSearchFilter(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, new ArrayList<>(clinicalDeptOrgUidSet), "1*"));
-        } else {
-            searchFilters.removeAll(searchFilters.stream().filter(item -> "serviceRequest.fromDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-        }
-        if (!this.hasFilterOnField("siteUID")) {
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-            searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }
     }
 
     public void arrivalTimeSet() {
