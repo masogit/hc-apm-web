@@ -140,6 +140,93 @@ public class NurseSiteMaintainService {
 		mapAssetInfo.clear();
 		mapOrgInfo.clear();
 	}
+
+	@Transactional
+	public void tBatchCompleteMaintain(NurseSiteMaintain maintain, String signatureId,String userUid, Date date,Date delayDate) {
+		int status = maintain.getStatus();
+		if (status==0 || status == 2 || status == 5 || status == 6 || status == 7) {
+			Set<String> setMaintainIds = new HashSet<String>();
+			Set<String> setMaintainItemIds = new HashSet<String>();
+			setMaintainIds.add(maintain.getId());
+			if (setMaintainIds.size() > 0) {
+				setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId0(setMaintainIds);
+				if (setMaintainItemIds!=null && setMaintainItemIds.size() > 0) {
+					nurseSiteMaintainDataRepository.completeMaintainDataByParent(setMaintainItemIds);
+					nurseSiteMaintainItemRepository.completeMaintainItem2(setMaintainItemIds, signatureId, userUid, date,delayDate);
+					nurseSiteMaintainItemRepository.completeMaintainItem5(setMaintainItemIds, signatureId, userUid, date,delayDate);
+					nurseSiteMaintainItemRepository.completeMaintainItem6(setMaintainItemIds, signatureId, userUid, date,delayDate);
+					nurseSiteMaintainItemRepository.completeMaintainItem7(setMaintainItemIds, signatureId, userUid, date,delayDate);
+				}
+			}
+		}
+	}
+
+	@Transactional
+	public void nativeDeleteMaintain(String id) {
+		Set<String> setMaintainItemIds = null;
+		setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId(id);
+		if (setMaintainItemIds!=null && setMaintainItemIds.size() > 0) {
+			nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(setMaintainItemIds);
+		}
+		nurseSiteMaintainItemRepository.deleteMaintainItemByParentId(id);
+		nurseSiteMaintainRepository.deleteMaintain(id);
+	}
+
+	@Transactional
+	public void tDeleteUnCheckedMaintainData(List<NurseSiteMaintain> listMaintain, String assetUid, boolean all) {
+		Set<String> setMaintainId = new HashSet<String>();
+		List<NurseSiteMaintainItem> listMaintainItem = null;
+		if (all) {
+			nativeDeleteMaintain(listMaintain);
+		} else {
+			if (listMaintain != null && listMaintain.size() > 0) {
+				for (int i = 0; i < listMaintain.size(); ++i) {
+					setMaintainId.add(listMaintain.get(i).getId());
+				}
+			}
+			if (setMaintainId.size() > 0) {
+				listMaintainItem = nurseSiteMaintainItemRepository.findByParentIdAndAssetUid(assetUid,setMaintainId);
+			}
+			if (listMaintainItem != null && listMaintainItem.size() > 0) {
+				nativeDeleteMaintainItem(listMaintainItem);
+			}
+		}
+	}
+
+	private void nativeDeleteMaintain(List<NurseSiteMaintain> listMaintain) {
+		Set<String> setMaintainIds = new HashSet<String>();
+		Set<String> setMaintainItemIds = null;
+		if (listMaintain != null && listMaintain.size() > 0) {
+			for (int i = 0; i < listMaintain.size(); ++i) {
+				setMaintainIds.add(listMaintain.get(i).getId());
+			}
+		}
+		if (setMaintainIds.size() > 0) {
+			setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId(setMaintainIds);
+		}
+		if (setMaintainItemIds!=null && setMaintainItemIds.size() > 0) {
+			nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(setMaintainItemIds);
+		}
+		if (setMaintainIds.size() > 0) {
+			nurseSiteMaintainItemRepository.deleteMaintainItemByParentId(setMaintainIds);
+		}
+		if (setMaintainIds.size() > 0) {
+			nurseSiteMaintainRepository.deleteMaintain(setMaintainIds);
+		}
+	}
+
+	private void nativeDeleteMaintainItem(List<NurseSiteMaintainItem> listMaintainItem) {
+		Set<String> setMaintainItemIds = new HashSet<String>();
+		if (listMaintainItem != null && listMaintainItem.size() > 0) {
+			for (int i = 0; i < listMaintainItem.size(); ++i) {
+				setMaintainItemIds.add(listMaintainItem.get(i).getId());
+			}
+		}
+		if (setMaintainItemIds.size() > 0) {
+			nurseSiteMaintainDataRepository.deleteMaintainDataByParentId(setMaintainItemIds);
+			nurseSiteMaintainItemRepository.deleteMaintainItem(setMaintainItemIds);
+		}
+	}
 	
 	public List<CustomRole> getCustomRole(Integer userId){
 		return customRoleRepository.findCustomRolesByUserId(userId);

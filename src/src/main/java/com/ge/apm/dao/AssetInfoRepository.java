@@ -272,4 +272,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "UPDATE asset_info SET shared_asset_type = NULL WHERE uid IN ?1",nativeQuery = true)
     void  clearShareAssetTypeByIds(List<String> assetIds);
 
+    @Query(value = "select o.* from asset_info o where o.uid in ?1", nativeQuery = true)
+    List<AssetInfo> fetchListByUid(Set<String> listUid);
+
 }
