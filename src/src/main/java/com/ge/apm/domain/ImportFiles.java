@@ -31,7 +31,7 @@ public class ImportFiles {
 
     public enum ImportFileType {
         AconnectPerformanceExcel, AppTrainingExcel, AssetInfoImportExcel, ColdHeaderExcel, DealerFEAndSalesExcel,
-        EEMonitorCSV, GEIBTableExcel, OLERulesExcel, PMResultExcel, PMScheduleExcel,
+        EEMonitorCSV, GEIBTableExcel, OLERulesExcel, PMResultExcel, PMScheduleExcel, UserAccountImportExcel,
         SrExcel, SrReportPdf, SrResetReport, UpTimeExcel, UsConnectStatusExcel, ZKBDealerFEAndSalesExcel,
         UserAccountSendMailExcel, UserAssetCustomerExcel, UserAssetFeExcel, UserAssetOLEExcel, UserAssetSalesExcel,
         ZkbAssetTransferExcel, CarePackageExcel, MSARecommendExcel, PromotionActivityExcel, CoilOpportunityExcel,
