@@ -8,3 +8,5 @@ update asset_alert_config set check_type = 7,valid_values = 'Shutdown;关闭;Pau
 
 -- 刷新asset_service_member表，定时任务加的类型从DealerFEAndSalesExcel改成GEIBTableExcel
 update asset_service_member set import_file_type = 'GEIBTableExcel' where import_file_type='DealerFEAndSalesExcel' and ge_user_type='9'
+--   USUpgradeRecommendExcel
+insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','USUpgradeRecommendExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
