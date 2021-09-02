@@ -177,7 +177,10 @@ public class PmOrderReportTemplateService {
     }
 
     public InputStream generateReportTemplateBySchemaId(byte[] activeTemplateBytes, String fReportId, String pReportId) throws IOException {
-        InputStream stream = new ByteArrayInputStream(activeTemplateBytes);
+        return this.generateReportTemplateBySchemaId(new ByteArrayInputStream(activeTemplateBytes), fReportId, pReportId);
+    }
+
+    public InputStream generateReportTemplateBySchemaId(InputStream  stream, String fReportId, String pReportId) throws IOException {
         MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
         // add dynamic table.
         TableSchema schema;
