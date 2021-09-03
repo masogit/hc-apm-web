@@ -2,6 +2,7 @@ package com.ge.apm.service.nurseSite;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.policy.DynamicTableRenderPolicy;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ImageUtils;
@@ -28,6 +29,9 @@ public class WordReportExportService {
 
     @Autowired
     BlobFileService blobFileService;
+
+    @Autowired
+    UserAccountRepository userAccountRepository;
 
     private final static List<Integer> PASS_STATUS = Arrays.asList(2, 5, 6, 7);
     private final static List<Integer> FAILURE_STATUS = Arrays.asList(3, 8);
@@ -180,8 +184,13 @@ public class WordReportExportService {
                 }
                 for (int m = 1; m <= 2; m++) {
                     if( m==1){
-                        UserAccount modifyBy = nurseSiteMaintainItem.getModifyBy();
-                        tableOneRow.addNewTableCell().setText(modifyBy.getName());
+                        String uid = nurseSiteMaintainItem.getUpdateByUid();
+                        if(uid == null){
+                            tableOneRow.addNewTableCell().setText(null);
+                        }else {
+                            UserAccount userAccount = userAccountRepository.getByUid(uid);
+                            tableOneRow.addNewTableCell().setText(userAccount.getName());
+                        }
                     }else if( m==2){
                         Map<String, String> map = commentMapMap.get(date);
                         String comment = map.get(assetInfoName);
