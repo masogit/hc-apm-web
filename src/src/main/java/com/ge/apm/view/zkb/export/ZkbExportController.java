@@ -77,6 +77,11 @@ public class ZkbExportController extends GenericCRUDUUIDController {
      */
     private static final String excelPath = "/portal/zkb/export/Order_History_And_Part_Order_Export.xlsx";
 
+    /**
+     * 当前用户登录名
+     */
+    private String loginName = "";
+
     @Override
     protected void init() {
         zkbPartOrderService = WebUtil.getBean(ZkbPartOrderService.class);
@@ -91,6 +96,7 @@ public class ZkbExportController extends GenericCRUDUUIDController {
         {
             this.tenantUid=currentUser.getTenantUID();
         }
+        this.loginName=currentUser.getLoginName();
         super.init();
     }
 
@@ -102,8 +108,8 @@ public class ZkbExportController extends GenericCRUDUUIDController {
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(excelPath);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            List<Map<String, Object>> fePartOrderList = this.zkbExportOrderService.getZkbFePartOrder(tenantUid);
-            List<Map<String, Object>> partOrderList = this.zkbExportOrderService.getZkbPartOrder(tenantUid);
+            List<Map<String, Object>> fePartOrderList = this.zkbExportOrderService.getZkbFePartOrder(tenantUid,this.loginName);
+            List<Map<String, Object>> partOrderList = this.zkbExportOrderService.getZkbPartOrder(tenantUid,this.loginName);
             List<ZkbOrderHistory> zkbOrderHistoryList = zkbOrderHistoryService.loadZkbOrderHistoryData(null,null,null,null,null,null,null,null,tenantUid);
             List<Map<String, Object>> orderHistoryMapList = zkbOrderHistoryService.createExportOrderHistoryData(zkbOrderHistoryList,this.userContextService);
             zkbExportOrderService.exportData(doc, fePartOrderList,partOrderList,orderHistoryMapList);

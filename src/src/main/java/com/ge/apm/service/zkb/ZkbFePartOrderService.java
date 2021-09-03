@@ -1240,19 +1240,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         return selected;
     }
 
-//    /**
-//     * 保存附件
-//     */
-//    @Transactional(rollbackFor = Exception.class)
-//    public void saveUploadFile(List<V2_BlobObject> v2_blobObjects,String id){
-//        if(v2_blobObjects != null){
-//            for (V2_BlobObject v : v2_blobObjects){
-//                v.setBoUuid(id);
-//                blobObjectRepository.save(v);
-//            }
-//        }
-//    }
-
     /**
      * 生成excel
      * @param doc 文件
@@ -2311,9 +2298,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 生成需要归还的配件探头结果集
      * @return
      */
-    public HashMap<String,Object> createZkbFePartOrderNeedReturnData(){
-        List<ZkbFePartOrder> zkbFePartOrderSparePartList = this.zkbFePartOrderMapper.buildFilter_queryNeedReturnSparePart();
-        List<ZkbFePartOrder> zkbFePartOrderProbeList = this.zkbFePartOrderMapper.buildFilter_queryNeedReturnProbe();
+    public HashMap<String,Object> createZkbFePartOrderNeedReturnData(String testLogin){
+        List<ZkbFePartOrder> zkbFePartOrderSparePartList = this.zkbFePartOrderMapper.buildFilter_queryNeedReturnSparePart(testLogin);
+        List<ZkbFePartOrder> zkbFePartOrderProbeList = this.zkbFePartOrderMapper.buildFilter_queryNeedReturnProbe(testLogin);
         List<Map<String, Object>> zkbSparePartFePartOrderDataMapList = new ArrayList<>();
         List<Map<String, Object>> zkbProbeFePartOrderDataMapList = new ArrayList<>();
         Map<String,Map<String, Object>>  zkbSparePartFePartOrderDataMap = new HashMap<>();
@@ -2371,8 +2358,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 生成excel
      * @param doc 文件
      */
-    public void exportReturnData(ExcelDocument doc) {
-        HashMap<String,Object> returnDataMap = this.createZkbFePartOrderNeedReturnData();
+    public void exportReturnData(ExcelDocument doc,String testLogin) {
+        HashMap<String,Object> returnDataMap = this.createZkbFePartOrderNeedReturnData(testLogin);
         Integer keyRow = 1;
         Integer dataRow = 2;
         List<Map<String, Object>> zkbSparePartFePartOrderDataMapList = (List<Map<String, Object>>) returnDataMap.get("zkbSparePartFePartOrderDataMapList");

@@ -350,7 +350,8 @@
                     <c:choose>
                         <c:when test="#{zkbFePartOrderProbeController.hasSupplierRight()}">
                             <h:panelGroup id="namepanel" >
-                                <p:commandButton immediate="false" process="@this" value="已上传说明函" update="growl zkbFePartOrderProbeEditForm" icon="fa fa-arrow-up" action="#{zkbFePartOrderProbeController.hasUploadLetter}" disabled="#{'t' eq zkbFePartOrderProbeController.selected.hasUploadLetter}" />
+                                <p:commandButton immediate="false" process="@this" value="已邮件发送给400探头专员" update="growl zkbFePartOrderProbeEditForm" icon="fa fa-arrow-up" action="#{zkbFePartOrderProbeController.hasUploadLetter}" disabled="#{'t' eq zkbFePartOrderProbeController.selected.hasUploadLetter}" />
+                                <p:outputLabel id="letterTips" style="color: red;font-weight:bold;margin-left: 30px;font-size: larger"  value="请尽快邮件提交探头说明函致400唐扬Yang.Tang@ge.com。"/>
                             </h:panelGroup>
                         </c:when>
                         <c:otherwise>
