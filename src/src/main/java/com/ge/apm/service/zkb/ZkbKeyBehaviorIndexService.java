@@ -7,6 +7,7 @@ import com.ge.apm.dao.mapper.ZkbKeyBehaviorIndexMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetInfoRow;
 import com.ge.apm.service.asset.KeyBehaviorIndexRow;
+import com.ge.apm.service.asset.TenantInfoRow;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.asset.ZkbKeyBehaviorIndexController;
 import org.apache.commons.collections.CollectionUtils;
@@ -19,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 
 import java.math.BigDecimal;
@@ -30,7 +32,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-
 /**
  * @author 503202755 2020/9/23
  */
@@ -80,12 +81,6 @@ public class ZkbKeyBehaviorIndexService {
      */
     @Autowired
     private ZkbContractAssetRepository zkbContractAssetRepository;
-
-    /**
-     * 设备信息
-     */
-    @Autowired
-    private AssetInfoRepository assetInfoRepository;
 
     /**
      * 申请单
@@ -181,6 +176,23 @@ public class ZkbKeyBehaviorIndexService {
      * no
      */
     public static final String no ="N";
+
+    /**
+     * 获取配置KPI生成配置权重
+     */
+    @Autowired
+    private ZkbKeyBehaviorIndexConfigRepository zkbKeyBehaviorIndexConfigRepository;
+
+
+    /**
+     * 导出excel路径
+     */
+    public static final String excelTenant = "/portal/zkb/keyHehaviorIndex/Generate_KPI_DATA.xlsx";
+
+    /**
+     * 批量生成sheet名字
+     */
+    public static final String excelSheetNameOfTenant = "Tenant";
 
     public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
@@ -332,6 +344,75 @@ public class ZkbKeyBehaviorIndexService {
     {
         List<SearchFilter> searchFilters = this.generageSearchFilter(tenantUID,beginningTime,endingTime,isZkbAdmin);
         return this.zkbKeyBehaviorIndexMapper.loadAverageZkbKeyBehaviorIndex(searchFilters);
+    }
+
+    /**
+     * 生成excel
+     * @param doc 文件
+     */
+    public void exportTenantData(ExcelDocument doc,List<TenantInfo> tenantInfoList) {
+        List<Map<String, Object>> tenantInfoMapList = this.createTenantInfoData(tenantInfoList);
+        Integer keyRow = 1;
+        Integer dataRow = 2;
+        if(CollectionUtils.isNotEmpty(tenantInfoMapList))
+        {
+            for (Map<String, Object> item : tenantInfoMapList) {
+                doc.writeRowData(excelSheetNameOfTenant, keyRow, dataRow++, item);
+            }
+        }
+    }
+
+    /**
+     * 租户信息
+     * @param tenantInfoList 租户列表
+     * @return
+     */
+    public List<Map<String, Object>> createTenantInfoData(List<TenantInfo> tenantInfoList)
+    {
+        List<Map<String, Object>> tenantInfoMapList = new ArrayList<>();
+        if(CollectionUtils.isEmpty(tenantInfoList))
+            return tenantInfoMapList;
+        for(TenantInfo tenantInfo:tenantInfoList)
+        {
+            Map<String,Object> map = new HashMap<>();
+            map.put("ID",tenantInfo.getUid());
+            map.put("代理商名称",tenantInfo.getName());
+            tenantInfoMapList.add(map);
+        }
+        return tenantInfoMapList;
+    }
+
+    /**
+     * 根据excel文件 读取文件中的数据
+     * @param doc 文件
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> getTenantMapFromTemplate(ExcelDocument doc) throws Exception {
+        LocalDateTime startTime = LocalDateTime.now();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (int i = EXCEL_KBI_DATA_ROW ; i <= doc.getWorkBook().getSheet(excelSheetNameOfTenant).getLastRowNum() + 1 ; i++) {
+            Map< String, Object> rowMap = doc.getDataRowMap(excelSheetNameOfTenant, EXCEL_KBI_HEADER_ROW, i);
+            Map<String, Object> map = new LinkedHashMap();
+            TenantInfoVO tenantInfoVO = new TenantInfoVO();
+            tenantInfoVO.setLineNum(i);
+            TenantInfoRow tenantInfoRow = new TenantInfoRow(tenantInfoVO,rowMap);
+            tenantInfoRow.setFieldStringValue("ID", "setUid");
+            tenantInfoRow.setFieldStringValue("代理商名称","setName");
+            tenantInfoRow.setFieldStringValue("年", "setYear");
+            tenantInfoRow.setFieldStringValue("月", "setMonth");
+            if(tenantInfoVO.isNull()){
+                continue;
+            }
+            map.put("tenantInfoVO", tenantInfoVO);
+            map.put("rowData", rowMap);
+            map.put("hashCode", tenantInfoVO.hashCode());
+            result.add(map);
+        }
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for getKbiMapFromTemplate: {} seconds", duration.getSeconds());
+        return result;
     }
 
     /**
@@ -517,6 +598,70 @@ public class ZkbKeyBehaviorIndexService {
     }
 
     /**
+     * 导入代理商数据
+     * @param tenantMapList 代理商列表
+     */
+    public void importTenantData(List<Map<String, Object>> tenantMapList) {
+        int row = 0;
+        boolean ok = true;
+        try {
+            for (Map<String, Object> item : tenantMapList) {
+                ++row;
+                if(!checkTenantData(item)) {
+                    ok=false;
+                }
+            }
+        } catch (Exception e) {
+            logger.info("error occurred when importing the {} row", row);
+            throw e;
+        }
+        if(!ok)
+            return;
+        for(Map<String, Object> item : tenantMapList)
+        {
+            TenantInfoVO tenantInfoVO = (TenantInfoVO)item.get("tenantInfoVO");
+            Date kpiDate = DateUtil.getDateByFormatStr(tenantInfoVO.getYear().toString()+"-"+tenantInfoVO.getYear().toString(),"yyyy-MM");
+            TenantInfo tenantInfo = this.tenantInfoDao.findByUid(tenantInfoVO.getUid());
+            this.generateSingleKpiData(tenantInfo,kpiDate);
+        }
+    }
+    public Date getLastDay(final Date date)
+    {
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        String lastDay = format.format(cal.getTime());
+        lastDay = lastDay+"235959";
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexController.dateFormat);
+        Date date1 = null;
+        try {
+            date1 = formatter.parse(lastDay);
+        } catch (ParseException e) {
+            logger.info(e.getMessage());
+        }
+        return date1;
+    }
+
+    public Date getMonthOfFirstDay(final Date date)
+    {
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+        String lastDay = format.format(cal.getTime());
+        lastDay = lastDay+"000000";
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexController.dateFormat);
+        Date date1 = null;
+        try {
+            date1 = formatter.parse(lastDay);
+        } catch (ParseException e) {
+            logger.info(e.getMessage());
+        }
+        return date1;
+    }
+
+    /**
      * 检查数据是否合法
      * 1.数据类型字段必填
      * @param item
@@ -581,6 +726,91 @@ public class ZkbKeyBehaviorIndexService {
             AssetInfoRow.addErrMessage(item, errorMessage.toString());
             isValidateData = false;
             return isValidateData;
+        }
+        return isValidateData;
+    }
+
+    /**
+     * 组装单个KPI
+     * @param tenantUID
+     * @return
+     */
+    public ZkbKeyBehaviorIndex prepareGenerateSingleKpiData(String tenantUID,Date kpiDate)
+    {
+        ZkbKeyBehaviorIndexConfig zkbKeyBehaviorIndexConfig = this.zkbKeyBehaviorIndexConfigRepository.getDefaultConfig();
+        List<ZkbKeyBehaviorIndexConfig>  list = this.zkbKeyBehaviorIndexConfigRepository.findByTenantUID(tenantUID);
+        if(CollectionUtils.isNotEmpty(list))
+        {
+            zkbKeyBehaviorIndexConfig=list.get(0);
+        }
+        ZkbKeyBehaviorIndex zkbKeyBehaviorIndex = new ZkbKeyBehaviorIndex();
+        zkbKeyBehaviorIndex.setPartReturnFullScore(zkbKeyBehaviorIndexConfig.getPartReturnFullScore());
+        zkbKeyBehaviorIndex.setPasteQuickResponseRateFullScore(zkbKeyBehaviorIndexConfig.getPasteQuickResponseRateFullScore());
+        zkbKeyBehaviorIndex.setApmBillingRateFullScore(zkbKeyBehaviorIndexConfig.getApmBillingRateFullScore());
+        zkbKeyBehaviorIndex.setSatisfactoryDegreeFullScore(zkbKeyBehaviorIndexConfig.getSatisfactoryDegreeFullScore());
+        zkbKeyBehaviorIndex.setComplianceFullScore(zkbKeyBehaviorIndexConfig.getComplianceFullScore());
+        zkbKeyBehaviorIndex.setEngineerFullScore(zkbKeyBehaviorIndexConfig.getEngineerFullScore());
+        zkbKeyBehaviorIndex.setTenantUID(tenantUID);
+        zkbKeyBehaviorIndex.setSatisfactoryDegreeScore(zkbKeyBehaviorIndexConfig.getSatisfactoryDegreeFullScore());
+        zkbKeyBehaviorIndex.setComplianceScore(zkbKeyBehaviorIndexConfig.getComplianceFullScore());
+        zkbKeyBehaviorIndex.setEngineerScore(zkbKeyBehaviorIndexConfig.getEngineerFullScore());
+        zkbKeyBehaviorIndex.setKbiDate(kpiDate);
+        return zkbKeyBehaviorIndex;
+    }
+
+    public void generateSingleKpiData(TenantInfo item,Date kpiDate)
+    {
+        Date lastDay = this.getLastDay(kpiDate);
+        Date monthOfFirstDay = this.getMonthOfFirstDay(kpiDate);
+        SimpleDateFormat formatter = new SimpleDateFormat(ZkbKeyBehaviorIndexService.monthDateFormat_two);
+        String dateStry = formatter.format(kpiDate);
+        ZkbKeyBehaviorIndex zkbKeyBehaviorIndex = this.prepareGenerateSingleKpiData(item.getUid(),kpiDate);
+        this.calculateScore(zkbKeyBehaviorIndex,item.getUid(),lastDay,monthOfFirstDay);
+        List<ZkbKeyBehaviorIndex> zkbKeyBehaviorIndexList = this.zkbKeyBehaviorIndexRepository.findByTenantUIDAndKbiDate(item.getUid(),ZkbKeyBehaviorIndexService.monthDateFormat_two,dateStry);
+        if(CollectionUtils.isNotEmpty(zkbKeyBehaviorIndexList))
+        {
+            ZkbKeyBehaviorIndex oldZkbKeyBehaviorIndex =zkbKeyBehaviorIndexList.get(0);
+            zkbKeyBehaviorIndex.setId(oldZkbKeyBehaviorIndex.getId());
+        }
+        this.zkbKeyBehaviorIndexRepository.save(zkbKeyBehaviorIndex);
+    }
+
+    /**
+     * 检查数据是否合法
+     * 1.数据类型字段必填
+     * @param item
+     * @return
+     */
+    public boolean checkTenantData(Map<String, Object> item) {
+        TenantInfoVO tenantInfoVO = (TenantInfoVO)item.get("tenantInfoVO");
+        boolean isValidateData = true;
+        AssetInfoRow.clearErrMessage(item);
+        item.put("status", ZkbOrderHistoryService.ImportStatus.New);
+        if(StringUtils.isBlank(tenantInfoVO.getUid())){
+            item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbKeyBehaviorIndex_idCannotBeNull"));
+            isValidateData = false;
+        }
+        if(tenantInfoVO.getYear()==null){
+            item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbKeyBehaviorIndex_yearCannotBeNull"));
+            isValidateData = false;
+        }
+        if(tenantInfoVO.getMonth()==null){
+            item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbKeyBehaviorIndex_monthCannotBeNull"));
+            isValidateData = false;
+        }
+        if(StringUtils.isNotBlank(tenantInfoVO.getUid()))
+        {
+            TenantInfo tenantInfo = tenantInfoDao.findByUid(tenantInfoVO.getUid());
+            if(tenantInfo==null)
+            {
+                item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
+                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbKeyBehaviorIndex_canNotFindTenantByUid"));
+                isValidateData = false;
+            }
+
         }
         return isValidateData;
     }
