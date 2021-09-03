@@ -117,4 +117,16 @@ public class ZkbPartOrderProvider {
         }
         return sb.toString();
     }
+
+    public String batchExport(Map<String,String> param){
+        String testLogin = param.get("testLogin");//是否测试账号登录
+        String tenantUid = param.get("tenantUid");
+        StringBuffer sql = new StringBuffer("SELECT * from zkb_part_order where 1=1");
+        if(StringUtils.isNotBlank(tenantUid))
+            sql.append(" and tenant_uid = '"+tenantUid+"' ");
+        if("f".equals(testLogin))
+            sql.append(" and data_type is null ");
+        sql.append(" order by request_date desc");
+        return sql.toString();
+    }
 }
