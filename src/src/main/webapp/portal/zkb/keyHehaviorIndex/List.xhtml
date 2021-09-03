@@ -44,6 +44,10 @@
                                 </p:commandButton>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <p:commandButton value="重新生成"  rendered="#{userContextService.zkbAdmin}" action="#{zkbKeyBehaviorIndexController.reGenerateDate}">
+                                </p:commandButton>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <p:commandButton value="生效"  rendered="#{userContextService.zkbAdmin}" actionListener="#{zkbKeyBehaviorIndexController.effect}"  update=":growl :zkbKeyBehaviorIndexForm:datalist">
                                 </p:commandButton>
                             </h:panelGroup>
