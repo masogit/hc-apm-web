@@ -14,5 +14,8 @@ delete from role_msg_rel where msg_key = 'UserAccountImportExcel';
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('batchFileType','UserAccountImportExcel',(select id from sys_role where name = 'DataMaintainStaff'), 'DataMaintainStaff',0);
 --apm-schedual新增模板導入      end   2021-09-01
 
+--修改asset_alert_config里config_type重复的规则 start 2021-09-03
+update asset_alert_config set config_type =103 where config_type =113 and upper_limit=70.0;
+--修改asset_alert_config里config_type重复的规则 end 2021-09-03
 
 
