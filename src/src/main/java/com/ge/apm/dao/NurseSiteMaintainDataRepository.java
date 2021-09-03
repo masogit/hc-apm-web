@@ -28,7 +28,8 @@ public interface NurseSiteMaintainDataRepository extends GenericRepositoryUUID<N
 	
 	@Query(value="select o.id from nurse_site_maintain_data o where o.parent_id in ?1",nativeQuery=true)
 	public Set<String> findIdsByParentIds(Set<String> parentIds);
-	
+
+    public List<NurseSiteMaintainData> findLByParentId(String parentId);
 	@Transactional
 	@Modifying
 	@Query(value = "update nurse_site_maintain_data set check_value=true where id in ?1", nativeQuery = true)

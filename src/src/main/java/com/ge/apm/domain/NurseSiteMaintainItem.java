@@ -144,8 +144,20 @@ public class NurseSiteMaintainItem implements Serializable {
 	
 	@Transient
 	private boolean blnEditComment=false;
-	
-	public NurseSiteMaintainItem() {
+
+    @Column(name = "update_by")
+    private String updateByUid;
+
+
+    public String getUpdateByUid() {
+        return updateByUid;
+    }
+
+    public void setUpdateByUid(String updateByUid) {
+        this.updateByUid = updateByUid;
+    }
+
+    public NurseSiteMaintainItem() {
 		super();
 	}
 
