@@ -25,6 +25,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 
 import java.text.ParseException;
@@ -2394,6 +2395,18 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             item.setBoUuid(id);
             this.blobObjectRepository.save(item);
         }
+    }
+    public boolean checkContractDate(List<ZkbContract> contractList)
+    {
+        if(CollectionUtils.isEmpty(contractList)) return false;
+        Date startDate = contractList.get(0).getStartDate();
+        Date endDate = contractList.get(0).getEndDate();
+        String format = "yyyy-MM-dd";
+        String dateStr = DateUtil.getFormatStrByDate(new Date(),format);
+        Date date = DateUtil.getDateByFormatStr(dateStr,format);
+        if(date.compareTo(startDate)>=0&&endDate.compareTo(date)>=0)
+            return false;
+        return true;
     }
 
 

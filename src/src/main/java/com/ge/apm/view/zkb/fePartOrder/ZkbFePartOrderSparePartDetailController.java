@@ -416,6 +416,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         return applyCount;
     }
+    public boolean checkContractDate()
+    {
+        return this.zkbFePartOrderService.checkContractDate(this.contractList);
+    }
 
 
     /**

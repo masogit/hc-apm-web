@@ -236,6 +236,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         this.zkbFePartOrderService.initTestStatus(this.loginName,this.selected);
     }
 
+    public boolean checkContractDate()
+    {
+        return this.zkbFePartOrderService.checkContractDate(this.contractList);
+    }
+
     @Override
     public void prepareEdit() {
         super.prepareEdit();
