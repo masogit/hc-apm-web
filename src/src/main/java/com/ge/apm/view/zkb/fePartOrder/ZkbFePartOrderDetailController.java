@@ -253,6 +253,10 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingApm.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
+    public boolean checkContractDate()
+    {
+        return this.zkbFePartOrderService.checkContractDate(this.contractList);
+    }
 
     /**
      * 供应商拒绝同意
@@ -277,8 +281,6 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
     {
 
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
-//        this.selected.setFullApmInfoUser(this.userName);
-//        this.selected.setFullApmInfoDate(new Date());
         this.zkbFePartOrderService.moveRemianTimeOfContract(zkbContract,2,this.selected,this.currentUser,this.i18Map.get("WaitingApm"));
         Date date = new Date();
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
