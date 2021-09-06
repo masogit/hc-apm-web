@@ -620,7 +620,7 @@ public class ZkbKeyBehaviorIndexService {
         for(Map<String, Object> item : tenantMapList)
         {
             TenantInfoVO tenantInfoVO = (TenantInfoVO)item.get("tenantInfoVO");
-            Date kpiDate = DateUtil.getDateByFormatStr(tenantInfoVO.getYear().toString()+"-"+tenantInfoVO.getYear().toString(),"yyyy-MM");
+            Date kpiDate = DateUtil.getDateByFormatStr(tenantInfoVO.getYear()+"-"+tenantInfoVO.getMonth(),"yyyy-MM");
             TenantInfo tenantInfo = this.tenantInfoDao.findByUid(tenantInfoVO.getUid());
             this.generateSingleKpiData(tenantInfo,kpiDate);
         }
@@ -791,12 +791,12 @@ public class ZkbKeyBehaviorIndexService {
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbKeyBehaviorIndex_idCannotBeNull"));
             isValidateData = false;
         }
-        if(tenantInfoVO.getYear()==null){
+        if(StringUtils.isBlank(tenantInfoVO.getYear())){
             item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbKeyBehaviorIndex_yearCannotBeNull"));
             isValidateData = false;
         }
-        if(tenantInfoVO.getMonth()==null){
+        if(StringUtils.isBlank(tenantInfoVO.getMonth())){
             item.put("status", ZkbOrderHistoryService.ImportStatus.Failure);
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbKeyBehaviorIndex_monthCannotBeNull"));
             isValidateData = false;
