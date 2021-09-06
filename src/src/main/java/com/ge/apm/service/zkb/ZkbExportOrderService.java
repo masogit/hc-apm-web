@@ -1,6 +1,7 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.ZkbFePartOrderMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.MicroServiceInvoker;
@@ -73,11 +74,8 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
     @Autowired
     private ZkbPartOrderItemRepository zkbPartOrderItemRepository;
 
-    /**
-     * 人工申请主表repository
-     */
     @Autowired
-    private ZkbFePartOrderRepository zkbFePartOrderRepository;
+    private ZkbFePartOrderMapper zkbFePartOrderMapper;
 
     /**
      * FE订单
@@ -575,14 +573,13 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
         }
     }
 
-    public List<Map<String, Object>> getZkbFePartOrder(String tenantUid)
+    public List<Map<String, Object>> getZkbFePartOrder(String tenantUid,String loginName)
     {
         List<Map<String, Object>> fePartOrderList = new ArrayList<>();
-        List<ZkbFePartOrder> list = null;
-        if(StringUtils.isNotBlank(tenantUid))
-            list=this.zkbFePartOrderRepository.findByTenantUidOrderByReportDateDesc(tenantUid);
-        else
-            list=this.zkbFePartOrderRepository.findAllFePartOrder();
+        String testLogin = "f";
+        if(StringUtils.isNotBlank(loginName)&&loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+            testLogin = "t";
+        List<ZkbFePartOrder> list=this.zkbFePartOrderMapper.batchExport(testLogin,tenantUid);
         if(CollectionUtils.isEmpty(list))
             return fePartOrderList;
         Map<String,Map<String,String>> i18Map=this.zkbFePartOrderService.batchI18MapForPartOrder();
@@ -593,17 +590,14 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
             Map<String,Object> map = this.getFePartOrderHashMap(zkbFePartOrder,i18Map,contractMap,tenantInfoMap);
             List<Map<String,Object>> mapListForSingleOrder = this.getFePartOrderHashMapBySparePartsAssetInfo(zkbFePartOrder,map,i18Map);
             if(CollectionUtils.isNotEmpty(mapListForSingleOrder))
-            {
                 fePartOrderList.addAll(mapListForSingleOrder);
-            }else
-            {
+            else
                 fePartOrderList.add(map);
-            }
         }
         return fePartOrderList;
     }
 
-    public List<Map<String, Object>> getZkbPartOrder(String tenantUid)
+    public List<Map<String, Object>> getZkbPartOrder(String tenantUid,String loginName)
     {
         List<Map<String, Object>> partOrderList = new ArrayList<>();
         List<ZkbPartOrder> list = null;
@@ -613,20 +607,22 @@ public class ZkbExportOrderService extends MicroServiceInvoker {
             list=this.zkbPartOrderRepository.findAllPartOrder();
         if(CollectionUtils.isEmpty(list))
             return partOrderList;
+        String testLogin = "f";
+        if(StringUtils.isNotBlank(loginName)&&loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+            testLogin = "t";
         Map<String,Map<String,String>> i18Map=this.batchI18MapForPartOrder();
         Map<String,ZkbContract> contractMap=this.zkbFePartOrderService.getContractMapForZkbPartOrder(list);
         Map<String,TenantInfo> tenantInfoMap=this.zkbFePartOrderService.getTenantInfoMapForZkbPartOrder(list);
         for(ZkbPartOrder zkbPartOrder:list)
         {
+            if(testLogin.equals("f")&&"test.".equals(zkbPartOrder.getDataType()))
+                continue;
             Map<String,Object> map = this.getPartOrderHashMap(zkbPartOrder,i18Map,contractMap,tenantInfoMap);
             List<Map<String,Object>> mapListForSingleOrder = this.getPartOrderHashMapBySparePartsAssetInfo(zkbPartOrder,map,i18Map);
             if(CollectionUtils.isNotEmpty(mapListForSingleOrder))
-            {
                 partOrderList.addAll(mapListForSingleOrder);
-            }else
-            {
+            else
                 partOrderList.add(map);
-            }
         }
         return partOrderList;
     }

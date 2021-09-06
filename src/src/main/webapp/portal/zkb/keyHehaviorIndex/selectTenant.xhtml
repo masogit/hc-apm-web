@@ -6,12 +6,12 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <ui:composition>
-        <p:dialog id="selectTenantBatchDlg" widgetVar="selectTenantBatchDialog" modal="true" resizable="true" draggable="true" closable="false" appendTo="@(body)" header="选择代理商">
+        <p:dialog id="selectTenantBatchDlg" widgetVar="selectTenantBatchDialog" modal="true" resizable="false" draggable="false" closable="false" appendTo="@(body)" header="选择代理商">
             <h:form id="workScheduleBatchForm">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
                         <label class="label">代理商</label>
-                        <p:selectManyMenu scrollHeight="300"  value="#{zkbKeyBehaviorIndexController.selectTenantInfoList}" var="t" converter="tenantInfoConverter" filter="true" filterMatchMode="contains" showCheckbox="true">
+                        <p:selectManyMenu style="width: 400px" scrollHeight="500"  value="#{zkbKeyBehaviorIndexController.selectTenantInfoList}" var="t" converter="tenantInfoConverter" filter="true" filterMatchMode="contains" showCheckbox="true">
                             <f:selectItems value="#{zkbKeyBehaviorIndexController.tenantInfoList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
                             <p:column>
                                 <h:outputText value="#{t.name}" />
@@ -21,6 +21,7 @@
                 </p:panelGrid>
                 <br/>
                 <br/>
+                <p:commandButton value="取消" actionListener="#{zkbKeyBehaviorIndexController.cancelSelectTenantInfoList}"   update=":searchForm" icon="ui-icon-arrow-back" oncomplete="PF('selectTenantBatchDialog').hide()"/>
                 <p:commandButton validateClient="true" value="确定" update=":searchForm" icon="ui-icon-check" oncomplete="PF('selectTenantBatchDialog').hide()"/>
             </h:form>
         </p:dialog>
