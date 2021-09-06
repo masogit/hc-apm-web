@@ -85,7 +85,7 @@
                             <p:spinner id="spareQuotaUse" value="#{zkbContractEditController.selected.spareQuotaUse}" min="0" max="1000"  />
                         </h:panelGroup>
 
-                        <c:if test="#{!zkbContractEditController.newContractFlag}">
+                        <c:if test="#{zkbContractEditController.selected.quotaDeductType eq 'Old'}">
                             <h:panelGroup>
                                 <label class="label">#{msg.zkbContract_probeQuota_total}</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaTotal}" min="0" max="1000"  />
@@ -103,7 +103,7 @@
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaUse}" min="0" max="1000"  />
                             </h:panelGroup>
                         </c:if>
-                        <c:if test="#{zkbContractEditController.newContractFlag}">
+                        <c:if test="#{zkbContractEditController.selected.quotaDeductType eq 'New'}">
                             <h:panelGroup>
                                 <label class="label">探头任意总名额</label>
                                 <p:spinner value="#{zkbContractEditController.selected.probeQuotaTotal}" min="0" max="1000"  />
