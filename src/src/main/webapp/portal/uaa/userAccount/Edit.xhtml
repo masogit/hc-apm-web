@@ -67,14 +67,22 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('region')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup>
+<!--                        <h:panelGroup rendered="#{userContextService.isSupportMultiLanguage()}">
                             <label class="label">#{msg.defaultLang}</label>
                             <p:selectOneMenu value="#{userAccountController.selected.defaultLanguage}">
                                 <f:selectItem itemLabel="zh" itemValue="zh"/>
                                 <f:selectItem itemLabel="en" itemValue="en"/>
-                                <!--<f:selectItem itemLabel="tw" itemValue="tw"/>-->
+                                &lt;!&ndash;<f:selectItem itemLabel="tw" itemValue="tw"/>&ndash;&gt;
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
+<!--                        <h:panelGroup rendered="#{not userContextService.isSupportMultiLanguage()}">
+                            <label class="label">#{msg.defaultLang}</label>
+                            <p:selectOneMenu value="#{userAccountController.selected.defaultLanguage}">
+                                <f:selectItem itemLabel="zh" itemValue="zh"/>
+                                &lt;!&ndash;<f:selectItem itemLabel="en" itemValue="en"/>
+                                <f:selectItem itemLabel="tw" itemValue="tw"/>&ndash;&gt;
+                            </p:selectOneMenu>
+                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.userPosition}</label>
                             <p:selectOneMenu value="#{userAccountController.selected.position}" >

@@ -126,8 +126,6 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
 
     private List<TenantInfo> tenantInfoList;
 
-    private ZkbPartOrderService zkbPartOrderService;
-
     private List<TenantInfo> selectTenantInfoList;
 
     @Override
@@ -136,7 +134,6 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
         zkbKeyBehaviorIndexService = WebUtil.getBean(ZkbKeyBehaviorIndexService.class);
         zkbKeyBehaviorIndexRepository = WebUtil.getBean(ZkbKeyBehaviorIndexRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
-        zkbPartOrderService = WebUtil.getBean(ZkbPartOrderService.class);
         currentUser = UserContextService.getCurrentUserAccount();
         if(!userContextService.isZkbAdmin())
         {
@@ -151,7 +148,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             isZkbadmin=ZkbKeyBehaviorIndexService.no;
         }
         this.rankMap = this.zkbKeyBehaviorIndexService.initRankingMap();
-        this.tenantInfoList=this.zkbPartOrderService.getSourceTenantInfoList();
+        this.tenantInfoList=this.zkbKeyBehaviorIndexService.getSourceTenantInfoList(currentUser.getLoginName());
         loadData();
     }
     /**
@@ -220,7 +217,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             return name.toString();
         for(TenantInfo tenantInfo:selectTenantInfoList)
         {
-            name.append(tenantInfo.getName()).append(",");
+            name.append(tenantInfo.getName()).append("；");
         }
         return name.substring(0,name.length()-1);
     }
@@ -510,6 +507,11 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             return true;
         }
         return false;
+    }
+
+    public void cancelSelectTenantInfoList()
+    {
+        this.selectTenantInfoList= null;
     }
 
     public void cancel() {
