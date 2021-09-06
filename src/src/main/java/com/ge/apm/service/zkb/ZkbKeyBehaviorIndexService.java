@@ -198,11 +198,10 @@ public class ZkbKeyBehaviorIndexService {
         New, Exist, Created, Failure, CheckFail
     }
 
-    public List<TenantInfo> getSourceTenantInfoList(){
-
-        List<SearchFilter> searchFilters = new ArrayList<>();
-        searchFilters.add(new SearchFilter("type", SearchFilter.Operator.EQ, 3));
-        return tenantInfoDao.findBySearchFilter(searchFilters);
+    public List<TenantInfo> getSourceTenantInfoList(String loginName){
+        if(StringUtils.isNotBlank(loginName)&&loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+            return this.tenantInfoDao.findByType(3);
+        return this.tenantInfoDao.findByTypeAndNameNotLike(3,"ZKB%");
     }
 
     /**
