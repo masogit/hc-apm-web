@@ -220,7 +220,7 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             return name.toString();
         for(TenantInfo tenantInfo:selectTenantInfoList)
         {
-            name.append(tenantInfo.getName()).append(",");
+            name.append(tenantInfo.getName()).append("；");
         }
         return name.substring(0,name.length()-1);
     }
@@ -510,6 +510,11 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             return true;
         }
         return false;
+    }
+
+    public void cancelSelectTenantInfoList()
+    {
+        this.selectTenantInfoList= null;
     }
 
     public void cancel() {
