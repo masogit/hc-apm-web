@@ -130,6 +130,7 @@
                                     <f:facet name="{Toolbar}">
                                     </f:facet>
                                 </p:dataTable>
+                                <p:outputLabel id="tips" rendered="#{zkbFePartOrderDetailController.hasEditRight('Requested') and zkbFePartOrderDetailController.checkContractDate()}" style="color: red;font-weight:bold;margin-left: 30px;font-size: larger"  value="您选择的合同已不在有效期内，请结合业务确认是否继续申请流程！"/>
                             </p:fieldset>
                         </h:panelGroup>
                     </p:fieldset>
@@ -153,17 +154,6 @@
                     </p:fieldset>
                     <p:fieldset id="orderedFieldset" legend="派工信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingApm')}">
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-
-<!--                                    <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingApm')}">-->
-<!--                                        <label class="label">#{msg.zkbFePartOrder_orderedPerson}*：</label>-->
-<!--                                        <p:inputText  readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.fullApmInfoUser}"  />-->
-<!--                                    </h:panelGroup>-->
-<!--                                    <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingApm')}">-->
-<!--                                        <label class="label">#{msg.zkbFePartOrder_orderedDate}*：</label>-->
-<!--                                        <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderDetailController.selected.fullApmInfoDate}"-->
-<!--                                                    showOn="button" showButtonPanel="true" navigator="true" mask="true"/>-->
-<!--                                    </h:panelGroup>-->
-
                                     <h:panelGroup >
                                         <label class="label">#{msg.zkbFePartOrder_sr}*</label>
                                         <p:inputText disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderDetailController.selected.sr}"  required="true" requiredMessage="#{msg.zkbFePartOrder_sr} #{msg.ValidationRequire}"/>
