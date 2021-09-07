@@ -407,7 +407,7 @@ public class PmReportService {
             // get template if the report storage is set.
             StreamedContent template = this.blobService.getBlobObjectByStorageId(rule.getReportStorageId());
             InputStream blobInputStream = template.getStream();
-            rawTemplate = this.pmOrderReportTemplateService.generateReportTemplateBySchemaId(blobInputStream, safetySchema, performanceSchema);
+            rawTemplate = this.pmOrderReportTemplateService.updateReportTemplateBySchemaId(blobInputStream, safetySchema, performanceSchema);
         } else {
             // generate template otherwise.
             try {
