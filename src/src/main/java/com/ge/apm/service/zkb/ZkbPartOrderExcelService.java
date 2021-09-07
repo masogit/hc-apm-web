@@ -192,6 +192,9 @@ public class ZkbPartOrderExcelService {
         zkbPartOrderDataMap.put("GE工程师电话", p.getGeEngineerPhone());
         zkbPartOrderDataMap.put("是否扣除名额", getValueByKey("whetherDeduct",p.getWhetherDeduct()));
         zkbPartOrderDataMap.put("备注", p.getRemark());
+        zkbPartOrderDataMap.put("技术支持审批备注", p.getTechRemark());
+        zkbPartOrderDataMap.put("区域经理审批备注", p.getManageRemark());
+        zkbPartOrderDataMap.put("销售总监审批备注", p.getDirectorRemark());
         return zkbPartOrderDataMap;
     }
 
