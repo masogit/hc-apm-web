@@ -1932,11 +1932,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                    }
                    if (!accessorySparePartsRequestList.isEmpty()) {
                        V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
-                       partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申领单
+                       partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getOwnerId()));//生成申领单
                    }
                    if (!accessorySparePartsBuyList.isEmpty()) {
                        V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsBuyList.get(0).getWoId());
-                       partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申购单
+                       partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getOwnerId()));//生成申购单
                    }
                }
            }
