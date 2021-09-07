@@ -11,7 +11,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -203,6 +202,37 @@ public class PmOrderReportTemplateService {
         template.write(out);
         return new ByteArrayInputStream(out.toByteArray());
     }
+
+    public InputStream updateReportTemplateBySchemaId(InputStream  stream, String fReportId, String pReportId) throws IOException {
+        MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
+        // add dynamic table.
+        TableSchema schema;
+        if (fReportId != null) {
+            TableDefinition td = templateDao.findById(fReportId);
+            schema = JSONObject.parseObject(td.getSchema(), TableSchema.class);
+            if (schema != null) {
+                builder.safetyReport(schema);
+            }
+        }
+        if (pReportId != null) {
+            TableDefinition td = templateDao.findById(pReportId);
+            schema = JSONObject.parseObject(td.getSchema(), TableSchema.class);
+            if (schema != null) {
+                builder.performanceReport(schema);
+            }
+        }
+        Map<String, Object> data = builder.build().data();
+        data.put(MaintenanceTemplate.Component.ACCESSORY_INFORMATION.toString(),null);
+        data.put(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(),null);
+        data.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(),null);
+        data.put(MaintenanceTemplate.Component.CHECK_LIST.toString(),null);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        XWPFTemplate template = XWPFTemplate.compile(stream).render(data);
+        template.write(out);
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
 
     private TableSchema getTableSchemaById(String id) {
         TableSchema schema = null;
