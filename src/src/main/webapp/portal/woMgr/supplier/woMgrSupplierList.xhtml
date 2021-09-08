@@ -37,7 +37,9 @@
                     </f:facet>
                     <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
                 </p:column>
-
+                <p:column headerText="所属医院">
+                    <h:outputText value="#{workOrderMgrSupplierController.getSiteOrgName(item.tenantUID)}"/>
+                </p:column>
                 <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
                     <h:outputText value="#{item.assetInfo.name}"/>
                 </p:column>
@@ -173,7 +175,7 @@
 
                 </p:column>
                 <p:column headerText="#{msg.Actions}" style="width: 100px" exportable="false" rendered="#{workOrderMgrSupplierController.queryIndex==3}">
-                    <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId and item.currentStepId==3? msg.takeorder:msg.CompeteOrder}" actionListener="#{workOrderMgrSupplierController.prepareAct(item.id)}" update="woSupplierTab:takeOrderDialogSupplierForm" oncomplete="PF('takeOrderDialog').show()"/>
+                    <p:commandButton value="#{msg.takeorder}" actionListener="#{workOrderMgrSupplierController.prepareAct(item.id)}" update="woSupplierTab:takeOrderDialogSupplierForm" oncomplete="PF('takeOrderDialog').show()"/>
                     <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrSupplierController.prepareAct(item.id)}" update="transferOrderDialogSupplierForm" oncomplete="PF('transferOrderDialog').show()"/>
                     <p:commandButton  value="#{msg.Cancel}"  actionListener="#{workOrderMgrSupplierController.prepareAct(item.id)}" update="woSupplierTab:cancelDialogForm" rendered="#{!userContextService.hasCurrentTenantName('')}" oncomplete="PF('cancelDialog').show()"/>
 

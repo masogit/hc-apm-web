@@ -308,6 +308,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }else if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(selectedContract.getQuotaDeductType())){
 
+                }else if(ZkbContract.QuotaDeductTypeEnum.Null.toString().equals(selectedContract.getQuotaDeductType())){
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "探头申请中名额扣除类型不能为N/A！", "");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
+                    contractList = new ArrayList<>();
+                    return;
                 }
                 initHighList(selectedContract.getId());
             } else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){ 
@@ -582,7 +587,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                flag=false;
+                //flag=false;
                 errorLog += "附件不能为空！";
             }
         }else{
@@ -720,14 +725,14 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             }
             if(onlineEngineFlag){
                 this.selected.setCatId(this.selected.getZkbPartOrderCat().getId());
-                if(this.selected.getOnlineEngine() != null){
-                    if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
-                        ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
-                        this.selected.setOnlineEngine(backUp);
-                        this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
-                    }else{
-                        this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
-                    }
+            }
+            if(this.selected.getOnlineEngine() != null){
+                if("t".equals(this.selected.getOnlineEngine().getIsVacation())){
+                    ZkbPartOrderUserConfig backUp = zkbPartOrderUserConfigRepository.findById(this.selected.getOnlineEngine().getUsBackUpId());
+                    this.selected.setOnlineEngine(backUp);
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getUsBackUpId());
+                }else{
+                    this.selected.setOnlineEngineer(this.selected.getOnlineEngine().getId());
                 }
             }
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
@@ -835,7 +840,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                             valueTypeTips = "";
                         }
                     }
-                    if(CopyByInvok.T.equals(selected.getContractCatId())){
+                    if(CopyByInvok.T.equals(selected.getTenantNewCatFlag())){
                         this.selected.setQty(selected.getQty() * 2);
                     }
                 }else{

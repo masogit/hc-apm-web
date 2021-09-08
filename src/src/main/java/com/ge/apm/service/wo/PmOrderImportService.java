@@ -46,23 +46,27 @@ public class PmOrderImportService {
         return ret;
     }
 
-    public void importWorkOrder(UploadedFile file) throws IOException {
+    public List<ImportPmOrderForm> importWorkOrder(UploadedFile file) throws IOException {
+        List<ImportPmOrderForm> result = new ArrayList<>();
         Workbook b = new HSSFWorkbook(file.getInputstream());
         Sheet sheet = b.getSheetAt(0);
         List<ImportPmOrderForm> importPmOrderForms = new ArrayList<>();
-        boolean departNumNull = false;
-        boolean financingNumNull = false;
         for(Row row:sheet) {
             if(row==null) continue;
-            try {
-                if(row.getRowNum()!=0 && row.getRowNum()!=1) {
-                    ImportPmOrderForm importPmOrderForm = new ImportPmOrderForm();
-                    for (int i = 0;i<14;i++) {   //字段数14
+            if(row.getRowNum()!=0 && row.getRowNum()!=1) {
+                ImportPmOrderForm importPmOrderForm = new ImportPmOrderForm();
+                boolean departNumNull = false;
+                boolean financingNumNull = false;
+                try {
+                    for (int i = 0;i<9;i++) {   //字段数14
                         Cell cell = row.getCell(i);
                         if(cell==null) {
                             if(i==1) financingNumNull = true;
                             if(i==2) departNumNull = true;
-                            continue;
+                            if(financingNumNull && departNumNull) {
+                                result.add(importPmOrderForm);
+                                continue;
+                            }
                         }
                         switch (cell.getColumnIndex()) {
                             case 0: importPmOrderForm.setAssetName(cell.getStringCellValue());break;
@@ -78,17 +82,18 @@ public class PmOrderImportService {
 
                     }
                     importPmOrderForms.add(importPmOrderForm);
-                }}
-            catch (Exception exception) {
-                continue; //可能是时间格式不一样导致的报错
+                } catch (Exception exception) {
+                    result.add(importPmOrderForm);
+                    continue; //可能是时间格式不一样导致的报错
+                }
+
             }
         }
-        if(departNumNull && financingNumNull) WebUtil.addSuccessMessage("资产编号和卡片号至少填写一个，请完整填写后再导入！");
-        importPmOrderForms(importPmOrderForms);
+        return importPmOrderForms(importPmOrderForms,result);
     }
 
     @Transactional
-    public void importPmOrderForms(List<ImportPmOrderForm> importPmOrderForms) {
+    public List<ImportPmOrderForm> importPmOrderForms(List<ImportPmOrderForm> importPmOrderForms,List<ImportPmOrderForm> result) {
         UserAccount userAccount = UserContext.getCurrentLoginUser();
         for(ImportPmOrderForm importPmOrderForm : importPmOrderForms) {
             AssetInfo assetInfo = null;
@@ -100,11 +105,15 @@ public class PmOrderImportService {
             } else if(importPmOrderForm.getDepartNum()!=null) {
                 assetInfos = assetInfoRepository.findByDepartNum(importPmOrderForm.getDepartNum());
             } else {
-                continue;
+                result.add(importPmOrderForm);continue;
             }
-            if(assetInfos.size()!=1) continue;
+            if(assetInfos.size()!=1) {
+                result.add(importPmOrderForm); continue;
+            }
             assetInfo = assetInfos.get(0);
-            if(pmOrderRepository.findByOriginPmNumAndSiteUID(importPmOrderForm.getPmNum(),assetInfo.getSiteUID()).size()>0) continue;
+            if(pmOrderRepository.findByOriginPmNumAndSiteUID(importPmOrderForm.getPmNum(),assetInfo.getSiteUID()).size()>0) {
+                result.add(importPmOrderForm); continue;
+            }
             V2_PmOrder pmOrder = new V2_PmOrder();
             pmOrder.setTenantUID(assetInfo.getTenantUID());
             pmOrder.setInstitutionUID(assetInfo.getInstitutionUID());
@@ -119,6 +128,7 @@ public class PmOrderImportService {
             pmOrder.setOwnerName(userAccount.getName());
             pmOrder.setCurrentPersonId(userAccount.getUid());
             pmOrder.setCurrentPersonName(userAccount.getName());
+            pmOrder.setImportBy(userAccount.getUid());
             pmOrder.setCreateTime(importPmOrderForm.getRequestTime());
             pmOrder.setFinished(true);
             pmOrder.setStartTime(importPmOrderForm.getRequestTime());
@@ -128,7 +138,6 @@ public class PmOrderImportService {
             pmOrder.setTotalPrice(0.0);
             pmOrder.setTotalManHour(0.0);
             pmOrder.setClinicalDeptId(assetInfo.getClinicalDeptUID());
-            pmOrder.setApprovalStatus(PmConstant.PM_APPROVAL_STATUS_INITIAL);
             pmOrder.setIntExtType(1); // 1:内修 2:外修 3:内转外
             pmOrder.setPmType(Integer.parseInt(importPmOrderForm.getPmType())); //保养类型
             pmOrder.setCurrentStepId("Closed");
@@ -154,6 +163,7 @@ public class PmOrderImportService {
             assetLifecycleEvent.setDescription(getDescriptionByWorkOrder(pmOrder));
             assetLifecycleEventRepository.save(assetLifecycleEvent);
         }
+        return result;
     }
 
     public String getDescriptionByWorkOrder(V2_PmOrder pmOrder) {

@@ -5,7 +5,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
-    <ui:define name="content">
+    <ui:define name="head">
         <h:outputStylesheet name="css/assetUsageAll.css"/>
         <h:outputScript name="js/assetUsageAll.js"/>
         <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
@@ -523,7 +523,7 @@
 
         </script>
         <script>
-            const gallery = new Viewer(document.getElementById('picDiv'), {inline: true});
+            new Viewer(document.getElementById('picDiv'), {inline: true});
         </script>
     </ui:define>
 </ui:composition>

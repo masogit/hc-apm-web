@@ -218,7 +218,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         }
         orderTypeList.add(ZkbFePartOrder.OrderType.ManMade.toString());
         orderTypeList.add(ZkbFePartOrder.OrderType.SpareParts.toString());
-        this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.zkbFePartOrder_status);
+        this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.status);
     }
 
 
@@ -496,7 +496,10 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         try {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(excelReturnPath);
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            zkbFePartOrderService.exportReturnData(doc);
+            String testLogin = "f";
+            if(StringUtils.isNotBlank(this.loginName)&&this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+                testLogin = "t";
+            zkbFePartOrderService.exportReturnData(doc,testLogin);
             exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "ZkbPartOrderExcel_Export.xlsx");
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(ZkbPartOrderController.class.getName()).log(Level.SEVERE, null, ex);

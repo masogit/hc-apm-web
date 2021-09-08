@@ -63,12 +63,6 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                         </p:panelGrid>
-<!--                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
-<!--                                <label class="label">#{msg.Search}</label>-->
-<!--                                <h:panelGroup>-->
-<!--                                    <p:inputText id="searchText" value="#{zkbOrderHistoryController.searchStr}" placeholder="#{msg.region}/#{msg.agent}/#{msg.contractNo}/#{msg.contractType}" maxlength="100" style="width: 500px"/>-->
-<!--                                </h:panelGroup>-->
-<!--                        </p:panelGrid>-->
                     </p:fieldset>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
@@ -86,7 +80,6 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-<!--                        <p:ajax event="rowSelect" listener="#{zkbOrderHistoryController.prepareEdit}" update="deleteButton"/>-->
                         <p:column width="150" headerText="#{msg.zkbHistory_dataType}" >
                             <h:outputText value="#{item.dataType}"/>
                         </p:column>
@@ -124,9 +117,6 @@
                         <p:column width="150" headerText="#{msg.zkbHistory_probeQuantity}" >
                             <h:outputText value="#{item.probeQuantity}"/>
                         </p:column>
-                        <!--                        <p:column width="150" headerText="#{msg.zkbHistory_totalContractProbeCount}" >-->
-                        <!--                            <h:outputText value="#{item.totalContractProbeCount}"/>-->
-                        <!--                        </p:column>-->
                         <p:column width="150" headerText="#{msg.zkbHistory_applyLimitCount}" >
                             <h:outputText value="#{item.applyLimitCount}"/>
                         </p:column>
@@ -220,9 +210,6 @@
                             <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbOrderHistoryController.exportAll}" icon="ui-icon-arrowthick-1-s">
                                 <p:fileDownload value="#{zkbOrderHistoryController.exportFile}"/>
                             </p:commandButton>
-<!--                            <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbOrderHistoryController.delete}" update=":zkbOrderHistoryListForm" disabled="#{empty zkbOrderHistoryController.selected.id}">-->
-<!--                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>-->
-<!--                            </p:commandButton>-->
                         </f:facet>
                     </p:dataTable>
                 </h:form>

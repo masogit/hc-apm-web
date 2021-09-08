@@ -337,6 +337,10 @@ public class AssetInfoBulkEditService {
             //clear asset dept
             item.setAssetDeptId(null);
             item.setAssetDeptUID(null);
+
+            //设备调剂设置清除
+            item.setSharedAssetTypeUid(null);
+            
             assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo, item);
             if (!isAllTransfer) {
                 item.setParentAssetId(null);

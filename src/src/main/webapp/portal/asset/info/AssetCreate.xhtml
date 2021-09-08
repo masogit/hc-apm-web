@@ -148,7 +148,7 @@
                                             <!--                                            </p:galleria>-->
                                             <!--<h:inputText value="#{assetInfoEditController.uploadFlag}"></h:inputText>-->
                                             <div class="container-fluid" style="height: 400px; overflow: auto;">
-                                                <div class="row" id="picDiv">
+                                                <div class="row" id="assetPagePicDiv">
                                                     <c:forEach items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" >
                                                         <div>
                                                             <img data-original="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
@@ -158,7 +158,7 @@
                                                     </c:forEach>
                                                 </div>
                                                 <script>
-                                                    new Viewer(document.getElementById('picDiv'), {inline: true});
+                                                    new Viewer(document.getElementById('assetPagePicDiv'), {inline: true});
                                                 </script>
                                             </div>
                                         </h:panelGroup>

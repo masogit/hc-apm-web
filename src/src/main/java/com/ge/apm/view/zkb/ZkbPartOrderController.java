@@ -118,20 +118,22 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
 
     @Override
     protected Page<ZkbPartOrder> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters,"");
         zkbContractPage = dao.findBySearchFilter(searchFilters, pageRequest);
         //searchFilters.clear();
         return zkbContractPage;
     }
 
-    public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters){
+    public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters,String type){
         List<SearchFilter> searchFilters = csearchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
 
         if(currentUser.getLoginName().indexOf(ZkbPartOrder.DATA_TYPE_TEST) > -1){
-            searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.EQ, ZkbPartOrder.DATA_TYPE_TEST));
+            if(StringUtils.isEmpty(type)){
+                searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.EQ, ZkbPartOrder.DATA_TYPE_TEST));
+            }
         }else {
             searchFilters.add(new SearchFilter("dataType", SearchFilter.Operator.IsNull, ""));
         }
@@ -428,7 +430,7 @@ public class ZkbPartOrderController  extends GenericCRUDUUIDController<ZkbPartOr
     private StreamedContent exportFile;
 
     public void exportAll(){
-        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters, "export");
         Sort sort=new Sort(Sort.Direction.DESC,"createdDate");
         List<ZkbPartOrder> zkbPartOrders =  dao.findBySearchFilter(searchFilters,sort);
         HashMap<String, Object> dataMap = zkbPartOrderExcelService.createZkbPartOrderData(zkbPartOrders);

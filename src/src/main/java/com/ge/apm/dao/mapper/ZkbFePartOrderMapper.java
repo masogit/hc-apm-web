@@ -31,12 +31,20 @@ public interface ZkbFePartOrderMapper {
      * @return
      */
     @SelectProvider(type = ZkbFePartOrderProvider.class, method = "buildFilter_queryNeedReturnSparePart")
-    List<ZkbFePartOrder> buildFilter_queryNeedReturnSparePart();
+    List<ZkbFePartOrder> buildFilter_queryNeedReturnSparePart(@Param("testLogin")String testLogin);
 
     /**
      * 查询等待归还的探头
      * @return
      */
     @SelectProvider(type = ZkbFePartOrderProvider.class, method = "buildFilter_queryNeedReturnProbe")
-    List<ZkbFePartOrder> buildFilter_queryNeedReturnProbe();
+    List<ZkbFePartOrder> buildFilter_queryNeedReturnProbe(@Param("testLogin")String testLogin);
+
+
+    /**
+     * 查询所有单子
+     * @return
+     */
+    @SelectProvider(type = ZkbFePartOrderProvider.class, method = "batchExport")
+    List<ZkbFePartOrder> batchExport(@Param("testLogin")String testLogin,@Param("tenantUid")String tenantUid);
 }

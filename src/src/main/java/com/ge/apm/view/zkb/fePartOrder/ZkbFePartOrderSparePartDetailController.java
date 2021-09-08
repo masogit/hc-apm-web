@@ -187,7 +187,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             e.printStackTrace();
         }
         configTypeMap=this.zkbFePartOrderService.getMapConfigByLoginName(this.loginName);
-        this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.zkbFePartOrder_status);
+        this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.status);
 
     }
 
@@ -264,6 +264,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
      */
     public void saveZkbFePartOrderAssetInfoTemp()
     {
+        if(StringUtils.isNotBlank(this.selectZkbFePartOrderAssetInfo.getAssetNo()))
+        {
+            this.selectZkbFePartOrderAssetInfo.setAssetNo(this.selectZkbFePartOrderAssetInfo.getAssetNo().trim());
+        }
         if("Create".equals(this.actionItemName)){
             if(CollectionUtils.isEmpty(this.selected.getZkbFePartOrderAssetInfoList())){
                 this.selected.setZkbFePartOrderAssetInfoList(new ArrayList<>());
@@ -412,6 +416,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         return applyCount;
     }
+    public boolean checkContractDate()
+    {
+        return this.zkbFePartOrderService.checkContractDate(this.contractList);
+    }
 
 
     /**
@@ -459,7 +467,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(adjustApplyCount<beforeAdjustQty)
         {
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,beforeAdjustQty-adjustApplyCount,this.currentUser,this.selected,this.i18Map.get("WaitingAssignment"));
+            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,beforeAdjustQty-adjustApplyCount,this.currentUser,this.selected,this.i18Map.get("TenantAccept"));
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingApm.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
@@ -487,7 +495,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
-            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("WaitingAssignment"));
+            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("TenantReject"));
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
@@ -521,7 +529,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         {
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
             int applyCount = this.getApplyCount();
-            this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("WaitingApm"));
+            this.zkbFePartOrderService.moveSpareQuota(2,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("FourHundredsAccept"));
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.FourHundredsAccept.toString(),
                 ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_WECHART);
@@ -566,7 +574,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())&&returnCount>0)
         {
-            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount,this.currentUser,this.selected,this.i18Map.get("WaitingGEAdmin"));
+            String statusType = "GEAdminAcceptPart";
+            if(returnComplete)
+                statusType = "GEAdminAccept";
+            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount,this.currentUser,this.selected,this.i18Map.get(statusType));
         }
         for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
         {
@@ -586,20 +597,20 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             endDate = new Date();
             gatewayURL=GatewayURL.FE_PART_ORDER_SEND_WECHART;
         }else if(returnCount>0)
-            {
-                workFlowStatus =ZkbFePartOrder.workFlowStatus.GEAdminAcceptPart.toString();
-                workFlowSteps =ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString();
-                startDate = new Date();
-                endDate = null;
-                gatewayURL=GatewayURL.FE_PART_ORDER_SEND_WECHART;
-            }else
-                {
-                    workFlowStatus =ZkbFePartOrder.workFlowStatus.GEAdminAcceptPart.toString();
-                    workFlowSteps =ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString();
-                    startDate = new Date();
-                    endDate = null;
-                    gatewayURL=null;
-                }
+        {
+            workFlowStatus =ZkbFePartOrder.workFlowStatus.GEAdminAcceptPart.toString();
+            workFlowSteps =ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString();
+            startDate = new Date();
+            endDate = null;
+            gatewayURL=GatewayURL.FE_PART_ORDER_SEND_WECHART;
+        }else
+        {
+            workFlowStatus =ZkbFePartOrder.workFlowStatus.GEAdminAcceptPart.toString();
+            workFlowSteps =ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString();
+            startDate = new Date();
+            endDate = null;
+            gatewayURL=null;
+        }
         return this.zkbFePartOrderService.wolkFlowToComplete(
                 this.selected,
                 this.userUid,

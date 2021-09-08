@@ -17,6 +17,7 @@ import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -41,6 +42,7 @@ public class V2SupplierPmOrderController extends V2PmOrderController {
         Sort sort = returnSort(pageRequest);
         pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
         result = super.getDAO().findBySearchFilter(this.searchFilters, pageRequest);
+        super.setCurrentPagePmOrders(result.getContent());
         this.searchFilters.clear();
         List<V2_PmOrder> currentPagePmOrders = result.getContent();
         Map<String, Boolean> selectedMap = super.getSelectedMap();
@@ -79,7 +81,12 @@ public class V2SupplierPmOrderController extends V2PmOrderController {
     protected void init() {
         super.init();
         String query = WebUtil.getRequestParameter("query");
-        super.setQueryIndex(StringUtils.isEmpty(query) ? 3 : Integer.parseInt(query));
+        if (StringUtils.isEmpty(query)) {
+            UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+            boolean isSupplierFE = currentUserAccount.getRoleNames().contains("SupplierFE");
+            query = isSupplierFE ? "3" : "7";
+        }
+        super.setQueryIndex( Integer.parseInt(query));
     }
 
     @Override
