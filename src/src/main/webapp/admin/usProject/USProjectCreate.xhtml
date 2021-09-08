@@ -101,12 +101,6 @@
                                                     <p:fileUpload allowTypes="/(\.|\/)(pdf)$/" fileUploadListener="#{uSProjectEditController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                                                   multiple="true" sizeLimit="104857600"  auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M"  label="#{msg.Add}"  />
                                                 </h:panelGroup>
-                                                <!--<p:dataList id="uploadedList" value="#{uSProjectEditController.pdfList}" var="item" varStatus="itemIndex" rowIndexVar="idx" emptyMessage="#{msg.noRecordFound}">
-                                                    #{item}
-                                                    <p:commandLink value="#{msg.delete}"  actionListener="uSProjectController.removeFile()" update="uploadedList"/>
-                                                </p:dataList>-->
-                                               <!-- <p:inputText    value="#{uSProjectEditController.pdf}" />-->
-                                               <!-- <a href="US/#{uSProjectEditController.pdf}" title="download" >#{uSProjectEditController.pdf}</a>-->
                                                 <div>
                                                 <p:commandLink  value="删除说明书"  actionListener="#{uSProjectEditController.removeFile()}" />
                                                 </div>
