@@ -35,8 +35,8 @@ public class FileScanUSService {
 
 
     public String saveUSFile(UploadedFile file) throws Exception {
-        String folderNameLocal =  this.getClass().getResource("").getPath().substring(0,this.getClass().getResource("").getPath().indexOf("target"))
-                +US_FILE_Folder_Local;
+
+        String folderNameLocal =  System.getProperty("webapp.root") +US_FILE_Folder_Local;
         LOGGER.info("USProject----------folderNameLocal"+folderNameLocal);
         return saveFile(file, folderNameLocal, file.getFileName());
     }
@@ -121,8 +121,7 @@ public class FileScanUSService {
 
     public  boolean deleteFile(String fileName) {
         boolean flag = false;
-        String path =  this.getClass().getResource("").getPath().substring(0,this.getClass().getResource("").getPath().indexOf("target"))
-                +US_FILE_Folder_Local;
+        String path =  System.getProperty("webapp.root") +US_FILE_Folder_Local;
         File rootFile = new File(path);
         if (!rootFile.exists()) {
             return flag;
