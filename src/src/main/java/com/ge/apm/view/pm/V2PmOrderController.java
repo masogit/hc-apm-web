@@ -2277,6 +2277,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedPmOrder.getSiteUID());
             eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
             itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
+            String partsType = String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType"));
+            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+            }
+            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+            }
         } else {
             switchTmp=false;
             if (accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()) {
