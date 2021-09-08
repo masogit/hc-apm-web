@@ -218,7 +218,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         }
         orderTypeList.add(ZkbFePartOrder.OrderType.ManMade.toString());
         orderTypeList.add(ZkbFePartOrder.OrderType.SpareParts.toString());
-        this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.zkbFePartOrder_status);
+        this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.status);
     }
 
 

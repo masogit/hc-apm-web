@@ -232,6 +232,11 @@ public class ZkbKeyBehaviorIndexController extends GenericCRUDUUIDController<Zkb
             WebUtil.addErrorMessage("请选择代理商");
             return;
         }
+        if(kpiDate==null)
+        {
+            WebUtil.addErrorMessage("生成月份 输入不可为空！");
+            return;
+        }
         for(TenantInfo item:selectTenantInfoList) {
             this.zkbKeyBehaviorIndexService.generateSingleKpiData(item,this.kpiDate);
         }
