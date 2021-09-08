@@ -1650,19 +1650,31 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void returnAudit(ZkbPartOrder zkbPartOrder,List<ZkbPartOrderReturn> zkbPartOrderReturnList,UserAccount userAccount){
-        for(ZkbPartOrderReturn r  : zkbPartOrderReturnList){
+    public void returnAudit(ZkbPartOrder zkbPartOrder,List<ZkbPartOrderReturn> auditReturnList,UserAccount userAccount,List<ZkbPartOrderReturn> zkbPartOrderReturnList){
+        for(ZkbPartOrderReturn r  : auditReturnList){
             r.setModifyFlag("N");
             r.setClosedDate(new Date());
             r.setClosedAuditerUid(userAccount.getUid());
             r.setClosedAuditer(userAccount.getName());
         }
-        zkbPartOrderReturnRepository.save(zkbPartOrderReturnList);
+        zkbPartOrderReturnRepository.save(auditReturnList);
         sendWeChatReturnAudit(zkbPartOrder);
+
+        boolean isAllYes = true;
+        for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
+            if(ZkbPartOrderReturn.DataStatusEnum.Reject.toString().equals(r.getDataStatus())){
+                isAllYes = false;
+            }
+        }
+        if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(zkbPartOrder.getStatus()) && !isAllYes){
+            closedBack(zkbPartOrder,userAccount);
+        }else{
+            partsClosed(zkbPartOrder,zkbPartOrderReturnList,userAccount);
+        }
 
         //如果审批通过后则进行核算名额
         int v = 0;
-        for (ZkbPartOrderReturn r : zkbPartOrderReturnList){
+        for (ZkbPartOrderReturn r : auditReturnList){
             if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(r.getReturnType()) && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(r.getReturnType())){
                 if(ZkbPartOrderReturn.DataStatusEnum.Accept.toString().equals(r.getDataStatus())){
                     v += r.getQty();
@@ -1676,9 +1688,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void partsClosed(ZkbPartOrder zkbPartOrder,UserAccount userAccount){
+    public void partsClosed(ZkbPartOrder zkbPartOrder,List<ZkbPartOrderReturn> zkbPartOrderReturnAcceptList,UserAccount userAccount){
         HashMap<String, Integer> returnMap = new HashMap<String, Integer>();
-        List<ZkbPartOrderReturn> zkbPartOrderReturnAcceptList = zkbPartOrderReturnRepository.findByPartOrderIdAndDataStatus(zkbPartOrder.getId(),ZkbPartOrderReturn.DataStatusEnum.Accept.toString());
+        //List<ZkbPartOrderReturn> zkbPartOrderReturnAcceptList = zkbPartOrderReturnRepository.findByPartOrderIdAndDataStatus(zkbPartOrder.getId(),ZkbPartOrderReturn.DataStatusEnum.Accept.toString());
         for(ZkbPartOrderReturn r : zkbPartOrderReturnAcceptList){
             if(returnMap.containsKey(r.getPartNo())){
                 Integer vv = returnMap.get(r.getPartNo());

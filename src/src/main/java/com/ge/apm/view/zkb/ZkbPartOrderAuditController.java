@@ -766,18 +766,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     WebUtil.addErrorMessage("请填写审批数据","");
                     return "";
                 }
-                zkbPartOrderService.returnAudit(selected,auditReturnList,currentUser);
-                boolean isAllYes = true;
-                for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
-                    if(ZkbPartOrderReturn.DataStatusEnum.Reject.toString().equals(r.getDataStatus())){
-                        isAllYes = false;
-                    }
-                }
-                if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus()) && !isAllYes){
-                    zkbPartOrderService.closedBack(selected,currentUser);
-                }else{
-                    zkbPartOrderService.partsClosed(selected,currentUser);
-                }
+                zkbPartOrderService.returnAudit(selected,auditReturnList,currentUser,zkbPartOrderReturnList);
+
                 selected = zkbPartOrderRepository.findById(selected.getId());
             }
         } else {
