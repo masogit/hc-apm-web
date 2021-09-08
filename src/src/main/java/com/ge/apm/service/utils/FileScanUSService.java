@@ -37,6 +37,7 @@ public class FileScanUSService {
     public String saveUSFile(UploadedFile file) throws Exception {
         String folderNameLocal =  this.getClass().getResource("").getPath().substring(0,this.getClass().getResource("").getPath().indexOf("target"))
                 +US_FILE_Folder_Local;
+        LOGGER.info("USProject----------folderNameLocal"+folderNameLocal);
         return saveFile(file, folderNameLocal, file.getFileName());
     }
 
@@ -67,7 +68,7 @@ public class FileScanUSService {
         } catch (Exception e) {
             throw e;
         }
-
+        LOGGER.info("USProject----------name"+fileName);
         return fileName;
     }
 
