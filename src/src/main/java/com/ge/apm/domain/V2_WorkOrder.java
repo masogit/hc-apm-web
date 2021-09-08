@@ -274,16 +274,30 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
     @Column(name="close_Step_End_Time")
     private Date closeStepEndTime;
 
-    @Column(name = "data_source")
-    private String dataSource; // 数据来源  如果是导入的工单: import ，系统创建的 null
+    @Column(name = "import_by")
+    private String importBy; //  工单导入人
+
     /**
      * 供应商派工时  供应商uid
      */
     @Column(name = "supplier_uid")
     private String supplierUid;
+    /**
+     * 工单创建类型  1:医院创建   2:供应商创建
+     */
+    @Column(name = "create_type",columnDefinition=" integer default 1 ")
+    private Integer createType = 1;
 
     @Transient
     private Integer orderCount;
+
+    public Integer getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(Integer createType) {
+        this.createType = createType;
+    }
 
     @Override
     public BigDecimal getTotalPriceToBigDecimal() {
@@ -409,9 +423,9 @@ public class V2_WorkOrder implements Serializable, ApprovableTarget {
         this.v2_workOrder_detail_list = v2_workOrder_detail_list;
     }
 
-    public String getDataSource() { return dataSource; }
+    public String getImportBy() { return importBy; }
 
-    public void setDataSource(String dataSource) { this.dataSource = dataSource; }
+    public void setImportBy(String importBy) { this.importBy = importBy; }
 
     public AssetInfo getAssetInfo() {
         return assetInfo;

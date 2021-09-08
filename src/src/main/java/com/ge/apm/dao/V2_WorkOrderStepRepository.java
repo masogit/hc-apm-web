@@ -2,6 +2,8 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.V2_WorkOrder_Step;
 import java.util.List;
+
+import com.ge.apm.domain.WorkflowConfig;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepository;
 
@@ -25,6 +27,12 @@ public interface V2_WorkOrderStepRepository extends GenericRepositoryUUID<V2_Wor
     @Query("select s from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%') and s.stepId = 4")
 //    @Query("select s.woId from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%')")
     public List<V2_WorkOrder_Step> findWorkIds(String owerName);
+
+    @Query("select s.ownerName from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%') and s.stepId = 4")
+    public List<String> findOwerNames(String owerName);
+
+    @Query(value="select s from V2_WorkOrder_Step s where s.woId in (select s.woId from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%') and s.stepId = 4) and s.stepId = 4")
+    public List<V2_WorkOrder_Step>  findWorkSteps(String owerName);
 
     @Query("select s from V2_WorkOrder_Step s where s.ownerName like  concat('%',?1,'%')")
     public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName);

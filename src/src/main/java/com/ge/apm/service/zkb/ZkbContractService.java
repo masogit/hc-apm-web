@@ -467,6 +467,13 @@ public class ZkbContractService {
                 }
             }
         }
+
+        if(ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())){
+            if(ZkbContract.QuotaDeductTypeEnum.Null.toString().equals(zkbContract.getQuotaDeductType())){
+                flag = false;
+                errorLog += "合同扣除类型不能为N/A,";
+            }
+        }
         if (errorLog.length()>0){
             errorLog = errorLog.substring(0,errorLog.length()-1);
         }

@@ -173,6 +173,9 @@ public class V2_PmOrder  implements Serializable, ApprovableTarget {
     @Column(name="origin_pm_num")
     private String originPmNum;
 
+    @Column(name="import_by")
+    private String importBy;  //导入人
+
     @Column(name="inst_id")
     private String instId;
     //    @Column(name = "feedback_rating")

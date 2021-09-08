@@ -25,6 +25,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 
 import java.text.ParseException;
@@ -278,11 +279,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 最大导入行数
      */
     public static final int EXCEL_FE_PART_ORDER_IMPORT_MAX_ROW = 10000;
-
-    /**
-     * 步骤
-     */
-    public static final String zkbFePartOrder_status="zkbFePartOrder_steps";
 
     /**
      * 给申请单添加单号和索引
@@ -1240,19 +1236,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         return selected;
     }
 
-//    /**
-//     * 保存附件
-//     */
-//    @Transactional(rollbackFor = Exception.class)
-//    public void saveUploadFile(List<V2_BlobObject> v2_blobObjects,String id){
-//        if(v2_blobObjects != null){
-//            for (V2_BlobObject v : v2_blobObjects){
-//                v.setBoUuid(id);
-//                blobObjectRepository.save(v);
-//            }
-//        }
-//    }
-
     /**
      * 生成excel
      * @param doc 文件
@@ -1420,13 +1403,13 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     {
                         for(ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo:zkbFePartOrderAssetInfoList)
                         {
-                            HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map,zkbFePartOrderAssetInfo,contractMap,tenantInfoMap);
-                            zkbSparePartFePartOrderDataList.add(map);
+                            List<HashMap<String,Object>> map = this.getSparePartHashMap(item,i18Map,zkbFePartOrderAssetInfo,contractMap,tenantInfoMap);
+                            zkbSparePartFePartOrderDataList.addAll(map);
                         }
                     }else
                         {
-                            HashMap<String,Object> map = this.getSparePartHashMap(item,i18Map,null,contractMap,tenantInfoMap);
-                            zkbSparePartFePartOrderDataList.add(map);
+                            List<HashMap<String,Object>> map = this.getSparePartHashMap(item,i18Map,null,contractMap,tenantInfoMap);
+                            zkbSparePartFePartOrderDataList.addAll(map);
                         }
                 }
             }
@@ -1747,7 +1730,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             logger.info("error occurred when importing the {} row", row);
             throw e;
         }
-        Set<String> idSet = new HashSet<>();
         if(validate)
         {
             if(CollectionUtils.isNotEmpty(zkbFePartOrderProbeList))
@@ -1765,7 +1747,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbFePartOrder.setReturnDate(item.getReturnDate());
                     zkbFePartOrder.setNewCatSn(item.getNewCatSn());
                     zkbFePartOrder.setGeAdminComment(item.getGeAdminComment());
-                    //Date contractStartDate = this.getDateFormat(ZkbFePartOrderProbeController.contractStartDateFormat,ZkbFePartOrderProbeController.contractStartDate);
                     ZkbContract zkbContract = this.zkbContractRepository.findById(zkbFePartOrder.getContractId());
                     boolean showZkbPoProbeQuotaType= false;
                     if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType()))
@@ -1790,57 +1771,63 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     zkbFePartOrderReturn.setReturnType(item.getReturnType());
                     zkbFePartOrderReturn.setComment(item.getGeAdminComment());
                     this.zkbFePartOrderReturnRepository.save(zkbFePartOrderReturn);
-                    idSet.add(item1.getId());
+                    String status = this.changeStatus(item1.getId(),userId,userName,tenantUid);
                     if(ZkbFePartOrderService.highArtificialTypeValue.equals(item1.getArtificialType())||ZkbFePartOrderSparePartDetailController.badReturnValue.equals(item.getReturnType()))
                     {
                         continue;
                     }
                     ZkbContract zkbContract =  this.zkbContractRepository.findById(item1.getContractId());
-                    this.moveSpareQuota(3,zkbContract,item.getQty(),userAccount,item1,i18Map.get("WaitingGEAdmin"));
+                    this.moveSpareQuota(3,zkbContract,item.getQty(),userAccount,item1,i18Map.get(status));
                 }
-            }
-        }
-        if(CollectionUtils.isNotEmpty(idSet))
-        {
-
-            for(String id:idSet)
-            {
-                ZkbFePartOrder zkbFePartOrder = this.zkbFePartOrderRepository.findById(id);
-                Integer returnCount = zkbFePartOrderReturnRepository.fetchQty(id); //归还数量
-                Integer applyCount = this.zkbFePartOrderAssetInfoRepository.fetchQty(id); //申请数量
-                String workFlowStatus ="";
-                String workFlowSteps ="";
-                Date startDate = null;
-                Date endDate = null;
-                GatewayURL gatewayURL =null;
-                if(returnCount>=applyCount)
-                {
-                    workFlowStatus =ZkbFePartOrder.workFlowStatus.GEAdminAccept.toString();
-                    workFlowSteps =ZkbFePartOrder.workFlowSteps.Complete.toString();
-                    startDate = new Date();
-                    endDate = new Date();
-                    gatewayURL=GatewayURL.FE_PART_ORDER_SEND_WECHART;
-                }else if(returnCount>0)
-                {
-                    workFlowStatus =ZkbFePartOrder.workFlowStatus.GEAdminAcceptPart.toString();
-                    workFlowSteps =ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString();
-                    startDate = new Date();
-                    endDate = null;
-                    gatewayURL=GatewayURL.FE_PART_ORDER_SEND_WECHART;
-                }
-                this.wolkFlowToComplete(
-                        zkbFePartOrder,
-                        userId,
-                        userName,
-                        tenantUid,
-                        "",
-                        workFlowStatus,
-                        workFlowSteps,startDate,endDate,gatewayURL);
             }
         }
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
+    }
+
+    /**
+     * 修改状态
+     * @param id
+     * @param userId
+     * @param userName
+     * @param tenantUid
+     * @return
+     */
+    public String changeStatus(String id,String userId,String userName,String tenantUid)
+    {
+        ZkbFePartOrder zkbFePartOrder = this.zkbFePartOrderRepository.findById(id);
+        Integer returnCount = zkbFePartOrderReturnRepository.fetchQty(id); //归还数量
+        Integer applyCount = this.zkbFePartOrderAssetInfoRepository.fetchQty(id); //申请数量
+        String workFlowStatus ="";
+        String workFlowSteps ="";
+        Date startDate = null;
+        Date endDate = null;
+        GatewayURL gatewayURL =null;
+        if(returnCount>=applyCount)
+        {
+            workFlowStatus =ZkbFePartOrder.workFlowStatus.GEAdminAccept.toString();
+            workFlowSteps =ZkbFePartOrder.workFlowSteps.Complete.toString();
+            startDate = new Date();
+            endDate = new Date();
+            gatewayURL=GatewayURL.FE_PART_ORDER_SEND_WECHART;
+        }else if(returnCount>0)
+        {
+            workFlowStatus =ZkbFePartOrder.workFlowStatus.GEAdminAcceptPart.toString();
+            workFlowSteps =ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString();
+            startDate = new Date();
+            endDate = null;
+            gatewayURL=GatewayURL.FE_PART_ORDER_SEND_WECHART;
+        }
+        this.wolkFlowToComplete(
+                zkbFePartOrder,
+                userId,
+                userName,
+                tenantUid,
+                "",
+                workFlowStatus,
+                workFlowSteps,startDate,endDate,gatewayURL);
+        return workFlowStatus;
     }
     public Date getDateFormat(String format,String formatDate)
     {
@@ -1879,7 +1866,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         {
             if(zkbFePartOrder.getQty()!=null&&zkbFePartOrder.getQty()>0)
             {
-                this.moveProbe(5,zkbContract,zkbFePartOrder.getQty(),showZkbPoProbeQuotaType,zkbFePartOrder.getZkbPoProbeQuotaType(),userAccount,zkbFePartOrder,true,i18Map.get("WaitingGEAdmin"));
+                this.moveProbe(5,zkbContract,zkbFePartOrder.getQty(),showZkbPoProbeQuotaType,zkbFePartOrder.getZkbPoProbeQuotaType(),userAccount,zkbFePartOrder,true,i18Map.get("GEAdminAccept"));
             }
             if(StringUtils.isNotBlank(zkbFePartOrder.getContractCatId())&&!ZkbFePartOrderProbeController.four_in_one.equals(zkbFePartOrder.getContractCatId()))
             {
@@ -2043,34 +2030,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_returnType")+errorMessage);
             isValidateData = false;
         }
-        if("DOA".equals(zkbFePartOrderVO.getReturnType()))
-        {
-            if(StringUtils.isBlank(zkbFePartOrderVO.getPartSerialNumber())){
-                item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_partSerialNumber")+errorMessage);
-                isValidateData = false;
-            }
-            if(StringUtils.isBlank(zkbFePartOrderVO.getPartQualityIssue())){
-                item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-                AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_partQualityIssue")+errorMessage);
-                isValidateData = false;
-            }
-        }
-        if(StringUtils.isBlank(zkbFePartOrderVO.getWaybillNo())){
-            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_airWayBillNo")+errorMessage);
-            isValidateData = false;
-        }
-        if(zkbFePartOrderVO.getReturnDate()==null){
-            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_returnDate1")+errorMessage);
-            isValidateData = false;
-        }
-        if(StringUtils.isBlank(zkbFePartOrderVO.getNewCatSn())){
-            item.put("status", ZkbCourseScheduleService.ImportStatus.Failure);
-            AssetInfoRow.addErrMessage(item, WebUtil.getMessage("zkbFePartOrder_newCatSn")+errorMessage);
-            isValidateData = false;
-        }
         if(StringUtils.isNotBlank(zkbFePartOrderVO.getPartOrderNo())) {
             List<ZkbFePartOrder> zkbFePartOrderList = this.zkbFePartOrderRepository.findByPartOrderNoAndOrderType(
                     zkbFePartOrderVO.getPartOrderNo(),
@@ -2213,11 +2172,13 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * @param zkbFePartOrderAssetInfo 申请信息
      * @return
      */
-    public HashMap<String,Object> getSparePartHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map,ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo,Map<String,ZkbContract> contractMap,Map<String,TenantInfo> tenantInfoMap)
+    public List<HashMap<String,Object>> getSparePartHashMap(ZkbFePartOrder zkbFePartOrder,Map<String,Map<String,String>> i18Map,ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo,Map<String,ZkbContract> contractMap,Map<String,TenantInfo> tenantInfoMap)
     {
+        List<HashMap<String,Object>> list = new ArrayList<>();
         HashMap sparePartMap = new HashMap();
         if(zkbFePartOrder==null){
-            return sparePartMap;
+            list.add(sparePartMap);
+            return list;
         }
         sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_systemId"),zkbFePartOrder.getSystemId());
         this.fullContractAndTenantInfo(contractMap,tenantInfoMap,sparePartMap,zkbFePartOrder.getContractId(),zkbFePartOrder.getTenantUid());
@@ -2257,8 +2218,35 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_orderNoa"),zkbFePartOrderAssetInfo.getOrderNo());
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_assetPrice"),zkbFePartOrderAssetInfo.getPrice());
             sparePartMap.put(WebUtil.getMessage("zkbFePartOrder_spareParts"),zkbFePartOrderAssetInfo.getSparePart());
+            if(sparePartMap.get(WebUtil.getMessage("zkbFePartOrder_assetNo"))==null
+                    ||sparePartMap.get(WebUtil.getMessage("zkbFePartOrder_orderNoa"))==null)
+            {
+                list.add(sparePartMap);
+                return list;
+            }
+            List<ZkbFePartOrderReturn> zkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderIdAndAssetNoAndOrderNo(
+                    zkbFePartOrder.getId(),
+                    sparePartMap.get(WebUtil.getMessage("zkbFePartOrder_assetNo")).toString(),
+                    sparePartMap.get(WebUtil.getMessage("zkbFePartOrder_orderNoa")).toString());
+            if(CollectionUtils.isEmpty(zkbFePartOrderReturnList))
+            {
+                list.add(sparePartMap);
+                return list;
+            }
+            for(ZkbFePartOrderReturn zkbFePartOrderReturn:zkbFePartOrderReturnList)
+            {
+                HashMap<String,Object> newMap = sparePartMap;
+                if(i18Map.containsKey(zkbPoReturnType)&&i18Map.get(zkbPoReturnType).containsKey(zkbFePartOrderReturn.getReturnType()))
+                {
+                    newMap.put(WebUtil.getMessage("zkbFePartOrder_returnType"),i18Map.get(zkbPoReturnType).get(zkbFePartOrderReturn.getReturnType()));
+                }
+                newMap.put(WebUtil.getMessage("zkbFePartOrder_returnDate"),this.dateFormat(zkbFePartOrderReturn.getReturnDate(),ZkbFePartOrderService.dateFormat));
+                newMap.put("归还"+WebUtil.getMessage("zkbFePartOrder_remark"),zkbFePartOrderReturn.getComment());
+                newMap.put("归还"+WebUtil.getMessage("zkbFePartOrder_assetQty"),zkbFePartOrderReturn.getQty());
+                list.add(newMap);
+            }
         }
-        return sparePartMap;
+        return list;
     }
 
     /**
@@ -2282,9 +2270,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 生成需要归还的配件探头结果集
      * @return
      */
-    public HashMap<String,Object> createZkbFePartOrderNeedReturnData(){
-        List<ZkbFePartOrder> zkbFePartOrderSparePartList = this.zkbFePartOrderMapper.buildFilter_queryNeedReturnSparePart();
-        List<ZkbFePartOrder> zkbFePartOrderProbeList = this.zkbFePartOrderMapper.buildFilter_queryNeedReturnProbe();
+    public HashMap<String,Object> createZkbFePartOrderNeedReturnData(String testLogin){
+        List<ZkbFePartOrder> zkbFePartOrderSparePartList = this.zkbFePartOrderMapper.buildFilter_queryNeedReturnSparePart(testLogin);
+        List<ZkbFePartOrder> zkbFePartOrderProbeList = this.zkbFePartOrderMapper.buildFilter_queryNeedReturnProbe(testLogin);
         List<Map<String, Object>> zkbSparePartFePartOrderDataMapList = new ArrayList<>();
         List<Map<String, Object>> zkbProbeFePartOrderDataMapList = new ArrayList<>();
         Map<String,Map<String, Object>>  zkbSparePartFePartOrderDataMap = new HashMap<>();
@@ -2342,8 +2330,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
      * 生成excel
      * @param doc 文件
      */
-    public void exportReturnData(ExcelDocument doc) {
-        HashMap<String,Object> returnDataMap = this.createZkbFePartOrderNeedReturnData();
+    public void exportReturnData(ExcelDocument doc,String testLogin) {
+        HashMap<String,Object> returnDataMap = this.createZkbFePartOrderNeedReturnData(testLogin);
         Integer keyRow = 1;
         Integer dataRow = 2;
         List<Map<String, Object>> zkbSparePartFePartOrderDataMapList = (List<Map<String, Object>>) returnDataMap.get("zkbSparePartFePartOrderDataMapList");
@@ -2378,6 +2366,18 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             item.setBoUuid(id);
             this.blobObjectRepository.save(item);
         }
+    }
+    public boolean checkContractDate(List<ZkbContract> contractList)
+    {
+        if(CollectionUtils.isEmpty(contractList)) return false;
+        Date startDate = contractList.get(0).getStartDate();
+        Date endDate = contractList.get(0).getEndDate();
+        String format = "yyyy-MM-dd";
+        String dateStr = DateUtil.getFormatStrByDate(new Date(),format);
+        Date date = DateUtil.getDateByFormatStr(dateStr,format);
+        if(date.compareTo(startDate)>=0&&endDate.compareTo(date)>=0)
+            return false;
+        return true;
     }
 
 

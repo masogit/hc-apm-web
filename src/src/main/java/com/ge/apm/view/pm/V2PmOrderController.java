@@ -1330,7 +1330,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 newServiceRequest.setCasePriority(casePriority);
             }
 
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picListForRP,null);
             //报修完后直接关单
             //pmOrderService.closePM(selectedPmOrder,picList);
             cancel();
@@ -1932,11 +1932,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                    }
                    if (!accessorySparePartsRequestList.isEmpty()) {
                        V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
-                       partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申领单
+                       partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getOwnerId()));//生成申领单
                    }
                    if (!accessorySparePartsBuyList.isEmpty()) {
                        V2_PmOrder v2PmOrder = dao.findById(accessorySparePartsBuyList.get(0).getWoId());
-                       partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getCurrentPersonId()));//生成申购单
+                       partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.PM_ORDER, userDao.getByUid(v2PmOrder.getOwnerId()));//生成申购单
                    }
                }
            }
@@ -2014,7 +2014,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 pmIdList.add(k);
 
         });
-        System.out.println();
     }
 
     public void onItemSelected() {
@@ -2278,6 +2277,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedPmOrder.getSiteUID());
             eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
             itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
+            String partsType = String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType"));
+            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+            }
+            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+            }
         } else {
             switchTmp=false;
             if (accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().isPresent()) {

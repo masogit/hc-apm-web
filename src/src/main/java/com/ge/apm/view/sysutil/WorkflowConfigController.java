@@ -3,14 +3,11 @@ package com.ge.apm.view.sysutil;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.persistence.Entity;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.*;
@@ -37,7 +34,6 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.service.common.UserCommonService;
 
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -199,16 +195,13 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
     }
 
     public boolean getViewShowTenantBox() {
-        if (Boolean.TRUE.equals(this.selected.getIsPmSupplierManualEnabled())) {
-            return false;
-        }
-        if (Boolean.TRUE.equals(this.selected.getIsPmSupplierTakeOrderEnabled())) {
+        if (Boolean.TRUE.equals(this.selected.getIsPmSupplierAutoEnabled())) {
             return false;
         }
         return true;
     }
     public boolean getWoViewShowTenantBox() {
-        if (Boolean.TRUE.equals(this.selected.getIsWoSupplierTakeOrderEnabled())) {
+        if (Boolean.TRUE.equals(this.selected.getIsWoSupplierAutoEnabled())) {
             return false;
         }
         return true;
@@ -522,8 +515,8 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         Boolean isPmManual = selected.getIsPmManualEnabled();
         Boolean isPmTakeOrder = selected.getIsPmTakeOrderEnabled();
         Boolean isMeasureManual = selected.getIsMeasureManualEnabled();
-        Boolean isPmSupplierManualEnabled = selected.getIsPmSupplierManualEnabled();
-        Boolean isPmSupplierTakeOrderEnabled = selected.getIsPmSupplierTakeOrderEnabled();
+        Boolean isPmSupplierAutoEnabled = selected.getIsPmSupplierAutoEnabled();
+        Boolean isWoSupplierAutoEnabled = selected.getIsWoSupplierAutoEnabled();
         Boolean isMeasureTakeOrder = selected.getIsMeasureTakeOrderEnabled();
 
 
@@ -550,12 +543,12 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         }
 
 
-        if (isManual != null && isTakeOrder != null && !isManual && !isTakeOrder) {
+        if (isManual != null && isTakeOrder != null && isWoSupplierAutoEnabled != null && !isWoSupplierAutoEnabled && !isManual && !isTakeOrder) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage(WebUtil.getMessage("WoManualAndGrapMsg"));
             return;
         }
-        boolean isDispatchTypeError = Boolean.TRUE.equals(isPmManual) || Boolean.TRUE.equals(isPmTakeOrder) || Boolean.TRUE.equals(isPmSupplierManualEnabled) || Boolean.TRUE.equals(isPmSupplierTakeOrderEnabled);
+        boolean isDispatchTypeError = Boolean.TRUE.equals(isPmManual) || Boolean.TRUE.equals(isPmTakeOrder) || Boolean.TRUE.equals(isPmSupplierAutoEnabled);
         if (!isDispatchTypeError) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             WebUtil.addErrorMessage(WebUtil.getMessage("PmManualAndGrapMsg"));

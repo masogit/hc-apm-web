@@ -972,6 +972,14 @@ public class UserContextService implements Serializable {
         return ApmConstant.MVS_TENANT_NAME.equals(tenantInfo.getName());
     }
 
+    public boolean isSupportMultiLanguage(){
+        TenantInfo tenantInfo = getTenantInfo();
+        if(tenantInfo.getIsSupportMultiLanguage() != null && tenantInfo.getIsSupportMultiLanguage() == true){
+            return true;
+        }
+        return false;
+    }
+
     public boolean isYiMaiYangGuangTenant() {
         TenantInfo tenantInfo = getTenantInfo();
         //这期上线，暂时写死，下个版本改成动态配置

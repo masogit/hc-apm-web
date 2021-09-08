@@ -293,12 +293,10 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         this.mvsAssetInfo = mvsAssetInfo;
     }
     public void partsPriceUpdate(){
-        if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
-            if(itemDetail.getApartsQuantity() == null || itemDetail.getPartsPrice() == null ){
-                itemDetail.setClosedPrice(0.0);
-            }else{
-                itemDetail.setClosedPrice(itemDetail.getPartsPrice()*itemDetail.getApartsQuantity());
-            }
+        if(itemDetail.getApartsQuantity() == null || itemDetail.getPartsPrice() == null ){
+            itemDetail.setClosedPrice(0.0);
+        }else{
+            itemDetail.setClosedPrice(itemDetail.getPartsPrice()*itemDetail.getApartsQuantity());
         }
     }
 
@@ -773,6 +771,7 @@ public void test1(){
             removeFilterOnField("assetInfo.assetOwnerId3");
             removeFilterOnField("assetInfo.uid");
             Integer  fillterStepId;
+            searchFilters.add(new SearchFilter("createType", SearchFilter.Operator.EQ, 1));//医院创建
             if (queryIndex == 1) {//已报修 可取消
                 if (userContextService.hasRole("AssetStaff") && !userContextService.hasRole("AssetHead")) {
                     searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
@@ -1584,7 +1583,7 @@ public void test1(){
         } else {
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(locationName);
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picList,null);
             cancel();
         }
     }
@@ -1696,6 +1695,13 @@ public void test1(){
             currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
             eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
             itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
+            String partsType = String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType"));
+            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+            }
+            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+            }   
         } else {
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();

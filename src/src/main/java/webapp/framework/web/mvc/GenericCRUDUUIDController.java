@@ -287,22 +287,42 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
             String strId ="id";
             if(fieldName.equals(strId)){
                 if(filterValue != null){
+
                     String filterName = filterValue.toString();
 //                    List<String> stepIds = workOrderStepDao.findWorkIds(filterName);
-                    List<V2_WorkOrder_Step> steps = workOrderService.getWorkIds(filterName);
+                    List<String> OwerNames = workOrderService.findOwerNames(filterName);
+                    StringBuffer OwerNameStrBu = new StringBuffer();
+                    for(String s : OwerNames){
+                        OwerNameStrBu.append(s).append(",");
+                    }
+                    String OwerNameStr = OwerNameStrBu.toString();
+                    List<V2_WorkOrder_Step> steps = workOrderService.findWorkSteps(filterName);
                     List<String> stepIds = new ArrayList<>();
                     for(V2_WorkOrder_Step s : steps){
-                        String workAfterId = s.getWoId();
+//                        String workAfterId = s.getWoId();
+                        String workAfterId = "";
+                        Date lastDate = s.getStartTime();
+                        if(OwerNameStr.contains(s.getOwnerName())){
+                            workAfterId = s.getWoId();
+                        }
                         for(V2_WorkOrder_Step s2 : steps){
-                            if(s.getWoId() == s2.getWoId()){
-                                if(s.getStartTime().before(s2.getStartTime())){
-                                    workAfterId = s2.getWoId();
+                            if(s.getWoId().equals(s2.getWoId())){
+                                if(lastDate.before(s2.getStartTime())){
+                                    lastDate=s2.getStartTime();
+                                    if(OwerNameStr.contains(s2.getOwnerName())){
+                                        workAfterId = s2.getWoId();
+                                    }else{
+                                        workAfterId="";
+                                    }
                                 }
                             }
                         }
-                        stepIds.add(workAfterId);
+                        if(!workAfterId.equals("")){
+                            stepIds.add(workAfterId);
+                        }
                     }
                     removeFilterOnField("id");
+                    System.out.println(stepIds);
                     searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.IN, stepIds));
                 }
                 continue;

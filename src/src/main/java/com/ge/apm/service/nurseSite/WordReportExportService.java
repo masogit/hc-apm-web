@@ -2,6 +2,7 @@ package com.ge.apm.service.nurseSite;
 
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.policy.DynamicTableRenderPolicy;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.utils.ImageUtils;
@@ -28,6 +29,9 @@ public class WordReportExportService {
 
     @Autowired
     BlobFileService blobFileService;
+
+    @Autowired
+    UserAccountRepository userAccountRepository;
 
     private final static List<Integer> PASS_STATUS = Arrays.asList(2, 5, 6, 7);
     private final static List<Integer> FAILURE_STATUS = Arrays.asList(3, 8);
@@ -128,34 +132,11 @@ public class WordReportExportService {
                 dataMap = m.getValue();
                 XWPFDocument document = new XWPFDocument();
                 for (int i=0;i<nurseSiteMaintainItemList.size();i++) {
-                    int secondNum =0;
-                    int size = 0;
-                    boolean isPage = false;
                     if (i > 0) {
                         //不同设备分页
                         document.createParagraph().setPageBreak(true);
                     }
-                    for (int j = 1; j <=count ; j++) {
-                        Date date = dataMap.get(j);
-                        int day = date.getDate();
-                        if(count == 1){
-                            size=j;//第一页
-                        }else {
-                            if (day<=16){
-                                size=j;//第一页
-                            }else {
-                                isPage=true;
-                            }
-                        }
-                    }
-                    if (isPage) {
-                        creatPage(1,i,size,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
-                        document.createParagraph().setPageBreak(true);
-                        secondNum=size+1;
-                        creatPage(secondNum,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
-                    } else {
                         creatPage(1,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
-                    }
                 }
                 ByteArrayOutputStream outStream = new ByteArrayOutputStream();
                 document.write(outStream);
@@ -193,7 +174,7 @@ public class WordReportExportService {
         for (int n = secondNum; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
             Date date = dataMap.get(n);
-            String dateStr = DateFormatUtils.format(date, "yyyy-MM-dd");
+            String dateStr = DateFormatUtils.format(date, "MM-dd");
             tableOneRow.getCell(0).setText(dateStr);//时间
             Map<String, List<String>> stringListMap = stringMap.get(date);
             List<String> stringList = stringListMap.get(assetInfoName);
@@ -202,7 +183,15 @@ public class WordReportExportService {
                     tableOneRow.addNewTableCell().setText(stringList.get(j));
                 }
                 for (int m = 1; m <= 2; m++) {
-                    if( m==2){
+                    if( m==1){
+                        String uid = nurseSiteMaintainItem.getUpdateByUid();
+                        if(uid == null){
+                            tableOneRow.addNewTableCell().setText(null);
+                        }else {
+                            UserAccount userAccount = userAccountRepository.getByUid(uid);
+                            tableOneRow.addNewTableCell().setText(userAccount.getName());
+                        }
+                    }else if( m==2){
                         Map<String, String> map = commentMapMap.get(date);
                         String comment = map.get(assetInfoName);
                         tableOneRow.addNewTableCell().setText(comment);

@@ -18,7 +18,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select o from AssetInfo o where o.hospitalId = ?1 and o.isValid = true")
     public List<AssetInfo> getByHospitalId(int hospitalId);
-
+    @Query("select siteUID from AssetInfo where id = ?1")
+    String findSiteUidByAssetId(Integer id);
     @Query("select o from AssetInfo o where o.siteId=?1 and o.modalityId = ?2 and o.isValid = true")
     public List<AssetInfo> getBySiteIdAndModalityId(int siteId, String modalityId);
 
@@ -270,5 +271,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Transactional
     @Query(value = "UPDATE asset_info SET shared_asset_type = NULL WHERE uid IN ?1",nativeQuery = true)
     void  clearShareAssetTypeByIds(List<String> assetIds);
+
+    @Query(value = "select o.* from asset_info o where o.uid in ?1", nativeQuery = true)
+    List<AssetInfo> fetchListByUid(Set<String> listUid);
 
 }
