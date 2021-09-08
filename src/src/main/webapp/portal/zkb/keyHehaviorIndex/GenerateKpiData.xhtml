@@ -21,7 +21,6 @@
                             <h:panelGroup>
                                 <label class="label">生成月份</label>
                                 <p:calendar timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM" value="#{zkbKeyBehaviorIndexController.kpiDate}"
-                                            required="true" requiredMessage="生成月份 #{msg.ValidationRequire}"
                                             showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
