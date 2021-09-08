@@ -248,11 +248,13 @@ public class USProjectEditController extends JpaCRUDController<USProject> {
         try {
             savedfilePath = fileScanService.saveUSFile(event.getFile());
         } catch (Exception ex) {
+            log.error("USProject文件上传失败");
             WebUtil.addErrorMessage(event.getFile().getFileName() + "上传失败!");
             return;
         }
         if (Strings.isNullOrEmpty(savedfilePath)) {
             WebUtil.addErrorMessage(event.getFile().getFileName() + "保存失败!");
+            log.error("USProject文件上传失败");
             return;
         }
         pdf = event.getFile().getFileName();
