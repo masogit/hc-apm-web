@@ -229,7 +229,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      */
     @Override
     protected Page<ZkbFePartOrder> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters,false);
         zkbFePartOrderPage=zkbFePartOrderRepository.findBySearchFilter(searchFilters, pageRequest);
         return zkbFePartOrderPage;
     }
@@ -239,7 +239,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      * @param csearchFilters
      * @return
      */
-    public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters) {
+    public List<SearchFilter> getSearchFilter(List<SearchFilter> csearchFilters,boolean export) {
         List<SearchFilter> searchFilters = csearchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
@@ -248,13 +248,12 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         {
             searchFilters.add((new SearchFilter("tenantUid", SearchFilter.Operator.EQ,this.queryTenantUID)));
         }
-        if(StringUtils.isNotBlank(this.loginName)&&this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith))
+        if(!(StringUtils.isNotBlank(this.loginName)&&this.loginName.startsWith(ZkbFePartOrderService.testLoginNameStartWith)))
         {
+            searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ,ZkbFePartOrderService.testStatusFalseValue)));
+        }else if (!export){
             searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ,ZkbFePartOrderService.testStatusTrueValue)));
-        }else
-            {
-                searchFilters.add((new SearchFilter("testStatus", SearchFilter.Operator.EQ,ZkbFePartOrderService.testStatusFalseValue)));
-            }
+        }
         //判断是不是我的待办选项卡
         if(MY_WORK.equals(this.queryStatus))
         {
@@ -435,7 +434,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
     }
 
     public void exportAll(){
-        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters);
+        List<SearchFilter> searchFilters = getSearchFilter(this.searchFilters,true);
         Sort sort = new Sort(Sort.Direction.DESC, "orderType").and(new Sort(Sort.Direction.DESC, "reportDate"));
         List<ZkbFePartOrder> zkbFePartOrderList =  this.zkbFePartOrderRepository.findBySearchFilter(searchFilters,sort);
         try {
