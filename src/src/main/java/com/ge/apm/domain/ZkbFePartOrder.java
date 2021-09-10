@@ -27,7 +27,7 @@ public class ZkbFePartOrder {
      * GEAdminAcceptPart GEAdmin 部分归还
      */
     public enum workFlowStatus {
-        Requested,TenantAccept,TenantReject,FourHundredsAccept,GEAdminAccept,GEAdminAcceptPart
+        Requested, TenantAccept, TenantReject, FourHundredsAccept, GEAdminAccept, GEAdminAcceptPart
     }
 
     /**
@@ -36,7 +36,7 @@ public class ZkbFePartOrder {
      * Probe:探头申请
      */
     public enum OrderType {
-        ManMade,SpareParts,Probe
+        ManMade, SpareParts, Probe
     }
 
     /**
@@ -45,34 +45,34 @@ public class ZkbFePartOrder {
      * Complete:完成
      */
     public enum workFlowSteps {
-        Requested,WaitingAssignment,WaitingApm,WaitingGEAdmin,Complete
+        Requested, WaitingAssignment, WaitingApm, WaitingGEAdmin, Complete
     }
 
     public enum zkbPoProbeQuotaType {
-        Any,Special,Normal,High
+        Any, Special, Normal, High
     }
 
     /**
      * 流程步骤
      */
     public static String[] stepAndRoles = new String[]
-    {
-            workFlowSteps.Requested.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
-            workFlowSteps.WaitingAssignment.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
-            workFlowSteps.WaitingApm.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
-            workFlowSteps.WaitingGEAdmin.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
-            workFlowSteps.Complete.toString()
-    };
+            {
+                    workFlowSteps.Requested.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.WaitingAssignment.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingApm.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.WaitingGEAdmin.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
+                    workFlowSteps.Complete.toString()
+            };
 
     /**
      * 流程步骤
      */
     public static String[] probeStepAndRoles = new String[]
             {
-                    workFlowSteps.Requested.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString(),
-                    workFlowSteps.WaitingAssignment.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
-                    workFlowSteps.WaitingApm.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString(),
-                    workFlowSteps.WaitingGEAdmin.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
+                    workFlowSteps.Requested.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString(),
+                    workFlowSteps.WaitingAssignment.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingApm.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString(),
+                    workFlowSteps.WaitingGEAdmin.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
                     workFlowSteps.Complete.toString()
             };
 
@@ -81,9 +81,9 @@ public class ZkbFePartOrder {
      */
     public static String[] manmadeStepAndRoles = new String[]
             {
-                    workFlowSteps.Requested.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
-                    workFlowSteps.WaitingAssignment.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
-                    workFlowSteps.WaitingApm.toString()+","+ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.Requested.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
+                    workFlowSteps.WaitingAssignment.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingApm.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
                     workFlowSteps.Complete.toString()
             };
 
@@ -125,7 +125,7 @@ public class ZkbFePartOrder {
     private String status;
 
     /**
-     *SystemID/厂商报修ID
+     * SystemID/厂商报修ID
      */
     @Column(name = "system_id")
     private String systemId;
@@ -340,7 +340,7 @@ public class ZkbFePartOrder {
     private String fatherPartOrderNo;
 
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
-    @JoinColumn(insertable=false, updatable=false, name = "cat_id", referencedColumnName = "id")
+    @JoinColumn(insertable = false, updatable = false, name = "cat_id", referencedColumnName = "id")
     private ZkbPartOrderCat zkbPartOrderCat;
 
     /**
@@ -389,7 +389,7 @@ public class ZkbFePartOrder {
      * 是否为紧急订单
      */
     @Column(name = "urgent_order")
-    private String urgentOrder=ZkbFePartOrderService.urgentOrderFalse;
+    private String urgentOrder = ZkbFePartOrderService.urgentOrderFalse;
 
     /**
      * 订单紧急的原因
@@ -841,13 +841,11 @@ public class ZkbFePartOrder {
 
     public List<ZkbFePartOrderAssetInfo> getZkbReturnFePartOrderAssetInfoList() {
         List<ZkbFePartOrderAssetInfo> templeList = new ArrayList<>();
-        if(CollectionUtils.isEmpty(zkbFePartOrderAssetInfoList))
-        {
+        if (CollectionUtils.isEmpty(zkbFePartOrderAssetInfoList)) {
             return templeList;
         }
-        for(ZkbFePartOrderAssetInfo item:this.zkbFePartOrderAssetInfoList)
-        {
-            if(0==item.getAssetQty())
+        for (ZkbFePartOrderAssetInfo item : this.zkbFePartOrderAssetInfoList) {
+            if (0 == item.getAssetQty())
                 continue;
             templeList.add(item);
         }
