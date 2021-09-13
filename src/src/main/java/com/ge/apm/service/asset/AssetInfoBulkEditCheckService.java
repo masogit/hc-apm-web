@@ -50,8 +50,19 @@ public class AssetInfoBulkEditCheckService {
             status.add(ReceiveBorrowConstant.STATE_RETURN_ACCEPTED);
             status.add(ReceiveBorrowConstant.STATE_RETURN_DELIVERED);
             status.add(ReceiveBorrowConstant.STATE_RETURN_SUSPENDED);
-            int count = sharedAssetReqDetailRepository.findCountByAssetInfoIdsAndState(assetUids,status);
-            if(count > 0){
+            List<SharedAssetReqDetail> sharedAssetReqDetails = sharedAssetReqDetailRepository.findCountByAssetInfoIdsAndState(assetUids,status);
+            if(sharedAssetReqDetails.size() > 0){
+                for (int i = 0; i < sharedAssetReqDetails.size(); i++) {
+                    SharedAssetReqDetail sharedAssetReqDetail = sharedAssetReqDetails.get(i);
+                    String returnId = sharedAssetReqDetail.getReturnId();
+                    if(!"".equals(returnId) && returnId !=null){
+                        SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(returnId);
+                        int state = sharedAssetRequest.getState();
+                        if (state==ReceiveBorrowConstant.STATE_RETURN_CONFIRMED){
+                            return true;
+                        }
+                    }
+                }
                 return false;
             }
         }
