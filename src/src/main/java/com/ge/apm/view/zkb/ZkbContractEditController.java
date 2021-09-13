@@ -157,11 +157,11 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     public void contractTypeSelect(){
         queryQuota();
         if ("Create".equalsIgnoreCase(actionName)) {
-            if(ZkbContract.ContractType.Biomed.toString().equals(selected.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(selected.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selected.getContractType())){
                 selected.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
             }
         }else {
-            if(ZkbContract.ContractType.Biomed.toString().equals(selected.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(selected.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selected.getContractType())){
                 if(StringUtils.isEmpty(selected.getQuotaDeductType())){
                     selected.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
                 }
