@@ -52,14 +52,19 @@ public class AssetInfoBulkEditCheckService {
             status.add(ReceiveBorrowConstant.STATE_RETURN_SUSPENDED);
             List<SharedAssetReqDetail> sharedAssetReqDetails = sharedAssetReqDetailRepository.findCountByAssetInfoIdsAndState(assetUids,status);
             if(sharedAssetReqDetails.size() > 0){
+                List<String> assetUidList = new ArrayList<>();
                 for (int i = 0; i < sharedAssetReqDetails.size(); i++) {
                     SharedAssetReqDetail sharedAssetReqDetail = sharedAssetReqDetails.get(i);
-                    String returnId = sharedAssetReqDetail.getReturnId();
-                    if(!"".equals(returnId) && returnId !=null){
-                        SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(returnId);
-                        int state = sharedAssetRequest.getState();
-                        if (state==ReceiveBorrowConstant.STATE_RETURN_CONFIRMED){
-                            return true;
+                    String assetInfoUid = sharedAssetReqDetail.getAssetInfoId();
+                    if(!assetUidList.contains(assetInfoUid)){
+                        assetUidList.add(assetInfoUid);
+                        String returnId = sharedAssetReqDetail.getReturnId();
+                        if(!"".equals(returnId) && returnId !=null){
+                            SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(returnId);
+                            int state = sharedAssetRequest.getState();
+                            if (state==ReceiveBorrowConstant.STATE_RETURN_CONFIRMED){
+                                return true;
+                            }
                         }
                     }
                 }
