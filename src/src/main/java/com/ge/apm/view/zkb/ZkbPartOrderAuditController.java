@@ -1008,10 +1008,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     //region  关单审批归还
     public void onRowEditReturn(RowEditEvent event){
-        if(zkbPartOrderReturn.getDataStatus().equals(ZkbPartOrderReturn.DataStatusEnum.Pending)){
-            zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.N.toString());
+        ZkbPartOrderReturn r = (ZkbPartOrderReturn)event.getObject();
+        if(r.getDataStatus().equals(ZkbPartOrderReturn.DataStatusEnum.Pending)){
+            r.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.N.toString());
         }else{
-            zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString());
+            r.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString());
         }
     }
 
