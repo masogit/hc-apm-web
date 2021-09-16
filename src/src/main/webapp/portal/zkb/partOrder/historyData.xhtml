@@ -29,7 +29,7 @@
                     <p:commandButton validateClient="false"   value="#{msg.Search}" actionListener="#{zkbPartOrderAuditController.queryHistoryData()}" update="zkbHistoryQueryForm"/>
                 </p:panelGrid>
             </p:fieldset>
-            <p:fieldset legend="智康宝历史数据">
+            <p:fieldset legend="智康保历史数据">
                 <p:dataTable id="zkbHistoryDataList" value="#{zkbPartOrderAuditController.zkbHistoryDataList}" var="item"
                              widgetVar="zkbHistoryDataList" selectionMode="single" paginatorPosition="both" paginatorAlwaysVisible="true"
                              paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
