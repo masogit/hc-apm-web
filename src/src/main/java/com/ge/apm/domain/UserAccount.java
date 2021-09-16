@@ -274,9 +274,6 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "account_creation_type")
 	private Integer accountCreationType;
 
-	@Column(name = "dealer_name")
-	private String dealerName;
-
 	public Integer getAccountCreationType() {
 		return accountCreationType;
 	}
@@ -612,7 +609,6 @@ public class UserAccount implements ChineseName, Serializable {
 
 	@JsonIgnore
 	public List<String> getRoleNames() {
-		logger.info("Get role names {}", this.loginName);
 		if (userRoleNames == null) {
 			userRoleNames = new ArrayList<>();
 			for (UserRole userRole : userRoleList) {
@@ -627,7 +623,7 @@ public class UserAccount implements ChineseName, Serializable {
 				userRoleNames.add("SiteAdmin");
 			if (this.isLocalAdmin)
 				userRoleNames.add("LocalAdmin");
-            if (this.isGeOp!=null && this.isGeOp)
+            if (this.isGeOp!=null && this.isGeOp.booleanValue())
                 userRoleNames.add("GeOp");
 
 			//add mvs role
@@ -637,6 +633,9 @@ public class UserAccount implements ChineseName, Serializable {
 				} else if (this.getMvsRoleType() == 2) {
 					userRoleNames.add(ApmConstant.MVS_ROLE_NAME_FE);
 				}
+			} else {
+				logger.info("No mvs role found: {}", this.loginName);
+
 			}
 		}
 
@@ -1201,13 +1200,5 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public void setComment(String comment) {
 		this.comment = comment;
-	}
-
-	public String getDealerName() {
-		return dealerName;
-	}
-
-	public void setDealerName(String dealerName) {
-		this.dealerName = dealerName;
 	}
 }

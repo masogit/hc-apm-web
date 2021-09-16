@@ -46,10 +46,6 @@
                        access="hasAnyRole('DataMaintainStaff')"/>
         <intercept-url pattern="/admin/probeRecommendImage/**"
                        access="hasAnyRole('DataMaintainStaff')"/>
-        <intercept-url pattern="/admin/questionNaire/**"
-                       access="hasAnyRole('DataMaintainStaff')"/>
-        <intercept-url pattern="/admin/usProject/**"
-                       access="hasAnyRole('DataMaintainStaff')"/>
 
         <intercept-url pattern="/home.xhtml" access="isAuthenticated()"/>
         <intercept-url pattern="/api/**" access="isAuthenticated()"/>

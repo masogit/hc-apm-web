@@ -146,17 +146,6 @@ public class CoilOpportunityImageEditController extends JpaCRUDController<CoilOp
             WebUtil.addErrorMessage("货号已存在！");
             return "";
         } else {
-            if(selected.getSort() != null &&  selected.getSort()  < 1 ){
-                WebUtil.addErrorMessage("排序必须是正整数");
-                return "";
-            }
-            if(selected.getSort() != null &&  selected.getSort()  > 0 ){
-                CoilOpportunityImage image =   dao.findBySort(selected.getSort());
-                if(image!=null){
-                    WebUtil.addErrorMessage("排序不能重复");
-                    return "";
-                }
-            }
             newAdd = true;
             if (!uploadImage) {
                 // 新增货号时删除未保存货号时上传的图片
@@ -172,31 +161,6 @@ public class CoilOpportunityImageEditController extends JpaCRUDController<CoilOp
             return "coilOpportunityImageList?faces-redirect=true";
         }
     }
-
-
-
-    /**
-     * 修改 sort 和 tag
-     */
-    @Transactional
-    public String saveChange() {
-
-        if(selected.getSort() != null &&  selected.getSort()  < 1 ){
-            WebUtil.addErrorMessage("排序必须是正整数");
-            return "";
-        }
-        if(selected.getSort() != null &&  selected.getSort()  > 0 ){
-            CoilOpportunityImage image =   dao.findBySort(selected.getSort());
-            CoilOpportunityImage origin =   dao.findById(selected.getId());
-            if(image!=null  &&  origin.getSort() != image.getSort() ){
-                WebUtil.addErrorMessage("排序不能重复");
-                return "";
-            }
-        }
-            dao.save(selected);
-            return "coilOpportunityImageList?faces-redirect=true";
-    }
-
 
     private void createAttachments(CoilOpportunityImage image, String[] selectedPictures) {
         List<V2_BlobObject> attachList = new ArrayList<>();

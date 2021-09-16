@@ -1,14 +1,18 @@
 package com.ge.apm.service.uaa;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
 import com.ge.apm.dao.*;
-import com.ge.apm.dao.mapper.AssetInfoMapper;
-import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.UserTagsMapper;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.utils.ExcelParser;
-import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
-import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -19,18 +23,15 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
+import com.ge.apm.dao.mapper.UserAccountMapper;
+import com.ge.apm.service.utils.ExcelParser;
+import com.ge.apm.service.utils.PasswordUtil;
+import com.ge.apm.view.sysutil.UserContextService;
 
 @Service
 public class UserAccountImportService {
@@ -58,10 +59,8 @@ public class UserAccountImportService {
 	private static final String HEADER_TAGS="标签";
 	private static final String HEADER_PASSWORD= getEncryptedPass();
 	private static final String HEADER_UUID="UUID";
-	private static final String HEADER_DEALERNAME="所属代理商";
 	private static final String SHEET_USER="datalist";
 	private static final String ROLE_GUEST="仅报修权限账号";
-	public static final String GE_IB_TBL_EXCEL = "GEIBTableExcel";
 	private static Map<String,Integer> sysRoleMap;
 	private Map<String,OrgInfo> mapOrgInfo=new HashMap<String,OrgInfo>();
 	private Map<String,OrgInfo> mapUidOrgInfo=new HashMap<String,OrgInfo>();
@@ -107,9 +106,6 @@ public class UserAccountImportService {
 
 	@Autowired
 	UserTagsRepository userTagsDao;
-
-	@Autowired
-	AssetServiceMemberRepository assetServiceMemberRepository;
 
 	EmailValidator emailValidator = EmailValidator.getInstance();
 
@@ -766,7 +762,6 @@ public class UserAccountImportService {
 		String tagsJoined;
 		String password;
 		String UUID;
-		String dealerName;
 
 		int institutionIndex=header.get(HEADER_INSTITUTION);
 		int hospitalIndex=header.get(HEADER_HOSPITAL);
@@ -786,7 +781,6 @@ public class UserAccountImportService {
 		int tagsIndex=header.get(HEADER_TAGS);
 		Integer passwordIndex=header.get(HEADER_PASSWORD);
 		int uuidIndex=header.get(HEADER_UUID);
-		int dealerNameIndex = header.get(HEADER_DEALERNAME);
 
 		for (int j = 1; j <= sheet.getLastRowNum(); j++) {
 			Row row = sheet.getRow(j);
@@ -851,8 +845,7 @@ public class UserAccountImportService {
 				}
 
 				UUID=ExcelParser.getCellStringValue(row, uuidIndex);
-				dealerName = ExcelParser.getCellStringValue(row, dealerNameIndex);
-
+				
 				if(!pass){
 					importFailedDataList.add(newUser);
 					failedCount++;
@@ -885,9 +878,7 @@ public class UserAccountImportService {
 				newUser.setImportRoleNames(roleName);
 				newUser.setPosition(getPositionKey(position));
 				newUser.setTags(separateTags(tagsJoined));
-				if(StringUtils.isNotBlank(dealerName)){
-					newUser.setDealerName(dealerName);
-				}
+
 				//handle password
 				if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(password.trim())) {
 					String checkResult = PasswordUtil.checkPwd(password.trim());
@@ -953,39 +944,13 @@ public class UserAccountImportService {
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.ROLE,"角色不能为空;");
 					pass=false;
 				}
-
-				//判断该用户是否存在,存在，则更新 所属代理商 字段
-				UserAccount oldUser = userAccountRepository.findByLoginName(loginName);
-				//更新用户
-				if(oldUser != null){
-					Integer id = oldUser.getId();
-					String uid = oldUser.getUid();
-					String oldTel = oldUser.getTelephone();
-					String oldDealerName = oldUser.getDealerName();
-					logger.info(">>>>>>该用户已存在，更新用户信息。loginName: {}", oldUser.getLoginName());
-					BeanUtils.copyProperties(newUser, oldUser);
-					oldUser.setDealerName(dealerName);
-					oldUser.setId(id);
-					oldUser.setUid(uid);
-					if(handleUser(oldUser, oldTel)){
-						//如果代理商变动了，则根据用户名清空旧的代理商关系
-						if(oldDealerName != null && !oldDealerName.equals(dealerName)){
-							assetServiceMemberRepository.deleteByUserUid(uid, GE_IB_TBL_EXCEL);
-						}
-						successCount++;
-					}else{
-						importFailedDataList.add(oldUser);
-						failedCount++;
-					}
-				}else{
-				//新建用户
-					if(handleNewUser(newUser, institution, hospital, site, department,department2,department3)==false){
-						importFailedDataList.add(newUser);
-						failedCount++;
-					}
-					else{
-						successCount++;
-					}
+				
+				if(handleNewUser(newUser, institution, hospital, site, department,department2,department3)==false){
+					importFailedDataList.add(newUser);
+					failedCount++;
+				}
+				else{
+					successCount++;
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -1030,6 +995,7 @@ public class UserAccountImportService {
         TenantInfo tenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
 		//TODO nickName
 		try {
+
 
 			user.setCreatedBy(currentUser.getLoginName());
 			user.setCreatedDate(new Date());
@@ -1267,36 +1233,5 @@ public class UserAccountImportService {
 			result=result.substring(0, result.length()-1);
 		}
 		return result;
-	}
-
-	/**
-	 *更新用户信息
-	 * @param userAccount
-	 * @return
-	 */
-	private boolean handleUser(UserAccount userAccount, String oldTel){
-		//如果手机号发生变动，则校验手机号
-		if(null == oldTel || !oldTel.equals(userAccount.getTelephone())){
-			telephoneValid(userAccount);
-		}
-		if(!supplementUserRole(userAccount)){
-			return false;
-		}
-		if(checkData(userAccount)){
-			String institutionName = userAccount.getInstitutionName();
-			String hospitalName = userAccount.getHospitalName();
-			String siteName = userAccount.getSiteName();
-			String department = userAccount.getDepartName();
-			String department2 = userAccount.getDepartName2();
-			String department3 = userAccount.getDepartName3();
-
-			setUIDs(userAccount, institutionName, hospitalName, siteName, department,department2,department3);
-			supplementAccessScope(userAccount);
-			if(checkData(userAccount)){
-				createUser(userAccount);
-				return true;
-			}
-		}
-		return false;
 	}
 }
