@@ -30,34 +30,6 @@ public class CoilOpportunityImage implements Serializable {
     private String cataLog;
 
     /**
-     * 标签
-     */
-    @Column(name = "tag")
-    private String tag;
-
-    public String getTag() {
-        return tag;
-    }
-
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
-
-    /**
-     * 排序
-     */
-    @Column(name = "sort")
-    private Integer sort;
-
-    /**
      * 上传人
      */
     @Column(name = "creator_uid", columnDefinition = "CHAR(32)")

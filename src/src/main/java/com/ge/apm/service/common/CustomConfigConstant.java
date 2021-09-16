@@ -268,7 +268,7 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getTemplateEnableList() {
-        return Arrays.asList("GEIBTableExcel", "AssetInfoImportExcel", "DealerFEAndSalesExcel", "ZKBDealerFEAndSalesExcel", "UserAccountImportExcel");
+        return Arrays.asList("GEIBTableExcel", "AssetInfoImportExcel");
     }
     public static List<String> ninthHospitalNineAuthority() {
         return Arrays.asList("AssetHead","ITAdmin","DataMaintainStaff","AssetStaff","HospitalHead","DeptHead","GEInternalStaff");

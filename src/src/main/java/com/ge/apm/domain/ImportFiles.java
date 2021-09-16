@@ -31,11 +31,11 @@ public class ImportFiles {
 
     public enum ImportFileType {
         AconnectPerformanceExcel, AppTrainingExcel, AssetInfoImportExcel, ColdHeaderExcel, DealerFEAndSalesExcel,
-        EEMonitorCSV, GEIBTableExcel, OLERulesExcel, PMResultExcel, PMScheduleExcel, UserAccountImportExcel,
-        SrExcel, SrReportPdf, SrResetReport, UpTimeExcel, UsConnectStatusExcel, ZKBDealerFEAndSalesExcel,
+        EEMonitorCSV, GEIBTableExcel, OLERulesExcel, PMResultExcel, PMScheduleExcel,
+        SrExcel, SrReportPdf, SrResetReport, UpTimeExcel, UsConnectStatusExcel,
         UserAccountSendMailExcel, UserAssetCustomerExcel, UserAssetFeExcel, UserAssetOLEExcel, UserAssetSalesExcel,
         ZkbAssetTransferExcel, CarePackageExcel, MSARecommendExcel, PromotionActivityExcel, CoilOpportunityExcel,
-        TrainingQuotaExcel, MVSControlExcel, MVSMatrixExcel, SparePartExcel,IBReportExcel,TubeInfoExcel,IBUInfoExcel,ProbeRecommendExcel,ANSSpareExcel}
+        TrainingQuotaExcel, MVSControlExcel, MVSMatrixExcel, SparePartExcel,IBReportExcel,TubeInfoExcel,IBUInfoExcel,ProbeRecommendExcel}
 
 
     public static final String STATUS_COMPLETED = "COMPLETED";

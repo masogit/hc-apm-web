@@ -87,7 +87,7 @@ public class LoginTelValidController {
                 WebUtil.addSuccessMessage("验证码已发送,请查收短信."+expire+"分钟后可以重新发送");
             }
         }catch (Exception e){
-            logger.error("sendMsMCode failure", e);
+            e.printStackTrace();
             WebUtil.addErrorMessage("验证码发送失败,请稍后重试");
         }
     }

@@ -34,7 +34,4 @@ public interface OrgInfoMapper {
 			") select * from cte_org")
 	List<OrgInfo> listParentClinicalDeptsWithSelectedClinicalDept(@Param("orgUid") String orgUid);
 
-	@Select("select uid, name, org_type, org_level, parent_uid from org_info where uid = #{orgUid}")
-	OrgInfo getByUid(@Param("orgUid") String orgUid);
-
 }
