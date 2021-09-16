@@ -25,7 +25,7 @@ public class ZkbCourseImExportService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZkbCourseImExportService.class);
 
-    private static final String SHEET_ZKB_COURSE = "智康保课程";//WebUtil.getMessage("zkbCourse");
+    private static final String SHEET_ZKB_COURSE = "智康宝课程";//WebUtil.getMessage("zkbCourse");
 
     private final String HEADER_CID = "课程ID";
     private final String HEADER_CNAME = "课程名称";

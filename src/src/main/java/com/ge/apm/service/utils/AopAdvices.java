@@ -38,14 +38,14 @@ public class AopAdvices {
 
   public Object logTag(ProceedingJoinPoint point) throws Throwable {
     return Try.of(point::proceed)
-      .onSuccess(response -> log.info("method: {}, result: {}", point.getTarget().getClass().getCanonicalName().concat(".").concat(point.getSignature().getName().concat("(").concat(List.of(point.getArgs()).mkString(",")).concat(")")), response))
+      .onSuccess(response -> log.info("method: {}", point.getTarget().getClass().getCanonicalName().concat(".").concat(point.getSignature().getName().concat("(").concat(List.of(point.getArgs()).mkString(",")).concat(")"))))
       .onFailure(throwable -> log.warn("method: {}, stackTrace: {}", point.getTarget().getClass().getCanonicalName().concat(".").concat(point.getSignature().getName().concat("(").concat(List.of(point.getArgs()).mkString(",")).concat(")")), throwable.getStackTrace()))
       .getOrElseThrow(Function.identity());
   }
 
   public Object logRequest(ProceedingJoinPoint point) throws Throwable {
     return Try.of(point::proceed)
-      .onSuccess(response -> log.info("method: {}, result: {}", point.getTarget().getClass().getCanonicalName().concat(".").concat(point.getSignature().getName().concat("(").concat(List.of(point.getArgs()).mkString(",")).concat(")")), response))
+      .onSuccess(response -> log.info("method: {}", point.getTarget().getClass().getCanonicalName().concat(".").concat(point.getSignature().getName().concat("(").concat(List.of(point.getArgs()).mkString(",")).concat(")"))))
       .onFailure(throwable -> log.warn("method: {}, stackTrace: {}", point.getTarget().getClass().getCanonicalName().concat(".").concat(point.getSignature().getName().concat("(").concat(List.of(point.getArgs()).mkString(",")).concat(")")), throwable.getStackTrace()))
       .getOrElseThrow(Function.identity());
   }
