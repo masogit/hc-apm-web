@@ -430,6 +430,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','arrivalListName','到货单名称/编号','Arrival List Name/Number',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','arrivalListOrderType','到货单类型','Arrival List Type',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','arrivalListManufacture','生产厂家','Manufacturer',NULL,-1);
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','brandManufacturerShortName','品牌/制造商简称','Brand Manufacturer Short Name',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','arrivalListOrigin','产地','Origin',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','contractNo','合同号','Contract Number',NULL,-1);
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','arrivalListContractNum','合同号','Contract Number',NULL,-1);
@@ -2347,9 +2348,13 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ConfictingWithTheExistingRecords', '和已存在记录冲突。', 'Conficting with the existing records.', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BatchWorkSchedule', '批量排班', 'Batch Work Schedule', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BatchWorkScheduleType', '批量排班类型', 'Batch Work Schedule Type', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ShiftBusinessType', '排班业务类型', 'Shift Business Type', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'BatchWorkScheduleTypecannotbeEmpty', '批量排班类型不能为空', 'Batch Work Schedule Type cannot be empty', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ShiftBusinessTypecannotbeEmpty', '排班业务类型不能为空', 'Shift Business Type cannot be empty', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WeekDay', '工作日', 'WeekDay', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WeekEnd', '周末', 'WeekEnd', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Maintain', '维修', 'Maintain', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'Adjust', '调剂', 'Adjust', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SwapDutyOwner', '调剂值班负责人', 'Swap Duty Owner', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NormalDutyTime', '正常值班时间', 'Normal Duty Time', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'NightDutyTelephoneNumber', '夜班值班电话', 'Night Duty Telephone Number', NULL, '-1');
