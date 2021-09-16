@@ -27,7 +27,7 @@
         <div class="ui-g-12 card" >
             <p:accordionPanel id="accordion" multiple="false" >
                 <p:tab title="#{msg.BasicInfo}" style="margin-bottom:100px">
-                    <div class="ui-g">
+                    <div class="ui-g" >
                         <div class="ui-g-8 ui-g-nopad">
                             <p:panelGrid id="basicPanel" columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
                                 <h:panelGroup>
@@ -41,21 +41,22 @@
                                     <p:autoComplete id="descption" value="#{uSProjectDetailController.selected.descption}" readonly="false"  />
                                     <label class="label">#{msg.psiDescription}<span style="color:red"></span></label>
                                     <p:autoComplete id="psiDescription" value="#{uSProjectDetailController.selected.psiDescription}" required="false" readonly="true" />
-                                    <!--<label class="label">#{msg.pdf}<span style="color:red"></span></label>
-                                    <p:autoComplete id="pdf" value="#{uSProjectDetailController.selected.pdf}" required="false" readonly="true" />-->
-                                     <div style="margin-top: 55px;">
-                                    <a href="#{uSProjectDetailController.pdf}" title="download" >#{uSProjectDetailController.selected.pdf}</a>
-                                     </div>
-                                    <div class="ui-g-4"    style="margin-top: 80px;" >
-                                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                            <h:panelGroup id="buttonGroup">
-                                                <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{uSProjectEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
-                                            </h:panelGroup>
-                                        </p:panelGrid>
-                                    </div>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </div>
+                        <div class="ui-g-4"  style="margin-right:300px;" >
+                            <div class="container-fluid" style="height: 400px; overflow: auto;">
+                                <div class="row" id="picDiv">
+
+                                    <p:dataList id="pictureList" value="#{uSProjectDetailController.getAttachList(uSProjectDetailController.selected.name)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                        <f:facet name="header">pdf说明书</f:facet>
+                                        <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                                    </p:dataList>
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </p:tab>
             </p:accordionPanel>

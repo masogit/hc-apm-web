@@ -7,21 +7,18 @@ import com.ge.apm.domain.USProUp;
 import com.ge.apm.domain.USProject;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.utils.FileScanUSService;
 import com.ge.apm.view.asset.AssetInfoEditController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.UploadedFile;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
-
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
@@ -42,24 +39,20 @@ public class USProjectEditController extends JpaCRUDController<USProject> {
     private USProUpRepository uSProUpRepository;
     private BlobFileService blobService;
     private BlobObjectRepository blobDao;
-    private FileScanUSService fileScanService;
+
     @Setter
     @Getter
     private List<V2_BlobObject> attachements;
     @Setter
     @Getter
     private String[] selectedPictures;
-    //如果无图片 就显示请上传图片
+    //如果无 就显示请上传
     @Setter
     @Getter
     private boolean uploadFlag;
     @Setter
     @Getter
     private boolean newAdd;
-
-    @Setter
-    @Getter
-    private String pdf;
 
 
     private boolean uploadImage;
@@ -70,7 +63,6 @@ public class USProjectEditController extends JpaCRUDController<USProject> {
         dao = WebUtil.getBean(USProjectRepository.class);
         uSProUpRepository = WebUtil.getBean(USProUpRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-        fileScanService = WebUtil.getBean(FileScanUSService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         if ("Create".equalsIgnoreCase(actionName)) {
@@ -101,7 +93,7 @@ public class USProjectEditController extends JpaCRUDController<USProject> {
     }
 
     /**
-     * 获取图片列表
+     * 获取列表
      *
      * @param name
      * @return
@@ -110,13 +102,13 @@ public class USProjectEditController extends JpaCRUDController<USProject> {
         if (attachements == null) {
             attachements = blobService.findBlobObjectsByBoUid(name);
         }
-        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG) && item.getBoType().equals(V2_BlobObject.BO_TYPE_US_Option) ).collect(Collectors.toList());
+        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_PDF) && item.getBoType().equals(V2_BlobObject.BO_TYPE_US_PROJECT) ).collect(Collectors.toList());
         uploadFlag = collect.size() == 0;
         return collect;
     }
 
     /**
-     * 删除图片
+     * 删除pdf
      *
      * @param blobId
      */
@@ -126,20 +118,28 @@ public class USProjectEditController extends JpaCRUDController<USProject> {
     }
 
     /**
-     * 添加图片
+     * 添加pdf
      *
      * @param event
      */
     public void handleFileUpload(FileUploadEvent event) {
         if (StringUtils.isEmpty(selected.getName())) {
-            WebUtil.addErrorMessage("name");
+            WebUtil.addErrorMessage("name必填");
             return;
         }
+        //查找name 是否有 pdf  一个name 只允许一个pdf
+        List<V2_BlobObject> attachs = blobService.findBlobObjectsByBoUid(selected.getName());
+        List<V2_BlobObject> collect = attachs.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_PDF) && item.getBoType().equals(V2_BlobObject.BO_TYPE_US_PROJECT) ).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(collect)){
+            WebUtil.addErrorMessage("一个name只能上传一个pdf说明书！");
+            return;
+        }
+
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             attachements.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_US_Option);
-            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_US_PROJECT);
+            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_PDF);
             blobObject.setBoUuid(selected.getName());
             blobService.saveBlobObject(blobObject);
             uploadImage = true;
@@ -152,6 +152,9 @@ public class USProjectEditController extends JpaCRUDController<USProject> {
     public String getListPageLink() {
         return "USProjectList?faces-redirect=true";
     }
+
+
+
 
 
     @Transactional
@@ -168,7 +171,6 @@ public class USProjectEditController extends JpaCRUDController<USProject> {
             // name 不存在，则新增
                 selected.setCreatorUID(UserContextService.getCurrentUserAccount().getUid());
                 selected.setCreateTime(new Date());
-                selected.setPdf(this.pdf);
                 this.create();
                 if(StringUtils.isNotEmpty(selected.getPsiDescription())){ //保存关系表
                     String psi = selected.getPsiDescription();
@@ -222,54 +224,13 @@ public class USProjectEditController extends JpaCRUDController<USProject> {
         List<V2_BlobObject> attachList = new ArrayList<>();
         for (String item : selectedPictures) {
             V2_BlobObject blobObject = blobDao.findAllByObjectStorageId(item).stream().findFirst().get();
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_US_Option);
-            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_IMG);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_US_PROJECT);
+            blobObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_PDF);
             blobObject.setBoUuid(image.getName());
             blobObject.setBoId(image.getId());
             attachList.add(blobObject);
         }
         blobDao.save(attachList);
-    }
-
-    private UploadedFile file;
-
-    public UploadedFile getFile() {
-        return file;
-    }
-
-    public void setFile(UploadedFile file) {
-        this.file = file;
-    }
-
-    //上传文件，返回文件全路径明
-    public void  uploadDataFile(FileUploadEvent event) {
-
-        String savedfilePath = null;
-        try {
-            savedfilePath = fileScanService.saveUSFile(event.getFile());
-        } catch (Exception ex) {
-            log.error("USProject文件上传失败"+ex.getMessage());
-            WebUtil.addErrorMessage(event.getFile().getFileName() + "上传失败!");
-            return;
-        }
-        if (Strings.isNullOrEmpty(savedfilePath)) {
-            WebUtil.addErrorMessage(event.getFile().getFileName() + "保存失败!");
-            log.error("USProject文件上传失败--savedfilePath is null");
-            return;
-        }
-        pdf = event.getFile().getFileName();
-        WebUtil.addSuccessMessage(event.getFile().getFileName() + "上传文件成功！");
-    }
-    // 删除pdf文件
-    public  void  removeFile(){
-        if(StringUtils.isNotEmpty(pdf)){
-            //删除之前，先查询 是否有其他方案用此说明书,有则不删
-            if(dao.countByPdf(pdf) == 0) {
-                fileScanService.deleteFile(pdf);
-            }
-            pdf = null;
-            WebUtil.addSuccessMessage( "删除说明书成功！");
-        }
     }
 
 
