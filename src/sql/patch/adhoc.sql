@@ -21,3 +21,6 @@ update asset_alert_config set config_type =103 where config_type =113 and upper_
 
 --   USUpgradeRecommendExcel
 insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values ('gamePlanBatchFileType','USUpgradeRecommendExcel',(select id from sys_role where name = 'DataMaintainStaff'),'DataMaintainStaff',0);
+
+--   hotfix   9.17
+ALTER TABLE  us_project drop pdf ;
