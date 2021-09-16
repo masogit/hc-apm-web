@@ -58,8 +58,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private String reason;
     private boolean operateFlag = false;
     private ZkbPartOrderUserConfigRepository zkbPartOrderUserConfigRepository;
-    private boolean newContractFlag = false;
-
     private ZkbContractCat zkbContractCatSelected;
     private List<I18nMessage> quotaDeductTypeList = new ArrayList<>();
     I18nMessageRepository i18nMessageRepository;
@@ -100,12 +98,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             zkbContractAssetList = zkbContractService.queryAssetByContractId(this.selected.getId());
             zkbContractCatList = zkbContractService.queryCatByContractId(this.selected.getId());
             prepareEdit();
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            if(ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(selected.getQuotaDeductType())){
-                newContractFlag = false;
-            }else{
-                newContractFlag = true;
-            }
         }
         queryQuota();
         targetAssets = new ArrayList();
@@ -165,8 +157,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     public void contractTypeSelect(){
         queryQuota();
         if ("Create".equalsIgnoreCase(actionName)) {
-            if(ZkbContract.ContractType.Biomed.toString().equals(selected.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(selected.getContractType())){
+            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selected.getContractType())){
                 selected.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
+            }
+        }else {
+            if(ZkbContract.ContractType.DI.toString().equals(selected.getContractType()) || ZkbContract.ContractType.PCB.toString().equals(selected.getContractType())){
+                if(StringUtils.isEmpty(selected.getQuotaDeductType())){
+                    selected.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
+                }
             }
         }
     }
@@ -615,14 +613,6 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void setOperateFlag(boolean operateFlag) {
         this.operateFlag = operateFlag;
-    }
-
-    public boolean isNewContractFlag() {
-        return newContractFlag;
-    }
-
-    public void setNewContractFlag(boolean newContractFlag) {
-        this.newContractFlag = newContractFlag;
     }
 
     public ZkbContractCat getZkbContractCatSelected() {

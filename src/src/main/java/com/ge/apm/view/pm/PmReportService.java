@@ -397,18 +397,20 @@ public class PmReportService {
             hmCheck = pmOrderService.fetchHmCheck(pmCheckItemList, pmOrder);
         }
 
+        String safetySchema = reportList.stream().filter(item -> Objects.equals(item.getBoType(), "pm-safety-report"))
+                .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
+        String performanceSchema = reportList.stream().filter(item -> Objects.equals(item.getBoType(), "pm-performance-report"))
+                .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
         InputStream rawTemplate;
+
         if (rule != null && !Strings.isNullOrEmpty(rule.getReportStorageId())) {
             // get template if the report storage is set.
             StreamedContent template = this.blobService.getBlobObjectByStorageId(rule.getReportStorageId());
-            rawTemplate = template.getStream();
+            InputStream blobInputStream = template.getStream();
+            rawTemplate = this.pmOrderReportTemplateService.updateReportTemplateBySchemaId(blobInputStream, safetySchema, performanceSchema);
         } else {
             // generate template otherwise.
             try {
-                String safetySchema = reportList.stream().filter(item -> Objects.equals(item.getBoType(), "pm-safety-report"))
-                        .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
-                String performanceSchema = reportList.stream().filter(item -> Objects.equals(item.getBoType(), "pm-performance-report"))
-                        .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
                 rawTemplate = this.pmOrderReportTemplateService.generateReportTemplateBySchemaId(activeTemplateBytes, safetySchema, performanceSchema);
             } catch (IOException e) {
                 throw new BusinessException("自动模版生成失败");

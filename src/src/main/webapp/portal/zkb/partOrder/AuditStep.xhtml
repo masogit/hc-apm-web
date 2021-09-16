@@ -660,6 +660,9 @@
                                 <p:column headerText="配件号">
                                     <p:inputText value="#{item.partNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                                 </p:column>
+                                <p:column headerText="实际配件号*">
+                                    <p:inputText value="#{item.actualPartNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                                </p:column>
                             </c:when>
                             <c:when test="#{zkbPartOrderAuditController.orderType eq 'Tool'}">
                                 <p:column headerText="工具号">
@@ -673,9 +676,11 @@
                         <p:column headerText="配件数量">
                             <h:outputText value="#{item.prePartQty}"/>
                         </p:column>
-                        <p:column headerText="实际配件数量">
-                            <p:spinner value="#{item.partQty}" min="0" max="#{item.prePartQty}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
-                        </p:column>
+                        <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
+                            <p:column headerText="实际配件数量">
+                                <p:spinner value="#{item.partQty}" min="0" max="#{item.prePartQty}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                            </p:column>
+                        </c:if>
                         <p:column headerText="配件SN(序列号)">
                             <h:outputText value="#{item.serialNumber}"/>
                         </p:column>

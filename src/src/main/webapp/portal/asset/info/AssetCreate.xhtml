@@ -8,8 +8,8 @@
 
     <ui:define name="content">
         <script type="text/javascript" src="#{wechatUtilService.getContextPath()}/resources/js/jquery.jplayer.min.js"/>
-        <!--<script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>-->
+        <script type="text/javascript" src="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/viewerjs@1.9.0/dist/viewer.min.css"/>
         <!--        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css"/>-->
         <style>
             div.ui-panelgrid-cell>label+div.ui-selectonemenu {
@@ -148,7 +148,7 @@
                                             <!--                                            </p:galleria>-->
                                             <!--<h:inputText value="#{assetInfoEditController.uploadFlag}"></h:inputText>-->
                                             <div class="container-fluid" style="height: 400px; overflow: auto;">
-                                                <div class="row" id="picDiv">
+                                                <div class="row" id="assetPagePicDiv">
                                                     <c:forEach items="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="attach" >
                                                         <div>
                                                             <img data-original="#{fileDownloadService.getImgUrl(attach.objectStorageId)}"
@@ -158,7 +158,7 @@
                                                     </c:forEach>
                                                 </div>
                                                 <script>
-                                                    new Viewer(document.getElementById('picDiv'), {inline: true});
+                                                    new Viewer(document.getElementById('assetPagePicDiv'), {inline: true});
                                                 </script>
                                             </div>
                                         </h:panelGroup>

@@ -698,6 +698,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         flag = false;
                         errorLog += "Order#不能为空,";
                     }
+                    if(ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType()) && StringUtils.isEmpty(zkbPartOrderItem.getActualPartNo())){
+                        flag = false;
+                        errorLog += "实际配件号不能为空,";
+                    }
                     if(zkbPartOrderItem.getPrePartQty() > zkbPartOrderItem.getPartQty()){
                         if(StringUtils.isEmpty(zkbPartOrderItem.getRemark())){
                             flag = false;
@@ -762,18 +766,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     WebUtil.addErrorMessage("请填写审批数据","");
                     return "";
                 }
-                zkbPartOrderService.returnAudit(selected,auditReturnList,currentUser);
-                boolean isAllYes = true;
-                for(ZkbPartOrderReturn r : zkbPartOrderReturnList){
-                    if(ZkbPartOrderReturn.DataStatusEnum.Reject.toString().equals(r.getDataStatus())){
-                        isAllYes = false;
-                    }
-                }
-                if(ZkbPartOrder.PartOrderStatus.Returned.toString().equals(selected.getStatus()) && !isAllYes){
-                    zkbPartOrderService.closedBack(selected,currentUser);
-                }else{
-                    zkbPartOrderService.partsClosed(selected,currentUser);
-                }
+                zkbPartOrderService.returnAudit(selected,auditReturnList,currentUser,zkbPartOrderReturnList);
+
                 selected = zkbPartOrderRepository.findById(selected.getId());
             }
         } else {
@@ -1014,10 +1008,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
 
     //region  关单审批归还
     public void onRowEditReturn(RowEditEvent event){
-        if(zkbPartOrderReturn.getDataStatus().equals(ZkbPartOrderReturn.DataStatusEnum.Pending)){
-            zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.N.toString());
+        ZkbPartOrderReturn r = (ZkbPartOrderReturn)event.getObject();
+        if(r.getDataStatus().equals(ZkbPartOrderReturn.DataStatusEnum.Pending)){
+            r.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.N.toString());
         }else{
-            zkbPartOrderReturn.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString());
+            r.setModifyFlag(ZkbPartOrderReturn.ModifyFlagEnum.Y.toString());
         }
     }
 

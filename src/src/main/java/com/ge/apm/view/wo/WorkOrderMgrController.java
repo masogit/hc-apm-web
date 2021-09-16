@@ -1695,6 +1695,13 @@ public void test1(){
             currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
             eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
             itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
+            String partsType = String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType"));
+            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+            }
+            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+            }   
         } else {
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
