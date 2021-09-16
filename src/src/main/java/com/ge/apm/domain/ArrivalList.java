@@ -76,10 +76,15 @@ public class ArrivalList implements Serializable {
     @Size(max = 64)
     @Column(name = "manufacture")
     private String manufacture;
-    
+
     @Size(max = 64)
     @Column(name = "manufacture_id")
     private String manufactureId;//制造商Id
+
+    //品牌/制造商简称
+    @Size(max = 64)
+    @Column(name = "brandmanufacturer_shortname")
+    private String brandManufacturerShortName;
 
     //品牌
     @Size(max = 64)
@@ -594,6 +599,13 @@ public class ArrivalList implements Serializable {
         this.isEdit = isEdit;
     }
 
+    public String getBrandManufacturerShortName() {
+        return brandManufacturerShortName;
+    }
+
+    public void setBrandManufacturerShortName(String brandManufacturerShortName) {
+        this.brandManufacturerShortName = brandManufacturerShortName;
+    }
     @Override
     public int hashCode() {
         Integer hash = 0;
