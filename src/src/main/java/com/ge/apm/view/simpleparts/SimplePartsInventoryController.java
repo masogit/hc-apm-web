@@ -1,5 +1,6 @@
 package com.ge.apm.view.simpleparts;
 
+import com.ge.apm.dao.mapper.simpleparts.SimplePartsInventoryMapper;
 import com.ge.apm.dao.simpleparts.SimplePartsInventoryRepository;
 import com.ge.apm.dao.simpleparts.SimplePartsWarehouseLocatorRepository;
 import com.ge.apm.domain.simpleparts.SimplePartsInventory;
@@ -11,11 +12,13 @@ import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.simpleparts.SimplePartsConfigService;
 import com.ge.apm.service.simpleparts.SimplePartsInventoryService;
 import com.ge.apm.service.simpleparts.SimplePartsWarehouseService;
+import com.ge.apm.service.simpleparts.SimplePartsWarehouseUserService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -25,9 +28,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -47,9 +48,11 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
     private SimplePartsInventoryRepository partsInventoryRepository;
     private SimplePartsWarehouseService partsWarehouseService;
     private SimplePartsWarehouseLocatorRepository partsWarehouseLocatorRepository;
+    private SimplePartsWarehouseUserService partsWarehouseUserService;
     private ConfigService workflowConfigService;
     private UaaService uuaService;
     private SimplePartsConfigService partsConfigService;
+    private UserContextService userContextService;
 
     /**
      * @author csh
@@ -69,6 +72,8 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
         partsWarehouseLocatorRepository = WebUtil.getBean(SimplePartsWarehouseLocatorRepository.class);
         workflowConfigService = WebUtil.getBean(ConfigService.class);
         partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        partsWarehouseUserService = WebUtil.getBean(SimplePartsWarehouseUserService.class);
     }
 
     /**
@@ -115,14 +120,35 @@ public class SimplePartsInventoryController extends GenericCRUDUUIDController<Si
         setUserSearchFilters();
 
         List<String> orgUidList = uuaService.getOrgListByUser(currentUserAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//
+//        Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+//        return res;
+        Boolean bool = userContextService.isPartsAdmin();
+        if(bool==true){
+            String userUid = currentUserAccount.getUid();
+            List<String> partsWarehouses = partsWarehouseUserService.findAllByPartsWarehouseByUserUid(userUid);
+            Set<String> warehouses = new HashSet<>(partsWarehouses);
+            if(warehouses.size() == 0){
+                searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, null));
+                Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+                return res;
+            }
+            searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, partsWarehouses));
+//          List<SimplePartsInventory> res= partsInventoryRepository.findByPartsWarehouseIds(warehouses);
+//            searchFilters.add(new SearchFilter("partsWarehouseId", SearchFilter.Operator.IN, warehouses, ""));
+            Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+            return res;
+        }else{
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, null));
+            Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
+            return res;
+        }
 
-        Page<SimplePartsInventory> res = partsInventoryRepository.findBySearchFilter(this.searchFilters, pageRequest);
-        return res;
     }
 
     @Override

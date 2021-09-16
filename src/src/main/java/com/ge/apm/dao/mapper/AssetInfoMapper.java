@@ -70,4 +70,7 @@ public interface AssetInfoMapper {
 	 */
 	@SelectProvider(type = AssetInfoProvider.class,method="getMvsWorkOrders")
 	List<String> getMvsWorkOrders(@Param("orgList")List<String> orgList,@Param("tenantUid")String tenantUid);
+
+	@SelectProvider(type = AssetInfoProvider.class,method="countAssetWithQRcode")
+	Integer countAssetWithQRcode(@Param("uidList")List<String> uidList,@Param("tenantUid")String tenantUid);
 }

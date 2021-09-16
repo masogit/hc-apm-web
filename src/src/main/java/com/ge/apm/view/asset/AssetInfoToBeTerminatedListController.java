@@ -1,13 +1,7 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
@@ -40,8 +34,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,6 +59,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
     private OrgInfoTreeService orgInfoTreeService;
     private I18nMessageRepository i18nDao;
     private AssetInfoParentAssetService parentAssetService;
+    private AssetHistoryService assetHistoryService;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -162,6 +156,7 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         uuaService = WebUtil.getBean(UaaService.class);
         assetLifecyleService = WebUtil.getBean(AssetLifecyleService.class);
         parentAssetService = WebUtil.getBean(AssetInfoParentAssetService.class);
+        assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap<>();
@@ -513,9 +508,11 @@ public class AssetInfoToBeTerminatedListController extends JpaCRUDController<Ass
         logger.info("Terminate: " + assetInfo.getUid());
         if (validateTermination(assetInfo)) return;
         int originStatus = assetInfo.getStatus();
+        AssetInfo oldAssetInfo = assetHistoryService.depCopy(assetInfo);
         assetInfo.setStatus(4);
         assetInfo.setIsValid(false);
         assetInfo.setTerminateDate(new Date());
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,assetInfo);
         dao.save(assetInfo);
         assetLifecyleService.saveLifecycle(originStatus,assetInfo,UserContextService.getCurrentUserAccount());
         aiMgrService.updateNurseSiteMaintain(assetInfo.getUid());

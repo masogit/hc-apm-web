@@ -44,10 +44,6 @@
                                     <label class="label">#{msg.zkbFePartOrder_hospitalClientPhone}*</label>
                                     <p:inputText maxlength="20" disabled="#{!zkbFePartOrderDetailController.hasEditRight('Requested')}" id="hospitalClientPhone" required="true" requiredMessage="#{msg.zkbFePartOrder_hospitalClientPhone} #{msg.ValidationRequire}" value="#{zkbFePartOrderDetailController.selected.hospitalClientPhone}"  />
                                 </h:panelGroup>
-<!--                                <h:panelGroup>-->
-<!--                                    <label class="label">#{msg.zkbFePartOrder_position}</label>-->
-<!--                                    <p:inputText maxlength="20" disabled="#{!zkbFePartOrderDetailController.workFlowInFistStep() or !zkbFePartOrderDetailController.hasEditRight()}" id="position" value="#{zkbFePartOrderDetailController.selected.position}" />-->
-<!--                                </h:panelGroup>-->
                                 <h:panelGroup>
                                     <label class="label">#{msg.zkbFePartOrder_functionType}</label>
                                     <p:inputText id="functionType" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.functionType}"  />
@@ -72,13 +68,9 @@
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_isSubtractTotalStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
-<!--                                <h:panelGroup>-->
-<!--                                    <label class="label">#{msg.zkbFePartOrder_location}</label>-->
-<!--                                    <p:inputText maxlength="20" disabled="#{!zkbFePartOrderDetailController.workFlowInFistStep() or !zkbFePartOrderDetailController.hasEditRight()}" id="location" value="#{zkbFePartOrderDetailController.selected.location}" />-->
-<!--                                </h:panelGroup>-->
                                 <h:panelGroup rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingAssignment')}">
                                     <label class="label">#{msg.zkbFePartOrder_currentStatus}</label>
-                                    <p:inputText maxlength="20" disabled="true" id="status" value="#{fieldMsg.fieldValue('zkbFePartOrder_status', zkbFePartOrderDetailController.selected.status)}" />
+                                    <p:inputText maxlength="20" disabled="true" id="status" value="#{zkbFePartOrderController.getI18(zkbFePartOrderDetailController.selected.status,zkbFePartOrderDetailController.selected.orderType)}" />
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.zkbFePartOrder_phenomenon}*</label>
@@ -110,10 +102,6 @@
                                     <p:column headerText="#{msg.zkbContract_spareQuota}">
                                         <h:outputText value="#{item.spareQuota}"/>
                                     </p:column>
-<!--                                    <p:column headerText="#{msg.zkbContract_probeQuota}" >-->
-<!--                                        <h:outputText value="#{item.probeQuota}"/>-->
-<!--                                    </p:column>-->
-
                                     <p:column headerText="探头任意剩余名额" >
                                         <h:outputText value="#{item.probeQuota}"/>
                                     </p:column>
@@ -123,10 +111,6 @@
                                     <p:column headerText="探头特殊剩余名额" >
                                         <h:outputText value="#{item.probeQuotaSpecial}"/>
                                     </p:column>
-<!--                                    <p:column headerText="探头高值剩余名额" >-->
-<!--                                        <h:outputText value="#{item.probeQuotaHigh}"/>-->
-<!--                                    </p:column>-->
-
                                     <p:column headerText="#{msg.zkbContract_geArtificialSupportTimes}" >
                                         <h:outputText value="#{item.geArtificialSupportTimes}"/>
                                     </p:column>
@@ -146,6 +130,7 @@
                                     <f:facet name="{Toolbar}">
                                     </f:facet>
                                 </p:dataTable>
+                                <p:outputLabel id="tips" rendered="#{zkbFePartOrderDetailController.hasEditRight('Requested') and zkbFePartOrderDetailController.checkContractDate()}" style="color: red;font-weight:bold;margin-left: 30px;font-size: larger"  value="您选择的合同已不在有效期内，请结合业务确认是否继续申请流程！"/>
                             </p:fieldset>
                         </h:panelGroup>
                     </p:fieldset>

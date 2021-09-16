@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
+import java.io.*;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -37,6 +38,8 @@ public class AssetHistoryService {
     public static final String FIELD_ASSET_DEPT_NAME = "assetDeptName";
     public static final String FILED_CLINICAL_DEPT_NAME = "clinicalDeptName";
     public static final String FILED_DEVICE_STATUS = "deviceStatus";
+    public static final String FILED_STATUS = "status";
+    public static final String IS_VALID = "isValid";
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -141,7 +144,7 @@ public class AssetHistoryService {
         Object oldFieldValue = null;
         Object newFieldValue = null;
 
-        if (FILED_DEVICE_STATUS.equals(fieldName)) {
+        if (FILED_DEVICE_STATUS.equals(fieldName)) {   // 资产状态
             Field field = oldAsset.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
 
@@ -159,6 +162,40 @@ public class AssetHistoryService {
                 newFieldValue = i18nMessageService.getMsgLabelByMsgTypeAndMsgKey("deviceStatus", String.valueOf(newFieldValue));
             }
 
+        } else if(FILED_STATUS.equals(fieldName)) {    // 当前状态
+            Field field = oldAsset.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+
+            oldFieldValue = field.get(oldAsset);
+            newFieldValue = field.get(newAsset);
+
+            if (Objects.equals(oldFieldValue, newFieldValue)) {
+                return Optional.empty();
+            }
+
+            if (null != oldFieldValue) {
+                oldFieldValue = i18nMessageService.getMsgLabelByMsgTypeAndMsgKey("assetStatus", String.valueOf(oldFieldValue));
+            }
+            if (null != newFieldValue) {
+                newFieldValue = i18nMessageService.getMsgLabelByMsgTypeAndMsgKey("assetStatus", String.valueOf(newFieldValue));
+            }
+        } else if(IS_VALID.equals(fieldName)) {
+            Field field = oldAsset.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+
+            oldFieldValue = field.get(oldAsset);
+            newFieldValue = field.get(newAsset);
+
+            if (Objects.equals(oldFieldValue, newFieldValue)) {
+                return Optional.empty();
+            }
+
+            if (null != oldFieldValue) {
+               oldFieldValue = Boolean.valueOf(String.valueOf(oldFieldValue)) ? "是" : "否";
+            }
+            if (null != newFieldValue) {
+                newFieldValue = Boolean.valueOf(String.valueOf(newFieldValue)) ? "是" : "否";
+            }
         }
 
         if (Objects.equals(oldFieldValue, newFieldValue)) {
@@ -228,6 +265,8 @@ public class AssetHistoryService {
                 Optional<AssetHistory.AssetHistoryInfo> optionalResult;
                 switch (fieldName) {
                     case FILED_DEVICE_STATUS:
+                    case FILED_STATUS:
+                    case IS_VALID:
                         optionalResult = getSpecialFieldValue(oldAsset, newAsset, fieldName);
                         break;
                     case FIELD_ASSET_DEPT_NAME:
@@ -311,8 +350,26 @@ public class AssetHistoryService {
         assetHistory.setHospitalUID(currentUserAccount.getHospitalUID());
         assetHistory.setTenantUID(currentUserAccount.getTenantUID());
         assetHistory.setInstitutionUID(currentUserAccount.getInstitutionUID());
+        assetHistory.setClinicalDeptUid(newAsset.getClinicalDeptUID());
 
         this.save(assetHistory);
+    }
+
+    public  <T> T depCopy(T srcList) {
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(byteOut);
+            out.writeObject(srcList);
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+            ObjectInputStream inStream = new ObjectInputStream(byteIn);
+            T destList = (T) inStream.readObject();
+            return destList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

@@ -37,6 +37,10 @@ public class ZkbContract implements ChineseName, Serializable {
         OC,NextYearBalance,Others
     }
 
+    public enum QuotaDeductTypeEnum{
+        New,Old,Null
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -289,6 +293,21 @@ public class ZkbContract implements ChineseName, Serializable {
     @JoinColumn(insertable=false, updatable=false,name = "contract_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     Set<ZkbContractAsset> zkbContractAssets = new HashSet<>();
 
+    /**
+     * New Old
+     */
+    @Column(name = "quota_deduct_type")
+    private String quotaDeductType;
+
+    public String getQuotaDeductType() {
+        return quotaDeductType;
+    }
+
+    public void setQuotaDeductType(String quotaDeductType) {
+        this.quotaDeductType = quotaDeductType;
+    }
+    @Transient
+    private String tenantName;
 
     public String getModifyType() {
         return modifyType;
@@ -769,5 +788,13 @@ public class ZkbContract implements ChineseName, Serializable {
             return 0;
         }
         return days;
+    }
+
+    public String getTenantName() {
+        return tenantName;
+    }
+
+    public void setTenantName(String tenantName) {
+        this.tenantName = tenantName;
     }
 }

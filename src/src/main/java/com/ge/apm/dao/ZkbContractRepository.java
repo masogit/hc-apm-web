@@ -66,4 +66,8 @@ public interface ZkbContractRepository extends GenericRepositoryUUID<ZkbContract
      */
     List<ZkbContract> findByIdIn(Set<String> contractIdSet);
 
+    @Query(value = "select distinct c.tenant_uid from zkb_contract c where c.start_date <?2 and c.end_date >= ?1 and c.last_modified_date >= ?1 and c.last_modified_date < ?2", nativeQuery = true)
+    List<String> queryByLastModifiedDate(Date d1,Date d2);
+
+
 }

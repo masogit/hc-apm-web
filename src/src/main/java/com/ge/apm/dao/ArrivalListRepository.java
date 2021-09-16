@@ -23,6 +23,7 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
     List<ArrivalList> findByContractItemIdIn(Collection<String> itemId);
 
     List<ArrivalList> findBySupplierId(Integer supplierId);
+    ArrivalList findByName(String name);
 
     @Modifying
     @Transactional
@@ -38,4 +39,18 @@ public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList
     public List<String> getArrivalListNotFinishedIds(List<String> orgUidList);
     @Query(value = "select distinct(list.id) from arrival_list list,arrival_list_item item where list.id=item.arrival_list_id and (list.tenant_uid in(?1) or list.site_uid in(?1) or list.institution_uid in(?1) or list.hospital_uid in(?1)) and list.status=2 and item.install_status in('instorage','finished')",nativeQuery = true)
     public List<String> getArrivalListPartiallyFinishedIds(List<String> orgUidList);
+    @Query(value = "select list.hospital_uid,list.institution_uid,list.site_uid,list.tenant_uid from arrival_list list where id = ?1}",nativeQuery = true)
+    public List<String> getArrivalListHILT(String id);
+    @Query(value = "select * from arrival_list list where id = ?1}",nativeQuery = true)
+    public ArrivalList getById(String id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE arrival_list SET is_edit=true where id=?1", nativeQuery = true)
+    public void updateIsEdit(String id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE arrival_list SET vendor=?1,supplier_id=?2,supplier_user_id=?3 WHERE id in ?4", nativeQuery = true)
+    public void updateBatchSupplier(String vendor, Integer supplierId, Integer SupplierUserId, List<String> ids);
 }

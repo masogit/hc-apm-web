@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import webapp.framework.util.StringUtil;
+
+import javax.persistence.Column;
 
 /**
  *
@@ -143,7 +146,41 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         }
 
     }
-    public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
+
+    public String getSrNum(String numType) {
+        String gatewayURL = null;
+        if(numType.equals("pm")) {
+            gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE).concat("/getPmNum");
+        } else if(numType.equals("work")) {
+            gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE).concat("/getSrNum");
+        } else {
+            return null;
+        }
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return String.valueOf(responseMap.get("data"));
+        } else {
+            return null;
+        }
+    }
+    public  Map<String, Object> findSupplierFEByAssetUid( AssetInfo asset) {
+        HttpHeaders header = createHttpHeaders(UserContextService.getAccessToken());
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        String gatewayURL = getGatewayURL(GatewayURL.SUPPLIER_FE_BY_ASSETUID);
+        String url = gatewayURL.replace("{assetUid}",asset.getUid());
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap;
+        } else {
+            return null;
+        }
+    }
+
+    public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList,Integer createType) {
         ServiceRequestForm formData = new ServiceRequestForm();
         formData.setAssetId(asset.getId());
         formData.setAssetStatus(String.valueOf(asset.getStatus()));
@@ -158,6 +195,8 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setCustomerName(newServiceRequest.getCustomerName());
         formData.setCustomerTel(newServiceRequest.getCustomerTel());
         formData.setCustomerPosition(newServiceRequest.getCustomerPosition());
+        formData.setCreateType(createType!= null ?createType :1);
+        formData.setSupplierUid(asset.getSupplierNewUID());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
@@ -226,6 +265,27 @@ class ServiceRequestForm {
     String customerName;
     String customerTel;
     String customerPosition;
+    /**
+     * 创建方式 1:医院创建  2:供应商创建
+     */
+    Integer createType = 1;
+    String supplierUid;
+
+    public String getSupplierUid() {
+        return supplierUid;
+    }
+
+    public void setSupplierUid(String supplierUid) {
+        this.supplierUid = supplierUid;
+    }
+
+    public Integer getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(Integer createType) {
+        this.createType = createType;
+    }
 
     public String getAssetLocation() {
         return assetLocation;

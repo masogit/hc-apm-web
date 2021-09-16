@@ -119,6 +119,13 @@ public class ZkbOrderHistory {
     private String systemNo;
 
     /**
+     * 备注
+     */
+    @Column(name = "remark")
+    private String remark;
+
+
+    /**
      * 故障描述
      */
     @Column(name = "fault_description")
@@ -634,5 +641,13 @@ public class ZkbOrderHistory {
 
     public void setHighValueLimitCount(Integer highValueLimitCount) {
         this.highValueLimitCount = highValueLimitCount;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

@@ -7,6 +7,7 @@ package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AeMapper;
 import com.ge.apm.dao.mapper.AssetTagsMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
@@ -21,19 +22,21 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-
-import java.util.*;
-import java.util.stream.Collectors;
 import javaslang.Tuple2;
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
 import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -42,7 +45,8 @@ import webapp.framework.web.WebUtil;
 @ManagedBean
 @ViewScoped
 public class AssetInfoDetailController {
-
+    private Logger log = Logger.getLogger(AssetInfoController.class.getName());
+    private AeMapper aeMapper;
     private AssetInfoRepository assetDao;
     private MvsAssetInfoRepository mvsAssetInfoDao;
     private MvsUtil mvsUtil;
@@ -60,7 +64,6 @@ public class AssetInfoDetailController {
     private AssetHistoryService assetHistoryService;
     private SysAuthGroupRepository sysAuthGroupDao;
     private UserAccountRepository userAccountRepository;
-
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
@@ -75,7 +78,7 @@ public class AssetInfoDetailController {
     private String maintanceType = "internal";
 
     private List<AssetLifecycleEvent> assetEvents;
-
+    private Boolean termOptions = Boolean.TRUE;//期限选项
     @Getter
     private List<JSONObject> changeHistoryList = Collections.emptyList();
     private SysAuthGroup selectedAuthGroup;
@@ -83,6 +86,7 @@ public class AssetInfoDetailController {
     @PostConstruct
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        aeMapper = WebUtil.getBean(AeMapper.class);
         mvsAssetInfoDao = WebUtil.getBean(MvsAssetInfoRepository.class);
         mvsUtil = WebUtil.getBean(MvsUtil.class);
         pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
@@ -143,6 +147,113 @@ public class AssetInfoDetailController {
         return orgDao.getByUid(uid);
     }
 
+    public void getPerformanceByDay(){
+        String str = aeMapper.selectAeMapperBean(String.valueOf(selected.getId()));
+        if(str!=null && selected.getStudydate()!=null){
+            List<HashMap> list = aeMapper.selectAeWorkloadBeanByDay(str,selected.getStudydate());
+            if(list!= null && !list.isEmpty() && list.get(0)!=null){
+                HashMap hashMap = list.get(0);
+                Date startTime = (Date) hashMap.get("start_time");
+                Date endTime = (Date) hashMap.get("end_time");
+                Double studyexposuretime = (Double) hashMap.get("studyexposuretime");
+                selected.setAet((String)hashMap.get("aet"));
+                selected.setStudydate((Date)hashMap.get("studydate"));
+                selected.setStartTime(startTime);
+                selected.setEndTime(endTime);
+                selected.setStudyexposuretime((double)Math.round(studyexposuretime/3600*100)/100);
+                double count = studyexposuretime / ((endTime.getTime() - startTime.getTime())/1000);
+                count = (double)Math.round(count*10000)/100;
+                selected.setUsageRate(count+"%");
+                Double monitorRate = selected.getMonitorRate();
+                Double otherPower = selected.getOtherPower();
+                Double unitPriceElectricity = selected.getUnitPriceElectricity()!=null ?selected.getUnitPriceElectricity() :0D;
+                double energyConsumption = (monitorRate + otherPower) * unitPriceElectricity * studyexposuretime / 3600;
+                selected.setEnergyConsumption((double)Math.round(energyConsumption*100)/100);
+            }else {
+                setCancel();
+            }
+        }
+    }
+    private void setCancel(){
+        selected.setStartTime(null);
+        selected.setEndTime(null);
+        selected.setStudyexposuretime(null);
+        selected.setUsageRate(null);
+        selected.setEnergyConsumption(null);
+    }
+
+    public Boolean getTermOptions() {
+        return termOptions;
+    }
+
+    public void setTermOptions(Boolean termOptions) {
+        this.termOptions = termOptions;
+        setCancel();
+        selected.setStudydate(null);
+    }
+
+    public void getPerformanceByMonth(){
+        String str = aeMapper.selectAeMapperBean(String.valueOf(selected.getId()));
+        if(str!=null && selected.getStudydate()!=null){
+            List<HashMap> list = aeMapper.selectAeWorkloadBeanByMonthMin(str,selected.getStudydate(),getLastDayOfMonth(selected.getStudydate()));
+            if(list!= null && !list.isEmpty() && list.get(0)!=null){
+                HashMap hashMap = list.get(0);
+                Date startTime = (Date) hashMap.get("min");
+                Date endTime = (Date) hashMap.get("max");
+                Double studyexposuretime = 0D;
+                List<HashMap> mapList = aeMapper.selectAeWorkloadBeanSumStudyexposuretime(str,selected.getStudydate(),getLastDayOfMonth(selected.getStudydate()));
+                if(mapList!= null && !mapList.isEmpty()){
+                    HashMap map = mapList.get(0);
+                    studyexposuretime = (Double) map.get("sum");
+                }
+                selected.setStartTime(startTime);
+                selected.setEndTime(endTime);
+                selected.setStudyexposuretime((double)Math.round(studyexposuretime/3600*100)/100);
+                double count = studyexposuretime / ((endTime.getTime() - startTime.getTime())/1000);
+                count = (double)Math.round(count*10000)/100;
+                selected.setUsageRate(count+"%");
+                Double monitorRate = selected.getMonitorRate();
+                Double otherPower = selected.getOtherPower();
+                Double unitPriceElectricity = selected.getUnitPriceElectricity()!=null ?selected.getUnitPriceElectricity() :0D;
+                double energyConsumption = (monitorRate + otherPower) * unitPriceElectricity * studyexposuretime / 3600;
+                selected.setEnergyConsumption((double)Math.round(energyConsumption*100)/100);
+            }else {
+                setCancel();
+            }
+        }
+    }
+    public String getListDetail() throws UnknownHostException {
+        String str = aeMapper.selectAeMapperBean(String.valueOf(selected.getId()));
+        if(str!=null){
+            List<String> list = aeMapper.selectAeWorkloadBeanByDashboardPage(str);
+            if(list!=null && !list.isEmpty()){
+                String dashboardPage = list.get(0);
+                String dashboardPageStart = dashboardPage.substring(0,dashboardPage.indexOf("#"));
+                String dashboardPageEnd = dashboardPage.substring(dashboardPage.indexOf("#"));
+                InetAddress addr = InetAddress.getLocalHost();
+                String hostAddress = addr.getHostAddress();
+                String token = UserContextService.getAccessToken().substring(7);
+                String url="http://"+hostAddress+ "/"+dashboardPageStart +"?"+"token="+token+dashboardPageEnd+"/device";
+                log.info("url="+url);
+                return url;
+            }
+
+        }
+        return null;
+    }
+    public static Date getLastDayOfMonth(final Date date) {
+
+        final Calendar cal = Calendar.getInstance();
+
+        cal.setTime(date);
+
+        final int last = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        cal.set(Calendar.DAY_OF_MONTH, last);
+
+        return cal.getTime();
+
+    }
     public List<V2_BlobObject> getAttachList(String assetuid, String type) {
         if (attachements == null || attachements.isEmpty()) {
             List<SearchFilter> sfs = new ArrayList();

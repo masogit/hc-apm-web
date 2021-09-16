@@ -94,8 +94,6 @@ public class ZkbContractImportService {
 
             Map<String, Object> map = new LinkedHashMap();
             ZkbContractVO contractInfoVO = new ZkbContractVO();
-
-
             contractInfoVO.setLineNum(i);
 
             ZkbContractRow contractRow = new ZkbContractRow(contractInfoVO, rowMap);
@@ -105,6 +103,7 @@ public class ZkbContractImportService {
             contractRow.setFieldStringValue("合同类型", "setContractType");
             contractRow.setFieldDateValue("合同开始日期", "setStartDate");
             contractRow.setFieldDateValue("合同结束日期", "setEndDate");
+            contractRow.setFieldStringValue("名额扣除类型", "setQuotaDeductType");
             contractRow.setFieldNumValue("IB数量", "setIbNumber");
             contractRow.setFieldNumValue("备件剩余名额", "setSpareQuota");
             contractRow.setFieldNumValue("备件总额", "setSpareQuotaTotal");
@@ -115,7 +114,6 @@ public class ZkbContractImportService {
             contractRow.setFieldNumValue("探头任意总额", "setProbeQuotaTotal");
             contractRow.setFieldNumValue("探头任意剩余名额", "setProbeQuota");
             contractRow.setFieldNumValue("探头任意已使用名额", "setProbeQuotaUse");
-
 
             contractRow.setFieldNumValue("探头普通总额", "setProbeQuotaNormalTotal");
             contractRow.setFieldNumValue("探头普通剩余名额", "setProbeQuotaNormal");
@@ -194,6 +192,15 @@ public class ZkbContractImportService {
     protected void importOneContract(ZkbContractVO contractInfoVO,UserAccount currentUser) {
         ZkbContract zkbContract = queryContractByNo(contractInfoVO.getContractNo());
         if(zkbContract != null){
+            if(StringUtils.isNotEmpty(contractInfoVO.getQuotaDeductType())){
+                if("旧逻辑扣减".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+                }else if("新逻辑扣减".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
+                }else if("N/A".equals(contractInfoVO.getQuotaDeductType())){
+                    zkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
+                }
+            }
             zkbContract.setSpareQuotaTotal(contractInfoVO.getSpareQuotaTotal());
             zkbContract.setSpareQuota(contractInfoVO.getSpareQuota());
             zkbContract.setSpareQuotaUse(contractInfoVO.getSpareQuotaUse());
@@ -219,6 +226,15 @@ public class ZkbContractImportService {
             newZkbContract.setCreatedBy(currentUser.getLoginName());
             newZkbContract.setCreatedDate(new Date());
 
+            if(StringUtils.isNotEmpty(newZkbContract.getQuotaDeductType())){
+                if("旧逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
+                }else if("新逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.New.toString());
+                }else if("N/A".equals(newZkbContract.getQuotaDeductType())){
+                    newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Null.toString());
+                }
+            }
             newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
             newZkbContract.setProbeQuotaApply(newZkbContract.getProbeQuotaTotal() - newZkbContract.getProbeQuotaUse() - newZkbContract.getProbeQuota());
             newZkbContract.setGeArtificialSupportTimesApply(newZkbContract.getGeArtificialSupportTimesTotal() - newZkbContract.getGeArtificialSupportTimesUse() - newZkbContract.getGeArtificialSupportTimes());
@@ -265,11 +281,11 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorContractTypeIsEmpty"));
             isValidateData = false;
         }else{
-            if(!EnumUtils.isValidEnum(ZkbContract.ContractType.class,contractInfoVO.getContractType())){
+            /*if(!EnumUtils.isValidEnum(ZkbContract.ContractType.class,contractInfoVO.getContractType())){
                 item.put("status", ImportStatus.Failure);
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTypeIsNotRange"));
                 isValidateData = false;
-            }
+            }*/
         }
 
         if(contractInfoVO.getStartDate() == null){
@@ -294,6 +310,11 @@ public class ZkbContractImportService {
                 ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractTenantUIDExist"));
                 isValidateData = false;
             }
+        }
+        if(StringUtils.isEmpty(contractInfoVO.getQuotaDeductType())){
+            item.put("status", ImportStatus.Failure);
+            ZkbContractRow.addErrMessage(item, "探头名额扣除类型不能为空！");
+            isValidateData = false;
         }
 
         int spareQuotaTotal = contractInfoVO.getSpareQuotaTotal() == null ? 0 : contractInfoVO.getSpareQuotaTotal();
@@ -358,7 +379,13 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item,  "备件/人工/保养总额小于备件/人工/保养剩余名额、备件/人工/保养已使用名额之和");
             isValidateData = false;
         }
-
+        if(ZkbContract.ContractType.Biomed.toString().equals(contractInfoVO.getContractType()) || ZkbContract.ContractType.CCS.toString().equals(contractInfoVO.getContractType())) {
+            if (ZkbContract.QuotaDeductTypeEnum.Null.toString().equals(contractInfoVO.getQuotaDeductType())) {
+                item.put("status", ImportStatus.Failure);
+                ZkbContractRow.addErrMessage(item, "合同扣除类型不能为N/A");
+                isValidateData = false;
+            }
+        }
         for (Map<String, Object> tempContractMap: importContractMapList) {
             ZkbContractVO tempZkbContractVO = (ZkbContractVO)tempContractMap.get("contractInfoVO");
             Integer tempHashCode = Integer.valueOf(tempContractMap.get("hashCode").toString());
@@ -785,10 +812,19 @@ public class ZkbContractImportService {
             }
         }
 
-        if(zkbContractCatVO.getSnNo() == null){
+        if(StringUtils.isEmpty(zkbContractCatVO.getSnNo())){
             item.put("status", ImportStatus.Failure);
             ZkbContractCatRow.addErrMessage(item, "SN编号不能为空");
             isValidateData = false;
+        }else{
+            if(StringUtils.isNotEmpty(zkbContractCatVO.getContractId())){
+                ZkbContractCat zkbContractCat = zkbContractCatRepository.findFirstByContractIdAndSnNo(zkbContractCatVO.getContractId(),zkbContractCatVO.getSnNo());
+                if(zkbContractCat != null){
+                    item.put("status", ImportStatus.Failure);
+                    ZkbContractCatRow.addErrMessage(item, "SN编号不能重复");
+                    isValidateData = false;
+                }
+            }
         }
 
         if(zkbContractCatVO.getEnabledName() == null){

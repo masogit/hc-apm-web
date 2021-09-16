@@ -1,5 +1,6 @@
 package com.ge.apm.dao;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -71,9 +72,67 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	@Modifying
 	@Query(value = "delete from nurse_site_maintain_item where parent_id = ?1", nativeQuery = true)
 	void deleteMaintainItemByParentId(String parentId);
+
+	@Transactional
+	@Modifying
+	@Query(value = "delete from nurse_site_maintain_item where parent_id in ?1", nativeQuery = true)
+	void deleteMaintainItemByParentId(Set<String> parentId);
 	
 	@Transactional
 	@Modifying
 	@Query(value = "delete from nurse_site_maintain_item a where a.id not in (select b.parent_id from nurse_site_maintain_data b )", nativeQuery = true)
 	void deleteInvalid();
+
+	@Transactional
+	@Modifying
+	//@Query(value = "update nurse_site_maintain_item set comment=?5 where schedule_date>=?1 and schedule_date<?2 and id in (select b.id from nurse_site_maintain_item b where b.status=0 and b.schedule_date>=?1 and b.schedule_date<?2 and b.asset_uid in(select a.uid from asset_info a where a.uid in (select d.asset_uid from nurse_site_maintain_item d where d.schedule_date>=?1 and d.schedule_date<?2) and a.status = ?3 ) and b.config_id in (select c.id from nurse_site_maintain_config c where c.type=?4))", nativeQuery = true)
+	@Query(value = "update nurse_site_maintain_item nsmi set comment=?5 where nsmi.status = 0 and nsmi.schedule_date>=?1 and nsmi.schedule_date<?2 and exists(select * from asset_info ai where ai.uid=nsmi.asset_uid and ai.status=?3 and not exists(select * from nurse_tenant_exception nte where nte.tenant_uid=ai.tenant_uid)) and exists(select * from nurse_site_maintain_config nsmc where nsmc.id=nsmi.config_id and nsmc.type=?4)", nativeQuery = true)
+	void updateDailyByStatus(Date startDate,Date endDate,int status,int configType,String comment);
+
+	@Transactional
+	@Modifying
+	//@Query(value = "update nurse_site_maintain_item set comment=?5 where schedule_date>=?1 and schedule_date<?2 and id in (select b.id from nurse_site_maintain_item b where b.status=0 and b.schedule_date>=?1 and b.schedule_date<?2 and b.asset_uid in(select a.uid from asset_info a where a.uid in (select d.asset_uid from nurse_site_maintain_item d where d.schedule_date>=?1 and d.schedule_date<?2) and a.is_valid = ?3 ) and b.config_id in (select c.id from nurse_site_maintain_config c where c.type=?4))", nativeQuery = true)
+	@Query(value = "update nurse_site_maintain_item nsmi set comment=?5 where nsmi.status = 0 and nsmi.schedule_date>=?1 and nsmi.schedule_date<?2 and exists(select * from asset_info ai where ai.uid=nsmi.asset_uid and ai.is_valid=?3 and not exists(select * from nurse_tenant_exception nte where nte.tenant_uid=ai.tenant_uid)) and exists(select * from nurse_site_maintain_config nsmc where nsmc.id=nsmi.config_id and nsmc.type=?4)", nativeQuery = true)
+	void updateDailyByValid(Date startDate,Date endDate,boolean status,int configType,String comment);
+
+	@Transactional
+	@Modifying
+	//@Query(value = "update nurse_site_maintain_item set comment=?5 where schedule_date>=?1 and schedule_date<?2 and id in (select b.id from nurse_site_maintain_item b where b.status=0 and b.schedule_date>=?1 and b.schedule_date<?2 and b.asset_uid in(select a.uid from asset_info a where a.uid in (select d.asset_uid from nurse_site_maintain_item d where d.schedule_date>=?1 and d.schedule_date<?2) and a.is_deleted = ?3 ) and b.config_id in (select c.id from nurse_site_maintain_config c where c.type=?4))", nativeQuery = true)
+	@Query(value = "update nurse_site_maintain_item nsmi set comment=?5 where nsmi.status = 0 and nsmi.schedule_date>=?1 and nsmi.schedule_date<?2 and exists(select * from asset_info ai where ai.uid=nsmi.asset_uid and ai.is_deleted=?3 and not exists(select * from nurse_tenant_exception nte where nte.tenant_uid=ai.tenant_uid)) and exists(select * from nurse_site_maintain_config nsmc where nsmc.id=nsmi.config_id and nsmc.type=?4)", nativeQuery = true)
+	void updateDailyByDelete(Date startDate,Date endDate,boolean status,int configType,String comment);
+
+	@Transactional
+	@Modifying
+	//@Query(value = "update nurse_site_maintain_item set check_date=?5,modify_date=?5,status=?6 where schedule_date>=?1 and schedule_date<?2 and id in (select b.id from nurse_site_maintain_item b where b.status=0 and b.schedule_date>=?1 and b.schedule_date<?2 and b.asset_uid in(select a.uid from asset_info a where a.uid in (select d.asset_uid from nurse_site_maintain_item d where d.schedule_date>=?1 and d.schedule_date<?2) and (a.status in ?3 or a.is_valid=false or a.is_deleted=true) ) and b.config_id in (select c.id from nurse_site_maintain_config c where c.type=?4))", nativeQuery = true)
+	@Query(value = "update nurse_site_maintain_item nsmi set check_date=?5,modify_date=?5,status=?6 where nsmi.status = 0 and nsmi.schedule_date>=?1 and nsmi.schedule_date<?2 and exists(select * from asset_info ai where ai.uid=nsmi.asset_uid and (ai.status in ?3 or ai.is_valid=false or ai.is_deleted=true) and not exists(select * from nurse_tenant_exception nte where nte.tenant_uid=ai.tenant_uid)) and exists(select * from nurse_site_maintain_config nsmc where nsmc.id=nsmi.config_id and nsmc.type=?4)", nativeQuery = true)
+	void updateDailyByStatus(Date startDate, Date endDate, Collection<Integer> statusArr, int configType, Date currentDate, int status);
+
+	@Query(value="select o.id from nurse_site_maintain_item o where o.parent_id in ?1 and o.status=0",nativeQuery=true)
+	public Set<String> findIdsByParentId0(Set<String> parentIds);
+
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=2 where id in ?1 and schedule_date>=?5 and (comment is null or comment='')", nativeQuery = true)
+	void completeMaintainItem2(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate);
+
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=5 where id in ?1 and schedule_date>=?5 and (comment is not null and comment!='')", nativeQuery = true)
+	void completeMaintainItem5(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate);
+
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=6 where id in ?1 and schedule_date<?5 and (comment is not null and comment!='')", nativeQuery = true)
+	void completeMaintainItem6(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate);
+
+	@Transactional
+	@Modifying
+	@Query(value = "update nurse_site_maintain_item set signature_id = ?2, modify_by = ?3, check_date=?4, modify_date=?4, signature_source_type=0,status=7 where id in ?1 and schedule_date<?5 and (comment is null or comment='')", nativeQuery = true)
+	void completeMaintainItem7(Set<String> ids,String signature,String modifyUid,Date modifyDate,Date delayDate);
+
+	@Query(value="select o.* from nurse_site_maintain_item o where o.asset_uid=?1 and o.parent_id in ?2",nativeQuery=true)
+	public List<NurseSiteMaintainItem> findByParentIdAndAssetUid(String assetUid,Set<String> parentIds);
+	//0：未检查,1:已检查，2:通过没commnet没有delay，3有问题，延期了,4进行中,5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，8，有问题，没有延期
+
+
 }

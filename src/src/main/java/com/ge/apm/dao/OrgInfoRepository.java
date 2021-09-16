@@ -14,7 +14,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     // @QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true")
     // })
     public List<OrgInfo> getByHospitalId(int hospitalId);
-
+    @Query("select o from OrgInfo o where o.uid = ?1")
+    OrgInfo getOrgInfoUIDByUid(String uid);
     /*
      * @Query(value =
      * "select t.uid from org_info t where site_uid in (?1) and name LIKE concat('%',?2,'%')"
@@ -79,11 +80,20 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query(value = "select o.uid from org_info o where o.org_type=4 and o.hospital_uid in (?1) ", nativeQuery = true)
     public List<String> findClinicalUidByHospitalUid(List<String> orgUid);
 
+    @Query(value = "select o.uid from org_info o where o.org_type=4 and o.hospital_uid in (?1) ", nativeQuery = true)
+    public List<String> findClinicalUidByHospitalUid(Set<String> orgUid);
+
     @Query(value = "select o.uid from org_info o where o.org_type=4 and o.institution_uid in (?1) ", nativeQuery = true)
     public List<String> findClinicalUidByInstitutionUid(List<String> orgUid);
 
+    @Query(value = "select o.uid from org_info o where o.org_type=4 and o.institution_uid in (?1) ", nativeQuery = true)
+    public List<String> findClinicalUidByInstitutionUid(Set<String> orgUid);
+
     @Query(value = "select o.uid from org_info o where o.org_type=4 and o.tenant_uid in (?1) ", nativeQuery = true)
     public List<String> findClinicalUidByTenantUid(List<String> orgUid);
+
+    @Query(value = "select o.uid from org_info o where o.org_type=4 and o.tenant_uid in (?1) ", nativeQuery = true)
+    public List<String> findClinicalUidByTenantUid(Set<String> orgUid);
 
     @Query(value = "select o.* from org_info o where o.uid in ?1 and o.site_uid=?2", nativeQuery = true)
     public List<OrgInfo> findByUidAndSiteUid(List<String> orgUid, String siteUid);
@@ -267,4 +277,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     @Query(value = "select o.name from org_info o where o.uid in (select c.parent_uid from org_info c where  c.uid =  ?1)", nativeQuery = true)
     String findParentNameByUid(String uid);
+
+    @Query(value = "select o.uid from org_info o where o.org_type=4 and o.site_uid in (?1) ", nativeQuery = true)
+    public List<String> findClinicalUidBySiteUid(Set<String> orgUid);
 }

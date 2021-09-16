@@ -20,6 +20,7 @@ import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.wo.PmOrderReportTemplateService;
+import com.ge.apm.service.wo.WorkOrderPublishRenderService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.google.common.base.Strings;
 import org.apache.commons.io.IOUtils;
@@ -41,9 +42,12 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 public class PmReportService {
+    static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(PmReportService.class);
 
     private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final String SIGNATURE_HOLDER = "审核人签名：";
+    private static final String MAINTENANCE_COMPLETION_SIGNATURE_TITLE = "保养完成签名：";
+    private static final String ACCEPTANCE_SIGNATURE_TITLE = "验收签名：";
     private static final String EMPTY_SIGNATURE_HOLDER = "";
 
     @Autowired
@@ -237,10 +241,39 @@ public class PmReportService {
             }
         }
 
+        //保养完成签名
+        String wcSignature = pmOrder.getWcSignature();
+        if (!Strings.isNullOrEmpty(wcSignature)) {
+            byte[] signatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(wcSignature);
+            if (signatureBytes != null) {
+                content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.toString(), MAINTENANCE_COMPLETION_SIGNATURE_TITLE);
+                content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), new PictureRenderData(100, 80, "wcSignature.png", signatureBytes));
+            }
+        }
+        //验收签名
+        String ackSignature = pmOrder.getAckSignature();
+        if (!Strings.isNullOrEmpty(ackSignature)) {
+            byte[] signatureBytes = this.pmOrderReportTemplateService.getSignatureBytes(ackSignature);
+            if (signatureBytes != null) {
+                content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE_TITLE.toString(), ACCEPTANCE_SIGNATURE_TITLE);
+                content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString(), new PictureRenderData(100, 80, "ackSignature.png", signatureBytes));
+            }
+        }
+
         if (!content.containsKey(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString())) {
             byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
             content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE_PLACE_HOLDER.toString(), EMPTY_SIGNATURE_HOLDER);
             content.put(MaintenanceTemplate.Component.ACCESSORY_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+        }
+        if (!content.containsKey(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString())) {
+            byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
+            content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE_TITLE.toString(), EMPTY_SIGNATURE_HOLDER);
+            content.put(MaintenanceTemplate.Component.MAINTENANCE_COMPLETION_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
+        }
+        if (!content.containsKey(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString())) {
+            byte[] signatureBytes = this.pmOrderReportTemplateService.getDefaultSignatureBytes();
+            content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE_TITLE.toString(), EMPTY_SIGNATURE_HOLDER);
+            content.put(MaintenanceTemplate.Component.ACCEPTANCE_SIGNATURE.toString(), new PictureRenderData(1, 1, "signature.png", signatureBytes));
         }
 
         // Maintenance Workflow Information
@@ -364,18 +397,20 @@ public class PmReportService {
             hmCheck = pmOrderService.fetchHmCheck(pmCheckItemList, pmOrder);
         }
 
+        String safetySchema = reportList.stream().filter(item -> Objects.equals(item.getBoType(), "pm-safety-report"))
+                .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
+        String performanceSchema = reportList.stream().filter(item -> Objects.equals(item.getBoType(), "pm-performance-report"))
+                .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
         InputStream rawTemplate;
+
         if (rule != null && !Strings.isNullOrEmpty(rule.getReportStorageId())) {
             // get template if the report storage is set.
             StreamedContent template = this.blobService.getBlobObjectByStorageId(rule.getReportStorageId());
-            rawTemplate = template.getStream();
+            InputStream blobInputStream = template.getStream();
+            rawTemplate = this.pmOrderReportTemplateService.updateReportTemplateBySchemaId(blobInputStream, safetySchema, performanceSchema);
         } else {
             // generate template otherwise.
             try {
-                String safetySchema = reportList.stream().filter(item -> Objects.equals(item.getBoType(), "pm-safety-report"))
-                        .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
-                String performanceSchema = reportList.stream().filter(item -> Objects.equals(item.getBoType(), "pm-performance-report"))
-                        .findAny().map(UnstructuredDataCollection::getSchemaId).orElse(null);
                 rawTemplate = this.pmOrderReportTemplateService.generateReportTemplateBySchemaId(activeTemplateBytes, safetySchema, performanceSchema);
             } catch (IOException e) {
                 throw new BusinessException("自动模版生成失败");

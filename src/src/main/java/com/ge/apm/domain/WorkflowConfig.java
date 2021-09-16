@@ -69,6 +69,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_auto_enabled")
     private Boolean isAutoEnabled; //是否自动派工
 
+    @Column(name = "is_wo_supplier_auto_enabled")
+    private Boolean isWoSupplierAutoEnabled; //是否供应商自动抢单(维修)
+
     @Column(name = "is_temp_user_report")
     private Boolean isTempUserReport;
 
@@ -136,6 +139,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_pm_manual_enabled")
     private Boolean isPmManualEnabled; //是否人工派工
 
+    @Column(name = "is_pm_supplier_auto_enabled")
+    private Boolean isPmSupplierAutoEnabled; //是否供应商自动派工
+
     @Column(name = "is_pm_auto_enabled")
     private Boolean isPmAutoEnabled; //是否自动派工
 
@@ -185,6 +191,9 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name="pm_wc_need_sign")
     private Boolean pmWcNeedSign; //保养完成是否需要签名
+
+    @Column(name="ai_need_maintenance")
+    private Boolean aiNeedMaintenance; //到货安装是否提示保养设置
 
     /***
      * for measure
@@ -247,6 +256,30 @@ public class WorkflowConfig implements Serializable {
     private Boolean enableUpdateSwitchingTime;
 
     /**
+     * 是否启用Imaging Insights
+     */
+    @Column(name = "ii_mobile_enable")
+    private Boolean iiMobileEnable;
+
+    /**
+     * ii_mobile_url
+     */
+    @Column(name = "ii_mobile_url")
+    private String iiMobileUrl;
+
+    /**
+     * 是否启用usiot_mobile_enable
+     */
+    @Column(name = "usiot_mobile_enable")
+    private Boolean usiotMobileEnable;
+
+    /**
+     * usiot_mobile_url
+     */
+    @Column(name = "usiot_mobile_url")
+    private String usiotMobileUrl;
+
+    /**
      * 资产附件类型配置
      */
     @Column(name = "customized_asset_attachment_category",columnDefinition="text")
@@ -295,6 +328,38 @@ public class WorkflowConfig implements Serializable {
 
     public void setEnableScrappedControl(boolean enableScrappedControl) {
         this.enableScrappedControl = enableScrappedControl;
+    }
+
+    public Boolean getIiMobileEnable() {
+        return iiMobileEnable;
+    }
+
+    public void setIiMobileEnable(Boolean iiMobileEnable) {
+        this.iiMobileEnable = iiMobileEnable;
+    }
+
+    public String getIiMobileUrl() {
+        return iiMobileUrl;
+    }
+
+    public void setIiMobileUrl(String iiMobileUrl) {
+        this.iiMobileUrl = iiMobileUrl;
+    }
+
+    public Boolean getUsiotMobileEnable() {
+        return usiotMobileEnable;
+    }
+
+    public void setUsiotMobileEnable(Boolean usiotMobileEnable) {
+        this.usiotMobileEnable = usiotMobileEnable;
+    }
+
+    public String getUsiotMobileUrl() {
+        return usiotMobileUrl;
+    }
+
+    public void setUsiotMobileUrl(String usiotMobileUrl) {
+        this.usiotMobileUrl = usiotMobileUrl;
     }
 
     public Integer getAssetDeptHeadWeight() {
@@ -575,6 +640,9 @@ public class WorkflowConfig implements Serializable {
     @Setter
     @Column(name = "aa_default_lease_man_hour")
     private Double defaultLeaseManHour = 0.0D;
+
+    @Column(name = "unit_price_electricity")
+    private Double unitPriceElectricity;
 
     @Getter
     @Setter
@@ -886,6 +954,14 @@ public class WorkflowConfig implements Serializable {
         this.dispatchUserName2 = dispatchUserName2;
     }
 
+    public Double getUnitPriceElectricity() {
+        return unitPriceElectricity;
+    }
+
+    public void setUnitPriceElectricity(Double unitPriceElectricity) {
+        this.unitPriceElectricity = unitPriceElectricity == null ? 0.56D : unitPriceElectricity;
+    }
+
     public WorkflowConfig() {
     }
 
@@ -1167,6 +1243,41 @@ public class WorkflowConfig implements Serializable {
     public void setPmWcNeedSign(Boolean pmWcNeedSign) {
         this.pmWcNeedSign = pmWcNeedSign;
     }
+
+    public Boolean getAiNeedMaintenance() {
+        return aiNeedMaintenance;
+    }
+
+    public void setAiNeedMaintenance(Boolean aiNeedMaintenance) {
+        this.aiNeedMaintenance = aiNeedMaintenance;
+    }
+
+    public Boolean getIsPmSupplierAutoEnabled() {
+        return  this.isPmSupplierAutoEnabled;
+    }
+
+    public void setIsPmSupplierAutoEnabled(Boolean isPmSupplierTakeOrderEnabled) {
+        if(Boolean.TRUE.equals(isPmSupplierTakeOrderEnabled)){
+            this.isPmTakeOrderEnabled =false;
+            this.isPmManualEnabled =false;
+            this.isPmAutoEnabled =false;
+        }
+        this.isPmSupplierAutoEnabled = isPmSupplierTakeOrderEnabled;
+    }
+
+    public Boolean getIsWoSupplierAutoEnabled() {
+        return isWoSupplierAutoEnabled;
+    }
+
+    public void setIsWoSupplierAutoEnabled(Boolean isWoSupplierAutoEnabled) {
+        if(Boolean.TRUE.equals(isWoSupplierAutoEnabled)){
+            this.isTakeOrderEnabled =false;
+            this.isManualEnabled =false;
+            this.isAutoEnabled =false;
+        }
+        this.isWoSupplierAutoEnabled = isWoSupplierAutoEnabled;
+    }
+
 
     @Override
     public int hashCode() {
