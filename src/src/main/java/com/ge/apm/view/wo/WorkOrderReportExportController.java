@@ -14,6 +14,8 @@ import com.ge.apm.service.wo.WorkOrderExportTemplateService;
 import com.ge.apm.service.wo.WorkOrderPublishRenderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
@@ -35,11 +37,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -105,6 +103,10 @@ public class WorkOrderReportExportController implements Serializable {
     private Boolean isInsulate;
     private String filterParts;
     private String filterTotalPrice;
+    @Getter @Setter
+    private String currentStepId;
+    @Getter @Setter
+    private Map<String,String> filterMap;
 
     @PostConstruct
     protected void init() {
@@ -133,6 +135,7 @@ public class WorkOrderReportExportController implements Serializable {
         isInsulate = tenantInfoRepository.findByuid(currentUser.getTenantUID()).getInsulate();
         isInsulate = isInsulate == null ? false : isInsulate;
 
+        filterMap = new HashMap<>();
         initOrgTree();
         loadClinicalDept();
         currentOwnerList = ucService.getWorkerList(null,"");
@@ -236,10 +239,14 @@ public class WorkOrderReportExportController implements Serializable {
         }
     }
 
+    public void reflashData() {
+        previewData(null);
+    }
 
     public void previewData(ActionEvent actionEvent) {
 
         this.selectedItems = null;
+        if(actionEvent!=null) filterMap.clear();
 
         if (null == startTime && null == endTime && null == closedStartTime && null == closedEndTime) {
             showMsgBox(WebUtil.getMessage("ApplyTimeErrTip"));
@@ -282,7 +289,7 @@ public class WorkOrderReportExportController implements Serializable {
 
 
             //workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList);
-            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice);
+            workOrderList = workOrderExportService.createWorkOrderData(selectedOrg, startTime, endTime, closedStartTime, closedEndTime, getStatusList(),filterDeptOrg,filterCurrentOwner, clinicalDeptList, filterParts, filterTotalPrice,filterMap,currentStepId);
         }
 
     }

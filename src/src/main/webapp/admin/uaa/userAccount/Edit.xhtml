@@ -52,12 +52,28 @@
                             <p:inputText id="telephone" label="#{msg.telephone}" value="#{userAccountController.selected.telephone}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">地区</label>
+                            <label class="label">#{msg.Region}</label>
                             <p:selectOneMenu value="#{userAccountController.selected.region}" >
                                 <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('region')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+<!--                        <h:panelGroup rendered="#{userContextService.isSupportMultiLanguage()}">
+                            <label class="label">#{msg.defaultLang}</label>
+                            <p:selectOneMenu value="#{userAccountController.selected.defaultLanguage}">
+                                <f:selectItem itemLabel="zh" itemValue="zh"/>
+                                <f:selectItem itemLabel="en" itemValue="en"/>
+                                &lt;!&ndash;<f:selectItem itemLabel="tw" itemValue="tw"/>&ndash;&gt;
+                            </p:selectOneMenu>
+                        </h:panelGroup>-->
+<!--                        <h:panelGroup rendered="#{not userContextService.isSupportMultiLanguage()}">
+                            <label class="label">#{msg.defaultLang}</label>
+                            <p:selectOneMenu value="#{userAccountController.selected.defaultLanguage}">
+                                <f:selectItem itemLabel="zh" itemValue="zh"/>
+                                &lt;!&ndash;<f:selectItem itemLabel="en" itemValue="en"/>
+                                <f:selectItem itemLabel="tw" itemValue="tw"/>&ndash;&gt;
+                            </p:selectOneMenu>
+                        </h:panelGroup>-->
                         <h:panelGroup rendered="false">
                             <p:selectBooleanCheckbox itemLabel="#{msg.isSiteAdmin}*" value="#{userAccountController.selected.isSiteAdmin}" required="true" requiredMessage="#{msg.isSiteAdmin} #{msg.ValidationRequire}"/>
                         </h:panelGroup>

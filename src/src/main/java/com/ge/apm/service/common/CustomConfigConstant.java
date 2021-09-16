@@ -99,6 +99,11 @@ public class CustomConfigConstant {
         allFields.put("siteUID", WebUtil.getMessage("hospitalId"));
         allFields.put("clinicalDeptName", WebUtil.getMessage("clinicalDeptName"));
         allFields.put("assetDeptName", WebUtil.getMessage("assetDeptName"));
+        allFields.put("accountingDeptName", WebUtil.getMessage("accountingDeptName"));
+        allFields.put("modalityType", WebUtil.getMessage("设备modality"));
+        allFields.put("monitorRate", WebUtil.getMessage("monitorRate"));
+        allFields.put("otherPower", WebUtil.getMessage("otherPower"));
+        allFields.put("unitPriceElectricity", WebUtil.getMessage("unitPriceElectricity"));
         allFields.put("clinicalOwnerName", WebUtil.getMessage("clinicalOwnerName"));
         allFields.put("clinicalOwnerTel", WebUtil.getMessage("clinicalOwnerTel"));
         allFields.put("manufacture", WebUtil.getMessage("manufacture"));
@@ -125,6 +130,7 @@ public class CustomConfigConstant {
         allFields.put("locationCode", WebUtil.getMessage("locationCode"));
         allFields.put("locationName", WebUtil.getMessage("locationName"));
         allFields.put("status", WebUtil.getMessage("status"));
+        allFields.put("isValid",WebUtil.getMessage("isValid"));
         allFields.put("deviceStatus", WebUtil.getMessage("deviceStatus"));
         allFields.put("comments", WebUtil.getMessage("comments"));
         allFields.put("locationNotes", WebUtil.getMessage("locationNotes"));
@@ -218,6 +224,9 @@ public class CustomConfigConstant {
         return Arrays.asList("assetUsage", "capitalSource", "measureGrade", "riskGrade",
                 "emergencyEquipment", "importEquipment", "measuringItemCategory", "accountingCategory");
     }
+    public static List<String> getAssetsEditpageEquipmentPerformanceFields() {
+        return Arrays.asList("monitorRate", "otherPower","unitPriceElectricity");
+    }
 
     public static List<String> getAssetsEditpageFinicialFields() {
         return Arrays.asList("purchasePrice", "salvageValue", "lifecycle", "depreciationMethod","createdBy");
@@ -255,7 +264,7 @@ public class CustomConfigConstant {
 
     public static List<String> getAssetsImportantFieldsAll() {
         return Arrays.asList("assetDeptName", "clinicalDeptName", "locationName", "clinicalOwnerName","deviceStatus"
-                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType");
+                ,"purchaseDate","purchasePrice","qrCode","installDate","departNum","name","financingNum","locationNotes","functionType","status","isValid");
     }
 
     public static List<String> getTemplateEnableList() {

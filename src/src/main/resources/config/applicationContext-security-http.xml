@@ -101,6 +101,9 @@
         <intercept-url pattern="/portal/analysis/assetScan**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','DeptHead')"/> <!-- 扫描详情统计 -->
         <intercept-url pattern="/portal/analysis/staffPerf**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead')"/>
 
+        <!-- 预防维护(供应商) -->
+        <intercept-url pattern="/portal/pm/supplier/**" access="hasAnyRole('SupplierFE','SupplierAdmin')"/> <!-- 保养工作台 -->
+
         <!-- 预防维护 -->
         <intercept-url pattern="/portal/insp/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff','zkbDealerFE','zkbDealerSales')"/> <!-- 巡检管理 -->
 

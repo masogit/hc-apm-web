@@ -246,4 +246,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Modifying
     @Query(value = "delete from user_account where uid = ?1", nativeQuery = true)
     int deleteByUid(String uid);
+
+    UserAccount findByLoginName(String loginName);
+
 }

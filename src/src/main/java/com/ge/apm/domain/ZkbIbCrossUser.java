@@ -35,7 +35,7 @@ public class ZkbIbCrossUser  {
     private String name;
     @Column(name = "name_py_code")
     private String namePyCode;
-    @Basic(optional = false)
+
     @JsonIgnore
     @Size(min = 1, max = 255)
     @Column(name = "password")

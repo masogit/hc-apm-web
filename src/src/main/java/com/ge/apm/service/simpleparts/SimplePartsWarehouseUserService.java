@@ -35,6 +35,10 @@ public class SimplePartsWarehouseUserService {
     @Autowired
     private SimplePartsWarehouseRepository partsWarehouseRepository;
 
+    public List<String> findAllByPartsWarehouseByUserUid(String userUid) {
+        return partsWarehouseUserRepository.findAllByPartsWarehouseByUserUid(userUid);
+    }
+
     public List<SimplePartsWarehouse> queryByUserUid() {
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         if (userAccount == null) {

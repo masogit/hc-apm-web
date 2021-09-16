@@ -171,21 +171,6 @@
                     </h:outputText>
                 </p:column>
 
-
-                <!-- <p:column headerText="操作" rendered="#{(v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==2 )and userContextService.hasRole('AssetStaff')}" exportable="false">
-                     <p:commandButton value="取消"  update="pmTab:pmCancelForm" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()"/>
-
-                     &lt;!&ndash;医工主任：待办 状态为待派工、待接单、已计划的可操作【取消】按钮，其他步骤按钮为灰色&ndash;&gt;
-                     <p:commandButton value="取消" update="pmTab:pmCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
-                     <p:commandButton value="取消" update="pmTab:pmCancelForm" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()"/>
-                 </p:column>-->
-                <!-- <p:column value="操作" rendered="#{v2PmOrderController.queryIndex==-1 and userContextService.hasRole('AssetHead')}" exportable="false">
-
-                 </p:column>
-
-                 <p:column value="操作" rendered="#{v2PmOrderController.queryIndex==2 and userContextService.hasRole('AssetHead')}" exportable="false">
-
-                 </p:column>-->
                 <!--待派工 2-->
                 <p:column headerText="#{msg.Operation}" style="width: 100px" rendered="#{v2PmOrderController.queryIndex==-1 and userContextService.hasRole('AssetHead')}" exportable="false">
                     <p:commandButton value="#{msg.Cancel}" update="pmTab:pmCancelForm" disabled="#{item.currentStepId ne 'Assign' and item.currentStepId and 'Maintain' and item.currentStepId ne 'Accept'}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
@@ -217,11 +202,11 @@
 
                 <!--已计划 0-->
                 <p:column headerText="#{msg.Operation}"  style="width: 100px" rendered="#{v2PmOrderController.queryIndex==0}" exportable="false">
-                    <p:commandButton value="#{msg.Maintenance}" class="maintainButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
+                    <p:commandButton value="#{msg.Maintenance}" class="maintainButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.approvalStatus==5 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
 
-                    <p:commandButton value="#{msg.Reassign}" class="transButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>
-                    <p:commandButton  class="planedCompleteButton" value="#{msg.Complete}"  disabled="#{item.approvalStatus eq '1' or v2PmOrderController.isChecked()}"  rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
+                    <p:commandButton value="#{msg.Reassign}" class="transButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.approvalStatus==5 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>
+                    <p:commandButton  class="planedCompleteButton" value="#{msg.Complete}"  disabled="#{item.approvalStatus eq '1' or item.approvalStatus eq '5' or v2PmOrderController.isChecked()}"  rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
                     <p:commandButton value="#{msg.Cancel}" update="pmTab:pmCancelForm" disabled="#{!userContextService.hasRole('AssetHead')}" actionListener="#{v2PmOrderController.prepareCancel(item.id)}" oncomplete="PF('pmCancelDialog').show()" />
                 </p:column>

@@ -17,6 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.ArrivalSupplierReportService;
 import com.ge.apm.service.asset.SupplierService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -65,6 +66,9 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     private String supplierUserBind;
     private SupplierService supplierService;
     private Integer statusFlag;
+    //复选的附件数据
+    private Map<String, Boolean> selectedMap;
+    private List<ArrivalList> currentPageAssets;
 
     @Override
     protected void init() {
@@ -75,6 +79,12 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         this.filterBySite = false;
         this.filterByHospital = false;
         supplierService = WebUtil.getBean(SupplierService.class);
+        this.selectedMap = new HashMap();
+        String encodeStr = WebUtil.getRequestParameter("str");
+        String statusFlagStr = null;
+        if(encodeStr != null){
+            supplierUserBind = (String) UrlEncryptController.getValueFromMap(encodeStr, "supplierUserBind");
+        }
     }
 
     @Override
@@ -118,6 +128,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         }
 
         Page<ArrivalList> result=dao.findBySearchFilter(this.searchFilters, pageRequest);
+        currentPageAssets = result.getContent();
         setCanDeleted(result);
         return result;
     }
@@ -189,6 +200,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     public void onFilter(FilterEvent event) {
         selected = null;
         super.onFilter(event);
+        this.selectedMap.clear();
     }
 
     @Override
@@ -227,6 +239,10 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     public String editAction() {
         return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Edit&listId=" + selected.getId());
+    }
+
+    public String batchDistribute() {
+        return UrlEncryptController.encodeUrlParam("batchDistributeSupplier?supplierUserBind=1");
     }
 
     public void exportSelectedToPdf() {
@@ -384,6 +400,42 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             Logger.getLogger(AssetArrivedListController.class.getName()).log(Level.SEVERE, null, e);
             WebUtil.addErrorMessage("导出失败");
         }
+    }
+
+    public boolean isChecked() {
+        Map<String, Boolean> map = this.selectedMap;
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    public void onSelectAllOfPage() {
+        boolean isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        for (ArrivalList item : currentPageAssets) {
+            selectedMap.put(item.getId(), !isSelectedCurrentPage);
+        }
+    }
+
+    public String getSupplierUserName(Integer userId){
+        if(userId != null){
+            UserAccount userAccount = uaaService.getUserById(userId);
+            if(userAccount != null){
+                return userAccount.getName();
+            }
+        }
+        return null;
+    }
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+        this.selectedMap = selectedMap;
     }
 
     public void setArrivalFormatTime(String arrivalFormatTime) {

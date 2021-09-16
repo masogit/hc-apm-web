@@ -34,6 +34,7 @@ public class CustomConfigObject {
     List<String> assetsEditpageCodesFields;
     List<String> assetsEditpageStatusFields;
     List<String> assetsEditpageCatalogFields;
+    List<String> assetsEditpageEquipmentPerformanceFields;
     List<String> assetsEditpageDateFields;
     List<String> assetsEditpageFinicialFields;
 
@@ -172,6 +173,15 @@ public class CustomConfigObject {
             assetsEditpageDateFields = CustomConfigConstant.getAssetsEditpageDateFields();
         }
         return assetsEditpageDateFields;
+    }
+
+    public List<String> getAssetsEditpageEquipmentPerformanceFields() {
+        assetsEditpageEquipmentPerformanceFields = CustomConfigConstant.getAssetsEditpageEquipmentPerformanceFields();
+        return assetsEditpageEquipmentPerformanceFields;
+    }
+
+    public void setAssetsEditpageEquipmentPerformanceFields(List<String> assetsEditpageEquipmentPerformanceFields) {
+        this.assetsEditpageEquipmentPerformanceFields = assetsEditpageEquipmentPerformanceFields;
     }
 
     public void setAssetsEditpageDateFields(List<String> assetsEditpageDateFields) {

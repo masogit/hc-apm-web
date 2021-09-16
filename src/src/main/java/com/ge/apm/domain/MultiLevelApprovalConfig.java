@@ -43,28 +43,16 @@ public class MultiLevelApprovalConfig implements Serializable {
     private String businessType;
 
     /**
-     * 资产类型
-     */
-    @Column(name = "asset_type")
-    private String assetType;
-
-    /**
-     * 是否委托oa审批
-     */
-    @Column(name = "is_entrust_oa")
-    private boolean entrustOa;
-
-    /**
      * 是否启用配置
      */
     @Column(name = "enable")
     private boolean enable;
 
-    /**
-     * 所选业务单元
-     */
-    @Column(name = "org_uid")
-    private String orgUid;
+//    /**
+//     * 所选业务单元
+//     */
+//    @Column(name = "org_uid")
+//    private String orgUid;
 
     /**
      * 审批流配置信息
@@ -112,36 +100,16 @@ public class MultiLevelApprovalConfig implements Serializable {
     private String createdBy;
 
     /**
+     * 组织id
+     */
+    @Column(name = "hier_org_uid", columnDefinition = "CHAR(32)")
+    private String hierOrgUid;
+
+    /**
      * 租户
      */
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
-
-    /**
-     * 集团
-     */
-    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
-    private String institutionUID;
-
-    /**
-     * 医院
-     */
-    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
-    private String hospitalUID;
-
-    /**
-     * 院区
-     */
-    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
-    private String siteUID;
-
-    public boolean getEntrustOa() {
-        return entrustOa;
-    }
-
-    public void setEntrustOa(boolean entrustOa) {
-        this.entrustOa = entrustOa;
-    }
 
     public boolean getEnable() {
         return enable;
@@ -169,5 +137,25 @@ public class MultiLevelApprovalConfig implements Serializable {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        return "MultiLevelApprovalConfig{" +
+                "id='" + id + '\'' +
+                ", approvalName='" + approvalName + '\'' +
+                ", approvalNum='" + approvalNum + '\'' +
+                ", businessType='" + businessType + '\'' +
+                ", enable=" + enable +
+                ", hierOrgUid='" + hierOrgUid + '\'' +
+                ", configration='" + configration + '\'' +
+                ", approvalItem='" + approvalItem + '\'' +
+                ", minAmount=" + minAmount +
+                ", maxAmount=" + maxAmount +
+                ", equipType='" + equipType + '\'' +
+                ", createdDate=" + createdDate +
+                ", createdBy='" + createdBy + '\'' +
+                ", tenantUID='" + tenantUID + '\'' +
+                '}';
     }
 }

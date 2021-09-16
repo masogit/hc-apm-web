@@ -1,13 +1,21 @@
 package com.ge.apm.view.pm;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.pm.RelRuleAssetService;
+import com.ge.apm.service.uaa.UaaService;
 import com.google.common.collect.Lists;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -15,12 +23,6 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PmOrderRuleRepository;
 import com.ge.apm.dao.RelRuleAssetRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.Brand;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.PmOrderRule;
-import com.ge.apm.domain.RelRuleAsset;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -41,6 +43,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private String queryCondition;
 	private List<String> assetUids;
 	private OrgInfoRepository orgInfoRepository;
+	private RelRuleAssetService relRuleAssetService;
+	private UaaService uaaService;
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
 	private UserCommonService userCommonService;
@@ -48,6 +52,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private boolean deleteRule3 = false;
 	private Map<String, Boolean> selectedMap;
 	private List<RelRuleAsset> currentPageAssets;
+	@Getter @Setter
+	private StreamedContent excelFile;
 	
 	@Override
 	protected void init() {
@@ -59,6 +65,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
+		relRuleAssetService = WebUtil.getBean(RelRuleAssetService.class);
+		uaaService = WebUtil.getBean(UaaService.class);
 		assetMap = new HashMap<>();
 		ruleMap = new HashMap<>();
 		this.selectedMap = new HashMap();
@@ -275,19 +283,70 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		return null;
 	}
 
-public List<SearchFilter> getAssetInfoByFilter(){
-	List<SearchFilter> searchAssetFilters = getFilter(user.getSiteUID());
-	if(StringUtils.isNotEmpty(queryCondition)) {
-		searchAssetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-		searchAssetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-		searchAssetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-		searchAssetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-		searchAssetFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
-		searchAssetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+	public List<SearchFilter> getAssetInfoByFilter(){
+		List<SearchFilter> searchAssetFilters = getFilter(user.getSiteUID());
+		if(StringUtils.isNotEmpty(queryCondition)) {
+			searchAssetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+		}
+		return searchAssetFilters;
 	}
-	return searchAssetFilters;
-}
-	
+
+	/**
+	 * 导出已经配置了规则的设备
+	 */
+	public void exportRelRuleAssets() {
+		try {
+			List<RelRuleAsset> relRuleAssets = dao.findBySearchFilter(this.searchFilters);
+			List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(relRuleAssets.stream().map(relRuleAsset -> {return relRuleAsset.getAssetUID();}).collect(Collectors.toList()));
+			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
+			excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
+	}
+
+	/**
+	 * 导出所有设备
+	 */
+	public void exportAllAssets() {
+		try {
+			List<AssetInfo> assetInfos = findAllAssets();
+			List<RelRuleAsset> relRuleAssets = dao.findByAssetUids(assetInfos.stream().map(assetInfo -> {return assetInfo.getUid();}).collect(Collectors.toList()));
+			List<AssetInfoAndRelRule> assetInfoAndRelRules = relRuleAssetService.mergeAssetInfoAndRelRule(assetInfos,relRuleAssets);
+			excelFile = relRuleAssetService.getExcelFile(assetInfoAndRelRules);
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
+	}
+
+
+
+	private List<AssetInfo> findAllAssets() {
+		List<SearchFilter> searchFilters = new ArrayList<>();
+		searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+		searchFilters.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
+		searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+		if (!UserContextService.isMVSRole()) {
+			UserAccount user = UserContextService.getCurrentUserAccount();
+			List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+			searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+			searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+			searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+			searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+			searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+		} else {
+			searchFilters.add(new SearchFilter("mvsEquip", SearchFilter.Operator.EQ, 1));
+		}
+		List<AssetInfo> allAssets =  assetInfoRepository.findBySearchFilter(searchFilters);
+		return allAssets;
+	}
+
 	public List<SearchFilter> getFilter(String siteUID) {
 		List<SearchFilter> filter = getOrgFilter(siteUID);
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));

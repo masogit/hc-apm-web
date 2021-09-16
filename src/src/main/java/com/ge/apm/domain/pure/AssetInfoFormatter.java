@@ -589,8 +589,8 @@ public class AssetInfoFormatter {
             return null;
         }
 
-        AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
-        //AssetInfo parentAsset = (AssetInfo) parentAssets.get(assetInfo.getParentAssetId());
+        //AssetInfo parentAsset = assetDao.getById(assetInfo.getParentAssetId());
+        AssetInfo parentAsset = (AssetInfo) parentAssets.get(assetInfo.getParentAssetId());
         if (parentAsset == null) return null;
 
         String departNum = parentAsset.getDepartNum() == null ? "" : parentAsset.getDepartNum();
@@ -750,8 +750,8 @@ public class AssetInfoFormatter {
     }
 
     private String joinTags(Map<String,List<String>> assetMap) {
-        List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
-        //List<String> assetTags = assetMap.get(assetInfo.getUid());
+        //List<String> assetTags = this.importService.assetTagsMapper.getTagsByAsset(assetInfo.getUid());
+        List<String> assetTags = assetMap.get(assetInfo.getUid());
         if (assetTags==null || assetTags.isEmpty()) {
             return null;
         }
@@ -801,11 +801,11 @@ public class AssetInfoFormatter {
     public String getVendorTel(Map supliers){
         Integer vendorId = assetInfo.getSupplierId();
         if(vendorId != null){
-            Supplier supplier= supplierDao.getById(vendorId);
-            //return  (String) supliers.get(vendorId);
-            if(null!=supplier && null!=supplier.getTel()){
+            //Supplier supplier= supplierDao.getById(vendorId);
+            /*if(null!=supplier && null!=supplier.getTel()){
                 return  supplier.getTel();
-            }
+            }*/
+            return  (String) supliers.get(vendorId);
         }
         return null;
     }

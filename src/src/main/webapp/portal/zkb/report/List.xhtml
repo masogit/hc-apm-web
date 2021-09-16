@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="维修工单统计"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="QrCodeLibListForm">
+                <p:dataTable id="datalist" value="#{zkbV2WorkOrderReportController.zkbV2WorkOrderReportList}" var="item"
+                             rowKey="#{item.id}" lazy="false" paginator="true" paginatorPosition="both"
+                             paginatorAlwaysVisible="true"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="20"
+                             emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+                    <p:column headerText="租户">
+                        <h:outputText value="#{item.tenantName}"/>
+                    </p:column>
+                    <c:forEach items="#{zkbV2WorkOrderReportController.yearMap}" var="yearMap">
+                        <p:column headerText="#{yearMap.value}">
+                            <h:outputText value="#{item.get(yearMap.key)}"/>
+                        </p:column>
+                    </c:forEach>
+                    <p:column headerText="总计">
+                        <h:outputText value="#{zkbV2WorkOrderReportController.takeTotal(item)}"/>
+                    </p:column>
+                    <c:forEach items="#{zkbV2WorkOrderReportController.yearMonthMap}" var="yearMonthMap">
+                        <p:column headerText="#{yearMonthMap.value}">
+                            <h:outputText value="#{item.get(yearMonthMap.key)}"/>
+                        </p:column>
+                    </c:forEach>
+                    <c:forEach items="#{zkbV2WorkOrderReportController.monthMap}" var="monthMap">
+                        <p:column headerText="#{monthMap.value}">
+                            <h:outputText value="#{item.get(monthMap.key)}"/>
+                        </p:column>
+                    </c:forEach>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="v2_work_order"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+
+
+</ui:composition>

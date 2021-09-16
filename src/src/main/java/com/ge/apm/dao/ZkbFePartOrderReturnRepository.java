@@ -26,7 +26,7 @@ public interface ZkbFePartOrderReturnRepository extends GenericRepositoryUUID<Zk
      * @return
      */
     @Query(value = "SELECT sum(qty) from zkb_fe_part_order_return where asset_no=?1 and order_no = ?2 and part_order_id = ?3",nativeQuery = true)
-    Integer allReturnQty(String assetNo,String orderNo,String partOrderId);
+    Integer allReturnQty(String assetNo, String orderNo, String partOrderId);
 
     /**
      * 根据流程ID获取申请备件数量
@@ -35,4 +35,13 @@ public interface ZkbFePartOrderReturnRepository extends GenericRepositoryUUID<Zk
      */
     @Query(value = "SELECT sum(qty) from zkb_fe_part_order_return where part_order_id = ?1", nativeQuery = true)
     Integer fetchQty(String fePartOrderId);
+
+    /**
+     * 根据主键查询
+     * @param partOrderId  工单主键
+     * @param assetNo 备件号
+     * @param orderNo Order#
+     * @return
+     */
+    List<ZkbFePartOrderReturn> findByPartOrderIdAndAssetNoAndOrderNo(String partOrderId, String assetNo, String orderNo);
 }

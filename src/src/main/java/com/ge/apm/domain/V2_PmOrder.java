@@ -3,6 +3,7 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +28,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.constant.ApprovalConstant;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.LazyCollection;
@@ -42,7 +45,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Data
 @Table(name = "v2_pm_order")
-public class V2_PmOrder  implements Serializable {
+public class V2_PmOrder  implements Serializable, ApprovableTarget {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -118,6 +121,12 @@ public class V2_PmOrder  implements Serializable {
     @Column(name="signature")
     private String signature;
 
+    @Column(name = "ack_signature")
+    private String ackSignature;
+
+    @Column(name = "wc_signature")
+    private String wcSignature;
+
     @Column(name="int_ext_type")
     private Integer intExtType;
 
@@ -125,6 +134,11 @@ public class V2_PmOrder  implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planTime;  //计划时间
+
+    @Column(name = "origin_plan_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date originPlanTime;  //原计划时间
 
     @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
@@ -155,6 +169,12 @@ public class V2_PmOrder  implements Serializable {
 
     @Column(name="pm_num")
     private String pmNum;
+
+    @Column(name="origin_pm_num")
+    private String originPmNum;
+
+    @Column(name="import_by")
+    private String importBy;  //导入人
 
     @Column(name="inst_id")
     private String instId;
@@ -206,6 +226,12 @@ public class V2_PmOrder  implements Serializable {
     @Column(name = "auto_ack_maintenance")
     private Boolean autoAckMaintenance;
 
+    /**
+     * 供应商派工时  供应商uid
+     */
+    @Column(name = "supplier_uid")
+    private String supplierUid;
+
     @Transient
     @JsonIgnore
     private String strPlanTime;
@@ -213,6 +239,26 @@ public class V2_PmOrder  implements Serializable {
     @Transient
     @JsonIgnore
     private String strFinishTime;
+
+    @Override
+    public BigDecimal getTotalPriceToBigDecimal() {
+        return totalPrice == null ? null : new BigDecimal(totalPrice);
+    }
+
+    @Override
+    public String getBusinessNumber() {
+        return getPmNum();
+    }
+
+    @Override
+    public String getBusinessUid() {
+        return getId();
+    }
+
+    @Override
+    public int getBusinessType() {
+        return  ApprovalConstant.BUSINESS_TYPE_ASSET_MAINTAIN_INT;
+    }
 
     public V2_PmOrder() {
     }
@@ -361,7 +407,7 @@ public class V2_PmOrder  implements Serializable {
         return totalPrice;
     }
 
-    public void setTotalPrice(Double totalPrice) {
+    public void setTotalPrice(Double  totalPrice) {
         this.totalPrice = totalPrice;
     }
 
@@ -381,6 +427,10 @@ public class V2_PmOrder  implements Serializable {
         this.planTime = planTime;
     }
 
+    public Date getOriginPlanTime() { return originPlanTime; }
+
+    public void setOriginPlanTime(Date originPlanTime) { this.originPlanTime = originPlanTime; }
+
     public String getPmNum() {
         return pmNum;
     }
@@ -388,6 +438,10 @@ public class V2_PmOrder  implements Serializable {
     public void setPmNum(String pmNum) {
         this.pmNum = pmNum;
     }
+
+    public String getOriginPmNum() { return originPmNum; }
+
+    public void setOriginPmNum(String originPmNum) { this.originPmNum = originPmNum; }
 
     public String getInstId() {
         return instId;
@@ -647,5 +701,21 @@ public class V2_PmOrder  implements Serializable {
 
     public void setAutoAckMaintenance(Boolean autoAckMaintenance) {
         this.autoAckMaintenance = autoAckMaintenance;
+    }
+
+    public String getAckSignature() {
+        return ackSignature;
+    }
+
+    public void setAckSignature(String ackSignature) {
+        this.ackSignature = ackSignature;
+    }
+
+    public String getWcSignature() {
+        return wcSignature;
+    }
+
+    public void setWcSignature(String wcSignature) {
+        this.wcSignature = wcSignature;
     }
 }

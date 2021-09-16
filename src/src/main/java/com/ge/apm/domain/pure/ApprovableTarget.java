@@ -4,9 +4,12 @@ import java.math.BigDecimal;
 
 public interface ApprovableTarget {
 
-    BigDecimal getTotalPrice();
+    BigDecimal getTotalPriceToBigDecimal();
 
     String getBusinessNumber();
 
+    String getBusinessUid();
+
     int getBusinessType();
+
 }

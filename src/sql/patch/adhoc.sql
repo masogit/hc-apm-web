@@ -1,3 +1,4 @@
+-- hc-apm-web-ib-gameplan-us-ibs
 -- YHAAO-12853 刷cms_psi_mapdata字段数据
 update cms_psi_mapdata pm set modality=t.modality  from (select modality,map_data from cms_document_product group by modality,map_data) as t where pm.map_data=t.map_data;
 
@@ -24,3 +25,7 @@ insert into role_msg_rel(msg_type, msg_key, role_id, role_name,role_type) values
 
 --   hotfix   9.17
 ALTER TABLE  us_project drop pdf ;
+--菜单添加
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','supplierMaintain','预防维护','supplier maintain',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('tenantVersionMenu','supplierMaintain.workbench','保养工作台','supplier maintain workbench ',NULL,-1);
+
