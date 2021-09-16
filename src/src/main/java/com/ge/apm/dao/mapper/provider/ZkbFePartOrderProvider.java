@@ -96,8 +96,9 @@ public class ZkbFePartOrderProvider {
      * 查询等待归还的配件
      * @return
      */
-    public String buildFilter_queryNeedReturnSparePart()
+    public String buildFilter_queryNeedReturnSparePart(Map<String,String> param)
     {
+        String testLogin = param.get("testLogin");//是否测试账号登录
         StringBuffer sb = new StringBuffer();
         sb.append(" SELECT " +
                 " zkb_fe_part.id, " +
@@ -117,12 +118,16 @@ public class ZkbFePartOrderProvider {
                 " INNER JOIN zkb_contract zkb_con on zkb_con.id = zkb_fe_part.contract_id " +
                 " INNER JOIN tenant_info tenant on zkb_fe_part.tenant_uid = tenant.uid " +
                 " INNER JOIN zkb_fe_part_order_asset_info zkb_fe_asset on zkb_fe_asset.fe_part_order_id = zkb_fe_part.id " +
-                " where zkb_fe_part.current_step = 'WaitingGEAdmin' and  zkb_fe_part.order_type = 'SpareParts' and  zkb_fe_asset.asset_qty>0 order by zkb_fe_part.report_date desc");
+                " where zkb_fe_part.current_step = 'WaitingGEAdmin' and  zkb_fe_part.order_type = 'SpareParts' and  zkb_fe_asset.asset_qty>0 ");
+        if("f".equals(testLogin))
+            sb.append(" and zkb_fe_part.test_status = 'f' ");
+        sb.append(" order by zkb_fe_part.report_date desc");
         return sb.toString();
     }
 
-    public String buildFilter_queryNeedReturnProbe()
+    public String buildFilter_queryNeedReturnProbe(Map<String,String> param)
     {
+        String testLogin = param.get("testLogin");//是否测试账号登录
         StringBuffer sb = new StringBuffer();
         sb.append(" SELECT " +
                 " tenant.name as tenant_name, " +
@@ -141,8 +146,23 @@ public class ZkbFePartOrderProvider {
                 " INNER JOIN tenant_info tenant on zkb_fe_part.tenant_uid = tenant.uid " +
                 " INNER JOIN zkb_contract zkb_con on zkb_con.id = zkb_fe_part.contract_id " +
                 " INNER JOIN zkb_part_order_cat cat on cat.id = zkb_fe_part.cat_id " +
-                " where zkb_fe_part.current_step = 'WaitingGEAdmin' and  zkb_fe_part.order_type = 'Probe' order by zkb_fe_part.report_date desc ");
+                " where zkb_fe_part.current_step = 'WaitingGEAdmin' and  zkb_fe_part.order_type = 'Probe' ");
+                if("f".equals(testLogin))
+                    sb.append(" and zkb_fe_part.test_status = 'f' ");
+        sb.append(" order by zkb_fe_part.report_date desc ");
         return sb.toString();
+    }
+
+    public String batchExport(Map<String,String> param){
+        String testLogin = param.get("testLogin");//是否测试账号登录
+        String tenantUid = param.get("tenantUid");
+        StringBuffer sql = new StringBuffer("SELECT * from zkb_fe_part_order where 1=1");
+        if(StringUtils.isNotBlank(tenantUid))
+            sql.append(" and tenant_uid = '"+tenantUid+"' ");
+        if("f".equals(testLogin))
+            sql.append(" and test_status = 'f' ");
+        sql.append(" order by report_date desc");
+        return sql.toString();
     }
 
 }

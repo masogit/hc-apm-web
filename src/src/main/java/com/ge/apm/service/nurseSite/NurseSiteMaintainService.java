@@ -895,6 +895,19 @@ public class NurseSiteMaintainService {
 			boolean delay=tempItem.getCheckDate().after(sheculeDate)?true:false;
 			boolean hasComment=StringUtils.isNotEmpty(tempItem.getComment())?true:false;
 			//0：未检查,1:已检查，4进行中,2:通过没commnet没有delay，5,通过有备注没有延期，6，通过有备注延期，7，通过，没有备注，延期了，3有问题，延期了,8，有问题，没有延期
+            String itemId = tempItem.getId();
+            List<NurseSiteMaintainData>  list= nurseSiteMaintainDataRepository.findLByParentId(itemId);
+            for (NurseSiteMaintainData nurseSiteMaintainDataNew : listData){
+                for (NurseSiteMaintainData nurseSiteMaintainDataOld : list){
+                    if(nurseSiteMaintainDataNew.getId().equals(nurseSiteMaintainDataOld.getId())){
+                        Boolean checkValueNew = nurseSiteMaintainDataNew.getCheckValue()!= null ?nurseSiteMaintainDataNew.getCheckValue() :false;
+                        Boolean checkValueOld = nurseSiteMaintainDataOld.getCheckValue() !=null ?nurseSiteMaintainDataOld.getCheckValue() :false;
+                        if(checkValueNew != checkValueOld){
+                            tempItem.setUpdateByUid(user.getUid());
+                        }
+                    }
+                }
+            }
 			while (itData.hasNext()) {
 				NurseSiteMaintainData tempData = itData.next();
 				Boolean value = tempData.getCheckValue();
