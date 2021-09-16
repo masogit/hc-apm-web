@@ -257,6 +257,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
      * @param telephone
      */
     public Boolean sendMsMCode(String telephone){
+
         String gatewayURL = getGatewayURL(GatewayURL.MSM_SEND_CODE);
         String url = gatewayURL.replace("{phone}",telephone);
         String token = UserContextService.getAccessToken();
@@ -264,16 +265,20 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         logger.info("url for sendMsMCode: " + url);
         ResponseEntity<String> response = template.exchange(url, HttpMethod.GET, requestEntity, String.class);
+        logger.info("sendMsMCode,telphone={},response={}",telephone, JSON.toJSONString(response));
+
         String body = response.getBody();
-        logger.info("sendMsMCode,telephone={},response body ={}",telephone, body);
+        logger.info("getMsMCode,telephone={},response body ={}",telephone, body);
         JSONObject result = JSON.parseObject(body);
-        return result.getBoolean("data");
+        Boolean isSuccess = result.getBoolean("data");
+        return isSuccess;
     }
     /**
      * 发送短信验证码
      * @param telephone
      */
     public Map getMsMCode(String telephone){
+
         String gatewayURL = getGatewayURL(GatewayURL.MSM_GET_CODE);
         String url = gatewayURL.replace("{phone}",telephone);
         String token = UserContextService.getAccessToken();
@@ -281,6 +286,8 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         logger.info("url for getMsMCode: " + url);
         ResponseEntity<String> response = template.exchange(url, HttpMethod.GET, requestEntity, String.class);
+        logger.info("getMsMCode,telephone={},response={}",telephone, JSON.toJSONString(response));
+
         String body = response.getBody();
         logger.info("getMsMCode,telephone={},response body ={}",telephone, body);
         JSONObject result = JSON.parseObject(body);

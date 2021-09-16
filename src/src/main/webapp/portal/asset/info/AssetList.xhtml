@@ -299,11 +299,6 @@
                                     <h:outputText value="#{item.qrCode}"/>
                                 </p:column>
                             </c:if>
-                            <c:if test="#{columnItem eq 'locationNotes'}">
-                                <p:column headerText="#{msg.locationNotes}" sortBy="#{item.locationNotes}" filterBy="#{item.locationNotes}" filterMatchMode="LIKE">
-                                    <h:outputText value="#{item.locationNotes}"/>
-                                </p:column>
-                            </c:if>
                             <c:if test="#{columnItem eq 'aliasName'}">
                                 <p:column  headerText="#{msg.aliasName}" sortBy="#{item.aliasName}" filterBy="#{item.aliasName}" filterMatchMode="LIKE" >
                                     <h:outputText value="#{item.aliasName}"/>
