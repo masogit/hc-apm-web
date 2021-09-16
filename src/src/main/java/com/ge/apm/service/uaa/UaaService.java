@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.OrgInfoMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -14,8 +15,6 @@ import org.hibernate.Hibernate;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +59,8 @@ public class UaaService {
     @Autowired
     private UserRoleRepository userRoleRepository;
 
-
+    @Autowired
+    private OrgInfoMapper orgInfoMapper;
 
     private void loadSysRoles(){
         if(sysRoles!=null) return;
@@ -98,6 +98,16 @@ public class UaaService {
             url = "/home.xhtml";
         
         return url;
+    }
+
+    public void setFullName(UserAccount user) {
+        OrgInfo node = orgInfoMapper.getByUid(user.getOrgInfoUID());
+        user.setOrgInfo(node);
+        while (node != null && node.getOrgType() != 0 && node.getParentUID() != null && !StringUtils.equals(node.getUid(), node.getParentUID())) {
+            OrgInfo parentNode = orgInfoMapper.getByUid(node.getParentUID());
+            node.setParentOrg(parentNode);
+            node = parentNode;
+        }
     }
     
     private String getDefautHomePage(String roleName){
@@ -382,11 +392,6 @@ public class UaaService {
     
     public List<OrgInfo> getOrgListByHospitalId(int hospitalId){
         return orgInfoDao.getByHospitalId(hospitalId);
-    }
-    
-    public List<OrgInfo> getFullOrgListBySiteId(int siteId) {
-        return orgInfoDao.getFullOrgListBySiteId(siteId);
-    
     }
 
     public DefaultTreeNode getFullOrgTreeBySiteId(DefaultTreeNode rootNode, int siteId, Integer selectedOrgId){
