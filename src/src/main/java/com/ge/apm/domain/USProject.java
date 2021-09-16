@@ -42,12 +42,6 @@ public class USProject implements Serializable {
     private String descption;
 
     /**
-     * pdf
-     */
-    @Column(name = "pdf")
-    private String pdf;
-
-    /**
      * psi_description
      */
     @Column(name = "psi_description")
@@ -97,14 +91,6 @@ public class USProject implements Serializable {
 
     public void setDescption(String descption) {
         this.descption = descption;
-    }
-
-    public String getPdf() {
-        return pdf;
-    }
-
-    public void setPdf(String pdf) {
-        this.pdf = pdf;
     }
 
     public Integer getId() {

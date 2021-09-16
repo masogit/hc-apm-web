@@ -7,13 +7,10 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import webapp.framework.web.WebUtil;
-
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,10 +25,6 @@ public class USProjectDetailController {
     @Getter
     private USProject selected;
 
-    @Setter
-    @Getter
-    private String pdf;
-
 
     @PostConstruct
     protected void init() {
@@ -40,9 +33,6 @@ public class USProjectDetailController {
         String encodeStr = WebUtil.getRequestParameter("str");
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
         selected = dao.findById(Integer.valueOf(selectedId));
-        if(StringUtils.isNotEmpty(selected.getPdf())){
-            pdf = "US"+ File.separator+selected.getPdf();
-        }
 
     }
 
@@ -50,7 +40,7 @@ public class USProjectDetailController {
         if (attachements == null) {
             attachements = blobService.findBlobObjectsByBoUid(name);
         }
-        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_IMG) && item.getBoType().equals(V2_BlobObject.BO_TYPE_US_Option) ).collect(Collectors.toList());
+        List<V2_BlobObject> collect = attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(V2_BlobObject.BO_SUB_TYPE_PDF) && item.getBoType().equals(V2_BlobObject.BO_TYPE_US_PROJECT) ).collect(Collectors.toList());
         return collect;
     }
 

@@ -56,6 +56,8 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_IBU_INFO = "IBUInfo";
     public static final String BO_TYPE_US_Option = "USOption";
     public static final String BO_TYPE_PROBE_RECOMMEND = "ProbeRecommend";
+    public static final String BO_TYPE_US_PROJECT = "USProject";
+    public static final String BO_SUB_TYPE_PDF = "Pdf";
     /**
      * 工程师信息
      */

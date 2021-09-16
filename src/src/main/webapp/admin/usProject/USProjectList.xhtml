@@ -73,10 +73,6 @@
                             <h:outputText value="#{item.psiDescription}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.pdf}" sortBy="#{item.pdf}" filterBy="#{item.pdf}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.pdf}"/>
-                        </p:column>
-
                         <p:column headerText="#{msg.creatorUID}" sortBy="#{item.creatorUID}">
                             <h:outputText value="#{batchFileController.getUserName(item.creatorUID)}"/>
                         </p:column>
