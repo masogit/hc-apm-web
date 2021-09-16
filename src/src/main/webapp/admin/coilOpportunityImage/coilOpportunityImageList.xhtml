@@ -63,6 +63,12 @@
                         <p:column headerText="#{msg.cataLog}" sortBy="#{item.cataLog}" filterBy="#{item.cataLog}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.cataLog}"/>
                         </p:column>
+                        <p:column headerText="#{msg.tag}" sortBy="#{item.tag}" filterBy="#{item.tag}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.tag}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.sort}" sortBy="#{item.sort}" >
+                            <h:outputText value="#{item.sort}"/>
+                        </p:column>
                         <p:column headerText="#{msg.creatorUID}" sortBy="#{item.creatorUID}">
                             <h:outputText value="#{batchFileController.getUserName(item.creatorUID)}"/>
                         </p:column>
