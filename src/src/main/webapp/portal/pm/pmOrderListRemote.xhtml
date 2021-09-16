@@ -65,9 +65,7 @@
 
 				<p:column headerText="#{msg.ReportDownload}" exportable="false">
 					<p:repeat value="#{item.reports}" var="report">
-						<p:link href="#{fileDownloadService.getFileUrl(report.storageId)}">
-							<h:outputText value="#{report.displayName}" />
-						</p:link>
+						<h:commandLink action="#{assetLifecycleEvent5Controller.getAnonymousReport(report.storageId)}" value="#{report.displayName}" />
 						<br />
 					</p:repeat>
 				</p:column>
