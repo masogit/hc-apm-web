@@ -67,4 +67,45 @@ public class CopyByInvok {
         return 0;
     }
 
+    public static int getBetweenYear(Date date1, Date date2) throws ParseException {
+        int n = 0;
+        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+        date1 = f.parse(f.format(date1));
+        date2 = f.parse(f.format(date2));
+        Calendar c1 = Calendar.getInstance();
+        Calendar c2 = Calendar.getInstance();
+        try {
+            c1.setTime(date1);
+            c2.setTime(date2);
+        } catch (Exception e3) {
+            System.out.println("wrong occured");
+        }
+        while (!c1.after(c2)) {
+            n++;
+            c1.add(Calendar.DATE, 1);
+        }
+
+        n = n-1;
+        n = n/365;
+        return n;
+    }
+
+    public static String compareDateByYyyyMMdd(Date date1,Date date2){
+        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            date1 = f.parse(f.format(date1));
+            date2 = f.parse(f.format(date2));
+
+            if(date1.getTime() > date2.getTime()){
+                return "GT";
+            }else if(date1.getTime() < date2.getTime()){
+                return "LT";
+            }else{
+                return "EQ";
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
