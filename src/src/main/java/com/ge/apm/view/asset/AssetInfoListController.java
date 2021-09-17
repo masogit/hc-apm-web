@@ -241,6 +241,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         Page<AssetInfo> res;
         if(createdByBoolean) {
             List<SearchFilter> searchFiltersList = new ArrayList(searchFilters);
+            searchFiltersList.removeIf(e -> e.fieldName.equals("createdBy"));
             List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
             List<String> loginNamList = new ArrayList<>();
             if(!userAccountList.isEmpty()){
