@@ -222,6 +222,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.OrderedReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.DirectorReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.CommercialReject.toString()));
+
         filters.add(new SearchFilter("requestDate", SearchFilter.Operator.LT,zkbPartOrder.getRequestDate()));
         List<ZkbPartOrder> historyList = zkbPartOrderRepository.findBySearchFilter(filters);
         Integer historyQty = 0;
@@ -246,6 +248,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.DirectorReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.OrderedReject.toString()));
         filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.UnOrderedReject.toString()));
+        filters.add(new SearchFilter("status", SearchFilter.Operator.NE,ZkbPartOrder.PartOrderStatus.CommercialReject.toString()));
         filters.add(new SearchFilter("requestDate", SearchFilter.Operator.GTE,DateUtils.addDays(zkbContract.getEndDate(),-6)));
         filters.add(new SearchFilter("requestDate", SearchFilter.Operator.LT,DateUtils.addDays(zkbContract.getEndDate(),1)));
         filters.add(new SearchFilter("orderType", SearchFilter.Operator.NE,ZkbPartOrder.OrderType.Tool.toString()));
@@ -428,8 +431,12 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             //如果为超声高端则不需要进行区域经理审批
             if("2".equals(zkbPartOrder.getArtificialType())){
+                if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()))){
+                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                }else{
+                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                }
                 zkbPartOrder.setStatus("Requested");
-                zkbPartOrder.setCurrentStep("OrderPending");
             }else{
                 zkbPartOrder.setStatus("Requested");
                 zkbPartOrder.setCurrentStep("ManagePending");
@@ -459,22 +466,27 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         ZkbPartOrderStep zkbPartOrderStep = new ZkbPartOrderStep();
         if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())) {
-            zkbPartOrderStep.setStepKey("TechnicalPending");
-            zkbPartOrderStep.setStepName("待技术支持审批");
+            zkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+            zkbPartOrderStep.setStepName(WebUtil.getFieldValueMessage("zkbPoSteps",ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
-            zkbPartOrderStep.setStepKey("TechnicalPending");
-            zkbPartOrderStep.setStepName("待技术支持审批");
+            zkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+            zkbPartOrderStep.setStepName(WebUtil.getFieldValueMessage("zkbPoSteps",ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())) {
             if("2".equals(zkbPartOrder.getArtificialType())){
-                zkbPartOrderStep.setStepKey("OrderPending");
-                zkbPartOrderStep.setStepName("待开单");
+                if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),zkbContract.getEndDate()))){
+                    zkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                    zkbPartOrderStep.setStepName(WebUtil.getFieldValueMessage("zkbPoSteps",ZkbPartOrderStep.PartOrderStep.CommercialPending.toString()));
+                }else{
+                    zkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                    zkbPartOrderStep.setStepName(WebUtil.getFieldValueMessage("zkbPoSteps",ZkbPartOrderStep.PartOrderStep.OrderPending.toString()));
+                }
             }else{
-                zkbPartOrderStep.setStepKey("ManagePending");
-                zkbPartOrderStep.setStepName("待经理审批");
+                zkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
+                zkbPartOrderStep.setStepName(WebUtil.getFieldValueMessage("zkbPoSteps",ZkbPartOrderStep.PartOrderStep.ManagePending.toString()));
             }
         }else if(ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())) {
-            zkbPartOrderStep.setStepKey("TechnicalPending");
-            zkbPartOrderStep.setStepName("待技术支持审批");
+            zkbPartOrderStep.setStepKey(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString());
+            zkbPartOrderStep.setStepName(WebUtil.getFieldValueMessage("zkbPoSteps",ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString()));
         }
         zkbPartOrderStep.setStartTime(new Date());
         zkbPartOrderStep.setOwnerId(userAccount.getUid());
@@ -494,6 +506,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         List<V2_BlobObject> v2_blobObjects = blobObjectRepository.fetchBlobObjectByUuidAndType(oldZkbPartOrder.getId(),V2_BlobObject.BO_TYPE_ZKB_PART_ORDER,V2_BlobObject.BO_TYPE_ZKB_PART_ORDER);
         List<V2_BlobObject> v2_prove_blobObjects = blobObjectRepository.fetchBlobObjectByUuidAndType(oldZkbPartOrder.getId(),V2_BlobObject.BO_TYPE_ZKB_PART_ORDER,V2_BlobObject.BO_TYPE_ZKB_PART_ORDER_PROVE);
         ZkbPartOrder newZkbPartOrder = oldZkbPartOrder;
+        ZkbContract zkbContract = zkbContractRepository.findById(newZkbPartOrder.getContractId());
         newZkbPartOrder.setId(null);
         newZkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Requested.toString());
         newZkbPartOrder.setRequestDate(new Date());
@@ -505,12 +518,16 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(newZkbPartOrder.getOrderType())) {
             //如果为超声高端则不需要进行区域经理审批
             if("2".equals(newZkbPartOrder.getArtificialType())){
-                newZkbPartOrder.setCurrentStep("OrderPending");
+                if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(newZkbPartOrder.getRequestDate(),zkbContract.getEndDate()))){
+                    newZkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                }else{
+                    newZkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                }
             }else{
-                newZkbPartOrder.setCurrentStep("ManagePending");
+                newZkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
             }
         }else if(ZkbPartOrder.OrderType.Tool.toString().equals(newZkbPartOrder.getOrderType())){
-            newZkbPartOrder.setCurrentStep("ManagePending");
+            newZkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.ManagePending.toString());
         }
         newZkbPartOrder.setCreatedBy(userAccount.getLoginName());
         newZkbPartOrder.setCreatedDate(new Date());
@@ -539,7 +556,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             nv.setBoUuid(newZkbPartOrder.getId());
         }
 
-        ZkbContract zkbContract = zkbContractRepository.findById(newZkbPartOrder.getContractId());
         subApplyQty(zkbContract,newZkbPartOrder,newZkbPartOrder.getQty(),userAccount,true);
         return newZkbPartOrder;
     }
@@ -641,6 +657,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     @Transactional(rollbackFor = Exception.class)
     public void auditNext(ZkbPartOrder zkbPartOrder,boolean nextFlag,UserAccount userAccount){
         String oldStep = zkbPartOrder.getCurrentStep();
+        ZkbContract c = zkbContractRepository.findById(zkbPartOrder.getContractId());
         if(ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep())){
             zkbPartOrder.setTechAuditDate(new Date());
             zkbPartOrder.setTechAuditerUid(userAccount.getUid());
@@ -657,7 +674,6 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setManageAuditerUid(userAccount.getUid());
             zkbPartOrder.setManageAuditer(userAccount.getName());
             if(nextFlag){
-                ZkbContract c = zkbContractRepository.findById(zkbPartOrder.getContractId());
                 if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
                     boolean flag  =false;
                     if(zkbPartOrder.getZkbPartOrderCat() != null && !ZkbPartOrderCat.ValueType.HighValue.toString().equals(zkbPartOrder.getZkbPartOrderCat().getValueType())){
@@ -687,6 +703,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.ManageAccept.toString());
                 if(CopyByInvok.F.equals(zkbPartOrder.getCheckApplyNumFlag())){
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.DirectorPending.toString());
+                }else if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
+                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
                 }else{
                     if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
                         zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
@@ -704,13 +722,32 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             zkbPartOrder.setDirectorAuditer(userAccount.getName());
             if(nextFlag){
                 zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.DirectorAccept.toString());
+                if("GT".equals(CopyByInvok.compareDateByYyyyMMdd(zkbPartOrder.getRequestDate(),c.getEndDate()))){
+                    zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString());
+                }else{
+                    if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
+                    }else{
+                        zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+                    }
+                }
+            }else{
+                zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.DirectorReject.toString());
+                zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+            }
+        }else if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrder.getCurrentStep())) {
+            zkbPartOrder.setCommercialAuditDate(new Date());
+            zkbPartOrder.setCommercialAuditerUid(userAccount.getUid());
+            zkbPartOrder.setCommercialAuditer(userAccount.getName());
+            if(nextFlag){
+                zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.CommercialAccept.toString());
                 if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
                 }else{
                     zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
                 }
             }else{
-                zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.DirectorReject.toString());
+                zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.CommercialReject.toString());
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
             }
         }
@@ -797,11 +834,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         String oldStep = zkbPartOrder.getCurrentStep();
         Integer qty = zkbPartOrder.getQty();
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(zkbPartOrder.getOrderType())){
-            zkbPartOrder.setOrderedDate(new Date());
-            zkbPartOrder.setOrderedAuditerUid(userAccount.getUid());
-            zkbPartOrder.setOrderedAuditer(userAccount.getName());
-            zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Ordered.toString());
-            zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+            if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())){
+                zkbPartOrder.setOrderedDate(new Date());
+                zkbPartOrder.setOrderedAuditerUid(userAccount.getUid());
+                zkbPartOrder.setOrderedAuditer(userAccount.getName());
+                zkbPartOrder.setStatus(ZkbPartOrder.PartOrderStatus.Ordered.toString());
+                zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
+            }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
             if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderPending.toString())) {
                 zkbPartOrder.setOrderedDate(new Date());
@@ -1453,7 +1492,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
             }
         }
         if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.TechnicalPending.toString().equals(zkbPartOrder.getCurrentStep()) ||
-                ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrder.getCurrentStep())) {
+            ZkbPartOrderStep.PartOrderStep.DirectorPending.toString().equals(zkbPartOrder.getCurrentStep()) || ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(zkbPartOrder.getCurrentStep())) {
             HashMap<String, String> emailWrapperMap = null;
             try {
                 emailWrapperMap = new HashMap<>();
@@ -1488,6 +1527,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         statusList.add(ZkbPartOrder.PartOrderStatus.DirectorAccept.toString());
         statusList.add(ZkbPartOrder.PartOrderStatus.TechnicalAccept.toString());
         statusList.add(ZkbPartOrder.PartOrderStatus.TechnicalReject.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.CommercialAccept.toString());
+        statusList.add(ZkbPartOrder.PartOrderStatus.CommercialReject.toString());
         if (statusList.contains(zkbPartOrder.getStatus())) {
             try {
                 String url = getGatewayURL(GatewayURL.PART_ORDER_SEND_WECHAT_MESSAGE).concat("?id=").concat(zkbPartOrder.getId());
