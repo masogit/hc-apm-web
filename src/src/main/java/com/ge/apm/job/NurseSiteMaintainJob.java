@@ -89,7 +89,7 @@ public class NurseSiteMaintainJob {
 	@Autowired
 	NurseSiteMaintainService nurseSiteMaintainService;
 
-	@Scheduled(cron = "20/20 * * * * *")
+	@Scheduled(cron = "5/20 * * * * *")
 	public void execute() {
 		try {
 			checkJob();
