@@ -260,8 +260,8 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             }
             if(CollectionUtils.isNotEmpty(zkbPartOrderUserConfigList))
             {
-                WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
-                return;
+                //WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameError"));
+                //return;
             }
         }
         if(backUpUser != null && StringUtils.isNotEmpty(backUpUser.getId())){
