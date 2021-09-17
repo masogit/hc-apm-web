@@ -229,7 +229,31 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             pageRequest =addRequiredSortById(pageRequest);
 
         lastPageSort = pageRequest.getSort(); //export excel use
-        Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        boolean createdByBoolean = false;
+        String value = null;
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("createdBy".equals(searchFilter.fieldName)) {
+                createdByBoolean = true;
+                value = (String)searchFilter.value;
+            }
+        }
+        Page<AssetInfo> res;
+        if(createdByBoolean) {
+            List<SearchFilter> searchFiltersList = new ArrayList(searchFilters);
+            List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
+            List<String> loginNamList = new ArrayList<>();
+            if(!userAccountList.isEmpty()){
+                for (UserAccount userAccount:userAccountList) {
+                    loginNamList.add(userAccount.getLoginName());
+                }
+            }
+            searchFiltersList.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
+            res = dao.findBySearchFilter(searchFiltersList, pageRequest);
+        }else {
+            res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        }
+
         currentPageAssets = res.getContent();
 
         //设置OneQrCodeStatus
