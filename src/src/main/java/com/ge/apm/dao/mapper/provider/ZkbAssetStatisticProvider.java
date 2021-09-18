@@ -41,7 +41,7 @@ public class ZkbAssetStatisticProvider {
                 " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
                 " INNER JOIN asset_info ai ON ai.uid= zca.asset_id" +
                 " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
-                " LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code on ib_qr_code.asset_uid = ai.uid and ib_qr_code.tenant_uid = ti.uid " +
+                " LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code on ib_qr_code.asset_uid = ai.uid " +
                 " where ac.contract_no is not null and ai.system_id is not null"+
                         " and to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date"
                 );
