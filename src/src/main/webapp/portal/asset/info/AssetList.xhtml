@@ -140,7 +140,7 @@
                                 <p:confirm header="#{msg.CancelWarrantyReminder}" message="#{msg.ConfirmToCancelTheEquipmentWarrantyReminder}" icon="ui-icon-alert"/>
                             </p:commandButton>
                         </p:column>
-                        <p:column  headerText="是否已配置保养规则" filterBy="#{item.isPm}" filterMatchMode="EQ">
+                        <p:column  headerText="是否已配置保养规则" rendered="#{assetInfoListController.showIsPm()}" filterBy="#{item.isPm}" filterMatchMode="EQ">
                             <h:outputText value="#{assetInfoListController.getRelRuleStatusName(item.uid,item.isPm)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="handleAssetGroupChange()" value="#{assetInfoListController.isPmSearch}"  autoWidth="false" style="max-width: 300px;" height="300" >
