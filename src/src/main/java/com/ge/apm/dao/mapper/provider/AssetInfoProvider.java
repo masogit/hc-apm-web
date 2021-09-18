@@ -93,9 +93,9 @@ public class AssetInfoProvider {
 		String uidList = getSetValue1(param.get("uidList")) ;
 		String tenantUid = (String) param.get("tenantUid");//
 		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT COUNT (ID) FROM ( SELECT DISTINCT ai.* FROM asset_info ai LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code ON ai.uid = ib_qr_code.asset_uid AND ib_qr_code.tenant_uid = '"+tenantUid+"' LEFT JOIN " +
+		sb.append("SELECT COUNT (ID) FROM ( SELECT DISTINCT ai.* FROM asset_info ai LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code ON ai.uid = ib_qr_code.asset_uid LEFT JOIN " +
 				"            (SELECT COUNT (ID) AS count1,bo_uuid FROM v2_blob_object WHERE bo_sub_type = '1' AND bo_uuid IN "+uidList+" GROUP BY bo_uuid) T " +
-				"            ON T.bo_uuid = ai.uid WHERE (ib_qr_code.is_qr_code = 't' OR T.count1 >= 3)" +
+				"            ON T.bo_uuid = ai.uid WHERE (ib_qr_code.is_qr_code = true OR T.count1 >= 3)" +
 				"            AND ai.uid IN "+uidList+") T1");
 
 		return sb.toString();
