@@ -46,12 +46,16 @@
                     </p:fieldset>
 
                     <p:fieldset legend="供应商激活权限配置">
-
                         <h:panelGrid columns="6" style="margin-bottom:10px" cellpadding="20">
                             <p:selectBooleanCheckbox value="#{tenantOptionConfigController.selected.activeSupplier}" itemLabel="允许激活供应商" />
                         </h:panelGrid>
                     </p:fieldset>
 
+                    <p:fieldset legend="设备列表配置">
+                        <h:panelGrid columns="6" style="margin-bottom:10px" cellpadding="20">
+                            <p:selectBooleanCheckbox value="#{tenantOptionConfigController.selected.showIsPm}" itemLabel="台账列表是否显示”是否已配置保养规则“列" />
+                        </h:panelGrid>
+                    </p:fieldset>
                     <p:commandButton value="保存" actionListener="#{tenantOptionConfigController.save()}"   update="basic" icon="pi pi-check"/>
 
                 </h:form>
