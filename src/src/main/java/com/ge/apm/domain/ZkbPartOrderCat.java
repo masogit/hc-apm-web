@@ -24,7 +24,7 @@ public class ZkbPartOrderCat implements Serializable {
      * SpecialValue:特殊
      */
     public enum ValueType {
-        HighValue,NormalValue,SpecialValue
+        HighValue,NormalValue,SpecialValue,
     }
 
     @Id

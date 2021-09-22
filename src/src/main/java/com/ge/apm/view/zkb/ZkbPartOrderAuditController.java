@@ -485,8 +485,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 }
                 showCommercial = true;
                 if(canEditFlag){
-                    showOrder = true;
-                    showBtn = "1";
+                    if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(selected.getCurrentStep())){
+                        showUnOrder = true;
+                        showBtn = "1";
+                    }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
+                        showOrder = true;
+                        showBtn = "1";
+                    }
                 }
             }else if(ZkbPartOrder.PartOrderStatus.CommercialReject.toString().equals(selected.getStatus())){
                 if(!ZkbPartOrder.OrderType.Tool.toString().equals(selected.getOrderType())){

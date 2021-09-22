@@ -160,7 +160,7 @@
                             </h:panelGroup>
                         </h:panelGroup>
 
-                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and !(zkbPartOrderEditController.artificialType eq '2')}">
+                        <h:panelGroup id="scoreFlagGroup" rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and !(zkbPartOrderEditController.artificialType eq '2')}">
                             <label class="label">是否使用积分抵扣*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.scoreFlag}" required="true" requiredMessage="是否使用积分抵扣 #{msg.ValidationRequire}" disabled="#{zkbPartOrderEditController.currentScoreFlag}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -168,6 +168,15 @@
                                 <f:selectItem itemLabel="否" itemValue="f"/>
                             </p:selectOneMenu>
                             <p:outputLabel id="cscore" value="#{zkbPartOrderEditController.currentScoreText}" disabled="true"  style="margin-left: 10px;color: red;font-size: larger"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Artificial' and zkbPartOrderEditController.artificialType eq '1'}">
+                            <label class="label">是否需要SSA Key*</label>
+                            <p:selectOneMenu value="#{zkbPartOrderEditController.selected.ssaKeyFlag}" required="true" requiredMessage="是否需要SSA Key #{msg.ValidationRequire}" >
+                                <p:ajax event="change" update="scoreFlagGroup"  listener="#{zkbPartOrderEditController.scoreFlagChange}"/>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="是" itemValue="t"/>
+                                <f:selectItem itemLabel="否" itemValue="f"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Parts' and zkbPartOrderEditController.assetInfo.assetGroup eq 2 }">
                             <label class="label">机型*</label>
@@ -180,7 +189,7 @@
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType != null and zkbPartOrderEditController.selectedContract.quotaDeductType eq 'New'}">
                             <label class="label">扣除名额类型*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.probeQuotaType}" required="true" requiredMessage="扣除名额类型 #{msg.ValidationRequire}">
-                                <p:ajax event="change" update="catModelGrid valueTypeGroup" />
+                                <p:ajax event="change" update="catModelGrid valueTypeGroup qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('ZkbPoProbeQuotaType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
@@ -188,7 +197,7 @@
                         <h:panelGroup rendered="#{zkbPartOrderEditController.orderType eq 'Probe' and zkbPartOrderEditController.selectedContract.quotaDeductType != null and zkbPartOrderEditController.selectedContract.quotaDeductType eq 'Old'}">
                             <label class="label">是否高值探头*</label>
                             <p:selectOneMenu value="#{zkbPartOrderEditController.selected.highCatFlag}" required="true" requiredMessage="是否高值探头 #{msg.ValidationRequire}">
-                                <p:ajax event="change" update="catModelGrid valueTypeGroup" />
+                                <p:ajax event="change" update="catModelGrid valueTypeGroup qty remainQty" listener="#{zkbPartOrderEditController.zkbPartOrderCatSelect}"/>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="是" itemValue="t"/>
                                 <f:selectItem itemLabel="否" itemValue="f"/>
