@@ -514,9 +514,13 @@ public class ZkbContractService {
             quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Spare.toString(),currentUser);
             quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),currentUser);
             quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),currentUser);
-            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString(),currentUser);
-            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),currentUser);
-            quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),currentUser);
+            if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())){
+                quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString(),currentUser);
+                quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),currentUser);
+                quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),currentUser);
+            }else{
+                quotaChange(zkbContract,oldContract,ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),currentUser);
+            }
             zkbContract = contractRepository.save(zkbContract);
         }else {
             if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag())){
@@ -525,10 +529,14 @@ public class ZkbContractService {
             zkbContract = contractRepository.save(zkbContract);
             zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Spare.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.SpareArtificial.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
-            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
-            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
-            zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
             zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Artificial.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
+            if(ZkbContract.QuotaDeductTypeEnum.New.toString().equals(zkbContract.getQuotaDeductType())){
+                zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
+                zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
+                zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.ProbeSpecial.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
+            }else{
+                zkbContractQuotaLogService.saveData(zkbContract,null,null,"contractAdd",ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),ZkbContract.class.getSimpleName(),currentUser,null);
+            }
         }
         return zkbContract;
     }
@@ -612,6 +620,19 @@ public class ZkbContractService {
                 f = true;
             }
             if(nullToZero(oldContract.getGeArtificialSupportTimesUse()) - nullToZero(zkbContract.getGeArtificialSupportTimesUse()) != 0){
+                f = true;
+            }
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.Probe.toString().equals(orderType)){
+            if(nullToZero(oldContract.getProbeQuota()) - nullToZero(zkbContract.getProbeQuota()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getProbeQuotaTotal()) - nullToZero(zkbContract.getProbeQuotaTotal()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getProbeQuotaApply()) - nullToZero(zkbContract.getProbeQuotaApply()) != 0){
+                f = true;
+            }
+            if(nullToZero(oldContract.getProbeQuotaUse()) - nullToZero(zkbContract.getProbeQuotaUse()) != 0){
                 f = true;
             }
         }

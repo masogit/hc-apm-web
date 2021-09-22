@@ -92,6 +92,7 @@ public class ZkbContractQuotaLogService {
         l.setOrderType(orderType);
         l.setBusinessType(businessType);
         l.setStep(step);
+
         if(ZkbContractQuotaLog.OrderTypeEnum.Spare.toString().equals(orderType)){
             l.setQuota(zkbContract.getSpareQuota());
             l.setQuotaApply(zkbContract.getSpareQuotaApply());
@@ -122,6 +123,11 @@ public class ZkbContractQuotaLogService {
             l.setQuotaApply(zkbContract.getProbeQuotaSpecialApply());
             l.setQuotaTotal(zkbContract.getProbeQuotaSpecialTotal());
             l.setQuotaUse(zkbContract.getProbeQuotaSpecialUse());
+        }else if(ZkbContractQuotaLog.OrderTypeEnum.Probe.toString().equals(orderType)){
+            l.setQuota(zkbContract.getProbeQuota());
+            l.setQuotaApply(zkbContract.getProbeQuotaApply());
+            l.setQuotaTotal(zkbContract.getProbeQuotaTotal());
+            l.setQuotaUse(zkbContract.getProbeQuotaUse());
         }
         zkbContractQuotaLogRepository.save(l);
     }
