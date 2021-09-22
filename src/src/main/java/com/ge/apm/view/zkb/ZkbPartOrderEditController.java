@@ -679,7 +679,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())){
                         Integer contractCount = zkbContract.getProbeQuotaNormal() == null ? 0 : zkbContract.getProbeQuotaNormal();
                         if(contractCount - selected.getQty() < 0){
-                            reLog = "合同探头普通剩余名额小于等于0，请检查！";
+                            reLog = "合同探头普通剩余名额不足，请检查！";
                         }
                     }
                 }
@@ -691,6 +691,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
                     if(contractCount - selected.getQty() < 0){
                         reLog = "合同探头剩余名额不足，请检查！";
+                    }
+                }else if(CopyByInvok.T.equals(selected.getHighCatFlag())){
+                    if(CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())){
+                        Integer contractCount = zkbContract.getProbeQuota() == null ? 0 : zkbContract.getProbeQuota();
+                        if(contractCount - selected.getQty() < 0){
+                            reLog = "合同探头剩余名额不足，请检查！";
+                        }
                     }
                 }
             }
