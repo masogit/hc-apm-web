@@ -83,8 +83,8 @@ public class ArrivalList implements Serializable {
 
     //品牌/制造商简称
     @Size(max = 64)
-    @Column(name = "brandmanufacturer_shortname")
-    private String brandManufacturerShortName;
+    @Column(name = "make_short_name")
+    private String makerShortName;
 
     //品牌
     @Size(max = 64)
@@ -599,13 +599,14 @@ public class ArrivalList implements Serializable {
         this.isEdit = isEdit;
     }
 
-    public String getBrandManufacturerShortName() {
-        return brandManufacturerShortName;
+    public String getMakerShortName() {
+        return makerShortName;
     }
 
-    public void setBrandManufacturerShortName(String brandManufacturerShortName) {
-        this.brandManufacturerShortName = brandManufacturerShortName;
+    public void setMakerShortName(String makerShortName) {
+        this.makerShortName = makerShortName;
     }
+
     @Override
     public int hashCode() {
         Integer hash = 0;
