@@ -89,7 +89,7 @@ public class NurseSiteMaintainJob {
 	@Autowired
 	NurseSiteMaintainService nurseSiteMaintainService;
 
-	@Scheduled(cron = "20/20 * * * * *")
+	@Scheduled(cron = "5/20 * * * * *")
 	public void execute() {
 		try {
 			checkJob();
@@ -388,8 +388,8 @@ public class NurseSiteMaintainJob {
 		}
 		if (listMaintain != null && listMaintain.size() > 0) {
 			for(int i=0;i<listMaintain.size();++i){
-				nurseSiteMaintainService.tBatchCompleteMaintain(listMaintain.get(i), userUid,signature, date,delayDate);
-			}
+				nurseSiteMaintainService.tBatchCompleteMaintain(listMaintain.get(i), signature,userUid, date,delayDate);
+            }
 		}
 	}
 

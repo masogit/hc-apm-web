@@ -499,7 +499,24 @@
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
-                <p:fieldset id="unOrderFieldset" legend="订货信息" rendered="#{zkbPartOrderAuditController.showUnOrder}">
+                <p:fieldset id="CommercialFieldset" legend="Commercial审批" rendered="#{zkbPartOrderAuditController.showCommercial}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CommercialPending')}">
+                            <label class="label">Commercial审批人</label>
+                            <p:inputText value="#{zkbPartOrderAuditController.selected.commercialAuditer}" disabled="true" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CommercialPending')}">
+                            <label class="label">Commercial审批时间*</label>
+                            <p:calendar timeZone="GMT+8" id="CommercialAuditDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.commercialAuditDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">Commercial审批备注</label>
+                            <p:inputTextarea id="CommercialRemark" value="#{zkbPartOrderAuditController.selected.commercialRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'CommercialPending')}">
+                            </p:inputTextarea>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset id="unOrderFieldset" legend="订货信息2" rendered="#{zkbPartOrderAuditController.showUnOrder}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup >
                             <label class="label">SR#*</label>

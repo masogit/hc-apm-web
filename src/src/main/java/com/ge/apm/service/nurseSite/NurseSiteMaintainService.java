@@ -151,11 +151,11 @@ public class NurseSiteMaintainService {
 			if (setMaintainIds.size() > 0) {
 				setMaintainItemIds = nurseSiteMaintainItemRepository.findIdsByParentId0(setMaintainIds);
 				if (setMaintainItemIds!=null && setMaintainItemIds.size() > 0) {
-					nurseSiteMaintainDataRepository.completeMaintainDataByParent(setMaintainItemIds);
-					nurseSiteMaintainItemRepository.completeMaintainItem2(setMaintainItemIds, signatureId, userUid, date,delayDate);
-					nurseSiteMaintainItemRepository.completeMaintainItem5(setMaintainItemIds, signatureId, userUid, date,delayDate);
-					nurseSiteMaintainItemRepository.completeMaintainItem6(setMaintainItemIds, signatureId, userUid, date,delayDate);
-					nurseSiteMaintainItemRepository.completeMaintainItem7(setMaintainItemIds, signatureId, userUid, date,delayDate);
+                    nurseSiteMaintainDataRepository.completeMaintainDataByParent(setMaintainItemIds);
+					nurseSiteMaintainItemRepository.completeMaintainItem2(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
+					nurseSiteMaintainItemRepository.completeMaintainItem5(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
+					nurseSiteMaintainItemRepository.completeMaintainItem6(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
+					nurseSiteMaintainItemRepository.completeMaintainItem7(setMaintainItemIds, signatureId, userUid, date,delayDate,userUid);
 				}
 			}
 		}
