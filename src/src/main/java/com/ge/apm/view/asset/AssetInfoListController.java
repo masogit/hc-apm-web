@@ -80,6 +80,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     //是否保养
     @Getter @Setter
     private String isPmSearch;
+
+    //显示子设备，主设备，或者全部类型的设备
+    @Getter
+    private int queryType = 1;
+    public void setQueryType(int queryType) {
+        this.searchFilters.clear();
+        this.queryType = queryType;
+    }
     private List<String> relRuleAssetUids = new ArrayList<>();
 
     private boolean terminate = false;
@@ -229,7 +237,32 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             pageRequest =addRequiredSortById(pageRequest);
 
         lastPageSort = pageRequest.getSort(); //export excel use
-        Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        boolean createdByBoolean = false;
+        String value = null;
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("createdBy".equals(searchFilter.fieldName)) {
+                createdByBoolean = true;
+                value = (String)searchFilter.value;
+            }
+        }
+        Page<AssetInfo> res;
+        if(createdByBoolean) {
+            List<SearchFilter> searchFiltersList = new ArrayList(searchFilters);
+            searchFiltersList.removeIf(e -> e.fieldName.equals("createdBy"));
+            List<UserAccount> userAccountList = userDao.findByTenantUIDAndNameList(user.getTenantUID(),String.valueOf(value));
+            List<String> loginNamList = new ArrayList<>();
+            if(!userAccountList.isEmpty()){
+                for (UserAccount userAccount:userAccountList) {
+                    loginNamList.add(userAccount.getLoginName());
+                }
+            }
+            searchFiltersList.add(new SearchFilter("createdBy", SearchFilter.Operator.IN, loginNamList));
+            res = dao.findBySearchFilter(searchFiltersList, pageRequest);
+        }else {
+            res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        }
+
         currentPageAssets = res.getContent();
 
         //设置OneQrCodeStatus
@@ -356,6 +389,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("assetTags.tag", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
+        if(queryType == 1) //全部
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "parentAssetId".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        if(queryType == 2) //主设备
+            this.updateSearchFilter(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, null, "1*"));
+        if(queryType == 3) //子设备
+            this.updateSearchFilter(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNotNull, null,"1*"));
 
         if (assetDeptOrgUidSet != null && !assetDeptOrgUidSet.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN, new ArrayList<>(assetDeptOrgUidSet), "1*"));

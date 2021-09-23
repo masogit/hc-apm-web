@@ -62,6 +62,17 @@ public class ZkbContractAsset {
     @Column(name = "asset_type")
     private String assetType;
 
+    @Column(name = "apply_num")
+    private Integer applyNum;
+
+    public Integer getApplyNum() {
+        return applyNum;
+    }
+
+    public void setApplyNum(Integer applyNum) {
+        this.applyNum = applyNum;
+    }
+
     public String getAssetType() {
         return assetType;
     }

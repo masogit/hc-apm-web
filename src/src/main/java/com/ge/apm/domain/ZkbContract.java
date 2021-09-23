@@ -41,6 +41,10 @@ public class ZkbContract implements ChineseName, Serializable {
         New,Old,Null
     }
 
+    public enum YOrNEnum{
+        Y,N
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -294,10 +298,35 @@ public class ZkbContract implements ChineseName, Serializable {
     Set<ZkbContractAsset> zkbContractAssets = new HashSet<>();
 
     /**
-     * New Old
+     * New Old  N/A
      */
     @Column(name = "quota_deduct_type")
     private String quotaDeductType;
+
+    /*
+     * Y  N
+     */
+    @Column(name = "five_nine_nine_flag")
+    private String fiveNineNineFlag;
+
+    @Column(name = "year_count")
+    private Integer yearCount;
+
+    public String getFiveNineNineFlag() {
+        return fiveNineNineFlag;
+    }
+
+    public void setFiveNineNineFlag(String fiveNineNineFlag) {
+        this.fiveNineNineFlag = fiveNineNineFlag;
+    }
+
+    public Integer getYearCount() {
+        return yearCount;
+    }
+
+    public void setYearCount(Integer yearCount) {
+        this.yearCount = yearCount;
+    }
 
     public String getQuotaDeductType() {
         return quotaDeductType;

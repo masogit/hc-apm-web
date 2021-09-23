@@ -65,8 +65,10 @@ public class WordReportExportService {
             TreeMap<Date, List<NurseSiteMaintainItem>> map = new TreeMap<>();
             Map<Date,Map<String,List<String>>> stringMap = new HashMap<>();
             Map<Date,Map<String,String>> commentMapMap = new HashMap<>();
+            Map<Date,Map<String,String>> updateByMapMap = new HashMap<>();
             Map<String,List<String>> assetNameMap = null;
             Map<String,String> commentMap = null;
+            Map<String,String> updateByMap = null;
             for (NurseSiteMaintain maintain : a.getValue()) {
                 Date scheduleDate = maintain.getScheduleDate();
                 if (scheduleDate == null) {
@@ -75,6 +77,7 @@ public class WordReportExportService {
                 List<NurseSiteMaintainItem> items = maintain.getListNurseSiteMaintainItem();
                 assetNameMap = new HashMap<>();
                 commentMap = new HashMap<>();
+                updateByMap = new HashMap<>();
                 for (int i = 0;i < items.size();i++) {
                     NurseSiteMaintainItem nurseSiteMaintainItem = items.get(i);
                     AssetInfo assetInfo = nurseSiteMaintainItem.getAssetInfo();
@@ -93,10 +96,13 @@ public class WordReportExportService {
                     }
                     assetNameMap.put(assetInfo.getName(),stringList);
                     commentMap.put(assetInfo.getName(),nurseSiteMaintainItem.getComment());
+                    updateByMap.put(assetInfo.getName(),nurseSiteMaintainItem.getUpdateByUid());
+
                 }
                 map.put(scheduleDate, items);
                 stringMap.put(scheduleDate,assetNameMap);
                 commentMapMap.put(scheduleDate,commentMap);
+                updateByMapMap.put(scheduleDate,updateByMap);
             }
             List<NurseSiteMaintainItem> nurseSiteMaintainItemList= null;
             int num =0;
@@ -136,7 +142,7 @@ public class WordReportExportService {
                         //不同设备分页
                         document.createParagraph().setPageBreak(true);
                     }
-                        creatPage(1,i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap);
+                        creatPage(i,count,dataMap,document,nurseSiteMaintainItemList,stringMap,commentMapMap,updateByMapMap);
                 }
                 ByteArrayOutputStream outStream = new ByteArrayOutputStream();
                 document.write(outStream);
@@ -151,8 +157,8 @@ public class WordReportExportService {
         return zip(reportMapMap);
     }
 
-    public void creatPage( int secondNum,int i,int size,Map<Integer ,Date> dataMap,XWPFDocument document,
-                           List<NurseSiteMaintainItem> nurseSiteMaintainItemList,Map<Date,Map<String,List<String>>>  stringMap,Map<Date,Map<String,String>> commentMapMap){
+    public void creatPage( int i,int size,Map<Integer ,Date> dataMap,XWPFDocument document, List<NurseSiteMaintainItem> nurseSiteMaintainItemList,
+                           Map<Date,Map<String,List<String>>>  stringMap,Map<Date,Map<String,String>> commentMapMap,Map<Date,Map<String,String>> updateByMapMap){
         XWPFTable table = document.createTable();
         XWPFTableRow tableOneRowOne = table.getRow(0);
         XWPFTableRow tableOneRowTwo = table.createRow();
@@ -171,7 +177,7 @@ public class WordReportExportService {
         tableOneRowTwo.addNewTableCell().setText("检查者");
         tableOneRowTwo.addNewTableCell().setText("备注");
         num = num + 2;
-        for (int n = secondNum; n <= size; n++) {
+        for (int n = 1; n <= size; n++) {
             XWPFTableRow tableOneRow = table.createRow();
             Date date = dataMap.get(n);
             String dateStr = DateFormatUtils.format(date, "MM-dd");
@@ -184,11 +190,12 @@ public class WordReportExportService {
                 }
                 for (int m = 1; m <= 2; m++) {
                     if( m==1){
-                        String uid = nurseSiteMaintainItem.getUpdateByUid();
-                        if(uid == null){
+                        Map<String, String> map = updateByMapMap.get(date);
+                        String updateByUid = map.get(assetInfoName);
+                        if(updateByUid == null){
                             tableOneRow.addNewTableCell().setText(null);
                         }else {
-                            UserAccount userAccount = userAccountRepository.getByUid(uid);
+                            UserAccount userAccount = userAccountRepository.getByUid(updateByUid);
                             tableOneRow.addNewTableCell().setText(userAccount.getName());
                         }
                     }else if( m==2){

@@ -41,6 +41,13 @@ public class AssetInfoBulkEditCheckService {
     //验证调剂中心
     public boolean verify(List<AssetInfo> assets) {
         if(assets != null && !assets.isEmpty()){
+            for (AssetInfo assetInfo:assets) {
+                String assetDeptUID = assetInfo.getAssetDeptUID();
+                String clinicalDeptUID = assetInfo.getClinicalDeptUID();
+                if(!assetDeptUID.equals(clinicalDeptUID)){
+                    return false;
+                }
+            }
            List<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toList());
             List<Integer> status = new ArrayList<>();
             status.add(ReceiveBorrowConstant.STATE_RENT_ACCEPTED);

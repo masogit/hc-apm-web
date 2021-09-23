@@ -1,9 +1,6 @@
 package com.ge.apm.domain;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -34,7 +31,9 @@ public class ZkbPartOrder implements Serializable {
      * Returned：归还  Closed：关单
      */
     public enum PartOrderStatus {
-        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,UnOrdered,UnOrderedReject,Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject
+        Requested,TechnicalAccept,TechnicalReject,
+        ManageAccept,ManageReject,UnOrdered,UnOrderedReject,
+        Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject,CommercialAccept,CommercialReject
     }
 
     /**
@@ -189,6 +188,20 @@ public class ZkbPartOrder implements Serializable {
     private String directorAuditer;
     @Column(name = "director_auditer_uid")
     private String directorAuditerUid;
+
+    /**
+     * commercial审批备注
+     */
+    @Column(name = "commercial_remark")
+    private String commercialRemark;
+
+    @Column(name = "commercial_audit_date")
+    private Date commercialAuditDate;
+
+    @Column(name = "commercial_auditer")
+    private String commercialAuditer;
+    @Column(name = "commercial_auditer_uid")
+    private String commercialAuditerUid;
 
     /**
      *
@@ -556,6 +569,20 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "modify_flag")
     private String modifyFlag;
+
+    /**
+     * t f
+     */
+    @Column(name = "ssa_key_flag")
+    private String ssaKeyFlag;
+
+    public String getSsaKeyFlag() {
+        return ssaKeyFlag;
+    }
+
+    public void setSsaKeyFlag(String ssaKeyFlag) {
+        this.ssaKeyFlag = ssaKeyFlag;
+    }
 
     public String getModifyFlag() {
         return modifyFlag;
@@ -1435,6 +1462,38 @@ public class ZkbPartOrder implements Serializable {
 
     public void setTenantNewCatFlag(String tenantNewCatFlag) {
         this.tenantNewCatFlag = tenantNewCatFlag;
+    }
+
+    public String getCommercialRemark() {
+        return commercialRemark;
+    }
+
+    public void setCommercialRemark(String commercialRemark) {
+        this.commercialRemark = commercialRemark;
+    }
+
+    public Date getCommercialAuditDate() {
+        return commercialAuditDate;
+    }
+
+    public void setCommercialAuditDate(Date commercialAuditDate) {
+        this.commercialAuditDate = commercialAuditDate;
+    }
+
+    public String getCommercialAuditer() {
+        return commercialAuditer;
+    }
+
+    public void setCommercialAuditer(String commercialAuditer) {
+        this.commercialAuditer = commercialAuditer;
+    }
+
+    public String getCommercialAuditerUid() {
+        return commercialAuditerUid;
+    }
+
+    public void setCommercialAuditerUid(String commercialAuditerUid) {
+        this.commercialAuditerUid = commercialAuditerUid;
     }
 
     @Override

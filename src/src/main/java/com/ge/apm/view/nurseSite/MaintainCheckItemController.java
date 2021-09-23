@@ -12,7 +12,10 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.DualListModel;
@@ -53,6 +56,9 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
     private UserAccount currentUser;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private NurseSiteMaintainCheckItemRepository dao;
+	//选定的院区
+	@Setter @Getter
+	private OrgInfo selectSite;
   	
 
     @Override
@@ -72,15 +78,32 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 
     @Override
     protected Page<NurseSiteMaintainCheckItem> loadData(PageRequest pageRequest) {
-    	List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        //need list or set
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*"));
-        Page<NurseSiteMaintainCheckItem> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
+        if(selectSite!=null) {
+			this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+			this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+			this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+			this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+		} else {
+			//need list or set
+			this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*"));
+		}
+        Page<NurseSiteMaintainCheckItem> pageResult=dao.findBySearchFilter(this.searchFilters, pageRequest);
         return pageResult;
     }
+
+	public void onSelectSiteTreeNode(NodeSelectEvent event) {
+		if(searchFilters!=null) searchFilters.clear();
+
+		if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+			selectSite = (OrgInfo) event.getTreeNode().getData();
+		} else {
+			selectSite = null;
+		}
+
+	}
 
     @Override
     public void save(){
