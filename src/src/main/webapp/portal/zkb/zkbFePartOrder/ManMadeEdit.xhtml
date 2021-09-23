@@ -134,8 +134,8 @@
                             </p:fieldset>
                         </h:panelGroup>
                     </p:fieldset>
-                    <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingAssignment')}">
-                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingAssignment') or zkbFePartOrderDetailController.checkRendered('WaitingCommercial')}">
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingAssignment')}">
                                 <label class="label">#{msg.zkbFePartOrder_tenantAssignUser}*：</label>
                                 <p:inputText id="tenantAssignUser" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.tenantAssignUser}"  />
@@ -152,6 +152,24 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
+                        <p:fieldset id="commercialManagementFieldset" legend="Commercial确认信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingCommercial')}">
+                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingCommercial')}">
+                                    <label class="label">#{msg.zkbFePartOrder_commercialAssignUser}*：</label>
+                                    <p:inputText id="commercialAssignUser" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.commercialAssignUser}"  />
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingCommercial')}">
+                                    <label class="label">#{msg.zkbFePartOrder_commercialAssignDate}*：</label>
+                                    <p:calendar disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderDetailController.selected.commercialAssignDate}"
+                                                showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.zkbFePartOrder_commercialComment}</label>
+                                    <p:inputTextarea disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingCommercial')}" id="commercialComment" required="true" requiredMessage="#{msg.zkbFePartOrder_comment} #{msg.ValidationRequire}" value="#{zkbFePartOrderDetailController.selected.commercialComment}" rows="2" cols="20">
+                                    </p:inputTextarea>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </p:fieldset>
                     <p:fieldset id="orderedFieldset" legend="派工信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingApm')}">
                         <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup >
@@ -180,6 +198,8 @@
                     <p:commandButton value="#{msg.submit}" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('Requested')}" disabled="#{zkbFePartOrderDetailController.contractError}" validateClient="true" update=":growl :zkbFePartOrderEditForm" action="#{zkbFePartOrderDetailController.saveAndToListPage}" style="float:left"/>
                     <p:commandButton value="同意派工" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingAssignment')}" process="@this"  action="#{zkbFePartOrderDetailController.supplierAccept(param['zkbFePartOrderEditForm:comment'])}" style="float:left"/>
                     <p:commandButton value="暂不派工" icon="ui-icon-close" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingAssignment')}" update=":growl :zkbFePartOrderEditForm" action="#{zkbFePartOrderDetailController.supplierReject}" style="float:left"/>
+                    <p:commandButton value="同意" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingCommercial')}" process="@this"  action="#{zkbFePartOrderDetailController.commercialAccept(param['zkbFePartOrderEditForm:commercialComment'])}" style="float:left"/>
+                    <p:commandButton value="不同意" icon="ui-icon-close" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingCommercial')}" update=":growl :zkbFePartOrderEditForm" action="#{zkbFePartOrderDetailController.commercialReject}" style="float:left"/>
                     <p:commandButton value="#{msg.submit}" icon="ui-icon-check" rendered="#{zkbFePartOrderDetailController.hasEditRight('WaitingApm')}" update=":growl :zkbFePartOrderEditForm"  validateClient="true" action="#{zkbFePartOrderDetailController.fullApmInfo}" style="float:left"/>
                     <p:commandButton immediate="false" process="@this" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{zkbFePartOrderDetailController.backList}" />
                     </h:panelGroup>
