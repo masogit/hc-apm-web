@@ -135,7 +135,7 @@
                         </h:panelGroup>
                     </p:fieldset>
                     <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderDetailController.checkRendered('WaitingAssignment') or zkbFePartOrderDetailController.checkRendered('WaitingCommercial')}">
-                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup rendered="#{!zkbFePartOrderDetailController.selected.currentStep.equals('WaitingAssignment')}">
                                 <label class="label">#{msg.zkbFePartOrder_tenantAssignUser}*：</label>
                                 <p:inputText id="tenantAssignUser" readonly="true" disabled="true" value="#{zkbFePartOrderDetailController.selected.tenantAssignUser}"  />
@@ -165,7 +165,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.zkbFePartOrder_commercialComment}</label>
-                                    <p:inputTextarea disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingCommercial')}" id="commercialComment" required="true" requiredMessage="#{msg.zkbFePartOrder_comment} #{msg.ValidationRequire}" value="#{zkbFePartOrderDetailController.selected.commercialComment}" rows="2" cols="20">
+                                    <p:inputTextarea disabled="#{!zkbFePartOrderDetailController.hasEditRight('WaitingCommercial')}" id="commercialComment" required="true" requiredMessage="#{msg.zkbFePartOrder_commercialComment} #{msg.ValidationRequire}" value="#{zkbFePartOrderDetailController.selected.commercialComment}" rows="2" cols="20">
                                     </p:inputTextarea>
                                 </h:panelGroup>
                             </p:panelGrid>

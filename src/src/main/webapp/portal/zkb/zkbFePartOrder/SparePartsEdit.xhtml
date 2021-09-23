@@ -211,7 +211,7 @@
             </p:fieldset>
 
             <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingAssignment') or zkbFePartOrderSparePartDetailController.checkRendered('WaitingCommercial')}">
-                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingAssignment')}">
                         <label class="label">#{msg.zkbFePartOrder_tenantAssignUser}*：</label>
                         <p:inputText  disabled="true"  value="#{zkbFePartOrderSparePartDetailController.selected.tenantAssignUser}"  />
@@ -229,7 +229,7 @@
                 </p:panelGrid>
             </p:fieldset>
                 <p:fieldset id="CommercialManagementFieldset" legend="Commercial确认信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingCommercial')}">
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingCommercial')}">
                             <label class="label">#{msg.zkbFePartOrder_commercialAssignUser}*：</label>
                             <p:inputText  disabled="true" value="#{zkbFePartOrderSparePartDetailController.selected.commercialAssignUser}"  />
@@ -241,7 +241,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.zkbFePartOrder_commercialComment}</label>
-                            <p:inputTextarea  id="commercialComment" required="true" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" requiredMessage="#{msg.zkbFePartOrder_comment} #{msg.ValidationRequire}" value="#{zkbFePartOrderSparePartDetailController.selected.commercialComment}" rows="2" cols="20">
+                            <p:inputTextarea  id="commercialComment" required="true" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingCommercial')}" requiredMessage="#{msg.zkbFePartOrder_commercialComment} #{msg.ValidationRequire}" value="#{zkbFePartOrderSparePartDetailController.selected.commercialComment}" rows="2" cols="20">
                             </p:inputTextarea>
                         </h:panelGroup>
                     </p:panelGrid>

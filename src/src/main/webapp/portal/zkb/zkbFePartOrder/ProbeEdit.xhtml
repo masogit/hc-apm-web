@@ -295,7 +295,7 @@
                 </p:panelGrid>
             </p:fieldset>
                 <p:fieldset  id="commercialManagementFieldset" legend="Commercial确认信息" rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingCommercial')}">
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup rendered="#{!zkbFePartOrderProbeController.selected.currentStep.equals('WaitingCommercial')}">
                             <label class="label">#{msg.zkbFePartOrder_commercialAssignUser}*：</label>
                             <p:inputText  disabled="true"  value="#{zkbFePartOrderProbeController.selected.commercialAssignUser}"  />
