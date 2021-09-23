@@ -240,7 +240,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         String format = "yyyy-MM-dd";
         String dateStr = DateUtil.getFormatStrByDate(this.selected.getReportDate(), format);
         Date reportDate = DateUtil.getDateByFormatStr(dateStr, format);
-        if (reportDate.compareTo(zkbContract.getStartDate()) < 0 && reportDate.compareTo(zkbContract.getEndDate()) > 0){
+        if (reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0){
             workFlowStep = ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString();
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected, this.userUid, this.userName, this.tenantUID, this.queryStatus, ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),

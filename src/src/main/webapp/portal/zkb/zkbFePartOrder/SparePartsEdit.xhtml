@@ -210,7 +210,7 @@
                 </p:dataTable>
             </p:fieldset>
 
-            <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingAssignment') or zkbFePartOrderSparePartDetailController.checkRendered('WaitingCommercial')}">
+            <p:fieldset id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingAssignment')}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.selected.currentStep.equals('WaitingAssignment')}">
                         <label class="label">#{msg.zkbFePartOrder_tenantAssignUser}*：</label>

@@ -252,7 +252,7 @@
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
-            <p:fieldset  id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingAssignment') or zkbFePartOrderProbeController.checkRendered('WaitingCommercial')}">
+            <p:fieldset  id="managementFieldset" legend="代理商确认信息" rendered="#{zkbFePartOrderProbeController.checkRendered('WaitingAssignment')}">
                 <p:fieldset id="uploadContractEvidence" rendered="#{zkbFePartOrderProbeController.selected.newCatFlag eq 't' and zkbFePartOrderProbeController.showZkbPoProbeQuotaType}">
                 <p:panelGrid>
                     <h:panelGroup>
