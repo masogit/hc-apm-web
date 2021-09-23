@@ -277,6 +277,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      */
     private void getSearchFilterByUserConfig(List<SearchFilter> searchFilters) {
         if (!(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString())
+                || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Commercial.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))) {
@@ -292,6 +293,8 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         } else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString())) {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbFePartOrder.workFlowSteps.WaitingAssignment.toString()));
             searchFilters.add(new SearchFilter("tenantUid", SearchFilter.Operator.EQ, this.tenantUID));
+        } else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Commercial.toString())) {
+            searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString()));
         } else if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())) {
             searchFilters.add(new SearchFilter("currentStep", SearchFilter.Operator.EQ, ZkbFePartOrder.workFlowSteps.WaitingGEAdmin.toString()));
         }
@@ -336,6 +339,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
      */
     private void getAllSearchFilterByUserConfig(List<SearchFilter> searchFilters) {
         if (!(this.configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString())
+                || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Commercial.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString())
                 || configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString()))) {

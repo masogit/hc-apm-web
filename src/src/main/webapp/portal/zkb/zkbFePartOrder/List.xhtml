@@ -26,6 +26,7 @@
                     <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
                         <p:commandButton value="待办"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'myWork'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('myWork')}" />
                         <p:commandButton value="待代理商确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingAssignment'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingAssignment')}" />
+                        <p:commandButton value="待Commercial确认"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingCommercial'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingCommercial')}" />
                         <p:commandButton value="待400开单/下单"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingApm'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingApm')}" />
                         <p:commandButton value="待FE归还"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'WaitingGEAdmin'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('WaitingGEAdmin')}" />
                         <p:commandButton value="完成"  process="@this"  disabled="#{zkbFePartOrderController.queryStatus eq 'Complete'}" rendered="true" action="#{zkbFePartOrderController.queryListByStatus('Complete')}" />
@@ -119,6 +120,8 @@
                                     <f:selectItem itemLabel="已申请" itemValue="Requested"/>
                                     <f:selectItem itemLabel="代理商同意" itemValue="TenantAccept"/>
                                     <f:selectItem itemLabel="代理商不同意" itemValue="TenantReject"/>
+                                    <f:selectItem itemLabel="Commercial同意" itemValue="CommercialAccept"/>
+                                    <f:selectItem itemLabel="Commercial不同意" itemValue="CommercialReject"/>
                                     <f:selectItem itemLabel="400已下单/开单" itemValue="FourHundredsAccept"/>
                                     <f:selectItem itemLabel="FE已部分归还" itemValue="GEAdminAcceptPart"/>
                                     <f:selectItem itemLabel="FE已归还" itemValue="GEAdminAccept"/>
