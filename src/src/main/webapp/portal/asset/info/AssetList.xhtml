@@ -50,18 +50,20 @@
             <div class="ui-g-12 card">
 
                 <h:form id="searchForm">
-                    <h:panelGrid id="filterType" columns="3" style="float: right">
-                        <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(1)}"  rendered="true" disabled="#{assetInfoListController.queryType == 1}" value="全部" />
-                        <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(2)}"  rendered="true" disabled="#{assetInfoListController.queryType == 2}" value="主设备"/>
-                        <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(3)}"  rendered="true" disabled="#{assetInfoListController.queryType == 3}" value="子设备"/>
+                    <h:panelGrid id="filterType" columns="4" style="float: right">
+                        <h:panelGroup style="float: right"  rendered="#{assetInfoListController.showWarrantyAlert}">
+                            <span >#{msg.Legend}：</span>
+                            <span class="warrantyExpireSoon">#{msg.MorWExpireSoon}</span>
+                            <span></span>
+                            <span class="warrantyExpired">#{msg.MorWExpired}</span>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(1)}"  rendered="true" disabled="#{assetInfoListController.queryType == 1}" value="全部" />
+                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(2)}"  rendered="true" disabled="#{assetInfoListController.queryType == 2}" value="主设备"/>
+                            <p:commandButton process="@this" update="AssetInfoListForm filterType" actionListener="#{assetInfoListController.setQueryType(3)}"  rendered="true" disabled="#{assetInfoListController.queryType == 3}" value="子设备"/>
+                        </h:panelGroup>
                     </h:panelGrid>
-                    <h:panelGroup style="position: absolute; float: right; right: 50px;" rendered="#{assetInfoListController.showWarrantyAlert}">
-                        <span >#{msg.Legend}：</span>
-                        <span class="warrantyExpireSoon">#{msg.MorWExpireSoon}</span>
-                        <span></span>
-                        <span class="warrantyExpired">#{msg.MorWExpired}</span>
-                    </h:panelGroup>
-                    
+
                     <h:panelGrid id="searchPanel" columns="3">
                         <h:panelGroup rendered="#{userContextService.hasNotAnyRole('MVSAdmin,MVSFE')}">
                             <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
