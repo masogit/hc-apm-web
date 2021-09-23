@@ -756,7 +756,7 @@ public class AssetInstallationController {
         asset.setFinancingNum(arrivalListItem.getFinancingNum());
         asset.setModalityId(arrivalListItem.getModalityId());
         asset.setSystemId(arrivalListItem.getSystemId());
-        asset.setMakerShortName(arrivalListItem.getArrivalList().getBrandManufacturerShortName());
+        asset.setMakerShortName(arrivalListItem.getArrivalList().getMakerShortName());
         String tempSiteUid = arrivalListItem.getArrivalList().getSiteUID();
         //check to delete
         String tempQrCode = asset.getQrCode();
