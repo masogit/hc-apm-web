@@ -3917,6 +3917,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','10','捐赠','Donate',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','11','国家呼吸疾病区域医疗中心','National Regional Medical Center for Respiratory Diseases',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','12','国家综合类别区域医疗中心','National Comprehensive Category Regional Medical Center',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','13','财政','Financial',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) SELECT 'capitalSource','14','其它','Other',NULL,"id" FROM tenant_info WHERE "name" = '浙江大学医学院附属邵逸夫医院' LIMIT 1;
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','201','麻醉机','麻醉机',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('geDeviceType','202','呼吸机','呼吸机',NULL,-1);
