@@ -22,12 +22,14 @@ public class ZkbFePartOrder {
      * Requested:已申请
      * TenantAccept:租户审批通过
      * TenantReject:租户批拒绝
+     * CommercialAccept Commercial审批通过
+     * CommercialReject Commercial拒绝
      * FourHundredsAccept:400回填
      * GEAdminAccept GEAdmin 全部归还
      * GEAdminAcceptPart GEAdmin 部分归还
      */
     public enum workFlowStatus {
-        Requested, TenantAccept, TenantReject, FourHundredsAccept, GEAdminAccept, GEAdminAcceptPart
+        Requested, TenantAccept, TenantReject, CommercialAccept, CommercialReject, FourHundredsAccept, GEAdminAccept, GEAdminAcceptPart
     }
 
     /**
@@ -45,7 +47,7 @@ public class ZkbFePartOrder {
      * Complete:完成
      */
     public enum workFlowSteps {
-        Requested, WaitingAssignment, WaitingApm, WaitingGEAdmin, Complete
+        Requested, WaitingAssignment, WaitingCommercial, WaitingApm, WaitingGEAdmin, Complete
     }
 
     public enum zkbPoProbeQuotaType {
@@ -59,6 +61,7 @@ public class ZkbFePartOrder {
             {
                     workFlowSteps.Requested.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
                     workFlowSteps.WaitingAssignment.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingCommercial.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.Commercial.toString(),
                     workFlowSteps.WaitingApm.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
                     workFlowSteps.WaitingGEAdmin.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
                     workFlowSteps.Complete.toString()
@@ -71,6 +74,7 @@ public class ZkbFePartOrder {
             {
                     workFlowSteps.Requested.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString(),
                     workFlowSteps.WaitingAssignment.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingCommercial.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.Commercial.toString(),
                     workFlowSteps.WaitingApm.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString(),
                     workFlowSteps.WaitingGEAdmin.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString(),
                     workFlowSteps.Complete.toString()
@@ -83,6 +87,7 @@ public class ZkbFePartOrder {
             {
                     workFlowSteps.Requested.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
                     workFlowSteps.WaitingAssignment.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString(),
+                    workFlowSteps.WaitingCommercial.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.Commercial.toString(),
                     workFlowSteps.WaitingApm.toString() + "," + ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString(),
                     workFlowSteps.Complete.toString()
             };
@@ -574,6 +579,24 @@ public class ZkbFePartOrder {
 
     @Column(name = "contract_cat_id")
     private String contractCatId;
+
+    /**
+     * Commercial审批备注
+     */
+    @Column(name = "commercial_comment")
+    private String commercialComment;
+
+    /**
+     * Commercial 审批人
+     */
+    @Column(name = "commercial_assign_user")
+    private String commercialAssignUser;
+
+    /**
+     * Commercial审批时间
+     */
+    @Column(name = "commercial_assign_date")
+    private Date commercialAssignDate;
 
     public String getId() {
         return id;
@@ -1279,5 +1302,29 @@ public class ZkbFePartOrder {
 
     public void setSecondNewCatFlag(String secondNewCatFlag) {
         this.secondNewCatFlag = secondNewCatFlag;
+    }
+
+    public String getCommercialComment() {
+        return commercialComment;
+    }
+
+    public void setCommercialComment(String commercialComment) {
+        this.commercialComment = commercialComment;
+    }
+
+    public String getCommercialAssignUser() {
+        return commercialAssignUser;
+    }
+
+    public void setCommercialAssignUser(String commercialAssignUser) {
+        this.commercialAssignUser = commercialAssignUser;
+    }
+
+    public Date getCommercialAssignDate() {
+        return commercialAssignDate;
+    }
+
+    public void setCommercialAssignDate(Date commercialAssignDate) {
+        this.commercialAssignDate = commercialAssignDate;
     }
 }
