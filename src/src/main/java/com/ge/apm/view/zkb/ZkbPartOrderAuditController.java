@@ -241,7 +241,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         }else{
                             boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
                             if(!r){
-                                WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。");
+                                WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
                             }
                         }
                     }
@@ -262,7 +262,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         }
                     }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
                         if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
-                            WebUtil.addErrorMessage("代理商申请SSA Key维修派工。");
+                            WebUtil.addErrorMessage("代理商申请SSA Key维修派工。","");
                         }
                     }
                 }
@@ -336,11 +336,12 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             if("2".equals(selected.getArtificialType())){
                 // 申请并有权限
                 if(ZkbPartOrder.PartOrderStatus.Requested.toString().equals(selected.getStatus()) && canEditFlag){
-                    showBtn = "1";
                     if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
                         showCommercial = true;
+                        showBtn = "0";
                     }else{
                         showOrder = true;
+                        showBtn = "1";
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.CommercialAccept.toString().equals(selected.getStatus())){
                     showCommercial = true;
@@ -374,10 +375,11 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     if(canEditFlag){
                         if(ZkbPartOrderStep.PartOrderStep.CommercialPending.toString().equals(selected.getCurrentStep())){
                             showCommercial = true;
+                            showBtn = "0";
                         }else{
                             showOrder = true;
+                            showBtn = "1";
                         }
-                        showBtn = "1";
                     }
                 }else if(ZkbPartOrder.PartOrderStatus.ManageReject.toString().equals(selected.getStatus())){
                     showManage = true;
