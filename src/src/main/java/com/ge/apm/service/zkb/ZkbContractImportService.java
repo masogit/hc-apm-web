@@ -102,8 +102,8 @@ public class ZkbContractImportService {
             contractRow.setFieldStringValue("区域","setRegion");
             contractRow.setFieldStringValue("代理商","setAgentName");
             contractRow.setFieldStringValue("合同类型", "setContractType");
-            contractRow.setFieldDateValue("合同开始日期", "setStartDate");
-            contractRow.setFieldDateValue("合同结束日期", "setEndDate");
+            contractRow.setFieldDateValue("合同开始日期", "setContractStartDate");
+            contractRow.setFieldDateValue("合同结束日期", "setContractEndDate");
             contractRow.setFieldStringValue("名额扣除类型", "setQuotaDeductType");
             contractRow.setFieldNumValue("IB数量", "setIbNumber");
             contractRow.setFieldNumValue("备件剩余名额", "setSpareQuota");
@@ -222,8 +222,17 @@ public class ZkbContractImportService {
             if(StringUtils.isNotEmpty(contractInfoVO.getFiveNineNineFlag())){
                 if("是".equals(contractInfoVO.getFiveNineNineFlag())){
                     zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
+                    zkbContract.setYearCount(1);
+                    zkbContract.setStartDate(zkbContract.getContractStartDate());
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(zkbContract.getContractEndDate());
+                    cal.add(Calendar.YEAR, 1);
+                    cal.add(Calendar.DATE, -1);
+                    zkbContract.setEndDate(cal.getTime());
                 }else{
                     zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.N.toString());
+                    zkbContract.setStartDate(zkbContract.getContractStartDate());
+                    zkbContract.setEndDate(zkbContract.getContractEndDate());
                 }
             }
             zkbContract.setLastModifiedBy(currentUser.getLoginName());
@@ -234,7 +243,6 @@ public class ZkbContractImportService {
             BeanUtils.copyProperties(contractInfoVO, newZkbContract);
             newZkbContract.setCreatedBy(currentUser.getLoginName());
             newZkbContract.setCreatedDate(new Date());
-
             if(StringUtils.isNotEmpty(newZkbContract.getQuotaDeductType())){
                 if("旧逻辑扣减".equals(newZkbContract.getQuotaDeductType())){
                     newZkbContract.setQuotaDeductType(ZkbContract.QuotaDeductTypeEnum.Old.toString());
@@ -248,8 +256,16 @@ public class ZkbContractImportService {
                 if("是".equals(contractInfoVO.getFiveNineNineFlag())){
                     newZkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
                     newZkbContract.setYearCount(1);
+                    newZkbContract.setStartDate(newZkbContract.getContractStartDate());
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(newZkbContract.getContractEndDate());
+                    cal.add(Calendar.YEAR, 1);
+                    cal.add(Calendar.DATE, -1);
+                    newZkbContract.setEndDate(cal.getTime());
                 }else{
                     newZkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.N.toString());
+                    newZkbContract.setStartDate(newZkbContract.getContractStartDate());
+                    newZkbContract.setEndDate(newZkbContract.getContractEndDate());
                 }
             }
             newZkbContract.setSpareQuotaApply(newZkbContract.getSpareQuotaTotal() - newZkbContract.getSpareQuotaUse() - newZkbContract.getSpareQuota());
@@ -309,9 +325,9 @@ public class ZkbContractImportService {
             ZkbContractRow.addErrMessage(item, "是否ZKB 599方案不能为空！");
             isValidateData = false;
         }else{
-            if("是".equals(contractInfoVO.getFiveNineNineFlag()) && contractInfoVO.getStartDate() != null && contractInfoVO.getEndDate() != null){
+            if("是".equals(contractInfoVO.getFiveNineNineFlag()) && contractInfoVO.getContractStartDate() != null && contractInfoVO.getContractEndDate() != null){
                 try {
-                    int n = CopyByInvok.getBetweenYear(contractInfoVO.getStartDate(),contractInfoVO.getEndDate());
+                    int n = CopyByInvok.getBetweenYear(contractInfoVO.getContractStartDate(),contractInfoVO.getContractEndDate());
                     if(n < 3){
                         item.put("status", ImportStatus.Failure);
                         ZkbContractRow.addErrMessage(item, "ZKB 599方案的合同有效期不能小于3年！");
@@ -324,13 +340,13 @@ public class ZkbContractImportService {
             }
         }
 
-        if(contractInfoVO.getStartDate() == null){
+        if(contractInfoVO.getContractStartDate() == null){
             item.put("status", ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorStartTimeIsEmpty"));
             isValidateData = false;
         }
 
-        if(contractInfoVO.getEndDate() == null ){
+        if(contractInfoVO.getContractEndDate() == null ){
             item.put("status", ImportStatus.Failure);
             ZkbContractRow.addErrMessage(item, WebUtil.getMessage("ErrorZkbContractEndTimeEmpty"));
             isValidateData = false;

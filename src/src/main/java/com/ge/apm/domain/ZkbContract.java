@@ -303,7 +303,7 @@ public class ZkbContract implements ChineseName, Serializable {
     @Column(name = "quota_deduct_type")
     private String quotaDeductType;
 
-    /*
+    /**
      * Y  N
      */
     @Column(name = "five_nine_nine_flag")
@@ -311,6 +311,39 @@ public class ZkbContract implements ChineseName, Serializable {
 
     @Column(name = "year_count")
     private Integer yearCount;
+
+    @Column(name = "contract_start_date")
+    private Date contractStartDate;
+
+    @Column(name = "contract_end_date")
+    private Date contractEndDate;
+
+    @Column(name = "renew_flag")
+    private String renewFlag;
+
+    public Date getContractStartDate() {
+        return contractStartDate;
+    }
+
+    public void setContractStartDate(Date contractStartDate) {
+        this.contractStartDate = contractStartDate;
+    }
+
+    public Date getContractEndDate() {
+        return contractEndDate;
+    }
+
+    public void setContractEndDate(Date contractEndDate) {
+        this.contractEndDate = contractEndDate;
+    }
+
+    public String getRenewFlag() {
+        return renewFlag;
+    }
+
+    public void setRenewFlag(String renewFlag) {
+        this.renewFlag = renewFlag;
+    }
 
     public String getFiveNineNineFlag() {
         return fiveNineNineFlag;
