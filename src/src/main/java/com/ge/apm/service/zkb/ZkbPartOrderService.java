@@ -123,7 +123,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderRepository.delete(zkbPartOrder);
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
         if(zkbContract != null){
-            subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
+            //subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
         }
 
         zkbPartOrder.setZkbPartOrderItems(zkbPartOrderItems);

@@ -140,13 +140,20 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         this.selected.setRemainQty(zkbContract.getProbeQuotaNormal());
                     }else if (ZkbPartOrder.ProbeQuotaTypeEnum.Special.toString().equals(selected.getProbeQuotaType())){
                         this.selected.setRemainQty(zkbContract.getProbeQuotaSpecial());
+                    }else if (ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
+                        if(CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())){
+                            this.selected.setRemainQty(zkbContract.getProbeQuotaNormal());
+                        }
                     }
                 }else{
                     if(StringUtils.isEmpty(selected.getHighCatFlag()) || CopyByInvok.F.equals(selected.getHighCatFlag())){
                         this.selected.setRemainQty(zkbContract.getProbeQuota());
                     }else{
-                        this.selected.setRemainQty(0);
+                        if(CopyByInvok.FOUR_TO_ONE.equals(selected.getContractCatId())){
+                            this.selected.setRemainQty(zkbContract.getProbeQuota());
+                        }
                     }
+
                 }
             }else if(ZkbPartOrder.OrderType.Artificial.toString().equals(selected.getOrderType())){
                 if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
@@ -234,17 +241,29 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         }else{
                             boolean r = zkbPartOrderService.checkApplyNumValid(selected,zkbContract);
                             if(!r){
-                                WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。","");
+                                WebUtil.addErrorMessage("未归还备件/探头数量已超过限额，请先提交备件/探头归还，若场地有其他特殊情况请邮件申请。");
                             }
                         }
                     }
                 }
                 if(userContextService.isZkbUser()) {
                     if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())
-                            && "t".equals(selected.getNeedLetterFlag())
-                            && ("f".equals(selected.getUploadLetterFlag()) || StringUtils.isEmpty(selected.getUploadLetterFlag()))){
+                            && CopyByInvok.T.equals(selected.getNeedLetterFlag())
+                            && (CopyByInvok.F.equals(selected.getUploadLetterFlag()) || StringUtils.isEmpty(selected.getUploadLetterFlag()))){
                         //WebUtil.addErrorMessage("请尽快邮件提交探头说明函致400彭海萍haiping.peng@ge.com。","");
                         letterTips = "请尽快邮件提交探头说明函致400唐扬Yang.Tang@ge.com。";
+                    }
+                }
+            }else if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Artificial.toString())){
+                if(canEditFlag){
+                    if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
+                        if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                            selected.setWhetherDeduct(CopyByInvok.F);
+                        }
+                    }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
+                        if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                            WebUtil.addErrorMessage("代理商申请SSA Key维修派工。");
+                        }
                     }
                 }
             }
