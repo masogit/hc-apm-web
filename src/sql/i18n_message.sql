@@ -3943,6 +3943,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType','FourHundredsTeam','400团队_备件','Four hundreds team',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType','FourHundredsTeam_Probe','400团队_探头','Four hundreds team',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType','Supplier','供应商','Supplier',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType','Commercial','Commercial','Commercial',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType','GEAdmin','GEAdmin','GEAdmin',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_configType','PublicEmail','公共邮箱','公共邮箱',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_machineStatus','functionLimit','限制功能使用','Function limit',NULL,-1);
@@ -4062,6 +4063,7 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','WaitingAssignment','待代理商确认','Waiting tenant assignment',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','WaitingCommercial','待Commercial确认','Waiting Commercial assignment',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','WaitingApm','待400开单/下单','Waiting 400 team full apm',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','WaitingGEAdmin','待FE归还','Waiting GE Admin return',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','Complete','完成','Complete',NULL,-1);
@@ -4069,6 +4071,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_status','Requested','已申请','Requested',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_status','TenantAccept','代理商同意','Tenant accept',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_status','TenantReject','代理商不同意','Tenant reject',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_status','CommercialAccept','Commercial同意','Commercial accept',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_status','CommercialReject','Commercial不同意','Commercial reject',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_status','FourHundredsAccept','400已下单','400 team accept',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_status','GEAdminAcceptPart','FE已部分归还','FE已部分归还',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_status','GEAdminAccept','FE已归还','GE Admin return',NULL,-1);
@@ -4098,6 +4102,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractCourseSchedule_type','offline','ATC','ATC',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbContractCourseSchedule_type','online','Online','Online',NULL,-1);
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_commercialAssignUser','Commercial审批人','Commercial assign user',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_commercialAssignDate','Commercial审批时间','Commercial assign date',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','zkbFePartOrder_commercialComment','Commercial审批备注','Commercial comment',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_221','无法打印心电图','无法打印心电图','',NULL,-1,1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id,order_by) VALUES ('lcsFaultType_221','打印心电图波形颜色较浅','打印心电图波形颜色较浅','',NULL,-1,2);

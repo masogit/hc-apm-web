@@ -9,6 +9,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -469,8 +470,17 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
             this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,beforeAdjustQty-adjustApplyCount,this.currentUser,this.selected,this.i18Map.get("TenantAccept"));
         }
+        //GE FE合同到期后400下单前增加Commercial角色进行审批
+        ZkbContract zkbContract = zkbContractRepository.findById(this.selected.getContractId());
+        String workFlowStep = ZkbFePartOrder.workFlowSteps.WaitingApm.toString();
+        String format = "yyyy-MM-dd";
+        String dateStr = DateUtil.getFormatStrByDate(this.selected.getReportDate(), format);
+        Date reportDate = DateUtil.getDateByFormatStr(dateStr, format);
+        if (reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0){
+            workFlowStep = ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString();
+        }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
-                ZkbFePartOrder.workFlowSteps.WaitingApm.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+                workFlowStep,date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
     private Integer qty(List<ZkbFePartOrderAssetInfo> afterAdjustAssetInfoList)
     {
@@ -498,6 +508,39 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("TenantReject"));
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
+                ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+    }
+
+    /**
+     * Commercial同意
+     * @return
+     */
+    public String commercialAccept(String comment)
+    {
+        Date date = new Date();
+        this.selected.setCommercialComment(comment);
+        this.selected.setCommercialAssignUser(this.userName);
+        this.selected.setCommercialAssignDate(date);
+        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.CommercialAccept.toString(),
+                ZkbFePartOrder.workFlowSteps.WaitingApm.toString(),date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+    }
+
+    /**
+     * Commercial拒绝
+     * @return
+     */
+    public String commercialReject()
+    {
+        Date date = new Date();
+        this.selected.setCommercialAssignUser(this.userName);
+        this.selected.setCommercialAssignDate(date);
+        int applyCount = this.getApplyCount();
+        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
+        {
+            this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("CommercialReject"));
+        }
+        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.CommercialReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
     }
 
