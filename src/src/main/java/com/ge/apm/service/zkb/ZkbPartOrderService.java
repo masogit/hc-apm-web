@@ -123,7 +123,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderRepository.delete(zkbPartOrder);
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
         if(zkbContract != null){
-            subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
+            //subApplyQty(zkbContract,zkbPartOrder,0 - zkbPartOrder.getQty(),userAccount,false);
         }
 
         zkbPartOrder.setZkbPartOrderItems(zkbPartOrderItems);
@@ -896,7 +896,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 zkbPartOrder.setCurrentStep(ZkbPartOrderStep.PartOrderStep.Complete.toString());
             }
         }else{
-            if(ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) || ZkbPartOrder.PartOrderStatus.DirectorAccept.toString().equals(zkbPartOrder.getStatus())){
+            if(ZkbPartOrder.PartOrderStatus.ManageAccept.toString().equals(zkbPartOrder.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.DirectorAccept.toString().equals(zkbPartOrder.getStatus()) ||
+                ZkbPartOrder.PartOrderStatus.CommercialAccept.toString().equals(zkbPartOrder.getStatus())){
                 zkbPartOrder.setOrderedDate(new Date());
                 zkbPartOrder.setOrderedAuditerUid(userAccount.getUid());
                 zkbPartOrder.setOrderedAuditer(userAccount.getName());
