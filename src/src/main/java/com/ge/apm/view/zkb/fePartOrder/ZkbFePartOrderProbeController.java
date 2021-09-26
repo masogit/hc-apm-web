@@ -346,6 +346,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             WebUtil.addErrorMessage(WebUtil.getMessage("不能选择高值探头"));
             return "";
         }
+        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        boolean fiveNineNine = this.zkbFePartOrderService.checkFiveNineNineContract(zkbContract,this.selected.getReportDate());
+        if(!fiveNineNine){
+            return "";
+        }
         if(this.checkShowSN()&&!four_in_one.equals(this.selected.getContractCatId()))
         {
             this.selected.setQty(0);
@@ -451,8 +456,14 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         if (reportDate.compareTo(zkbContract.getStartDate()) < 0 || reportDate.compareTo(zkbContract.getEndDate()) > 0){
             workFlowStep = ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString();
         }
-        return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
+        String result = this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantAccept.toString(),
                 workFlowStep,date,null,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
+        //注意：流程为WaitingCommercial审批时需要发微信、短信、邮件通知
+        if(workFlowStep.equals(ZkbFePartOrder.workFlowSteps.WaitingCommercial.toString())){
+            this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
+            this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_MESSAGE);
+        }
+        return result;
     }
 
     /**
