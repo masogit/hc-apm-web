@@ -18,6 +18,11 @@ public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbCon
 
     ZkbContractAsset findFirstByContractIdAndAssetId(String contractId, String assetId);
 
+    long countByContractIdAndAssetType(String contractId,String assetType);
+
+    @Query("select count(a.id) from  ZkbContractAsset a where a.contractId = ?1 and a.assetType = ?2 and a.applyNum > 0")
+    long countByApplyNum(String contractId,String assetType);
+
     @Query(value = "select distinct a.contract_id from zkb_contract_asset a where a.asset_id=?1", nativeQuery = true)
     List<String> findDistinctContractId(String assetId);
 

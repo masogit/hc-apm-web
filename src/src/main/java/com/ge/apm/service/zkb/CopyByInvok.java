@@ -84,14 +84,18 @@ public class CopyByInvok {
         } catch (Exception e3) {
             System.out.println("wrong occured");
         }
+
         while (!c1.after(c2)) {
             n++;
             c1.add(Calendar.DATE, 1);
         }
-
-        n = n-1;
-        n = n/365;
-        return n;
+        if(n % 365 == 0){
+            return n/365;
+        }else{
+            n = n-1;
+            n = n/365;
+            return n;
+        }
     }
 
     public static String compareDateByYyyyMMdd(Date date1,Date date2){

@@ -798,8 +798,9 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
     public void scoreFlagChange(){
         if("t".equals(selected.getSsaKeyFlag())){
-            currentScoreFlag = false;
+            currentScoreFlag = true;
             currentScoreText = "";
+            selected.setScoreFlag(CopyByInvok.F);
             return;
         }
         currentScore = zkbIntegralService.queryScoreFlag(selectionTenantInfo);
@@ -809,6 +810,8 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             currentScoreFlag = true;
             /*FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "积分不够", "");
             FacesContext.getCurrentInstance().addMessage(null, message);*/
+        }else{
+            currentScoreFlag = false;
         }
     }
 
