@@ -3,6 +3,7 @@ package com.ge.apm.view.zkb.fePartOrder;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.zkb.ZkbContractAssetService;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -153,7 +154,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 
     private Map<String,String> i18Map;
 
-
+    private ZkbContractAssetService zkbContractAssetService;
 
 
     @Override
@@ -189,7 +190,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         configTypeMap=this.zkbFePartOrderService.getMapConfigByLoginName(this.loginName);
         this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.status);
-
+        zkbContractAssetService = WebUtil.getBean(ZkbContractAssetService.class);
     }
 
 
@@ -397,9 +398,9 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 return "";
             }else{
                 if(yearCount == 1){
-                    Double count = Math.floor(reaminApplyCount/2);
-                    if(count < applyCount){
-                        WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_599contractSupportTimesCannotBeZero")+count.intValue());
+                    Boolean halfAsset = zkbContractAssetService.checkHalfAsset(zkbContract.getId(),null);
+                    if(null == halfAsset || !halfAsset){
+                        WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_599contractSupportTimesCannotBeZero"));
                         return "";
                     }
                 }
