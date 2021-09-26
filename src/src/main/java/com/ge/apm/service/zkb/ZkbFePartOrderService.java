@@ -2234,6 +2234,18 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return false;
         return true;
     }
-
+    public boolean checkFiveNineNineContract(ZkbContract zkbContract,Date reportDate) {
+        boolean flag = true;
+        if("Y".equals(zkbContract.getFiveNineNineFlag())) {
+            String format = "yyyy-MM-dd";
+            String dateStr = DateUtil.getFormatStrByDate(reportDate, format);
+            Date reportDatetimp = DateUtil.getDateByFormatStr(dateStr, format);
+            if (reportDatetimp.compareTo(zkbContract.getStartDate()) < 0 || reportDatetimp.compareTo(zkbContract.getEndDate()) > 0) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractValidPeriodError！"));
+                flag = false;
+            }
+        }
+        return flag;
+    }
 
 }

@@ -199,8 +199,12 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractSystemIdError"));
             return "";
         }
+        ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
+        boolean fiveNineNine = this.zkbFePartOrderService.checkFiveNineNineContract(zkbContract,this.selected.getReportDate());
+        if(!fiveNineNine){
+            return "";
+        }
         if ("true".equals(this.selected.getSubtractTotalStatus())) {
-            ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
             if ("DI".equals(zkbContract.getContractType())
                     || "PCB".equals(zkbContract.getContractType())
                     || "PCB MVS".equals(zkbContract.getContractType())) {
