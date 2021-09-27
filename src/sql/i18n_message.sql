@@ -4312,3 +4312,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 
 -- 多级审批配置，添加不良事件
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('businessType', 'adverseEvents', '不良事件', 'adverseEvents', NULL, -1);
+
+-- YHAAO-13407 质控评审 读取默认数据错误 👇
+alter table public.audit_default_group add column if not exists clause text null;
+-- YHAAO-13407 质控评审 读取默认数据错误 👆
