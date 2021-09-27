@@ -50,7 +50,10 @@ public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbCon
     List<ZkbContractAsset> findZkbContractAssetByTenantUID(String tenantUID, Date kpiDate);
 
     @Modifying
-    @Transactional
-    @Query(value = "UPDATE ZkbContractAsset SET applyNum=applyNum+1 WHERE a.contractId = ?1 and asset_id=?2 and a.assetType = ?3", nativeQuery = true)
-    public void updateContractAssetApplyNum(String contractId,String assetId,String assetType);
+    @Query(value = "UPDATE ZkbContractAsset SET applyNum=(select coalesce(apply_num,0)+1) WHERE contractId=?1 and asset_id=?2 and assetType=?3 limit 1", nativeQuery = true)
+    public void addContractAssetApplyNum(String contractId,String assetId,String assetType);
+
+    @Modifying
+    @Query(value = "UPDATE ZkbContractAsset SET applyNum=(select coalesce(apply_num,0)-1) WHERE contractId=?1 and asset_id=?2 and assetType=?3 limit 1", nativeQuery = true)
+    public void subtractContractAssetApplyNum(String contractId,String assetId,String assetType);
 }
