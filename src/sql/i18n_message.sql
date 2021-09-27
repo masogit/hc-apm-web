@@ -4309,3 +4309,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','monitorRate','主机功率','accounting Department',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','otherPower','其他功率','accounting Department',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','unitPriceElectricity','电费单价','accounting Department',NULL,-1);
+
+-- 多级审批配置，添加不良事件
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('businessType', 'adverseEvents', '不良事件', 'adverseEvents', NULL, -1);
