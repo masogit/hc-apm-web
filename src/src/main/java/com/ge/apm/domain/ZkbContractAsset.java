@@ -63,7 +63,7 @@ public class ZkbContractAsset {
     private String assetType;
 
     @Column(name = "apply_num")
-    private Integer applyNum;
+    private Integer applyNum = 0;
 
     public Integer getApplyNum() {
         return applyNum;

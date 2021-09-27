@@ -415,6 +415,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrder.setContractId(zkbContract.getId());
         zkbPartOrder.setContractNo(zkbContract.getContractNo());
         zkbPartOrder.setTenantUID(tenantUid);
+        zkbPartOrder.setUploadLetterFlag(null);
+        zkbPartOrder.setNeedLetterFlag(null);
         if(StringUtils.isNotEmpty(zkbPartOrder.getTenantNewCatFlag())){
             zkbPartOrder.setNewCatFlag(zkbPartOrder.getTenantNewCatFlag());
         }
@@ -876,6 +878,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         }
                     }
                 }
+                zkbPartOrder.setUploadLetterFlag(CopyByInvok.F);
             }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString())) {
                 zkbPartOrder.setUnOrderDate(new Date());
                 zkbPartOrder.setUnOrderAuditer(userAccount.getName());
