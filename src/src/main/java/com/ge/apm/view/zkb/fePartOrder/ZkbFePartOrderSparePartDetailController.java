@@ -392,16 +392,18 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 return "";
             }
         }else{
-            Integer yearCount = zkbContract.getYearCount();
-            if(yearCount == null){
-                WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractValidPeriodError！"));
-                return "";
-            }else{
-                if(yearCount == 1){
-                    Boolean halfAsset = zkbContractAssetService.checkHalfAsset(zkbContract.getId(),null);
-                    if(null == halfAsset || !halfAsset){
-                        WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_599contractSupportTimesCannotBeZero"));
-                        return "";
+            if("Y".equals(zkbContract.getFiveNineNineFlag())) {
+                Integer yearCount = zkbContract.getYearCount();
+                if(yearCount == null){
+                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractValidPeriodError！"));
+                    return "";
+                }else{
+                    if(yearCount == 1){
+                        Boolean halfAsset = zkbContractAssetService.checkHalfAsset(zkbContract.getId(),null);
+                        if(null == halfAsset || !halfAsset){
+                            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_599contractSupportTimesCannotBeZero"));
+                            return "";
+                        }
                     }
                 }
             }
@@ -418,6 +420,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
             this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount,this.currentUser,this.selected,"备件申请");
+        }else{
+            if("Y".equals(zkbContract.getFiveNineNineFlag()) && 1 == zkbContract.getYearCount()) {
+                AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
+                if(assetInfo != null){
+                    zkbContractAssetService.updateContractAssetApplyNum(zkbContract.getId(),assetInfo.getUid());
+                }
+            }
         }
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
