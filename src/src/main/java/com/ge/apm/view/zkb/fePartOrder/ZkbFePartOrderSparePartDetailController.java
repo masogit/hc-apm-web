@@ -392,16 +392,18 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 return "";
             }
         }else{
-            Integer yearCount = zkbContract.getYearCount();
-            if(yearCount == null){
-                WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractValidPeriodError！"));
-                return "";
-            }else{
-                if(yearCount == 1){
-                    Boolean halfAsset = zkbContractAssetService.checkHalfAsset(zkbContract.getId(),null);
-                    if(null == halfAsset || !halfAsset){
-                        WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_599contractSupportTimesCannotBeZero"));
-                        return "";
+            if("Y".equals(zkbContract.getFiveNineNineFlag())) {
+                Integer yearCount = zkbContract.getYearCount();
+                if(yearCount == null){
+                    WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractValidPeriodError！"));
+                    return "";
+                }else{
+                    if(yearCount == 1){
+                        Boolean halfAsset = zkbContractAssetService.checkHalfAsset(zkbContract.getId(),null);
+                        if(null == halfAsset || !halfAsset){
+                            WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_599contractSupportTimesCannotBeZero"));
+                            return "";
+                        }
                     }
                 }
             }
@@ -418,6 +420,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
             this.zkbFePartOrderService.moveSpareQuota(1,zkbContract,applyCount,this.currentUser,this.selected,"备件申请");
+        }else{
+            boolean flag = this.zkbFePartOrderService.checkFiveNineNineContract(zkbContract,this.selected.getReportDate());
+            if(flag && 1 == zkbContract.getYearCount()) {
+                AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
+                if(assetInfo != null){
+                    zkbContractAssetService.addContractAssetApplyNum(zkbContract.getId(),assetInfo.getUid());
+                }
+            }
         }
         this.zkbFePartOrderService.sendMessage(this.selected.getId(), GatewayURL.FE_PART_ORDER_SEND_WECHART);
         return url;
@@ -531,6 +541,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
             this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("TenantReject"));
+        }else{
+            boolean flag = this.zkbFePartOrderService.checkFiveNineNineContract(zkbContract,this.selected.getReportDate());
+            if(flag && 1 == zkbContract.getYearCount()) {
+                AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
+                if(assetInfo != null){
+                    zkbContractAssetService.subtractContractAssetApplyNum(zkbContract.getId(),assetInfo.getUid());
+                }
+            }
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.TenantReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);
@@ -564,6 +582,14 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType()))
         {
             this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,applyCount,this.currentUser,this.selected,this.i18Map.get("CommercialReject"));
+        }else{
+            boolean flag = this.zkbFePartOrderService.checkFiveNineNineContract(zkbContract,this.selected.getReportDate());
+            if(flag && 1 == zkbContract.getYearCount()) {
+                AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
+                if(assetInfo != null){
+                    zkbContractAssetService.subtractContractAssetApplyNum(zkbContract.getId(),assetInfo.getUid());
+                }
+            }
         }
         return this.zkbFePartOrderService.wolkFlowToComplete(this.selected,this.userUid,this.userName,this.tenantUID,this.queryStatus,ZkbFePartOrder.workFlowStatus.CommercialReject.toString(),
                 ZkbFePartOrder.workFlowSteps.Complete.toString(),date,date,GatewayURL.FE_PART_ORDER_SEND_EMAIL);

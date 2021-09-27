@@ -38,4 +38,11 @@ public class ZkbContractAssetService {
         }
     }
 
+    public void addContractAssetApplyNum(String contractId,String assetId){
+        zkbContractAssetRepository.addContractAssetApplyNum(contractId,assetId,"highMachine");
+    }
+
+    public void subtractContractAssetApplyNum(String contractId,String assetId){
+        zkbContractAssetRepository.subtractContractAssetApplyNum(contractId,assetId,"highMachine");
+    }
 }

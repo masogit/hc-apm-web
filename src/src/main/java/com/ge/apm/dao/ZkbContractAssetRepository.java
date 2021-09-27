@@ -1,7 +1,9 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ZkbContractAsset;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.Date;
@@ -47,4 +49,11 @@ public interface ZkbContractAssetRepository extends GenericRepositoryUUID<ZkbCon
     @Query(value = "SELECT zca.* from zkb_contract zkbc INNER JOIN zkb_contract_asset zca on zkbc.id = zca.contract_id where zkbc.tenant_uid = ?1 and zkbc.start_date<=?2 and zkbc.end_date>=?2", nativeQuery = true)
     List<ZkbContractAsset> findZkbContractAssetByTenantUID(String tenantUID, Date kpiDate);
 
+    @Modifying
+    @Query(value = "UPDATE ZkbContractAsset SET applyNum=(select coalesce(apply_num,0)+1) WHERE contractId=?1 and asset_id=?2 and assetType=?3 limit 1", nativeQuery = true)
+    public void addContractAssetApplyNum(String contractId,String assetId,String assetType);
+
+    @Modifying
+    @Query(value = "UPDATE ZkbContractAsset SET applyNum=(select coalesce(apply_num,0)-1) WHERE contractId=?1 and asset_id=?2 and assetType=?3 limit 1", nativeQuery = true)
+    public void subtractContractAssetApplyNum(String contractId,String assetId,String assetType);
 }
