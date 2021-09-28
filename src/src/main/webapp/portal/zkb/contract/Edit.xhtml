@@ -249,7 +249,18 @@
                             <label class="label">#{msg.zkbContract_remark}</label>
                             <p:inputText id="remark" value="#{zkbContractEditController.selected.remark}" />
                         </h:panelGroup>
-
+                        <h:panelGroup>
+                            <label class="label">实际开始时间</label>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.startDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">实际结束时间</label>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{zkbContractEditController.selected.endDate}" required="true" requiredMessage="#{msg.zkbContract_endDate} #{msg.ValidationRequire}" showOn="button" disabled="false"  Input="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">599计数年</label>
+                            <p:inputText value="#{zkbContractEditController.selected.yearCount}" />
+                        </h:panelGroup>
                     </p:panelGrid>
 
 
@@ -334,6 +345,9 @@
                             </p:column>
                             <p:column headerText="是否超声高低机" >
                                 <h:outputText value="#{fieldMsg.fieldValue('zkbContractAssetType',zkbContractAssetItem.assetType)}" />
+                            </p:column>
+                            <p:column headerText="申请数量" >
+                                <h:outputText value="#{zkbContractAssetItem.applyNum}" />
                             </p:column>
                             <f:facet name="{Toolbar}">
                                 <p:commandButton immediate="false"  process="@this" id="createAssetButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbContractEditController.prepareAssetCreate}" update=":growl :zkbContractAssetEditDlg" oncomplete="PF('zkbContractAssetEditDlg').show()" disabled="#{userContextService.zkbUser}" rendered="#{zkbContractEditController.operateFlag}"/>
