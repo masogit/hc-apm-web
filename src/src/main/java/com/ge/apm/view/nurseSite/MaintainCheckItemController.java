@@ -56,9 +56,6 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
     private UserAccount currentUser;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private NurseSiteMaintainCheckItemRepository dao;
-	//选定的院区
-	@Setter @Getter
-	private OrgInfo selectSite;
   	
 
     @Override
@@ -81,29 +78,11 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        if(selectSite!=null) {
-			this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
-			this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
-			this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
-			this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
-		} else {
-			//need list or set
-			this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*"));
-		}
+        //need list or set
+		this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*"));
         Page<NurseSiteMaintainCheckItem> pageResult=dao.findBySearchFilter(this.searchFilters, pageRequest);
         return pageResult;
     }
-
-	public void onSelectSiteTreeNode(NodeSelectEvent event) {
-		if(searchFilters!=null) searchFilters.clear();
-
-		if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-			selectSite = (OrgInfo) event.getTreeNode().getData();
-		} else {
-			selectSite = null;
-		}
-
-	}
 
     @Override
     public void save(){
