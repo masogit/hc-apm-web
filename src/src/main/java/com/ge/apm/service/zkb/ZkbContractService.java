@@ -523,9 +523,13 @@ public class ZkbContractService {
             }
             if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag())){
                 zkbContract.setStartDate(zkbContract.getContractStartDate());
+                int year = zkbContract.getYearCount() == null ? 1 :  zkbContract.getYearCount();
+                if(zkbContract.getYearCount() == null){
+                    zkbContract.setYearCount(1);
+                }
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(zkbContract.getContractEndDate());
-                cal.add(Calendar.YEAR, 1);
+                cal.add(Calendar.YEAR, year);
                 cal.add(Calendar.DATE, -1);
                 zkbContract.setEndDate(cal.getTime());
             }else{

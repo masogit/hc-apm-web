@@ -15,6 +15,11 @@ import javax.validation.constraints.Size;
 public class ZkbContractAsset {
 
     private static final long serialVersionUID = 1L;
+
+    public enum AssetTypeEnum{
+        highMachine,lowMachine,empty
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
