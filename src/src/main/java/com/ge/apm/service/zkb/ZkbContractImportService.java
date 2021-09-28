@@ -224,9 +224,13 @@ public class ZkbContractImportService {
                     zkbContract.setFiveNineNineFlag(ZkbContract.YOrNEnum.Y.toString());
                     zkbContract.setYearCount(1);
                     zkbContract.setStartDate(zkbContract.getContractStartDate());
+                    int year = zkbContract.getYearCount() == null ? 1 :  zkbContract.getYearCount();
+                    if(zkbContract.getYearCount() == null){
+                        zkbContract.setYearCount(1);
+                    }
                     Calendar cal = Calendar.getInstance();
-                    cal.setTime(zkbContract.getContractEndDate());
-                    cal.add(Calendar.YEAR, 1);
+                    cal.setTime(zkbContract.getContractStartDate());
+                    cal.add(Calendar.YEAR, year);
                     cal.add(Calendar.DATE, -1);
                     zkbContract.setEndDate(cal.getTime());
                 }else{
@@ -258,7 +262,7 @@ public class ZkbContractImportService {
                     newZkbContract.setYearCount(1);
                     newZkbContract.setStartDate(newZkbContract.getContractStartDate());
                     Calendar cal = Calendar.getInstance();
-                    cal.setTime(newZkbContract.getContractEndDate());
+                    cal.setTime(newZkbContract.getContractStartDate());
                     cal.add(Calendar.YEAR, 1);
                     cal.add(Calendar.DATE, -1);
                     newZkbContract.setEndDate(cal.getTime());
