@@ -29,7 +29,6 @@ public class ZkbContractAssetService {
         double d = total * 0.5 ;
         if((int)d != d){
             d= (int) d;
-            d++;
         }
         if(highCount < d){
             return true;
