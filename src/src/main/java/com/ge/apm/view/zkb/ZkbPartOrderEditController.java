@@ -294,11 +294,11 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     if(selectedContract.getYearCount() == 1){
                         Boolean r = zkbContractAssetService.checkHalfAsset(selectedContract.getId(),selected.getAssetId());
                         if(r == null){
-                            WebUtil.addErrorMessage("","合同中没有高端机设备！");
+                            WebUtil.addErrorMessage("合同中没有高端机设备！","");
                             contractList = new ArrayList<>();
                             return;
                         }else if(!r){
-                            WebUtil.addErrorMessage("","高端机设备申请种类超过50%,不能再申请！");
+                            WebUtil.addErrorMessage("高端机设备申请种类超过50%,不能再申请！","");
                             contractList = new ArrayList<>();
                         }
                     }
@@ -677,11 +677,10 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         //region 实时获取合同进行校验数量
         ZkbContract zkbContract = zkbPartOrderService.getZkbContractRepository().findById(selectedContract.getId());
         String reLog = "";
-        if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) || ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
-
-            if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType) && ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag())){
-                ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),selected.getAssetId());
-                if(ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType()) && zkbContract.getYearCount() == 1){
+        if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
+            ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
+            if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag()) && ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
+                if(zkbContract.getYearCount() == 1){
                     Boolean r = zkbContractAssetService.checkHalfAsset(zkbContract.getId(),selected.getAssetId());
                     if(r == null){
                         reLog = "合同中没有高端机设备！";
@@ -690,17 +689,15 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                     }
                 }
             }else{
-                if(!"2".equals(selected.getArtificialType())){
-                    if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
-                        Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
-                        if(contractCount - selected.getQty() < 0){
-                            reLog = "合同备件剩余名额不足，请检查！";
-                        }
-                    }else{
-                        Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
-                        if(contractCount - selected.getQty() < 0){
-                            reLog = "合同备件+人工+保养剩余名额不足，请检查！";
-                        }
+                if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                    Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
+                    if(contractCount - selected.getQty() < 0){
+                        reLog = "合同备件剩余名额不足，请检查！";
+                    }
+                }else{
+                    Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                    if(contractCount - selected.getQty() < 0){
+                        reLog = "合同备件+人工+保养剩余名额不足，请检查！";
                     }
                 }
             }
@@ -777,6 +774,18 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
                             reLog = "备件+人工+保养剩余名额不足，请检查！";
                         }
                     }
+                }
+            }
+        } else if(ZkbPartOrder.OrderType.Tool.toString().equals(orderType)){
+            if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
+                Integer contractCount = zkbContract.getSpareQuota() == null ? 0 : zkbContract.getSpareQuota();
+                if(contractCount - selected.getQty() < 0){
+                    reLog = "合同备件剩余名额不足，请检查！";
+                }
+            }else{
+                Integer contractCount = zkbContract.getSpareArtificail() == null ? 0 : zkbContract.getSpareArtificail();
+                if(contractCount - selected.getQty() < 0){
+                    reLog = "合同备件+人工+保养剩余名额不足，请检查！";
                 }
             }
         }

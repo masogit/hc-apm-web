@@ -528,7 +528,7 @@ public class ZkbContractService {
                     zkbContract.setYearCount(1);
                 }
                 Calendar cal = Calendar.getInstance();
-                cal.setTime(zkbContract.getContractEndDate());
+                cal.setTime(zkbContract.getContractStartDate());
                 cal.add(Calendar.YEAR, year);
                 cal.add(Calendar.DATE, -1);
                 zkbContract.setEndDate(cal.getTime());
@@ -542,7 +542,7 @@ public class ZkbContractService {
                 zkbContract.setYearCount(1);
                 zkbContract.setStartDate(zkbContract.getContractStartDate());
                 Calendar cal = Calendar.getInstance();
-                cal.setTime(zkbContract.getContractEndDate());
+                cal.setTime(zkbContract.getContractStartDate());
                 cal.add(Calendar.YEAR, 1);
                 cal.add(Calendar.DATE, -1);
                 zkbContract.setEndDate(cal.getTime());
