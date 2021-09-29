@@ -1146,33 +1146,33 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         }else{
             newServiceRequest.setRequestReason(faultReason);
         }
-//        WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(selectedAsset.getId());
-//        if (woc == null) {
-//            WebUtil.addErrorMessage("医院未配置流程配置项,无法创建工单");
-//            return;
-//        }
-//
-//        Boolean isWoSupplierAutoEnabled = woc.getIsWoSupplierAutoEnabled();
-//        boolean isSupplierOrder = Boolean.TRUE.equals(isWoSupplierAutoEnabled);
-//        if (!isSupplierOrder) {
-//            WebUtil.addErrorMessage("医院已禁止供应商创建维修工单");
-//            return;
-//        }
-//        if(selectedAsset.getSupplierNewUID() == null){
-//            WebUtil.addErrorMessage("设备未关联供应商,无法使用供应商派工");
-//            return;
-//        }
-//        Map<String, Object> map = woService.findSupplierFEByAssetUid(selectedAsset);
-//        List<UserAccount>  data = (List<UserAccount>)map.get("data");
-//        if(ObjectUtils.isEmpty(data)){
-//            WebUtil.addErrorMessage("设备未绑定供应商维修工程师");
-//            return;
-//        }
-//        int size = data.size();
-//        if(size>1){
-//            WebUtil.addErrorMessage("设备绑定工程师过多(" + data.stream().map(UserAccount::getName).collect(Collectors.joining(",")) +")");
-//            return;
-//        }
+        WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(selectedAsset.getId());
+        if (woc == null) {
+            WebUtil.addErrorMessage("医院未配置流程配置项,无法创建工单");
+            return;
+        }
+
+        Boolean isWoSupplierAutoEnabled = woc.getIsWoSupplierAutoEnabled();
+        boolean isSupplierOrder = Boolean.TRUE.equals(isWoSupplierAutoEnabled);
+        if (!isSupplierOrder) {
+            WebUtil.addErrorMessage("医院已禁止供应商创建维修工单");
+            return;
+        }
+        if(selectedAsset.getSupplierNewUID() == null){
+            WebUtil.addErrorMessage("设备未关联供应商,无法使用供应商派工");
+            return;
+        }
+        Map<String, Object> map = woService.findSupplierFEByAssetUid(selectedAsset);
+        List<UserAccount>  data = (List<UserAccount>)map.get("data");
+        if(ObjectUtils.isEmpty(data)){
+            WebUtil.addErrorMessage("设备未绑定供应商维修工程师");
+            return;
+        }
+        int size = data.size();
+        if(size>1){
+            WebUtil.addErrorMessage("设备绑定工程师过多(" + data.stream().map(UserAccount::getName).collect(Collectors.joining(",")) +")");
+            return;
+        }
         if (null == selectedAsset) {
             WebUtil.addErrorMessage(WebUtil.getMessage("NoEquipmentSelectedNoRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
