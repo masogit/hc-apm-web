@@ -301,6 +301,10 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
 
         List<UserAccount> res = this.acker.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
+        if(res!=null && !res.isEmpty() && res.contains(currentUserAccount)){
+            res.remove(currentUserAccount);
+        }
         return res;
     }
     public void changeStatus() {
@@ -559,7 +563,11 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         searchFilters.add(new SearchFilter("supplierUid", SearchFilter.Operator.EQ, currentUserAccount.getTenantUID()));
         if (3==queryIndex) {
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
-        }else {
+        }else if (queryIndex == 7) { //待关单
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 6));
+        }else if (queryIndex == 8) { //已关单
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
+        } else {
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
         }
         searchFilters.add(new SearchFilter("createType", SearchFilter.Operator.EQ, 2));
@@ -821,12 +829,12 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
            displayTime=true;
        }
         Integer userId = selectedWorkOrder.getAckId();
-       if( userId!=null){
-          ua1 = userDao.getById(userId);
-       }else{
-           ua1 = userDao.getById(selectedWorkOrder.getServiceRequest().getRequestorId());
-
-       }
+//       if( userId!=null){
+//          ua1 = userDao.getById(userId);
+//       }else{
+//           ua1 = userDao.getById(selectedWorkOrder.getServiceRequest().getRequestorId());
+//
+//       }
 
        String result = selectedWorkOrder.getRepairResult();
        if(result!=null) {
@@ -910,6 +918,10 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
     }
 
     public void saveRepairWorkOrder() throws Exception{
+        if(ua1==null){
+            WebUtil.addErrorMessage("保存失败,请选择验收人");
+            return ;
+        }
         assigneeId =ua1.getId().toString();
         if (hourRequired) {
             if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() < 0.01) {
@@ -1002,6 +1014,10 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
     }
 
     public void repairWorkOrder() {
+        if(ua1==null){
+            WebUtil.addErrorMessage("维修失败,请选择验收人");
+            return ;
+        }
         boolean valid = true;
         if (confirmedUpDate ==
                 null) {
@@ -1130,33 +1146,33 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         }else{
             newServiceRequest.setRequestReason(faultReason);
         }
-        WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(selectedAsset.getId());
-        if (woc == null) {
-            WebUtil.addErrorMessage("医院未配置流程配置项,无法创建工单");
-            return;
-        }
-
-        Boolean isWoSupplierAutoEnabled = woc.getIsWoSupplierAutoEnabled();
-        boolean isSupplierOrder = Boolean.TRUE.equals(isWoSupplierAutoEnabled);
-        if (!isSupplierOrder) {
-            WebUtil.addErrorMessage("医院已禁止供应商创建保养工单");
-            return;
-        }
-        if(selectedAsset.getSupplierNewUID() == null){
-            WebUtil.addErrorMessage("设备未关联供应商,无法使用供应商派工");
-            return;
-        }
-        Map<String, Object> map = woService.findSupplierFEByAssetUid(selectedAsset);
-        List<UserAccount>  data = (List<UserAccount>)map.get("data");
-        if(ObjectUtils.isEmpty(data)){
-            WebUtil.addErrorMessage("设备未绑定供应商维修工程师");
-            return;
-        }
-        int size = data.size();
-        if(size>1){
-            WebUtil.addErrorMessage("设备绑定工程师过多(" + data.stream().map(UserAccount::getName).collect(Collectors.joining(",")) +")");
-            return;
-        }
+//        WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(selectedAsset.getId());
+//        if (woc == null) {
+//            WebUtil.addErrorMessage("医院未配置流程配置项,无法创建工单");
+//            return;
+//        }
+//
+//        Boolean isWoSupplierAutoEnabled = woc.getIsWoSupplierAutoEnabled();
+//        boolean isSupplierOrder = Boolean.TRUE.equals(isWoSupplierAutoEnabled);
+//        if (!isSupplierOrder) {
+//            WebUtil.addErrorMessage("医院已禁止供应商创建维修工单");
+//            return;
+//        }
+//        if(selectedAsset.getSupplierNewUID() == null){
+//            WebUtil.addErrorMessage("设备未关联供应商,无法使用供应商派工");
+//            return;
+//        }
+//        Map<String, Object> map = woService.findSupplierFEByAssetUid(selectedAsset);
+//        List<UserAccount>  data = (List<UserAccount>)map.get("data");
+//        if(ObjectUtils.isEmpty(data)){
+//            WebUtil.addErrorMessage("设备未绑定供应商维修工程师");
+//            return;
+//        }
+//        int size = data.size();
+//        if(size>1){
+//            WebUtil.addErrorMessage("设备绑定工程师过多(" + data.stream().map(UserAccount::getName).collect(Collectors.joining(",")) +")");
+//            return;
+//        }
         if (null == selectedAsset) {
             WebUtil.addErrorMessage(WebUtil.getMessage("NoEquipmentSelectedNoRepairTip"));
             RequestContext requestContext = RequestContext.getCurrentInstance();
