@@ -806,7 +806,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                     break;
             }
         } else {
-            orderType = ZkbContractQuotaLog.OrderTypeEnum.ProbeAny.toString();
+            orderType = ZkbContractQuotaLog.OrderTypeEnum.Probe.toString();
             switch (type) {
                 case 1:
                     //探头剩余名额-1，探头申请名额+1
