@@ -99,7 +99,7 @@
                 </p:panelGrid>
                 <br/>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrSupplierController.updateAccessPrice()}" value="#{msg.Save}" update="woSupplierTab:woMgrSupplierDetailForm woSupplierTab:repairCompleteDialogForm:accessList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogPriceDlg');"/>
+<!--                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrSupplierController.updateAccessPrice()}" value="#{msg.Save}" update="woSupplierTab:woMgrSupplierDetailForm woSupplierTab:repairCompleteDialogForm:accessList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogPriceDlg');"/>-->
                     <p:commandButton immediate="true" actionListener="#{workOrderMgrSupplierController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'moreAccDialogPriceDlg');"/>
                 </h:panelGroup>
             </h:panelGroup>
