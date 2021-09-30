@@ -301,10 +301,6 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
 
         List<UserAccount> res = this.acker.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        UserAccount currentUserAccount = UserContextService.getCurrentUserAccount();
-        if(res!=null && !res.isEmpty() && res.contains(currentUserAccount)){
-            res.remove(currentUserAccount);
-        }
         return res;
     }
     public void changeStatus() {
@@ -1173,7 +1169,7 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         }
         int size = data.size();
         if(size>1){
-            WebUtil.addErrorMessage("设备绑定工程师过多(" + data.stream().map(UserAccount::getName).collect(Collectors.joining(",")) +")");
+            WebUtil.addErrorMessage("设备绑定工程师过多");
             return;
         }
         if (null == selectedAsset) {
