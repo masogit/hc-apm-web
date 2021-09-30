@@ -2238,6 +2238,9 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         boolean flag = true;
         if("Y".equals(zkbContract.getFiveNineNineFlag())) {
             String format = "yyyy-MM-dd";
+            if(reportDate == null){
+                reportDate = new Date();
+            }
             String dateStr = DateUtil.getFormatStrByDate(reportDate, format);
             Date reportDatetimp = DateUtil.getDateByFormatStr(dateStr, format);
             if (reportDatetimp.compareTo(zkbContract.getStartDate()) < 0 || reportDatetimp.compareTo(zkbContract.getEndDate()) > 0) {

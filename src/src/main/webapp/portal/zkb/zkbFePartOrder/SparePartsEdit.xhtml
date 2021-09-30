@@ -10,6 +10,7 @@
 <ui:composition>
     <h:panelGroup id="zkbFePartOrderSparePartsEditpanelGroup">
         <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='SpareParts'}">
+            <p:messages id="messages" showDetail="true" closable="false" autoUpdate="true" ></p:messages>
             <p:fieldset id="zkbWorkFlowFieldset" legend="工单信息" >
                 <h:form id="searchForm">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbFePartOrderSparePartDetailController.workFlowInFistStep()}">
@@ -29,7 +30,7 @@
                              widgetVar="sparePartsZkbFePartOrder" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrder}"
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.reportDate}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm" />
+                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderSparePartDetailController.selectedWorkFlow}"  update="zkbFePartOrderSparePartsEditForm:zkbContractDatalist_spareParts zkbFePartOrderSparePartsEditForm messages" />
                     <p:column headerText="报修单号">
                         <h:outputText value="#{item.partOrderNo}"/>
                     </p:column>

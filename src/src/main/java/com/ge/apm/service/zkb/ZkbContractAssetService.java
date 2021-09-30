@@ -18,30 +18,34 @@ public class ZkbContractAssetService {
 
 
     public Boolean checkHalfAsset(String contractId,String assetId){
-
+        Boolean checkHalfAsset = null;
         ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(contractId,assetId);
-        if(zkbContractAsset.getApplyNum() != null && zkbContractAsset.getApplyNum() > 0){
-            return true;
+        if(zkbContractAsset == null){
+            return checkHalfAsset;
         }
+        if(zkbContractAsset.getApplyNum() == null){
+            long total = 0;
+            long highCount = 0;
 
-        long total = 0;
-        long highCount = 0;
+            total = zkbContractAssetRepository.countByContractIdAndAssetType(contractId,"highMachine");
+            highCount = zkbContractAssetRepository.countByApplyNum(contractId,"highMachine");
 
-        total = zkbContractAssetRepository.countByContractIdAndAssetType(contractId,"highMachine");
-        highCount = zkbContractAssetRepository.countByApplyNum(contractId,"highMachine");
-
-        if(total == 0){
-            return null;
+            if(total == 0){
+                return checkHalfAsset;
+            }
+            double d = total * 0.5 ;
+            if((int)d != d){
+                d= (int) d;
+            }
+            if(highCount < d){
+                checkHalfAsset = true;
+            }else{
+                checkHalfAsset = false;
+            }
+        }else if(zkbContractAsset.getApplyNum() > 0){
+            checkHalfAsset = true;
         }
-        double d = total * 0.5 ;
-        if((int)d != d){
-            d= (int) d;
-        }
-        if(highCount < d){
-            return true;
-        }else{
-            return false;
-        }
+        return checkHalfAsset;
     }
 
     public void addContractAssetApplyNum(String contractId,String assetId){
