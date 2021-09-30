@@ -268,7 +268,7 @@ class ServiceRequestForm {
     /**
      * 创建方式 1:医院创建  2:供应商创建
      */
-    Integer createType = 1;
+    Integer createType;
     String supplierUid;
 
     public String getSupplierUid() {
