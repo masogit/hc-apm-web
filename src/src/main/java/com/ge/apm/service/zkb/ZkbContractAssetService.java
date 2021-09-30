@@ -23,7 +23,7 @@ public class ZkbContractAssetService {
         if(zkbContractAsset == null){
             return checkHalfAsset;
         }
-        if(zkbContractAsset.getApplyNum() == null){
+        if(zkbContractAsset.getApplyNum() == null || zkbContractAsset.getApplyNum() == 0){
             long total = 0;
             long highCount = 0;
 
