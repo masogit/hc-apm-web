@@ -291,7 +291,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
 
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
                 if(ZkbContract.YOrNEnum.Y.toString().equals(selectedContract.getFiveNineNineFlag()) && ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
-                    if(selectedContract.getYearCount() == 1){
+                    if(selectedContract.getYearCount() == 1 && (zkbContractAsset.getApplyNum() == null || zkbContractAsset.getApplyNum() == 0)){
                         Boolean r = zkbContractAssetService.checkHalfAsset(selectedContract.getId(),selected.getAssetId());
                         if(r == null){
                             WebUtil.addErrorMessage("合同中没有高端机设备！","");
@@ -680,12 +680,12 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
             if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag()) && ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
-                if(zkbContract.getYearCount() == 1){
+                if(zkbContract.getYearCount() == 1 && (zkbContractAsset.getApplyNum() == null || zkbContractAsset.getApplyNum() == 0)){
                     Boolean r = zkbContractAssetService.checkHalfAsset(zkbContract.getId(),selected.getAssetId());
                     if(r == null){
                         reLog = "合同中没有高端机设备！";
                     }else if(!r){
-                        reLog = "高端机设备申请种类超过50%,不能再申请！";
+                        reLog = "当前备件申请的设备已经超过50%的IB入保数额，此IB无法申请备件！";
                     }
                 }
             }else{

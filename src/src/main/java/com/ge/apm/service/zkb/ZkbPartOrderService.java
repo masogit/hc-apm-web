@@ -154,9 +154,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 2));
         assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 3));
 
-        Pageable pageable = new PageRequest(0, 5000);
-        Page page = v2_workOrderRepository.findBySearchFilter(assetFilters, pageable);
-        List<V2_WorkOrder> v2_workOrderList = page.getContent();
+        List<V2_WorkOrder> v2_workOrderList = v2_workOrderRepository.findBySearchFilter(assetFilters);
         for(V2_WorkOrder v : v2_workOrderList){
             if(v != null) {
                 HashMap<String, Object> m = new HashMap<>(20);
@@ -208,9 +206,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         filters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ,tenUId));
         filters.add(new SearchFilter("startDate", SearchFilter.Operator.LTE, requestTime));
         filters.add(new SearchFilter("endDate", SearchFilter.Operator.GT, DateUtils.addDays(requestTime, -1)));
-        Pageable pageable = new PageRequest(0, 5000);
-        Page page = zkbContractRepository.findBySearchFilter(filters, pageable);
-        List<ZkbContract> zkbContracts = new ArrayList(page.getContent());
+        List<ZkbContract> zkbContracts = zkbContractRepository.findBySearchFilter(filters);
         return zkbContracts;
     }
 
