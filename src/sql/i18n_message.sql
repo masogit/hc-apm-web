@@ -4060,7 +4060,7 @@ INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) V
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_returnTooMaxError','错误：归还数量不能大于申请数量','错误：归还数量不能大于申请数量',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_returnListCannotBeNull','错误：请填写归还备件信息','错误：请填写归还备件信息',NULL,	-1	);
 INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_contractValidPeriodError','错误：合同不在有效期内','Error:Invalid contract',NULL,	-1	);
-INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_599contractSupportTimesCannotBeZero','错误：本设备高端机备件不能继续申请，请及时续费','错误：本设备高端机备件不能继续申请，请及时续费',NULL,	-1	);
+INSERT INTO i18n_message (msg_type,msg_key,value_zh,value_en,value_tw,site_id) VALUES ('message','zkbFePartOrder_599contractSupportTimesCannotBeZero','错误：当前备件申请的设备已经超过50%的IB入保数额，此IB无法申请备件','错误：当前备件申请的设备已经超过50%的IB入保数额，此IB无法申请备件',NULL,	-1	);
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbFePartOrder_steps','WaitingAssignment','待代理商确认','Waiting tenant assignment',NULL,-1);
