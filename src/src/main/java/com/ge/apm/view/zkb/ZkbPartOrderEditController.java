@@ -292,13 +292,13 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             if(ZkbPartOrder.OrderType.Parts.toString().equals(orderType)){
                 if(ZkbContract.YOrNEnum.Y.toString().equals(selectedContract.getFiveNineNineFlag()) && ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
                     if(selectedContract.getYearCount() == 1 && (zkbContractAsset.getApplyNum() == null || zkbContractAsset.getApplyNum() == 0)){
-                        Boolean r = zkbContractAssetService.checkHalfAsset(selectedContract.getId(),selected.getAssetId());
+                        Boolean r = zkbContractAssetService.checkHalfAsset(selectedContract.getId(),assetInfo.getUid());
                         if(r == null){
                             WebUtil.addErrorMessage("合同中没有高端机设备！","");
                             contractList = new ArrayList<>();
                             return;
                         }else if(!r){
-                            WebUtil.addErrorMessage("高端机设备申请种类超过50%,不能再申请！","");
+                            WebUtil.addErrorMessage("当前备件申请的设备已经超过50%的IB入保数额，此IB无法申请备件！","");
                             contractList = new ArrayList<>();
                         }
                     }
