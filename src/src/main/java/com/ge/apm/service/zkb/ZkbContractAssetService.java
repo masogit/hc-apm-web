@@ -1,6 +1,7 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.ZkbContractAssetRepository;
+import com.ge.apm.domain.ZkbContractAsset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,12 @@ public class ZkbContractAssetService {
 
 
     public Boolean checkHalfAsset(String contractId,String assetId){
+
+        ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(contractId,assetId);
+        if(zkbContractAsset.getApplyNum() != null && zkbContractAsset.getApplyNum() > 0){
+            return true;
+        }
+
         long total = 0;
         long highCount = 0;
 
