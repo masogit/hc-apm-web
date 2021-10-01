@@ -560,7 +560,13 @@ public class WorkOrderMgrSupplierController extends  GenericCRUDUUIDController<V
         if (3==queryIndex) {
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentUserAccount.getId()));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
-        }else if (queryIndex == 7) { //待关单
+        }else if (queryIndex == 5) { //待验收
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
+        } else if (queryIndex == 6) { //待评价
+            searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.EQ, 0));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
+        } else if (queryIndex == 7) { //待关单
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, currentUserAccount.getId()));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 6));
         }else if (queryIndex == 8) { //已关单
