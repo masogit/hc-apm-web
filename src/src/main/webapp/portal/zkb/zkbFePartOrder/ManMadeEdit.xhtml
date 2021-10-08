@@ -11,6 +11,7 @@
 <ui:composition>
                 <h:form id="zkbFePartOrderEditForm" >
                     <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='ManMade'}">
+                    <p:messages id="manMadeMessages" showDetail="true" closable="false" autoUpdate="true" ></p:messages>
                     <p:fieldset id="zkbFiledSet" legend="基本信息" style="margin-bottom:20px" rendered="#{zkbFePartOrderDetailController.selected !=null}">
                         <h:panelGroup>
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
