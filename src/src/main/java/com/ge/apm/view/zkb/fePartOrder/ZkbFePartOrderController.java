@@ -196,6 +196,7 @@ public class ZkbFePartOrderController extends GenericCRUDUUIDController<ZkbFePar
         zkbFePartOrderRepository = WebUtil.getBean(ZkbFePartOrderRepository.class);
         zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
+        String token = UserContextService.getAccessToken();
         this.loginName = currentUser.getLoginName();
         this.queryStatus = WebUtil.getRequestParameter("queryStatus");
         this.tenantUID = currentUser.getTenantUID();

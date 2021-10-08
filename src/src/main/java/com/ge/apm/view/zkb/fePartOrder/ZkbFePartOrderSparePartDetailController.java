@@ -261,26 +261,11 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     {
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selectZkbFePartOrder.getContractId());
         this.selected = this.zkbFePartOrderService.selectedWorkFlow(this.selected,this.selectZkbFePartOrder);
-        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        if("Y".equals(zkbContract.getFiveNineNineFlag())){
-            Integer yearCount = zkbContract.getYearCount();
-            if(yearCount == null){
-                WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_contractValidPeriodError！"));
-            }else{
-                if(yearCount == 1){
-                    AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
-                    if(assetInfo != null){
-                        Boolean halfAsset = zkbContractAssetService.checkHalfAsset(zkbContract.getId(),assetInfo.getUid());
-                        if(null == halfAsset){
-                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "合同中没有高端机设备", "");
-                            FacesContext.getCurrentInstance().addMessage(null, message);
-                        }else if(!halfAsset){
-                            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, WebUtil.getMessage("zkbFePartOrder_599contractSupportTimesCannotBeZero"), "");
-                            FacesContext.getCurrentInstance().addMessage(null, message);
-                        }
-                    }
-                }
-            }
+        ZkbContract zkbContract =  contractList.get(0);
+        AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
+        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(zkbContract,this.selected,assetInfo.getUid());
+        if(!fiveNineNine){
+            this.selected.setFatherPartOrderNo(null);
         }
     }
 
@@ -392,7 +377,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         int applyCount = this.getApplyCount();
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        boolean fiveNineNine = this.zkbFePartOrderService.checkFiveNineNineContract(zkbContract,this.selected.getReportDate());
+        AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
+        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(zkbContract,this.selected,assetInfo.getUid());
         if(!fiveNineNine){
             return "";
         }
@@ -812,7 +798,6 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(zkbContract == null){
             zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());;
         }
-//        boolean flag = this.zkbFePartOrderService.checkFiveNineNineContract(zkbContract,this.selected.getReportDate());
         if("Y".equals(zkbContract.getFiveNineNineFlag()) && 1 == zkbContract.getYearCount()) {
             AssetInfo assetInfo = assetInfoRepository.getBySystemId(this.selected.getSystemId());
             if(assetInfo != null){

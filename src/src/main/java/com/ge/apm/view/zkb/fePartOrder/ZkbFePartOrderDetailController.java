@@ -7,6 +7,7 @@ import com.ge.apm.domain.ZkbContract;
 import com.ge.apm.domain.ZkbFePartOrder;
 import com.ge.apm.domain.ZkbFePartOrderUserConfig;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.zkb.ZkbContractAssetService;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -96,6 +97,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
 
     private Map<String, String> i18Map;
 
+    private ZkbContractAssetService zkbContractAssetService;
     @Override
     protected void init() {
         super.init();
@@ -124,6 +126,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
         }
         configTypeMap = this.zkbFePartOrderService.getMapConfigByLoginName(this.loginName);
         this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.status);
+        zkbContractAssetService = WebUtil.getBean(ZkbContractAssetService.class);
     }
 
     @Override
@@ -182,6 +185,11 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             this.contractError = true;
             return;
         }
+        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        Boolean fiveNineNine = zkbContractAssetService.checkFiveNineNineContract(zkbContract,selected,null);
+        if(!fiveNineNine){
+            contractError = true;
+        }
     }
 
     public String backList() {
@@ -200,7 +208,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return "";
         }
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
-        boolean fiveNineNine = this.zkbFePartOrderService.checkFiveNineNineContract(zkbContract,this.selected.getReportDate());
+        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(zkbContract,this.selected,null);
         if(!fiveNineNine){
             return "";
         }

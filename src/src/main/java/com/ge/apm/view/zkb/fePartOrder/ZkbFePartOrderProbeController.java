@@ -6,6 +6,7 @@ import com.ge.apm.dao.ZkbFePartOrderRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.zkb.ZkbContractAssetService;
 import com.ge.apm.service.zkb.ZkbFePartOrderService;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -185,6 +186,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
 
     private Map<String,String> i18Map;
 
+    private ZkbContractAssetService zkbContractAssetService;
     @Override
     protected void init() {
         super.init();
@@ -218,6 +220,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         }
         configTypeMap=this.zkbFePartOrderService.getMapConfigByLoginName(this.loginName);
         this.i18Map = this.zkbFePartOrderService.getI18MessageMap(ZkbFePartOrderService.status);
+        zkbContractAssetService = WebUtil.getBean(ZkbContractAssetService.class);
 
     }
 
@@ -286,6 +289,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     public void selectedWorkFlow()
     {
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selectZkbFePartOrder.getContractId());
+        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),this.selected,null);
+        if(!fiveNineNine){
+            this.selected.setFatherPartOrderNo(null);
+            return ;
+        }
         this.selected = this.zkbFePartOrderService.selectedWorkFlow(this.selected,this.selectZkbFePartOrder);
         this.selected.setProductNumber(this.selectZkbFePartOrder.getFunctionType());
         this.showZkbPoProbeQuotaType=false;
@@ -341,14 +349,13 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     public String saveAndToListPage()
     {
+        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),this.selected,null);
+        if(!fiveNineNine){
+            return "";
+        }
         if(this.selected.getZkbPartOrderCat()!=null&&ZkbPartOrderCat.ValueType.HighValue.toString().equals(this.selected.getZkbPartOrderCat().getValueType()))
         {
             WebUtil.addErrorMessage(WebUtil.getMessage("不能选择高值探头"));
-            return "";
-        }
-        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        boolean fiveNineNine = this.zkbFePartOrderService.checkFiveNineNineContract(zkbContract,this.selected.getReportDate());
-        if(!fiveNineNine){
             return "";
         }
         if(this.checkShowSN()&&!four_in_one.equals(this.selected.getContractCatId()))
