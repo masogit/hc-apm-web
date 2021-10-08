@@ -638,7 +638,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
         }
         if(!ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             if(this.v2_blobObjectList == null || this.v2_blobObjectList.size() == 0){
-                //flag=false;
+                flag=false;
                 errorLog += "附件不能为空！";
             }
         }else{
@@ -681,7 +681,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             ZkbContractAsset zkbContractAsset = zkbContractAssetRepository.findFirstByContractIdAndAssetId(zkbContract.getId(),assetInfo.getUid());
             if(ZkbContract.YOrNEnum.Y.toString().equals(zkbContract.getFiveNineNineFlag()) && ZkbContractAsset.AssetTypeEnum.highMachine.toString().equals(zkbContractAsset.getAssetType())){
                 if(zkbContract.getYearCount() == 1 && (zkbContractAsset.getApplyNum() == null || zkbContractAsset.getApplyNum() == 0)){
-                    Boolean r = zkbContractAssetService.checkHalfAsset(zkbContract.getId(),selected.getAssetId());
+                    Boolean r = zkbContractAssetService.checkHalfAsset(zkbContract.getId(),assetInfo.getUid());
                     if(r == null){
                         reLog = "合同中没有高端机设备！";
                     }else if(!r){
