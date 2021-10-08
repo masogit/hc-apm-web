@@ -11,6 +11,7 @@
 <ui:composition>
     <h:panelGroup id="zkbFePartOrderProbeEditPanelGroup">
         <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='Probe'}">
+            <p:messages id="probeMessages" showDetail="true" closable="false" autoUpdate="true" ></p:messages>
             <p:fieldset id="zkbProbeWorkFlowFieldset" legend="工单信息" >
                 <h:form id="probeSearchForm">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbFePartOrderProbeController.workFlowInFistStep()}">
@@ -22,7 +23,7 @@
                         <label class="label">#{msg.zkbFePartOrder_sr}</label>
                         <p:inputText id="probeFatherPartOrderNo" disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}"  />
                     </h:panelGroup>
-                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderProbeController.getSparePartsZkbFePartOrder(param['probeSearchForm:probeSystemId'],param['probeSearchForm:probeFatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderProbeForm:probeZkbFePartOrder"/>
+                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderProbeController.getSparePartsZkbFePartOrder(param['probeSearchForm:probeSystemId'],param['probeSearchForm:probeFatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderProbeForm:probeZkbFePartOrder probeMessages"/>
                 </p:panelGrid>
                 </h:form>
                 <h:form id="zkbFePartOrderProbeForm">
@@ -30,7 +31,7 @@
                              widgetVar="probeZkbFePartOrder" selectionMode="single" selection="#{zkbFePartOrderProbeController.selectZkbFePartOrder}"
                              lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.reportDate}"
                              paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderProbeController.selectedWorkFlow}"  update="zkbFePartOrderProbeEditForm:zkbContractDatalist_probe zkbFePartOrderProbeEditForm" />
+                    <p:ajax event="rowSelect"  listener="#{zkbFePartOrderProbeController.selectedWorkFlow}"  update="zkbFePartOrderProbeEditForm:zkbContractDatalist_probe zkbFePartOrderProbeEditForm probeMessages" />
                     <p:column headerText="报修单号">
                         <h:outputText value="#{item.partOrderNo}"/>
                     </p:column>
