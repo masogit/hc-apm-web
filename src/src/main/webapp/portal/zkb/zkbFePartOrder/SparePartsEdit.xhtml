@@ -22,7 +22,7 @@
                         <label class="label">#{msg.zkbFePartOrder_sr}</label>
                         <p:inputText id="fatherPartOrderNo" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}"  />
                     </h:panelGroup>
-                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderSparePartDetailController.getSparePartsZkbFePartOrder(param['searchForm:systemId'],param['searchForm:fatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderForm:sparePartsZkbFePartOrder"/>
+                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderSparePartDetailController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderSparePartDetailController.getSparePartsZkbFePartOrder(param['searchForm:systemId'],param['searchForm:fatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderForm:sparePartsZkbFePartOrder messages"/>
                 </p:panelGrid>
                 </h:form>
                 <h:form id="zkbFePartOrderForm">

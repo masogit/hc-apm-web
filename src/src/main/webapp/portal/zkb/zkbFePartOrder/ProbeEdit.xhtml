@@ -23,7 +23,7 @@
                         <label class="label">#{msg.zkbFePartOrder_sr}</label>
                         <p:inputText id="probeFatherPartOrderNo" disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}"  />
                     </h:panelGroup>
-                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderProbeController.getSparePartsZkbFePartOrder(param['probeSearchForm:probeSystemId'],param['probeSearchForm:probeFatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderProbeForm:probeZkbFePartOrder"/>
+                    <p:commandButton validateClient="false" disabled="#{!zkbFePartOrderProbeController.hasEditRight('Requested')}" process="@this"  actionListener="#{zkbFePartOrderProbeController.getSparePartsZkbFePartOrder(param['probeSearchForm:probeSystemId'],param['probeSearchForm:probeFatherPartOrderNo'])}" value="#{msg.Search}" update="zkbFePartOrderProbeForm:probeZkbFePartOrder probeMessages"/>
                 </p:panelGrid>
                 </h:form>
                 <h:form id="zkbFePartOrderProbeForm">
