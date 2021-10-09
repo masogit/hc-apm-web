@@ -192,7 +192,8 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
             return UrlEncryptController.encodeUrlParam("Edit?action=Edit&selectedid=".concat(selected.getId()));
         }else{
-            WebUtil.addErrorMessage(WebUtil.getMessage("ErrorContractNoIsExist"));
+            String errorLog = (String) r.get("errorLog");
+            WebUtil.addErrorMessage(errorLog);
             return "";
         }
     }
