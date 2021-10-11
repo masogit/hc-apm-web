@@ -289,7 +289,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     public void selectedWorkFlow()
     {
         this.contractList=this.zkbFePartOrderService.loadZkbContractInfo(this.selectZkbFePartOrder.getContractId());
-        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),this.selected,null);
+        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             this.selected.setFatherPartOrderNo(null);
             return ;
@@ -349,7 +349,7 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
      */
     public String saveAndToListPage()
     {
-        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),this.selected,null);
+        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             return "";
         }

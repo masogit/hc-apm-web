@@ -74,10 +74,20 @@ public class ZkbContractAssetService {
      * 注意：高端机备件申请时合同计数年第一年进行总数的50%验证，其他同人工、探头。
      * @param zkbContract
      * @param zkbFePartOrder
-     * @param assetUid 高端机备件申请时 不能为空
+     * @param assetUid 超声高端机在备件申请时 不能为空
      * @return
      */
-    public boolean checkFiveNineNineContract(ZkbContract zkbContract, ZkbFePartOrder zkbFePartOrder, String assetUid) {
+    /**
+     * 功能：合同有效期、计数年校验（人工、备件和探头申请时进行校验）
+     * 注意：高端机备件申请时合同计数年第一年进行总数的50%验证，其他同人工、探头。
+     * @param zkbContract
+     * @param reportDate 报修时间
+     * @param ArtificialType 超声高端机High
+     * @param orderType 备件申请SpareParts
+     * @param assetUid 超声高端机在备件申请时不能为null
+     * @return
+     */
+    public boolean checkFiveNineNineContract(ZkbContract zkbContract,Date reportDate, String ArtificialType,String orderType, String assetUid) {
         boolean flag = true;
         String messageKey = null;
         if("Y".equals(zkbContract.getFiveNineNineFlag())) {
@@ -87,7 +97,6 @@ public class ZkbContractAssetService {
                 return false;
             }
             String format = "yyyy-MM-dd";
-            Date reportDate = zkbFePartOrder.getReportDate();
             if(reportDate == null){
                 reportDate = new Date();
             }
@@ -97,8 +106,8 @@ public class ZkbContractAssetService {
 //                messageKey = "zkbFePartOrder_contractValidPeriodError";
                 messageKey = "zkbFePartOrder_599contractSupportTimesCannotBeZero";
                 flag = false;
-            }else if(ZkbFePartOrderService.highArtificialTypeValue.equals(zkbFePartOrder.getArtificialType()) &&
-                    ZkbFePartOrder.OrderType.SpareParts.toString().equals(zkbFePartOrder.getOrderType()) && yearCount == 1){
+            }else if(ZkbFePartOrderService.highArtificialTypeValue.equals(ArtificialType) &&
+                    ZkbFePartOrder.OrderType.SpareParts.toString().equals(orderType) && yearCount == 1){
                 //高端机备件申请时第一年进行总数的50%验证
                 if(assetUid != null){
                     Boolean halfAsset = checkHalfAsset(zkbContract.getId(),assetUid);
