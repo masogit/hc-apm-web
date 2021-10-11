@@ -1564,7 +1564,7 @@ public void test1(){
 
     public void saveServiceRequest() {
         WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(selectedAsset.getId());
-        if (woc != null && woc.getIsWoSupplierAutoEnabled()) {
+        if (woc != null && woc.getIsWoSupplierAutoEnabled() !=null && woc.getIsWoSupplierAutoEnabled()) {
             this.saveServiceRequestSupplier();
         }
         if(StringUtils.isEmpty(faultReason)){
