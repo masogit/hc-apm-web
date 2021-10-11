@@ -623,6 +623,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return result;
     }
 
+    public Boolean showIsPm() {
+        Boolean flag = Boolean.FALSE;
+        Optional<TenantOptionConfig> tenantOptionConfigOptional = WebUtil.getBean(TenantOptionConfigRepository.class).findByTenantUid(WebUtil.getBean(UserContextService.class).getTenantInfo().getUid());
+        if (tenantOptionConfigOptional.isPresent()) {
+            flag = tenantOptionConfigOptional.get().getShowIsPm();
+        }
+        return flag;
+    }
+
     public String getRelRuleStatusName(String uid,Boolean isPm) {
         String result = null;
         if(isPm==null || isPm == false) {
