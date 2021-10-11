@@ -851,19 +851,19 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                     return "";
                 }
 
-                if(!"2".equals(selected.getArtificialType())) {
-                    if (ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
-                        if(c.getSpareQuotaApply() < selected.getQty()){
-                            WebUtil.addErrorMessage("备件申请名额不足，请联系供应商！","");
-                            return "";
-                        }
-                    }else{
-                        if(c.getSpareArtificailApply() < selected.getQty()){
-                            WebUtil.addErrorMessage("联合申请名额不足，请联系供应商！","");
-                            return "";
-                        }
-                    }
-                }
+//                if(!"2".equals(selected.getArtificialType())) {
+//                    if (ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType()) || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())) {
+//                        if(c.getSpareQuotaApply() < selected.getQty()){
+//                            WebUtil.addErrorMessage("备件申请名额不足，请联系供应商！","");
+//                            return "";
+//                        }
+//                    }else{
+//                        if(c.getSpareArtificailApply() < selected.getQty()){
+//                            WebUtil.addErrorMessage("联合申请名额不足，请联系供应商！","");
+//                            return "";
+//                        }
+//                    }
+//                }
                 selected.setQty(t);
             }
         }
