@@ -186,7 +186,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return;
         }
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        Boolean fiveNineNine = zkbContractAssetService.checkFiveNineNineContract(zkbContract,selected,null);
+        Boolean fiveNineNine = zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             contractError = true;
         }
@@ -208,7 +208,7 @@ public class ZkbFePartOrderDetailController extends GenericCRUDUUIDController<Zk
             return "";
         }
         ZkbContract zkbContract = this.zkbContractRepository.findById(this.selected.getContractId());
-        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(zkbContract,this.selected,null);
+        Boolean fiveNineNine = this.zkbContractAssetService.checkFiveNineNineContract(contractList.get(0),selected.getReportDate(),selected.getArtificialType(),selected.getOrderType(),null);
         if(!fiveNineNine){
             return "";
         }
