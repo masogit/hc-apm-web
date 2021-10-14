@@ -121,7 +121,13 @@ public enum GatewayURL {
     FE_PART_ORDER_SEND_WECHART("/hcapmassetservice/api/apm/zkb/zkbfepartorder/sendWechatMessage"),
     FE_PART_ORDER_SEND_WECHART_REMIND_LETTER("/hcapmassetservice/api/apm/zkb/zkbfepartorder/sendWeChatRemindLetter"),
     CONTRACT_COURSE_SCHEDULE_MESSAGE("/hcapmreportservice/api/apm/zkb/zkbCourseSchedule/sendMessage"),
-    CONTRACT_COURSE_SCHEDULE_SEND_MESSAGE_BY_TELEPHONE("/hcapmreportservice/api/apm/zkb/zkbCourseSchedule/sendMessageByTelephone");
+    CONTRACT_COURSE_SCHEDULE_SEND_MESSAGE_BY_TELEPHONE("/hcapmreportservice/api/apm/zkb/zkbCourseSchedule/sendMessageByTelephone"),
+
+    // 不良事件详情
+    GET_ADVERSE_EVENTS_INFO("/hcapmassetservice/api/apm/asset/adverse/events/getDetailByUid/{uid}"),
+    // 不良事件审批
+    APPROVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveAdverseEvent");
+
 
     private final String url;
 
