@@ -50,6 +50,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean showClosed=false;
     private boolean canEditFlag=false;
     private boolean isChoseAdmin = false;
+    private boolean whetherDeductEdit = true;
     private String showBtn = "";
     private ZkbPartOrderReturn zkbPartOrderReturn;
     private List<ZkbPartOrderReturn> zkbPartOrderReturnList;
@@ -259,8 +260,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Artificial.toString())){
                 if(canEditFlag){
                     if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
-                        if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                        if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                            whetherDeductEdit = true;
                             selected.setWhetherDeduct(CopyByInvok.F);
+                        }
+                        if(CopyByInvok.T.equals(selected.getScoreFlag())){
+                            whetherDeductEdit = true;
+                            selected.setWhetherDeduct(CopyByInvok.T);
                         }
                     }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
                         if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
@@ -273,7 +279,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 initRemindLetterFlag();
                 if(StringUtils.isNotEmpty(selected.getProbeQuotaType()) && ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
                     showCatListFlag = "2";
-                }else if(StringUtils.isNotEmpty(selected.getHighCatFlag()) && "t".equals(selected.getHighCatFlag())){
+                }else if(StringUtils.isNotEmpty(selected.getHighCatFlag()) && CopyByInvok.T.equals(selected.getHighCatFlag())){
                     showCatListFlag = "2";
                 }else{
                     showCatListFlag = "1";
@@ -1526,6 +1532,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         this.showCommercial = showCommercial;
     }
     //endregion
+
+    public boolean isWhetherDeductEdit() {
+        return whetherDeductEdit;
+    }
+
+    public void setWhetherDeductEdit(boolean whetherDeductEdit) {
+        this.whetherDeductEdit = whetherDeductEdit;
+    }
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {

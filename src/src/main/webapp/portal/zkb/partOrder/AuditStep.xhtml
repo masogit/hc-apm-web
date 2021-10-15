@@ -654,7 +654,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup rendered="#{!(zkbPartOrderAuditController.selected.artificialType eq '2')}">
                                     <label class="label">是否扣除名额*</label>
-                                    <p:selectOneMenu id="whetherDeduct" value="#{zkbPartOrderAuditController.selected.whetherDeduct}" disabled="#{(zkbPartOrderAuditController.selected.ssaKeyFlag != null and zkbPartOrderAuditController.selected.ssaKeyFlag eq 't')}" required="true" requiredMessage="#{msg.zkbPartOrder_whetherDeduct} #{msg.ValidationRequire}" >
+                                    <p:selectOneMenu id="whetherDeduct" value="#{zkbPartOrderAuditController.selected.whetherDeduct}" disabled="#{zkbPartOrderAuditController.whetherDeductEdit}" required="true" requiredMessage="#{msg.zkbPartOrder_whetherDeduct} #{msg.ValidationRequire}" >
                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItem itemLabel="是" itemValue="t"/>
                                         <f:selectItem itemLabel="否" itemValue="f"/>
