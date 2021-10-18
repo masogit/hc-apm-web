@@ -231,7 +231,7 @@ public class ZkbIntegralService {
     }
 
     public List<ZkbIntegralRecord> queryRecordByIntegralId(String integralId){
-        List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findByZkbIntegralIdOrderByCreatedDateDesc(integralId);
+        List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findByZkbIntegralIdAndRecordTypeNotOrderByCreatedDateDesc(integralId,ZkbIntegralRecord.RecordType.KpiAdd.toString());
         return zkbIntegralRecords;
     }
 
