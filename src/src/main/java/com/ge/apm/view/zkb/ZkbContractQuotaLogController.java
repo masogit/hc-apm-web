@@ -77,6 +77,10 @@ public class ZkbContractQuotaLogController  extends GenericCRUDUUIDController<Zk
         zkbIbCrossService.handleIbCrossJob();
     }
 
+    public void qRCodeJobTest(){
+
+    }
+
     public StreamedContent getExportFile() {
         return exportFile;
     }

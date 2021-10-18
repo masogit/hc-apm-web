@@ -275,4 +275,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "select o.* from asset_info o where o.uid in ?1", nativeQuery = true)
     List<AssetInfo> fetchListByUid(Set<String> listUid);
 
+    @Query(value = "select a.* from asset_info a " +
+            "left outer join zkb_asset_qr_code_from_ib q on a.id = q.asset_id " +
+            "left join tenant_info t on t.uid = a.tenant_uid " +
+            "where t.type ='3' and (q.is_qr_code != true or q.is_qr_code is null) and a.system_id like '0824%' and a.tenant_uid = ?1", nativeQuery = true)
+    List<AssetInfo> queryAssetByZkbQrCode(String tenantUid);
 }
