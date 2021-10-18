@@ -272,6 +272,7 @@ public class ZkbIntegralService {
     public List<Map<String, Object>> createZkbIntegralRecordData(List<String> ids,HashMap<String, String> tenMap){
         List<SearchFilter> searchFilters = new ArrayList<>();
         searchFilters.add(new SearchFilter("zkbIntegralId", SearchFilter.Operator.IN, ids));
+        searchFilters.add(new SearchFilter("recordType", SearchFilter.Operator.NE, ZkbIntegralRecord.RecordType.KpiAdd.toString()));
         Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
 
         List<ZkbIntegralRecord> zkbIntegralRecords = zkbIntegralRecordRepository.findBySearchFilter(searchFilters,sort);
