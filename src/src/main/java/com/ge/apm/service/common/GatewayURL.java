@@ -111,6 +111,7 @@ public enum GatewayURL {
     PART_ORDER_SEND_WECHAT_RETURN_AUDIT("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatReturnAudit"),
     COURSE_TRAIN_SEND_WE_CHART("/hcapmassetservice/api/apm/zkb/courseTrain/sendWeChatMessages"),
     COURSE_TRAIN_SEND_EMAIL_AUDIT("/hcapmreportservice/api/apm/report/courseTrain/sendHtmlForAudit"),
+    PART_ORDER_QR_CODE_JOB("/hcapmassetservice/api/apm/zkb/partOrder/qrCodeJob"),
 
     SUPPLIER_FE_BY_ASSETUID("/hcapmsuppliermanager/api/apm/supplierManager/userAccount/findSupplierFE/{assetUid}"),
 
