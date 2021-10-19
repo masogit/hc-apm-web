@@ -1,10 +1,12 @@
 package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.ZkbContractQuotaLogRepository;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.ZkbContractQuotaLog;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.zkb.ZkbContractQuotaLogService;
 import com.ge.apm.service.zkb.ZkbIbCrossService;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
@@ -38,6 +40,10 @@ public class ZkbContractQuotaLogController  extends GenericCRUDUUIDController<Zk
     private ZkbContractQuotaLogService zkbContractQuotaLogService;
     private Page<ZkbContractQuotaLog> zkbContractQuotaLogPage;
     private ZkbIbCrossService zkbIbCrossService;
+    private int count = 0;
+    private boolean showBtn = false;
+    private UserAccount currentUser;
+    private UserContextService userContextService;
 
     @Override
     protected void init() {
@@ -45,6 +51,8 @@ public class ZkbContractQuotaLogController  extends GenericCRUDUUIDController<Zk
         zkbContractQuotaLogRepository = WebUtil.getBean(ZkbContractQuotaLogRepository.class);
         zkbContractQuotaLogService = WebUtil.getBean(ZkbContractQuotaLogService.class);
         zkbIbCrossService = WebUtil.getBean(ZkbIbCrossService.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        userContextService = WebUtil.getBean(UserContextService.class);
     }
 
     @Override
@@ -78,7 +86,14 @@ public class ZkbContractQuotaLogController  extends GenericCRUDUUIDController<Zk
     }
 
     public void qRCodeJobTest(){
+        zkbIbCrossService.qRCodeJobTest();
+    }
 
+    public void rowSelect(){
+        count++;
+        if(!userContextService.isZkbUser() && count >=3){
+            showBtn = true;
+        }
     }
 
     public StreamedContent getExportFile() {
@@ -87,6 +102,14 @@ public class ZkbContractQuotaLogController  extends GenericCRUDUUIDController<Zk
 
     public void setExportFile(StreamedContent exportFile) {
         this.exportFile = exportFile;
+    }
+
+    public boolean isShowBtn() {
+        return showBtn;
+    }
+
+    public void setShowBtn(boolean showBtn) {
+        this.showBtn = showBtn;
     }
 
     @Override

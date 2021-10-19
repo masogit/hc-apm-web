@@ -11,9 +11,10 @@
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="名额日志管理"/><!--#{msg.ZKBCourseMgt}-->
             </div>
-            <h:panelGrid id="buttonSet" columns="20" cellpadding="5">
-                <p:commandButton value="TEST"  process="@this"  rendered="true" action="#{zkbContractQuotaLogController.test}" />
-            </h:panelGrid>
+            <h:panelGroup id="buttonSet" columns="20" cellpadding="5" style="background: white !important;">
+                <p:commandButton value="ib穿越定时"  process="@this" action="#{zkbContractQuotaLogController.test}" rendered="#{zkbContractQuotaLogController.showBtn}" />
+                <p:commandButton value="一机一码定时"  process="@this" action="#{zkbContractQuotaLogController.test}" rendered="#{zkbContractQuotaLogController.showBtn}"/>
+            </h:panelGroup>
 
             <div class="ui-g-12 card">
                 <h:form id="zkbCourseListForm">
@@ -25,7 +26,7 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-
+                       <p:ajax event="rowSelect" listener="#{zkbContractQuotaLogController.rowSelect}" update="buttonSet"/>
                         <p:ajax event="filter" listener="#{zkbContractQuotaLogController.onFilter}" />
                         <p:column headerText="合同号" filterBy="#{item.contractNo}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.contractNo}"/>
