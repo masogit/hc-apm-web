@@ -1,6 +1,7 @@
 package com.ge.apm.dao.mapper;
 
 import com.ge.apm.dao.mapper.provider.ZkbAssetStatisticProvider;
+import com.ge.apm.domain.ZkbAssetQrCodeInfo;
 import com.ge.apm.domain.ZkbAssetStatistic;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -20,4 +21,7 @@ public interface ZkbAssetStatisticMapper {
 
     @SelectProvider(type = ZkbAssetStatisticProvider.class,method="loadQrCount")
     List<ZkbAssetStatistic> loadQrCount(@Param("list")List<String> list);
+
+    @SelectProvider(type = ZkbAssetStatisticProvider.class,method="getZkbAssetQrCodeInfoList")
+    List<ZkbAssetQrCodeInfo> getZkbAssetQrCodeInfoList(@Param("filters") List<SearchFilter> filters);
 }

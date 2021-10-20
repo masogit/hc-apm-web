@@ -56,15 +56,19 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <p:commandButton value="#{msg.SearchResult}" actionListener="#{zkbAssetStatisticController.loadData}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :zkbAssetStatisticListForm:datalist">
+                            <p:commandButton value="#{msg.SearchResult}" icon="ui-icon-arrowthick-1-s" update=":growl :zkbAssetStatisticListForm:datalist">
+                            </p:commandButton>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p:commandButton value="二维码统计(重新生成)" action="#{zkbAssetStatisticController.regenerateZkbAssetQrCodeInfo}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :zkbAssetStatisticListForm:datalist" rendered="#{userContextService.zkbAdmin}">
                             </p:commandButton>
                         </h:panelGroup>
                     </p:panelGrid>
                 </h:form>
                 <h:form id="zkbAssetStatisticListForm">
-                    <p:dataTable id="datalist" value="#{zkbAssetStatisticController.zkbAssetStatisticList}" var="item" widgetVar="datalist"
+                    <p:dataTable id="datalist" value="#{zkbAssetStatisticController.lazyModel}" var="item" widgetVar="dataList"
                                  selectionMode="single" selection="#{zkbAssetStatisticController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
@@ -72,9 +76,9 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,50,100,500">
-                        <p:ajax event="rowSelect" listener="#{zkbAssetStatisticController.prepareEdit}" update="editButton"/>
+                        <p:ajax event="rowSelect" update="editButton"/>
                         <p:column headerText="#{msg.zkbHistory_agent}" >
-                            <h:outputText value="#{item.name}"/>
+                            <h:outputText value="#{item.tenantName}"/>
                         </p:column>
                         <p:column  headerText="#{msg.zkbAssetStatistic_hospitalName}" >
                             <h:outputText value="#{item.hospitalName}"/>
@@ -91,6 +95,12 @@
                         <p:column  headerText="#{msg.zkbAssetStatistic_qrCodeOfPaste}" >
                             <h:outputText value="#{item.qrCodeCountState}"/>
                         </p:column>
+                        <p:column  headerText="是否已贴一机一码" >
+                            <h:outputText value="#{item.ibQrCodeState}"/>
+                        </p:column>
+                        <p:column  headerText="是否已贴旧二维码" >
+                            <h:outputText value="#{item.qrCodeState}"/>
+                        </p:column>
                         <p:column  headerText="#{msg.zkbAssetStatistic_canNotPast}" >
                             <h:outputText value="#{item.canNotPastQrCode}"/>
                         </p:column>
@@ -98,9 +108,12 @@
                             <h:outputText value="#{item.reason}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="editButton" rendered="#{!userContextService.zkbAdmin}" actionListener="#{zkbAssetStatisticController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":zkbAssetQrCodeInfo :zkbAssetQrCodeInfoEditForm" oncomplete="PF('zkbAssetQrCodeInfo').show()" disabled="#{empty zkbAssetStatisticController.selected.id}"/>
-                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbAssetStatisticController.exportAll}" icon="ui-icon-arrowthick-1-s">
-                                <p:fileDownload value="#{zkbAssetStatisticController.exportFile}"/>
+                            <p:commandButton id="editButton" rendered="#{!userContextService.zkbAdmin}" actionListener="#{zkbAssetStatisticController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":zkbAssetQrCodeInfo :zkbAssetQrCodeInfoEditForm" oncomplete="PF('zkbAssetQrCodeInfo').show()" disabled="#{empty zkbAssetStatisticController.selected}"/>
+<!--                            <p:commandButton id="exportButton" ajax="false" title="#{msg.exportToXLS}" actionListener="#{zkbAssetStatisticController.exportAll}" icon="ui-icon-arrowthick-1-s">-->
+<!--                                <p:fileDownload value="#{zkbAssetStatisticController.exportFile}"/>-->
+<!--                            </p:commandButton>-->
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                                <p:dataExporter type="xlsx" target="datalist" fileName="Asset_Statistic_Template"/>
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
