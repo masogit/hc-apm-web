@@ -80,18 +80,6 @@
 								<f:selectItems value="#{fieldMsg.getFieldValueList('assetScrapped')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 							</p:selectManyCheckbox>
 						</h:panelGroup>
-						<h:panelGroup>
-							<label class="label">#{msg.DeviceAdverseEventMgmt}</label>
-							<p:selectManyCheckbox value="#{customRoleController.mapAuthCard['adverseEventsReporter']}" layout="responsive" columns="4">
-								<f:selectItems value="#{fieldMsg.getFieldValueList('adverseEventsReporter')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-							</p:selectManyCheckbox>
-						</h:panelGroup>
-						<h:panelGroup>
-							<label class="label">#{msg.adverseEventsApprover}</label>
-							<p:selectManyCheckbox value="#{customRoleController.mapAuthCard['adverseEventsApprover']}" layout="responsive" columns="4">
-								<f:selectItems value="#{fieldMsg.getFieldValueList('adverseEventsApprover')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-							</p:selectManyCheckbox>
-						</h:panelGroup>
 					</p:panelGrid>
 
 				</p:fieldset>
