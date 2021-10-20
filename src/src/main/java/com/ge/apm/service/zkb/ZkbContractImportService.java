@@ -765,6 +765,8 @@ public class ZkbContractImportService {
                 }
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getTrainReasonFlag())){
                     zkbContractAsset.setTrainReasonFlag(WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAssetVO.getTrainReasonFlag()));
+                }else {
+                    zkbContractAsset.setTrainReasonFlag("empty");
                 }
                 zkbContractAssetRepository.save(zkbContractAsset);
                 zkbContractLogService.addLog(zkbContractAssetVO.getContractId(),zkbContractAssetVO.getContractNo(),"assetEdit","",zkbContractAssetVO.getQrCode(),"导入设备编辑",currentUser);
@@ -789,6 +791,8 @@ public class ZkbContractImportService {
                 }
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getTrainReasonFlag())){
                     newZkbContractAsset.setTrainReasonFlag(WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAssetVO.getTrainReasonFlag()));
+                }else {
+                    zkbContractAsset.setTrainReasonFlag("empty");
                 }
                 newZkbContractAsset.setSubRegion(zkbContractAssetVO.getSubRegion());
                 newZkbContractAsset.setModality(zkbContractAssetVO.getModality());
