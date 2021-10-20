@@ -125,7 +125,7 @@ public class ZkbAssetStatistic {
         if(StringUtils.isNotBlank(this.qrCodeCount))
         {
             Integer integerQrCodeCount = new Integer(this.qrCodeCount);
-            if(integerQrCodeCount.intValue()>=3)
+            if(integerQrCodeCount.intValue()==3)
             {
                 return "Y";
             }

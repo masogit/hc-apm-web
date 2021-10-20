@@ -1,6 +1,8 @@
 package com.ge.apm.dao.mapper.provider;
 
+import org.apache.commons.lang3.StringUtils;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -119,5 +121,41 @@ public class ZkbAssetStatisticProvider {
         String filter=sb.toString();
         filter = filter.substring(0,filter.length()-1);
         return filter;
+    }
+
+    /**
+     * 查出所有合同相关联设备需要进行二维码贴码的信息
+     * @return
+     */
+    public String getZkbAssetQrCodeInfoList(Map<String,Object> param){
+        List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
+        String currentDate = getDateStr();
+        StringBuilder sb = new StringBuilder();
+        sb.append(" SELECT qr_code_info.id,"+
+                " ai.clinical_dept_name as hospital_name, "+
+                " ai.function_type, "+
+                " ai.system_id," +
+                " ti.uid AS tenant_uid," +
+                " ti. NAME AS tenant_name," +
+                " ai.uid AS asset_uid," +
+                " ac.contract_no,"+
+                " qr_code_info.reason AS reason," +
+                " qr_code_info.can_not_past_qr_code," +
+                " qr_code_info.reason_date,"+
+                " qr_code_info.qr_code_count_state,qr_code_info.ib_qr_code_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date,ib_qr_code.is_qr_code AS ibQrCodeTemporary"+
+                " FROM" +
+                " zkb_contract ac" +
+                " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
+                " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
+                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id" +
+                " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
+                " LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code on ib_qr_code.asset_uid = ai.uid " +
+                " WHERE" +
+                " to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date" +
+                " AND (qr_code_info.qr_code_count_state is null OR qr_code_info.qr_code_count_state='N')"
+        );
+        String filter = buildFilter_loadAllAsset(searchFilterList);
+        sb.append(filter);
+        return sb.toString();
     }
 }
