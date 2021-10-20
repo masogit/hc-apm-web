@@ -3610,7 +3610,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbUrgentReasonType','1','场地维修有其他第三方竞争','Site maintenance has other third-party competition',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbUrgentReasonType','2','其他特殊原因（需注明在备注栏）','Other special reasonse',NULL,-1);
 
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoAssetTrainReasonFlag','t','是','t',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoAssetTrainReasonFlag','f','否','f',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPoAssetTrainReasonFlag','empty','N/A','empty',NULL,-1);
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPartOrderType','Parts','备件申请','Parts Apply',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbPartOrderType','Probe','探头申请','Probe Apply',NULL,-1);
@@ -4318,3 +4320,64 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 -- YHAAO-13407 质控评审 读取默认数据错误 👇
 alter table public.audit_default_group add column if not exists clause text null;
 -- YHAAO-13407 质控评审 读取默认数据错误 👆
+
+-- 多级审批，不良事件字段名
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','workOrderNum','工单编号','Work order number',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','reporterName','报告人','reporter',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','reportDate','报告时间','report time',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','department','科室','department',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','occurredPlace','发生地','Place of occurrence',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','deviceNum','设备编号','device ID',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('field_name','productName','产品名称','product name',NULL,-1);
+-- 不良事件状态
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventStatus', '1', '暂存', 'stage', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventStatus', '2', '待审核', 'pending approve', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventStatus', '3', '审核中', 'in the audit', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventStatus', '4', '已退回', 'returned', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventStatus', '5', '已作废', 'invalid', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventStatus', '6', '审核通过', 'The audit was approved', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventStatus', '7', '待上报', 'to be reported', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventStatus', '8', '已上报', 'reported', NULL, -1);
+-- 不良事件操作人
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventProcesser', '1', '医生', 'doctor', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventProcesser', '2', '护士', 'nurse', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventProcesser', '3', '患者', 'patient', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventProcesser', '4', '其他', 'other', NULL, -1);
+-- 不良事件伤害程度
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventHarmDegree', '1', '死亡', 'death', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventHarmDegree', '2', '严重伤害', 'serious injury', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventHarmDegree', '3', '其他', 'other', NULL, -1);
+-- 不良事件年龄类型
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventAgeType', '1', '岁', 'year', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventAgeType', '2', '月', 'month', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventAgeType', '3', '日', 'day', NULL, -1);
+-- 不良事件患者性别
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventSex', '1', '男', 'male', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventSex', '2', '女', 'female', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventSex', '3', '未知', 'unknown', NULL, -1);
+-- 不良事件使用场所
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventUsePlace', '1', '医疗机构', 'medical institutions', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventUsePlace', '2', '家庭', 'home', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventUsePlace', '3', '其他', 'other', NULL, -1);
+-- 不良事件事件原因分析
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventCause', '1', '产品原因（包括说明书）', 'product reasons (including instructions)', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventCause', '2', '操作原因', 'the reason for the operation', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventCause', '3', '患者自身原因', 'patient own cause', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventCause', '4', '无法确定', 'not sure', NULL, -1);
+-- 不良事件审核结果
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventApprovalResult', '1', '同意上报', 'agree to report', NULL, -1);
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventApprovalResult', '2', '同意不上报', 'agree not to report', NULL, -1);
+-- 不良事件微信端卡片权限配置
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'wechatCard', 'adverseEvents_reporter', '不良事件上报', 'Adverse events are reported', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'wechatCard', 'adverseEvents_approver', '不良事件审核及提交至国家检测信息系统', 'Adverse event audit and submission to the national detection information system', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'label', 'adverseEventsApprover', '不良事件审核及提交至国家检测信息系统', 'Adverse event audit and submission to the national detection information system', NULL,- 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '我的上报', '我的上报', 'My report', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '暂存', '暂存', 'Staging', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '审核中', '审核中', 'In the audit', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '已退回', '已退回', 'Returned', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '已作废', '已作废', 'Invalid', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '审核完成', '审核完成', 'Audit complete', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsApprover', '待审核', '待审核', 'Pending audit', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsApprover', '审核中', '审核中', 'In the audit', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsApprover', '待上报', '待上报', 'To be reported', NULL, - 1 );
+INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsApprover', '全部工单', '全部工单', 'All work order', NULL, - 1 );

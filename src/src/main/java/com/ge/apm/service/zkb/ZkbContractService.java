@@ -254,8 +254,10 @@ public class ZkbContractService {
             if(StringUtils.isNotEmpty(zkbContractAsset.getAssetType())){
                 zkbContractAssetDataMap.put("高低端机", WebUtil.getFieldValueMessage("zkbContractAssetType",zkbContractAsset.getAssetType()));
             }
+            if(StringUtils.isNotEmpty(zkbContractAsset.getTrainReasonFlag())){
+                zkbContractAssetDataMap.put("是否代理商自身原因未完成培训", WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAsset.getTrainReasonFlag()));
+            }
             zkbContractAssetDataMap.put("备注", zkbContractAsset.getAssetInfo().getComments());
-
             zkbContractAssetDataList.add(zkbContractAssetDataMap);
         }
 

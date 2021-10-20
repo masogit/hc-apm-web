@@ -50,6 +50,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean showClosed=false;
     private boolean canEditFlag=false;
     private boolean isChoseAdmin = false;
+    private boolean isOrder = false;
+    private boolean whetherDeductEdit = false;
     private String showBtn = "";
     private ZkbPartOrderReturn zkbPartOrderReturn;
     private List<ZkbPartOrderReturn> zkbPartOrderReturnList;
@@ -67,6 +69,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<I18nMessage> returnTypeList= new ArrayList<>();
     private String valueTypeTips = "";
     private String showOrderedFieldsetText = "";
+    private String trainTips="";
     private String queryStatus;
     private List<ZkbPartOrderItemVo> zkbPartOrderItemVoList = new ArrayList<>();
     private HashMap<String,String> conditionMap = new HashMap<>();
@@ -259,8 +262,13 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             }else if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Artificial.toString())){
                 if(canEditFlag){
                     if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(selected.getCurrentStep())){
-                        if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                        if(selected.getSsaKeyFlag() != null && CopyByInvok.T.equals(selected.getSsaKeyFlag())){
+                            whetherDeductEdit = true;
                             selected.setWhetherDeduct(CopyByInvok.F);
+                        }
+                        if(CopyByInvok.T.equals(selected.getScoreFlag())){
+                            whetherDeductEdit = true;
+                            selected.setWhetherDeduct(CopyByInvok.T);
                         }
                     }else if(ZkbPartOrderStep.PartOrderStep.ManagePending.toString().equals(selected.getCurrentStep())){
                         if(CopyByInvok.T.equals(selected.getSsaKeyFlag())){
@@ -268,12 +276,18 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                         }
                     }
                 }
+                if(isChoseAdmin || isOrder){
+                    ZkbContractAsset zkbContractAsset = zkbPartOrderService.getZkbContractAssetRepository().findFirstByContractIdAndAssetId(selected.getContractId(),selected.getAssetId());
+                    if(zkbContractAsset != null && CopyByInvok.T.equals(zkbContractAsset.getTrainReasonFlag())){
+                        trainTips = "由于代理商个人原因未在规定时间内完成培训，无免费人工";
+                    }
+                }
             }
             if(this.selected.getOrderType().equals(ZkbPartOrder.OrderType.Probe.toString())){
                 initRemindLetterFlag();
                 if(StringUtils.isNotEmpty(selected.getProbeQuotaType()) && ZkbPartOrder.ProbeQuotaTypeEnum.High.toString().equals(selected.getProbeQuotaType())){
                     showCatListFlag = "2";
-                }else if(StringUtils.isNotEmpty(selected.getHighCatFlag()) && "t".equals(selected.getHighCatFlag())){
+                }else if(StringUtils.isNotEmpty(selected.getHighCatFlag()) && CopyByInvok.T.equals(selected.getHighCatFlag())){
                     showCatListFlag = "2";
                 }else{
                     showCatListFlag = "1";
@@ -676,10 +690,14 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
                 showClosed = true;
                 showBtn = "";
             }
-            List<ZkbPartOrderUserConfig> closeUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
-            if(closeUserConfigs.size() > 0){
-                isChoseAdmin = true;
-            }
+        }
+        List<ZkbPartOrderUserConfig> closeUserConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.ClosePending.toString());
+        if(closeUserConfigs.size() > 0){
+            isChoseAdmin = true;
+        }
+        List<ZkbPartOrderUserConfig> orderConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.OrderPending.toString());
+        if(orderConfigs.size() > 0){
+            isOrder = true;
         }
     }
 
@@ -1526,6 +1544,22 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         this.showCommercial = showCommercial;
     }
     //endregion
+
+    public boolean isWhetherDeductEdit() {
+        return whetherDeductEdit;
+    }
+
+    public void setWhetherDeductEdit(boolean whetherDeductEdit) {
+        this.whetherDeductEdit = whetherDeductEdit;
+    }
+
+    public String getTrainTips() {
+        return trainTips;
+    }
+
+    public void setTrainTips(String trainTips) {
+        this.trainTips = trainTips;
+    }
 
     @Override
     protected GenericRepositoryUUID<ZkbPartOrder> getDAO() {

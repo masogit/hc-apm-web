@@ -3,8 +3,15 @@ package com.ge.apm.service.zkb;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.mapper.ZkbIbCrossMapper;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.GatewayURL;
+import com.ge.apm.service.utils.MicroServiceInvoker;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +25,7 @@ import java.util.*;
  * @description :
  */
 @Service
-public class ZkbIbCrossService {
+public class ZkbIbCrossService extends MicroServiceInvoker {
 
 
     @Autowired
@@ -169,5 +176,17 @@ public class ZkbIbCrossService {
         calendar.add(Calendar.DATE, days);
         Date d2 = calendar.getTime();
         return d2;
+    }
+
+    public void qRCodeJobTest(){
+        try {
+            String url = getGatewayURL(GatewayURL.PART_ORDER_QR_CODE_JOB);
+            String token = UserContextService.getAccessToken();
+            HttpHeaders header = createHttpHeaders(token);
+            HttpEntity<Map> requestEntity = new HttpEntity<>(header);
+            ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

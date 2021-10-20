@@ -44,7 +44,7 @@ public class AssetInfoBulkEditCheckService {
             for (AssetInfo assetInfo:assets) {
                 String assetDeptUID = assetInfo.getAssetDeptUID();
                 String clinicalDeptUID = assetInfo.getClinicalDeptUID();
-                if(!assetDeptUID.equals(clinicalDeptUID)){
+                if(assetDeptUID!=null && clinicalDeptUID !=null &&!assetDeptUID.equals(clinicalDeptUID)){
                     return false;
                 }
             }

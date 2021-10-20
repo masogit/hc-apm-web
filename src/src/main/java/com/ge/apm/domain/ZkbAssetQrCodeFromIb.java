@@ -3,6 +3,7 @@ package com.ge.apm.domain;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author : 503189362
@@ -46,6 +47,28 @@ public class ZkbAssetQrCodeFromIb {
 
     @Column(name = "one_qr_code")
     private String oneQrCode;
+
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @Column(name = "update_date")
+    private Date updateDate;
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 
     public String getOneQrCode() {
         return oneQrCode;

@@ -95,6 +95,7 @@ public interface ApprovalConstant {
     String APPROVAL_ASSET_BORROW_RETURN = "assetBorrowReturn";//设备借用归还
     String APPROVAL_ASSET_RECEIVE_RETURN = "assetReceiveReturn";//设备领用归还
     String APPROVAL_ASSET_TRANSFER = "assetTransfer";//设备转移
+    String APPROVAL_ADVERSE_EVENTS = "adverseEvents"; // 不良事件上报
 
 
     int BUSINESS_TYPE_SPARE_PARTS_REQUEST_INT = 1;//备件申领单
@@ -109,6 +110,10 @@ public interface ApprovalConstant {
     int BUSINESS_TYPE_ASSET_RECEIVE_RETURN = 10;//领用归还申请
     int BUSINESS_TYPE_ASSET_TRANSFER = 11;//设备转移
     int BUSINESS_TYPE_SPARE_PARTS_RETURN_INT = 12; //备件申退单
+    int BUSINESS_TYPE_ADVERSE_EVENTS = 13; // 不良事件上报
+
+
+    String BUSINESS_TYPE_ADVERSE_EVENTS_NAME = "不良事件上报"; // 不良事件上报
     /**
      * 档案信息修改 是否需要审批标识
      * 1.资产维修审批中 2.资产维修不需要审批
