@@ -1,0 +1,619 @@
+package com.ge.apm.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.constant.ApprovalConstant;
+import lombok.Data;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+@Entity
+@Table(name = "adverse_events")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cacheable
+@Data
+@DynamicUpdate
+@DynamicInsert
+@EntityListeners(AuditingEntityListener.class)
+public class AdverseEvents implements Serializable, ApprovableTarget {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
+
+    @Column(name = "uid", updatable = false)
+    private String uid;
+
+    /**
+     * 工单编号
+     */
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 50)
+    @Column(name = "work_order_num")
+    private String workOrderNum;
+
+    /**
+     * 报告人姓名
+     */
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 50)
+    @Column(name = "reporter_name")
+    private String reporterName;
+
+    /**
+     * 报告时间
+     */
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "report_date")
+    private Date reportDate;
+
+    /**
+     * 科室
+     */
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 50)
+    @Column(name = "department")
+    private String department;
+
+    /**
+     * 发生地
+     */
+    @Column(name = "occurred_place")
+    @Size(min = 1, max = 100)
+    private String occurredPlace;
+
+    /**
+     * 资产名称
+     */
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(name = "asset_name")
+    private String assetName;
+
+    /**
+     * 设备编号
+     */
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(name = "device_num")
+    private String deviceNum;
+
+    /**
+     * 产品名称
+     */
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(name = "product_name")
+    private String productName;
+
+    /**
+     * 注册证编号
+     */
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Column(name = "registration_number")
+    private String registrationNum;
+
+    /**
+     * 曾用注册证编号
+     */
+    @Column(name = "previously_registration_num")
+    @Size(min = 1, max = 100)
+    private String previouslyRegistrationNum;
+
+    /**
+     * 曾用注册证编号是否上报
+     */
+    @Column(name = "previously_registration_report")
+    private Boolean previouslyRegistrationReport;
+
+    /**
+     * 型号
+     */
+    @Column(name = "model")
+    @Size(min = 1, max = 100)
+    private String model;
+
+    /**
+     * 规格
+     */
+    @Column(name = "standard")
+    @Size(min = 1, max = 100)
+    private String standard;
+
+    /**
+     * 产品类别
+     */
+    @Column(name = "product_category")
+    @Size(min = 1, max = 50)
+    private String productCategory;
+
+    /**
+     * 产地
+     */
+    @Column(name = "origin_place")
+    private String originPlace;
+
+    /**
+     * 产品批号
+     */
+    @Column(name = "product_lot_num")
+    @Size(min = 1, max = 100)
+    private String productLotNum;
+
+    /**
+     * 产品编号
+     */
+    @Column(name = "product_num")
+    @Size(min = 1, max = 100)
+    private String productNum;
+
+    /**
+     * udi
+     */
+    @Column(name = "udi")
+    private String udi;
+
+    /**
+     * 生产日期
+     */
+    @Column(name = "production_date")
+    private Date productionDate;
+
+    /**
+     * 有效期至
+     */
+    @Column(name = "valid_until")
+    private Date validUntil;
+
+    /**
+     * 停用日期
+     */
+    @Column(name = "retirement_date")
+    private Date retirementDate;
+
+    /**
+     * 上市许可证持有人
+     */
+    @Column(name = "marketing_auth_holder")
+    private String marketingAuthHolder;
+
+    /**
+     * 操作人
+     */
+    @Column(name = "operator")
+    private Integer operator;
+
+    /**
+     * 操作人描述
+     */
+    @Column(name = "operator_desc")
+    @Size(min = 1, max = 50)
+    private String operatorDesc;
+
+    /**
+     * 事件发生日期
+     */
+    @Column(name = "event_occurred_date")
+    private Date eventOccurredDate;
+
+    /**
+     * 事件发现或获知日期
+     */
+    @Column(name = "event_discover_date")
+    private Date eventDiscoverDate;
+
+    /**
+     * 伤害程度 1-死亡 2-严重伤害 3-其他
+     */
+    @Column(name = "harm_degree")
+    private Integer harmDegree;
+
+    /**
+     * 伤害程度描述
+     */
+    @Column(name = "harm_degree_desc")
+    @Size(min = 1, max = 100)
+    private String harmDegreeDesc;
+
+    /**
+     * 伤害表现
+     */
+    @Column(name = "harm_perform")
+    @Size(min = 1, max = 100)
+    private String harmPerform;
+
+    /**
+     * 伤害表现附件
+     */
+    @Transient
+    @JsonProperty
+    private List<String> harmPerformFile;
+
+    /**
+     * 器械故障表现
+     */
+    @Column(name = "device_fault_perform")
+    @Size(min = 1, max = 50)
+    private String deviceFaultPerform;
+
+    /**
+     * 器械故障表现附件
+     */
+    @Transient
+    @JsonProperty
+    private List<String> deviceFaultPerformFile;
+
+    /**
+     * 患者姓名
+     */
+    @Column(name = "patient_name")
+    @Size(min = 1, max = 50)
+    private String patientName;
+
+    /**
+     * 患者性别
+     */
+    @Column(name = "patient_sex")
+    private Integer patientSex;
+
+    /**
+     * 患者出生日期
+     */
+    @Column(name = "patient_born_date")
+    private Date patientBornDate;
+
+    /**
+     * 患者年龄
+     */
+    @Column(name = "patient_age")
+    private String patientAge;
+
+    /**
+     * 患者年龄类型 1-岁 2-月 3-日
+     */
+    @Column(name = "patient_age_type")
+    private Integer patientAgeType;
+
+    /**
+     * 患者病历号
+     */
+    @Column(name = "medical_case_num")
+    @Size(min = 1, max = 100)
+    private String medicalCaseNum;
+
+    /**
+     * 既往病史
+     */
+    @Column(name = "medical_history")
+    @Size(min = 1, max = 500)
+    private String medicalHistory;
+
+    /**
+     * 预期治疗疾病或者作用
+     */
+    @Column(name = "except_affect")
+    @Size(min = 1, max = 500)
+    private String exceptAffect;
+
+    /**
+     * 器械使用日期
+     */
+    @Column(name = "device_used_date")
+    private Date deviceUsedDate;
+
+    /**
+     * 使用场所 1-医疗机构 2-家庭 3-其他
+     */
+    @Column(name = "use_place")
+    private Integer usePlace;
+
+    /**
+     * 场所名称
+     */
+    @Column(name = "place_name")
+    @Size(min = 1, max = 100)
+    private String placeName;
+
+    /**
+     * 使用过程
+     */
+    @Column(name = "use_process")
+    @Size(min = 1, max = 500)
+    private String useProcess;
+
+    /**
+     * 合并用药/器械情况说明
+     */
+    @Column(name = "device_desc")
+    @Size(min = 1, max = 500)
+    private String deviceDesc;
+
+    /**
+     * 事件原因分析
+     */
+    @Column(name = "event_cause_analyze")
+    @Size(min = 1, max = 500)
+    private String eventCauseAnalyze;
+
+    /**
+     * 事件原因分析描述
+     */
+    @Column(name = "event_cause_desc")
+    @Size(min = 1, max = 500)
+    private String eventCauseDesc;
+
+    /**
+     * 事件原因分析描述附件
+     */
+    @Transient
+    @JsonProperty
+    private List<String> eventCauseDescFile;
+
+    /**
+     * 初步处置情况
+     */
+    @Column(name = "init_dispose_situ")
+    @Size(min = 1, max = 500)
+    private String initDisposeSitu;
+
+    /**
+     * 初步处置情况附件
+     */
+    @Transient
+    @JsonProperty
+    private List<String> initDisposeSituFile;
+
+    /**
+     * 状态
+     * 1-暂存 2-	待审核 3-已取消 4-已退回 5-已作废（暂时保留）
+     * 6-审核通过 7-待上报 8-已上报
+     */
+    @Column(name = "status")
+    private Integer status;
+
+    /**
+     * 是否有效
+     */
+    @Column(name = "is_valid")
+    private Boolean isValid;
+
+    /**
+     * 修改字段
+     */
+    @Column(name = "update_col")
+    @Size(min = 1, max = 5000)
+    private String updateCol;
+
+    /**
+     * 是否开展了调查
+     */
+    @Column(name = "has_survey")
+    private Boolean hasSurvey;
+
+    /**
+     * 调查情况
+     */
+    @Column(name = "survey_situ")
+    @Size(min = 1, max = 500)
+    private String surveySitu;
+
+    /**
+     * 调查情况附件
+     */
+    @Transient
+    @JsonProperty
+    private List<String> surveySituFile;
+
+    /**
+     * 关联性评价
+     */
+    @Column(name = "relevance_eval")
+    @Size(min = 1, max = 500)
+    private String relevanceEval;
+
+    /**
+     * 评价结果-事件原因分析
+     */
+    @Column(name = "eval_cause_analyze")
+    @Size(min = 1, max = 500)
+    private String evalCauseAnalyze;
+
+    /**
+     * 评价结果-事件原因分析附件
+     */
+    @Transient
+    @JsonProperty
+    private List<String> evalCauseAnalyzeFile;
+
+    /**
+     * 是否已采取控制措施
+     */
+    @Column(name = "has_control_measure")
+    private Boolean hasControlMeasure;
+
+    /**
+     * 具体控制措施
+     */
+    @Column(name = "control_measure_desc")
+    @Size(min = 1, max = 500)
+    private String controlMeasureDesc;
+
+    /**
+     * 具体控制措施附件
+     */
+    @Transient
+    @JsonProperty
+    private List<String> controlMeasureDescFile;
+
+    /**
+     * 未采取控制措施原因
+     */
+    @Column(name = "not_control_cause")
+    @Size(min = 1, max = 500)
+    private String notControlCause;
+
+    /**
+     * 是否错报误报
+     */
+    @Column(name = "has_false_report")
+    private Boolean hasFalseReport;
+
+    /**
+     * 错报误报原因
+     */
+    @Column(name = "false_report_cause")
+    @Size(min = 1, max = 500)
+    private String falseReportCause;
+
+    /**
+     * 错报误报原因附件
+     */
+    @Transient
+    @JsonProperty
+    private List<String> falseReportCauseFile;
+
+    /**
+     * 当前审核人uid
+     */
+    @Column(name = "audit_user_uid")
+    private String auditUserUid;
+
+    /**
+     * 当前审核人姓名
+     */
+    /*@Column(name = "audit_user_name")
+    @Size(min = 1, max = 50)
+    private String auditUserName;*/
+
+    /**
+     * 退回原因
+     */
+    @Column(name = "return_reason")
+    @Size(min = 1, max = 500)
+    private String returnReason;
+
+    /**
+     * 审核结果
+     */
+    @Column(name = "approval_result")
+    private Integer approvalResult;
+
+    /**
+     * pdf文件的file id
+     */
+    @Column(name = "pdf_object_id")
+    private Integer pdfObjectId;
+
+    /**
+     * 是否合并报告
+     */
+    @Column(name = "report_merge")
+    private Boolean reportMerge;
+
+    /**
+     * 报告合并编码
+     */
+    @Column(name = "report_merge_code")
+    @Size(min = 1, max = 100)
+    private String reportMergeCode;
+
+    @Column(name = "created_by", nullable = true, length = 50, updatable = false)
+    @JsonIgnore
+    private String createdBy;
+
+    @Column(name = "created_date", nullable = true)
+    @JsonIgnore
+    @CreatedDate
+    private Date createdDate;
+
+    @Column(name = "last_modified_by", length = 50)
+    @JsonIgnore
+    private String lastModifiedBy;
+
+    @Column(name = "last_modified_date")
+    @JsonIgnore
+    @LastModifiedDate
+    private Date lastModifiedDate = new Date();
+
+    @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
+    private String tenantUID;
+
+    @Column(name="institution_uid",columnDefinition = "CHAR(32)")
+    private String institutionUID;
+
+    @Column(name="hospital_uid",columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+
+    @Column(name="site_uid",columnDefinition = "CHAR(32)")
+    private String siteUID;
+
+    /**
+     * 审批意见
+     */
+    @Transient
+    @JsonProperty
+    private String approvalOpinion;
+
+    /**
+     * 审批人
+     */
+    @Transient
+    @JsonProperty
+    private String actualApproverName;
+
+    /**
+     * 审批时间
+     */
+    @Transient
+    @JsonProperty
+    private Date actualApproverDate;
+
+
+    @Override
+    public BigDecimal getTotalPriceToBigDecimal() {
+        return new BigDecimal("0.00");
+    }
+
+    @Override
+    public String getBusinessNumber() {
+        return getWorkOrderNum();
+    }
+
+    @Override
+    public String getBusinessUid() {
+        return getUid();
+    }
+
+    @Override
+    public int getBusinessType() {
+        return ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS;
+    }
+
+}

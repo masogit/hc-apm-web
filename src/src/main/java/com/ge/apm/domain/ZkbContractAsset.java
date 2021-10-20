@@ -70,6 +70,20 @@ public class ZkbContractAsset {
     @Column(name = "apply_num")
     private Integer applyNum = 0;
 
+    /**
+     * empty t f
+     */
+    @Column(name = "train_reason_flag")
+    private String trainReasonFlag;
+
+    public String getTrainReasonFlag() {
+        return trainReasonFlag;
+    }
+
+    public void setTrainReasonFlag(String trainReasonFlag) {
+        this.trainReasonFlag = trainReasonFlag;
+    }
+
     public Integer getApplyNum() {
         return applyNum;
     }

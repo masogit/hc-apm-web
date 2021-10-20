@@ -104,15 +104,30 @@
                         <!--设备转移-->
                         <!--<ui:include src="content/AssetTransferApproval.xhtml"></ui:include>-->
 
+                        <!--不良事件-->
+                        <ui:include src="content/AdverseEventsApproval.xhtml"></ui:include>
+
+                        <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 13}">
+                            <label class="label" style="font-size: medium; font-weight: bold">审核结果</label>
+                            <p:selectOneRadio id="enable" value="#{multiLevelApprovalController.approvalResult}">
+                                <f:selectItem itemLabel="同意上报" itemValue="1"/>
+                                <f:selectItem itemLabel="同意不上报" itemValue="2"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">审批意见</label>
                             <p:inputText id="unitPrice" name="unitPrice" placeholder="审批意见"
                                          value="#{multiLevelApprovalController.approvalOpinion}"/>
                         </h:panelGroup>
                     </p:panelGrid>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 13}">
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                         <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                    </h:panelGroup>
+                    <!--不良事件审批-->
+                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 13}">
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.adverseEventsAgree()}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.adverseEventsDisagree()}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
                     </h:panelGroup>
 
                 </h:form>

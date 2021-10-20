@@ -4,18 +4,25 @@ import com.ge.apm.dao.MultiLevelApprovalRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.dao.V2_WorkOrderRepository;
+import com.ge.apm.domain.AdverseEvents;
 import com.ge.apm.domain.MultiLevelApproval;
 import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.V2_WorkOrder;
 import com.ge.apm.service.approval.MultiLevelApprovalService;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.simpleparts.SimplePartsRequestLineItemService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.TransactionForm;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -23,6 +30,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +55,10 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
     @Getter
     @Setter
     private String approvalOpinion;
+
+    @Getter
+    @Setter
+    private Integer approvalResult;// 不良事件审核结果 1-同意上报 2-同意不上报
 
     @Getter
     private Object primaryApprovalData;
@@ -98,6 +110,14 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
                 primaryApprovalData = pmOrderLists;
                 secondaryApprovalData = woService.getWorkOrderDetails(byId.getId());;
                 break;
+            case ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS:
+                String token = UserContextService.getAccessToken();
+                AdverseEvents adverseEvents = multiLevelApprovalService.getAdverseEvents(token, multiLevelApproval.getBusinessUid());
+                List<AdverseEvents> list = new ArrayList<>();
+                list.add(adverseEvents);
+                primaryApprovalData = list;
+                secondaryApprovalData = adverseEvents;
+                break;
             default:
                 throw new RuntimeException("New Business type not handled yet");
         }
@@ -130,6 +150,48 @@ public class MultiLevelApprovalController extends GenericCRUDUUIDController<Mult
             return;
          }
         multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmitByDisagree(multiLevelApproval,approvalOpinion);
+        selected = null;
+    }
+
+    /**
+     * 不良事件--审批同意
+     * @return
+     */
+    public void adverseEventsAgree() throws Exception {
+        MultiLevelApproval multiLevelApproval= multiLevelApprovalRepository.findById(selected.getId());
+        boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(approvalIng){
+            WebUtil.addWarnMessage("审批流已经被审批，勿重复操作！");
+            return;
+        }
+        String token = UserContextService.getAccessToken();
+        AdverseEvents events = new AdverseEvents();
+        events.setUid(multiLevelApproval.getBusinessUid());
+        events.setStatus(6);
+        events.setApprovalOpinion(approvalOpinion);
+        events.setApprovalResult(approvalResult);
+        multiLevelApprovalService.approveAdverseEvents(token, events);
+        selected = null;
+    }
+
+    /**
+     * 不良事件--审批不同意
+     * @return
+     */
+    public void adverseEventsDisagree() {
+        MultiLevelApproval multiLevelApproval = multiLevelApprovalRepository.findById(selected.getId());
+        boolean approvalIng = multiLevelApproval.getApprovalIng();
+        if(approvalIng){
+            WebUtil.addWarnMessage("审批流已经被审批,勿重复操作！");
+            return;
+        }
+        String token = UserContextService.getAccessToken();
+        AdverseEvents events = new AdverseEvents();
+        events.setUid(multiLevelApproval.getBusinessUid());
+        events.setStatus(4);
+        events.setApprovalOpinion(approvalOpinion);
+        events.setApprovalResult(approvalResult);
+        multiLevelApprovalService.approveAdverseEvents(token, events);
         selected = null;
     }
 

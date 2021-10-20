@@ -48,7 +48,7 @@
                             </f:facet>
                         </p:column>
                         <p:column headerText="#{msg.zkbKeyUserConfig_type}" filterBy="#{item.configType}" filterMatchMode="LIKE">
-                            <h:outputText  value="#{item.configTypeName}" />
+                            <h:outputText  value="#{fieldMsg.fieldValue('zkbPoStepsRole', item.configType)}" />
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />

@@ -850,6 +850,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void orderTypeChange(){
+        selected.setScoreFlag(CopyByInvok.F);
         if(ZkbPartOrder.OrderType.Artificial.toString().equals(orderType)){
             this.selected.setQty(1);
         }else{

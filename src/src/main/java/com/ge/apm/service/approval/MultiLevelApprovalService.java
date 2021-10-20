@@ -1,12 +1,14 @@
 package com.ge.apm.service.approval;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.ge.apm.dao.*;
 import com.ge.apm.dao.simpleparts.SimplePartsRequestRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.simpleparts.SimplePartsRequest;
 import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.constant.*;
 import com.ge.apm.service.pm.V2_PmOrderService;
@@ -14,13 +16,16 @@ import com.ge.apm.service.simpleparts.SimplePartsConfigService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestService;
 import com.ge.apm.service.simpleparts.SimplePartsRequestWorkOrderService;
 import com.ge.apm.service.utils.ApmConstant;
+import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.PmOrderActionForm;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -31,7 +36,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-public class MultiLevelApprovalService {
+public class MultiLevelApprovalService extends MicroServiceInvoker {
 
     protected static final Logger logger = Logger.getLogger(MultiLevelApprovalService.class);
 
@@ -96,6 +101,8 @@ public class MultiLevelApprovalService {
                 return ApprovalConstant.APPROVAL_ASSET_RECEIVE_RETURN;
             case ApprovalConstant.BUSINESS_TYPE_ASSET_TRANSFER:
                 return ApprovalConstant.APPROVAL_ASSET_TRANSFER;
+            case ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS:
+                return ApprovalConstant.APPROVAL_ADVERSE_EVENTS;
             default: return null;
         }
     }
@@ -498,7 +505,7 @@ public class MultiLevelApprovalService {
                         com.ge.apm.domain.ApprovalNode node = approvalNodes.get(approvalLevel);
                         if(node != null){
                             boolean usingRole = node.getUsingRole();
-                            if (usingRole) {//角色审批
+                            if (usingRole) {//角色审批，根据角色拉取用户进行审批
                                 List<Integer> nodeRoleUids = node.getRoleUids();
                                 if (nodeRoleUids != null) {
                                     List<UserAccount> userAccounts = userAccountRepository.getApprovalPersonByRoleId(nodeRoleUids);
@@ -616,6 +623,8 @@ public class MultiLevelApprovalService {
                 return ApprovalConstant.APPROVAL_ASSET_TRANSFER_CHI;
             case ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_RETURN_INT:
                 return ApprovalConstant.BUSINESS_TYPE_SPARE_PARTS_RETURN;
+            case ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS:
+                return ApprovalConstant.BUSINESS_TYPE_ADVERSE_EVENTS_NAME;
         }
         return null;
     }
@@ -626,5 +635,32 @@ public class MultiLevelApprovalService {
     public MultiLevelApprovalConfig checkMultiLevelApprovalPersonAndSubmit(ApprovableTarget approvableTarget) {
         MultiLevelApprovalConfig multiLevelApprovalConfig = this.getFirstApprovalList(approvableTarget);
         return multiLevelApprovalConfig;
+    }
+
+    public AdverseEvents getAdverseEvents(String token, String uid){
+        HttpEntity<String > requestEntity = new HttpEntity<>(uid, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.GET_ADVERSE_EVENTS_INFO);
+        String url = gatewayURL.replace("{uid}",uid);
+        ResponseEntity<String> response = template.exchange(url, HttpMethod.GET, requestEntity, String.class);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            String result = response.getBody();
+            JSONObject jsonObject = JSONObject.parseObject(result);
+            JSONObject data = jsonObject.getJSONObject("data");
+            AdverseEvents adverseEvents = JSONObject.toJavaObject(data, AdverseEvents.class);
+            return adverseEvents;
+        }
+        return null;
+    }
+
+    public void approveAdverseEvents(String token, AdverseEvents adverseEvents){
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        HttpEntity<AdverseEvents> requestEntity = new HttpEntity<>(adverseEvents, createHttpHeaders(token));
+        String gatewayURL = getGatewayURL(GatewayURL.APPROVE_ADVERSE_EVENTS);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        if (!isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            String message = responseMap.get("message").toString();
+            throw new RuntimeException(message);
+        }
     }
 }
