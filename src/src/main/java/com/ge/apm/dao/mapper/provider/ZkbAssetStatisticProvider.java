@@ -152,7 +152,8 @@ public class ZkbAssetStatisticProvider {
                 " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
                 " LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code on ib_qr_code.asset_uid = ai.uid " +
                 " WHERE" +
-                " to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date" +
+                " ac.contract_no is not null AND ai.system_id is not null" +
+                " AND to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date" +
                 " AND (qr_code_info.qr_code_count_state is null OR qr_code_info.qr_code_count_state='N') " +
                 " AND (qr_code_info.can_not_past_qr_code is null OR qr_code_info.can_not_past_qr_code='N')"
         );
@@ -179,10 +180,10 @@ public class ZkbAssetStatisticProvider {
                 " FROM" +
                 " zkb_asset_qr_code_info qr_code_info" +
                 " INNER JOIN tenant_info ti ON ti.uid=qr_code_info.tenant_uid" +
-                " INNER JOIN asset_info ai ON ai.system_id=qr_code_info.system_id" +
+                " INNER JOIN asset_info ai ON ai.system_id=qr_code_info.system_id AND ai.tenant_uid=qr_code_info.tenant_uid" +
                 " LEFT JOIN zkb_contract_asset zca ON ai.uid=zca.asset_id" +
                 " LEFT JOIN zkb_contract ac ON ac.ID=zca.contract_id" +
-                " WHERE ac.contract_no is not null AND ac.tenant_uid=qr_code_info.tenant_uid AND qr_code_info.tenant_name isnull"
+                " WHERE qr_code_info.tenant_name isnull"
         );
         return sb.toString();
     }
