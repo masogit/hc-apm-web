@@ -764,7 +764,7 @@ public class ZkbContractImportService {
                     zkbContractAsset.setAssetType(getHighLowAssetFromCh(zkbContractAssetVO.getAssetType()));
                 }
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getTrainReasonFlag())){
-                    zkbContractAsset.setTrainReasonFlag(WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAssetVO.getTrainReasonFlag()));
+                    zkbContractAsset.setTrainReasonFlag(getTrainReasonFlagFromCh(zkbContractAssetVO.getTrainReasonFlag()));
                 }else {
                     zkbContractAsset.setTrainReasonFlag("empty");
                 }
@@ -790,9 +790,9 @@ public class ZkbContractImportService {
                     newZkbContractAsset.setAssetType(getHighLowAssetFromCh(zkbContractAssetVO.getAssetType()));
                 }
                 if(StringUtils.isNotEmpty(zkbContractAssetVO.getTrainReasonFlag())){
-                    newZkbContractAsset.setTrainReasonFlag(WebUtil.getFieldValueMessage("zkbPoAssetTrainReasonFlag",zkbContractAssetVO.getTrainReasonFlag()));
+                    newZkbContractAsset.setTrainReasonFlag(getTrainReasonFlagFromCh(zkbContractAssetVO.getTrainReasonFlag()));
                 }else {
-                    zkbContractAsset.setTrainReasonFlag("empty");
+                    newZkbContractAsset.setTrainReasonFlag("empty");
                 }
                 newZkbContractAsset.setSubRegion(zkbContractAssetVO.getSubRegion());
                 newZkbContractAsset.setModality(zkbContractAssetVO.getModality());
@@ -823,6 +823,19 @@ public class ZkbContractImportService {
                 return "highMachine";
             case "超声低端机":
                 return "lowMachine";
+            case "N/A":
+                return "empty";
+            default:
+                return "";
+        }
+    }
+
+    public String getTrainReasonFlagFromCh(String va){
+        switch (va){
+            case "是":
+                return "t";
+            case "否":
+                return "f";
             case "N/A":
                 return "empty";
             default:
