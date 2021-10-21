@@ -133,6 +133,7 @@ public class ZkbAssetStatisticProvider {
         StringBuilder sb = new StringBuilder();
         sb.append(" SELECT DISTINCT qr_code_info.id,"+
                 " ai.clinical_dept_name as hospital_name, "+
+                " ai.clinical_dept_id,"+
                 " ai.function_type, "+
                 " ai.system_id," +
                 " ti.uid AS tenant_uid," +
@@ -162,14 +163,26 @@ public class ZkbAssetStatisticProvider {
 
     public String getZkbAssetQrCode(){
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT DISTINCT qr_code_info.id,ai.clinical_dept_name as hospital_name,ai.function_type,ti. NAME AS tenant_name,ai.uid AS asset_uid,ac.contract_no" +
+        sb.append("SELECT DISTINCT qr_code_info.id,"+
+                        " ai.clinical_dept_name as hospital_name, "+
+                        " ai.clinical_dept_id,"+
+                        " ai.function_type, "+
+                        " ai.system_id," +
+                        " ti.uid AS tenant_uid," +
+                        " ti. NAME AS tenant_name," +
+                        " ai.uid AS asset_uid," +
+                        " ac.contract_no,"+
+                        " qr_code_info.reason AS reason," +
+                        " qr_code_info.can_not_past_qr_code," +
+                        " qr_code_info.reason_date,"+
+                        " qr_code_info.qr_code_count_state,qr_code_info.ib_qr_code_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date" +
                 " FROM" +
-                " zkb_contract ac" +
-                " INNER JOIN zkb_contract_asset zca ON zca.contract_id=ac.ID" +
-                " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
-                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id" +
-                " INNER JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid" +
-                " WHERE qr_code_info.tenant_name isnull "
+                " zkb_asset_qr_code_info qr_code_info" +
+                " INNER JOIN tenant_info ti ON ti.uid=qr_code_info.tenant_uid" +
+                " INNER JOIN asset_info ai ON ai.system_id=qr_code_info.system_id" +
+                " LEFT JOIN zkb_contract_asset zca ON ai.uid=zca.asset_id" +
+                " LEFT JOIN zkb_contract ac ON ac.ID=zca.contract_id" +
+                " WHERE ac.contract_no is not null AND ac.tenant_uid=qr_code_info.tenant_uid AND qr_code_info.tenant_name isnull"
         );
         return sb.toString();
     }

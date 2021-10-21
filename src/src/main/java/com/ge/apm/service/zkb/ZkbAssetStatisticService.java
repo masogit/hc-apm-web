@@ -171,7 +171,7 @@ public class ZkbAssetStatisticService {
     public void regenerateZkbAssetQrCodeInfo(List<SearchFilter> searchFilter){
         List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = zkbAssetStatisticMapper.getZkbAssetQrCodeInfoList(searchFilter);
         if(zkbAssetQrCodeInfoList == null || zkbAssetQrCodeInfoList.size() == 0){
-            WebUtil.addErrorMessage("没有找到需要生成的记录");
+            WebUtil.addErrorMessage("没有新的二维码记录需要生成");
             return ;
         }
         for (ZkbAssetQrCodeInfo zkbAssetQrCodeInfo : zkbAssetQrCodeInfoList){
@@ -206,7 +206,7 @@ public class ZkbAssetStatisticService {
                     zkbAssetQrCodeInfo.setQrCodeDate(date);
                     zkbAssetQrCodeInfo.setQrCodeCountState("Y");
                     zkbAssetQrCodeInfo.setCreatedDate(date);
-                }else if(zkbAssetQrCodeInfo.getId() == null){//ID == null 则新增记录
+                }else if(zkbAssetQrCodeInfo.getId() == null || qrCodeCountState == null){//ID == null 则新增记录
                     zkbAssetQrCodeInfo.setQrCodeCountState("N");
                     zkbAssetQrCodeInfo.setCreatedDate(date);
                 }
