@@ -24,4 +24,7 @@ public interface ZkbAssetStatisticMapper {
 
     @SelectProvider(type = ZkbAssetStatisticProvider.class,method="getZkbAssetQrCodeInfoList")
     List<ZkbAssetQrCodeInfo> getZkbAssetQrCodeInfoList(@Param("filters") List<SearchFilter> filters);
+
+    @SelectProvider(type = ZkbAssetStatisticProvider.class,method="getZkbAssetQrCode")
+    List<ZkbAssetQrCodeInfo> getZkbAssetQrCode();
 }
