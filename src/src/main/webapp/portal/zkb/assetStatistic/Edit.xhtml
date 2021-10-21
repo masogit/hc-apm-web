@@ -39,7 +39,7 @@
                 <h:panelGroup>
                     <label class="label">#{msg.zkbAssetStatistic_canNotPast}</label>
                     <p:selectOneMenu  value="#{zkbAssetStatisticController.selected.canNotPastQrCode}" required="true" requiredMessage="#{msg.zkbAssetStatistic_canNotPast} #{msg.ValidationRequire}">
-                        <p:ajax event="change"  update=":zkbAssetQrCodeInfoEditForm" />
+                        <p:ajax event="change" update=":zkbAssetQrCodeInfoEditForm" />
                         <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                         <f:selectItem itemLabel="Y" itemValue="Y"/>
                         <f:selectItem itemLabel="N" itemValue="N"/>
@@ -59,7 +59,7 @@
                                 showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
             </p:panelGrid>
-            <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbAssetStatisticController.save}" oncomplete="PF('zkbAssetQrCodeInfo').hide()" update=":growl :zkbAssetStatisticListForm "  style="float:left" rendered="#{zkbAssetStatisticController.selected.qrCodeCountState eq 'N'}"/>
+            <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbAssetStatisticController.save}" oncomplete="PF('zkbAssetQrCodeInfo').hide()" update=":growl :zkbAssetStatisticListForm "  style="float:left"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbAssetQrCodeInfo').hide()"/>
         </h:form>
     </p:dialog>

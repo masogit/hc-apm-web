@@ -131,7 +131,7 @@ public class ZkbAssetStatisticProvider {
         List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
         String currentDate = getDateStr();
         StringBuilder sb = new StringBuilder();
-        sb.append(" SELECT qr_code_info.id,"+
+        sb.append(" SELECT DISTINCT qr_code_info.id,"+
                 " ai.clinical_dept_name as hospital_name, "+
                 " ai.function_type, "+
                 " ai.system_id," +
@@ -147,15 +147,30 @@ public class ZkbAssetStatisticProvider {
                 " zkb_contract ac" +
                 " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
                 " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
-                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id" +
+                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id AND ai.is_deleted=false AND ai.is_valid=true" +
                 " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
                 " LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code on ib_qr_code.asset_uid = ai.uid " +
                 " WHERE" +
                 " to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date" +
-                " AND (qr_code_info.qr_code_count_state is null OR qr_code_info.qr_code_count_state='N')"
+                " AND (qr_code_info.qr_code_count_state is null OR qr_code_info.qr_code_count_state='N') " +
+                " AND (qr_code_info.can_not_past_qr_code is null OR qr_code_info.can_not_past_qr_code='N')"
         );
         String filter = buildFilter_loadAllAsset(searchFilterList);
         sb.append(filter);
+        return sb.toString();
+    }
+
+    public String getZkbAssetQrCode(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT DISTINCT qr_code_info.id,ai.clinical_dept_name as hospital_name,ai.function_type,ti. NAME AS tenant_name,ai.uid AS asset_uid,ac.contract_no" +
+                " FROM" +
+                " zkb_contract ac" +
+                " INNER JOIN zkb_contract_asset zca ON zca.contract_id=ac.ID" +
+                " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
+                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id" +
+                " INNER JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid" +
+                " WHERE qr_code_info.tenant_name isnull "
+        );
         return sb.toString();
     }
 }
