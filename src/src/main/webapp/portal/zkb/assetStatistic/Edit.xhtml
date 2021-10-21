@@ -59,7 +59,7 @@
                                 showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
             </p:panelGrid>
-            <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbAssetStatisticController.save}" oncomplete="PF('zkbAssetQrCodeInfo').hide()" update=":growl :zkbAssetStatisticListForm "  style="float:left"/>
+            <p:commandButton value="#{msg.save}" icon="ui-icon-check" validateClient="true" actionListener="#{zkbAssetStatisticController.save}" oncomplete="PF('zkbAssetQrCodeInfo').hide()" update=":growl :zkbAssetStatisticListForm "  style="float:left" rendered="#{empty zkbAssetStatisticController.selected.qrCodeCountState or zkbAssetStatisticController.selected.qrCodeCountState eq 'N'}"/>
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbAssetQrCodeInfo').hide()"/>
         </h:form>
     </p:dialog>
