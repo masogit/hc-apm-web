@@ -4367,17 +4367,9 @@ INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_i
 -- 不良事件审核结果
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventApprovalResult', '1', '同意上报', 'agree to report', NULL, -1);
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventApprovalResult', '2', '同意不上报', 'agree not to report', NULL, -1);
--- 不良事件微信端卡片权限配置
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'wechatCard', 'adverseEvents_reporter', '不良事件上报', 'Adverse events are reported', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'wechatCard', 'adverseEvents_approver', '不良事件审核及提交至国家检测信息系统', 'Adverse event audit and submission to the national detection information system', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'label', 'adverseEventsApprover', '不良事件审核及提交至国家检测信息系统', 'Adverse event audit and submission to the national detection information system', NULL,- 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '我的上报', '我的上报', 'My report', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '暂存', '暂存', 'Staging', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '审核中', '审核中', 'In the audit', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '已退回', '已退回', 'Returned', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '已作废', '已作废', 'Invalid', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsReporter', '审核完成', '审核完成', 'Audit complete', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsApprover', '待审核', '待审核', 'Pending audit', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsApprover', '审核中', '审核中', 'In the audit', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsApprover', '待上报', '待上报', 'To be reported', NULL, - 1 );
-INSERT INTO i18n_message ( msg_type, msg_key, value_zh, value_en, value_tw, site_id )VALUES( 'adverseEventsApprover', '全部工单', '全部工单', 'All work order', NULL, - 1 );
+--不良事件状态补充
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventStatus', '9', '待采购填写', 'to be filled in by the buyer', NULL, -1);
+-- 不良事件补充（采购员角色微信卡片）
+INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('wechatCard', 'adverseEvents_supplement  ', '不良事件补充', 'adverseEvents supplement', NULL, -1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','adverseEvents_supplement ','不良事件补充','adverseEvents supplement',NULL,-1);
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('adverseEventsSupplementCard','adverseEventPurchaser.filled','待填写','To be filled',NULL,-1);

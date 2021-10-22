@@ -34,6 +34,12 @@ public class ZkbAssetQrCodeInfo {
     private String tenantUID;
 
     /**
+     * 供应商名称
+     */
+    @Column(name = "tenant_name")
+    private String tenantName;
+
+    /**
      * 是否能粘贴二维啊
      */
     @Column(name = "can_not_past_qr_code")
@@ -51,6 +57,8 @@ public class ZkbAssetQrCodeInfo {
     @Column(name = "asset_uid")
     private String assetUid;
 
+    @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
+    private String clinicalDeptUID;//设备所属科室
     /**
      * 医院名称
      */
@@ -62,11 +70,6 @@ public class ZkbAssetQrCodeInfo {
      */
     @Column(name = "function_type")
     private String functionType;
-    /**
-     * 供应商名称
-     */
-    @Column(name = "tenant_name")
-    private String tenantName;
     /**
      * 合同编号
      */
@@ -240,6 +243,14 @@ public class ZkbAssetQrCodeInfo {
 
     public void setQrCodeDate(Date qrCodeDate) {
         this.qrCodeDate = qrCodeDate;
+    }
+
+    public String getClinicalDeptUID() {
+        return clinicalDeptUID;
+    }
+
+    public void setClinicalDeptUID(String clinicalDeptUID) {
+        this.clinicalDeptUID = clinicalDeptUID;
     }
 
     @Override
