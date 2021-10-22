@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <p:dialog id="zkbPartOrderModifyDlg" widgetVar="zkbPartOrderModifyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{zkbPartOrderAuditController.modifyTitle}" width="70%" height="620">
+        <h:form id="zkbOrderModifyForm" style="height: 100%">
+            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <c:choose>
+                    <c:when test="#{zkbPartOrderAuditController.modifyType eq 'OrderExtraPending'}">
+                        <h:panelGroup >
+                            <label class="label">SR#*</label>
+                            <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">Act#*</label>
+                            <p:inputText value="#{zkbPartOrderAuditController.selected.activityNo}" required="true" requiredMessage="#{msg.zkbPartOrder_activityNo} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                    </c:when>
+                    <c:when test="#{zkbPartOrderAuditController.modifyType eq 'OrderPending'}">
+                        <c:choose>
+                            <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}">
+                                <h:panelGroup >
+                                    <label class="label">SR#*</label>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.srNo}" required="true" requiredMessage="#{msg.zkbPartOrder_srNo} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">Act#*</label>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.activityNo}" required="true" requiredMessage="#{msg.zkbPartOrder_activityNo} #{msg.ValidationRequire}"/>
+                                </h:panelGroup>
+                            </c:when>
+                            <c:when test="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                                <h:panelGroup>
+                                    <label class="label">Order#*</label>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.orderNo}" required="true" requiredMessage="#{msg.zkbPartOrder_orderNo} #{msg.ValidationRequire}" />
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{!userContextService.zkbUser}">
+                                    <label class="label">价格*</label>
+                                    <p:inputText value="#{zkbPartOrderAuditController.selected.price}" required="true" requiredMessage="价格 #{msg.ValidationRequire}" />
+                                </h:panelGroup>
+                            </c:when>
+                        </c:choose>
+                    </c:when>
+                </c:choose>
+            </p:panelGrid>
+            <c:if test="#{zkbPartOrderAuditController.modifyType eq 'OrderPending' and zkbPartOrderAuditController.selected.orderType eq 'Parts'}">
+                <p:dataTable id="zkbOrderDatalist2" value="#{zkbPartOrderAuditController.selected.zkbPartOrderItems}" var="item"
+                             widgetVar="zkbContractCourseDatalist" selectionMode="single"
+                             lazy="false" paginator="true" rowKey="#{item.partNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
+                             paginatorTemplate="" rows="20" emptyMessage="#{msg.noRecordFound}" >
+                    <c:choose>
+                        <c:when test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
+                            <p:column headerText="配件号">
+                                <p:inputText value="#{item.partNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                            </p:column>
+                            <p:column headerText="实际配件号*">
+                                <p:inputText value="#{item.actualPartNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                            </p:column>
+                        </c:when>
+                        <c:when test="#{zkbPartOrderAuditController.orderType eq 'Tool'}">
+                            <p:column headerText="工具号">
+                                <p:inputText value="#{item.partNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                            </p:column>
+                        </c:when>
+                    </c:choose>
+                    <p:column headerText="配件名称">
+                        <p:inputText value="#{item.partName}"  />
+                    </p:column>
+                    <p:column headerText="配件数量">
+                        <h:outputText value="#{item.prePartQty}"/>
+                    </p:column>
+                    <p:column headerText="实际配件数量">
+                        <h:outputText value="#{item.partQty}"/>
+                    </p:column>
+                    <p:column headerText="配件SN(序列号)">
+                        <h:outputText value="#{item.serialNumber}"/>
+                    </p:column>
+                    <p:column headerText="Order#*">
+                        <p:inputText value="#{item.orderNo}" />
+                    </p:column>
+                    <p:column headerText="价格*" rendered="#{!userContextService.zkbUser}">
+                        <p:inputText value="#{item.price}" />
+                    </p:column>
+                    <p:column headerText="备注（说明是否DOA或者Short life）">
+                        <p:inputText value="#{item.remark}" />
+                    </p:column>
+                </p:dataTable>
+            </c:if>
+
+
+            <p:commandButton validateClient="true" style="float: bottom" value="保存" action="#{zkbPartOrderAuditController.saveOrderModify}" update=":growl :zkbPartOrderEditForm" icon="ui-icon-check" oncomplete="PF('zkbPartOrderModifyDlg').hide()" />
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbPartOrderModifyDlg').hide()"/>
+        </h:form>
+    </p:dialog>
+    
+</ui:composition>
+</html>
