@@ -172,7 +172,7 @@ public class ZkbAssetStatisticProvider {
                         " ti.uid AS tenant_uid," +
                         " ti. NAME AS tenant_name," +
                         " ai.uid AS asset_uid," +
-                        " ac.contract_no,"+
+                        " (select ac.contract_no from zkb_contract ac,zkb_contract_asset zca where zca.contract_id=ac.ID and ai.uid=zca.asset_id and to_date('20211021','yyyyMMdd')>=ac.start_date and to_date('20211021','yyyyMMdd')<=ac.end_date) as contract_no,"+
                         " qr_code_info.reason AS reason," +
                         " qr_code_info.can_not_past_qr_code," +
                         " qr_code_info.reason_date,"+
@@ -180,9 +180,7 @@ public class ZkbAssetStatisticProvider {
                 " FROM" +
                 " zkb_asset_qr_code_info qr_code_info" +
                 " INNER JOIN tenant_info ti ON ti.uid=qr_code_info.tenant_uid" +
-                " INNER JOIN asset_info ai ON ai.system_id=qr_code_info.system_id AND ai.tenant_uid=qr_code_info.tenant_uid" +
-                " LEFT JOIN zkb_contract_asset zca ON ai.uid=zca.asset_id" +
-                " LEFT JOIN zkb_contract ac ON ac.ID=zca.contract_id" +
+                " INNER JOIN asset_info ai ON ai.system_id=qr_code_info.system_id AND ai.tenant_uid=qr_code_info.tenant_uid"+
                 " WHERE qr_code_info.tenant_name isnull"
         );
         return sb.toString();
