@@ -58,11 +58,11 @@
                     </p:fieldset>
                     <p:panelGrid columns="5" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <p:commandButton value="#{msg.SearchResult}" icon="ui-icon-arrowthick-1-s" update=":growl :zkbAssetStatisticListForm:datalist">
+                            <p:commandButton value="#{msg.SearchResult}" icon="ui-icon-search" update=":growl :zkbAssetStatisticListForm:datalist">
                             </p:commandButton>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <p:commandButton value="二维码统计(重新生成)" action="#{zkbAssetStatisticController.regenerateZkbAssetQrCodeInfo}" icon="ui-icon-arrowthick-1-s" validateClient="false" update=":growl :zkbAssetStatisticListForm:datalist" rendered="#{userContextService.zkbAdmin}">
+                            <p:commandButton value="二维码统计(重新生成)" action="#{zkbAssetStatisticController.regenerateZkbAssetQrCodeInfo}" validateClient="false" update=":growl :zkbAssetStatisticListForm:datalist" rendered="#{userContextService.zkbAdmin}">
                             </p:commandButton>
                         </h:panelGroup>
                     </p:panelGrid>

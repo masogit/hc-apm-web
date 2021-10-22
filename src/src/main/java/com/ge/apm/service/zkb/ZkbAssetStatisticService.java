@@ -170,12 +170,19 @@ public class ZkbAssetStatisticService {
 
     public void regenerateZkbAssetQrCodeInfo(List<SearchFilter> searchFilter){
         List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = zkbAssetStatisticMapper.getZkbAssetQrCodeInfoList(searchFilter);
-        if(zkbAssetQrCodeInfoList == null){
-            WebUtil.addErrorMessage("没有找到需要生成的记录");
+        if(zkbAssetQrCodeInfoList == null || zkbAssetQrCodeInfoList.size() == 0){
+            WebUtil.addErrorMessage("没有新的二维码记录需要生成");
             return ;
         }
         for (ZkbAssetQrCodeInfo zkbAssetQrCodeInfo : zkbAssetQrCodeInfoList){
             handleQRCodeInfo(zkbAssetQrCodeInfo);
+        }
+        //这里主要是针对历史数据的数据补全
+        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList2 = zkbAssetStatisticMapper.getZkbAssetQrCode();
+        if(zkbAssetQrCodeInfoList2 != null || zkbAssetQrCodeInfoList2.size() > 0){
+            for (ZkbAssetQrCodeInfo zkbAssetQrCodeInfo : zkbAssetQrCodeInfoList2){
+                zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
+            }
         }
     }
 
@@ -199,11 +206,9 @@ public class ZkbAssetStatisticService {
                     zkbAssetQrCodeInfo.setQrCodeDate(date);
                     zkbAssetQrCodeInfo.setQrCodeCountState("Y");
                     zkbAssetQrCodeInfo.setCreatedDate(date);
-                }else if(zkbAssetQrCodeInfo.getId() == null){//ID == null 则新增记录
+                }else if(zkbAssetQrCodeInfo.getId() == null || qrCodeCountState == null){//ID == null 则新增记录
                     zkbAssetQrCodeInfo.setQrCodeCountState("N");
                     zkbAssetQrCodeInfo.setCreatedDate(date);
-                }else{
-                    return ;
                 }
             }
         }
