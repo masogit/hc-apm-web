@@ -51,6 +51,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private boolean canEditFlag=false;
     private boolean isChoseAdmin = false;
     private boolean isOrder = false;
+    private boolean isUnOrder = false;
     private boolean whetherDeductEdit = false;
     private String showBtn = "";
     private ZkbPartOrderReturn zkbPartOrderReturn;
@@ -84,6 +85,9 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     private List<HashMap<String, String>> highCatList = new ArrayList<>();
     private String showCatListFlag = "";//1显示探头 2:显示sn列表
     private List<SvcEngineLogisticsLineVO> svcEngineLogisticsLineVOList = new ArrayList<>();
+
+    private String modifyType="";
+    private String modifyTitle="";
 
     @Override
     protected void init() {
@@ -699,6 +703,43 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         if(orderConfigs.size() > 0){
             isOrder = true;
         }
+        List<ZkbPartOrderUserConfig> unOrderConfigs = zkbPartOrderUserConfigRepository.findByLoginNameAndConfigType(currentUser.getLoginName(), ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString());
+        if(unOrderConfigs.size() > 0){
+            isUnOrder = true;
+        }
+    }
+
+    public Boolean isCanModifyUnOrder(){
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
+            if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus()) || ZkbPartOrder.PartOrderStatus.UnOrdered.toString().equals(selected.getStatus())){
+                if(isUnOrder || isChoseAdmin){
+                    return Boolean.TRUE;
+                }
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    public Boolean isCanModifyOrder(){
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+            if(ZkbPartOrder.PartOrderStatus.Ordered.toString().equals(selected.getStatus())){
+                if(isOrder || isChoseAdmin){
+                    return Boolean.TRUE;
+                }
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    public Boolean isCanModifyClose(){
+        if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType()) || ZkbPartOrder.OrderType.Parts.toString().equals(selected.getOrderType())){
+            if(ZkbPartOrder.PartOrderStatus.Closed.toString().equals(selected.getStatus())){
+                if(isChoseAdmin){
+                    return Boolean.TRUE;
+                }
+            }
+        }
+        return Boolean.FALSE;
     }
 
     public void initHighList(String contractId){
@@ -1184,6 +1225,21 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
     }
 
+    public void prepareModify(String m){
+        modifyType = m;
+        if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(m)){
+            modifyTitle = "下单数据修改";
+
+        }else if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(m)){
+            modifyTitle = "开单数据修改";
+        }
+    }
+
+    public void saveOrderModify(){
+        zkbPartOrderService.saveOrderModify(selected,currentUser,modifyType);
+        selected = zkbPartOrderRepository.findById(selected.getId());
+    }
+
     //region get、set
     public boolean isHaveTrainCourseFlag() {
         return haveTrainCourseFlag;
@@ -1197,16 +1253,20 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         return "List?faces-redirect=true&queryStatus="+queryStatus;
     }
 
-    public void naFlagListener(){
-        zkbPartOrderReturn.setPartSerialNumber("");
+    public String getModifyType() {
+        return modifyType;
     }
 
-    public boolean iscanEditFlag() {
-        return canEditFlag;
+    public void setModifyType(String modifyType) {
+        this.modifyType = modifyType;
     }
 
-    public void setcanEditFlag(boolean canEditFlag) {
-        this.canEditFlag = canEditFlag;
+    public String getModifyTitle() {
+        return modifyTitle;
+    }
+
+    public void setModifyTitle(String modifyTitle) {
+        this.modifyTitle = modifyTitle;
     }
 
     public String getArtificialType() {
@@ -1543,6 +1603,23 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     public void setShowCommercial(boolean showCommercial) {
         this.showCommercial = showCommercial;
     }
+
+    public boolean isOrder() {
+        return isOrder;
+    }
+
+    public void setOrder(boolean order) {
+        isOrder = order;
+    }
+
+    public boolean isUnOrder() {
+        return isUnOrder;
+    }
+
+    public void setUnOrder(boolean unOrder) {
+        isUnOrder = unOrder;
+    }
+
     //endregion
 
     public boolean isWhetherDeductEdit() {
