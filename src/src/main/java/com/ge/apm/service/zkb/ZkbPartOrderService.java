@@ -14,9 +14,6 @@ import org.primefaces.event.FileUploadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -101,6 +98,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
     @Autowired
     SvcEngineLogisticsStatusRepository svcEngineLogisticsStatusRepository;
+
+    @Autowired
+    ZkbPartOrderModifyLogRepository zkbPartOrderModifyLogRepository;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -1978,6 +1978,63 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         return svcEngineLogisticsOrderDetailVOS;
     }
+
+    //region  下单修改
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrderModify(ZkbPartOrder zkbPartOrder,UserAccount userAccount,String modifyType){
+        ZkbPartOrder oldZkbPartOrder = zkbPartOrderRepository.findById(zkbPartOrder.getId());
+
+        if(ZkbPartOrderStep.PartOrderStep.OrderExtraPending.toString().equals(modifyType)){
+            ZkbPartOrderModifyLog zkbPartOrderModifyLog = new ZkbPartOrderModifyLog();
+            zkbPartOrderModifyLog.setSrNo(oldZkbPartOrder.getSrNo());
+            zkbPartOrderModifyLog.setActivityNo(oldZkbPartOrder.getActivityNo());
+            zkbPartOrderModifyLog.setPartOrderId(oldZkbPartOrder.getId());
+            zkbPartOrderModifyLog.setCreateUserDate(new Date());
+            zkbPartOrderModifyLog.setCreateUserUid(userAccount.getUid());
+            zkbPartOrderModifyLog.setCreateUserName(userAccount.getName());
+            zkbPartOrderModifyLogRepository.save(zkbPartOrderModifyLog);
+        }else if(ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(modifyType)){
+            if (ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType())){
+                List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(zkbPartOrder.getId());
+                for(ZkbPartOrderItem zkbPartOrderItem : zkbPartOrderItems){
+                    ZkbPartOrderModifyLog zkbPartOrderModifyLog = new ZkbPartOrderModifyLog();
+                    zkbPartOrderModifyLog.setSrNo(oldZkbPartOrder.getSrNo());
+                    zkbPartOrderModifyLog.setActivityNo(oldZkbPartOrder.getActivityNo());
+                    zkbPartOrderModifyLog.setPartOrderId(oldZkbPartOrder.getId());
+                    zkbPartOrderModifyLog.setPartOrderItemId(zkbPartOrderItem.getId());
+                    zkbPartOrderModifyLog.setOrderNo(zkbPartOrderItem.getOrderNo());
+                    zkbPartOrderModifyLog.setActualPartNo(zkbPartOrderItem.getActualPartNo());
+                    zkbPartOrderModifyLog.setPartName(zkbPartOrderItem.getPartName());
+                    zkbPartOrderModifyLog.setPrice(zkbPartOrderItem.getPrice());
+                    zkbPartOrderModifyLog.setCreateUserDate(new Date());
+                    zkbPartOrderModifyLog.setCreateUserUid(userAccount.getUid());
+                    zkbPartOrderModifyLog.setCreateUserName(userAccount.getName());
+                    zkbPartOrderModifyLogRepository.save(zkbPartOrderModifyLog);
+                }
+            }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+                ZkbPartOrderModifyLog zkbPartOrderModifyLog = new ZkbPartOrderModifyLog();
+                zkbPartOrderModifyLog.setOrderNo(oldZkbPartOrder.getOrderNo());
+                zkbPartOrderModifyLog.setPrice(oldZkbPartOrder.getPrice());
+                zkbPartOrderModifyLog.setPartOrderId(oldZkbPartOrder.getId());
+                zkbPartOrderModifyLog.setCreateUserDate(new Date());
+                zkbPartOrderModifyLog.setCreateUserUid(userAccount.getUid());
+                zkbPartOrderModifyLog.setCreateUserName(userAccount.getName());
+                zkbPartOrderModifyLogRepository.save(zkbPartOrderModifyLog);
+            }
+        }
+
+        Integer dataFlag = zkbPartOrder.getDataFlag() == null ? 0 : zkbPartOrder.getDataFlag();
+        dataFlag++;
+        zkbPartOrder.setDataFlag(dataFlag);
+        zkbPartOrderRepository.save(zkbPartOrder);
+
+        if (ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) && ZkbPartOrderStep.PartOrderStep.OrderPending.toString().equals(modifyType)) {
+            for (ZkbPartOrderItem i : zkbPartOrder.getZkbPartOrderItems() ) {
+                zkbPartOrderItemRepository.save(i);
+            }
+        }
+    }
+    //endregion
 
     public List<ZkbPartOrderItem> queryItemBuPartOrderId(String id){
         List<ZkbPartOrderItem> zkbPartOrderItems = zkbPartOrderItemRepository.findByPartOrderId(id);
