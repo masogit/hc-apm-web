@@ -8,45 +8,108 @@
 <ui:composition>
     <p:dialog id="zkbPartOrderReturnModifyDlg" widgetVar="zkbPartOrderReturnModifyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还明细修改" width="70%" height="620">
         <h:form id="zkbPartOrderReturnModifyForm">
-            <p:commandButton validateClient="true" value="提交" actionListener="#{zkbPartOrderAuditController.submitCloseReturn}" update=":growl :zkbPartOrderEditForm:zkbReturnDatalist"
+            <p:commandButton validateClient="true" value="提交" actionListener="#{zkbPartOrderAuditController.submitCloseReturn}" update=":growl :zkbPartOrderEditForm"
                  icon="ui-icon-check" oncomplete="PF('zkbPartOrderReturnModifyDlg').hide()" />
             <p:commandButton immediate="true" process="@this" value="返回" icon="ui-icon-cancel" onclick="PF('zkbPartOrderReturnModifyDlg').hide()"/>
-            <p:dataTable id="zkbPoReturnModifyList" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModifyList}" var="item"
-                         widgetVar="zkbPoReturnModifyList" selectionMode="single"  selection="#{zkbPartOrderAuditController.zkbPartOrderReturnModify}"
-                         lazy="false" paginator="true" rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.returnDate}"
-                         paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                <p:ajax event="rowSelect" update="editReturnButton :zkbModifyForm"/>
+            <p:fieldset rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts'}" style="margin-top: 5px;">
+                <p:dataTable id="zkbPoReturnModifyList" value="#{zkbPartOrderAuditController.zkbPartOrderReturnModifyList}" var="item"
+                             widgetVar="zkbPoReturnModifyList" selectionMode="single"  selection="#{zkbPartOrderAuditController.zkbPartOrderReturnModify}"
+                             lazy="false" paginator="true" rowKey="#{item.waybillNo}" sortMode="single" sortOrder="ascending" sortBy="#{item.returnDate}"
+                             paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                    <p:ajax event="rowSelect" update="editReturnModifyButton deleteReturnModifyButton"/>
 
-                <p:column headerText="运单号">
-                    <h:outputText value="#{item.waybillNo}"/>
-                </p:column>
-                <p:column headerText="归还日期">
-                    <h:outputText value="#{item.returnDate}">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-                    </h:outputText>
-                </p:column>
-                <p:column headerText="配件号">
-                    <h:outputText value="#{item.partNo}"/>
-                </p:column>
-                <p:column headerText="归还类型">
-                    <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnType',item.returnType)}"/>
-                </p:column>
-                <p:column headerText="Part Serial Number">
-                    <h:outputText value="#{item.partSerialNumber}"/>
-                </p:column>
-                <p:column headerText="故障描述" >
-                    <h:outputText value="#{item.partQualityIssue}"/>
-                </p:column>
-                <p:column headerText="归还数量">
-                    <h:outputText value="#{item.qty}"/>
-                </p:column>
-                <p:column headerText="备注">
-                    <h:outputText value="#{item.remark}"/>
-                </p:column>
-                <f:facet name="{Toolbar}">
-                    <p:commandButton immediate="false" process="@this" id="editReturnButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbPartOrderAuditController.prepareReturnEdit}" update=":growl :zkbPartOrderReturnModifyEditDlg"  oncomplete="PF('zkbPartOrderReturnModifyEditDlg').show()"  disabled="#{empty zkbPartOrderAuditController.zkbPartOrderReturnModify }" rendered="#{zkbPartOrderAuditController.selected.currentStep eq 'ReturnPending' and zkbPartOrderAuditController.canEditFlag }"/>
-                </f:facet>
-            </p:dataTable>
+                    <p:column headerText="运单号">
+                        <h:outputText value="#{item.waybillNo}"/>
+                    </p:column>
+                    <p:column headerText="归还日期">
+                        <h:outputText value="#{item.returnDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="配件号">
+                        <h:outputText value="#{item.partNo}"/>
+                    </p:column>
+                    <p:column headerText="归还类型">
+                        <h:outputText value="#{fieldMsg.fieldValue('zkbPoReturnType',item.returnType)}"/>
+                    </p:column>
+                    <p:column headerText="Part Serial Number">
+                        <h:outputText value="#{item.partSerialNumber}"/>
+                    </p:column>
+                    <p:column headerText="故障描述" >
+                        <h:outputText value="#{item.partQualityIssue}"/>
+                    </p:column>
+                    <p:column headerText="归还数量">
+                        <h:outputText value="#{item.qty}"/>
+                    </p:column>
+                    <p:column headerText="备注">
+                        <h:outputText value="#{item.remark}"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton immediate="false" process="@this" id="createReturnModifyButton" icon="ui-icon-plus" validateClient="false" title="#{msg.Create}" actionListener="#{zkbPartOrderAuditController.prepareReturnModifyCreate}" update=":growl :zkbPartOrderReturnModifyDlg" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" />
+                        <p:commandButton immediate="false" process="@this" id="editReturnModifyButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbPartOrderAuditController.prepareReturnModifyEdit}" update=":growl :zkbPartOrderReturnModifyDlg"  oncomplete="PF('zkbPartOrderReturnModifyDlg').show()"  disabled="#{empty zkbPartOrderAuditController.zkbPartOrderReturnModify }"/>
+                        <p:commandButton immediate="false" process="@this"  id="deleteReturnModifyButton" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbPartOrderAuditController.deleteReturnModify}" update=":growl :zkbPartOrderReturnModifyForm:zkbPoReturnModifyList" disabled="#{empty zkbPartOrderAuditController.zkbPartOrderReturnModify}" >
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </p:fieldset>
+            <p:fieldset rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}" style="margin-top: 5px;">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Probe'}">
+                    <h:panelGroup>
+                        <label class="label">归还类型*</label>
+                        <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.returnType}"  required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" >
+                            <p:ajax event="change" update="psGroup pqGroup" />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{zkbPartOrderAuditController.returnTypeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup id="psGroup" style="text-align: left">
+                        <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA')}" style="text-align: left">
+                            <label class="label">Part Serial Number*</label>
+                            <p:inputText value="#{zkbPartOrderAuditController.selected.partSerialNumber}" style="text-align: left" required="true" requiredMessage="Part Serial Number不能为空" />
+                        </h:panelGroup>
+                    </h:panelGroup>
+                    <h:panelGroup id="pqGroup" style="text-align: left">
+                        <h:panelGroup rendered="#{(zkbPartOrderAuditController.selected.returnType eq 'DOA')}" style="text-align: left">
+                            <label class="label">故障描述*</label>
+                            <p:selectOneMenu  value="#{zkbPartOrderAuditController.selected.partQualityIssue}" required="true" requiredMessage="故障描述不能为空" style="text-align: left" >
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="Boot Up Issue" itemValue="Boot Up Issue"/>
+                                <f:selectItem itemLabel="Cosmetic Issue" itemValue="Cosmetic Issue"/>
+                                <f:selectItem itemLabel="Disassembled" itemValue="Disassembled"/>
+                                <f:selectItem itemLabel="Function Does Not Work" itemValue="Function Does Not Work"/>
+                                <f:selectItem itemLabel="Image Quality Issue" itemValue="Image Quality Issue"/>
+                                <f:selectItem itemLabel="Missing/Swapped Component" itemValue="Missing/Swapped Component"/>
+                                <f:selectItem itemLabel="Other" itemValue="Other"/>
+                                <f:selectItem itemLabel="Physical Damage" itemValue="Physical Damage"/>
+                                <f:selectItem itemLabel="Used/Dirty" itemValue="Used/Dirty"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="false">
+                        <label class="label">归还数量*</label>
+                        <p:inputText id="returnQty" value="#{zkbPartOrderAuditController.selected.returnQty}"  required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">运单号*</label>
+                        <p:inputText  value="#{zkbPartOrderAuditController.selected.waybillNo}" required="true" requiredMessage="#{msg.zkbPartOrder_waybillNo} #{msg.ValidationRequire}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">归还日期*</label>
+                        <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.returnDate}" showOn="button" Input="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">新探头SN编号*</label>
+                        <p:inputText id="newCatSn" value="#{zkbPartOrderAuditController.selected.newCatSn}"  required="true" requiredMessage="新探头SN编号 #{msg.ValidationRequire}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">归还备注</label>
+                        <p:inputTextarea id="returnRemark" value="#{zkbPartOrderAuditController.selected.returnRemark}"  rows="2" cols="20" >
+                        </p:inputTextarea>
+                    </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
         </h:form>
 
         <h:form id="zkbModifyForm">
