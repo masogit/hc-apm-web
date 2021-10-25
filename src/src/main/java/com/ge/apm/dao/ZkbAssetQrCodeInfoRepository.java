@@ -1,7 +1,9 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ZkbAssetQrCodeInfo;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 
 import java.util.Date;
@@ -32,4 +34,9 @@ public interface ZkbAssetQrCodeInfoRepository extends GenericRepositoryUUID<ZkbA
 
     @Query(value = "SELECT COUNT(bo_uuid) AS qr_code_count FROM v2_blob_object WHERE bo_sub_type = '1' AND bo_uuid =?1 GROUP BY bo_uuid", nativeQuery = true)
     Integer findAttachedCount(String assetUID);
+
+    @Transactional
+    @Modifying
+    @Query(value = "delete from zkb_asset_qr_code_info qr where qr.can_not_past_qr_code is null or qr.system_id not in(select ai.system_id from asset_info ai where qr.system_id=ai.system_id)", nativeQuery = true)
+    void deleteZkbAssetQrCodeInfo();
 }
