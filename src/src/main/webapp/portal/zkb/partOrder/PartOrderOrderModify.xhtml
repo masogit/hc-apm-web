@@ -55,15 +55,15 @@
                     <c:choose>
                         <c:when test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
                             <p:column headerText="配件号">
-                                <p:inputText value="#{item.partNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                                <p:inputText value="#{item.partNo}" />
                             </p:column>
                             <p:column headerText="实际配件号*">
-                                <p:inputText value="#{item.actualPartNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                                <p:inputText value="#{item.actualPartNo}" />
                             </p:column>
                         </c:when>
                         <c:when test="#{zkbPartOrderAuditController.orderType eq 'Tool'}">
                             <p:column headerText="工具号">
-                                <p:inputText value="#{item.partNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
+                                <p:inputText value="#{item.partNo}" />
                             </p:column>
                         </c:when>
                     </c:choose>
@@ -77,7 +77,7 @@
                         <h:outputText value="#{item.partQty}"/>
                     </p:column>
                     <p:column headerText="配件SN(序列号)">
-                        <h:outputText value="#{item.serialNumber}"/>
+                        <h:inputText value="#{item.serialNumber}"/>
                     </p:column>
                     <p:column headerText="Order#*">
                         <p:inputText value="#{item.orderNo}" />
