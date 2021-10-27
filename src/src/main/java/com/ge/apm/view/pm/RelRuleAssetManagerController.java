@@ -164,6 +164,12 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 				if(relRuleAsset.getRuleUID() != null) {
 					ruleUids.add(relRuleAsset.getRuleUID());
 				}
+                if(relRuleAsset.getRuleUIDInspection() != null) {
+                    ruleUids.add(relRuleAsset.getRuleUIDInspection());
+                }
+                if(relRuleAsset.getRuleUID4() != null) {
+                    ruleUids.add(relRuleAsset.getRuleUID4());
+                }
 				
 			}
 			if(CollectionUtils.isNotEmpty(assetUids)){

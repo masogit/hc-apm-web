@@ -10,6 +10,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.SupplierService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
 import com.ge.apm.service.uaa.UaaService;
@@ -72,7 +73,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     private String ruleUid;
     //private SupplierRepository supplierDao;
     private SupplierService supplierService;
-
+    private ConfigService configService;
     private TenantInfo selectedTenant;
     private OrgInfo selectedUserOrg;
     private OrgInfo selectedOrg;
@@ -93,6 +94,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         brandRepository = WebUtil.getBean(BrandRepository.class);
+        configService = WebUtil.getBean(ConfigService.class);
         targetAssets = new ArrayList<>();
         queryAsset = new QueryAsset();
         queryAsset.setTenantUID(user.getTenantUID());
@@ -108,6 +110,12 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
         //initTree(user.getTenantUID());
         initOrgTree();
+    }
+
+    public boolean getPmRule(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        return workflowConfig != null && workflowConfig.getPmRule();
     }
 
     public void initOrgTree() {
@@ -419,11 +427,14 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
                 }
                 if (level != null) {
                     if (level == 1) {
+                        rel.setRuleUIDInspection(pmOrderRule.getUid());
                         rel.setRuleUID1(pmOrderRule.getUid());
                     } else if (level == 2) {
                         rel.setRuleUID2(pmOrderRule.getUid());
                     } else if (level == 3) {
                         rel.setRuleUID(pmOrderRule.getUid());
+                    }else if (level == 4) {
+                        rel.setRuleUID4(pmOrderRule.getUid());
                     }
                     rels.add(rel);
                 }
