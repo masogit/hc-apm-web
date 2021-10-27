@@ -117,7 +117,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
     public boolean getPmRule(){
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
-        return workflowConfig != null && workflowConfig.getPmRule();
+        return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
     }
 
 	public void initOrgTree() {

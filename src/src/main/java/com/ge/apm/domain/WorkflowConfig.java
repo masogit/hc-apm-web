@@ -133,8 +133,8 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "pm_simplify")
     private Boolean pmSimplify; // 简化保养
 
-    @Column(name = "pm_rule")
-    private Boolean pmRule; // 是否启用四级规则
+    @Column(name = "pm_rule_level_four")
+    private Boolean pmRuleLevelFour ; // 是否启用四级规则
 
     @Column(name = "is_pm_take_order_enabled")
     private Boolean isPmTakeOrderEnabled; //是否允许抢单
@@ -314,12 +314,12 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "other_clinical_dept_head_weight")
     private Integer otherClinicalDeptHeadWeight = 1;//院区下的其他科室主任
 
-    public Boolean getPmRule() {
-        return pmRule;
+    public Boolean getPmRuleLevelFour() {
+        return pmRuleLevelFour == null ? false : pmRuleLevelFour;
     }
 
-    public void setPmRule(Boolean pmRule) {
-        this.pmRule = pmRule;
+    public void setPmRuleLevelFour(Boolean pmRuleLevelFour) {
+        this.pmRuleLevelFour = pmRuleLevelFour;
     }
 
     public Integer getClinicalDeptHeadWeight() {
