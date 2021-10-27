@@ -168,6 +168,11 @@ public class WorkOrderExportService {
         }
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
+            if(visableMvsAssetSystemIds.contains(workOrderExportPojo.getId())) {
+                workOrderExportPojo.setMVSWorkOrder(true);
+            } else {
+                workOrderExportPojo.setMVSWorkOrder(false);
+            }
             boolean isReturn = true;
             if(isReturn && filterMap.get("srNum")!=null && filterMap.get("srNum").length()>0) {   //报修单号
                 if(workOrderExportPojo.getSrNum()!=null) {
@@ -257,6 +262,7 @@ public class WorkOrderExportService {
                 workOrderMap.put(WebUtil.getMessage("CurrentStep_xlsx"), currentStepId != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, currentStepId.toString()) : "");
             }
 
+            workOrderMap.put("是否MVS工单",workOrderExportPojo.getMVSWorkOrder()? "是" : "否");
             workOrderMap.put(WebUtil.getMessage("requestorId"), workOrderExportPojo.getRequestorName());
             workOrderMap.put(WebUtil.getMessage("RequestTime_xlsx"), formatDate(workOrderExportPojo.getRequestTime()));
             workOrderMap.put(WebUtil.getMessage("FaultDescription_xlsx"), workOrderExportPojo.getRequestReason());
