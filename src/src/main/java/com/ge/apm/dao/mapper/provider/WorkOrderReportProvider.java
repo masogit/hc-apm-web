@@ -1,6 +1,5 @@
 package com.ge.apm.dao.mapper.provider;
 
-import com.ge.apm.service.wo.WorkOrderExportService;
 import webapp.framework.dao.SearchFilter;
 
 import java.util.List;
@@ -324,6 +323,8 @@ public class WorkOrderReportProvider {
 
         String filter = buildFilter(searchFilterList);
         sb.append(filter);
+        String filterMVS = buildFilterForMVS(searchFilterList);
+        if(filterMVS!=null) sb.append(filterMVS);
         sb.append(" order by wo.created_date desc ");
 
         return sb.toString();
@@ -389,6 +390,79 @@ public class WorkOrderReportProvider {
 
         }
 
+        return sb.toString();
+
+    }
+
+    public String buildFilterForMVS(List<SearchFilter> searchFilterList){
+
+        StringBuilder sb = new StringBuilder();
+        for (SearchFilter searchFilter1 : searchFilterList) {
+            String tempColumn1 = searchFilter1.fieldName;
+            Object value1 = searchFilter1.value;
+            if(tempColumn1.equals("woIds")) {
+                String str1 = "";
+                List<Object> valueList = (List<Object>) value1;
+                if(valueList.size()==0) return null;
+                for (Object obj : (List<Object>) value1) {
+                    str1 += "'" + obj + "',";
+                }
+                str1 = str1.substring(0, str1.length() - 1);
+                sb.append(" or ( wo.id in (" + str1 + ") ");
+
+                //页面原有的条件
+                for (SearchFilter searchFilter : searchFilterList) {
+                    String tempColumn = searchFilter.fieldName;
+                    Object value = searchFilter.value;
+                    SearchFilter.Operator op = searchFilter.operator;
+                    if(tempColumn.equals("orgUID")){
+                        sb.append(" and (wo.tenant_uid='" + value + "' or wo.institution_uid='" + value + "' or wo.hospital_uid='" + value + "' or wo.site_uid='" + value + "') ");
+                    }else if(tempColumn.equals("assetInfo.clinicalDeptUID")){
+                        String str = "";
+                        for (Object obj : (List<Object>)value) {
+                            str += "'" + obj + "',";
+                        }
+                        str = str.substring(0, str.length() - 1);
+                        sb.append(" and ai.clinical_dept_uid in (" + str + ") ");
+                    }else if(tempColumn.equals("currentPersonId")){
+                        sb.append(" and wo.current_person_id=" + value);
+                    }else if(tempColumn.equals("createdDate")){
+                        if(op.equals(SearchFilter.Operator.GTE)){
+                            sb.append(" and wo.created_date>='" + value + "' ");
+                        }else if (op.equals(SearchFilter.Operator.LT)) {
+                            sb.append(" and wo.created_date<'" + value + "' ");
+                        }
+                    }else if(tempColumn.equals("closeTime")){
+                        if(op.equals(SearchFilter.Operator.GTE)){
+                            sb.append(" and wo.close_time>='" + value + "' ");
+                        }else if (op.equals(SearchFilter.Operator.LT)){
+                            sb.append(" and wo.close_time<'" + value + "' ");
+                        }
+                    }else if(tempColumn.equals("status")){
+                        String str = "";
+                        for (Object obj : (List<Object>)value) {
+                            str += obj + ",";
+                        }
+                        str = str.substring(0, str.length() - 1);
+                        sb.append(" and wo.status in (" + str + ") ");
+                    }else if(tempColumn.equals("filterParts")){
+                        if(FILTERPARTS_EXIST.equals(value)){
+                            sb.append(" and (select count(*) from v2_work_order_detail wod where wod.wo_id=wo.id) > 0 ");
+                        }else if(FILTERPARTS_UNEXIST.equals(value)){
+                            sb.append(" and (select count(*) from v2_work_order_detail wod where wod.wo_id=wo.id) <= 0 ");
+                        }
+                    }else if(tempColumn.equals("filterTotalPrice")){
+                        if(FILTERTOTALPRICE_EXIST.equals(value)){
+                            sb.append(" and wo.total_price > 0 ");
+                        }else if(FILTERTOTALPRICE_UNEXIST.equals(value)){
+                            sb.append(" and wo.total_price <= 0 ");
+                        }
+                    }
+
+                }
+                sb.append(" ) ");
+            }
+        }
         return sb.toString();
 
     }
