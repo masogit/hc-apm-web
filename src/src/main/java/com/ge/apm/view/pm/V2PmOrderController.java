@@ -661,7 +661,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public boolean getPmRule(){
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
-        return workflowConfig != null && workflowConfig.getPmRule();
+        return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
     }
 
     public String getRuleLevelName(Integer ruleLevel){
@@ -773,6 +773,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
              result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 3);
              if(result){
                  WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel3WorkOrdersInBatches"));
+                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
+                 return result;
+             }
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 4);
+             if(result){
+                 WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel4WorkOrdersInBatches"));
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
                  return result;
              }

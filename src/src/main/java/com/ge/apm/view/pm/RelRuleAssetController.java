@@ -115,7 +115,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     public boolean getPmRule(){
         UserAccount userAccount = UserContextService.getCurrentUserAccount();
         WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
-        return workflowConfig != null && workflowConfig.getPmRule();
+        return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
     }
 
     public void initOrgTree() {

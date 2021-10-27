@@ -2730,6 +2730,7 @@
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'MustProvideReason', '审核不通过原因必须填写', 'Must provide the reason for approval failure', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CantOperateWorkorderUnderApproval', '审核中的工单,无法操作', 'Unable to operate the workorder under approval', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CanTLevel3WorkOrdersInBatches', '3级保养工单不能批量完成', 'Cannot complete the level 3 maintenance work orders in batches', NULL, '-1');
+    INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CanTLevel4WorkOrdersInBatches', '质量控制保养工单不能批量完成', 'Cannot complete the level 3 maintenance work orders in batches', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'CantRessignApprovalBatch', '审核中的工单，无法批量转单', 'Unable to reassign the workorders under approval in batches', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'FailedToGenerateTheMaintenanceReport', '保养报告生成失败', 'Failed to generate the maintenance report', NULL, '-1');
     INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'DeactivatedCantRepair', '所选设备停用，不能保养', 'The selected equipment is deactivated and cannot be maintained', NULL, '-1');
