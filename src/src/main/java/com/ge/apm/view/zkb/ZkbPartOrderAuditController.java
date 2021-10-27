@@ -1336,7 +1336,7 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
         }
         zkbPartOrderService.saveOrderModify(selected,currentUser,modifyType);
         selected = zkbPartOrderRepository.findById(selected.getId());
-        return "AuditStep?faces-redirect=true&str="+WebUtil.getRequestParameter("str");
+        return "AuditStep?faces-redirect=true&str="+str;
     }
 
     public String closeOrderModify(){
