@@ -472,7 +472,7 @@ public class WorkOrderReportProvider {
                     Object value = searchFilter.value;
                     SearchFilter.Operator op = searchFilter.operator;
                     if(tempColumn.equals("orgUID")){
-                        sb.append(" and (wo.tenant_uid='" + value + "' or wo.institution_uid='" + value + "' or wo.hospital_uid='" + value + "' or wo.site_uid='" + value + "') ");
+                        sb.append(" and (ai.tenant_uid='" + value + "' or ai.institution_uid='" + value + "' or ai.hospital_uid='" + value + "' or ai.site_uid='" + value + "') ");
                     }else if(tempColumn.equals("assetInfo.clinicalDeptUID")){
                         String str = "";
                         for (Object obj : (List<Object>)value) {
