@@ -3,11 +3,14 @@ package com.ge.apm.service.wo;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.WorkOrderReportMapper;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.WorkOrderExportPojo;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.orginfo.OrgInfoTreeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -71,6 +74,26 @@ public class WorkOrderExportService {
     private OrgInfoTreeService orgInfoTreeService;
     @Autowired
     private WorkOrderReportMapper worDao;
+    @Autowired
+    private AssetInfoMapper assetInfoMapper;
+    @Autowired
+    private UaaService uaaService;
+    @Autowired
+    private TenantInfoRepository tenantDao;
+
+
+    List<String> getVisableMvsAssetSystemId(){
+        List<String> result = new ArrayList<>();
+        Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
+        if(tenantInfo.isPresent()) {
+            String tenantUid = tenantInfo.get().getUid();
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            result = assetInfoMapper.getMvsWorkOrders(orgUidList,tenantUid);
+        }
+        return result;
+    }
+
 
     public List<Map<String, Object>> createWorkOrderData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList,OrgInfo clinicalDept,UserAccount currentOwner, List<OrgInfo> clinicalDeptList, String filterParts, String filterTotalPrice,Map<String,String> filterMap,String currentStep){
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -139,7 +162,10 @@ public class WorkOrderExportService {
         if(filterTotalPrice != null){
             searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
         }
-
+        List<String> visableMvsAssetSystemIds = getVisableMvsAssetSystemId();
+        if(visableMvsAssetSystemIds.size()>0) {
+            searchFilters.add(new SearchFilter("woIds", SearchFilter.Operator.IN, visableMvsAssetSystemIds));
+        }
         List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
             boolean isReturn = true;

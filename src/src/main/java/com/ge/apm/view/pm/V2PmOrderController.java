@@ -6,6 +6,7 @@
 package com.ge.apm.view.pm;
 
 import com.alibaba.fastjson.JSONPath;
+import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.exception.BusinessException;
@@ -53,10 +54,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.ToggleEvent;
+import org.primefaces.event.*;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.slf4j.LoggerFactory;
@@ -69,6 +67,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -155,6 +154,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private AssetInfoMgrService aimService;
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private V2_PmOrderRepository dao;
+    private AssetInfoMapper assetInfoMapper;
     @Getter @Setter
     private Double totalManHours;
     @Getter @Setter
@@ -232,7 +232,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String queryAssetUid;
     private ConfigService configService;
     private SimplePartsConfigService partsConfigService;
-
+    //tab Title
+    @Getter
+    private String tabTitle;
     private String plannedCompletionTimeFormat = null;
     private String actualCompletionTimeFormat = null;
     @Setter@Getter
@@ -1373,6 +1375,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
         unstructuredDataDao = WebUtil.getBean(UnstructuredDataRepository.class);
         pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
+        assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
         pmckLstDao = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         reportDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
@@ -1651,7 +1654,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             Sort sort= returnSort(pageRequest);
 
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-            Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
+            if("MVS保养".equals(tabTitle)){
+                List<SearchFilter> filters = buildMvsSearchFilter();
+                result  = dao.findBySearchFilter(filters, pageRequest);
+            }else{
+                result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            }
+//            Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPagePmOrders = result.getContent();
             result.getContent().forEach(item->pmIdList.add(item.getId()));
             return result;
@@ -1684,7 +1693,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
             Sort sort = new Sort(orders);
             pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-            Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            if("MVS保养".equals(tabTitle)){
+                List<SearchFilter> filters = buildMvsSearchFilter();
+                result  = dao.findBySearchFilter(filters, pageRequest);
+            }else{
+                result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            }
+//            Page<V2_PmOrder> result = dao.findBySearchFilter(this.searchFilters, pageRequest);
            // result.getContent().forEach(item->pmIdList.add(item.getId()));
             currentPagePmOrders = result.getContent();
             return result;
@@ -1786,7 +1801,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.selected = null;
         Sort sort = returnSort(pageRequest);
         pageRequest = new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
-        result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        //查询Mvs保养
+        if("MVS保养".equals(tabTitle)){
+            List<SearchFilter> filters = buildMvsSearchFilter();
+            result = dao.findBySearchFilter(filters, pageRequest);
+        }else{
+            result = dao.findBySearchFilter(this.searchFilters, pageRequest);
+        }
         currentPagePmOrders = result.getContent();
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
         if(queryIndex==20 || queryIndex== 8){
@@ -1798,6 +1819,41 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         return result;
     }
+
+    public List<SearchFilter> buildMvsSearchFilter(){
+        List<SearchFilter> filters = new ArrayList<>();
+
+        List<String> orderIds = getVisableMvsAssetSystemId();
+        filters.add(new SearchFilter("id",SearchFilter.Operator.IN,orderIds));
+
+        for (SearchFilter searchFilter :searchFilters) {
+            if ("currentStepId,isFinished,dispatchMode,approvalStatus,currentStepName".contains(searchFilter.fieldName)) {
+                filters.add(searchFilter);
+            }
+        }
+
+        return filters;
+    }
+
+    List<String> getVisableMvsAssetSystemId(){
+        TenantInfoRepository tenantDao=WebUtil.getBean(TenantInfoRepository.class);
+        Optional<TenantInfo> tenantInfo = tenantDao.findFirstByName(ApmConstant.MVS_TENANT_NAME);
+        String tenantUid = tenantInfo.get().getUid();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        return assetInfoMapper.getMvsPmOrders(orgUidList,tenantUid);
+    }
+
+    //tab切换
+    public void onTabChange(TabChangeEvent event) {
+        FacesMessage msg = new FacesMessage("activeTab", event.getTab().getTitle());
+        tabTitle = msg.getDetail();
+        /*if("MVS工单".equals(tabTitle)){
+        }*/
+//        queryIndex = -1;
+        selected = null;
+    }
+
 
     protected Sort returnSort(PageRequest pageRequest){
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
