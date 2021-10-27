@@ -4,7 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:composition>
 
@@ -67,7 +68,7 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.period}</label>
-                            <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="1" maxValue="120" decimalPlaces="0" 
+                            <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="1" maxValue="120" decimalPlaces="0"
                             required="false" requiredMessage="#{msg.OutOfRange}"  />
                            <!--  <p:inputText id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/> -->
                         </h:panelGroup>
@@ -79,11 +80,16 @@
                             <label class ="label">#{msg.ruleLevel}*</label>
                             <p:selectOneMenu value="#{pmOrderRuleController.selected.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <c:if test="#{pmOrderRuleController.getPmRule()}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </c:if>
+                                <c:if test="#{!pmOrderRuleController.getPmRule()}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </c:if>
                             </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>
-                    
+
                      <p:panelGrid id="report" columns="1"  styleClass="ui-panelgrid-blank form-group" layout="grid" >
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
@@ -96,7 +102,7 @@
 	                        &nbsp;&nbsp;
 	                   <p:commandButton rendered="#{not empty pmOrderRuleController.selected.safetyReport}"  immediate="true" value="#{msg.preview}" onclick="preparePreview(1,'PmOrderRuleApproveForm');" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                        </h:panelGroup>
-                       
+
                        <h:panelGroup>
 	                		<label class ="label">#{msg.performanceReport}</label>
 	                     <p:selectOneMenu  value="#{pmOrderRuleController.selected.performanceReport}"  >
@@ -120,7 +126,7 @@
                              <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="${msg.Delete}" update=":PmOrderRuleApproveForm:importReportTemplate :uploadApproveDialogForm :growl" process="@this" actionListener="#{pmOrderRuleController.removeReportTemplate}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}"/>
                          </h:panelGroup>
                      </h:panelGroup>
-                       
+
                    </p:panelGrid>
 
                     &nbsp;&nbsp;
@@ -128,7 +134,7 @@
                         <p:selectManyCheckbox id="grid2" value="#{pmOrderRuleController.ids}" layout="pageDirection" columns="1"   styleClass="checkboxGroup"
                         rendered="#{pmOrderRuleController.getSelectedIds() != null}">
                             <f:selectItems value="#{pmOrderRuleController.getAllItems()}" var="i"  itemLabel="#{i.name}(#{i.period}月)"  itemValue="#{i.id}"  />
-                        </p:selectManyCheckbox>	
+                        </p:selectManyCheckbox>
                     </p:scrollPanel>-->
 
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -159,8 +165,8 @@
                         </h:panelGroup>
                     </p:panelGrid>
 					<br/>
-                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}" 
-                    update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" 
+                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}"
+                    update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check"
                     oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');"/>
                     &nbsp;&nbsp;
                    <!--  immediate="true"  -->
@@ -168,10 +174,10 @@
                       &nbsp;&nbsp;
                       <!-- and pmOrderRuleController.selected.id != null -->
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.approve()}" value="#{msg.Approval}" update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl"
-                    icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');" rendered="#{userContextService.hasRole('AssetHead') and pmOrderRuleController.selected.status != 1}"/> 
+                    icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');" rendered="#{userContextService.hasRole('AssetHead') and pmOrderRuleController.selected.status != 1}"/>
                 </h:panelGroup>
             </h:form>
-            
+
         </p:dialog>
         <ui:include src="ItemApprove.xhtml"/>
         <p:dialog id="uploadApproveDialog" widgetVar="uploadApproveDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.UploadTemplateFile}">
