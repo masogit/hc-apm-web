@@ -99,12 +99,7 @@
                             </c:if>
                         </p:selectOneMenu>
                     </f:facet>
-                    <c:if test="#{v2PmOrderController.getPmRule()}">
                         <h:outputText value="#{fieldMsg.fieldValue('ruleLevelFour',item.ruleLevel)}"/>
-                    </c:if>
-                    <c:if test="#{!v2PmOrderController.getPmRule()}">
-                        <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',item.ruleLevel)}"/>
-                    </c:if>
                 </p:column>
 
                         <p:column headerText="#{msg.MaintenanceType}"  sortBy="#{item.pmType}" filterBy="#{item.pmType}" filterMatchMode="EQ">
