@@ -64,6 +64,9 @@
                     <p:column headerText="#{msg.AssetName}"  filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getAssetName(item.assetUID)}"/>
                     </p:column>
+                    <p:column headerText="#{msg.Level1RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE">
+                        <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUIDInspection)}"/>
+                    </p:column>
                     <p:column headerText="#{msg.Level2RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE">
                     		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID2)}"/>
                     		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',relRuleAssetManagerController.getRuleName(item.ruleUID2))}"/> -->
@@ -71,6 +74,9 @@
                     <p:column headerText="#{msg.Level3RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE">
                     		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID)}"/>
                     		<!-- <h:outputText value="#{fieldMsg.fieldValue('ruleLevel',relRuleAssetManagerController.getRuleName(item.ruleUID))}"/> -->
+                    </p:column>
+                    <p:column headerText="#{msg.Level4RulePM}" sortBy="" filterBy="" filterMatchMode="LIKE">
+                    		<h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID4)}"/>
                     </p:column>
                     <p:column headerText="#{msg.departNum}"  filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getDepartNum(item.assetUID)}"/>
