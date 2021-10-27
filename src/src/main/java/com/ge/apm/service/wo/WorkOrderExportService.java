@@ -163,10 +163,11 @@ public class WorkOrderExportService {
             searchFilters.add(new SearchFilter("filterTotalPrice", SearchFilter.Operator.EQ, filterTotalPrice));
         }
         List<String> visableMvsAssetSystemIds = getVisableMvsAssetSystemId();
+        List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
         if(visableMvsAssetSystemIds.size()>0) {
             searchFilters.add(new SearchFilter("woIds", SearchFilter.Operator.IN, visableMvsAssetSystemIds));
+            workOrderList.addAll(worDao.workOrderExportForMVS(searchFilters));
         }
-        List<WorkOrderExportPojo> workOrderList = worDao.workOrderExport(searchFilters);
         workOrderList = workOrderList.stream().filter(workOrderExportPojo -> {
             if(visableMvsAssetSystemIds.contains(workOrderExportPojo.getId())) {
                 workOrderExportPojo.setMVSWorkOrder(true);
