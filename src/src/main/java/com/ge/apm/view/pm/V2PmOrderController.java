@@ -1885,7 +1885,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //        queryIndex = -1;
         selected = null;
     }
-
+    public void updateQueryIndex(int query){
+        queryIndex = query;
+        selected = null;
+    }
 
     protected Sort returnSort(PageRequest pageRequest){
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
