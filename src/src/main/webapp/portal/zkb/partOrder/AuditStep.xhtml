@@ -1,10 +1,10 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:c="http://java.sun.com/jsp/jstl/core"
-                template="/WEB-INF/template.xhtml">
+                                                                   xmlns:h="http://java.sun.com/jsf/html"
+                                                                   xmlns:f="http://java.sun.com/jsf/core"
+                                                                   xmlns:ui="http://java.sun.com/jsf/facelets"
+                                                                   xmlns:p="http://primefaces.org/ui"
+                                                                   xmlns:c="http://java.sun.com/jsp/jstl/core"
+                                                                   template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
         <div class="ui-g-12 card cardTitle">
@@ -551,7 +551,7 @@
                             <!--<p:commandLink immediate="false" process="@this" update="zkbPartOrderModifyDlg" style="text-decoration:underline;font-weight:bold;margin-left: 0px;font-size: x-large" action="#{zkbPartOrderAuditController.prepareModify('OrderExtraPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()"  >
                                 <h:outputText value="修改" />
                             </p:commandLink>-->
-                            <p:commandButton immediate="false" process="@this" value="修改" action="#{zkbPartOrderAuditController.prepareModify('OrderExtraPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" update=":zkbPartOrderModifyDlg" />
+                            <p:commandButton immediate="false" process="@this" value="开单信息修改" action="#{zkbPartOrderAuditController.prepareModify('OrderExtraPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" update=":zkbPartOrderModifyDlg" />
 
                         </h:panelGroup>
                     </p:panelGrid>
@@ -686,7 +686,7 @@
                             <!--<p:commandLink immediate="false" process="@this" update=":zkbPartOrderModifyDlg" style="text-decoration:underline;font-weight:bold;margin-left: 0px;font-size: x-large" action="#{zkbPartOrderAuditController.prepareModify('OrderPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" >
                                 <h:outputText value="修改" />
                             </p:commandLink>-->
-                            <p:commandButton immediate="false" process="@this" value="修改" action="#{zkbPartOrderAuditController.prepareModify('OrderPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" update=":zkbPartOrderModifyDlg" />
+                            <p:commandButton immediate="false" process="@this" value="下单信息修改" action="#{zkbPartOrderAuditController.prepareModify('OrderPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" update=":zkbPartOrderModifyDlg" />
                         </h:panelGroup>
                     </p:panelGrid>
 
@@ -980,7 +980,7 @@
                             <!--<p:commandLink immediate="false" process="@this" update="zkbPartOrderReturnModifyDlg" style="font-weight:bold;margin-left: 0px;font-size: x-large;text-decoration:underline" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" >
                                 <h:outputText value="修改" />
                             </p:commandLink>-->
-                            <p:commandButton immediate="false" process="@this" value="修改" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" update=":zkbPartOrderReturnModifyDlg" />
+                            <p:commandButton immediate="false" process="@this" value="归还信息修改" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" update=":zkbPartOrderReturnModifyDlg" />
                         </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
