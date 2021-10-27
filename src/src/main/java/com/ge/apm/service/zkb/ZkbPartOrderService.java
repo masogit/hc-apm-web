@@ -1736,6 +1736,8 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         //1.保存历史数据
         zkbPartOrderReturnHistoryRepository.save(zkbPartOrderReturnHistoryList);
 
+        zkbPartOrderReturnRepository.deleteByPartOrderId(zkbPartOrder.getId());
+
         //2.保存修改
         for(ZkbPartOrderReturn zkbPartOrderReturn : zkbPartOrderReturnModifyList){
             zkbPartOrderReturn.setDataStatus(ZkbPartOrderReturn.DataStatusEnum.Accept.toString());
