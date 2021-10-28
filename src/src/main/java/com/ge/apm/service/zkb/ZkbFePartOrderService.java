@@ -24,6 +24,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
@@ -113,6 +114,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     @Autowired
     private ZkbContractCatRepository zkbContractCatRepository;
 
+    @Autowired
+    ZkbFePartOrderModifyLogRepository zkbFePartOrderModifyLogRepository;
+
+    @Autowired
+    ZkbFePartOrderReturnLogRepository zkbFePartOrderReturnLogRepository;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -601,7 +607,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         this.zkbContractRepository.save(zkbContract);
         this.zkbContractQuotaLogService.saveData(zkbContract, null, zkbFePartOrder, opType, orderType, "zkbFePartOrder", userAccount, step);
     }
-
     /**
      * 移动备件名额
      *
@@ -663,7 +668,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         this.zkbContractRepository.save(zkbContract);
         this.zkbContractQuotaLogService.saveData(zkbContract, null, zkbFePartOrder, opType, orderType, "zkbFePartOrder", userAccount, step);
     }
-
     /**
      * 移动探头名额
      *
@@ -1042,6 +1046,25 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         boolean right = false;
         if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.Supplier.toString())) {
             right = true;
+        }
+        return right;
+    }
+
+    public boolean hasOrderModifyRight(String orderType,String currentStatus,Map<String, String> configTypeMap) {
+        boolean right = false;
+        if(orderType.equals(ZkbFePartOrder.OrderType.ManMade.toString())){
+            return right;
+        }
+        if(configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.GEAdmin.toString())){
+            right = true;
+        }else if(orderType.equals(ZkbFePartOrder.OrderType.SpareParts.toString())){
+            if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam.toString())) {
+                right = true;
+            }
+        }else if(orderType.equals(ZkbFePartOrder.OrderType.Probe.toString())){
+            if (configTypeMap.containsKey(ZkbFePartOrderUserConfig.ConfigTypeEnum.FourHundredsTeam_Probe.toString())) {
+                right = true;
+            }
         }
         return right;
     }
@@ -2235,4 +2258,93 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         return true;
     }
 
+    /**
+     * 下单信息修改
+     * @param zkbPartOrder
+     * @param userAccount
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void saveOrderModify(ZkbFePartOrder zkbPartOrder,UserAccount userAccount){
+        ZkbFePartOrder oldZkbPartOrder = zkbFePartOrderRepository.findById(zkbPartOrder.getId());
+
+        if (ZkbFePartOrder.OrderType.SpareParts.toString().equals(zkbPartOrder.getOrderType())){
+            List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = zkbFePartOrderAssetInfoRepository.findByFePartOrderId(zkbPartOrder.getId());
+            for(ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo : zkbFePartOrderAssetInfoList){
+                ZkbFePartOrderModifyLog zkbPartOrderModifyLog = new ZkbFePartOrderModifyLog();
+                zkbPartOrderModifyLog.setSrNo(oldZkbPartOrder.getSr());
+                zkbPartOrderModifyLog.setActivityNo(oldZkbPartOrder.getAct());
+                zkbPartOrderModifyLog.setPartOrderId(oldZkbPartOrder.getId());
+                zkbPartOrderModifyLog.setPartOrderItemId(zkbFePartOrderAssetInfo.getId());
+                zkbPartOrderModifyLog.setOrderNo(zkbFePartOrderAssetInfo.getOrderNo());
+                zkbPartOrderModifyLog.setActualPartNo(zkbFePartOrderAssetInfo.getAssetNo());
+                zkbPartOrderModifyLog.setPartName(zkbFePartOrderAssetInfo.getAssetDescription());
+                zkbPartOrderModifyLog.setPrice(zkbFePartOrderAssetInfo.getPrice());
+                zkbPartOrderModifyLog.setCreateUserDate(new Date());
+                zkbPartOrderModifyLog.setCreateUserUid(userAccount.getUid());
+                zkbPartOrderModifyLog.setCreateUserName(userAccount.getName());
+                zkbFePartOrderModifyLogRepository.save(zkbPartOrderModifyLog);
+            }
+        }else if(ZkbFePartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+            ZkbFePartOrderModifyLog zkbPartOrderModifyLog = new ZkbFePartOrderModifyLog();
+            zkbPartOrderModifyLog.setSrNo(oldZkbPartOrder.getSr());
+            zkbPartOrderModifyLog.setActivityNo(oldZkbPartOrder.getAct());
+            zkbPartOrderModifyLog.setOrderNo(oldZkbPartOrder.getOrderNo());
+            zkbPartOrderModifyLog.setPrice(oldZkbPartOrder.getPrice());
+            zkbPartOrderModifyLog.setPartOrderId(oldZkbPartOrder.getId());
+            zkbPartOrderModifyLog.setCreateUserDate(new Date());
+            zkbPartOrderModifyLog.setCreateUserUid(userAccount.getUid());
+            zkbPartOrderModifyLog.setCreateUserName(userAccount.getName());
+            zkbFePartOrderModifyLogRepository.save(zkbPartOrderModifyLog);
+        }else{
+            return ;
+        }
+        zkbFePartOrderRepository.save(zkbPartOrder);
+        zkbFePartOrderAssetInfoRepository.save(zkbPartOrder.getZkbFePartOrderAssetInfoList());
+    }
+
+    /**
+     * 已归还已完成工单信息修改
+     * @param zkbPartOrder
+     * @param userAccount
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void saveReturnModify(ZkbFePartOrder zkbPartOrder,UserAccount userAccount){
+        if (ZkbFePartOrder.OrderType.SpareParts.toString().equals(zkbPartOrder.getOrderType())){
+            List<ZkbFePartOrderReturn> ZkbFePartOrderReturnList = zkbPartOrder.getZkbFePartOrderReturnList();
+            for(ZkbFePartOrderReturn zkbFePartOrderReturn : ZkbFePartOrderReturnList){
+                ZkbFePartOrderReturn oldZkbFePartOrderReturn = zkbFePartOrderReturnRepository.findById(zkbFePartOrderReturn.getId());
+                if(oldZkbFePartOrderReturn == null){
+                    oldZkbFePartOrderReturn = zkbFePartOrderReturn;
+                }
+                ZkbFePartOrderReturnLog zkbFePartOrderReturnLog = new ZkbFePartOrderReturnLog();
+                zkbFePartOrderReturnLog.setAssetNo(oldZkbFePartOrderReturn.getAssetNo());
+                zkbFePartOrderReturnLog.setQty(oldZkbFePartOrderReturn.getQty());
+                zkbFePartOrderReturnLog.setPartOrderId(oldZkbFePartOrderReturn.getPartOrderId());
+                zkbFePartOrderReturnLog.setOrderNo(oldZkbFePartOrderReturn.getOrderNo());
+                zkbFePartOrderReturnLog.setReturnType(oldZkbFePartOrderReturn.getReturnType());
+                zkbFePartOrderReturnLog.setComment(oldZkbFePartOrderReturn.getComment());
+                zkbFePartOrderReturnLog.setCreateDate(new Date());
+                zkbFePartOrderReturnLog.setCreateUserId(userAccount.getUid());
+                zkbFePartOrderReturnLog.setCreateUserName(userAccount.getName());
+                zkbFePartOrderReturnLogRepository.save(zkbFePartOrderReturnLog);
+            }
+        }else if(ZkbFePartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
+            ZkbFePartOrder oldZkbPartOrder = zkbFePartOrderRepository.findById(zkbPartOrder.getId());
+            ZkbFePartOrderReturnLog zkbFePartOrderReturnLog = new ZkbFePartOrderReturnLog();
+            zkbFePartOrderReturnLog.setWaybillNo(zkbPartOrder.getWaybillNo());
+            zkbFePartOrderReturnLog.setReturnType(oldZkbPartOrder.getReturnType());
+            zkbFePartOrderReturnLog.setQty(oldZkbPartOrder.getQty());
+            zkbFePartOrderReturnLog.setOrderNo(oldZkbPartOrder.getOrderNo());
+            zkbFePartOrderReturnLog.setPartOrderId(oldZkbPartOrder.getId());
+            zkbFePartOrderReturnLog.setComment(oldZkbPartOrder.getGeAdminComment());
+            zkbFePartOrderReturnLog.setCreateDate(new Date());
+            zkbFePartOrderReturnLog.setCreateUserId(userAccount.getUid());
+            zkbFePartOrderReturnLog.setCreateUserName(userAccount.getName());
+            zkbFePartOrderReturnLogRepository.save(zkbFePartOrderReturnLog);
+        }else{
+            return ;
+        }
+        zkbFePartOrderRepository.save(zkbPartOrder);
+        zkbFePartOrderReturnRepository.save(zkbPartOrder.getZkbFePartOrderReturnList());
+    }
 }

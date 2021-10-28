@@ -171,7 +171,7 @@ public class ZkbAssetStatisticService {
     public void regenerateZkbAssetQrCodeInfo(List<SearchFilter> searchFilter){
         //先清除数据在重新生成
         zkbAssetQrCodeInfoRepository.deleteZkbAssetQrCodeInfo();
-        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = zkbAssetStatisticMapper.getZkbAssetQrCodeInfoList(searchFilter);
+        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = zkbAssetStatisticMapper.getZkbAssetQrCodeInfoList(null);
         if(zkbAssetQrCodeInfoList == null || zkbAssetQrCodeInfoList.size() == 0){
             WebUtil.addErrorMessage("没有新的二维码记录需要生成");
             return ;

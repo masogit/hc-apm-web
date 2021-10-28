@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition>
+    <p:dialog id="zkbPartOrderRetrunModifyDlg" widgetVar="zkbPartOrderRetrunModifyDlg" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还信息修改" width="70%" height="620">
+        <h:form id="zkbOrderRetrunModifyForm" style="height: 100%">
+            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{zkbFePartOrderDetailController.selected.orderType=='Probe'}">
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_returnType}*</label>
+                    <p:selectOneMenu  value="#{zkbFePartOrderProbeController.selected.returnType}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" >
+                        <p:ajax event="change" update="partSerialNumberGroup partQualityIssueGroup" />
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_airWayBillNo}*</label>
+                    <p:inputText  value="#{zkbFePartOrderProbeController.selected.waybillNo}" required="true" requiredMessage="#{msg.zkbPartOrder_waybillNo} #{msg.ValidationRequire}" />
+                </h:panelGroup>
+                <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='Probe'}">
+                    <label class="label">#{msg.zkbFePartOrder_orderNoa}*</label>
+                    <p:inputText value="#{zkbFePartOrderProbeController.selected.orderNo}"  required="true" requiredMessage="#{msg.zkbFePartOrder_orderNoa} #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='Probe'}">
+                    <label class="label">#{msg.zkbFePartOrder_assetPrice}*</label>
+                    <p:inputText value="#{zkbFePartOrderProbeController.selected.price}"  required="true" requiredMessage="#{msg.zkbFePartOrder_assetPrice} #{msg.ValidationRequire}"/>
+                </h:panelGroup>
+            </p:panelGrid>
+            <p:dataTable id="zkbFePartOrderReturnListModify" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderReturnList}" var="item"
+                         widgetVar="zkbFePartOrderReturnListModify" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn}"
+                         lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
+                         paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
+                <p:ajax event="rowSelect" update=":zkbOrderRetrunModifyForm:zkbFePartOrderReturnListModify:editReturnDetailButton2 :zkbOrderRetrunModifyForm:zkbFePartOrderReturnListModify:deleteReturnDetailButton2" />
+                <p:column headerText="#{msg.zkbFePartOrder_assetNo}">
+                    <h:outputText value="#{item.assetNo}"/>
+                </p:column>
+                <p:column headerText="#{msg.zkbFePartOrder_assetQty}">
+                    <h:outputText value="#{item.qty}"/>
+                </p:column>
+                <p:column headerText="#{msg.zkbFePartOrder_orderNoa}">
+                    <h:outputText value="#{item.orderNo}"/>
+                </p:column>
+                <p:column headerText="#{msg.zkbFePartOrder_returnType}">
+                    <h:outputText value="#{fieldMsg.fieldValue('zkbFePartOrder_zkbPoReturnType', item.returnType)}"/>
+                </p:column>
+                <p:column headerText="#{msg.zkbFePartOrder_returnDate}">
+                    <h:outputText value="#{item.returnDate}">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{msg.zkbFePartOrder_remark}">
+                    <h:outputText value="#{item.comment}"/>
+                </p:column>
+                <f:facet name="{Toolbar}">
+                    <p:commandButton immediate="false" process="@this" id="createReturnDetailButton2" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemCreate}"  update=":returnZkbFePartOrderAssetInfoEditForm zkbFePartOrderReturnListModify" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" />
+                    <p:commandButton immediate="false" process="@this" id="editReturnDetailButton2" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemEdit}" update=":returnZkbFePartOrderAssetInfoEditForm zkbFePartOrderReturnListModify"  oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()"/>
+                    <p:commandButton immediate="false" process="@this"  id="deleteReturnDetailButton2" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteReturnItem}" update=":returnZkbFePartOrderAssetInfoEditForm zkbFePartOrderReturnListModify">
+                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </f:facet>
+            </p:dataTable>
+
+            <p:commandButton validateClient="true" style="float: bottom" value="保存" action="#{zkbFePartOrderSparePartDetailController.saveReturnModify}" update=":growl :zkbFePartOrderSparePartsEditForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'zkbPartOrderRetrunModifyDlg');" rendered="#{zkbFePartOrderSparePartDetailController.selected.orderType=='SpareParts'}"/>
+            <p:commandButton validateClient="true" style="float: bottom" value="保存" action="#{zkbFePartOrderProbeController.saveReturnModify}" update=":growl :zkbFePartOrderProbeEditForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'zkbPartOrderRetrunModifyDlg');" rendered="#{zkbFePartOrderProbeController.selected.orderType=='Probe'}"/>
+            <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('zkbPartOrderRetrunModifyDlg').hide()"/>
+        </h:form>
+    </p:dialog>
+    
+</ui:composition>
+</html>
