@@ -720,7 +720,7 @@
                                 <p:spinner value="#{item.partQty}" min="0" max="#{item.prePartQty}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                             </p:column>
                         </c:if>
-                        <p:column headerText="配件SN(序列号)*">
+                        <p:column headerText="配件SN(序列号)">
                             <h:outputText value="#{item.serialNumber}"/>
                         </p:column>
                         <p:column headerText="Order#*">
