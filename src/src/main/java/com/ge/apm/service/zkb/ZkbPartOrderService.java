@@ -980,7 +980,10 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         }else if(oldStep.equals(ZkbPartOrderStep.PartOrderStep.ClosePending.toString())){
             if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
-                subReturnQty(zkbContract,zkbPartOrder, zkbPartOrder.getReturnQty(),userAccount);
+                if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(zkbPartOrder.getReturnType())
+                    && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(zkbPartOrder.getReturnType())) {
+                    subReturnQty(zkbContract,zkbPartOrder, zkbPartOrder.getReturnQty(),userAccount);
+                }
             }else if(ZkbPartOrder.OrderType.Parts.toString().equals(zkbPartOrder.getOrderType()) || ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
                 List<ZkbPartOrderReturn> zkbPartOrderReturns = zkbPartOrderReturnRepository.findByPartOrderId(zkbPartOrder.getId());
                 if(zkbPartOrderReturns != null && zkbPartOrderReturns.size() > 0){
@@ -1431,8 +1434,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                 }
             }
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())) {
-            if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(zkbPartOrder.getReturnType())
-                && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(zkbPartOrder.getReturnType())) {
+
                 if(StringUtils.isEmpty(zkbContract.getQuotaDeductType()) || ZkbContract.QuotaDeductTypeEnum.Old.toString().equals(zkbContract.getQuotaDeductType())) {
                     if(StringUtils.isEmpty(zkbPartOrder.getHighCatFlag()) || CopyByInvok.F.equals(zkbPartOrder.getHighCatFlag()) || CopyByInvok.FOUR_TO_ONE.equals(zkbPartOrder.getContractCatId())){
                         zkbContract.setProbeQuotaUse((zkbContract.getProbeQuotaUse() == null ? 0 : zkbContract.getProbeQuotaUse()) - qty);
@@ -1500,7 +1502,7 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                         }
                     }
                 }
-            }
+
         }else if(ZkbPartOrder.OrderType.Tool.toString().equals(zkbPartOrder.getOrderType())){
             if(ZkbContract.ContractType.CCS.toString().equals(zkbContract.getContractType())
                 || ZkbContract.ContractType.Biomed.toString().equals(zkbContract.getContractType())){
@@ -1758,7 +1760,9 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         zkbPartOrderReturnRepository.save(zkbPartOrderReturnModifyList);
 
         //3.名额修改
-        subReturnQty(zkbContract,zkbPartOrder,ce,currentUser);
+        if(ce != 0){
+            subReturnQty(zkbContract,zkbPartOrder,ce,currentUser);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -1766,18 +1770,19 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
         ZkbPartOrder oldZkbPartOrder = zkbPartOrderRepository.findById(zkbPartOrder.getId());
         int oldBackTotal = 0;
         if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(oldZkbPartOrder.getReturnType()) && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(oldZkbPartOrder.getReturnType())){
-            oldBackTotal = 1;
+            oldBackTotal = zkbPartOrder.getQty();
         }
         int nowBackTotal = 0;
         if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(zkbPartOrder.getReturnType()) && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(zkbPartOrder.getReturnType())){
-            nowBackTotal = 1;
+            nowBackTotal = zkbPartOrder.getQty();
         }
         int ce =  nowBackTotal - oldBackTotal;
         zkbPartOrderRepository.save(zkbPartOrder);
         //3.名额修改
         ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
-        subReturnQty(zkbContract,zkbPartOrder,ce,account);
-
+        if(ce != 0){
+            subReturnQty(zkbContract,zkbPartOrder,ce,account);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
