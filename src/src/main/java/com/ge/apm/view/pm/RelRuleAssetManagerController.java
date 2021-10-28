@@ -7,6 +7,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.RelRuleAssetService;
 import com.ge.apm.service.uaa.UaaService;
@@ -54,6 +55,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private List<RelRuleAsset> currentPageAssets;
 	@Getter @Setter
 	private StreamedContent excelFile;
+    private ConfigService configService;
 	
 	@Override
 	protected void init() {
@@ -66,6 +68,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		relRuleAssetService = WebUtil.getBean(RelRuleAssetService.class);
+        configService = WebUtil.getBean(ConfigService.class);
 		uaaService = WebUtil.getBean(UaaService.class);
 		assetMap = new HashMap<>();
 		ruleMap = new HashMap<>();
@@ -203,6 +206,11 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}
 		return null;
 	}
+    public boolean getPmRule(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
+    }
 
 	public AssetInfo getAssetInfo(String assetUid) {
 		return assetMap.get(assetUid);
