@@ -87,9 +87,21 @@
                         </p:column>
                 <p:column headerText="#{msg.functionType}" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE"> <h:outputText value="#{item.assetInfo.functionType}"/>
                 </p:column>
-                        <p:column headerText="#{msg.MeasurementGrade2}" sortBy="#{item.ruleLevel}" filterBy="#{item.ruleLevel}" filterMatchMode="EQ">
-                            <h:outputText value="#{item.ruleLevel}"/>
-                        </p:column>
+                <p:column headerText="#{msg.MeasurementGrade2}" sortBy="#{msg.ruleLevel}" filterBy="#{msg.ruleLevel}" filterMatchMode="EQ">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.filterPmRuleLevel}">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <c:if test="#{v2PmOrderController.getPmRule()}">
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </c:if>
+                            <c:if test="#{!v2PmOrderController.getPmRule()}">
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </c:if>
+                        </p:selectOneMenu>
+                    </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('ruleLevelFour',item.ruleLevel)}"/>
+                </p:column>
+
                         <p:column headerText="#{msg.MaintenanceType}"  sortBy="#{item.pmType}" filterBy="#{item.pmType}" filterMatchMode="EQ">
                             <f:facet name="filter" >
                                 <p:selectOneMenu onchange="PF('varDataListgl').filter()" value="#{v2PmOrderController.repairTypeInt}">
@@ -370,8 +382,12 @@
                         <label class="label">#{msg.MaintenanceLevel}*</label>
                         <p:selectOneMenu  value="#{v2PmOrderController.ruleLevel}" required="true" requiredMessage="#{msg.MaintenanceLevel}#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItem itemLabel="#{msg.Level2Rule}" itemValue="2" />
-                            <f:selectItem itemLabel="#{msg.Level3Rule}" itemValue="3" />
+                            <c:if test="#{v2PmOrderController.getPmRule()}">
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevelFour')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </c:if>
+                            <c:if test="#{!v2PmOrderController.getPmRule()}">
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </c:if>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>

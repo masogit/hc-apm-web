@@ -1,10 +1,10 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:c="http://java.sun.com/jsp/jstl/core"
-                template="/WEB-INF/template.xhtml">
+                                                                   xmlns:h="http://java.sun.com/jsf/html"
+                                                                   xmlns:f="http://java.sun.com/jsf/core"
+                                                                   xmlns:ui="http://java.sun.com/jsf/facelets"
+                                                                   xmlns:p="http://primefaces.org/ui"
+                                                                   xmlns:c="http://java.sun.com/jsp/jstl/core"
+                                                                   template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
         <div class="ui-g-12 card cardTitle">
@@ -548,9 +548,11 @@
                             </p:inputTextarea>
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.isCanModifyUnOrder()}">
-                            <p:commandLink immediate="false" process="@this" update="growl zkbPartOrderModifyDlg" style="text-decoration:underline;font-weight:bold;margin-left: 0px;font-size: x-large" action="#{zkbPartOrderAuditController.prepareModify('OrderExtraPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()"  >
+                            <!--<p:commandLink immediate="false" process="@this" update="zkbPartOrderModifyDlg" style="text-decoration:underline;font-weight:bold;margin-left: 0px;font-size: x-large" action="#{zkbPartOrderAuditController.prepareModify('OrderExtraPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()"  >
                                 <h:outputText value="修改" />
-                            </p:commandLink>
+                            </p:commandLink>-->
+                            <p:commandButton immediate="false" process="@this" value="开单信息修改" action="#{zkbPartOrderAuditController.prepareModify('OrderExtraPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" update=":zkbPartOrderModifyDlg" />
+
                         </h:panelGroup>
                     </p:panelGrid>
 
@@ -681,9 +683,10 @@
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd HH:mm:ss" value="#{zkbPartOrderAuditController.selected.orderedDate}" disabled="true"  Input="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
                         <h:panelGroup rendered="#{zkbPartOrderAuditController.isCanModifyOrder()}">
-                            <p:commandLink immediate="false" process="@this" update="growl zkbPartOrderModifyDlg" style="text-decoration:underline;font-weight:bold;margin-left: 0px;font-size: x-large" action="#{zkbPartOrderAuditController.prepareModify('OrderPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" >
+                            <!--<p:commandLink immediate="false" process="@this" update=":zkbPartOrderModifyDlg" style="text-decoration:underline;font-weight:bold;margin-left: 0px;font-size: x-large" action="#{zkbPartOrderAuditController.prepareModify('OrderPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" >
                                 <h:outputText value="修改" />
-                            </p:commandLink>
+                            </p:commandLink>-->
+                            <p:commandButton immediate="false" process="@this" value="下单信息修改" action="#{zkbPartOrderAuditController.prepareModify('OrderPending')}" oncomplete="PF('zkbPartOrderModifyDlg').show()" update=":zkbPartOrderModifyDlg" />
                         </h:panelGroup>
                     </p:panelGrid>
 
@@ -693,7 +696,7 @@
                                  paginatorTemplate="" rows="20" emptyMessage="#{msg.noRecordFound}" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Tool'}">
                         <c:choose>
                             <c:when test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
-                                <p:column headerText="配件号">
+                                <p:column headerText="配件号*">
                                     <p:inputText value="#{item.partNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                                 </p:column>
                                 <p:column headerText="实际配件号*">
@@ -701,23 +704,23 @@
                                 </p:column>
                             </c:when>
                             <c:when test="#{zkbPartOrderAuditController.orderType eq 'Tool'}">
-                                <p:column headerText="工具号">
+                                <p:column headerText="工具号*">
                                     <p:inputText value="#{item.partNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                                 </p:column>
                             </c:when>
                         </c:choose>
-                        <p:column headerText="配件名称">
+                        <p:column headerText="配件名称*">
                             <p:inputText value="#{item.partName}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </p:column>
-                        <p:column headerText="配件数量">
+                        <p:column headerText="配件数量*">
                             <h:outputText value="#{item.prePartQty}"/>
                         </p:column>
                         <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
-                            <p:column headerText="实际配件数量">
+                            <p:column headerText="实际配件数量*">
                                 <p:spinner value="#{item.partQty}" min="0" max="#{item.prePartQty}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                             </p:column>
                         </c:if>
-                        <p:column headerText="配件SN(序列号)">
+                        <p:column headerText="配件SN(序列号)*">
                             <h:outputText value="#{item.serialNumber}"/>
                         </p:column>
                         <p:column headerText="Order#*">
@@ -934,6 +937,12 @@
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
+                    <h:panelGroup rendered="#{zkbPartOrderAuditController.isCanModifyClose()}">
+                        <!--<p:commandLink immediate="false" process="@this" update="zkbPartOrderReturnModifyDlg" style="font-weight:bold;margin-left: 0px;font-size: x-large;text-decoration:underline" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" >
+                            <h:outputText value="修改" />
+                        </p:commandLink>-->
+                        <p:commandButton immediate="false" process="@this" value="归还信息修改" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" update=":zkbPartOrderReturnModifyDlg" />
+                    </h:panelGroup>
                 </p:fieldset>
                 <p:fieldset id="closeFieldset" legend="#{zkbPartOrderAuditController.closeFieldTitle()}" rendered="#{zkbPartOrderAuditController.showClosed}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -973,11 +982,7 @@
                             <p:inputTextarea id="closedRemark" value="#{zkbPartOrderAuditController.selected.closedRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag)}">
                             </p:inputTextarea>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.isCanModifyClose()}">
-                            <p:commandLink immediate="false" process="@this" update="growl zkbPartOrderReturnModifyDlg" style="font-weight:bold;margin-left: 0px;font-size: x-large;text-decoration:underline" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" >
-                                <h:outputText value="修改" />
-                            </p:commandLink>
-                        </h:panelGroup>
+
                     </p:panelGrid>
                 </p:fieldset>
                 <p:outputLabel id="saveTips" style="color: red" value="#{zkbPartOrderAuditController.saveTips}"/><br/>
