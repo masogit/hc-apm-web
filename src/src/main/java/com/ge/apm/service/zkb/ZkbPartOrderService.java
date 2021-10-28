@@ -1446,12 +1446,18 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                             zkbContractRepository.save(zkbContract);
                             zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.Probe.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                         }else{
-                            ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
-                            if(zkbContractCat != null){
-                                zkbContractCat.setEnabled(true);
-                                zkbContractCat.setLastModifiedDate(new Date());
-                                zkbContractCat.setLastModifiedBy(userAccount.getName());
-                                zkbContractCatRepository.save(zkbContractCat);
+                            if(qty != 0){
+                                ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                                if(zkbContractCat != null){
+                                    if(qty >0){
+                                        zkbContractCat.setEnabled(true);
+                                    }else if(qty < 0){
+                                        zkbContractCat.setEnabled(false);
+                                    }
+                                    zkbContractCat.setLastModifiedDate(new Date());
+                                    zkbContractCat.setLastModifiedBy(userAccount.getName());
+                                    zkbContractCatRepository.save(zkbContractCat);
+                                }
                             }
                         }
                     }
@@ -1478,12 +1484,18 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
                             zkbContractRepository.save(zkbContract);
                             zkbContractQuotaLogService.saveData(zkbContract,zkbPartOrder,null,ZkbContractQuotaLog.OpTypeEnum.ZkbPartOrderReturn.toString(),ZkbContractQuotaLog.OrderTypeEnum.ProbeNormal.toString(),ZkbPartOrder.class.getSimpleName(),userAccount,WebUtil.getFieldValueMessage("zkbPoStatus",zkbPartOrder.getStatus()));
                         }else{
-                            ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
-                            if(zkbContractCat != null){
-                                zkbContractCat.setEnabled(true);
-                                zkbContractCat.setLastModifiedDate(new Date());
-                                zkbContractCat.setLastModifiedBy(userAccount.getName());
-                                zkbContractCatRepository.save(zkbContractCat);
+                            if(qty != 0){
+                                ZkbContractCat zkbContractCat = zkbContractCatRepository.findById(zkbPartOrder.getContractCatId());
+                                if(zkbContractCat != null){
+                                    if(qty >0){
+                                        zkbContractCat.setEnabled(true);
+                                    }else if(qty < 0){
+                                        zkbContractCat.setEnabled(false);
+                                    }
+                                    zkbContractCat.setLastModifiedDate(new Date());
+                                    zkbContractCat.setLastModifiedBy(userAccount.getName());
+                                    zkbContractCatRepository.save(zkbContractCat);
+                                }
                             }
                         }
                     }
@@ -1747,6 +1759,25 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
 
         //3.名额修改
         subReturnQty(zkbContract,zkbPartOrder,ce,currentUser);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void probeModifyReturn(ZkbPartOrder zkbPartOrder,UserAccount account){
+        ZkbPartOrder oldZkbPartOrder = zkbPartOrderRepository.findById(zkbPartOrder.getId());
+        int oldBackTotal = 0;
+        if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(oldZkbPartOrder.getReturnType()) && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(oldZkbPartOrder.getReturnType())){
+            oldBackTotal = 1;
+        }
+        int nowBackTotal = 0;
+        if(!ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.badReturn.toString().equals(zkbPartOrder.getReturnType()) && !ZkbPartOrderReturn.ReturnTypeNoQuotaEnum.useNoReturn.toString().equals(zkbPartOrder.getReturnType())){
+            nowBackTotal = 1;
+        }
+        int ce =  nowBackTotal - oldBackTotal;
+        zkbPartOrderRepository.save(zkbPartOrder);
+        //3.名额修改
+        ZkbContract zkbContract = zkbContractRepository.findById(zkbPartOrder.getContractId());
+        subReturnQty(zkbContract,zkbPartOrder,ce,account);
+
     }
 
     @Transactional(rollbackFor = Exception.class)

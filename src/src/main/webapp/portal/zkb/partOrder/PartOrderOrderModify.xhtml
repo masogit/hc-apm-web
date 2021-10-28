@@ -54,7 +54,7 @@
                              paginatorTemplate="" rows="20" emptyMessage="#{msg.noRecordFound}" >
                     <c:choose>
                         <c:when test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
-                            <p:column headerText="配件号">
+                            <p:column headerText="配件号*">
                                 <p:inputText value="#{item.partNo}" />
                             </p:column>
                             <p:column headerText="实际配件号*">
@@ -67,16 +67,16 @@
                             </p:column>
                         </c:when>
                     </c:choose>
-                    <p:column headerText="配件名称">
+                    <p:column headerText="配件名称*">
                         <p:inputText value="#{item.partName}"  />
                     </p:column>
-                    <p:column headerText="配件数量">
+                    <p:column headerText="配件数量*">
                         <h:outputText value="#{item.prePartQty}"/>
                     </p:column>
-                    <p:column headerText="实际配件数量">
+                    <p:column headerText="实际配件数量*">
                         <h:outputText value="#{item.partQty}"/>
                     </p:column>
-                    <p:column headerText="配件SN(序列号)">
+                    <p:column headerText="配件SN(序列号)*">
                         <p:inputText value="#{item.serialNumber}"/>
                     </p:column>
                     <p:column headerText="Order#*">

@@ -1232,8 +1232,8 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
             zkbPartOrderService.submitCloseReturn(zkbPartOrderReturnModifyList,selected,currentUser);
             zkbPartOrderReturnList = zkbPartOrderService.getZkbPartOrderReturnRepository().findByPartOrderId(selected.getId());
         }else if(ZkbPartOrder.OrderType.Probe.toString().equals(selected.getOrderType())){
-            zkbPartOrderRepository.save(selected);
 
+            zkbPartOrderService.probeModifyReturn(selected,currentUser);
         }
 
     }
