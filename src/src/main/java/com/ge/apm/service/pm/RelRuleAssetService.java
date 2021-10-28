@@ -55,16 +55,18 @@ public class RelRuleAssetService {
             if(assetInfoAndRelRule.getAssetName()!=null) row.createCell(2).setCellValue(assetInfoAndRelRule.getAssetName());
             if(assetInfoAndRelRule.getAssetOwnerName()!=null) row.createCell(3).setCellValue(assetInfoAndRelRule.getAssetOwnerName());
             if(assetInfoAndRelRule.getPmOwnerName()!=null) row.createCell(4).setCellValue(assetInfoAndRelRule.getPmOwnerName());
-            if(assetInfoAndRelRule.getLevelTwoName()!=null) row.createCell(5).setCellValue(assetInfoAndRelRule.getLevelTwoName());
-            if(assetInfoAndRelRule.getLevelThreeName()!=null) row.createCell(6).setCellValue(assetInfoAndRelRule.getLevelThreeName());
-            if(assetInfoAndRelRule.getDepartNum()!=null) row.createCell(7).setCellValue(assetInfoAndRelRule.getDepartNum());
-            if(assetInfoAndRelRule.getAssetGroupName()!=null) row.createCell(8).setCellValue(assetInfoAndRelRule.getAssetGroupName());
-            if(assetInfoAndRelRule.getClinicalDeptName()!=null) row.createCell(9).setCellValue(assetInfoAndRelRule.getClinicalDeptName());
-            if(assetInfoAndRelRule.getNationalStandardCode()!=null) row.createCell(10).setCellValue(assetInfoAndRelRule.getNationalStandardCode());
-            if(assetInfoAndRelRule.getMakerShortName()!=null) row.createCell(11).setCellValue(assetInfoAndRelRule.getMakerShortName());
-            if(assetInfoAndRelRule.getManufacture()!=null) row.createCell(12).setCellValue(assetInfoAndRelRule.getManufacture());
-            if(assetInfoAndRelRule.getCreatedDate()!=null) row.createCell(13).setCellValue(simpleDateFormat.format(assetInfoAndRelRule.getCreatedDate()));
-            if(assetInfoAndRelRule.getQrCode()!=null) row.createCell(14).setCellValue(assetInfoAndRelRule.getQrCode());
+            if(assetInfoAndRelRule.getLevelOneName()!=null) row.createCell(5).setCellValue(assetInfoAndRelRule.getLevelOneName());
+            if(assetInfoAndRelRule.getLevelTwoName()!=null) row.createCell(6).setCellValue(assetInfoAndRelRule.getLevelTwoName());
+            if(assetInfoAndRelRule.getLevelThreeName()!=null) row.createCell(7).setCellValue(assetInfoAndRelRule.getLevelThreeName());
+            if(assetInfoAndRelRule.getLevelFourName()!=null) row.createCell(8).setCellValue(assetInfoAndRelRule.getLevelFourName());
+            if(assetInfoAndRelRule.getDepartNum()!=null) row.createCell(9).setCellValue(assetInfoAndRelRule.getDepartNum());
+            if(assetInfoAndRelRule.getAssetGroupName()!=null) row.createCell(10).setCellValue(assetInfoAndRelRule.getAssetGroupName());
+            if(assetInfoAndRelRule.getClinicalDeptName()!=null) row.createCell(11).setCellValue(assetInfoAndRelRule.getClinicalDeptName());
+            if(assetInfoAndRelRule.getNationalStandardCode()!=null) row.createCell(12).setCellValue(assetInfoAndRelRule.getNationalStandardCode());
+            if(assetInfoAndRelRule.getMakerShortName()!=null) row.createCell(13).setCellValue(assetInfoAndRelRule.getMakerShortName());
+            if(assetInfoAndRelRule.getManufacture()!=null) row.createCell(14).setCellValue(assetInfoAndRelRule.getManufacture());
+            if(assetInfoAndRelRule.getCreatedDate()!=null) row.createCell(15).setCellValue(simpleDateFormat.format(assetInfoAndRelRule.getCreatedDate()));
+            if(assetInfoAndRelRule.getQrCode()!=null) row.createCell(16).setCellValue(assetInfoAndRelRule.getQrCode());
             i++;
         }
     }
@@ -76,16 +78,18 @@ public class RelRuleAssetService {
         row.createCell(2).setCellValue("资产名称");
         row.createCell(3).setCellValue("维修负责人");
         row.createCell(4).setCellValue("保养负责人");
-        row.createCell(5).setCellValue("二级规则");
-        row.createCell(6).setCellValue("三级规则");
-        row.createCell(7).setCellValue("设备编号（院方）");
-        row.createCell(8).setCellValue("设备分类");
-        row.createCell(9).setCellValue("所属科室");
-        row.createCell(10).setCellValue("设备国标码");
-        row.createCell(11).setCellValue("品牌/制造商简称");
-        row.createCell(12).setCellValue("制造商");
-        row.createCell(13).setCellValue("配置日期");
-        row.createCell(14).setCellValue("二维码");
+        row.createCell(5).setCellValue("巡检");
+        row.createCell(6).setCellValue("二级规则");
+        row.createCell(7).setCellValue("三级规则");
+        row.createCell(8).setCellValue("质量控制");
+        row.createCell(9).setCellValue("设备编号（院方）");
+        row.createCell(10).setCellValue("设备分类");
+        row.createCell(11).setCellValue("所属科室");
+        row.createCell(12).setCellValue("设备国标码");
+        row.createCell(13).setCellValue("品牌/制造商简称");
+        row.createCell(14).setCellValue("制造商");
+        row.createCell(15).setCellValue("配置日期");
+        row.createCell(16).setCellValue("二维码");
     }
 
     public List<AssetInfoAndRelRule> mergeAssetInfoAndRelRule(List<AssetInfo> assetInfos, List<RelRuleAsset> relRuleAssets) {
@@ -94,6 +98,8 @@ public class RelRuleAssetService {
         for(RelRuleAsset relRuleAsset : relRuleAssets) {
             if(relRuleAsset.getRuleUID2()!=null) pmOrderRuleUids.add(relRuleAsset.getRuleUID2());
             if(relRuleAsset.getRuleUID()!=null) pmOrderRuleUids.add(relRuleAsset.getRuleUID());
+            if(relRuleAsset.getRuleUID1()!=null) pmOrderRuleUids.add(relRuleAsset.getRuleUID1());
+            if(relRuleAsset.getRuleUID4()!=null) pmOrderRuleUids.add(relRuleAsset.getRuleUID4());
         }
         List<PmOrderRule> pmOrderRules = pmOrderRuleRepository.findByUidIn(new ArrayList<>(pmOrderRuleUids));
         Map<String,String> uidAndName = new HashMap<>();
@@ -110,8 +116,10 @@ public class RelRuleAssetService {
                     assetInfoAndRelRule.setAssetName(assetInfo.getName());
                     assetInfoAndRelRule.setAssetOwnerName(assetInfo.getAssetOwnerName());
                     assetInfoAndRelRule.setPmOwnerName(assetInfo.getPmOwnerName());
+                    assetInfoAndRelRule.setLevelOneName(uidAndName.get(relRuleAsset.getRuleUID1()));
                     assetInfoAndRelRule.setLevelTwoName(uidAndName.get(relRuleAsset.getRuleUID2()));
                     assetInfoAndRelRule.setLevelThreeName(uidAndName.get(relRuleAsset.getRuleUID()));
+                    assetInfoAndRelRule.setLevelFourName(uidAndName.get(relRuleAsset.getRuleUID4()));
                     assetInfoAndRelRule.setDepartNum(assetInfo.getDepartNum());
                     assetInfoAndRelRule.setAssetGroupName(FieldValueMessageController.fieldValue("assetGroup",assetInfo.getAssetGroup().toString()));
                     assetInfoAndRelRule.setClinicalDeptName(assetInfo.getClinicalDeptName());

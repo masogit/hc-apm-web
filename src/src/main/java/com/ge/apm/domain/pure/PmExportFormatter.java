@@ -73,7 +73,13 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ASSETNAME.getChinese(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getChinese(), this.getSerialNUm());
             map.put(ExportFields.ASSETNUM.getChinese(), this.getAssetNumber());
-            map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
+            if("1".equals(this.getRuleLevel())){
+                map.put(ExportFields.RUNLEVEL.getChinese(), "巡检");
+            }else if("4".equals(this.getRuleLevel())){
+                map.put(ExportFields.RUNLEVEL.getChinese(), "质量控制");
+            }else {
+                map.put(ExportFields.RUNLEVEL.getChinese(), this.getRuleLevel());
+            }
             map.put(ExportFields.PMTYPE.getChinese(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getChinese(), this.getClincialName());
             map.put(ExportFields.PMRULE.getChinese(), this.pmOrderRule.getName());
@@ -88,7 +94,13 @@ public class PmExportFormatter<T> {
             map.put(ExportFields.ASSETNAME.getEnglish(), this.getAssetName());
             map.put(ExportFields.SERIALNUM.getEnglish(), this.getSerialNUm());
             map.put(ExportFields.ASSETNUM.getEnglish(), this.getAssetNumber());
-            map.put(ExportFields.RUNLEVEL.getEnglish(), this.getRuleLevel());
+            if("1".equals(this.getRuleLevel())){
+                map.put(ExportFields.RUNLEVEL.getEnglish(), "巡检");
+            }else if("4".equals(this.getRuleLevel())){
+                map.put(ExportFields.RUNLEVEL.getEnglish(), "质量控制");
+            }else {
+                map.put(ExportFields.RUNLEVEL.getEnglish(), this.getRuleLevel());
+            }
             map.put(ExportFields.PMTYPE.getEnglish(), this.getFromI18(i18PmtypeList,v2_pmOrder.getPmType()));
             map.put(ExportFields.CLINICALNAME.getEnglish(), this.getClincialName());
             map.put(ExportFields.PMRULE.getEnglish(), this.pmOrderRule.getName());
