@@ -132,7 +132,7 @@ public class ZkbAssetStatisticProvider {
         StringBuilder sb = new StringBuilder();
         sb.append(" SELECT DISTINCT qr_code_info.id,"+
                 " ai.clinical_dept_name as hospital_name, "+
-                " ai.clinical_dept_id,"+
+                " ai.clinical_dept_uid,"+
                 " ai.function_type, "+
                 " ai.system_id," +
                 " ti.uid AS tenant_uid," +
@@ -170,7 +170,7 @@ public class ZkbAssetStatisticProvider {
         String currentDate = getDateStr();
         sb.append("SELECT DISTINCT qr_code_info.id,"+
                         " ai.clinical_dept_name as hospital_name, "+
-                        " ai.clinical_dept_id,"+
+                        " ai.clinical_dept_uid,"+
                         " ai.function_type, "+
                         " ai.system_id," +
                         " ti.uid AS tenant_uid," +
