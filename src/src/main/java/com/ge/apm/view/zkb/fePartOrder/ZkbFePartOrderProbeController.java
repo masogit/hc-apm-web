@@ -875,4 +875,18 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     public void setV2_blobObjectList(List<V2_BlobObject> v2_blobObjectList) {
         this.v2_blobObjectList = v2_blobObjectList;
     }
+
+    public boolean hasOrderModifyRight() {
+        return zkbFePartOrderService.hasOrderModifyRight(selected.getOrderType(),selected.getStatus(),configTypeMap);
+    }
+
+    public void saveOrderModify(){
+        zkbFePartOrderService.saveOrderModify(selected,currentUser);
+        this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
+    }
+
+    public void saveReturnModify(){
+        zkbFePartOrderService.saveReturnModify(selected,currentUser);
+        this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
+    }
 }

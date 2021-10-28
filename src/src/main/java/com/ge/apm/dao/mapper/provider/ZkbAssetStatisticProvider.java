@@ -128,7 +128,6 @@ public class ZkbAssetStatisticProvider {
      * @return
      */
     public String getZkbAssetQrCodeInfoList(Map<String,Object> param){
-        List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
         String currentDate = getDateStr();
         StringBuilder sb = new StringBuilder();
         sb.append(" SELECT DISTINCT qr_code_info.id,"+
@@ -157,13 +156,18 @@ public class ZkbAssetStatisticProvider {
                 " AND (qr_code_info.qr_code_count_state is null OR qr_code_info.qr_code_count_state='N') " +
                 " AND (qr_code_info.can_not_past_qr_code is null OR qr_code_info.can_not_past_qr_code='N')"
         );
-        String filter = buildFilter_loadAllAsset(searchFilterList);
-        sb.append(filter);
+        if(param != null){
+            List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
+            String filter = buildFilter_loadAllAsset(searchFilterList);
+            sb.append(filter);
+        }
+
         return sb.toString();
     }
 
     public String getZkbAssetQrCode(){
         StringBuilder sb = new StringBuilder();
+        String currentDate = getDateStr();
         sb.append("SELECT DISTINCT qr_code_info.id,"+
                         " ai.clinical_dept_name as hospital_name, "+
                         " ai.clinical_dept_id,"+
@@ -172,7 +176,7 @@ public class ZkbAssetStatisticProvider {
                         " ti.uid AS tenant_uid," +
                         " ti. NAME AS tenant_name," +
                         " ai.uid AS asset_uid," +
-                        " (select ac.contract_no from zkb_contract ac,zkb_contract_asset zca where zca.contract_id=ac.ID and ai.uid=zca.asset_id and to_date('20211021','yyyyMMdd')>=ac.start_date and to_date('20211021','yyyyMMdd')<=ac.end_date) as contract_no,"+
+                        " (select ac.contract_no from zkb_contract ac,zkb_contract_asset zca where zca.contract_id=ac.ID and ai.uid=zca.asset_id and to_date('"+currentDate+"','yyyyMMdd')>=ac.start_date and to_date('"+currentDate+"','yyyyMMdd')<=ac.end_date) as contract_no,"+
                         " qr_code_info.reason AS reason," +
                         " qr_code_info.can_not_past_qr_code," +
                         " qr_code_info.reason_date,"+
