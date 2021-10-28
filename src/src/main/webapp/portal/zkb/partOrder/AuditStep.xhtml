@@ -696,7 +696,7 @@
                                  paginatorTemplate="" rows="20" emptyMessage="#{msg.noRecordFound}" rendered="#{zkbPartOrderAuditController.selected.orderType eq 'Parts' or zkbPartOrderAuditController.selected.orderType eq 'Tool'}">
                         <c:choose>
                             <c:when test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
-                                <p:column headerText="配件号">
+                                <p:column headerText="配件号*">
                                     <p:inputText value="#{item.partNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                                 </p:column>
                                 <p:column headerText="实际配件号*">
@@ -704,23 +704,23 @@
                                 </p:column>
                             </c:when>
                             <c:when test="#{zkbPartOrderAuditController.orderType eq 'Tool'}">
-                                <p:column headerText="工具号">
+                                <p:column headerText="工具号*">
                                     <p:inputText value="#{item.partNo}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                                 </p:column>
                             </c:when>
                         </c:choose>
-                        <p:column headerText="配件名称">
+                        <p:column headerText="配件名称*">
                             <p:inputText value="#{item.partName}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                         </p:column>
-                        <p:column headerText="配件数量">
+                        <p:column headerText="配件数量*">
                             <h:outputText value="#{item.prePartQty}"/>
                         </p:column>
                         <c:if test="#{zkbPartOrderAuditController.orderType eq 'Parts'}">
-                            <p:column headerText="实际配件数量">
+                            <p:column headerText="实际配件数量*">
                                 <p:spinner value="#{item.partQty}" min="0" max="#{item.prePartQty}" readonly="#{!(zkbPartOrderAuditController.selected.currentStep eq 'OrderPending' and zkbPartOrderAuditController.canEditFlag)}" />
                             </p:column>
                         </c:if>
-                        <p:column headerText="配件SN(序列号)">
+                        <p:column headerText="配件SN(序列号)*">
                             <h:outputText value="#{item.serialNumber}"/>
                         </p:column>
                         <p:column headerText="Order#*">
@@ -937,6 +937,12 @@
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
+                    <h:panelGroup rendered="#{zkbPartOrderAuditController.isCanModifyClose()}">
+                        <!--<p:commandLink immediate="false" process="@this" update="zkbPartOrderReturnModifyDlg" style="font-weight:bold;margin-left: 0px;font-size: x-large;text-decoration:underline" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" >
+                            <h:outputText value="修改" />
+                        </p:commandLink>-->
+                        <p:commandButton immediate="false" process="@this" value="归还信息修改" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" update=":zkbPartOrderReturnModifyDlg" />
+                    </h:panelGroup>
                 </p:fieldset>
                 <p:fieldset id="closeFieldset" legend="#{zkbPartOrderAuditController.closeFieldTitle()}" rendered="#{zkbPartOrderAuditController.showClosed}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -976,12 +982,7 @@
                             <p:inputTextarea id="closedRemark" value="#{zkbPartOrderAuditController.selected.closedRemark}" rows="2" cols="20" disabled="#{!(zkbPartOrderAuditController.selected.currentStep eq 'ClosePending' and zkbPartOrderAuditController.canEditFlag)}">
                             </p:inputTextarea>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{zkbPartOrderAuditController.isCanModifyClose()}">
-                            <!--<p:commandLink immediate="false" process="@this" update="zkbPartOrderReturnModifyDlg" style="font-weight:bold;margin-left: 0px;font-size: x-large;text-decoration:underline" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" >
-                                <h:outputText value="修改" />
-                            </p:commandLink>-->
-                            <p:commandButton immediate="false" process="@this" value="归还信息修改" action="#{zkbPartOrderAuditController.preReturnModifyEdit}" oncomplete="PF('zkbPartOrderReturnModifyDlg').show()" update=":zkbPartOrderReturnModifyDlg" />
-                        </h:panelGroup>
+
                     </p:panelGrid>
                 </p:fieldset>
                 <p:outputLabel id="saveTips" style="color: red" value="#{zkbPartOrderAuditController.saveTips}"/><br/>
