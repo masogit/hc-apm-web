@@ -667,7 +667,7 @@ public class AssetFileImportBaseService {
                     }
 
                     //临床助手检查进行中
-                    Optional<String> optionalResult = assetInfoBulkEditCheckService.verifyForNurseSite(assets);
+                    Optional<String> optionalResult = assetInfoBulkEditCheckService.verifyForNurseSiteByBatchImport(assets);
                     if (optionalResult.isPresent()) {
                         item.put("status", ImportStatus.CheckFail);
                         result.add(Boolean.FALSE);

@@ -239,6 +239,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String actualCompletionTimeFormat = null;
     @Setter@Getter
     private boolean hasConfigMultiLevelApproval = false;
+    private String filterPmRuleLevel;
     //备注
     @Getter @Setter
     private String remarks;
@@ -657,6 +658,29 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService.invokeBatchPmOrderCancel(cancelReason, selectedMap, cancelInt);
     }
 
+    public boolean getPmRule(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
+    }
+
+    public String getRuleLevelName(Integer ruleLevel){
+        switch (ruleLevel){
+            case 1:
+                return "巡检";
+
+            case 2:
+                return "2";
+
+            case 3:
+                return "3";
+
+            case 4:
+                return "质量控制";
+            default:
+                return "";
+        }
+    }
 
 
     public boolean allowChanged() {
@@ -749,6 +773,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
              result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 3);
              if(result){
                  WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel3WorkOrdersInBatches"));
+                 RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
+                 return result;
+             }
+             result = dao.getBatchPmOrderList(orderNumList).stream().anyMatch(item -> item.getRuleLevel() == 4);
+             if(result){
+                 WebUtil.addErrorMessage(WebUtil.getMessage("CanTLevel4WorkOrdersInBatches"));
                  RequestContext.getCurrentInstance().addCallbackParam("batchForbidForMaintanLevel", true);
                  return result;
              }
@@ -1820,6 +1850,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return result;
     }
 
+    public String getFilterPmRuleLevel() {
+        return filterPmRuleLevel;
+    }
+
+    public void setFilterPmRuleLevel(String filterPmRuleLevel) {
+        this.filterPmRuleLevel = filterPmRuleLevel;
+    }
+
     public List<SearchFilter> buildMvsSearchFilter(){
         List<SearchFilter> filters = new ArrayList<>();
 
@@ -1853,7 +1891,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //        queryIndex = -1;
         selected = null;
     }
-
+    public void updateQueryIndex(int query){
+        queryIndex = query;
+        selected = null;
+    }
 
     protected Sort returnSort(PageRequest pageRequest){
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
