@@ -2283,6 +2283,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 zkbPartOrderModifyLog.setCreateUserUid(userAccount.getUid());
                 zkbPartOrderModifyLog.setCreateUserName(userAccount.getName());
                 zkbFePartOrderModifyLogRepository.save(zkbPartOrderModifyLog);
+                zkbFePartOrderAssetInfoRepository.save(zkbFePartOrderAssetInfo);
             }
         }else if(ZkbFePartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
             ZkbFePartOrderModifyLog zkbPartOrderModifyLog = new ZkbFePartOrderModifyLog();
@@ -2299,7 +2300,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return ;
         }
         zkbFePartOrderRepository.save(zkbPartOrder);
-        zkbFePartOrderAssetInfoRepository.save(zkbPartOrder.getZkbFePartOrderAssetInfoList());
     }
 
     /**
@@ -2312,7 +2312,11 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         if (ZkbFePartOrder.OrderType.SpareParts.toString().equals(zkbPartOrder.getOrderType())){
             List<ZkbFePartOrderReturn> ZkbFePartOrderReturnList = zkbPartOrder.getZkbFePartOrderReturnList();
             for(ZkbFePartOrderReturn zkbFePartOrderReturn : ZkbFePartOrderReturnList){
-                ZkbFePartOrderReturn oldZkbFePartOrderReturn = zkbFePartOrderReturnRepository.findById(zkbFePartOrderReturn.getId());
+                String id = zkbFePartOrderReturn.getId();
+                ZkbFePartOrderReturn oldZkbFePartOrderReturn = null;
+                if(id != null){
+                    oldZkbFePartOrderReturn = zkbFePartOrderReturnRepository.findById(zkbFePartOrderReturn.getId());
+                }
                 if(oldZkbFePartOrderReturn == null){
                     oldZkbFePartOrderReturn = zkbFePartOrderReturn;
                 }
@@ -2327,6 +2331,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 zkbFePartOrderReturnLog.setCreateUserId(userAccount.getUid());
                 zkbFePartOrderReturnLog.setCreateUserName(userAccount.getName());
                 zkbFePartOrderReturnLogRepository.save(zkbFePartOrderReturnLog);
+                zkbFePartOrderReturnRepository.save(zkbFePartOrderReturn);
             }
         }else if(ZkbFePartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
             ZkbFePartOrder oldZkbPartOrder = zkbFePartOrderRepository.findById(zkbPartOrder.getId());
@@ -2345,6 +2350,5 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             return ;
         }
         zkbFePartOrderRepository.save(zkbPartOrder);
-        zkbFePartOrderReturnRepository.save(zkbPartOrder.getZkbFePartOrderReturnList());
     }
 }

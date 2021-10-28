@@ -906,6 +906,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
     }
 
     public void saveOrderModify(){
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
         boolean flag = true;
         String errorLog = "";
         for(ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo : selected.getZkbFePartOrderAssetInfoList()){
@@ -938,58 +939,48 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         if(!flag){
             errorLog = errorLog.substring(0,errorLog.length()-1);
             WebUtil.addErrorMessage(errorLog,"");
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
         zkbFePartOrderService.saveOrderModify(selected,currentUser);
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(selected.getId());
         selected.setZkbFePartOrderAssetInfoList(zkbFePartOrderAssetInfoList);
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
     }
 
     public void saveReturnModify(){
-        RequestContext requestContext = RequestContext.getCurrentInstance();
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
         List<ZkbFePartOrderReturn> zkbFePartOrderReturnList = this.selected.getZkbFePartOrderReturnList();
-        if(CollectionUtils.isEmpty(zkbFePartOrderReturnList)||!this.checkHasNew(zkbFePartOrderReturnList))
-        {
+        if(CollectionUtils.isEmpty(zkbFePartOrderReturnList)||!this.checkHasNew(zkbFePartOrderReturnList)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_returnListCannotBeNull"));
-            requestContext.addCallbackParam("validationFailed", true);
             return ;
         }
         List<ZkbFePartOrderAssetInfo> assetInfoList = this.selected.getZkbReturnFePartOrderAssetInfoList();
         Map<String,Integer> assetInfoMap = this.zkbFePartOrderService.getAssetInfoMap(assetInfoList);
         Map<String,Integer> zkbFePartOrderReturnMap = this.zkbFePartOrderService.getZkbFePartOrderReturnMap(zkbFePartOrderReturnList,this.selected);
-        boolean returnComplete = true;
-        for(String key:assetInfoMap.keySet())
-        {
-            if(!zkbFePartOrderReturnMap.containsKey(key))
-            {
+        for(String key:assetInfoMap.keySet()) {
+            if(!zkbFePartOrderReturnMap.containsKey(key)) {
                 continue;
             }
-            if(zkbFePartOrderReturnMap.get(key)>assetInfoMap.get(key))
-            {
+            if(zkbFePartOrderReturnMap.get(key)>assetInfoMap.get(key)) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_returnTooMaxError"));
-                requestContext.addCallbackParam("validationFailed", true);
                 return ;
             }
         }
-//        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-//        int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
-//        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())&&returnCount>0)
-//        {
-//            String statusType = "GEAdminAcceptPart";
-//            if(returnComplete)
-//                statusType = "GEAdminAccept";
-//            this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount,this.currentUser,this.selected,this.i18Map.get(statusType));
-//        }
-//        for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList)
-//        {
-//            item.setPartOrderId(this.selected.getId());
-//            this.zkbFePartOrderReturnRepository.save(item);
-//        }
-
+        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+        int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
+        List<ZkbFePartOrderReturn> oldZkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(this.selected.getId());
+        int oldReturnCount = this.getReturnCount(zkbFePartOrderReturnList);
+        if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())) {
+            if(returnCount > oldReturnCount){
+                this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,oldReturnCount-returnCount,this.currentUser,this.selected,"备件申请已归还信息修改退还名额");
+            }else if(returnCount < oldReturnCount){
+                this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount-oldReturnCount,this.currentUser,this.selected,"备件申请已归还信息修改补扣名额");
+            }
+        }
         zkbFePartOrderService.saveReturnModify(selected,currentUser);
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
         selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnRepository.findByPartOrderId(this.selected.getId()));
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
     }
 }
