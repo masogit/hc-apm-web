@@ -191,6 +191,35 @@ public class AssetInfoBulkEditCheckService {
 
         return Optional.empty();
     }
+
+    /**
+     * 批量导入资产时
+     * @param assets
+     * @return
+     */
+    public Optional<String> verifyForNurseSiteByBatchImport(List<AssetInfo> assets) {
+        // asset in repaire  status
+        for(AssetInfo as: assets){
+            //临床助手检查进行中
+            List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findByAssetUid(as.getUid());
+            if(!StringUtils.isEmpty(nurseSiteMaintainItemList) && nurseSiteMaintainItemList.size()>0){
+                Set<String> setMaintainIds = new HashSet<String>();
+                for (int i = 0; i < nurseSiteMaintainItemList.size(); i++) {
+                    setMaintainIds.add(nurseSiteMaintainItemList.get(i).getId());
+                }
+                Set<NurseSiteMaintainData> maintainDataByParentIds = nurseSiteMaintainDataRepository.findMaintainDataByParentIds(setMaintainIds);
+                for (NurseSiteMaintainData nurseSiteMaintainData : maintainDataByParentIds) {
+                    Boolean checkValue = nurseSiteMaintainData.getCheckValue() != null ? true :false;
+                    if(!checkValue){
+                        return Optional.of("设备("+as.getName()+")当前有未完成的日常检查工单无法迁移 请先关闭工单！");
+                    }
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
     public List<AssetInfo>verifyForNurseSiteByBatchEdit(List<AssetInfo> assets) {
         List<AssetInfo> list = new ArrayList<>();
         for(AssetInfo as: assets){
