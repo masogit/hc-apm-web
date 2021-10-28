@@ -886,6 +886,27 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
     }
 
     public void saveReturnModify(){
+        ZkbFePartOrder oldZkbPartOrder = zkbFePartOrderRepository.findById(selected.getId());
+        ZkbContract zkbContract = this.zkbContractRepository.findById(selected.getContractId());
+        if(!oldZkbPartOrder.getReturnType().equals(selected.getReturnType())){
+            Integer type = 0;
+            String step = null;
+            if("badReturn".equals(oldZkbPartOrder.getReturnType())){
+                type = 3;
+                step = "探头申请已归还信息修改扣除名额";
+            }
+            if (!"badReturn".equals(selected.getReturnType())) {
+                type = 5;
+                step = "探头申请已归还信息修改坏还退还名额";
+            }
+            if (selected.getQty() != null && selected.getQty() > 0) {
+                zkbFePartOrderService.moveProbe(type, zkbContract, selected.getQty(), showZkbPoProbeQuotaType, selected.getZkbPoProbeQuotaType(), currentUser, selected, true, step);
+            }
+            if (StringUtils.isNotBlank(selected.getContractCatId()) && !ZkbFePartOrderProbeController.four_in_one.equals(selected.getContractCatId())) {
+                zkbFePartOrderService.updateZkbContractCat(currentUser, true, selected.getContractCatId());
+            }
+        }
+
         zkbFePartOrderService.saveReturnModify(selected,currentUser);
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
     }
