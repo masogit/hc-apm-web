@@ -2266,7 +2266,6 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     @Transactional(rollbackFor = Exception.class)
     public void saveOrderModify(ZkbFePartOrder zkbPartOrder,UserAccount userAccount){
         ZkbFePartOrder oldZkbPartOrder = zkbFePartOrderRepository.findById(zkbPartOrder.getId());
-
         if (ZkbFePartOrder.OrderType.SpareParts.toString().equals(zkbPartOrder.getOrderType())){
             List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = zkbFePartOrderAssetInfoRepository.findByFePartOrderId(zkbPartOrder.getId());
             for(ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo : zkbFePartOrderAssetInfoList){
@@ -2283,6 +2282,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 zkbPartOrderModifyLog.setCreateUserUid(userAccount.getUid());
                 zkbPartOrderModifyLog.setCreateUserName(userAccount.getName());
                 zkbFePartOrderModifyLogRepository.save(zkbPartOrderModifyLog);
+            }
+            for(ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo : zkbPartOrder.getZkbFePartOrderAssetInfoList()){
                 zkbFePartOrderAssetInfoRepository.save(zkbFePartOrderAssetInfo);
             }
         }else if(ZkbFePartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){

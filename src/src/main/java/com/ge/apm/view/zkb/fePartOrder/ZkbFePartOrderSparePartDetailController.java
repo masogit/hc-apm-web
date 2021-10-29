@@ -945,6 +945,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(selected.getId());
         selected.setZkbFePartOrderAssetInfoList(zkbFePartOrderAssetInfoList);
+        List<ZkbFePartOrderReturn> zkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId());
+        selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnList);
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
     }
 
@@ -980,7 +982,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         zkbFePartOrderService.saveReturnModify(selected,currentUser);
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
-        selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnRepository.findByPartOrderId(this.selected.getId()));
+        List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(selected.getId());
+        selected.setZkbFePartOrderAssetInfoList(zkbFePartOrderAssetInfoList);
+        List<ZkbFePartOrderReturn> zkbFePartOrderReturnList2 = this.zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId());
+        selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnList2);
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
     }
 }
