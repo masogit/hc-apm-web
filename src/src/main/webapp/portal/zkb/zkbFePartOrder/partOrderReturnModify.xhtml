@@ -13,7 +13,7 @@
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_returnType}*</label>
                     <p:selectOneMenu  value="#{zkbFePartOrderProbeController.selected.returnType}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" >
-                        <p:ajax event="change" update="partSerialNumberGroup partQualityIssueGroup" />
+<!--                        <p:ajax event="change" update="partSerialNumberGroup partQualityIssueGroup" />-->
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
