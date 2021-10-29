@@ -57,9 +57,9 @@
                     <h:outputText value="#{item.comment}"/>
                 </p:column>
                 <f:facet name="{Toolbar}">
-                    <p:commandButton immediate="false" process="@this" id="createReturnDetailButton2" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemCreate}"  update=":returnZkbFePartOrderAssetInfoEditForm" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" />
-                    <p:commandButton immediate="false" process="@this" id="editReturnDetailButton2" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemEdit}" update=":returnZkbFePartOrderAssetInfoEditForm"  oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()"/>
-                    <p:commandButton immediate="false" process="@this"  id="deleteReturnDetailButton2" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteReturnItem}" update=":returnZkbFePartOrderAssetInfoEditForm">
+                    <p:commandButton process="@this" id="createReturnDetailButton2" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemCreate}"  update=":returnZkbFePartOrderAssetInfoEditForm" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" />
+                    <p:commandButton process="@this" id="editReturnDetailButton2" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemEdit}" update=":returnZkbFePartOrderAssetInfoEditForm"  oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()"/>
+                    <p:commandButton process="@this"  id="deleteReturnDetailButton2" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteReturnItem}" update=":returnZkbFePartOrderAssetInfoEditForm">
                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </f:facet>
