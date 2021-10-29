@@ -96,6 +96,9 @@ public class ZkbFePartOrderReturnLog implements Serializable {
     @Column(name = "waybill_no")
     private String waybillNo;
 
+    @Column(name = "new_cat_sn")
+    private String newCatSn;
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -241,5 +244,13 @@ public class ZkbFePartOrderReturnLog implements Serializable {
 
     public void setWaybillNo(String waybillNo) {
         this.waybillNo = waybillNo;
+    }
+
+    public String getNewCatSn() {
+        return newCatSn;
+    }
+
+    public void setNewCatSn(String newCatSn) {
+        this.newCatSn = newCatSn;
     }
 }

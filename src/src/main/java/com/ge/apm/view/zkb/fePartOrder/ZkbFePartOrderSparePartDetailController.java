@@ -901,6 +901,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         return zkbFePartOrderService.hasOrderModifyRight(selected.getOrderType(),selected.getStatus(),configTypeMap);
     }
 
+    public boolean hasOrderReturnModifyRight() {
+        return zkbFePartOrderService.hasOrderReturnModifyRight(selected.getOrderType(),selected.getStatus(),configTypeMap);
+    }
+
     public boolean hasAdminRight() {
         return this.zkbFePartOrderService.hasAdminRight(configTypeMap);
     }
@@ -912,7 +916,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         for(ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo : selected.getZkbFePartOrderAssetInfoList()){
             if(StringUtils.isEmpty(zkbFePartOrderAssetInfo.getAssetNo())){
                 flag = false;
-                errorLog += "配件号不能为空,";
+                errorLog += "备件号不能为空,";
             }
             if(StringUtils.isEmpty(zkbFePartOrderAssetInfo.getAssetDescription())){
                 flag = false;
@@ -931,7 +935,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 if(!oldItem.getAssetNo().equals(zkbFePartOrderAssetInfo.getAssetNo()) || !oldItem.getAssetDescription().equals(zkbFePartOrderAssetInfo.getAssetDescription())){
                     if(StringUtils.isEmpty(zkbFePartOrderAssetInfo.getSparePart())){
                         flag = false;
-                        errorLog += "配件号或配件名称修改后备注不能为空,";
+                        errorLog += "备件号或配件名称修改后备注不能为空,";
                     }
                 }
             }
@@ -945,8 +949,6 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(selected.getId());
         selected.setZkbFePartOrderAssetInfoList(zkbFePartOrderAssetInfoList);
-        List<ZkbFePartOrderReturn> zkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId());
-        selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnList);
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
     }
 
@@ -982,10 +984,12 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         zkbFePartOrderService.saveReturnModify(selected,currentUser);
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
+        selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId()));
+        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+    }
+    public void cancelOrderModify(){
+        this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
         List<ZkbFePartOrderAssetInfo> zkbFePartOrderAssetInfoList = this.zkbFePartOrderAssetInfoRepository.findByFePartOrderId(selected.getId());
         selected.setZkbFePartOrderAssetInfoList(zkbFePartOrderAssetInfoList);
-        List<ZkbFePartOrderReturn> zkbFePartOrderReturnList2 = this.zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId());
-        selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnList2);
-        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
     }
 }

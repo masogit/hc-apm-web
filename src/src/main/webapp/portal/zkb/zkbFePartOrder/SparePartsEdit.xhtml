@@ -258,7 +258,7 @@
                         <p:calendar readonly="true" disabled="true" timeZone="#{userContextService.getTimeZone()}" locale = "#{userContextService.getCalendarLocale()}"  pattern="yyyy-MM-dd HH:mm:ss"  value="#{zkbFePartOrderSparePartDetailController.selected.fullApmInfoDate}"
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
-                    <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingApm') and zkbFePartOrderSparePartDetailController.hasOrderModifyRight()}">
+                    <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.hasOrderModifyRight()}">
                         <p:commandButton process="@this" icon="ui-icon-pencil" value="修改" update="growl zkbFePartOrderModifyDlg"  oncomplete="PF('zkbFePartOrderModifyDlg').show()"/>
                     </h:panelGroup>
                 </p:panelGrid>
@@ -287,7 +287,7 @@
                 </p:dataTable>
             </p:fieldset>
             <p:fieldset id="geAdminFieldset" legend="FE归还信息" rendered="#{zkbFePartOrderSparePartDetailController.checkRendered('WaitingGEAdmin')}">
-                <h:panelGroup rendered="#{!zkbFePartOrderSparePartDetailController.hasEditRight('WaitingGEAdmin') and zkbFePartOrderSparePartDetailController.hasAdminRight()}">
+                <h:panelGroup rendered="#{zkbFePartOrderSparePartDetailController.hasOrderReturnModifyRight()}">
                     <p:commandButton process="@this" icon="ui-icon-pencil" value="修改" update="growl zkbPartOrderRetrunModifyDlg"  oncomplete="PF('zkbPartOrderRetrunModifyDlg').show()"/>
                 </h:panelGroup>
                 <p:dataTable id="zkbFePartOrderReturnList" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderReturnList}" var="item"

@@ -880,6 +880,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         return zkbFePartOrderService.hasOrderModifyRight(selected.getOrderType(),selected.getStatus(),configTypeMap);
     }
 
+    public boolean hasOrderReturnModifyRight() {
+        return zkbFePartOrderService.hasOrderReturnModifyRight(selected.getOrderType(),selected.getStatus(),configTypeMap);
+    }
+
     public void saveOrderModify(){
         zkbFePartOrderService.saveOrderModify(selected,currentUser);
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
