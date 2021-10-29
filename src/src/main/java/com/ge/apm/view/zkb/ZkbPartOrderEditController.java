@@ -666,7 +666,7 @@ public class ZkbPartOrderEditController  extends GenericCRUDUUIDController<ZkbPa
             errorLog += "剩余数量不能为空！";
         }else if(selected.getRemainQty() < 0){
             flag=false;
-            errorLog += "剩余数量不能小于0！";
+            errorLog += "剩余数量不足！";
         }
 
         if(!flag){
