@@ -13,29 +13,49 @@
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_returnType}*</label>
                     <p:selectOneMenu  value="#{zkbFePartOrderProbeController.selected.returnType}" required="true" requiredMessage="#{msg.zkbPartOrder_returnType} #{msg.ValidationRequire}" >
-<!--                        <p:ajax event="change" update="partSerialNumberGroup partQualityIssueGroup" />-->
+                        <p:ajax event="change" update="partSerialNumberGroup partQualityIssueGroup" />
                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_zkbPoReturnType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
+                </h:panelGroup>
+                <h:panelGroup id="partSerialNumberGroup" style="text-align: left">
+                    <h:panelGroup rendered="#{(zkbFePartOrderProbeController.selected.returnType eq 'DOA')}" style="text-align: left">
+                        <label class="label">#{msg.zkbFePartOrder_partSerialNumber}*</label>
+                        <p:inputText  value="#{zkbFePartOrderProbeController.selected.partSerialNumber}" style="text-align: left" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}"  required="true" requiredMessage="#{msg.zkbFePartOrder_partSerialNumber} #{msg.ValidationRequire}" />
+                    </h:panelGroup>
+                </h:panelGroup>
+                <h:panelGroup id="partQualityIssueGroup" style="text-align: left">
+                    <h:panelGroup rendered="#{(zkbFePartOrderProbeController.selected.returnType eq 'DOA')}" style="text-align: left">
+                        <label class="label">#{msg.zkbFePartOrder_partQualityIssue}*</label>
+                        <p:selectOneMenu  value="#{zkbFePartOrderProbeController.selected.partQualityIssue}" required="true" requiredMessage="#{msg.zkbFePartOrder_breakDescription} #{msg.ValidationRequire}" style="text-align: left"  >
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('zkbFePartOrder_partQualityIssue')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_airWayBillNo}*</label>
                     <p:inputText  value="#{zkbFePartOrderProbeController.selected.waybillNo}" required="true" requiredMessage="#{msg.zkbPartOrder_waybillNo} #{msg.ValidationRequire}" />
                 </h:panelGroup>
-                <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='Probe'}">
-                    <label class="label">#{msg.zkbFePartOrder_orderNoa}*</label>
-                    <p:inputText value="#{zkbFePartOrderProbeController.selected.orderNo}"  required="true" requiredMessage="#{msg.zkbFePartOrder_orderNoa} #{msg.ValidationRequire}"/>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_returnDate1}*</label>
+                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd" value="#{zkbFePartOrderProbeController.selected.returnDate}" showOn="button"  Input="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" required="true" requiredMessage="#{msg.zkbPartOrder_returnDate} #{msg.ValidationRequire}"/>
                 </h:panelGroup>
-                <h:panelGroup rendered="#{zkbFePartOrderDetailController.selected.orderType=='Probe'}">
-                    <label class="label">#{msg.zkbFePartOrder_assetPrice}*</label>
-                    <p:inputText value="#{zkbFePartOrderProbeController.selected.price}"  required="true" requiredMessage="#{msg.zkbFePartOrder_assetPrice} #{msg.ValidationRequire}"/>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_newCatSn}*</label>
+                    <p:inputText  value="#{zkbFePartOrderProbeController.selected.newCatSn}" required="true" requiredMessage="#{msg.zkbFePartOrder_newCatSn} #{msg.ValidationRequire}" />
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">#{msg.zkbFePartOrder_remark}</label>
+                    <p:inputTextarea disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingGEAdmin')}" value="#{zkbFePartOrderProbeController.selected.geAdminComment}" rows="2" cols="20">
+                    </p:inputTextarea>
                 </h:panelGroup>
             </p:panelGrid>
             <p:dataTable id="zkbFePartOrderReturnListModify" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderReturnList}" var="item"
                          widgetVar="zkbFePartOrderReturnListModify" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn}"
-                         lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
+                         lazy="false" paginator="true" rowKey="#{item.returnDate}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
                          paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                <p:ajax event="rowSelect" update="createReturnDetailButton2 editReturnDetailButton2 deleteReturnDetailButton2" />
+                <p:ajax event="rowSelect" update="editReturnDetailButton2 deleteReturnDetailButton2" />
                 <p:column headerText="#{msg.zkbFePartOrder_assetNo}">
                     <h:outputText value="#{item.assetNo}"/>
                 </p:column>
@@ -57,9 +77,9 @@
                     <h:outputText value="#{item.comment}"/>
                 </p:column>
                 <f:facet name="{Toolbar}">
-                    <p:commandButton process="@this" id="createReturnDetailButton2" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemCreate}"  update=":returnZkbFePartOrderAssetInfoEditForm" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" />
-                    <p:commandButton process="@this" id="editReturnDetailButton2" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemEdit}" update=":returnZkbFePartOrderAssetInfoEditForm"  oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()"/>
-                    <p:commandButton process="@this"  id="deleteReturnDetailButton2" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteReturnItem}" update=":returnZkbFePartOrderAssetInfoEditForm">
+                    <p:commandButton immediate="false" process="@this" id="createReturnDetailButton2" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemCreate}"  update=":returnZkbFePartOrderAssetInfoEditForm zkbFePartOrderReturnListModify" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" />
+                    <p:commandButton immediate="false" process="@this" id="editReturnDetailButton2" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemEdit}" update=":returnZkbFePartOrderAssetInfoEditForm zkbFePartOrderReturnListModify"  oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" disabled="#{empty zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn}"/>
+                    <p:commandButton immediate="false" process="@this"  id="deleteReturnDetailButton2" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteReturnItem}" update=":returnZkbFePartOrderAssetInfoEditForm zkbFePartOrderReturnListModify" disabled="#{empty zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn}">
                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </f:facet>
