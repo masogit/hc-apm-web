@@ -35,7 +35,7 @@
                          widgetVar="zkbFePartOrderReturnListModify" selectionMode="single" selection="#{zkbFePartOrderSparePartDetailController.selectZkbFePartOrderReturn}"
                          lazy="false" paginator="true" rowKey="#{item.index}"  sortMode="single" sortOrder="ascending" sortBy="#{item.index}"
                          paginatorTemplate="{Toolbar}" rows="20" emptyMessage="#{msg.noRecordFound}">
-                <p:ajax event="rowSelect" update=":zkbOrderRetrunModifyForm:zkbFePartOrderReturnListModify:editReturnDetailButton2 :zkbOrderRetrunModifyForm:zkbFePartOrderReturnListModify:deleteReturnDetailButton2" />
+                <p:ajax event="rowSelect" update="createReturnDetailButton2 editReturnDetailButton2 deleteReturnDetailButton2" />
                 <p:column headerText="#{msg.zkbFePartOrder_assetNo}">
                     <h:outputText value="#{item.assetNo}"/>
                 </p:column>
@@ -57,9 +57,9 @@
                     <h:outputText value="#{item.comment}"/>
                 </p:column>
                 <f:facet name="{Toolbar}">
-                    <p:commandButton immediate="false" process="@this" id="createReturnDetailButton2" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemCreate}"  update=":returnZkbFePartOrderAssetInfoEditForm zkbFePartOrderReturnListModify" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" />
-                    <p:commandButton immediate="false" process="@this" id="editReturnDetailButton2" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemEdit}" update=":returnZkbFePartOrderAssetInfoEditForm zkbFePartOrderReturnListModify"  oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()"/>
-                    <p:commandButton immediate="false" process="@this"  id="deleteReturnDetailButton2" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteReturnItem}" update=":returnZkbFePartOrderAssetInfoEditForm zkbFePartOrderReturnListModify">
+                    <p:commandButton immediate="false" process="@this" id="createReturnDetailButton2" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemCreate}"  update=":returnZkbFePartOrderAssetInfoEditForm" oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()" />
+                    <p:commandButton immediate="false" process="@this" id="editReturnDetailButton2" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{zkbFePartOrderSparePartDetailController.prepareReturnItemEdit}" update=":returnZkbFePartOrderAssetInfoEditForm"  oncomplete="PF('returnZkbFePartOrderAssetInfoEditDlg').show()"/>
+                    <p:commandButton immediate="false" process="@this"  id="deleteReturnDetailButton2" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{zkbFePartOrderSparePartDetailController.deleteReturnItem}" update=":returnZkbFePartOrderAssetInfoEditForm">
                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                     </p:commandButton>
                 </f:facet>

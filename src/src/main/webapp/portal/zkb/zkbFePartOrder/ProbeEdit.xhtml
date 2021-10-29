@@ -364,7 +364,7 @@
                                     showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                     <h:panelGroup rendered="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm') and zkbFePartOrderProbeController.hasOrderModifyRight()}">
-                        <p:commandButton process="@this" title="修改" update="growl zkbFePartOrderModifyDlg"  oncomplete="PF('zkbFePartOrderModifyDlg').show()"/>
+                        <p:commandButton process="@this" icon="ui-icon-pencil" value="修改" update="growl zkbFePartOrderModifyDlg"  oncomplete="PF('zkbFePartOrderModifyDlg').show()"/>
                     </h:panelGroup>
                 </p:panelGrid>
             </p:fieldset>
