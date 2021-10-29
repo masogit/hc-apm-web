@@ -2348,7 +2348,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 zkbFePartOrderReturnLog.setCreateUserName(userAccount.getName());
                 zkbFePartOrderReturnLogRepository.save(zkbFePartOrderReturnLog);
                 if(zkbFePartOrderReturn.getPartOrderId() == null){
-                    zkbFePartOrderReturn.setPartOrderId(oldZkbFePartOrderReturn.getPartOrderId());
+                    zkbFePartOrderReturn.setPartOrderId(zkbPartOrder.getId());
                 }
                 zkbFePartOrderReturnRepository.save(zkbFePartOrderReturn);
             }
