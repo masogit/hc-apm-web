@@ -186,7 +186,13 @@ public class PmReportService {
         // Maintenance information
         content.put(MaintenanceTemplate.Maintenance.NUMBER.toString(), pmOrder.getPmNum());
         content.put(MaintenanceTemplate.Maintenance.CREATOR.toString(), pmOrder.getCreatorName());
-        content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), pmOrder.getRuleLevel());
+        if(pmOrder.getRuleLevel()==1){
+            content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), "巡检");
+        }else if(pmOrder.getRuleLevel()==4){
+            content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), "质量控制");
+        }else {
+            content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), pmOrder.getRuleLevel());
+        }
         content.put(MaintenanceTemplate.Maintenance.PLAN_TIME.toString(), pmOrder.getPlanTime() != null ? DEFAULT_DAY.print(pmOrder.getPlanTime().getTime()) : "");
         content.put(MaintenanceTemplate.Maintenance.COMPLETE_TIME.toString(), pmOrder.getEndTime() != null ? DEFAULT_DAY.print(pmOrder.getEndTime().getTime()) : "");
         content.put(MaintenanceTemplate.Maintenance.TYPE.toString(), FieldValueMessageController.fieldValue("pmType", String.valueOf(pmOrder.getPmType())));
