@@ -974,7 +974,8 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
-        int oldReturnCount = this.getReturnCount(zkbFePartOrderReturnList);
+        List<ZkbFePartOrderReturn> oldZkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId());
+        int oldReturnCount = this.getReturnCount(oldZkbFePartOrderReturnList);
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())) {
             if(returnCount > oldReturnCount){
                 this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,oldReturnCount-returnCount,this.currentUser,this.selected,"备件申请已归还信息修改退还名额");

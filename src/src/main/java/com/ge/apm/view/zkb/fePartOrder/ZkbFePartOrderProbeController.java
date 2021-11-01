@@ -898,11 +898,11 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
             if("badReturn".equals(selected.getReturnType())){
                 type = 3;
                 step = "探头申请已归还信息修改扣除名额";
-            }else{
+            }else if("badReturn".equals(oldZkbPartOrder.getReturnType())){
                 type = 5;
-                step = "探头申请已归还信息修改坏还退还名额";
+                step = "探头申请已归还信息修改退还名额";
             }
-            if (selected.getQty() != null && selected.getQty() > 0) {
+            if (type > 0 && selected.getQty() != null && selected.getQty() > 0) {
                 zkbFePartOrderService.moveProbe(type, zkbContract, selected.getQty(), showZkbPoProbeQuotaType, selected.getZkbPoProbeQuotaType(), currentUser, selected, true, step);
             }
             if (StringUtils.isNotBlank(selected.getContractCatId()) && !ZkbFePartOrderProbeController.four_in_one.equals(selected.getContractCatId())) {
