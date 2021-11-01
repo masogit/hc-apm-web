@@ -974,7 +974,6 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
-        List<ZkbFePartOrderReturn> oldZkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(this.selected.getId());
         int oldReturnCount = this.getReturnCount(zkbFePartOrderReturnList);
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())) {
             if(returnCount > oldReturnCount){

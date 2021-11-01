@@ -2327,6 +2327,7 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
     public void saveReturnModify(ZkbFePartOrder zkbPartOrder,UserAccount userAccount){
         if (ZkbFePartOrder.OrderType.SpareParts.toString().equals(zkbPartOrder.getOrderType())){
             List<ZkbFePartOrderReturn> ZkbFePartOrderReturnList = zkbPartOrder.getZkbFePartOrderReturnList();
+            List<ZkbFePartOrderReturn> oldZkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(zkbPartOrder.getId());
             for(ZkbFePartOrderReturn zkbFePartOrderReturn : ZkbFePartOrderReturnList){
                 String id = zkbFePartOrderReturn.getId();
                 ZkbFePartOrderReturn oldZkbFePartOrderReturn = null;
@@ -2336,21 +2337,17 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
                 if(oldZkbFePartOrderReturn == null){
                     oldZkbFePartOrderReturn = zkbFePartOrderReturn;
                 }
-                ZkbFePartOrderReturnLog zkbFePartOrderReturnLog = new ZkbFePartOrderReturnLog();
-                zkbFePartOrderReturnLog.setAssetNo(oldZkbFePartOrderReturn.getAssetNo());
-                zkbFePartOrderReturnLog.setQty(oldZkbFePartOrderReturn.getQty());
-                zkbFePartOrderReturnLog.setPartOrderId(oldZkbFePartOrderReturn.getPartOrderId());
-                zkbFePartOrderReturnLog.setOrderNo(oldZkbFePartOrderReturn.getOrderNo());
-                zkbFePartOrderReturnLog.setReturnType(oldZkbFePartOrderReturn.getReturnType());
-                zkbFePartOrderReturnLog.setComment(oldZkbFePartOrderReturn.getComment());
-                zkbFePartOrderReturnLog.setCreateDate(new Date());
-                zkbFePartOrderReturnLog.setCreateUserId(userAccount.getUid());
-                zkbFePartOrderReturnLog.setCreateUserName(userAccount.getName());
-                zkbFePartOrderReturnLogRepository.save(zkbFePartOrderReturnLog);
+                saveZkbFePartOrderReturnLog(oldZkbFePartOrderReturn,userAccount);
                 if(zkbFePartOrderReturn.getPartOrderId() == null){
                     zkbFePartOrderReturn.setPartOrderId(zkbPartOrder.getId());
                 }
                 zkbFePartOrderReturnRepository.save(zkbFePartOrderReturn);
+            }
+            for(ZkbFePartOrderReturn oldZkbFePartOrderReturn : oldZkbFePartOrderReturnList){
+                if(!ZkbFePartOrderReturnList.contains(oldZkbFePartOrderReturn)){
+                    saveZkbFePartOrderReturnLog(oldZkbFePartOrderReturn,userAccount);
+                    zkbFePartOrderReturnRepository.delete(oldZkbFePartOrderReturn);
+                }
             }
         }else if(ZkbFePartOrder.OrderType.Probe.toString().equals(zkbPartOrder.getOrderType())){
             ZkbFePartOrder oldZkbPartOrder = zkbFePartOrderRepository.findById(zkbPartOrder.getId());
@@ -2371,5 +2368,19 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
         }else{
             return ;
         }
+    }
+
+    public void  saveZkbFePartOrderReturnLog(ZkbFePartOrderReturn oldZkbFePartOrderReturn,UserAccount userAccount){
+        ZkbFePartOrderReturnLog zkbFePartOrderReturnLog = new ZkbFePartOrderReturnLog();
+        zkbFePartOrderReturnLog.setAssetNo(oldZkbFePartOrderReturn.getAssetNo());
+        zkbFePartOrderReturnLog.setQty(oldZkbFePartOrderReturn.getQty());
+        zkbFePartOrderReturnLog.setPartOrderId(oldZkbFePartOrderReturn.getPartOrderId());
+        zkbFePartOrderReturnLog.setOrderNo(oldZkbFePartOrderReturn.getOrderNo());
+        zkbFePartOrderReturnLog.setReturnType(oldZkbFePartOrderReturn.getReturnType());
+        zkbFePartOrderReturnLog.setComment(oldZkbFePartOrderReturn.getComment());
+        zkbFePartOrderReturnLog.setCreateDate(new Date());
+        zkbFePartOrderReturnLog.setCreateUserId(userAccount.getUid());
+        zkbFePartOrderReturnLog.setCreateUserName(userAccount.getName());
+        zkbFePartOrderReturnLogRepository.save(zkbFePartOrderReturnLog);
     }
 }
