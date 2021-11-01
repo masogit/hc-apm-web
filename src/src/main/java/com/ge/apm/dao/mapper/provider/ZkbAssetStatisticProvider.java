@@ -183,7 +183,7 @@ public class ZkbAssetStatisticProvider {
                 " zkb_asset_qr_code_info qr_code_info" +
                 " INNER JOIN tenant_info ti ON ti.uid=qr_code_info.tenant_uid" +
                 " INNER JOIN asset_info ai ON ai.system_id=qr_code_info.system_id AND ai.tenant_uid=qr_code_info.tenant_uid"+
-                " WHERE qr_code_info.tenant_name isnull"
+                " WHERE qr_code_info.can_not_past_qr_code is not null and qr_code_info.qr_code_count_state is null"
         );
         return sb.toString();
     }
