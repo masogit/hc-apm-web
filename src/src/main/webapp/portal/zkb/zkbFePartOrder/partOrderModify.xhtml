@@ -16,7 +16,7 @@
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.zkbFePartOrder_assetPrice}*</label>
-                    <p:inputText disabled="#{!zkbFePartOrderProbeController.hasEditRight('WaitingApm')}" value="#{zkbFePartOrderProbeController.selected.price}"  required="true" requiredMessage="#{msg.zkbFePartOrder_assetPrice} #{msg.ValidationRequire}"/>
+                    <p:inputText value="#{zkbFePartOrderProbeController.selected.price}"  required="true" requiredMessage="#{msg.zkbFePartOrder_assetPrice} #{msg.ValidationRequire}"/>
                 </h:panelGroup>
             </p:panelGrid>
             <p:dataTable id="zkbFePartOrderAssetInfoList_Modify" value="#{zkbFePartOrderSparePartDetailController.selected.zkbFePartOrderAssetInfoList}" var="item"
