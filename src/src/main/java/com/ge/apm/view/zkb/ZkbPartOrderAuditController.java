@@ -1055,6 +1055,10 @@ public class ZkbPartOrderAuditController extends GenericCRUDUUIDController<ZkbPa
     }
 
     public void saveReturn(){
+        if(!"DOA".equals(zkbPartOrderReturn.getReturnType())){
+            zkbPartOrderReturn.setPartSerialNumber(null);
+            zkbPartOrderReturn.setPartQualityIssue(null);
+        }
         if("Create".equals(actionReturnName) || "Edit".equals(actionReturnName)){
             boolean flag = true;
             Integer total = 0;
