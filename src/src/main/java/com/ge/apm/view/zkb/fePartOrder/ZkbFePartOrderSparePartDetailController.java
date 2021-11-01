@@ -901,6 +901,10 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         return zkbFePartOrderService.hasOrderModifyRight(selected.getOrderType(),selected.getStatus(),configTypeMap);
     }
 
+    public boolean hasOrderReturnModifyRight() {
+        return zkbFePartOrderService.hasOrderReturnModifyRight(selected.getOrderType(),selected.getStatus(),configTypeMap);
+    }
+
     public boolean hasAdminRight() {
         return this.zkbFePartOrderService.hasAdminRight(configTypeMap);
     }
@@ -912,7 +916,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         for(ZkbFePartOrderAssetInfo zkbFePartOrderAssetInfo : selected.getZkbFePartOrderAssetInfoList()){
             if(StringUtils.isEmpty(zkbFePartOrderAssetInfo.getAssetNo())){
                 flag = false;
-                errorLog += "配件号不能为空,";
+                errorLog += "备件号不能为空,";
             }
             if(StringUtils.isEmpty(zkbFePartOrderAssetInfo.getAssetDescription())){
                 flag = false;
@@ -931,7 +935,7 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
                 if(!oldItem.getAssetNo().equals(zkbFePartOrderAssetInfo.getAssetNo()) || !oldItem.getAssetDescription().equals(zkbFePartOrderAssetInfo.getAssetDescription())){
                     if(StringUtils.isEmpty(zkbFePartOrderAssetInfo.getSparePart())){
                         flag = false;
-                        errorLog += "配件号或配件名称修改后备注不能为空,";
+                        errorLog += "备件号或配件名称修改后备注不能为空,";
                     }
                 }
             }
@@ -948,12 +952,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
     }
 
-    public void saveReturnModify(){
+    public String saveReturnModify(){
         RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+        String urlPage = "";
         List<ZkbFePartOrderReturn> zkbFePartOrderReturnList = this.selected.getZkbFePartOrderReturnList();
-        if(CollectionUtils.isEmpty(zkbFePartOrderReturnList)||!this.checkHasNew(zkbFePartOrderReturnList)) {
+        if(CollectionUtils.isEmpty(zkbFePartOrderReturnList)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_returnListCannotBeNull"));
-            return ;
+            return urlPage;
         }
         List<ZkbFePartOrderAssetInfo> assetInfoList = this.selected.getZkbReturnFePartOrderAssetInfoList();
         Map<String,Integer> assetInfoMap = this.zkbFePartOrderService.getAssetInfoMap(assetInfoList);
@@ -964,13 +969,13 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             }
             if(zkbFePartOrderReturnMap.get(key)>assetInfoMap.get(key)) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_returnTooMaxError"));
-                return ;
+                return urlPage;
             }
         }
         ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
         int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
-        List<ZkbFePartOrderReturn> oldZkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(this.selected.getId());
-        int oldReturnCount = this.getReturnCount(zkbFePartOrderReturnList);
+        List<ZkbFePartOrderReturn> oldZkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId());
+        int oldReturnCount = this.getReturnCount(oldZkbFePartOrderReturnList);
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())) {
             if(returnCount > oldReturnCount){
                 this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,oldReturnCount-returnCount,this.currentUser,this.selected,"备件申请已归还信息修改退还名额");
@@ -980,7 +985,11 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
         }
         zkbFePartOrderService.saveReturnModify(selected,currentUser);
         this.selected=this.zkbFePartOrderRepository.findById(selected.getId());
-        selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnRepository.findByPartOrderId(this.selected.getId()));
-        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+        selected.setZkbFePartOrderReturnList(zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId()));
+//        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+        return UrlEncryptController.encodeUrlParam("Edit?action=" + ZkbFePartOrderController.EDIT_ACTION + "&id=" + this.selected.getId() + "&queryStatus=myWork");
+    }
+    public String cancelOrderModify(){
+       return UrlEncryptController.encodeUrlParam("Edit?action=" + ZkbFePartOrderController.EDIT_ACTION + "&id=" + this.selected.getId() + "&queryStatus=myWork");
     }
 }

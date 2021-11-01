@@ -64,6 +64,7 @@ public class ZkbAssetStatisticProvider {
      */
     public String buildFilter_loadAllAsset(List<SearchFilter> searchFilterList){
         StringBuilder sb = new StringBuilder();
+        if(searchFilterList == null) return "";
         for (SearchFilter searchFilter : searchFilterList) {
             String tempColumn = searchFilter.fieldName;
             Object value = searchFilter.value;
@@ -153,14 +154,11 @@ public class ZkbAssetStatisticProvider {
                 " WHERE" +
                 " ac.contract_no is not null AND ai.system_id is not null" +
                 " AND to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date" +
-                " AND (qr_code_info.qr_code_count_state is null OR qr_code_info.qr_code_count_state='N') " +
-                " AND (qr_code_info.can_not_past_qr_code is null OR qr_code_info.can_not_past_qr_code='N')"
+                " AND (qr_code_info.qr_code_count_state is null OR qr_code_info.qr_code_count_state='N') "
         );
-        if(param != null){
-            List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
-            String filter = buildFilter_loadAllAsset(searchFilterList);
-            sb.append(filter);
-        }
+        List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
+        String filter = buildFilter_loadAllAsset(searchFilterList);
+        sb.append(filter);
 
         return sb.toString();
     }
