@@ -895,11 +895,10 @@ public class ZkbFePartOrderProbeController extends GenericCRUDUUIDController<Zkb
         if(!oldZkbPartOrder.getReturnType().equals(selected.getReturnType())){
             Integer type = 0;
             String step = null;
-            if("badReturn".equals(oldZkbPartOrder.getReturnType())){
+            if("badReturn".equals(selected.getReturnType())){
                 type = 3;
                 step = "探头申请已归还信息修改扣除名额";
-            }
-            if (!"badReturn".equals(selected.getReturnType())) {
+            }else{
                 type = 5;
                 step = "探头申请已归还信息修改坏还退还名额";
             }
