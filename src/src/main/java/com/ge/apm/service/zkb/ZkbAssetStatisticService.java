@@ -169,8 +169,8 @@ public class ZkbAssetStatisticService {
     }
 
     public void regenerateZkbAssetQrCodeInfo(List<SearchFilter> searchFilter){
-        //先清除数据在重新生成
-        zkbAssetQrCodeInfoRepository.deleteZkbAssetQrCodeInfo();
+        //先清除已过期的合同中关联的设备、已修改system_id和已失效的设备数据
+        zkbAssetQrCodeInfoRepository.deleteZkbAssetQrCodeInfo(new Date());
         List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = zkbAssetStatisticMapper.getZkbAssetQrCodeInfoList(null);
         if(zkbAssetQrCodeInfoList == null || zkbAssetQrCodeInfoList.size() == 0){
             WebUtil.addErrorMessage("没有新的二维码记录需要生成");
@@ -180,12 +180,12 @@ public class ZkbAssetStatisticService {
             handleQRCodeInfo(zkbAssetQrCodeInfo);
         }
         //这里主要是针对历史数据的数据补全
-        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList2 = zkbAssetStatisticMapper.getZkbAssetQrCode();
-        if(zkbAssetQrCodeInfoList2 != null || zkbAssetQrCodeInfoList2.size() > 0){
-            for (ZkbAssetQrCodeInfo zkbAssetQrCodeInfo : zkbAssetQrCodeInfoList2){
-                zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
-            }
-        }
+//        List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList2 = zkbAssetStatisticMapper.getZkbAssetQrCode();
+//        if(zkbAssetQrCodeInfoList2 != null || zkbAssetQrCodeInfoList2.size() > 0){
+//            for (ZkbAssetQrCodeInfo zkbAssetQrCodeInfo : zkbAssetQrCodeInfoList2){
+//                zkbAssetQrCodeInfoRepository.save(zkbAssetQrCodeInfo);
+//            }
+//        }
     }
 
     @Transactional(rollbackFor = Exception.class)

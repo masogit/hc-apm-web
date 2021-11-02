@@ -1,4 +1,9 @@
 
+--不良事件字段非空约束修改
+alter table adverse_events alter asset_name drop not null;
+alter table adverse_events alter device_num drop not null;
+alter table adverse_events alter product_name drop not null;
+alter table adverse_events alter registration_number drop not null;
 --不良事件字段长度修改
 alter table adverse_events alter column medical_history type varchar(1000);
 alter table adverse_events alter column except_affect type varchar(1000);
