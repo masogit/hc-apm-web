@@ -967,20 +967,21 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
             if(!zkbFePartOrderReturnMap.containsKey(key)) {
                 continue;
             }
-            if(zkbFePartOrderReturnMap.get(key)>assetInfoMap.get(key)) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("zkbFePartOrder_returnTooMaxError"));
+            if(zkbFePartOrderReturnMap.get(key) != assetInfoMap.get(key)) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("归还数量必须等于申请数量"));
                 return urlPage;
             }
         }
-        ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
-        int returnCount = this.getReturnCount(zkbFePartOrderReturnList);
-        List<ZkbFePartOrderReturn> oldZkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId());
-        int oldReturnCount = this.getReturnCount(oldZkbFePartOrderReturnList);
+
         if(!ZkbFePartOrderService.highArtificialTypeValue.equals(this.selected.getArtificialType())) {
-            if(returnCount > oldReturnCount){
-                this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,oldReturnCount-returnCount,this.currentUser,this.selected,"备件申请已归还信息修改退还名额");
-            }else if(returnCount < oldReturnCount){
-                this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,returnCount-oldReturnCount,this.currentUser,this.selected,"备件申请已归还信息修改补扣名额");
+            ZkbContract zkbContract =  this.zkbContractRepository.findById(this.selected.getContractId());
+            List<ZkbFePartOrderReturn> oldZkbFePartOrderReturnList = this.zkbFePartOrderReturnRepository.findByPartOrderId(selected.getId());
+            int oldBadReturnCount = getBadReturnCount(oldZkbFePartOrderReturnList);
+            int badreturnCount = getBadReturnCount(zkbFePartOrderReturnList);
+            if(badreturnCount > oldBadReturnCount){
+                this.zkbFePartOrderService.moveSpareQuota(3,zkbContract,oldBadReturnCount-badreturnCount,this.currentUser,this.selected,"备件申请已归还信息修改补扣名额");
+            }else if(badreturnCount < oldBadReturnCount){
+                this.zkbFePartOrderService.moveSpareQuota(4,zkbContract,badreturnCount-oldBadReturnCount,this.currentUser,this.selected,"备件申请已归还信息修改退还名额");
             }
         }
         zkbFePartOrderService.saveReturnModify(selected,currentUser);
@@ -989,7 +990,23 @@ public class ZkbFePartOrderSparePartDetailController extends GenericCRUDUUIDCont
 //        RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
         return UrlEncryptController.encodeUrlParam("Edit?action=" + ZkbFePartOrderController.EDIT_ACTION + "&id=" + this.selected.getId() + "&queryStatus=myWork");
     }
+
     public String cancelOrderModify(){
        return UrlEncryptController.encodeUrlParam("Edit?action=" + ZkbFePartOrderController.EDIT_ACTION + "&id=" + this.selected.getId() + "&queryStatus=myWork");
+    }
+
+    /**
+     * 获取坏还总数
+     * @param zkbFePartOrderReturnList
+     * @return
+     */
+    public int getBadReturnCount(List<ZkbFePartOrderReturn> zkbFePartOrderReturnList){
+        int qty = 0;
+        for(ZkbFePartOrderReturn item:zkbFePartOrderReturnList) {
+            if(badReturnValue.equals(item.getReturnType())||StringUtils.isNotBlank(item.getId())){
+                qty = qty + item.getQty();
+            }
+        }
+        return qty;
     }
 }
