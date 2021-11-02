@@ -169,7 +169,7 @@ public class ZkbAssetStatisticService {
     }
 
     public void regenerateZkbAssetQrCodeInfo(List<SearchFilter> searchFilter){
-        //先清除过期合同设备数据在重新生成
+        //先清除已过期的合同中关联的设备、已修改system_id和已失效的设备数据
         zkbAssetQrCodeInfoRepository.deleteZkbAssetQrCodeInfo(new Date());
         List<ZkbAssetQrCodeInfo> zkbAssetQrCodeInfoList = zkbAssetStatisticMapper.getZkbAssetQrCodeInfoList(null);
         if(zkbAssetQrCodeInfoList == null || zkbAssetQrCodeInfoList.size() == 0){
