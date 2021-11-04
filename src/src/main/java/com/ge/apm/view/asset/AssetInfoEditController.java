@@ -204,7 +204,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         assetHistoryService = WebUtil.getBean(AssetHistoryService.class);
         authGroupDao = WebUtil.getBean(SysAuthGroupRepository.class);
         medicalInstrumentsClassificationCompCtrl = WebUtil.getBean(MedicalInstrumentsClassificationCompCtrl.class);
-
         medicalInstrumentsClassificationCompCtrl.registerController(this);
 
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -285,6 +284,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             if (readableFieldsList.contains("createdBy")) {
                 readableFieldsList.remove("createdBy");
             }
+        }
+        if(selected.getUnitPriceElectricity()==null){
+            WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
+            selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
         }
         initGbTree();
         initOrgTree();
@@ -437,6 +440,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("clinicalOwner", selected.getClinicalOwnerId() == null ? null : userDao.findById(selected.getClinicalOwnerId()));
         selectedObjectMap.put("clinicalDept", selected.getClinicalDeptUID() == null ? null : orgDao.findByUid(selected.getClinicalDeptUID()));
         selectedObjectMap.put("assetDept", selected.getAssetDeptUID() == null ? null : orgDao.findByUid(selected.getAssetDeptUID()));
+        selectedObjectMap.put("accountingDept", selected.getAccountingDeptUID() == null ? null : orgDao.findByUid(selected.getAccountingDeptUID()));
         selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
         selectedObjectMap.put("maintainer", selected.getMaitananceId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getMaitananceId())));
         selectedObjectMap.put("manufacturer", selected.getManufactureId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getManufactureId())));
@@ -652,7 +656,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage("设备编号已被占用");
             return "";
         }
-
+        if(selected.getUnitPriceElectricity()==null){
+            WorkflowConfig workflowConfig = configService.findConfigBySite(selected.getSiteUID());
+            selected.setUnitPriceElectricity(workflowConfig != null ? workflowConfig.getUnitPriceElectricity() : null);
+        }
         //设置质保时间
         if (null == selected.getFactoryWarrantyDate()) {
             if (selected.getAcceptDate() != null && selected.getWarrantyMonth() != null) {
@@ -928,7 +935,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     //转入待报废
     public String processToBeTerminated() {
         int originStatus = selected.getStatus();
+        AssetInfo oldAssetInfo = assetHistoryService.depCopy(selected);
         this.selected.setStatus(4);
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
         update();
         assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
         return "AssetList?faces-redirect=true";
@@ -937,9 +946,11 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     //重新启用
     public String processToBeValid() {
         int originStatus = selected.getStatus();
+        AssetInfo oldAssetInfo = assetHistoryService.depCopy(selected);
         this.selected.setStatus(1);
         this.selected.setIsValid(true);
         this.selected.setTerminateDate(null);
+        assetHistoryService.saveAssetHistoryIfUpdated(oldAssetInfo,selected);
         update();
         assetLifecyleService.saveLifecycle(originStatus,selected,UserContextService.getCurrentUserAccount());
         return "AssetTerminateEntryList?faces-redirect=true";

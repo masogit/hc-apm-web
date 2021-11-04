@@ -57,6 +57,6 @@ public interface SimplePartsCategoryRepository extends JpaRepository<SimpleParts
     @Query(value = "select sys.encoded from simple_parts_category sys where sys.encoded=?1 and sys.tenant_uid = ?2", nativeQuery = true)
     String findEncodedById(String id, String tenantUid);
 
-    @Query(value = "select * from simple_parts_category cat where cat.encoded=?1", nativeQuery = true)
-    SimplePartsCategory findByEncoded(String encoded);
+    @Query(value = "select * from simple_parts_category cat where cat.encoded=?1 and cat.tenant_uid=?2", nativeQuery = true)
+    SimplePartsCategory findByEncoded(String encoded, String tenantUid);
 }

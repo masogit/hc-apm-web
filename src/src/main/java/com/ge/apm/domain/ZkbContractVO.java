@@ -26,6 +26,7 @@ public class ZkbContractVO extends ZkbContract {
         this.lineNum = lineNum;
     }
 
+
     public boolean isNull() {
         boolean flag = false;
 

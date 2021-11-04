@@ -13,7 +13,9 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.pure.SimplePartsItemValue;
 import com.ge.apm.domain.simpleparts.SimplePartsInventory;
 import com.ge.apm.domain.simpleparts.SimplePartsItem;
+import com.ge.apm.service.approval.MultiLevelApprovalService;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.constant.ApprovalConstant;
 import com.ge.apm.service.constant.AssetConstant;
 import com.ge.apm.service.constant.SimplePartsConstant;
 import com.ge.apm.service.constant.WorkOrderConstant;
@@ -24,6 +26,7 @@ import com.ge.apm.service.utils.ApmConstant;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.service.wo.WorkflowService;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -43,6 +46,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -113,6 +117,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private  UserOrgInfoRepository userOrgInfoRepository;
     private BlobObjectRepository blobObjectRepository;
     private V2_ServiceRequest newServiceRequest;
+    private WorkflowService workflowService;
     private MvsAssetInfoRepository mvsAssetInfoRepository;
     private V2_WorkOrder selectedWorkOrder;
     private List<V2_WorkOrder> selectedWorkOrderList;
@@ -159,7 +164,6 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     private String token;
     private OrgInfoTreeService orgInfoTreeService;
     private AutoCompleteService autoCompleteService;
-
     private AssetInfoMgrService aimService;
     private List<Supplier> supplierList = new ArrayList<Supplier>();
     private Map<String, Object> selectedObjectMap = new HashMap();
@@ -196,13 +200,19 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
     @Getter
     @Setter
     private Integer currentQuantity;
+    @Setter@Getter
+    private boolean hasConfigMultiLevelApproval = false;
     private SimplePartsRequestService partsRequestService;
     private SimplePartsInventoryService partsInventoryService;
     private SimplePartsItemService partsItemService;
     private SimplePartsRequestWorkOrderService partsRequestWorkOrderService;
     private SimplePartsConfigService partsConfigService;
+    private MultiLevelApprovalService multiLevelApprovalService;
+    @Setter@Getter
+    private String highlevelApprovalComments;
     @Override
     protected void init() {
+        super.init();
         try {
             supplierController = WebUtil.getBean(SupplierController.class);
             ccService = WebUtil.getBean(CustomConfigService.class);
@@ -229,6 +239,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             woConDao = WebUtil.getBean(WorkflowConfigRepository.class);
             woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
             assetInfoMapper = WebUtil.getBean(AssetInfoMapper.class);
+            workflowService = WebUtil.getBean(WorkflowService.class);
             serviceRequestApiService = WebUtil.getBean(ServiceRequestApiService.class);
             orgInfoTreeService = WebUtil.getBean(OrgInfoTreeService.class);
             autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
@@ -237,6 +248,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
             partsItemService = WebUtil.getBean(SimplePartsItemService.class);
             partsRequestWorkOrderService = WebUtil.getBean(SimplePartsRequestWorkOrderService.class);
             partsConfigService = WebUtil.getBean(SimplePartsConfigService.class);
+            multiLevelApprovalService = WebUtil.getBean(MultiLevelApprovalService.class);
             selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             tenantInfo = userContextService.getTenantInfo();
             customConfig = ccService.getCustomConfigBySite(selectSite.getUid());
@@ -285,10 +297,12 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         this.mvsAssetInfo = mvsAssetInfo;
     }
     public void partsPriceUpdate(){
-        if(itemDetail.getClosedPrice()==null||itemDetail.getClosedPrice()==0.0) {
-            itemDetail.setClosedPrice(itemDetail.getPartsPrice());
+        if(itemDetail.getApartsQuantity() == null || itemDetail.getPartsPrice() == null ){
+            itemDetail.setClosedPrice(0.0);
+        }else{
+            itemDetail.setClosedPrice(itemDetail.getPartsPrice()*itemDetail.getApartsQuantity());
         }
-}
+    }
 
    /* public boolean displayTime(){
        if(subStatus==1)
@@ -297,7 +311,7 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
            return false;
     }
 */
-    @Getter @Setter
+    @Setter
     public boolean displayTime=false;
 
     public UserAccount getUa1() {
@@ -385,17 +399,25 @@ public class WorkOrderMgrController extends  GenericCRUDUUIDController<V2_WorkOr
         }
     }
     public void selectSubstatus(){
-        if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
+        if(selectedWorkOrder.getSubStatus() == null){
+            displayTime=false;
+        }else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS1){
             subStatus =1;
             displayTime=true;
-        }
-        else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS2){
+        }else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS2){
             subStatus =2;
             displayTime=false;
         } else if(selectedWorkOrder.getSubStatus().intValue()==ApmConstant.SUBSTATUS3){
             subStatus =3;
             displayTime=false;
         }
+    }
+
+    public boolean getDisplayTime(){
+        if(selectedWorkOrder.getSubStatus() == null){
+            return false;
+        }
+        return this.displayTime;
     }
 
     public void closePrcieUpdate(){
@@ -851,7 +873,7 @@ public void test1(){
                 searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
                 if(!(userContextService.hasRole("AssetHead")||userContextService.hasRole("DeptHead"))){
                     searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-}
+                }
                 if(userContextService.hasRole("DeptHead")){
                     List<String> clinicalUidList =  orgDao.findClinicalUidBySiteUid(Arrays.asList(userContextService.getCurrentUserAccount().getSiteUID()));
                     searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
@@ -896,8 +918,12 @@ public void test1(){
             boolean isId= false;
             for (SearchFilter searchFilter :searchFilters) {
                 if ("id".equals(searchFilter.fieldName)) {
-                    value = (String)searchFilter.value;
-                    isId = true;
+                    if(searchFilter.value instanceof java.util.List){
+                        isId = false;
+                    }else{
+                        value = (String)searchFilter.value;
+                        isId = true;
+                    }
                 }
             }
             if(isId) {
@@ -1084,6 +1110,27 @@ public void test1(){
         }
 
    }
+    public String getRepairPersonName(String woId,Integer step){
+        List <V2_WorkOrder_Step >vs=null;
+        vs =woService.getWorkOrderRepaireName(woId,step);
+        if(vs !=null && vs.size()>0){
+            if(vs.size()==1){
+                return vs.get(0).getOwnerName();
+            }else{
+                V2_WorkOrder_Step lastRepaireName = vs.get(0);
+                for(V2_WorkOrder_Step woStep : vs){
+                    boolean before = lastRepaireName.getStartTime().before(woStep.getStartTime());
+                    if(before){
+                        lastRepaireName = woStep;
+                    }
+                }
+                return lastRepaireName.getOwnerName();
+            }
+        }else {
+            return "";
+        }
+
+    }
 
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
@@ -1187,8 +1234,14 @@ public void test1(){
 
 
     public void prepareCompleteOrder(String woid) {
-
         selectedWorkOrder = dao.findById(woid);
+        MultiLevelApprovalConfig approval = multiLevelApprovalService.checkMultiLevelApprovalPersonAndSubmit(selectedWorkOrder);
+        hasConfigMultiLevelApproval = false;
+        if (approval != null) {
+            logger.info("维修-----------多级审核已激活");
+            hasConfigMultiLevelApproval = true;
+        }
+
         acker=woService.getAckerList(selectedWorkOrder.getId());
         //如果子状态为1 说明是等待备件 需要显示日期
 
@@ -1219,13 +1272,10 @@ public void test1(){
        }
 
         //获取当前工单的所属流程配置
-
         ResponseEntity<LinkedHashMap> reponseBody = serviceRequestApiService.invokeWorkFlowConfig(token,
                 selectedWorkOrder.getAssetId());
         hourRequired = Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("hourRequired")).orElse(false);
-
-
 
         if (selectedWorkOrder.getManHours() != null && selectedWorkOrder.getManHours() == 0.0) {
             selectedWorkOrder.setManHours(null);
@@ -1233,7 +1283,6 @@ public void test1(){
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
         statusStartTime=selectedWorkOrder.getStatusStartTime();
         statusCloseTime=selectedWorkOrder.getStatusCloseTime();
-      //  currentStatus = 1; //selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = woService.getAttachByBoSubType(selectedWorkOrder.getSrId(), V2_BlobObject.BO_SUB_TYPE_IMG);
@@ -1246,6 +1295,20 @@ public void test1(){
                 selectedWorkOrder.getAssetId());
         return Optional.ofNullable(reponseBody).map(ResponseEntity::getBody).map(body -> (Map) body.get("data"))
                 .map(data -> (Boolean) data.get("isCasetypeRequired")).orElse(false);
+    }
+
+    // 走多级审批流,提交审核
+    public void submitForApproval() throws Exception {
+        if(selectedWorkOrder == null){
+            return;
+        }
+        MultiLevelApproval approval = multiLevelApprovalService.getMultiLevelApprovalPersonAndSubmit(selectedWorkOrder, null, false);
+        if (approval == null) {
+            WebUtil.addErrorMessage("审批流发起失败,请配置审批流!");
+            return ;
+        }
+        selectedWorkOrder.setApprovalStatus(WorkOrderConstant.APPROVAL_STATUS_PENDING);
+        dao.save(selectedWorkOrder);
     }
 
     //  提交审核前的计算
@@ -1500,6 +1563,10 @@ public void test1(){
     }
 
     public void saveServiceRequest() {
+        WorkflowConfig woc = workflowService.fetchWorkflowByAssetId(selectedAsset.getId());
+        if (woc != null && woc.getIsWoSupplierAutoEnabled() !=null && woc.getIsWoSupplierAutoEnabled()) {
+            this.saveServiceRequestSupplier();
+        }
         if(StringUtils.isEmpty(faultReason)){
             newServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
         }else{
@@ -1523,7 +1590,51 @@ public void test1(){
         } else {
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(locationName);
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picList,null);
+            cancel();
+        }
+    }
+
+
+    public void saveServiceRequestSupplier() {
+        if(StringUtils.isEmpty(faultReason)){
+            newServiceRequest.setRequestReason(WebUtil.getMessage("EquipmentFault"));
+        }else{
+            newServiceRequest.setRequestReason(faultReason);
+        }
+        if(selectedAsset.getSupplierNewUID() == null){
+            WebUtil.addErrorMessage("设备未关联供应商,无法使用供应商派工");
+            return;
+        }
+        Map<String, Object> map = woService.findSupplierFEByAssetUid(selectedAsset);
+        List<UserAccount>  data = (List<UserAccount>)map.get("data");
+        if(ObjectUtils.isEmpty(data)){
+            WebUtil.addErrorMessage("设备未绑定供应商维修工程师");
+            return;
+        }
+        int size = data.size();
+        if(size>1){
+            WebUtil.addErrorMessage("设备绑定工程师过多");
+            return;
+        }
+        if (null == selectedAsset) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoEquipmentSelectedNoRepairTip"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
+        if (selectedAsset.getStatus() == 4) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ToBeTerminatedCannotBeRequestedForRepairTip"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("NoAssetDepartmentNoRepaired"));
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        } else {
+            selectedAsset.setStatus(currentStatus);
+            newServiceRequest.setAssetLocation(locationName);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picList,2);
             cancel();
         }
     }
@@ -1635,6 +1746,13 @@ public void test1(){
             currentCustomConfig = customConfigService.getCurrentCustomConfig(selectedWorkOrder.getSiteUID());
             eval = JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType");
             itemDetail.setPartsType(String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType")));
+            String partsType = String.valueOf(JSONPath.eval(currentCustomConfig, "$.mobilePage.pageWorkOrder.accessoryDefaultType"));
+            if (WorkOrderConstant.PARTS_TYPE_RECEIVING.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_RECEIVING;
+            }
+            if (WorkOrderConstant.PARTS_TYPE_PURCHASE.equals(partsType)) {
+                statusFlag = WorkOrderConstant.STATUS_FLAG_PURCHASE;
+            }   
         } else {
             switchTmp=false;
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(selectedWorkOrder.getId())).findAny().get();
@@ -1906,50 +2024,10 @@ public void test1(){
         cancel();
     }
 
-    public void approveWorkOrder() {
-        List<V2_WorkOrder_Detail> approvedDetailsNew = new ArrayList<>();
-        if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
-            WebUtil.addErrorMessage(WebUtil.getMessage(WebUtil.getMessage("ApprovalFallureReasonRequired")));
-            RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
-            return;
+    public void approveHighLevelWorkOrder() {
+        if (com.alibaba.druid.util.StringUtils.isEmpty(highlevelApprovalComments)) {
+            highlevelApprovalComments = WebUtil.getMessage("highlevelApproval");
         }
-        if(this.isEnableIntegrationWithWorkOrder()){
-            for (int i = 0; i < approvedDetails.size(); i++) {
-                V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
-                if (selectedMap.get(v2_workOrder_detail.getId())) {
-                    if(v2_workOrder_detail.getPartsItemId() !=null){
-                        if (!v2_workOrder_detail.getApproved()) {
-                            approvedDetailsNew.add(v2_workOrder_detail);
-                        }
-                        v2_workOrder_detail.setApproved(true);
-                    }
-                }
-            }
-            if (selectedApproverUid ==null) {
-                //最后一个审批通过的时候 生成相应单子
-                List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
-                List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
-                if (!approvedDetailsNew.isEmpty()) {
-                    for (int i = 0; i < approvedDetailsNew.size(); i++) {
-                        V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
-                        if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
-                            accessorySparePartsRequestList.add(v2_workOrder_detail);
-                        } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
-                            accessorySparePartsBuyList.add(v2_workOrder_detail);
-                        }
-                    }
-                    if (!accessorySparePartsRequestList.isEmpty()) {
-                        LOGGER.info("维修工单生成申领单start!!!!");
-                        partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER);//生成申领单
-                    }
-                    if (!accessorySparePartsBuyList.isEmpty()) {
-                        LOGGER.info("维修工单生成申购单start!!!!");
-                        partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER);//生成申购单
-                    }
-                }
-            }
-        }
-
         approvedDetails.stream().filter(item -> selectedMap.get(item.getId())).forEach(item -> item.setApproved(true));
         approvedDetails.forEach(item -> {
             item.setCreatedDate(null);
@@ -1957,6 +2035,59 @@ public void test1(){
                 item.setApproved(false);
             }
         });
+        woService.approveHighLevelAction(selectedWorkOrder, approvedDetails, highlevelApprovalComments, selectedApproverUid);
+        cancel();
+    }
+
+    public void approveWorkOrder() {
+        if (selectedApproverUid !=null) {
+            approveHighLevelWorkOrder();
+            return;
+        }
+
+        List<V2_WorkOrder_Detail> approvedDetailsNew = new ArrayList<>();
+        if (approvedDetails.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId())) && Strings.isNullOrEmpty(comments)) {
+            WebUtil.addErrorMessage(WebUtil.getMessage(WebUtil.getMessage("ApprovalFallureReasonRequired")));
+            RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
+            return;
+        }
+
+        for (int i = 0; i < approvedDetails.size(); i++) {
+            V2_WorkOrder_Detail v2_workOrder_detail = approvedDetails.get(i);
+            if (selectedMap.get(v2_workOrder_detail.getId())) {
+                if (v2_workOrder_detail.getApproved() == null || !v2_workOrder_detail.getApproved()) {
+                    approvedDetailsNew.add(v2_workOrder_detail);
+                }
+                v2_workOrder_detail.setApproved(true);
+            }else{
+                v2_workOrder_detail.setApproved(false);
+                approvedDetailsNew.add(v2_workOrder_detail);
+            }
+        }
+
+        if(this.isEnableIntegrationWithWorkOrder()){
+            //最后一个审批通过的时候 生成相应单子
+            List<V2_WorkOrder_Detail> accessorySparePartsBuyList = new ArrayList<>();//申购
+            List<V2_WorkOrder_Detail> accessorySparePartsRequestList = new ArrayList<>();//申领
+            if (!approvedDetailsNew.isEmpty()) {
+                for (int i = 0; i < approvedDetailsNew.size(); i++) {
+                    V2_WorkOrder_Detail v2_workOrder_detail = approvedDetailsNew.get(i);
+                    if (ApmConstant.TREASURY_USE.equals(v2_workOrder_detail.getPartsType())) {//库房领用
+                        accessorySparePartsRequestList.add(v2_workOrder_detail);
+                    } else if (ApmConstant.MEDICAL_WORKERS_PURCHASING.equals(v2_workOrder_detail.getPartsType())) {//医工采购
+                        accessorySparePartsBuyList.add(v2_workOrder_detail);
+                    }
+                }
+                if (!accessorySparePartsRequestList.isEmpty()) {
+                    V2_WorkOrder v2_WorkOrder = dao.findById(accessorySparePartsRequestList.get(0).getWoId());
+                    partsRequestWorkOrderService.savePartsRequest(accessorySparePartsRequestList, SimplePartsConstant.WORK_ORDER, userDao.getById(v2_WorkOrder.getCurrentPersonId()));//生成申领单
+                }
+                if (!accessorySparePartsBuyList.isEmpty()) {
+                    V2_WorkOrder v2_WorkOrder = dao.findById(accessorySparePartsBuyList.get(0).getWoId());
+                    partsRequestWorkOrderService.savePartsPurchase(accessorySparePartsBuyList, SimplePartsConstant.WORK_ORDER, userDao.getById(v2_WorkOrder.getCurrentPersonId()));//生成申购单
+                }
+            }
+        }
         woService.approveAction(selectedWorkOrder, approvedDetails, comments);
         cancel();
     }

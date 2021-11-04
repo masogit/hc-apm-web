@@ -3,6 +3,8 @@ package com.ge.apm.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.ge.apm.domain.pure.ApprovableTarget;
+import com.ge.apm.service.constant.ApprovalConstant;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -13,6 +15,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +23,7 @@ import java.util.List;
 @Table(name = "v2_work_order")
 /*@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable(true)*/
-public class V2_WorkOrder implements Serializable {
+public class V2_WorkOrder implements Serializable, ApprovableTarget {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -89,6 +92,7 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "total_price")
     private Double totalPrice;
 
+    //1：流程中；2：已完成；3：已取消 (生命周期状态 :具体流程需查看步骤表)
     @Column(name = "status")
     private Integer status;
 
@@ -186,6 +190,10 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "man_hours")
     private Double manHours;
 
+    /**
+     * 补充维修工单 approvalStatus 字段含义
+     * 0 初始化工单(新建工单审核状态), 1 待审核, 2 审核同意, 3 审核不同意, 4 审批部分同意
+     */
     @Column(name = "approval_status")
     private String approvalStatus;
 
@@ -265,13 +273,66 @@ public class V2_WorkOrder implements Serializable {
     private String closeStepOwnerName;
     @Column(name="close_Step_End_Time")
     private Date closeStepEndTime;
-    
+
+    @Column(name = "import_by")
+    private String importBy; //  工单导入人
+
+    /**
+     * 供应商派工时  供应商uid
+     */
+    @Column(name = "supplier_uid")
+    private String supplierUid;
+    /**
+     * 工单创建类型  1:医院创建   2:供应商创建
+     */
+    @Column(name = "create_type",columnDefinition=" integer default 1 ")
+    private Integer createType = 1;
+
+    @Transient
+    private Integer orderCount;
+
+    public Integer getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(Integer createType) {
+        this.createType = createType;
+    }
+
+    @Override
+    public BigDecimal getTotalPriceToBigDecimal() {
+        return totalPrice == null ? null : new BigDecimal(totalPrice);
+    }
+
+    @Override
+    public String getBusinessNumber() {
+        return getServiceRequest().getSrNum();
+    }
+
+    @Override
+    public String getBusinessUid() {
+        return getId();
+    }
+
+    @Override
+    public int getBusinessType() {
+        return  ApprovalConstant.BUSINESS_TYPE_ASSET_REPAIR_INT;
+    }
+
     public Integer getDispatchMode() {
         return dispatchMode;
     }
 
     public void setDispatchMode(Integer dispatchMode) {
         this.dispatchMode = dispatchMode;
+    }
+
+    public String getSupplierUid() {
+        return supplierUid;
+    }
+
+    public void setSupplierUid(String supplierUid) {
+        this.supplierUid = supplierUid;
     }
 
     public String getTenantUID() {
@@ -361,6 +422,10 @@ public class V2_WorkOrder implements Serializable {
     public void setV2_workOrder_detail_list(List<V2_WorkOrder_Detail> v2_workOrder_detail_list) {
         this.v2_workOrder_detail_list = v2_workOrder_detail_list;
     }
+
+    public String getImportBy() { return importBy; }
+
+    public void setImportBy(String importBy) { this.importBy = importBy; }
 
     public AssetInfo getAssetInfo() {
         return assetInfo;
@@ -828,5 +893,13 @@ public class V2_WorkOrder implements Serializable {
 
     public void setStatusCloseTime(Date statusCloseTime) {
         this.statusCloseTime = statusCloseTime;
+    }
+
+    public Integer getOrderCount() {
+        return orderCount;
+    }
+
+    public void setOrderCount(Integer orderCount) {
+        this.orderCount = orderCount;
     }
 }

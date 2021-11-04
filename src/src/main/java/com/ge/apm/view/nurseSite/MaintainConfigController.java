@@ -12,7 +12,10 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.DualListModel;
@@ -93,6 +96,11 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private AssetSelectController assetSelectController;
   	private UserAuth customRoleAuth;
 
+	//选定的院区
+	@Setter
+	@Getter
+	private OrgInfo selectSite;
+
     @Override
     protected void init() {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -121,15 +129,31 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
     @Override
     protected Page<NurseSiteMaintainConfig> loadData(PageRequest pageRequest) {
-    	List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        //need list or set
-        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listOrgUid, "1*"));
+		if(selectSite!=null) {
+			this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+			this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+			this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+			this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+		}
+		//need list or set
+		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listOrgUid, "1*"));
         Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
         return pageResult;
     }
+
+	public void onSelectSiteTreeNode(NodeSelectEvent event) {
+		if(searchFilters!=null) searchFilters.clear();
+
+		if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+			selectSite = (OrgInfo) event.getTreeNode().getData();
+		} else {
+			selectSite = null;
+		}
+
+	}
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {

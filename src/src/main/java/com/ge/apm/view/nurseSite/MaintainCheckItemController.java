@@ -12,7 +12,10 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.DualListModel;
@@ -72,13 +75,12 @@ public class MaintainCheckItemController extends GenericCRUDUUIDController<Nurse
 
     @Override
     protected Page<NurseSiteMaintainCheckItem> loadData(PageRequest pageRequest) {
-    	List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
         //need list or set
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*"));
-        Page<NurseSiteMaintainCheckItem> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
+		this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*"));
+        Page<NurseSiteMaintainCheckItem> pageResult=dao.findBySearchFilter(this.searchFilters, pageRequest);
         return pageResult;
     }
 

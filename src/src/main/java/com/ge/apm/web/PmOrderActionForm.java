@@ -27,7 +27,10 @@ public class PmOrderActionForm {
     String pmOrderId;
     Integer pmType;
     String applyTime;
-
+    /**
+     * 创建方式 1:医院创建  2:供应商创建
+     */
+    private Integer createType = 1;
 //    String currentPersonId;//验收人
 
 
@@ -176,7 +179,15 @@ public class PmOrderActionForm {
         this.applyTime = applyTime;
     }
 
-//    public String getCurrentPersonId() {
+    public Integer getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(Integer createType) {
+        this.createType = createType;
+    }
+
+    //    public String getCurrentPersonId() {
 //        return currentPersonId;
 //    }
 //

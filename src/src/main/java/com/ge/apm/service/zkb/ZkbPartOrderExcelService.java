@@ -192,6 +192,21 @@ public class ZkbPartOrderExcelService {
         zkbPartOrderDataMap.put("GE工程师电话", p.getGeEngineerPhone());
         zkbPartOrderDataMap.put("是否扣除名额", getValueByKey("whetherDeduct",p.getWhetherDeduct()));
         zkbPartOrderDataMap.put("备注", p.getRemark());
+        zkbPartOrderDataMap.put("技术支持审批人", p.getTechAuditer());
+        if(p.getTechAuditDate() != null){
+            zkbPartOrderDataMap.put("技术支持审批时间", DateFormatUtils.format(p.getTechAuditDate(),"yyyy-MM-dd"));
+        }
+        zkbPartOrderDataMap.put("技术支持审批备注", p.getTechRemark());
+        zkbPartOrderDataMap.put("区域经理审批人", p.getManageAuditer());
+        if(p.getManageAuditDate() != null){
+            zkbPartOrderDataMap.put("区域经理审批时间", DateFormatUtils.format(p.getManageAuditDate(),"yyyy-MM-dd"));
+        }
+        zkbPartOrderDataMap.put("区域经理审批备注", p.getManageRemark());
+        zkbPartOrderDataMap.put("销售总监审批人", p.getDirectorAuditer());
+        if(p.getDirectorAuditDate() != null){
+            zkbPartOrderDataMap.put("销售总监审批时间", DateFormatUtils.format(p.getDirectorAuditDate(),"yyyy-MM-dd"));
+        }
+        zkbPartOrderDataMap.put("销售总监审批备注", p.getDirectorRemark());
         return zkbPartOrderDataMap;
     }
 

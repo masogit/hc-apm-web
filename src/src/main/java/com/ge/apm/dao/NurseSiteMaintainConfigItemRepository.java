@@ -37,4 +37,12 @@ public interface NurseSiteMaintainConfigItemRepository extends GenericRepository
 
 	@Query(value="select o.* from nurse_site_maintain_config_item o where o.parent_id in ?1",nativeQuery=true)
 	public List<NurseSiteMaintainConfigItem> findByParentIds(Set<String> parentIds);
+
+	@Transactional
+	@Modifying
+	@Query(value="delete from nurse_site_maintain_config_item o where o.asset_uid=?1",nativeQuery=true)
+	public void deleteByAssetUid(String assetUid);
+
+	@Query(value="select o.* from nurse_site_maintain_config_item o where o.asset_uid=?1",nativeQuery=true)
+	public List<NurseSiteMaintainConfigItem> findByAssetUid(String assetUid);
 }

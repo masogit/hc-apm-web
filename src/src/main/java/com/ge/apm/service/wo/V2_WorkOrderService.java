@@ -97,6 +97,22 @@ public class V2_WorkOrderService {
     public List<V2_WorkOrder_Step> getWorkOrderDetailResponsor(String woId, Integer step){
        return  stepDao.findResponsor(woId,step);
     }
+    public List<V2_WorkOrder_Step> getWorkOrderRepaireName(String woId, Integer step){
+        return  stepDao.findRepaireName(woId,step);
+    }
+
+    public List<V2_WorkOrder_Step> getWorkIds(String owerName){
+        return  stepDao.findWorkIds(owerName);
+    }
+
+    public List<String> findOwerNames(String owerName){
+        return  stepDao.findOwerNames(owerName);
+    }
+
+    public List<V2_WorkOrder_Step> findWorkSteps(String owerName){
+        return  stepDao.findWorkSteps(owerName);
+    }
+
     public List<V2_WorkOrder_Step> getWorkOrderDetailByownerName(String ownerName){
        return  stepDao.getWorkOrderDetailByownerName(ownerName);
     }
@@ -118,9 +134,12 @@ public class V2_WorkOrderService {
     }
 
 
-    public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
+    public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList,Integer createType) {
         String token = UserContextService.getAccessToken();
-        Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset, picList);
+        Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset, picList,createType);
+    }
+    public  Map<String, Object> findSupplierFEByAssetUid( AssetInfo asset) {
+       return srApi.findSupplierFEByAssetUid(asset);
     }
 
     public List<V2_BlobObject> getAttachByBoSubType(String srUid,String bosubType) {
@@ -568,6 +587,28 @@ public class V2_WorkOrderService {
 
     public List<ServiceRequestMsg> getServiceRequestMessageList(String id) {
         return msgDao.findBySrIdOrderBySendTime(id);
+    }
+
+    /**
+     * @param
+     * @return void
+     * @date 2020/6/29 11:00
+     * 设置总单据信息
+     */
+    public void approveHighLevelAction(V2_WorkOrder selectedWorkOrder, List<V2_WorkOrder_Detail> approvedDetails, String comments,String approverUid) {
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setStepDetail(approvedDetails);
+        formData.setDesc(comments);
+        formData.setAssigneeId(approverUid);
+        String approvalType = "approval";
+        String res = srApi.invokeWorkOrderAction(token, formData, approvalType, selectedWorkOrder.getId());
+        if (res == null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail", "提交"));
+        } else {
+            WebUtil.addSuccessMessage("已提交");
+        }
     }
 
 }

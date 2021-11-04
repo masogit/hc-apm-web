@@ -1,6 +1,8 @@
 package com.ge.apm.dao.mapper.provider;
 
+import org.apache.commons.lang3.StringUtils;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,13 +35,15 @@ public class ZkbAssetStatisticProvider {
                 " ai.uid AS asset_uid," +
                 " ac.contract_no,"+
                 " qr_code_info.reason AS reason," +
-                " qr_code_info.can_not_past_qr_code AS can_not_past_qr_code"+
+                " qr_code_info.can_not_past_qr_code AS can_not_past_qr_code,"+
+                " ib_qr_code.is_qr_code"+
                 " FROM" +
                 " zkb_contract ac" +
                 " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
                 " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
                 " INNER JOIN asset_info ai ON ai.uid= zca.asset_id" +
                 " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
+                " LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code on ib_qr_code.asset_uid = ai.uid " +
                 " where ac.contract_no is not null and ai.system_id is not null"+
                         " and to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date"
                 );
@@ -60,6 +64,7 @@ public class ZkbAssetStatisticProvider {
      */
     public String buildFilter_loadAllAsset(List<SearchFilter> searchFilterList){
         StringBuilder sb = new StringBuilder();
+        if(searchFilterList == null) return "";
         for (SearchFilter searchFilter : searchFilterList) {
             String tempColumn = searchFilter.fieldName;
             Object value = searchFilter.value;
@@ -117,5 +122,69 @@ public class ZkbAssetStatisticProvider {
         String filter=sb.toString();
         filter = filter.substring(0,filter.length()-1);
         return filter;
+    }
+
+    /**
+     * 查出所有合同相关联设备需要进行二维码贴码的信息
+     * @return
+     */
+    public String getZkbAssetQrCodeInfoList(Map<String,Object> param){
+        String currentDate = getDateStr();
+        StringBuilder sb = new StringBuilder();
+        sb.append(" SELECT DISTINCT qr_code_info.id,"+
+                " ai.clinical_dept_name as hospital_name, "+
+                " ai.clinical_dept_uid,"+
+                " ai.function_type, "+
+                " ai.system_id," +
+                " ti.uid AS tenant_uid," +
+                " ti. NAME AS tenant_name," +
+                " ai.uid AS asset_uid," +
+                " ac.contract_no,"+
+                " qr_code_info.reason AS reason," +
+                " qr_code_info.can_not_past_qr_code," +
+                " qr_code_info.reason_date,"+
+                " qr_code_info.qr_code_count_state,qr_code_info.ib_qr_code_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date,ib_qr_code.is_qr_code AS ibQrCodeTemporary"+
+                " FROM" +
+                " zkb_contract ac" +
+                " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
+                " INNER JOIN tenant_info ti ON ti.uid = ac.tenant_uid" +
+                " INNER JOIN asset_info ai ON ai.uid= zca.asset_id AND ai.is_deleted=false AND ai.is_valid=true" +
+                " LEFT JOIN zkb_asset_qr_code_info qr_code_info ON qr_code_info.system_id= ai.system_id and ti.uid = qr_code_info.tenant_uid " +
+                " LEFT JOIN zkb_asset_qr_code_from_ib ib_qr_code on ib_qr_code.asset_uid = ai.uid " +
+                " WHERE" +
+                " ac.contract_no is not null AND ai.system_id is not null" +
+                " AND to_date('"+currentDate+"','"+dateFormat+"')>=ac.start_date and to_date('"+currentDate+"','"+dateFormat+"')<=ac.end_date" +
+                " AND (qr_code_info.qr_code_count_state is null OR qr_code_info.qr_code_count_state='N') "
+        );
+        List<SearchFilter> searchFilterList = (List<SearchFilter>) param.get("filters");
+        String filter = buildFilter_loadAllAsset(searchFilterList);
+        sb.append(filter);
+
+        return sb.toString();
+    }
+
+    public String getZkbAssetQrCode(){
+        StringBuilder sb = new StringBuilder();
+        String currentDate = getDateStr();
+        sb.append("SELECT DISTINCT qr_code_info.id,"+
+                        " ai.clinical_dept_name as hospital_name, "+
+                        " ai.clinical_dept_uid,"+
+                        " ai.function_type, "+
+                        " ai.system_id," +
+                        " ti.uid AS tenant_uid," +
+                        " ti. NAME AS tenant_name," +
+                        " ai.uid AS asset_uid," +
+                        " (select ac.contract_no from zkb_contract ac,zkb_contract_asset zca where zca.contract_id=ac.ID and ai.uid=zca.asset_id and to_date('"+currentDate+"','yyyyMMdd')>=ac.start_date and to_date('"+currentDate+"','yyyyMMdd')<=ac.end_date) as contract_no,"+
+                        " qr_code_info.reason AS reason," +
+                        " qr_code_info.can_not_past_qr_code," +
+                        " qr_code_info.reason_date,"+
+                        " qr_code_info.qr_code_count_state,qr_code_info.ib_qr_code_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date" +
+                " FROM" +
+                " zkb_asset_qr_code_info qr_code_info" +
+                " INNER JOIN tenant_info ti ON ti.uid=qr_code_info.tenant_uid" +
+                " INNER JOIN asset_info ai ON ai.system_id=qr_code_info.system_id AND ai.tenant_uid=qr_code_info.tenant_uid"+
+                " WHERE qr_code_info.can_not_past_qr_code is not null and qr_code_info.qr_code_count_state is null"
+        );
+        return sb.toString();
     }
 }

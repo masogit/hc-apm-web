@@ -31,6 +31,9 @@ public class ZkbPartOrderItem implements Serializable {
     @Column(name = "part_no")
     private String partNo;
 
+    @Column(name = "actual_part_no")
+    private String actualPartNo;
+
     /**
      * 配件名称
      */
@@ -42,6 +45,9 @@ public class ZkbPartOrderItem implements Serializable {
      */
     @Column(name = "part_qty")
     private int partQty;
+
+    @Column(name = "pre_part_qty")
+    private Integer prePartQty;
 
     /**
      * 配件SN(序列号)
@@ -60,6 +66,22 @@ public class ZkbPartOrderItem implements Serializable {
 
     @Column(name = "order_no")
     private String orderNo;
+
+    public String getActualPartNo() {
+        return actualPartNo;
+    }
+
+    public void setActualPartNo(String actualPartNo) {
+        this.actualPartNo = actualPartNo;
+    }
+
+    public Integer getPrePartQty() {
+        return prePartQty;
+    }
+
+    public void setPrePartQty(Integer prePartQty) {
+        this.prePartQty = prePartQty;
+    }
 
     public String getOrderNo() {
         return orderNo;

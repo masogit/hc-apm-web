@@ -111,6 +111,9 @@ public enum GatewayURL {
     PART_ORDER_SEND_WECHAT_RETURN_AUDIT("/hcapmassetservice/api/apm/zkb/partOrder/sendWeChatReturnAudit"),
     COURSE_TRAIN_SEND_WE_CHART("/hcapmassetservice/api/apm/zkb/courseTrain/sendWeChatMessages"),
     COURSE_TRAIN_SEND_EMAIL_AUDIT("/hcapmreportservice/api/apm/report/courseTrain/sendHtmlForAudit"),
+    PART_ORDER_QR_CODE_JOB("/hcapmassetservice/api/apm/zkb/partOrder/qrCodeJob"),
+
+    SUPPLIER_FE_BY_ASSETUID("/hcapmsuppliermanager/api/apm/supplierManager/userAccount/findSupplierFE/{assetUid}"),
 
     SMS_VERIFICATION_CODE("/hcapmreportservice/api/apm/report/partOrder/sendTheVerificationCode"),
     SMS_SEND_MAIL("/hcapmreportservice/api/apm/report/partOrder/sendMail"),
@@ -119,7 +122,13 @@ public enum GatewayURL {
     FE_PART_ORDER_SEND_WECHART("/hcapmassetservice/api/apm/zkb/zkbfepartorder/sendWechatMessage"),
     FE_PART_ORDER_SEND_WECHART_REMIND_LETTER("/hcapmassetservice/api/apm/zkb/zkbfepartorder/sendWeChatRemindLetter"),
     CONTRACT_COURSE_SCHEDULE_MESSAGE("/hcapmreportservice/api/apm/zkb/zkbCourseSchedule/sendMessage"),
-    CONTRACT_COURSE_SCHEDULE_SEND_MESSAGE_BY_TELEPHONE("/hcapmreportservice/api/apm/zkb/zkbCourseSchedule/sendMessageByTelephone");
+    CONTRACT_COURSE_SCHEDULE_SEND_MESSAGE_BY_TELEPHONE("/hcapmreportservice/api/apm/zkb/zkbCourseSchedule/sendMessageByTelephone"),
+
+    // 不良事件详情
+    GET_ADVERSE_EVENTS_INFO("/hcapmassetservice/api/apm/asset/adverse/events/getDetailByUid/{uid}"),
+    // 不良事件审批
+    APPROVE_ADVERSE_EVENTS("/hcapmassetservice/api/apm/asset/adverse/events/approveAdverseEvent");
+
 
     private final String url;
 
