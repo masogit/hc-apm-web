@@ -15,67 +15,78 @@
             <h:panelGroup>
                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
-                        <label class="label">APM用户名</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_apm}</label>
                         <p:inputText id="loginName" value="#{zkbPartOrderUserConfigController.selected.loginName}" required="true" requiredMessage="APM用户名#{msg.ValidationRequire}" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">名称</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_name}</label>
                         <p:inputText id="name" value="#{zkbPartOrderUserConfigController.selected.name}"  required="false" requiredMessage="名称#{msg.ValidationRequire}" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">邮箱</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_email}</label>
                         <p:inputText id="email" value="#{zkbPartOrderUserConfigController.selected.email}"  required="false" requiredMessage="邮箱#{msg.ValidationRequire}" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">电话</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_phone}</label>
                         <p:inputText id="phone" value="#{zkbPartOrderUserConfigController.selected.phone}"  required="false" requiredMessage="电话#{msg.ValidationRequire}" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">用户sso</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_sso}</label>
                         <p:inputText id="sso" value="#{zkbPartOrderUserConfigController.selected.sso}"  required="false" requiredMessage="用户sso#{msg.ValidationRequire}" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">区域</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_region}</label>
                         <p:selectOneMenu id="region" value="#{zkbPartOrderUserConfigController.selected.region}" required="false" requiredMessage="区域#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractRegion')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">类型</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_type}</label>
                         <p:selectOneMenu id="configType" value="#{zkbPartOrderUserConfigController.selected.configType}"  required="true" requiredMessage="类型#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoStepsRole')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">资产类型</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_propertyType}</label>
                         <p:selectOneMenu id="assetType" value="#{zkbPartOrderUserConfigController.selected.assetType}" required="false" requiredMessage="资产类型#{msg.ValidationRequire}">
+                            <p:ajax  update="backUpGroup" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="US" itemValue="US"/>
                             <f:selectItem itemLabel="CT" itemValue="CT"/>
                             <f:selectItem itemLabel="XR" itemValue="XR"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
+                    <h:panelGroup id="backUpGroup">
+                        <h:panelGroup  rendered="#{zkbPartOrderUserConfigController.selected.assetType eq 'US'}">
+                            <label class="label">#{msg.zkbKeyUserConfig_usBackUp}</label>
+                            <p:autoComplete dropdown="true" value="#{zkbPartOrderUserConfigController.backUpUser}"  scrollHeight="300" forceSelection="true"
+                                            completeMethod="#{zkbPartOrderUserConfigController.autoCompleteBackUpList}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="zkbPartOrderUserConfigConverter">
+                            </p:autoComplete>
+                        </h:panelGroup>
+                    </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">备注</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_remark}</label>
                         <p:inputText id="remark" value="#{zkbPartOrderUserConfigController.selected.remark}"  required="false" requiredMessage="备注#{msg.ValidationRequire}" />
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">订单类型</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_orderType}</label>
                         <p:selectOneMenu id="orderType" value="#{zkbPartOrderUserConfigController.selected.orderType}" required="false" requiredMessage="订单类型#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="Probe" itemValue="Probe"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">是否休假</label>
+                        <label class="label">#{msg.zkbKeyUserConfig_holiday}</label>
                         <p:selectOneMenu id="isVacation" value="#{zkbPartOrderUserConfigController.selected.isVacation}" required="false" requiredMessage="是否休假#{msg.ValidationRequire}">
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItem itemLabel="是" itemValue="t"/>
                             <f:selectItem itemLabel="否" itemValue="f"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
+
+
                 </p:panelGrid>
                 <h:panelGroup>
                     <p:commandButton validateClient="true" actionListener="#{zkbPartOrderUserConfigController.save}" update=":zkbPartOrderUserConfigListForm :zkbPartOrderUserConfigEditForm :growl" value="#{msg.Save}" icon="ui-icon-check"/>

@@ -1,7 +1,6 @@
 package com.ge.apm.service.zkb;
 
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
-import com.ge.apm.domain.ZkbPartOrderCat;
 import com.ge.apm.domain.ZkbPartOrderUserConfig;
 import webapp.framework.web.WebUtil;
 

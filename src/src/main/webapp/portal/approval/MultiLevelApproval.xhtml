@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <style>
+            div.ui-panelgrid-cell > label + div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+        </style>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.audit}"/>
+            </div>
+            <div class="ui-g-12 card">
+
+                <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                    <p:commandButton value="我发起的"   process="@this" update="approvalList ItemDetailViewForm buttonSet" disabled="#{multiLevelApprovalListController.initiatedByMe}" actionListener="#{multiLevelApprovalListController.initiateApprovalByMe}" />
+                    <p:commandButton value="待审批"     process="@this" update="approvalList ItemDetailViewForm buttonSet" disabled="#{multiLevelApprovalListController.pendingApprovalByMe}" actionListener="#{multiLevelApprovalListController.pendingApprovalByMe}" />
+                    <p:commandButton value="我审批的"   process="@this" update="approvalList ItemDetailViewForm buttonSet"  disabled="#{multiLevelApprovalListController.approvedByMe}" actionListener="#{multiLevelApprovalListController.approvedApprovalByMe}" />
+                </h:panelGrid>
+
+                <p:dataTable id="approvalList" value="#{multiLevelApprovalListController.lazyModel}"
+                             var="item"
+                             widgetVar="approvalList"
+                             lazy="true" paginator="true" paginatorPosition="bottom"
+                             paginatorAlwaysVisible="true"
+                             selectionMode="single" selection="#{multiLevelApprovalListController.selected}"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending"
+                             sortBy="#{item.createdDate}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown} {Exporters}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,50,100,500">
+
+                    <p:ajax event="rowSelect" listener="#{multiLevelApprovalListController.onRowSelect}" update="ItemDetailViewForm"/>
+
+                    <p:column headerText="审批单号" >
+                        <h:outputText value="#{item.approvalNumber}"/>
+                    </p:column>
+                    <p:column headerText="业务单号" >
+                        <h:outputText value="#{item.businessNumber}"/>
+                    </p:column>
+                    <p:column headerText="业务类型" >
+                        <h:outputText value="#{multiLevelApprovalGlobalController.getBusinessType(item)}"/>
+                    </p:column>
+                    <p:column headerText="总审批进度" >
+                        <h:outputText value="#{multiLevelApprovalGlobalController.swapLevelName(item.approvalLevelNow)}"/>
+                    </p:column>
+                    <p:column headerText="审批时间" sortBy="#{item.actualApproverDate}" rendered="#{!multiLevelApprovalListController.pendingApprovalByMe}">
+                        <h:outputText value="#{item.actualApproverDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy-MM-dd HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" rendered="#{multiLevelApprovalListController.pendingApprovalByMe}">
+                        <p:commandButton value="审批"
+                                         action="#{multiLevelApprovalListController.promptApproval(item)}"
+                                         update="MultiLevelApprovalClaimDialog"
+                                         oncomplete="PF('MultiLevelApprovalClaimDialog').show()" />
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                    </f:facet>
+                </p:dataTable>
+
+                <ui:include src="MultiLeveApprovalDetail.xhtml"/>
+
+            </div>
+
+            <p:dialog class="MultiLevelApprovalClaimDialog" id="MultiLevelApprovalClaimDialog" widgetVar="MultiLevelApprovalClaimDialog" modal="true" height="600" width="1200"  resizable="false" draggable="true" appendTo="@(body)" header="审批">
+                <h:form id="approvalDialogForm" class="tform">
+
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                        <!--节点详情-->
+                        <ui:include src="MultiLeveApprovalNodesDetail.xhtml"></ui:include>
+
+                        <!--备件内容-->
+                        <!--<ui:include src="content/PartsApproval.xhtml"></ui:include>-->
+
+                        <!--档案信息修改-->
+                        <!--<ui:include src="content/AssetChangeApproval.xhtml"></ui:include>-->
+
+                        <!--设备大修-->
+                        <!--<ui:include src="content/OverhaulRepairApproval.xhtml"></ui:include>-->
+
+                        <!--借用申请和借用归还申请-->
+                        <!--<ui:include src="content/BorrowApproval.xhtml"></ui:include>-->
+
+                        <!--领用申请和领用归还申请-->
+                        <!--<ui:include src="content/ReceiveApproval.xhtml"></ui:include>-->
+
+                        <!--设备维修-->
+                        <ui:include src="content/AssetRepairApproval.xhtml"></ui:include>
+
+                        <!--设备保养-->
+                        <ui:include src="content/AssetMaintenanceApproval.xhtml"></ui:include>
+
+                        <!--设备转移-->
+                        <!--<ui:include src="content/AssetTransferApproval.xhtml"></ui:include>-->
+
+                        <!--不良事件-->
+                        <ui:include src="content/AdverseEventsApproval.xhtml"></ui:include>
+
+                        <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 13}">
+                            <label class="label" style="font-size: medium; font-weight: bold">审核结果</label>
+                            <p:selectOneRadio id="enable" value="#{multiLevelApprovalController.approvalResult}">
+                                <f:selectItem itemLabel="同意上报" itemValue="1"/>
+                                <f:selectItem itemLabel="同意不上报" itemValue="2"/>
+                            </p:selectOneRadio>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">审批意见</label>
+                            <p:inputText id="unitPrice" name="unitPrice" placeholder="审批意见"
+                                         value="#{multiLevelApprovalController.approvalOpinion}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag != 13}">
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersonByAgree()}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.getMultiLevelApprovalPersionAndSubmitByDisagree()}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                    </h:panelGroup>
+                    <!--不良事件审批-->
+                    <h:panelGroup rendered="#{multiLevelApprovalController.businessTypeFlag == 13}">
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.adverseEventsAgree()}" value="同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                        <p:commandButton validateClient="true" immediate="false" actionListener="#{multiLevelApprovalController.adverseEventsDisagree()}" value="不同意" update="approvalList ItemDetailViewForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'MultiLevelApprovalClaimDialog');"/>
+                    </h:panelGroup>
+
+                </h:form>
+
+            </p:dialog>
+        </div>
+    </ui:define>
+</ui:composition>

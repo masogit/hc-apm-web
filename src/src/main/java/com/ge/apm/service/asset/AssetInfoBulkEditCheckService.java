@@ -41,6 +41,13 @@ public class AssetInfoBulkEditCheckService {
     //验证调剂中心
     public boolean verify(List<AssetInfo> assets) {
         if(assets != null && !assets.isEmpty()){
+            for (AssetInfo assetInfo:assets) {
+                String assetDeptUID = assetInfo.getAssetDeptUID();
+                String clinicalDeptUID = assetInfo.getClinicalDeptUID();
+                if(assetDeptUID!=null && clinicalDeptUID !=null &&!assetDeptUID.equals(clinicalDeptUID)){
+                    return false;
+                }
+            }
            List<String> assetUids = assets.stream().map(p -> p.getUid()).collect(Collectors.toList());
             List<Integer> status = new ArrayList<>();
             status.add(ReceiveBorrowConstant.STATE_RENT_ACCEPTED);
@@ -50,8 +57,24 @@ public class AssetInfoBulkEditCheckService {
             status.add(ReceiveBorrowConstant.STATE_RETURN_ACCEPTED);
             status.add(ReceiveBorrowConstant.STATE_RETURN_DELIVERED);
             status.add(ReceiveBorrowConstant.STATE_RETURN_SUSPENDED);
-            int count = sharedAssetReqDetailRepository.findCountByAssetInfoIdsAndState(assetUids,status);
-            if(count > 0){
+            List<SharedAssetReqDetail> sharedAssetReqDetails = sharedAssetReqDetailRepository.findCountByAssetInfoIdsAndState(assetUids,status);
+            if(sharedAssetReqDetails.size() > 0){
+                List<String> assetUidList = new ArrayList<>();
+                for (int i = 0; i < sharedAssetReqDetails.size(); i++) {
+                    SharedAssetReqDetail sharedAssetReqDetail = sharedAssetReqDetails.get(i);
+                    String assetInfoUid = sharedAssetReqDetail.getAssetInfoId();
+                    if(!assetUidList.contains(assetInfoUid)){
+                        assetUidList.add(assetInfoUid);
+                        String returnId = sharedAssetReqDetail.getReturnId();
+                        if(!"".equals(returnId) && returnId !=null){
+                            SharedAssetRequest sharedAssetRequest = sharedAssetRequestRepository.findById(returnId);
+                            int state = sharedAssetRequest.getState();
+                            if (state==ReceiveBorrowConstant.STATE_RETURN_CONFIRMED){
+                                return true;
+                            }
+                        }
+                    }
+                }
                 return false;
             }
         }
@@ -168,6 +191,35 @@ public class AssetInfoBulkEditCheckService {
 
         return Optional.empty();
     }
+
+    /**
+     * 批量导入资产时
+     * @param assets
+     * @return
+     */
+    public Optional<String> verifyForNurseSiteByBatchImport(List<AssetInfo> assets) {
+        // asset in repaire  status
+        for(AssetInfo as: assets){
+            //临床助手检查进行中
+            List<NurseSiteMaintainItem> nurseSiteMaintainItemList = nurseSiteMaintainItemRepository.findByAssetUid(as.getUid());
+            if(!StringUtils.isEmpty(nurseSiteMaintainItemList) && nurseSiteMaintainItemList.size()>0){
+                Set<String> setMaintainIds = new HashSet<String>();
+                for (int i = 0; i < nurseSiteMaintainItemList.size(); i++) {
+                    setMaintainIds.add(nurseSiteMaintainItemList.get(i).getId());
+                }
+                Set<NurseSiteMaintainData> maintainDataByParentIds = nurseSiteMaintainDataRepository.findMaintainDataByParentIds(setMaintainIds);
+                for (NurseSiteMaintainData nurseSiteMaintainData : maintainDataByParentIds) {
+                    Boolean checkValue = nurseSiteMaintainData.getCheckValue() != null ? true :false;
+                    if(!checkValue){
+                        return Optional.of("设备("+as.getName()+")当前有未完成的日常检查工单无法迁移 请先关闭工单！");
+                    }
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
     public List<AssetInfo>verifyForNurseSiteByBatchEdit(List<AssetInfo> assets) {
         List<AssetInfo> list = new ArrayList<>();
         for(AssetInfo as: assets){

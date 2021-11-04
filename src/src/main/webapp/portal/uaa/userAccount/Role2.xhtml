@@ -12,7 +12,7 @@
         <p:dialog id="RoleEditDlg2" widgetVar="RoleEditDialog2" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.AssignRole}">
             <h:form id="UserRoleEditForm2">
                 <h:panelGroup id="display2">
-                    <p:tabView class="ui-g-12" id="tabview2"   dynamic="false"   cache="false">
+                    <p:tabView class="ui-g-12" id="tabview2"   style="height: 362px; overflow: auto;" dynamic="false"   cache="false">
                         <p:tab title="#{msg.AssignRole}" class="ui-g-12" >
                     <p:panelGrid columns="2" rendered="#{userAccountController.selected != null}">
                         <p:outputLabel value="#{msg.login_name}"/>

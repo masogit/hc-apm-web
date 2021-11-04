@@ -15,6 +15,11 @@ import javax.validation.constraints.Size;
 public class ZkbContractAsset {
 
     private static final long serialVersionUID = 1L;
+
+    public enum AssetTypeEnum{
+        highMachine,lowMachine,empty
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -61,6 +66,31 @@ public class ZkbContractAsset {
      */
     @Column(name = "asset_type")
     private String assetType;
+
+    @Column(name = "apply_num")
+    private Integer applyNum = 0;
+
+    /**
+     * empty t f
+     */
+    @Column(name = "train_reason_flag")
+    private String trainReasonFlag;
+
+    public String getTrainReasonFlag() {
+        return trainReasonFlag;
+    }
+
+    public void setTrainReasonFlag(String trainReasonFlag) {
+        this.trainReasonFlag = trainReasonFlag;
+    }
+
+    public Integer getApplyNum() {
+        return applyNum;
+    }
+
+    public void setApplyNum(Integer applyNum) {
+        this.applyNum = applyNum;
+    }
 
     public String getAssetType() {
         return assetType;

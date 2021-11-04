@@ -1,11 +1,13 @@
 package com.ge.apm.service.wo;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.domain.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
@@ -20,17 +22,6 @@ import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.dao.mapper.WechatMessageLogMapper;
 import com.ge.apm.dao.mapper.WorkOrderMapper;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.CasePriorityNum;
-import com.ge.apm.domain.Constans;
-import com.ge.apm.domain.ReopenPushModel;
-import com.ge.apm.domain.TimeOutRule;
-import com.ge.apm.domain.TimeoutPushModel;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WechatMessageLog;
-import com.ge.apm.domain.WorkFlow;
-import com.ge.apm.domain.WorkOrder;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.utils.WeiXinUtils;
@@ -57,7 +48,14 @@ public class WorkflowService {
 
 	@Autowired
 	WechatMessageLogMapper wechatMessageLogMapper;
-
+    @Autowired
+    AssetInfoRepository assetInfoRepository;
+    @Autowired
+    OrgInfoRepository orgInfoRepository;
+    @Autowired
+    TenantInfoRepository tenantInfoRepository;
+    @Autowired
+    WorkflowConfigRepository workflowConfigRepository;
 	@Autowired
 	CoreService coreService;
 
@@ -398,5 +396,76 @@ public class WorkflowService {
 		// }
 		return tor;
 	}
-
+    public WorkflowConfig fetchWorkflowByAssetId(Integer assetId){
+        if(assetId == null){
+            logger.warn("assetId is null !");
+            return null;
+        }
+        String siteUID = assetInfoRepository.findSiteUidByAssetId(assetId);
+        if(siteUID == null ){
+            logger.error("asset is deleted ! assetId is {}",assetId);
+            return null;
+        }
+        return getWorkflowByOrg(siteUID);
+    }
+    public WorkflowConfig getWorkflowByOrg(String orgUid){
+        OrgInfo orgInfo = orgInfoRepository.getOrgInfoUIDByUid(orgUid);
+        if(orgInfo == null){
+            logger.error("orgInfo has been deleted ! orgUid is {}",orgUid);
+            return null;
+        }
+        TenantInfo tenantInfo = tenantInfoRepository.findByUid(orgInfo.getTenantUID());
+        if(tenantInfo == null){
+            logger.error("tenant has been deleted ! tenantUID is {}",orgInfo.getTenantUID());
+            return null;
+        }
+        //如果是隔离租户，则只查询资产所属机构对应的工作流
+        if(tenantInfo.getIsInsulate() != null && tenantInfo.getIsInsulate()){
+            WorkflowConfig insulateConfig = workflowConfigRepository.findFirstBySiteUID(orgInfo.getSiteUID());
+            if(insulateConfig == null){
+                logger.warn("can't find workflowConfig in current level ! uid is {}",orgInfo.getSiteUID());
+            }
+            return insulateConfig;
+        }
+        List<WorkflowConfig> configs = workflowConfigRepository.findByTenantUID(orgInfo.getTenantUID());//fetchWorkflowConfig();
+        Map<String,WorkflowConfig> siteMap = new HashMap<String,WorkflowConfig>();
+        Map<String,WorkflowConfig> hospitalMap = new HashMap<String,WorkflowConfig>();
+        Map<String,WorkflowConfig> institutionMap = new HashMap<String,WorkflowConfig>();
+        Map<String,WorkflowConfig> tenantMap = new HashMap<String,WorkflowConfig>();
+        for (WorkflowConfig config : configs) {
+            int level = getLevel(config);
+            if(level == 1) {//租户级别
+                tenantMap.put(config.getTenantUID(), config);
+            }else if(level == 2) {//集团级别
+                institutionMap.put(config.getInstitutionUID(), config);
+            }else if(level == 3) {//医院级别
+                hospitalMap.put(config.getHospitalUID(), config);
+            }else if(level == 4) {//院区级别
+                siteMap.put(config.getSiteUID(), config);
+            }
+        }
+        if(siteMap.get(orgInfo.getSiteUID()) != null){
+            return siteMap.get(orgInfo.getSiteUID());
+        }else if(hospitalMap.get(orgInfo.getHospitalUID()) != null){
+            return hospitalMap.get(orgInfo.getHospitalUID());
+        }else if(institutionMap.get(orgInfo.getInstitutionUID()) != null){
+            return institutionMap.get(orgInfo.getInstitutionUID());
+        }else if(tenantMap.get(orgInfo.getTenantUID()) != null){
+            return tenantMap.get(orgInfo.getTenantUID());
+        }
+        return null;
+    }
+    public int getLevel(WorkflowConfig config) {
+        OrgInfo org = orgInfoRepository.getOrgInfoUIDByUid(config.getSiteUID());
+        if(org.getOrgType() == 0) {
+            return 1;
+        }else if(org.getOrgType() == 1) {
+            return 2;
+        }else if(org.getOrgType() == 2) {
+            return 3;
+        }else if(org.getOrgType() == 3) {
+            return 4;
+        }
+        return -1;
+    }
 }

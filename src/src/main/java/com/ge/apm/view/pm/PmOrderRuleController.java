@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.SupplierService;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
@@ -62,7 +63,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private Integer loginUserOrgType;
     private UserCommonService userCommonService;
     private UaaService uaaService;
-
+    private ConfigService configService;
     private OrgInfo selectedUserOrg;
     private TenantInfo selectedTenant;
     private TreeNode orgTree;
@@ -90,6 +91,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
         pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
         pmOrderReportTemplateService = WebUtil.getBean(PmOrderReportTemplateService.class);
+        configService = WebUtil.getBean(ConfigService.class);
         templateDao = WebUtil.getBean(TableDefinitionRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
@@ -104,6 +106,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         //initTree(user.getTenantUID());
 //        BeanUtils.copyProperties(selected,pmOrderRule);
         initOrgTree();
+    }
+
+    public boolean getPmRule(){
+        UserAccount userAccount = UserContextService.getCurrentUserAccount();
+        WorkflowConfig workflowConfig = configService.findConfigBySite(userAccount.getSiteUID());
+        return workflowConfig != null && workflowConfig.getPmRuleLevelFour();
     }
 
     public void initOrgTree() {

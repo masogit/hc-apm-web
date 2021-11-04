@@ -1,9 +1,6 @@
 package com.ge.apm.domain;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -34,7 +31,9 @@ public class ZkbPartOrder implements Serializable {
      * Returned：归还  Closed：关单
      */
     public enum PartOrderStatus {
-        Requested,TechnicalAccept,TechnicalReject,ManageAccept,ManageReject,UnOrdered,UnOrderedReject,Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject
+        Requested,TechnicalAccept,TechnicalReject,
+        ManageAccept,ManageReject,UnOrdered,UnOrderedReject,
+        Ordered,OrderedReject,PartReturned,Returned,Closed,DirectorAccept,DirectorReject,CommercialAccept,CommercialReject
     }
 
     /**
@@ -121,7 +120,7 @@ public class ZkbPartOrder implements Serializable {
      * 数量
      */
     @Column(name = "qty")
-    private int qty;
+    private Integer qty;
 
     /**
      * 备注
@@ -189,6 +188,20 @@ public class ZkbPartOrder implements Serializable {
     private String directorAuditer;
     @Column(name = "director_auditer_uid")
     private String directorAuditerUid;
+
+    /**
+     * commercial审批备注
+     */
+    @Column(name = "commercial_remark")
+    private String commercialRemark;
+
+    @Column(name = "commercial_audit_date")
+    private Date commercialAuditDate;
+
+    @Column(name = "commercial_auditer")
+    private String commercialAuditer;
+    @Column(name = "commercial_auditer_uid")
+    private String commercialAuditerUid;
 
     /**
      *
@@ -463,6 +476,12 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "cat_num")
     private Integer catNum;
 
+    @Column(name = "contract_cat_id")
+    private String contractCatId;
+
+    @Column(name = "contract_sn_no")
+    private String contractSnNo;
+
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(insertable=false, updatable=false, name = "cat_id", referencedColumnName = "id")
     private ZkbPartOrderCat zkbPartOrderCat;
@@ -472,7 +491,7 @@ public class ZkbPartOrder implements Serializable {
     private AssetInfo assetInfo;
 
     @Transient
-    private int remainQty = 0;
+    private Integer remainQty;
 
     @Column(name = "asset_type_di")
     private String assetTypeDi; //ct xr
@@ -489,6 +508,12 @@ public class ZkbPartOrder implements Serializable {
      */
     @Column(name = "new_cat_flag")
     private String newCatFlag;
+
+    /**
+     * 租户是否全新探头
+     */
+    @Column(name = "tenant_new_cat_flag")
+    private String tenantNewCatFlag="f";
 
     /**
      * 是否上过培训课
@@ -527,6 +552,9 @@ public class ZkbPartOrder implements Serializable {
     @Column(name = "score_flag")
     private String scoreFlag = "f";
 
+    @Column(name = "high_cat_flag")
+    private String highCatFlag;
+
     /**
      * asset_info systemid
      */
@@ -535,6 +563,58 @@ public class ZkbPartOrder implements Serializable {
 
     @Column(name = "probe_quota_type")
     private String probeQuotaType;
+
+    /**
+     * t f
+     */
+    @Column(name = "modify_flag")
+    private String modifyFlag;
+
+    /**
+     * t f
+     */
+    @Column(name = "ssa_key_flag")
+    private String ssaKeyFlag;
+
+    public String getSsaKeyFlag() {
+        return ssaKeyFlag;
+    }
+
+    public void setSsaKeyFlag(String ssaKeyFlag) {
+        this.ssaKeyFlag = ssaKeyFlag;
+    }
+
+    public String getModifyFlag() {
+        return modifyFlag;
+    }
+
+    public void setModifyFlag(String modifyFlag) {
+        this.modifyFlag = modifyFlag;
+    }
+
+    public String getContractCatId() {
+        return contractCatId;
+    }
+
+    public void setContractCatId(String contractCatId) {
+        this.contractCatId = contractCatId;
+    }
+
+    public String getContractSnNo() {
+        return contractSnNo;
+    }
+
+    public void setContractSnNo(String contractSnNo) {
+        this.contractSnNo = contractSnNo;
+    }
+
+    public String getHighCatFlag() {
+        return highCatFlag;
+    }
+
+    public void setHighCatFlag(String highCatFlag) {
+        this.highCatFlag = highCatFlag;
+    }
 
     public String getProbeQuotaType() {
         return probeQuotaType;
@@ -896,11 +976,11 @@ public class ZkbPartOrder implements Serializable {
         this.artificialType = artificialType;
     }
 
-    public int getRemainQty() {
+    public Integer getRemainQty() {
         return remainQty;
     }
 
-    public void setRemainQty(int remainQty) {
+    public void setRemainQty(Integer remainQty) {
         this.remainQty = remainQty;
     }
 
@@ -1168,11 +1248,11 @@ public class ZkbPartOrder implements Serializable {
         this.status = status;
     }
 
-    public int getQty() {
+    public Integer getQty() {
         return qty;
     }
 
-    public void setQty(int qty) {
+    public void setQty(Integer qty) {
         this.qty = qty;
     }
 
@@ -1374,6 +1454,46 @@ public class ZkbPartOrder implements Serializable {
 
     public void setSystemId(String systemId) {
         this.systemId = systemId;
+    }
+
+    public String getTenantNewCatFlag() {
+        return tenantNewCatFlag;
+    }
+
+    public void setTenantNewCatFlag(String tenantNewCatFlag) {
+        this.tenantNewCatFlag = tenantNewCatFlag;
+    }
+
+    public String getCommercialRemark() {
+        return commercialRemark;
+    }
+
+    public void setCommercialRemark(String commercialRemark) {
+        this.commercialRemark = commercialRemark;
+    }
+
+    public Date getCommercialAuditDate() {
+        return commercialAuditDate;
+    }
+
+    public void setCommercialAuditDate(Date commercialAuditDate) {
+        this.commercialAuditDate = commercialAuditDate;
+    }
+
+    public String getCommercialAuditer() {
+        return commercialAuditer;
+    }
+
+    public void setCommercialAuditer(String commercialAuditer) {
+        this.commercialAuditer = commercialAuditer;
+    }
+
+    public String getCommercialAuditerUid() {
+        return commercialAuditerUid;
+    }
+
+    public void setCommercialAuditerUid(String commercialAuditerUid) {
+        this.commercialAuditerUid = commercialAuditerUid;
     }
 
     @Override

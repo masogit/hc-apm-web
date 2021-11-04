@@ -48,6 +48,13 @@
                         <f:selectItems value="#{fieldMsg.getFieldValueList('zkbContractAssetType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                     </p:selectOneMenu>
                 </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">是否代理商自身原因未完成培训*</label>
+                    <p:selectOneMenu value="#{zkbContractEditController.zkbContractAssetSelected.trainReasonFlag}" required="true" requiredMessage="是否代理商自身原因未完成培训 #{msg.ValidationRequire}">
+                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('zkbPoAssetTrainReasonFlag')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                    </p:selectOneMenu>
+                </h:panelGroup>
                 <h:panelGroup rendered="#{zkbContractEditController.actionAssetName eq 'Edit'}">
                     <label class="label">操作原因*</label>
                     <p:inputTextarea rows="5" cols="30" id="opRemark" value="#{zkbContractEditController.reason}" required="true" requiredMessage="原因不能为空">
