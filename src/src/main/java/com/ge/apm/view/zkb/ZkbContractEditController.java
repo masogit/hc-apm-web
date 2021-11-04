@@ -5,6 +5,7 @@ import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetTagService;
+import com.ge.apm.service.zkb.CopyByInvok;
 import com.ge.apm.service.zkb.ZkbContractService;
 import com.ge.apm.service.zkb.ZkbPartOrderService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
@@ -61,6 +62,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private ZkbContractCat zkbContractCatSelected;
     private List<I18nMessage> quotaDeductTypeList = new ArrayList<>();
     I18nMessageRepository i18nMessageRepository;
+    private boolean fourInOneFlag = false;
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -137,6 +139,13 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         zkbContractAssetList = new ArrayList<>();
     }
 
+    public void fourInOneFlagChange(){
+        if(fourInOneFlag){
+            zkbContractCatSelected.setSnNo(CopyByInvok.FOUR_TO_ONE);
+        }else{
+            zkbContractCatSelected.setSnNo("");
+        }
+    }
 
     public void queryQuota(){
         if(StringUtils.isEmpty(selected.getContractType())){
@@ -381,7 +390,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void saveCat(){
         boolean flag=true;
-        for(ZkbContractCat c : zkbContractCatList){
+        /*for(ZkbContractCat c : zkbContractCatList){
             if(zkbContractCatSelected.getSnNo().equals(c.getSnNo())){
                 if("Create".equals(actionCatName)){
                     flag=false;
@@ -393,7 +402,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
                     }
                 }
             }
-        }
+        }*/
         if (!flag){
             WebUtil.addErrorMessage("sn编号已存在");
             contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
@@ -647,6 +656,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void setQuotaDeductTypeList(List<I18nMessage> quotaDeductTypeList) {
         this.quotaDeductTypeList = quotaDeductTypeList;
+    }
+
+    public boolean isFourInOneFlag() {
+        return fourInOneFlag;
+    }
+
+    public void setFourInOneFlag(boolean fourInOneFlag) {
+        this.fourInOneFlag = fourInOneFlag;
     }
 
     @Override
