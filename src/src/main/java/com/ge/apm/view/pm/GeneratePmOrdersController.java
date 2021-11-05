@@ -278,6 +278,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		total = assetInfoList.size();
 	}
 
+	public void addSelected(){
+
+	}
+
     public List<OrgInfo> getClinicalDeptList(String name){
         List<SearchFilter> filter = new ArrayList<>();
         filter.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4,"1*"));
