@@ -5,7 +5,7 @@
 
 <ui:composition>
 
-	<p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" width="800" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)"
+	<p:dialog id="CustomRoleEditDlg" widgetVar="CustomRoleEditDialog" width="950" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)"
 		header="#{customRoleController.CRUDActionName} #{msg.CustomRole}">
 		<h:form id="CustomRoleEditForm">
 			<h:panelGroup id="display">
@@ -54,9 +54,9 @@
 				<p:fieldset id="cardConfig" legend="#{msg.WeChatCardConfiguration}">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
-							<p:selectManyCheckbox value="#{customRoleController.cards}" layout="responsive" columns="4">
+							<p:selectManyCheckbox value="#{customRoleController.cards}" layout="responsive" columns="4" >
 								<c:forEach items="#{customRoleController.listI18nCards}" var="item">
-								<c:if test="#{!('adverseEvents_supplement'.equals(item.msgKey) and !'1'.equals(userContextService.tenantInfo.customTenant))}">
+								<c:if test="#{!('adverseEvents_supplement'.equals(item.msgKey) and !'1'.equals(userContextService.tenantInfo.customTenant))}" >
 									<f:selectItem itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
 								</c:if>
 								</c:forEach>
