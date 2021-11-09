@@ -1,6 +1,7 @@
 package com.ge.apm.view.zkb;
 
 import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.ZkbContractCatRepository;
 import com.ge.apm.dao.ZkbContractRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
@@ -63,6 +64,8 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
     private List<I18nMessage> quotaDeductTypeList = new ArrayList<>();
     I18nMessageRepository i18nMessageRepository;
     private boolean fourInOneFlag = false;
+    private ZkbContractCatRepository zkbContractCatRepository;
+    private TenantInfo tenantInfo;
 
     @Override
     protected GenericRepositoryUUID<ZkbContract> getDAO() {
@@ -79,13 +82,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         assetTagService = WebUtil.getBean(AssetTagService.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         zkbPartOrderUserConfigRepository = WebUtil.getBean(ZkbPartOrderUserConfigRepository.class);
-
+        zkbContractCatRepository = WebUtil.getBean(ZkbContractCatRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
         String encodeStr = WebUtil.getRequestParameter("str");
         actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 selectionTenantInfo = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectionTenantInfo");
+                tenantInfo =getTenantInfo(selectionTenantInfo);
                 prepareCreate();
             }catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -95,6 +99,7 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         }else {
             String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
             this.selected = dao.findById(selectedId);
+            tenantInfo =getTenantInfo(selected.getTenantUID());
             contractCourseList = zkbContractService.queryCourseByContractId(this.selected.getId());
             this.selected.setZkbContractCourses(contractCourseList);
             zkbContractAssetList = zkbContractService.queryAssetByContractId(this.selected.getId());
@@ -381,11 +386,18 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
         actionCatName="Create";
         zkbContractCatSelected = new ZkbContractCat();
         this.reason = "";
+        this.fourInOneFlag = false;
     }
 
     public void prepareCatEdit(){
         actionCatName="Edit";
         this.reason = "";
+        zkbContractCatSelected = zkbContractCatRepository.findById(zkbContractCatSelected.getId());
+        if(CopyByInvok.FOUR_TO_ONE.equals(zkbContractCatSelected.getSnNo())){
+            this.fourInOneFlag = true;
+        }else{
+            this.fourInOneFlag = false;
+        }
     }
 
     public void saveCat(){
@@ -413,8 +425,11 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
             zkbContractCatSelected.setContractId(this.selected.getId());
         }
         zkbContractService.saveCat(zkbContractCatSelected,actionCatName,reason,currentUser,selected);
-        zkbContractCatList = zkbContractService.queryCatByContractId(selected.getId());
+        //zkbContractCatList = zkbContractService.queryCatByContractId(selected.getId());
+        fourInOneFlag = false;
+        this.zkbContractCatSelected = null;
     }
+
 
     public void deleteCat(){
         zkbContractService.deleteCat(zkbContractCatSelected,selected,currentUser,reason);
@@ -664,6 +679,14 @@ public class ZkbContractEditController extends GenericCRUDUUIDController<ZkbCont
 
     public void setFourInOneFlag(boolean fourInOneFlag) {
         this.fourInOneFlag = fourInOneFlag;
+    }
+
+    public TenantInfo getTenantInfo() {
+        return tenantInfo;
+    }
+
+    public void setTenantInfo(TenantInfo tenantInfo) {
+        this.tenantInfo = tenantInfo;
     }
 
     @Override
