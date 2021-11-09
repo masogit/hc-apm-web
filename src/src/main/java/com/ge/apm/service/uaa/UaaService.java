@@ -344,6 +344,29 @@ public class UaaService {
                 zkbIbCrossUserStatusRepository.save(zkbIbCrossUserStatus);
             }
         }
+
+        List<UserRole> userRoles = userRoleRepository.findByUserIdAndRoleType(userAccount.getId(),5);
+        if(CollectionUtils.isNotEmpty(userRoles) && newRoleNames.contains("后台运营管理")){
+            List<ZkbFePartOrderUserConfig> list = null;
+            ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
+            list = zkbFePartOrderUserConfigRepository.findByLoginName(userAccount.getLoginName());
+            if(CollectionUtils.isNotEmpty(list)){
+                if(!list.get(0).getConfigType().equals("Supplier")){
+                    WebUtil.addErrorMessage("此用户在FE USER CONFIG中已有角色："+WebUtil.getMessage(list.get(0).getConfigType()));
+                }
+                return;
+            }
+            ZkbFePartOrderUserConfig zkbFePartOrderUserConfig = new ZkbFePartOrderUserConfig();
+            zkbFePartOrderUserConfig.setLoginName(userAccount.getLoginName());
+            zkbFePartOrderUserConfig.setName(userAccount.getName());
+            zkbFePartOrderUserConfig.setEmail(userAccount.getEmail());
+            zkbFePartOrderUserConfig.setPhone(userAccount.getTelephone());
+//            zkbFePartOrderUserConfig.setSso(selectedTemp.getSso());
+            zkbFePartOrderUserConfig.setConfigType("Supplier");
+            zkbFePartOrderUserConfig.setRemark("本用户由《用户管理》菜单页面中同步创建");
+            zkbFePartOrderUserConfig.setTenantUid(userAccount.getTenantUID());
+            zkbFePartOrderUserConfigRepository.save(zkbFePartOrderUserConfig);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -1494,5 +1517,30 @@ public class UaaService {
         TreeNodeUtil.sortTreeNodeByName(rootNode);
         rootNode.setExpanded(true);
         return rootNode;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void addZkbFeSupplierAdminUser(UserAccount userAccount, List<String> newRoleNames){
+        List<UserRole> userRoles = userRoleRepository.findByUserIdAndRoleType(userAccount.getId(),5);
+        if(CollectionUtils.isNotEmpty(userRoles) || newRoleNames.contains("后台运营管理")){
+            List<ZkbFePartOrderUserConfig> list = null;
+            ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
+            list = zkbFePartOrderUserConfigRepository.findByLoginName(userAccount.getLoginName());
+            if(CollectionUtils.isNotEmpty(list)){
+                if(!list.get(0).getConfigType().equals("Supplier")){
+                    WebUtil.addErrorMessage("此用户在智康宝FE USER CONFIG中已有角色："+WebUtil.getMessage(list.get(0).getConfigType()));
+                }
+                return;
+            }
+            ZkbFePartOrderUserConfig zkbFePartOrderUserConfig = new ZkbFePartOrderUserConfig();
+            zkbFePartOrderUserConfig.setLoginName(userAccount.getLoginName());
+            zkbFePartOrderUserConfig.setName(userAccount.getName());
+            zkbFePartOrderUserConfig.setEmail(userAccount.getEmail());
+            zkbFePartOrderUserConfig.setPhone(userAccount.getTelephone());
+            zkbFePartOrderUserConfig.setConfigType("Supplier");
+            zkbFePartOrderUserConfig.setRemark("本用户由《用户管理》菜单页面中同步创建");
+            zkbFePartOrderUserConfig.setTenantUid(userAccount.getTenantUID());
+            zkbFePartOrderUserConfigRepository.save(zkbFePartOrderUserConfig);
+        }
     }
 }
