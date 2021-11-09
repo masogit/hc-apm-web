@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+<ui:define name="content">
+    <div class="ui-g">
+        <div class="ui-g-12 card cardTitle">
+            <p:outputLabel class="pageTitle" value="探头信息列表"/>
+        </div>
+        <div class="ui-g-12 card">
+            <h:form id="probeListForm">
+                <p:dataTable id="datalist_probe" value="#{zkbProbeController.lazyModel}" var="item" widgetVar="varDataList_probe"
+                             selectionMode="single" selection="#{zkbProbeController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             rows="20" emptyMessage="数据为空"
+                             rowsPerPageTemplate="20,50,100,500">
+                    <p:ajax event="rowSelect" update="editButton"/>
+                    <p:ajax event="filter" listener="#{zkbProbeController.onFilter}" />
+                    <p:column headerText="探头号" filterBy="#{item.catNo}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.catNo}"/>
+                    </p:column>
+                    <p:column headerText="探头型号"  filterBy="#{item.catModel}"  filterMatchMode="LIKE"  >
+                        <h:outputText value="#{item.catModel}"/>
+                    </p:column>
+                    <p:column headerText="探头类型"  filterBy="#{item.catType}"  filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.catType}"/>
+                    </p:column>
+                    <p:column headerText="价值类型" filterBy="#{item.valueType}" filterMatchMode="EQ">
+                        <h:outputText value="#{fieldMsg.fieldValue('zkbProbe_valueType',item.valueType)}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_probe').filter()">
+                                <f:selectItem itemLabel="请选择..." itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbProbe_valueType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="是否有效" filterBy="#{item.isVaild}" filterMatchMode="EQ">
+                        <h:outputText value="#{fieldMsg.fieldValue('zkbProbe_isVaild',item.isVaild)}"/>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList_probe').filter()">
+                                <f:selectItem itemLabel="请选择..." itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('zkbProbe_isVaild')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="新增" actionListener="#{zkbProbeController.prepareCreate}" update="probeEditDlg" oncomplete="PF('probeEditDialog').show()" />
+                        <p:commandButton id="editButton"  icon="ui-icon-pencil" title="编辑" actionListener="#{zkbProbeController.prepareEdit}" update="probeEditDlg" oncomplete="PF('probeEditDialog').show()" disabled="#{empty zkbProbeController.selected.id}" />
+                       <!-- <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="删除" actionListener="#{zkbProbeController.delete}" update=":probeListForm:datalist_probe" disabled="#{empty zkbProbeController.selected.id}">
+                            <p:confirm header="删除确认" message="您确定要删除选定的记录么?" icon="ui-icon-alert"/>
+                        </p:commandButton>-->
+                        <p:commandButton title="导出到EXCEL" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist_probe" fileName="zkbProbe_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="importButton" ajax="false" title="探头导入" action="Import.xhtml" icon="ui-icon-arrowstop-1-n">
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <ui:include src="Edit.xhtml"/>
+        </div>
+    </div>
+</ui:define>
+</ui:composition>
+
