@@ -385,6 +385,35 @@
         </h:panelGroup>
     </c:if>
 
+
+
+<!--    電流閾值-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'powerOnThreshold')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.powerOnThreshold}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['powerOnThreshold'].required? '*':''}</span></label>
+            <p:inputText  id="powerOnThreshold" value="#{assetInfoEditController.selected.powerOnThreshold}" required="#{assetInfoEditController.customConfig.assetFields['powerOnThreshold'].required}"
+                          readonly="#{!assetInfoEditController.needEdit('powerOnThreshold')}" />
+        </h:panelGroup>
+    </c:if>
+    <!--    射频码-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'rfId')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.rfId}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['rfId'].required? '*':''}</span></label>
+            <p:inputText  id="rfId" value="#{assetInfoEditController.selected.powerOnThreshold}" required="#{assetInfoEditController.customConfig.assetFields['rfId'].required}"
+                          readonly="#{!assetInfoEditController.needEdit('rfId')}" />
+        </h:panelGroup>
+    </c:if>
+    <!--    射频码分组-->
+    <c:if test="#{assetInfoEditController.needShow(fieldItem, 'rfGroup')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.rfGroup}<span style="color:#dc2525">#{assetInfoEditController.customConfig.assetFields['rfGroup'].required? '*':''}</span></label>
+            <p:inputText  id="rfGroup" value="#{assetInfoEditController.selected.rfGroup}" required="#{assetInfoEditController.customConfig.assetFields['rfGroup'].required}"
+                          readonly="#{!assetInfoEditController.needEdit('rfGroup')}" />
+        </h:panelGroup>
+    </c:if>
+
+
+
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'parentAssetId')}" >
         <h:panelGroup>
             <label class="label">#{msg.parentAsset}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required? '*':''}</span></label>

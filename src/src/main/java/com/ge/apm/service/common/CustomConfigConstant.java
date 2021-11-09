@@ -179,6 +179,9 @@ public class CustomConfigConstant {
         allFields.put("oneQrCode", WebUtil.getMessage("oneQrCode"));
         allFields.put("installStatus", WebUtil.getMessage("installStatus"));
         allFields.put("geibTable_installedTime", WebUtil.getMessage("geibTable_installedTime"));
+        allFields.put("powerOnThreshold", WebUtil.getMessage("powerOnThreshold"));
+        allFields.put("rfId", WebUtil.getMessage("rfId"));
+        allFields.put("rfGroup", WebUtil.getMessage("rfGroup"));
         return allFields;
     }
 
