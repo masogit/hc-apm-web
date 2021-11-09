@@ -1566,8 +1566,8 @@ public class ZkbFePartOrderService extends MicroServiceInvoker {
             zkbFePartOrderRow.setFieldStringValue(WebUtil.getMessage("zkbFePartOrder_assetNo"), "setAssetNo");
             zkbFePartOrderRow.setFieldStringValue(WebUtil.getMessage("zkbFePartOrder_orderNoa"), "setOrderNo");
             zkbFePartOrderRow.setFieldStringValue(WebUtil.getMessage("zkbFePartOrder_returnType"), "setReturnType");
-            zkbFePartOrderRow.setFieldStringValue("归还备注", "setGeAdminComment");
             zkbFePartOrderRow.setFieldIntegerValue("归还数量", "setQty");
+            zkbFePartOrderRow.setFieldStringValue("归还备注", "setGeAdminComment");
             if (zkbFePartOrderVO.isSparePartNull()) {
                 break;
             }
