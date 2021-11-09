@@ -107,7 +107,7 @@ public class ZkbAssetQrCodeInfo {
     /**
      * 临时存储
      */
-    @Column(name = "ib_qr_code_temporary")
+    @Column(name = "ibqrcodetemporary")
     private Boolean ibQrCodeTemporary;
 
     public String getId() {
