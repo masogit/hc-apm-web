@@ -629,7 +629,7 @@ public class AssetFileImportBaseService {
             }
 
             if(asset != null){
-                if(!assetDeptName.equals(asset.getAssetDeptName()) || !clinicalDeptName.equals(asset.getClinicalDeptName())){
+                if((assetDeptName!=null && !assetDeptName.equals(asset.getAssetDeptName()) )|| (clinicalDeptName!= null && !clinicalDeptName.equals(asset.getClinicalDeptName()))){
                     if(asset.getSharedAssetTypeUid() != null){
                         item.put("status", ImportStatus.CheckFail);
                         result.add(Boolean.FALSE);
