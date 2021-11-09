@@ -143,7 +143,7 @@ public class ZkbAssetStatisticProvider {
                 " qr_code_info.reason AS reason," +
                 " qr_code_info.can_not_past_qr_code," +
                 " qr_code_info.reason_date,"+
-                " qr_code_info.qr_code_count_state,qr_code_info.ib_qr_code_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date,ib_qr_code.is_qr_code AS ibQrCodeTemporary"+
+                " qr_code_info.qr_code_count_state,qr_code_info.ib_qr_code_state,qr_code_info.qr_code_state,qr_code_info.created_date,qr_code_info.qr_code_date,ib_qr_code.is_qr_code AS ibqrcodetemporary"+
                 " FROM" +
                 " zkb_contract ac" +
                 " INNER JOIN zkb_contract_asset zca ON CAST (ac. ID AS VARCHAR) = zca.contract_id" +
