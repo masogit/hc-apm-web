@@ -232,6 +232,25 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "measure_dispatch_user_name2")
     private String measureDispatchUserName2;
 
+    //出库状态检查间隔
+    @Column(name = "outbound_status_check_interval")
+    private Integer outboundstatuscheckinterval ;
+    //预约状态锁定时长
+    @Column(name = "appointment_status_locked_time")
+    private Integer appointmentstatuslockedtime ;
+    //是否启用无人值守
+    @Column(name = "whether_to_enable_unattended ")
+    private Boolean whethertoenableunattended;
+
+
+
+    public Boolean getWhethertoenableunattended() {
+        return whethertoenableunattended;
+    }
+
+    public void setWhethertoenableunattended(Boolean whethertoenableunattended) {
+        this.whethertoenableunattended = whethertoenableunattended;
+    }
 
     /***
      * 调剂相关
@@ -327,6 +346,24 @@ public class WorkflowConfig implements Serializable {
     public void setIsMobilePhoneFileReview(Boolean isMobilePhoneFileReview) {
         this.isMobilePhoneFileReview = isMobilePhoneFileReview;
     }
+
+
+    public Integer getOutboundstatuscheckinterval() {
+        return outboundstatuscheckinterval;
+    }
+
+    public void setOutboundstatuscheckinterval(Integer outboundstatuscheckinterval) {
+        this.outboundstatuscheckinterval = outboundstatuscheckinterval;
+    }
+
+    public Integer getAppointmentstatuslockedtime() {
+        return appointmentstatuslockedtime;
+    }
+
+    public void setAppointmentstatuslockedtime(Integer appointmentstatuslockedtime) {
+        this.appointmentstatuslockedtime = appointmentstatuslockedtime;
+    }
+
 
     public Boolean getWoDirectReception() {
         return woDirectReception == null ? false : woDirectReception;
