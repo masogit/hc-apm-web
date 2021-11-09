@@ -2179,5 +2179,13 @@ public class ZkbPartOrderService  extends MicroServiceInvoker {
     public void setZkbContractAssetRepository(ZkbContractAssetRepository zkbContractAssetRepository) {
         this.zkbContractAssetRepository = zkbContractAssetRepository;
     }
+
+    public ZkbContractCatRepository getZkbContractCatRepository() {
+        return zkbContractCatRepository;
+    }
+
+    public void setZkbContractCatRepository(ZkbContractCatRepository zkbContractCatRepository) {
+        this.zkbContractCatRepository = zkbContractCatRepository;
+    }
 }
 
