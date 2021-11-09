@@ -1,5 +1,7 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.ZkbFePartOrderUserConfigRepository;
 import com.ge.apm.dao.ZkbPartOrderRepository;
 import com.ge.apm.dao.ZkbPartOrderUserConfigRepository;
 import com.ge.apm.domain.*;
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -88,7 +91,6 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
      * 当前用户登录名
      */
     private String loginName = "";
-
 
     /**
      * 初始化
@@ -269,8 +271,63 @@ public class ZkbPartOrderUserConfigController extends GenericCRUDUUIDController<
             selected.setUsBackUpName(backUpUser.getName());
         }
         super.save();
+        SynCreateFePartOrderUser(selected);
         this.selected = null;
         this.backUpUser = null;
+    }
+
+    /**
+     * 400开单、400下单、GE Admin、Commercial4个角色自动同步信息到GE FE User Config中
+     * 注意：GE FE User Config中已存在用户，则不能在新增，不能修改用户配置的角色，其他信息可修改。
+     * @param zkbPartOrderUserConfig
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void  SynCreateFePartOrderUser(ZkbPartOrderUserConfig zkbPartOrderUserConfig){
+        String geFeConfigType = null;
+        if("OrderExtraPending".equals(zkbPartOrderUserConfig.getConfigType())||"OrderPending".equals(zkbPartOrderUserConfig.getConfigType())){
+            if(selected.getOrderType() == null || !selected.getOrderType().equals("Probe")){
+                geFeConfigType = "FourHundredsTeam";
+            }else{
+                geFeConfigType = "FourHundredsTeam_Probe";
+            }
+        }
+        if(zkbPartOrderUserConfig.getConfigType().equals("CommercialPending")){
+            geFeConfigType = "Commercial";
+        }else if(zkbPartOrderUserConfig.getConfigType().equals("ClosePending")){
+            geFeConfigType = "GEAdmin";
+        }
+        if(geFeConfigType != null){
+            UserAccountRepository userAccountRepository=WebUtil.getBean(UserAccountRepository.class);
+            UserAccount userAccount = userAccountRepository.getByLoginName(zkbPartOrderUserConfig.getLoginName());
+            if(userAccount==null) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("zkbKeyUserConfig_loginNameNotExist"));
+                return;
+            }
+            List<ZkbFePartOrderUserConfig> list = null;
+            ZkbFePartOrderUserConfigRepository zkbFePartOrderUserConfigRepository = WebUtil.getBean(ZkbFePartOrderUserConfigRepository.class);
+            list = zkbFePartOrderUserConfigRepository.findByLoginName(zkbPartOrderUserConfig.getLoginName());
+            ZkbFePartOrderUserConfig zkbFePartOrderUserConfig = null;
+            if(CollectionUtils.isEmpty(list)){
+                zkbFePartOrderUserConfig = new ZkbFePartOrderUserConfig();
+            }else{
+                zkbFePartOrderUserConfig = list.get(0);
+                //GE FE User Config中已存在用户，不能修改用户配置的角色，其他信息可修改。
+                if(!zkbFePartOrderUserConfig.getConfigType().equals(geFeConfigType)){
+                   WebUtil.addErrorMessage("用户添加成功，但此用户在FE USER CONFIG中已有角色："+WebUtil.getMessage(zkbFePartOrderUserConfig.getConfigType()));
+                   return;
+                }
+            }
+            zkbFePartOrderUserConfig.setLoginName(zkbPartOrderUserConfig.getLoginName());
+            zkbFePartOrderUserConfig.setName(zkbPartOrderUserConfig.getName());
+            zkbFePartOrderUserConfig.setEmail(zkbPartOrderUserConfig.getEmail());
+            zkbFePartOrderUserConfig.setPhone(zkbPartOrderUserConfig.getPhone());
+//            zkbFePartOrderUserConfig.setSso(zkbPartOrderUserConfig.getSso());
+            zkbFePartOrderUserConfig.setConfigType(geFeConfigType);
+            zkbFePartOrderUserConfig.setIsVacation(zkbPartOrderUserConfig.getIsVacation());
+            zkbFePartOrderUserConfig.setRemark("本用户由ZKB FE USER CONFIG页面中同步创建");
+            zkbFePartOrderUserConfig.setTenantUid(userAccount.getTenantUID());
+            zkbFePartOrderUserConfigRepository.save(zkbFePartOrderUserConfig);
+        }
     }
 
     public List<ZkbPartOrderUserConfig> autoCompleteBackUpList(String query){
