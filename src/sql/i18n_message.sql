@@ -4389,3 +4389,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message(msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType', 'HighValue', '高值', 'HighValue', NULL, -1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType','NormalValue','普通','NormalValue',NULL,-1);
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('zkbProbe_valueType','SpecialValue','特殊','SpecialValue',NULL,-1);
+-- 探头信息维护
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES ('label','ZkbPartOrderCat','探头信息','ZkbPartOrderCat',NULL,-1);
